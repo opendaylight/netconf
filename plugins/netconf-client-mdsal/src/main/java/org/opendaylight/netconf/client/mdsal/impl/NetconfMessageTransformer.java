@@ -43,13 +43,11 @@ import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -433,15 +431,15 @@ public class NetconfMessageTransformer
     }
 
     @Override
-    public DOMActionResult toActionResult(final Absolute action, final NetconfMessage message) {
+    public DOMRpcResult toActionResult(final Absolute action, final NetconfMessage message) {
         final ActionDefinition actionDefinition = actions.get(action);
         checkArgument(actionDefinition != null, "Action does not exist: %s", action);
         final ContainerNode normalizedNode = parseResult(message, action, actionDefinition);
 
         if (normalizedNode == null) {
-            return new SimpleDOMActionResult(List.of());
+            return new DefaultDOMRpcResult(List.of());
         } else {
-            return new SimpleDOMActionResult(normalizedNode, List.of());
+            return new DefaultDOMRpcResult(normalizedNode, List.of());
         }
     }
 

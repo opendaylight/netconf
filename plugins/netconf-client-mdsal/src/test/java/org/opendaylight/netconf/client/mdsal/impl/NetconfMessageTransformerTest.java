@@ -833,7 +833,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             </rpc-reply>"""));
         final var actionResult = actionNetconfMessageTransformer.toActionResult(RESET_SERVER_PATH, message);
         assertNotNull(actionResult);
-        final var containerNode = actionResult.getOutput().orElseThrow();
+        final var containerNode = actionResult.value();
         assertNotNull(containerNode);
         assertEquals("now", containerNode.body().iterator().next().body());
     }
@@ -847,7 +847,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var actionResult =
             actionNetconfMessageTransformer.toActionResult(CHECK_WITH_OUTPUT_INTERFACE_PATH, message);
         assertNotNull(actionResult);
-        assertTrue(actionResult.getOutput().isEmpty());
+        assertNull(actionResult.value());
     }
 
     @Test
@@ -859,7 +859,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var actionResult =
             actionNetconfMessageTransformer.toActionResult(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH, message);
         assertNotNull(actionResult);
-        assertTrue(actionResult.getOutput().isEmpty());
+        assertNull(actionResult.value());
     }
 
     @Test

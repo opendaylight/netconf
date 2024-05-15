@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -268,13 +267,12 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         LOG.info("{}: invokeSlaveAction for {}, input: {}, identifier: {} on action service {}", id, schemaPath,
             containerNodeMessage, domDataTreeIdentifier, deviceAction);
 
-        final ListenableFuture<? extends DOMActionResult> actionResult = deviceAction.invokeAction(schemaPath,
+        final var actionResult = deviceAction.invokeAction(schemaPath,
             domDataTreeIdentifier, containerNodeMessage != null ? containerNodeMessage.getNode() : null);
 
-        Futures.addCallback(actionResult, new FutureCallback<DOMActionResult>() {
-
+        Futures.addCallback(actionResult, new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(final DOMActionResult domActionResult) {
+            public void onSuccess(final DOMRpcResult domActionResult) {
                 LOG.debug("{}: invokeSlaveAction for {}, domActionResult: {}", id, schemaPath, domActionResult);
                 if (domActionResult == null) {
                     recipient.tell(new EmptyResultResponse(), getSender());
@@ -282,9 +280,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 }
 
                 //Check DomActionResult containing Ok onSuccess pass empty nodeMessageReply
-                ContainerNodeMessage nodeMessageReply = domActionResult.getOutput().map(ContainerNodeMessage::new)
-                        .orElse(null);
-                recipient.tell(new InvokeActionMessageReply(nodeMessageReply, domActionResult.getErrors()), getSelf());
+                final var value = domActionResult.value();
+                final var nodeMessageReply = value != null ? new ContainerNodeMessage(value) : null;
+                recipient.tell(new InvokeActionMessageReply(nodeMessageReply, domActionResult.errors()), getSelf());
             }
 
             @Override

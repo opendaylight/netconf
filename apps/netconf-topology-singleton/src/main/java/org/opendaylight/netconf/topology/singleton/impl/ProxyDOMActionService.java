@@ -18,10 +18,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
@@ -40,7 +40,7 @@ import scala.concurrent.Future;
 /**
  * Implementation of {@link DOMActionService} provided by device in Odl-Cluster environment to invoke action.
  * Communicates action message {@link InvokeActionMessage} to {@link ActorSystem} using {@link ActorRef} and transforms
- * replied NETCONF message to action result, using {@link SimpleDOMActionResult}.
+ * replied NETCONF message to action result, using {@link DefaultDOMRpcResult}.
  */
 public class ProxyDOMActionService implements Actions.Normalized {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyDOMActionService.class);
@@ -67,7 +67,7 @@ public class ProxyDOMActionService implements Actions.Normalized {
     }
 
     @Override
-    public FluentFuture<DOMActionResult> invokeAction(final Absolute type,
+    public FluentFuture<DOMRpcResult> invokeAction(final Absolute type,
             final DOMDataTreeIdentifier domDataTreeIdentifier, final ContainerNode input) {
         requireNonNull(type);
         requireNonNull(input);
@@ -79,7 +79,7 @@ public class ProxyDOMActionService implements Actions.Normalized {
         final Future<Object> scalaFuture = Patterns.ask(masterActorRef, new InvokeActionMessage(
             new SchemaPathMessage(type), containerNodeMessage, domDataTreeIdentifier), actorResponseWaitTime);
 
-        final SettableFuture<DOMActionResult> settableFuture = SettableFuture.create();
+        final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
 
         scalaFuture.onComplete(new OnComplete<>() {
             @Override
@@ -103,12 +103,11 @@ public class ProxyDOMActionService implements Actions.Normalized {
                 final ContainerNodeMessage containerNodeMessage =
                     ((InvokeActionMessageReply) response).getContainerNodeMessage();
 
-                final DOMActionResult result;
-
+                final DOMRpcResult result;
                 if (containerNodeMessage == null) {
-                    result = new SimpleDOMActionResult(ImmutableList.copyOf(errors));
+                    result = new DefaultDOMRpcResult(ImmutableList.copyOf(errors));
                 } else {
-                    result = new SimpleDOMActionResult(containerNodeMessage.getNode(), ImmutableList.copyOf(errors));
+                    result = new DefaultDOMRpcResult(containerNodeMessage.getNode(), ImmutableList.copyOf(errors));
                 }
                 settableFuture.set(result);
             }

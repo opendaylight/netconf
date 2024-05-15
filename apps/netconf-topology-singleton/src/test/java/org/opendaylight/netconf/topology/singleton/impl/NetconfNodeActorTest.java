@@ -65,7 +65,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -80,7 +79,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -538,7 +536,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(List.of(new SourceIdentifier("testActionID")));
         registerSlaveMountPoint();
 
-        ArgumentCaptor<DOMActionService> domActionServiceCaptor = ArgumentCaptor.forClass(DOMActionService.class);
+        final var domActionServiceCaptor = ArgumentCaptor.forClass(DOMActionService.class);
         verify(mockMountPointBuilder).addService(eq(DOMActionService.class), domActionServiceCaptor.capture());
 
         final DOMActionService slaveDomActionService = domActionServiceCaptor.getValue();
@@ -549,7 +547,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier.of(testQName);
 
-        final DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
+        final DOMDataTreeIdentifier domDataTreeIdentifier = DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL,
             yangIIdPath);
 
         final ContainerNode outputNode = ImmutableNodes.newContainerBuilder()
@@ -559,24 +557,23 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         // Action with no response output.
         doReturn(FluentFutures.immediateNullFluentFuture()).when(mockDOMActionService)
             .invokeAction(any(), any(), any());
-        DOMActionResult result = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode)
+        var result = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode)
             .get(2, TimeUnit.SECONDS);
         assertEquals(null, result);
 
         // Action with response output.
-        doReturn(FluentFutures.immediateFluentFuture(new SimpleDOMActionResult(outputNode))).when(mockDOMActionService)
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(outputNode))).when(mockDOMActionService)
             .invokeAction(any(), any(), any());
         result = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode)
             .get(2, TimeUnit.SECONDS);
 
-        assertEquals(Optional.of(outputNode), result.getOutput());
-        assertTrue(result.getErrors().isEmpty());
+        assertEquals(outputNode, result.value());
+        assertTrue(result.errors().isEmpty());
 
         // Action failure.
         doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringActionException("mock")))
             .when(mockDOMActionService).invokeAction(any(), any(), any());
-        final ListenableFuture<? extends DOMActionResult> future = slaveDomActionService.invokeAction(schemaPath,
-            domDataTreeIdentifier, outputNode);
+        final var future = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode);
 
         final ExecutionException e = assertThrows(ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
         final Throwable cause = e.getCause();
