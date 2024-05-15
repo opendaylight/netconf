@@ -7,9 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -24,11 +24,10 @@ import com.google.common.util.concurrent.Futures;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -58,22 +57,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.DOMException;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
+@ExtendWith(MockitoExtension.class)
+final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    @Before
-    public void before() {
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
-            any(), any());
-    }
 
     @Override
     RestconfStrategy newStrategy(final DatabindContext databind) {
@@ -82,11 +70,21 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testDeleteDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy testNegativeDeleteDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         doReturn(Futures.immediateFailedFuture(new TransactionCommitFailedException(
             "Commit of transaction " + this + " failed", new NetconfDocumentedException("id",
                 ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))).when(netconfService).commit();
@@ -94,7 +92,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testDeleteFullList() {
+    void testDeleteFullList() {
         final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
             .node(SONG_QNAME).build();
@@ -105,7 +103,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
             .withChild(SONG1).withChild(SONG2).build();
         final var songKeyFields = List.of(YangInstanceIdentifier.of(SONG_INDEX_QNAME));
-
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         // data fetched using key field names to minimize amount of data returned
         doReturn(immediateFluentFuture(Optional.of(songListData))).when(netconfService)
             .getConfig(songListWildcardPath, songKeyFields);
@@ -124,6 +124,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPostContainerDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
@@ -132,6 +133,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             // FIXME: exact match
             .merge(any(), any(), any(), any());
@@ -143,6 +145,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFailedFluentFuture(domException)).when(netconfService)
             // FIXME: exact match
             .create(any(), any(), any(), any());
@@ -153,6 +156,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPatchContainerDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
             any());
         return jukeboxStrategy();
@@ -160,6 +166,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPatchLeafDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
@@ -168,6 +176,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPatchListDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
@@ -175,7 +185,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutCreateContainerData() {
+    void testPutCreateContainerData() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -189,7 +201,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutReplaceContainerData() {
+    void testPutReplaceContainerData() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
@@ -203,7 +217,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutCreateLeafData() {
+    void testPutCreateLeafData() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -215,7 +231,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutReplaceLeafData() {
+    void testPutReplaceLeafData() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
@@ -228,7 +246,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutCreateListData() {
+    void testPutCreateListData() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -247,9 +267,13 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
      * @throws ParseException if ApiPath string cannot be parsed
      */
     @Test
-    public void testPutDataWithInsertAfterLast() throws ParseException {
+    void testPutDataWithInsertAfterLast() throws ParseException {
         // Spy of jukeboxStrategy will be used later to count how many items was inserted
         final var spyStrategy = spy(jukeboxStrategy());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+
         final var spyTx = spy(jukeboxStrategy().prepareWriteExecution());
         doReturn(spyTx).when(spyStrategy).prepareWriteExecution();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(any());
@@ -285,9 +309,13 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
      * @throws ParseException if ApiPath string cannot be parsed
      */
     @Test
-    public void testPostDataWithInsertAfterLast() throws ParseException {
+    void testPostDataWithInsertAfterLast() throws ParseException {
         // Spy of jukeboxStrategy will be used later to count how many items was inserted
         final var spyStrategy = spy(jukeboxStrategy());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+
         final var spyTx = spy(jukeboxStrategy().prepareWriteExecution());
         doReturn(spyTx).when(spyStrategy).prepareWriteExecution();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(any());
@@ -316,7 +344,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutReplaceListData() {
+    void testPutReplaceListData() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
@@ -331,6 +361,11 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
+            any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .remove(LogicalDatastoreType.CONFIGURATION, ARTIST_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -341,6 +376,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -350,11 +388,19 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testPatchMergePutContainerStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
+            any(), any());
         return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy deleteNonexistentDataTestStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFailedFuture(
             new TransactionCommitFailedException("Commit of transaction " + this + " failed",
                 new NetconfDocumentedException("id", ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))))

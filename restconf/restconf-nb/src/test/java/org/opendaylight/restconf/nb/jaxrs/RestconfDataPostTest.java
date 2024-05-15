@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -79,7 +79,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostMapEntryData() {
+    void testPostMapEntryData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -97,7 +97,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostExistingData() {
+    void testPostExistingData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateTrueFluentFuture())
             .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
@@ -116,7 +116,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostExistingListsDataErrorPath() {
+    void testPostExistingListsDataErrorPath() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -139,7 +139,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostDataWithInsertLast() {
+    void testPostDataWithInsertLast() {
         // Mocking the query parameters to include 'insert=last'
         final var queryParams = new MultivaluedHashMap<String, String>();
         queryParams.put(INSERT, List.of("last"));
@@ -166,7 +166,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostDataWithInsertFirst() {
+    void testPostDataWithInsertFirst() {
         // Mocking the query parameters to include 'insert=first'
         final var queryParams = new MultivaluedHashMap<String, String>();
         queryParams.put(INSERT, List.of("first"));
@@ -197,7 +197,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostDataWithInsertBefore() {
+    void testPostDataWithInsertBefore() {
         // Mocking the query parameters to include 'insert=before' and 'point=example-jukebox:jukebox/playlist=0/song=2'
         final var queryParams = new MultivaluedHashMap<String, String>();
         queryParams.put(INSERT, List.of("before"));
@@ -229,7 +229,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
     }
 
     @Test
-    public void testPostDataWithInsertAfter() {
+    void testPostDataWithInsertAfter() {
         // Mocking the query parameters to include 'insert=after' and 'point=example-jukebox:jukebox/playlist=0/song=1'
         final var queryParams = new MultivaluedHashMap<String, String>();
         queryParams.put(INSERT, List.of("after"));

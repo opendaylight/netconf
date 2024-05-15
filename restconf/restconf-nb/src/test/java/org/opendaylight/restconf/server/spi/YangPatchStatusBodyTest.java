@@ -7,9 +7,8 @@
  */
 package org.opendaylight.restconf.server.spi;
 
-import java.io.IOException;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
@@ -17,7 +16,7 @@ import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
-public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
+class YangPatchStatusBodyTest extends AbstractJukeboxTest {
     private final ServerError error = new ServerError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
         "Data already exists");
     private final PatchStatusEntity statusEntity = new PatchStatusEntity("patch1", true, null);
@@ -27,7 +26,7 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      * Test if per-operation status is omitted if global error is present.
      */
     @Test
-    public void testOutputWithGlobalError() throws IOException {
+    void testOutputWithGlobalError() {
         final var body = new YangPatchStatusBody(new PatchStatusContext("patch", List.of(statusEntity), false,
             List.of(error)));
 
@@ -61,7 +60,7 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      * Test if per-operation status is present if there is no global error present.
      */
     @Test
-    public void testOutputWithoutGlobalError() throws IOException {
+    void testOutputWithoutGlobalError() {
         final var body = new YangPatchStatusBody(new PatchStatusContext("patch", List.of(statusEntityError), false,
             null));
 

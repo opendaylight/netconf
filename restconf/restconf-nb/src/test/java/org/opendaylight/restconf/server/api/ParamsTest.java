@@ -7,19 +7,19 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
 import java.util.Set;
 import java.util.function.Function;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
@@ -35,13 +35,13 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ParamsTest {
+@ExtendWith(MockitoExtension.class)
+class ParamsTest {
     /**
      * Test when not allowed parameter type is used.
      */
     @Test
-    public void checkParametersTypesNegativeTest() {
+    void checkParametersTypesNegativeTest() {
         final var mockDatabind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
 
         assertInvalidIAE(EventStreamGetParams::of);
@@ -58,7 +58,7 @@ public class ParamsTest {
      * Test of parsing default parameters from URI request.
      */
     @Test
-    public void parseUriParametersDefaultTest() {
+    void parseUriParametersDefaultTest() {
         // no parameters, default values should be used
         final var params = assertParams(DataGetParams::of, QueryParameters.of());
         assertEquals(ContentParam.ALL, params.content());
@@ -67,7 +67,7 @@ public class ParamsTest {
     }
 
     @Test
-    public void testInvalidValueReadDataParams() {
+    void testInvalidValueReadDataParams() {
         assertParamsThrows(
             "Invalid content value: Value can be 'all', 'config' or 'nonconfig', not 'odl-invalid-value'",
             DataGetParams::of, ContentParam.uriName, "odl-invalid-value");
@@ -91,7 +91,7 @@ public class ParamsTest {
      * Testing parsing of with-defaults parameter which value matches 'report-all-tagged' setting.
      */
     @Test
-    public void parseUriParametersWithDefaultAndTaggedTest() {
+    void parseUriParametersWithDefaultAndTaggedTest() {
         final var params = assertParams(DataGetParams::of, WithDefaultsParam.uriName,
             "report-all-tagged");
         assertEquals(WithDefaultsParam.REPORT_ALL_TAGGED, params.withDefaults());
@@ -101,7 +101,7 @@ public class ParamsTest {
      * Testing parsing of with-defaults parameter which value matches 'report-all' setting.
      */
     @Test
-    public void parseUriParametersWithDefaultAndReportAllTest() {
+    void parseUriParametersWithDefaultAndReportAllTest() {
         final var params = assertParams(DataGetParams::of, WithDefaultsParam.uriName,
             "report-all");
         assertEquals(WithDefaultsParam.REPORT_ALL, params.withDefaults());
@@ -112,7 +112,7 @@ public class ParamsTest {
      * - non-reporting setting.
      */
     @Test
-    public void parseUriParametersWithDefaultAndNonTaggedTest() {
+    void parseUriParametersWithDefaultAndNonTaggedTest() {
         final var params = assertParams(DataGetParams::of, WithDefaultsParam.uriName,
             "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
@@ -122,7 +122,7 @@ public class ParamsTest {
      * Test of parsing user defined parameters from URI request.
      */
     @Test
-    public void parseUriParametersUserDefinedTest() {
+    void parseUriParametersUserDefinedTest() {
         final QName containerChild = QName.create("ns", "container-child");
 
         final var params = assertParams(DataGetParams::of, QueryParameters.of(
@@ -156,7 +156,7 @@ public class ParamsTest {
     }
 
     private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod,
-            final RestconfQueryParam<?> param) {
+        final RestconfQueryParam<?> param) {
         assertParamsThrows("Invalid parameter: " + param.paramName(), paramsMethod, param.paramName(),
             "odl-test-value");
     }
@@ -166,12 +166,12 @@ public class ParamsTest {
     }
 
     private static void assertParamsThrows(final String expectedMessage,
-            final Function<QueryParameters, ?> paramsMethod, final String name, final String value) {
+        final Function<QueryParameters, ?> paramsMethod, final String name, final String value) {
         assertParamsThrows(expectedMessage, paramsMethod, QueryParameters.of(name, value));
     }
 
     private static void assertParamsThrows(final String expectedMessage,
-            final Function<QueryParameters, ?> paramsMethod, final QueryParameters params) {
+        final Function<QueryParameters, ?> paramsMethod, final QueryParameters params) {
         final var ex = assertThrows(IllegalArgumentException.class, () -> assertParams(paramsMethod, params));
         assertEquals(expectedMessage, ex.getMessage());
     }
@@ -181,7 +181,7 @@ public class ParamsTest {
     }
 
     private static <T> T assertParams(final Function<QueryParameters, T> paramsMethod, final String name,
-            final String value) {
+        final String value) {
         return assertParams(paramsMethod, QueryParameters.of(name, value));
     }
 }
