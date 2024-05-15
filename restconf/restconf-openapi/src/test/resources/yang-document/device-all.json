@@ -5155,6 +5155,137 @@
         "summary": "PATCH - string-types - 123 - test"
       }
     },
+    "/rests/data/nodes/node=123/yang-ext:mount/strings-examples-length:test": {
+      "put": {
+        "description": "",
+        "summary": "PUT - strings-examples-length - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "strings-examples-length:test": {
+                    "$ref": "#/components/schemas/strings-examples-length_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-examples-length_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - strings-examples-length - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "strings-examples-length:test": {
+                    "$ref": "#/components/schemas/strings-examples-length_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-examples-length_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - strings-examples-length - test",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - strings-examples-length - test",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/strings-examples-length_test"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test": {
+                      "$ref": "#/components/schemas/strings-examples-length_test",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-unique": {
       "get": {
         "tags": [
@@ -13830,6 +13961,37 @@
         "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
         "title": "string-types_test",
         "type": "object"
+      },
+      "strings-examples-length_test": {
+        "title": "strings-examples-length_test",
+        "type": "object",
+        "properties": {
+          "my-phys-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00",
+            "minLength": 5,
+            "maxLength": 5
+          },
+          "my-mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:",
+            "minLength": 12,
+            "maxLength": 18
+          },
+          "my-string": {
+            "description": "",
+            "type": "string",
+            "example": "00000",
+            "minLength": 5,
+            "maxLength": 10
+          }
+        },
+        "xml": {
+          "name": "test",
+          "namespace": "urn:ietf:params:xml:ns:yang:strings:examples"
+        }
       },
       "toaster_make-toast_input": {
         "properties": {
