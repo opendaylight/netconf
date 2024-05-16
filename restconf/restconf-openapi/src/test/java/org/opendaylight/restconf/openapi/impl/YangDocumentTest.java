@@ -164,7 +164,6 @@ public class YangDocumentTest extends AbstractDocumentTest {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
         final var moduleDoc = getMountDocByModule(moduleName, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
-
     }
 
     private static Stream<Arguments> getOperationalMountParameters() {
