@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "39bf43e2_faa18858",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-05-16T15:21:59Z",
+      "side": 1,
+      "message": "everything except positive integers means width is ignored",
+      "parentUuid": "33883853_10011203",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a50082b_62b39888",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
         "patchSetId": 18
