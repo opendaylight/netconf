@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
@@ -172,12 +171,7 @@ public final class ApiPathCanonizer {
             final T value) {
         @SuppressWarnings("unchecked")
         final var codec = (JSONCodec<T>) databind.jsonCodecs().codecFor(schema, stack);
-        try (var jsonWriter = new HackJsonWriter()) {
-            codec.writeValue(jsonWriter, value);
-            return jsonWriter.acquireCaptured().rawString();
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to serialize '" + value + "'", e);
-        }
+        return codec.unparseValue(value).rawString();
     }
 
     /**
