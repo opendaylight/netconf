@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -16,11 +16,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
@@ -28,8 +28,8 @@ import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfClientSessionTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfClientSessionTest {
 
     @Mock
     ChannelHandler channelHandler;
@@ -38,7 +38,7 @@ public class NetconfClientSessionTest {
     Channel channel;
 
     @Test
-    public void testNetconfClientSession() throws Exception {
+    void testNetconfClientSession() throws Exception {
         final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         final var sessId = new SessionIdType(Uint32.valueOf(20));
         final var caps = List.of("cap1", "cap2");

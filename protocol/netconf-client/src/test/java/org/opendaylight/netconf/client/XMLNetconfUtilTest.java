@@ -9,15 +9,15 @@ package org.opendaylight.netconf.client;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
-public class XMLNetconfUtilTest {
+class XMLNetconfUtilTest {
     @Test
-    public void testXPath() throws Exception {
+    void testXPath() throws Exception {
         final var correctXPath = XMLNetconfUtil.compileXPath("/top/innerText");
         final var ex = assertThrows(IllegalStateException.class,
             () -> XMLNetconfUtil.compileXPath("!@(*&$!"));

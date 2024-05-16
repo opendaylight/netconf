@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.client;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -22,14 +22,14 @@ import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-public class SimpleNetconfClientSessionListenerTest {
+class SimpleNetconfClientSessionListenerTest {
     private Channel channel;
     private ChannelPromise channelFuture;
     private HelloMessage helloMessage;
@@ -37,8 +37,8 @@ public class SimpleNetconfClientSessionListenerTest {
     private NetconfClientSessionListener sessionListener;
     private NetconfClientSession clientSession;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         channel = mock(Channel.class);
         channelFuture = mock(ChannelPromise.class);
         mockEventLoop();
@@ -63,7 +63,7 @@ public class SimpleNetconfClientSessionListenerTest {
     }
 
     @Test
-    public void testSessionDown() {
+    void testSessionDown() {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
@@ -74,7 +74,7 @@ public class SimpleNetconfClientSessionListenerTest {
     }
 
     @Test
-    public void testSendRequest() {
+    void testSendRequest() {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
@@ -85,7 +85,7 @@ public class SimpleNetconfClientSessionListenerTest {
     }
 
     @Test
-    public void testOnMessage() {
+    void testOnMessage() {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
