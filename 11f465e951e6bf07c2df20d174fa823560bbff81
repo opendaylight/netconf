@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c05b407_bc341e96",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfTransaction.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-05-16T09:10:20Z",
+      "side": 0,
+      "message": "Please change this FIXME to:\n\nFIXME: this method should only be invoked if we are crossing an implicit list.\n\nIf you do not want to, also fix the last part of the FIXME message.",
+      "revId": "11f465e951e6bf07c2df20d174fa823560bbff81",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

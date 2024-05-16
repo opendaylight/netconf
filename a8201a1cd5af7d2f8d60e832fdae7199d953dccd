@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "061ad9ab_16ecb6ba",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-05-16T09:10:20Z",
+      "side": 1,
+      "message": "Please change protected to package-private for this method.",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 13
+      },
+      "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e69cccc0_56eb995f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-05-16T09:10:20Z",
+      "side": 1,
+      "message": "Please change protected to package-private for this method.\nhttps://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html\n\n\"Class \u0027RestconfTransaction\u0027 is exposed outside its defined visibility scope\"",
+      "range": {
+        "startLine": 328,
+        "startChar": 0,
+        "endLine": 328,
+        "endChar": 13
+      },
+      "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "434b30d1_44cd315a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-05-16T09:10:20Z",
+      "side": 1,
+      "message": "Wrong indentation on `data` parameter.",
+      "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
