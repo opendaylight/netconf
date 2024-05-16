@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -32,35 +31,19 @@ import org.osgi.service.component.annotations.Reference;
  * This singleton class is responsible for creation, removal and searching for {@link RestconfStream}s.
  */
 @Singleton
-@Component(factory = MdsalRestconfStreamRegistry.FACTORY_NAME, service = RestconfStream.Registry.class)
+@Component(service = RestconfStream.Registry.class)
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry {
-    public static final String FACTORY_NAME = "org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker";
-
     private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RestconfState.QNAME),
         NodeIdentifier.create(Streams.QNAME),
         NodeIdentifier.create(Stream.QNAME));
-    private static final String USE_WEBSOCKETS_PROP = ".useWebsockets";
 
     private final DOMDataBroker dataBroker;
 
-    public MdsalRestconfStreamRegistry(final DOMDataBroker dataBroker, final boolean useWebsockets) {
-        super(useWebsockets);
-        this.dataBroker = requireNonNull(dataBroker);
-    }
-
     @Inject
-    public MdsalRestconfStreamRegistry(final DOMDataBroker dataBroker) {
-        this(dataBroker, false);
-    }
-
     @Activate
-    public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker, final Map<String, ?> props) {
-        this(dataBroker, (boolean) requireNonNull(props.get(USE_WEBSOCKETS_PROP)));
-    }
-
-    public static Map<String, ?> props(final boolean useSSE) {
-        return Map.of(USE_WEBSOCKETS_PROP, !useSSE);
+    public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
     }
 
     @Override

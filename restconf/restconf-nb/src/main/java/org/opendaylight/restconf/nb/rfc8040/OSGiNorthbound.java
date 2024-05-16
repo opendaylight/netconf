@@ -14,7 +14,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultPingExecutor;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultRestconfStreamServletFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
-import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
@@ -54,10 +54,6 @@ public final class OSGiNorthbound {
         @AttributeDefinition(min = "0")
         int max$_$thread$_$count() default DefaultPingExecutor.DEFAULT_CORE_POOL_SIZE;
 
-        @Deprecated(since = "7.0.0", forRemoval = true)
-        @AttributeDefinition
-        boolean use$_$sse() default true;
-
         @AttributeDefinition(name = "{+restconf}", description = """
             The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
         String restconf() default "rests";
@@ -80,12 +76,8 @@ public final class OSGiNorthbound {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
-    private final ComponentFactory<MdsalRestconfStreamRegistry> registryFactory;
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
-
-    private ComponentInstance<MdsalRestconfStreamRegistry> registry;
-    @Deprecated(since = "7.0.0", forRemoval = true)
-    private boolean useSSE;
+    private final RestconfStream.Registry registry;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
     private Map<String, ?> servletProps;
@@ -94,17 +86,13 @@ public final class OSGiNorthbound {
     public OSGiNorthbound(
             @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
-            @Reference(target = "(component.factory=" + MdsalRestconfStreamRegistry.FACTORY_NAME + ")")
-            final ComponentFactory<MdsalRestconfStreamRegistry> registryFactory, final Configuration configuration) {
-        this.registryFactory = requireNonNull(registryFactory);
+            @Reference final RestconfStream.Registry registry, final Configuration configuration) {
+        this.registry = requireNonNull(registry);
         this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
 
-        useSSE = configuration.use$_$sse();
-        registry = registryFactory.newInstance(FrameworkUtil.asDictionary(MdsalRestconfStreamRegistry.props(useSSE)));
-
-        servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(), registry.getInstance(),
+        servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(), registry,
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
+            PrettyPrintParam.of(configuration.pretty$_$print()),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
@@ -115,18 +103,9 @@ public final class OSGiNorthbound {
 
     @Modified
     void modified(final Configuration configuration) {
-        final var newUseSSE = configuration.use$_$sse();
-        if (newUseSSE != useSSE) {
-            useSSE = newUseSSE;
-            registry.dispose();
-            registry = registryFactory.newInstance(FrameworkUtil.asDictionary(
-                MdsalRestconfStreamRegistry.props(useSSE)));
-            LOG.debug("ListenersBroker restarted with {}", newUseSSE ? "SSE" : "Websockets");
-        }
-        final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            registry.getInstance(),
+        final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(), registry,
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
+            PrettyPrintParam.of(configuration.pretty$_$print()),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
@@ -144,8 +123,6 @@ public final class OSGiNorthbound {
     void deactivate() {
         servletFactory.dispose();
         servletFactory = null;
-        registry.dispose();
-        registry = null;
         LOG.info("Global RESTCONF northbound pools stopped");
     }
 }

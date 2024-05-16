@@ -42,7 +42,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private static final String PROP_STREAM_REGISTRY = ".streamRegistry";
     private static final String PROP_NAME_PREFIX = ".namePrefix";
     private static final String PROP_CORE_POOL_SIZE = ".corePoolSize";
-    private static final String PROP_USE_WEBSOCKETS = ".useWebsockets";
     private static final String PROP_STREAMS_CONFIGURATION = ".streamsConfiguration";
     private static final String PROP_RESTCONF = ".restconf";
     private static final String PROP_PRETTY_PRINT = ".prettyPrint";
@@ -56,12 +55,11 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
 
     private final DefaultPingExecutor pingExecutor;
     private final StreamsConfiguration streamsConfiguration;
-    private final boolean useWebsockets;
 
     public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport, final String restconf,
             final RestconfStream.Registry streamRegistry, final StreamsConfiguration streamsConfiguration,
             final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint, final String namePrefix,
-            final int corePoolSize, final boolean useWebsockets) {
+            final int corePoolSize) {
         this.servletSupport = requireNonNull(servletSupport);
         this.restconf = requireNonNull(restconf);
         if (restconf.endsWith("/")) {
@@ -72,12 +70,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
         pingExecutor = new DefaultPingExecutor(namePrefix, corePoolSize);
-        this.useWebsockets = useWebsockets;
-        if (useWebsockets) {
-            LOG.warn("""
-                RESTCONF event streams use WebSockets instead of Server-Sent Events. This option is will be removed in
-                the next major release.""");
-        }
     }
 
     @Activate
@@ -88,8 +80,7 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
             (StreamsConfiguration) props.get(PROP_STREAMS_CONFIGURATION),
             (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING),
             (PrettyPrintParam) props.get(PROP_PRETTY_PRINT),
-            (String) props.get(PROP_NAME_PREFIX), (int) requireNonNull(props.get(PROP_CORE_POOL_SIZE)),
-            (boolean) requireNonNull(props.get(PROP_USE_WEBSOCKETS)));
+            (String) props.get(PROP_NAME_PREFIX), (int) requireNonNull(props.get(PROP_CORE_POOL_SIZE)));
     }
 
     @Override
@@ -99,14 +90,13 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
 
     @Override
     public HttpServlet newStreamServlet() {
-        return useWebsockets ? new WebSocketInitializer(restconf, streamRegistry, pingExecutor, streamsConfiguration)
-            : servletSupport.createHttpServletBuilder(
-                new Application() {
-                    @Override
-                    public Set<Object> getSingletons() {
-                        return Set.of(new SSEStreamService(streamRegistry, pingExecutor, streamsConfiguration));
-                    }
-                }).build();
+        return servletSupport.createHttpServletBuilder(
+            new Application() {
+                @Override
+                public Set<Object> getSingletons() {
+                    return Set.of(new SSEStreamService(streamRegistry, pingExecutor, streamsConfiguration));
+                }
+            }).build();
     }
 
     @Override
@@ -126,14 +116,13 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     }
 
     public static Map<String, ?> props(final String restconf, final RestconfStream.Registry streamRegistry,
-            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint, final boolean useSSE,
+            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final StreamsConfiguration streamsConfiguration, final String namePrefix, final int corePoolSize) {
         return Map.of(
             PROP_RESTCONF, restconf,
             PROP_STREAM_REGISTRY, streamRegistry,
             PROP_ERROR_TAG_MAPPING, errorTagMapping,
             PROP_PRETTY_PRINT, prettyPrint,
-            PROP_USE_WEBSOCKETS, !useSSE,
             PROP_STREAMS_CONFIGURATION, streamsConfiguration,
             PROP_NAME_PREFIX, namePrefix,
             PROP_CORE_POOL_SIZE, corePoolSize);
