@@ -205,7 +205,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                     }
                   }
                 }"""), uriInfo, ar));
-        assertEquals(OUTPUT, body.output());
+        assertEquals(OUTPUT, body.data());
         assertJson("""
             {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", body);
         assertXml("""

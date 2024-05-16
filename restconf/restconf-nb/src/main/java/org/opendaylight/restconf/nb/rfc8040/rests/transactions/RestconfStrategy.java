@@ -91,7 +91,6 @@ import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.restconf.server.spi.OperationsResource;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
@@ -1319,7 +1318,7 @@ public abstract class RestconfStrategy implements DatabindAware {
     private static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
             final @Nullable ContainerNode value) {
         return value == null || value.isEmpty() ? InvokeResult.EMPTY
-            : new InvokeResult(new OperationOutputBody(path, value));
+            : new InvokeResult(NormalizedFormattableBody.of(path, value));
     }
 
     public @NonNull RestconfFuture<CharSource> resolveSource(final SourceIdentifier source,
