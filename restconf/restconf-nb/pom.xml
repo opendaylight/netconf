@@ -221,18 +221,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-servlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-server</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>yanglib-mdsal-writer</artifactId>
     </dependency>
@@ -321,7 +309,6 @@
         <configuration>
           <instructions>
             <Bundle-Name>Restconf Connector</Bundle-Name>
-            <Import-Package>org.eclipse.jetty.websocket.server, *</Import-Package>
           </instructions>
         </configuration>
       </plugin>
