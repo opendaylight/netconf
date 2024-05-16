@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "765a5986_82d49835",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-05-16T14:46:35Z",
+      "side": 1,
+      "message": "assertInstanceOf",
+      "revId": "9ed9e0261bf08b57102bcfff62ab7d8af68d5e91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
