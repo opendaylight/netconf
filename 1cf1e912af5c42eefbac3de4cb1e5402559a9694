@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33883853_10011203",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-16T14:52:21Z",
+      "side": 1,
+      "message": "what if width is negative ? for pagination its empty list, but better to ask Ivan",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a50082b_62b39888",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-16T14:52:21Z",
+      "side": 1,
+      "message": "IMHO: you can create something like \n\n    public static Collection\u003c? extends DataSchemaNode\u003e widthList(final DataNodeContainer node, final Integer width) {\n        if (width \u003e 0) {\n            return node.getChildNodes().stream().limit(width).toList();\n        }\n        return node.getChildNodes();\n    }\n\nmaybe in RestDocgenUtil.java and you can use it for every check to avoid repetition.",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20b2e036_4865ee0b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-16T14:52:21Z",
+      "side": 1,
+      "message": "IMHO: let\u0027s keep the methods static https://git.opendaylight.org/gerrit/c/netconf/+/109685",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

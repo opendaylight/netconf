@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df509545_c9eedcfa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/ComponentsStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-16T14:52:21Z",
+      "side": 0,
+      "message": "line",
+      "revId": "182c56bb143aa808ee406827a6e0dcceb855b37f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c601b04_2a29396a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-16T14:52:21Z",
+      "side": 0,
+      "message": "line",
+      "revId": "182c56bb143aa808ee406827a6e0dcceb855b37f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
