@@ -47,7 +47,6 @@ import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
-import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -83,7 +82,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return JUKEBOX_SCHEMA;
     }
 
-    static final void assertJson(final String expectedJson, final OperationOutputBody payload) {
+    static final void assertJson(final String expectedJson, final NormalizedFormattableBody<?> payload) {
         final var baos = new ByteArrayOutputStream();
         try {
             payload.formatToJSON(PrettyPrintParam.FALSE, baos);
@@ -93,7 +92,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         assertEquals(expectedJson, baos.toString(StandardCharsets.UTF_8));
     }
 
-    static final void assertXml(final String expectedXml, final OperationOutputBody payload) {
+    static final void assertXml(final String expectedXml, final NormalizedFormattableBody<?> payload) {
         final var baos = new ByteArrayOutputStream();
         try {
             payload.formatToXML(PrettyPrintParam.FALSE, baos);
@@ -114,12 +113,12 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     }
 
     static final ContainerNode assertOperationOutput(final int status, final Consumer<AsyncResponse> invocation) {
-        return assertOperationOutputBody(status, invocation).output();
+        return assertInstanceOf(ContainerNode.class, assertOperationOutputBody(status, invocation).data());
     }
 
-    static final OperationOutputBody assertOperationOutputBody(final int status,
+    static final NormalizedFormattableBody<?> assertOperationOutputBody(final int status,
             final Consumer<AsyncResponse> invocation) {
-        return assertInstanceOf(OperationOutputBody.class, assertFormattableBody(status, invocation));
+        return assertInstanceOf(NormalizedFormattableBody.class, assertFormattableBody(status, invocation));
     }
 
     static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
