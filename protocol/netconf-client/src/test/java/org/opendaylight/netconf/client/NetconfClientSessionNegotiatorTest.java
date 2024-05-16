@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -34,8 +34,8 @@ import io.netty.util.concurrent.Promise;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
@@ -52,15 +52,15 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
-public class NetconfClientSessionNegotiatorTest {
+class NetconfClientSessionNegotiatorTest {
     private HelloMessage helloMessage;
     private ChannelPipeline pipeline;
     private ChannelPromise future;
     private Channel channel;
     private ChannelInboundHandlerAdapter channelInboundHandlerAdapter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         helloMessage = HelloMessage.createClientHello(Set.of("exi:1.0"), Optional.empty());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
@@ -147,7 +147,7 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     @Test
-    public void testNetconfClientSessionNegotiator() throws Exception {
+    void testNetconfClientSessionNegotiator() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
@@ -159,7 +159,7 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     @Test
-    public void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
+    void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(false).when(promise).isDone();
         doReturn(promise).when(promise).setSuccess(any());
@@ -172,7 +172,7 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     @Test
-    public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
+    void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         RpcMessage exiMessage = NetconfStartExiMessageProvider.create(EXIParameters.empty(), "msg-id");
         doReturn(promise).when(promise).setSuccess(any());
@@ -199,7 +199,7 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     @Test
-    public void testNetconfClientSessionNegotiatorGetCached() throws Exception {
+    void testNetconfClientSessionNegotiatorGetCached() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);

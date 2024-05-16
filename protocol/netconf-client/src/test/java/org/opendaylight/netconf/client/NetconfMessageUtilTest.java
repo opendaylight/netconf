@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.client;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
-public class NetconfMessageUtilTest {
+class NetconfMessageUtilTest {
     @Test
-    public void testNetconfMessageUtil() throws Exception {
+    void testNetconfMessageUtil() throws Exception {
         final NetconfMessage okMessage = new NetconfMessage(XmlFileLoader.xmlFileToDocument(
             "netconfMessages/rpc-reply_ok.xml"));
         assertTrue(NetconfMessageUtil.isOKMessage(okMessage));
