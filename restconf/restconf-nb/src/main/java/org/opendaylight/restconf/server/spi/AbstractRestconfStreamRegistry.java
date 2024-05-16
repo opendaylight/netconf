@@ -54,11 +54,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
 
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final boolean useWebsockets;
-
-    protected AbstractRestconfStreamRegistry(final boolean useWebsockets) {
-        this.useWebsockets = useWebsockets;
-    }
 
     @Override
     public final @Nullable RestconfStream<?> lookupStream(final String name) {
@@ -146,16 +141,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * @param restconfURI request base URI, with trailing slash
      * @throws IllegalArgumentException if the result would have been malformed
      */
-    protected final @NonNull String baseStreamLocation(final URI restconfURI) {
+    protected static final @NonNull String baseStreamLocation(final URI restconfURI) {
         var scheme = restconfURI.getScheme();
-        if (useWebsockets) {
-            scheme = switch (scheme) {
-                // Secured HTTP goes to Secured WebSockets
-                case "https" -> "wss";
-                // Unsecured HTTP and others go to unsecured WebSockets
-                default -> "ws";
-            };
-        }
 
         try {
             return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
