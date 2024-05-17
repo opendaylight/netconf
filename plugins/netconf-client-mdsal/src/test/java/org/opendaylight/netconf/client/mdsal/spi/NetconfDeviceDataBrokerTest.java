@@ -17,14 +17,14 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.List;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -45,61 +45,61 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NetconfDeviceDataBrokerTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfDeviceDataBrokerTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
     private Rpcs.Normalized rpcService;
     private NetconfDeviceDataBroker dataBroker;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfTcp.class);
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterClass() {
         SCHEMA_CONTEXT = null;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
         dataBroker = getDataBroker(CapabilityURN.CANDIDATE);
     }
 
     @Test
-    public void testNewReadOnlyTransaction() {
+    void testNewReadOnlyTransaction() {
         final DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
         verify(rpcService).invokeNetconf(eq(Get.QNAME), any());
     }
 
     @Test
-    public void testNewReadWriteTransaction() {
+    void testNewReadWriteTransaction() {
         final DOMDataTreeReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
         verify(rpcService).invokeNetconf(eq(Get.QNAME), any());
     }
 
     @Test
-    public void testWritableRunningCandidateWriteTransaction() {
+    void testWritableRunningCandidateWriteTransaction() {
         testWriteTransaction(WriteCandidateRunningTx.class, CapabilityURN.WRITABLE_RUNNING, CapabilityURN.CANDIDATE);
     }
 
     @Test
-    public void testCandidateWriteTransaction() {
+    void testCandidateWriteTransaction() {
         testWriteTransaction(WriteCandidateTx.class, CapabilityURN.CANDIDATE);
     }
 
     @Test
-    public void testRunningWriteTransaction() {
+    void testRunningWriteTransaction() {
         testWriteTransaction(WriteRunningTx.class, CapabilityURN.WRITABLE_RUNNING);
     }
 
     @Test
-    public void testDOMFieldsExtensions() {
+    void testDOMFieldsExtensions() {
         final var fieldsExtension = dataBroker.extension(NetconfDOMDataBrokerFieldsExtension.class);
         assertNotNull(fieldsExtension);
 
