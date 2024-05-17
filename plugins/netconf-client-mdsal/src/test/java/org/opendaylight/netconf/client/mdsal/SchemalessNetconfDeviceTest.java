@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -30,14 +30,14 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.w3c.dom.Document;
 
-public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
+class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
     private static final String TEST_NAMESPACE = "test:namespace";
     private static final String TEST_MODULE = "test-module";
     private static final String TEST_REVISION = "2013-07-22";
 
     @Test
-    public void testSessionOnMethods() throws Exception {
+    void testSessionOnMethods() throws Exception {
         final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = mockCloseableClass(NetconfDeviceCommunicator.class);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",

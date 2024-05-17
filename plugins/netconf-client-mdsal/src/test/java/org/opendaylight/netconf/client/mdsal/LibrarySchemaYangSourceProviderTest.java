@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 
-public class LibrarySchemaYangSourceProviderTest {
+class LibrarySchemaYangSourceProviderTest {
     private final SourceIdentifier workingSid = new SourceIdentifier("abc");
     private final LibrarySchemaSourceProvider yangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
         Map.of(workingSid, LibrarySchemaYangSourceProviderTest.class.getResource("/schemas/config-test-rpc.yang")));
