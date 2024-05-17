@@ -74,7 +74,7 @@ class KeepaliveSalFacadeTest {
     }
 
     @Test
-    void testKeepaliveSuccess() throws Exception {
+    void testKeepaliveSuccess() {
         doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
@@ -119,7 +119,7 @@ class KeepaliveSalFacadeTest {
     }
 
     @Test
-    void testNonKeepaliveRpcFailure() throws Exception {
+    void testNonKeepaliveRpcFailure() {
         doAnswer(invocation -> proxyRpc = invocation.getArgument(2, RemoteDeviceServices.class).rpcs())
                 .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
