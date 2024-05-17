@@ -12,7 +12,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -20,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 
-public class LibrarySchemaYangSourceProviderTest {
+class LibrarySchemaYangSourceProviderTest {
     private final SourceIdentifier workingSid = new SourceIdentifier("abc");
     private final LibrarySchemaSourceProvider yangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
         Map.of(workingSid, LibrarySchemaYangSourceProviderTest.class.getResource("/schemas/config-test-rpc.yang")));
@@ -32,7 +31,7 @@ public class LibrarySchemaYangSourceProviderTest {
     }
 
     @Test
-    void testGetSourceFailure() throws InterruptedException, MalformedURLException {
+    void testGetSourceFailure() throws Exception {
         final var sourceIdentifierURLMap = Map.of(workingSid, new URL("http://non-existing-entity.yang"));
         final var failingYangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
             sourceIdentifierURLMap);
