@@ -324,7 +324,7 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         //            The characters in a key value string are constrained, and some
         //            characters need to be percent-encoded, as described in Section 3.5.3.
         try {
-            return databind.jsonCodecs().codecFor(schemaNode, stack).parseValue(null, value);
+            return databind.jsonCodecs().codecFor(schemaNode, stack).parseValue(value);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
