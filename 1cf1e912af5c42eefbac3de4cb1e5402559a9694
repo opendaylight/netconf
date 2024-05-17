@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9c3427b_ec1830f9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-17T07:03:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39bf43e2_faa18858",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a50082b_62b39888",
