@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab5c50fa_96620e96",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-17T12:25:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "061ad9ab_16ecb6ba",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 13
+      },
+      "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e69cccc0_56eb995f",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49ac3647_5209a0ee",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-17T12:25:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e69cccc0_56eb995f",
+      "range": {
+        "startLine": 328,
+        "startChar": 0,
+        "endLine": 328,
+        "endChar": 13
+      },
+      "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "434b30d1_44cd315a",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-05-16T09:10:20Z",
       "side": 1,
       "message": "Wrong indentation on `data` parameter.",
+      "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30d923f2_523d5c1a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-17T12:25:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "434b30d1_44cd315a",
       "revId": "a8201a1cd5af7d2f8d60e832fdae7199d953dccd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
