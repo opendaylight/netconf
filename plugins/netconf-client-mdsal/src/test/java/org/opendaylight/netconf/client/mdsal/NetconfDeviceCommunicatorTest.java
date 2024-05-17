@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -32,16 +34,17 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -62,21 +65,23 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfDeviceCommunicatorTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfDeviceCommunicatorTest {
     private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
 
     @Mock
     private RemoteDevice<NetconfDeviceCommunicator> mockDevice;
+    @Mock
+    private ChannelFuture mockChannelFuture;
+    @Mock
+    private Future operationFuture;
 
     private NetconfClientSession spySession;
     private NetconfDeviceCommunicator communicator;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         communicator = new NetconfDeviceCommunicator(
                 new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
         spySession = spy(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
@@ -89,34 +94,49 @@ public class NetconfDeviceCommunicatorTest {
         communicator.onSessionUp(spySession);
     }
 
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequest() throws Exception {
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequest() {
         return sendRequest(UUID.randomUUID().toString(), true);
     }
 
     @SuppressWarnings("unchecked")
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final String messageID,
-                                                                    final boolean doLastTest) throws Exception {
-        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
-        Element element = doc.createElement("request");
+            final boolean doLastTest) {
+        final var doc = UntrustedXML.newDocumentBuilder().newDocument();
+        final var element = doc.createElement("request");
         element.setAttribute("message-id", messageID);
         doc.appendChild(element);
-        NetconfMessage message = new NetconfMessage(doc);
+        final var message = new NetconfMessage(doc);
 
-        ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture)
                 .addListener(any(GenericFutureListener.class));
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture =
-                communicator.sendRequest(message, QName.create("", "mockRpc"));
+        final var resultFuture = communicator.sendRequest(message, QName.create("", "mockRpc"));
         if (doLastTest) {
-            assertNotNull("ListenableFuture is null", resultFuture);
+            assertNotNull(resultFuture, "ListenableFuture is null");
+        }
+        return resultFuture;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithoutMocking(final String messageID,
+        final boolean doLastTest) {
+        final var doc = UntrustedXML.newDocumentBuilder().newDocument();
+        final var element = doc.createElement("request");
+        element.setAttribute("message-id", messageID);
+        doc.appendChild(element);
+        final var message = new NetconfMessage(doc);
+
+        final var resultFuture =
+            communicator.sendRequest(message, QName.create("", "mockRpc"));
+        if (doLastTest) {
+            assertNotNull(resultFuture, "ListenableFuture is null");
         }
         return resultFuture;
     }
 
     @Test
-    public void testOnSessionUp() {
+    void testOnSessionUp() {
         final var testCapability = "urn:opendaylight:params:xml:ns:test?module=test-module&revision=2014-06-02";
         final var serverCapabilities = Set.of(
             CapabilityURN.ROLLBACK_ON_ERROR,
@@ -144,75 +164,75 @@ public class NetconfDeviceCommunicatorTest {
     }
 
     @SuppressWarnings("unchecked")
-    @Test(timeout = 5000)
-    public void testOnSessionDown() throws Exception {
-        setupSession();
+    @Test
+    void testOnSessionDown() {
+        assertTimeout(Duration.ofMillis(5000), () -> {
+            setupSession();
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest();
-        final ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest();
+            final var resultFuture1 = sendRequest();
+            final var resultFuture2 = sendRequest();
 
-        doNothing().when(mockDevice).onRemoteSessionDown();
+            doNothing().when(mockDevice).onRemoteSessionDown();
 
-        communicator.onSessionDown(spySession, new Exception("mock ex"));
+            communicator.onSessionDown(spySession, new Exception("mock ex"));
 
-        verifyErrorRpcResult(resultFuture1.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
-        verifyErrorRpcResult(resultFuture2.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
+            verifyErrorRpcResult(resultFuture1.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
+            verifyErrorRpcResult(resultFuture2.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
 
-        verify(mockDevice).onRemoteSessionDown();
+            verify(mockDevice).onRemoteSessionDown();
 
-        reset(mockDevice);
+            reset(mockDevice);
 
-        communicator.onSessionDown(spySession, new Exception("mock ex"));
+            communicator.onSessionDown(spySession, new Exception("mock ex"));
 
-        verify(mockDevice, never()).onRemoteSessionDown();
+            verify(mockDevice, never()).onRemoteSessionDown();
+        });
     }
 
     @Test
-    public void testOnSessionTerminated() throws Exception {
+    void testOnSessionTerminated() throws Exception {
         setupSession();
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest();
+        final ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest();
 
         doNothing().when(mockDevice).onRemoteSessionDown();
 
-        String reasonText = "testing terminate";
-        NetconfTerminationReason reason = new NetconfTerminationReason(reasonText);
+        final var reasonText = "testing terminate";
+        final var reason = new NetconfTerminationReason(reasonText);
         communicator.onSessionTerminated(spySession, reason);
 
-        RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
-        assertEquals("RpcError message", reasonText, rpcError.getMessage());
+        final var rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
+        assertEquals(reasonText, rpcError.getMessage(), "RpcError message");
 
         verify(mockDevice).onRemoteSessionDown();
     }
 
     @Test
-    public void testClose() throws Exception {
+    void testClose() {
         communicator.close();
         verify(mockDevice, never()).onRemoteSessionDown();
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testSendRequest() throws Exception {
+    void testSendRequest() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        QName rpc = QName.create("", "mockRpc");
+        final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        final var rpc = QName.create("", "mockRpc");
 
         final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
-        ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message, rpc);
 
         verify(spySession).sendMessage(same(message));
 
-        assertNotNull("ListenableFuture is null", resultFuture);
+        assertNotNull(resultFuture, "ListenableFuture is null");
 
         verify(mockChannelFuture).addListener(futureListener.capture());
-        Future<Void> operationFuture = mock(Future.class);
         doReturn(null).when(operationFuture).cause();
         futureListener.getValue().operationComplete(operationFuture);
 
@@ -221,26 +241,26 @@ public class NetconfDeviceCommunicatorTest {
     }
 
     @Test
-    public void testSendRequestWithNoSession() throws Exception {
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        QName rpc = QName.create("", "mockRpc");
+    void testSendRequestWithNoSession() throws Exception {
+        final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        final var rpc = QName.create("", "mockRpc");
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message, rpc);
 
-        assertNotNull("ListenableFuture is null", resultFuture);
+        assertNotNull(resultFuture, "ListenableFuture is null");
 
         // Should have an immediate result
-        RpcResult<NetconfMessage> rpcResult = Futures.getDone(resultFuture);
+        final var rpcResult = Futures.getDone(resultFuture);
 
         verifyErrorRpcResult(rpcResult, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
     }
 
     private static NetconfMessage createSuccessResponseMessage(final String messageID)
             throws ParserConfigurationException {
-        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
-        Element rpcReply = doc.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
+        final var doc = UntrustedXML.newDocumentBuilder().newDocument();
+        final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
         rpcReply.setAttribute("message-id", messageID);
-        Element element = doc.createElementNS("ns", "data");
+        final var element = doc.createElementNS("ns", "data");
         element.setTextContent(messageID);
         rpcReply.appendChild(element);
         doc.appendChild(rpcReply);
@@ -250,66 +270,58 @@ public class NetconfDeviceCommunicatorTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testSendRequestWithWithSendFailure() throws Exception {
+    void testSendRequestWithWithSendFailure() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        QName rpc = QName.create("", "mockRpc");
+        final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        final var rpc = QName.create("", "mockRpc");
 
         final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
-        ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message, rpc);
 
-        assertNotNull("ListenableFuture is null", resultFuture);
+        assertNotNull(resultFuture, "ListenableFuture is null");
 
         verify(mockChannelFuture).addListener(futureListener.capture());
 
-        Future<Void> operationFuture = mock(Future.class);
         doReturn(new Exception("mock error")).when(operationFuture).cause();
         futureListener.getValue().operationComplete(operationFuture);
 
         // Should have an immediate result
-        RpcResult<NetconfMessage> rpcResult = Futures.getDone(resultFuture);
+        final var rpcResult = Futures.getDone(resultFuture);
 
-        RpcError rpcError = verifyErrorRpcResult(rpcResult, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
-        assertEquals("RpcError message contains \"mock error\"", true,
-                rpcError.getMessage().contains("mock error"));
+        final var rpcError = verifyErrorRpcResult(rpcResult, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
+        assertEquals(true, rpcError.getMessage().contains("mock error"),
+            "RpcError message contains \"mock error\"");
     }
 
     //Test scenario verifying whether missing message is handled
     @Test
-    public void testOnMissingResponseMessage() throws Exception {
+    void testOnMissingResponseMessage() throws Exception {
 
         setupSession();
 
-        String messageID1 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest(messageID1, true);
-
-        String messageID2 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest(messageID2, true);
-
-        String messageID3 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture3 = sendRequest(messageID3, true);
+        final var messageID = UUID.randomUUID().toString();
+        final var resultFuture = sendRequest(messageID, true);
 
         //response messages 1,2 are omitted
-        communicator.onMessage(spySession, createSuccessResponseMessage(messageID3));
+        communicator.onMessage(spySession, createSuccessResponseMessage(messageID));
 
-        verifyResponseMessage(resultFuture3.get(), messageID3);
+        verifyResponseMessage(resultFuture.get(), messageID);
     }
 
     @Test
-    public void testOnSuccessfulResponseMessage() throws Exception {
+    void testOnSuccessfulResponseMessage() throws Exception {
         setupSession();
 
-        String messageID1 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest(messageID1, true);
+        final var messageID1 = UUID.randomUUID().toString();
+        final var resultFuture1 = sendRequest(messageID1, true);
 
-        String messageID2 = UUID.randomUUID().toString();
-        final ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest(messageID2, true);
+        final var messageID2 = UUID.randomUUID().toString();
+        final var resultFuture2 = sendRequest(messageID2, true);
 
         communicator.onMessage(spySession, createSuccessResponseMessage(messageID1));
         communicator.onMessage(spySession, createSuccessResponseMessage(messageID2));
@@ -319,87 +331,88 @@ public class NetconfDeviceCommunicatorTest {
     }
 
     @Test
-    public void testOnResponseMessageWithError() throws Exception {
+    void testOnResponseMessageWithError() throws Exception {
         setupSession();
 
-        String messageID = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
+        final var messageID = UUID.randomUUID().toString();
+        final var resultFuture = sendRequest(messageID, true);
 
         communicator.onMessage(spySession, createErrorResponseMessage(messageID));
 
-        RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE);
-        assertEquals("RpcError message", "Missing attribute", rpcError.getMessage());
+        final var rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE);
+        assertEquals("Missing attribute", rpcError.getMessage(), "RpcError message");
 
-        String errorInfo = rpcError.getInfo();
+        final var errorInfo = rpcError.getInfo();
         assertNotNull("RpcError info is null", errorInfo);
-        assertTrue("Error info contains \"foo\"", errorInfo.contains("<bad-attribute>foo</bad-attribute>"));
-        assertTrue("Error info contains \"bar\"", errorInfo.contains("<bad-element>bar</bad-element>"));
+        assertTrue(errorInfo.contains("<bad-attribute>foo</bad-attribute>"), "Error info contains \"foo\"");
+        assertTrue(errorInfo.contains("<bad-element>bar</bad-element>"), "Error info contains \"bar\"");
     }
 
     @Test
-    public void testOnResponseMessageWithMultipleErrors() throws Exception {
+    void testOnResponseMessageWithMultipleErrors() throws Exception {
         setupSession();
 
-        String messageID = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
+        final var messageID = UUID.randomUUID().toString();
+        final var resultFuture = sendRequest(messageID, true);
 
         communicator.onMessage(spySession, createMultiErrorResponseMessage(messageID));
 
-        RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.PROTOCOL, ErrorTag.OPERATION_FAILED);
+        final var rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.PROTOCOL, ErrorTag.OPERATION_FAILED);
 
-        String errorInfo = rpcError.getInfo();
+        final var errorInfo = rpcError.getInfo();
         assertNotNull("RpcError info is null", errorInfo);
 
-        String errorInfoMessages = rpcError.getInfo();
-        String errMsg1 = "Number of member links configured, i.e [1], "
+        final var errorInfoMessages = rpcError.getInfo();
+        final var errMsg1 = "Number of member links configured, i.e [1], "
                 + "for interface [ae0]is lesser than the required minimum [2].";
-        String errMsg2 = "configuration check-out failed";
-        assertTrue(String.format("Error info contains \"%s\" or \"%s\'", errMsg1, errMsg2),
-                errorInfoMessages.contains(errMsg1) && errorInfoMessages.contains(errMsg2));
+        final var errMsg2 = "configuration check-out failed";
+        assertTrue(errorInfoMessages.contains(errMsg1) && errorInfoMessages.contains(errMsg2),
+            String.format("Error info contains \"%s\" or \"%s\'", errMsg1, errMsg2));
     }
 
     @Test
-    public void testOnResponseMessageWithWrongMessageID() throws Exception {
+    void testOnResponseMessageWithWrongMessageID() throws Exception {
         setupSession();
 
-        String messageID = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
+        final var messageID = UUID.randomUUID().toString();
+        final var resultFuture = sendRequest(messageID, true);
 
         communicator.onMessage(spySession, createSuccessResponseMessage(UUID.randomUUID().toString()));
 
-        RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
-        assertFalse("RpcError message non-empty", Strings.isNullOrEmpty(rpcError.getMessage()));
+        final var rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
+        assertFalse(Strings.isNullOrEmpty(rpcError.getMessage()), "RpcError message non-empty");
 
-        String errorInfo = rpcError.getInfo();
+        final var errorInfo = rpcError.getInfo();
         assertNotNull("RpcError info is null", errorInfo);
-        assertTrue("Error info contains \"actual-message-id\"", errorInfo.contains("actual-message-id"));
-        assertTrue("Error info contains \"expected-message-id\"", errorInfo.contains("expected-message-id"));
+        assertTrue(errorInfo.contains("actual-message-id"), "Error info contains \"actual-message-id\"");
+        assertTrue(errorInfo.contains("expected-message-id"), "Error info contains \"expected-message-id\"");
     }
 
     @Test
-    public void testConcurrentMessageLimit() throws Exception {
+    void testConcurrentMessageLimit() throws Exception {
         setupSession();
-        ArrayList<String> messageID = new ArrayList<>();
+        final var messageID = new ArrayList<String>();
 
         for (int i = 0; i < 10; i++) {
             messageID.add(UUID.randomUUID().toString());
-            ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID.get(i), false);
-            assertEquals("ListenableFuture is null", true, resultFuture instanceof UncancellableFuture);
+            final var resultFuture = sendRequest(messageID.get(i), false);
+            assertInstanceOf(UncancellableFuture.class, resultFuture, "ListenableFuture is null");
         }
 
-        final String notWorkingMessageID = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(notWorkingMessageID, false);
-        assertEquals("ListenableFuture is null", false, resultFuture instanceof UncancellableFuture);
+        final var notWorkingMessageID = UUID.randomUUID().toString();
+        var resultFuture = sendRequestWithoutMocking(notWorkingMessageID,
+            false);
+        assertInstanceOf(UncancellableFuture.class, resultFuture, "ListenableFuture is null");
 
         communicator.onMessage(spySession, createSuccessResponseMessage(messageID.get(0)));
 
         resultFuture = sendRequest(messageID.get(0), false);
-        assertNotNull("ListenableFuture is null", resultFuture);
+        assertNotNull(resultFuture, "ListenableFuture is null");
     }
 
     private static NetconfMessage createMultiErrorResponseMessage(final String messageID) throws Exception {
         // multiple rpc-errors which simulate actual response like in NETCONF-666
-        String xmlStr = "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
+        final var xmlStr = "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
                 + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
                 + "xmlns:junos=\"http://xml.juniper.net/junos/18.4R1/junos\" message-id=\"" + messageID + "\">"
                 + "<nc:rpc-error>\n"
@@ -424,13 +437,13 @@ public class NetconfDeviceCommunicatorTest {
                 + "</nc:rpc-error>\n"
                 + "</nc:rpc-reply>";
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
-        Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
+        final var bis = new ByteArrayInputStream(xmlStr.getBytes());
+        final var doc = UntrustedXML.newDocumentBuilder().parse(bis);
         return new NetconfMessage(doc);
     }
 
     private static NetconfMessage createErrorResponseMessage(final String messageID) throws Exception {
-        String xmlStr = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\""
+        final var xmlStr = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\""
                 + "           message-id=\"" + messageID + "\">"
                 + "  <rpc-error>"
                 + "    <error-type>rpc</error-type>"
@@ -444,38 +457,33 @@ public class NetconfDeviceCommunicatorTest {
                 + "  </rpc-error>"
                 + "</rpc-reply>";
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
-        Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
+        final var bis = new ByteArrayInputStream(xmlStr.getBytes());
+        final var doc = UntrustedXML.newDocumentBuilder().parse(bis);
         return new NetconfMessage(doc);
     }
 
     private static void verifyResponseMessage(final RpcResult<NetconfMessage> rpcResult, final String dataText) {
-        assertNotNull("RpcResult is null", rpcResult);
-        assertTrue("isSuccessful", rpcResult.isSuccessful());
-        NetconfMessage messageResult = rpcResult.getResult();
-        assertNotNull("getResult", messageResult);
-//        List<SimpleNode<?>> nodes = messageResult.getSimpleNodesByName(
-//                                         QName.create( URI.create( "ns" ), null, "data" ) );
-//        assertNotNull( "getSimpleNodesByName", nodes );
-//        assertEquals( "List<SimpleNode<?>> size", 1, nodes.size() );
-//        assertEquals( "SimpleNode value", dataText, nodes.iterator().next().getValue() );
+        assertNotNull(rpcResult, "RpcResult is null");
+        assertTrue(rpcResult.isSuccessful(), "isSuccessful");
+        final var messageResult = rpcResult.getResult();
+        assertNotNull(messageResult, "getResult");
     }
 
     private static RpcError verifyErrorRpcResult(final RpcResult<NetconfMessage> rpcResult,
-                                                 final ErrorType expErrorType, final ErrorTag expErrorTag) {
-        assertNotNull("RpcResult is null", rpcResult);
-        assertFalse("isSuccessful", rpcResult.isSuccessful());
-        assertNotNull("RpcResult errors is null", rpcResult.getErrors());
-        assertEquals("Errors size", 1, rpcResult.getErrors().size());
-        RpcError rpcError = rpcResult.getErrors().iterator().next();
-        assertEquals("getErrorSeverity", ErrorSeverity.ERROR, rpcError.getSeverity());
-        assertEquals("getErrorType", expErrorType, rpcError.getErrorType());
-        assertEquals("getErrorTag", expErrorTag, rpcError.getTag());
+            final ErrorType expErrorType, final ErrorTag expErrorTag) {
+        assertNotNull(rpcResult, "RpcResult is null");
+        assertFalse(rpcResult.isSuccessful(), "isSuccessful");
+        assertNotNull(rpcResult.getErrors(), "RpcResult errors is null");
+        assertEquals(1, rpcResult.getErrors().size(), "Errors size");
+        final var rpcError = rpcResult.getErrors().iterator().next();
+        assertEquals(ErrorSeverity.ERROR, rpcError.getSeverity(), "getErrorSeverity");
+        assertEquals(expErrorType, rpcError.getErrorType(), "getErrorType");
+        assertEquals(expErrorTag, rpcError.getTag(), "getErrorTag");
 
-        final String msg = rpcError.getMessage();
+        final var msg = rpcError.getMessage();
         assertNotNull("getMessage is null", msg);
-        assertFalse("getMessage is empty", msg.isEmpty());
-        assertFalse("getMessage is blank", CharMatcher.whitespace().matchesAllOf(msg));
+        assertFalse(msg.isEmpty(), "getMessage is empty");
+        assertFalse(CharMatcher.whitespace().matchesAllOf(msg), "getMessage is blank");
         return rpcError;
     }
 }
