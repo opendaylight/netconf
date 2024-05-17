@@ -7,15 +7,15 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.net.InetSocketAddress;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class RemoteDeviceIdTest {
+class RemoteDeviceIdTest {
     @Test
-    public void testEquals() {
+    void testEquals() {
         final var address = new InetSocketAddress("127.0.0.1", 8000);
 
         final var remoteDeviceId = new RemoteDeviceId("test", address);
@@ -27,7 +27,7 @@ public class RemoteDeviceIdTest {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode() {
         final var name = "name";
         final var address = new InetSocketAddress("127.0.0.1", 8000);
         final var remoteDeviceId = new RemoteDeviceId(name, address);
