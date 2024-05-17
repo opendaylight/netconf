@@ -22,6 +22,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
+import org.opendaylight.yangtools.yang.data.codec.gson.DefaultJSONValueWriter;
 
 /**
  * Result of a {@code PATCH} request as defined in
@@ -130,7 +131,8 @@ public final class YangPatchStatusBody extends FormattableBody {
             final var errorPath = restconfError.getErrorPath();
             if (errorPath != null) {
                 writer.name("error-path");
-                status.databind().jsonCodecs().instanceIdentifierCodec().writeValue(writer, errorPath);
+                status.databind().jsonCodecs().instanceIdentifierCodec()
+                    .writeValue(new DefaultJSONValueWriter(writer), errorPath);
             }
             final var errorMessage = restconfError.getErrorMessage();
             if (errorMessage != null) {
