@@ -11,16 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opendaylight.netconf.transport.http.BasicAuthHandler.BASIC_AUTH_PREFIX;
+import static org.opendaylight.netconf.transport.http.AbstractBasicAuthHandler.BASIC_AUTH_PREFIX;
+import static org.opendaylight.netconf.transport.http.TestUtils.basicAuthHeader;
+import static org.opendaylight.netconf.transport.http.TestUtils.httpRequest;
 
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.stream.Stream;
@@ -49,7 +46,7 @@ public class BasicAuthHandlerTest {
 
     @BeforeEach
     void beforeEach() {
-        final var authHandler = BasicAuthHandler.ofNullable(new HttpServerGrouping() {
+        final var authHandler = BasicAuthHandlerFactory.ofNullable(new HttpServerGrouping() {
             @Override
             public Class<? extends HttpServerGrouping> implementedInterface() {
                 throw new UnsupportedOperationException();
@@ -95,14 +92,14 @@ public class BasicAuthHandlerTest {
         });
         assertNotNull(authHandler);
 
-        channel = new EmbeddedChannel(authHandler);
+        channel = new EmbeddedChannel(authHandler.create());
     }
 
     @ParameterizedTest(name = "BasicAuth success: {0} password configured")
     @MethodSource("authSuccessArgs")
     void authSuccess(final String testDesc, final String username, final String password) {
-        final String authHeader = authHeader(BASIC_AUTH_PREFIX, username, password);
-        final var request = newHttpRequest(authHeader);
+        final String authHeader = basicAuthHeader(username, password);
+        final var request = httpRequest(authHeader);
         channel.writeInbound(request);
         // nonnull read indicates the message is passed for next handler
         assertEquals(request, channel.readInbound());
@@ -118,7 +115,7 @@ public class BasicAuthHandlerTest {
     @ParameterizedTest(name = "BasicAuth failure: {0}")
     @MethodSource("authFailureArgs")
     void authFailure(final String testDesc, final String authHeader) {
-        channel.writeInbound(newHttpRequest(authHeader));
+        channel.writeInbound(httpRequest(authHeader));
         // null indicates the request is consumed and not passed to next handler
         assertNull(channel.readInbound());
         // verify response
@@ -136,20 +133,7 @@ public class BasicAuthHandlerTest {
             Arguments.of("Base64 decode failure", BASIC_AUTH_PREFIX + "cannot-decode-this"),
             Arguments.of("No expected username:password",
                 BASIC_AUTH_PREFIX + Base64.getEncoder().encodeToString("abcd".getBytes(StandardCharsets.UTF_8))),
-            Arguments.of("Unknown user", authHeader(BASIC_AUTH_PREFIX, "unknown", "user")),
-            Arguments.of("Wrong password", authHeader(BASIC_AUTH_PREFIX, USERNAME1, PASSWORD2)));
-    }
-
-    private static String authHeader(final String prefix, final String username, final String password) {
-        return prefix + Base64.getEncoder()
-            .encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static HttpRequest newHttpRequest(final String authHeader) {
-        final var request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/uri");
-        if (authHeader != null) {
-            request.headers().add(HttpHeaderNames.AUTHORIZATION, authHeader);
-        }
-        return request;
+            Arguments.of("Unknown user", basicAuthHeader("unknown", "user")),
+            Arguments.of("Wrong password", basicAuthHeader(USERNAME1, PASSWORD2)));
     }
 }

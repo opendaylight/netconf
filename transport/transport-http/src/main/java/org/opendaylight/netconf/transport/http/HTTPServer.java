@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.ServerBootstrap;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
@@ -38,6 +39,7 @@ public final class HTTPServer extends HTTPTransportStack {
      * @param listener {@link TransportChannelListener} to notify when the session is established
      * @param bootstrap {@link ServerBootstrap} to use for the underlying Netty server channel
      * @param listenParams Listening parameters
+     * @param dispatcher server logic layer implementation as {@link RequestDispatcher}
      * @return A future
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
@@ -45,6 +47,26 @@ public final class HTTPServer extends HTTPTransportStack {
     public static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
             final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams,
             final RequestDispatcher dispatcher) throws UnsupportedConfigurationException {
+        return listen(listener, bootstrap, listenParams, dispatcher, null);
+    }
+
+    /**
+     * Attempt to establish a {@link HTTPServer} on a local address.
+     *
+     * @param listener {@link TransportChannelListener} to notify when the session is established
+     * @param bootstrap {@link ServerBootstrap} to use for the underlying Netty server channel
+     * @param listenParams Listening parameters
+     * @param dispatcher server logic layer implementation as {@link RequestDispatcher}
+     * @param authHandlerFactory {@link AuthHandlerFactory} instance, provides channel handler serving the request
+     *      authentication; optional, if defined the Basic Auth settings of listenParams will be ignored
+     * @return A future
+     * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
+     * @throws NullPointerException if any argument is {@code null}
+     */
+    public static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+            final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams,
+            final RequestDispatcher dispatcher, final @Nullable AuthHandlerFactory authHandlerFactory)
+            throws UnsupportedConfigurationException {
         final HttpServerGrouping httpParams;
         final TcpServerGrouping tcpParams;
         final TlsServerGrouping tlsParams;
@@ -60,8 +82,10 @@ public final class HTTPServer extends HTTPTransportStack {
         } else {
             throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         }
-        final var server = new HTTPServer(listener,
-            new ServerChannelInitializer(httpParams, requireNonNull(dispatcher)));
+        final var channelInitializer = authHandlerFactory == null
+            ? new ServerChannelInitializer(httpParams, requireNonNull(dispatcher))
+            : new ServerChannelInitializer(authHandlerFactory, requireNonNull(dispatcher));
+        final var server = new HTTPServer(listener, channelInitializer);
         final var underlay = tlsParams == null
             ? TCPServer.listen(server.asListener(), bootstrap, tcpParams)
             : TLSServer.listen(server.asListener(), bootstrap, tcpParams, new HttpSslHandlerFactory(tlsParams));
