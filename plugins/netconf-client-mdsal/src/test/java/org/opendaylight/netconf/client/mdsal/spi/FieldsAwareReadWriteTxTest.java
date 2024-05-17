@@ -10,16 +10,16 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class FieldsAwareReadWriteTxTest {
     @Mock
     private NetconfDOMFieldsReadTransaction delegateReadTx;

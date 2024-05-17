@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -21,14 +21,14 @@ import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
@@ -55,7 +55,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.w3c.dom.Node;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -67,30 +67,28 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     private NetconfDeviceRpc rpc;
     private QName type;
     private DOMRpcResult expectedReply;
+    private NetconfMessage reply;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() {
         SCHEMA_CONTEXT = null;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA_CONTEXT), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
-        final var reply = new NetconfMessage(XmlUtil.readXmlToDocument(
+        reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"
                         + "<data>\n"
                         + "</data>\n"
                         + "</rpc-reply>"));
-        final var result = RpcResultBuilder.success(reply).build();
-        doReturn(Futures.immediateFuture(result))
-                .when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
         rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicator, transformer);
 
         type = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config");
@@ -98,7 +96,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testDeadlock() throws Exception {
+    public void testDeadlock() {
         // when rpc is successful, but transformer fails for some reason
         final RpcTransformer<ContainerNode, DOMRpcResult> failingTransformer = mock(RpcTransformer.class);
         final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
@@ -114,6 +112,9 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testInvokeRpc() throws Exception {
+        final var rpcResult = RpcResultBuilder.success(reply).build();
+        doReturn(Futures.immediateFuture(rpcResult)).when(communicator).sendRequest(any(NetconfMessage.class),
+            any(QName.class));
         ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
         final DOMRpcResult result = rpc.domRpcService().invokeRpc(type, input).get();
         assertEquals(expectedReply.value().name(), result.value().name());
@@ -129,7 +130,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testRegisterRpcListener() throws Exception {
+    public void testRegisterRpcListener() {
         final var argument = ArgumentCaptor.forClass(Collection.class);
 
         rpc.domRpcService().registerRpcListener(listener);

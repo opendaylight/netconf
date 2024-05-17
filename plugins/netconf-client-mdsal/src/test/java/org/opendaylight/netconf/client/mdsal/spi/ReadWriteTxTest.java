@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.FluentFuture;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class ReadWriteTxTest {
     @Mock
     private DOMDataTreeReadTransaction delegateReadTx;
@@ -34,13 +34,13 @@ public class ReadWriteTxTest {
     private DOMDataTreeWriteTransaction delegateWriteTx;
     private ReadWriteTx<?> tx;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         tx = new ReadWriteTx<>(delegateReadTx, delegateWriteTx);
     }
 
     @Test
-    public void submit() throws Exception {
+    public void submit() {
         final YangInstanceIdentifier id1 = TxTestUtils.getContainerId();
         final ContainerNode containerNode = TxTestUtils.getContainerNode();
         tx.put(LogicalDatastoreType.CONFIGURATION, id1, containerNode);
@@ -56,7 +56,7 @@ public class ReadWriteTxTest {
     }
 
     @Test
-    public void cancel() throws Exception {
+    public void cancel() {
         tx.cancel();
         verify(delegateWriteTx).cancel();
     }
@@ -77,7 +77,7 @@ public class ReadWriteTxTest {
     }
 
     @Test
-    public void getIdentifier() throws Exception {
+    public void getIdentifier() {
         final ReadWriteTx<?> tx2 = new ReadWriteTx<>(delegateReadTx, delegateWriteTx);
         assertNotEquals(tx.getIdentifier(), tx2.getIdentifier());
     }

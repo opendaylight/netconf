@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -17,12 +17,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
@@ -35,14 +35,14 @@ import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Mock
     private RemoteDeviceCommunicator listener;
 
     private SchemalessNetconfDeviceRpc deviceRpc;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         RpcResult<NetconfMessage> msg = null;
         ListenableFuture<RpcResult<NetconfMessage>> future = Futures.immediateFuture(msg);
