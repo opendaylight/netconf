@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
@@ -29,14 +29,14 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
-public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
+class NetconfToNotificationTest extends AbstractBaseSchemasTest {
 
     NetconfMessageTransformer messageTransformer;
 
     NetconfMessage userNotification;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    void setup() throws Exception {
         InputStream notifyPayloadStream = getClass().getResourceAsStream("/notification-payload.xml");
         assertNotNull(notifyPayloadStream);
 
@@ -63,7 +63,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testMostRecentWrongYangModel() throws Exception {
+    void testMostRecentWrongYangModel() {
         final var schemaContext = getNotificationSchemaContext(getClass(), true);
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(schemaContext), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
@@ -71,7 +71,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testToNotificationFunction() throws Exception {
+    void testToNotificationFunction() {
         final var schemaContext = getNotificationSchemaContext(getClass(), false);
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(schemaContext), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
