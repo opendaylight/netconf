@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,12 +26,12 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -62,8 +62,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfBaseOpsTest extends AbstractTestModelTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfBaseOpsTest extends AbstractTestModelTest {
     private static final QNameModule TEST_MODULE = QNameModule.ofRevision("test:namespace", "2013-07-22");
 
     private static final QName CONTAINER_C_QNAME = QName.create(TEST_MODULE, "c");
@@ -81,8 +81,18 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     private static final NodeIdentifier CONTAINER_E_NID = NodeIdentifier.create(CONTAINER_E_QNAME);
     private static final QName LEAF_Z_QNAME = QName.create(TEST_MODULE, "z");
     private static final NodeIdentifier LEAF_Z_NID = NodeIdentifier.create(LEAF_Z_QNAME);
+    private static final NetconfMessage NETCONF_OK_MESSAGE;
+    private static final NetconfMessage NETCONF_DATA_MESSAGE;
 
     static {
+        final var okStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_ok.xml");
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        try {
+            NETCONF_OK_MESSAGE = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
+            NETCONF_DATA_MESSAGE = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        } catch (SAXException | IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreComments(true);
     }
@@ -92,22 +102,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     private NetconfRpcFutureCallback callback;
     private NetconfBaseOps baseOps;
 
-    @Before
-    public void setUp() throws Exception {
-        final var okStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_ok.xml");
-        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
-        final var ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
-        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
-        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(data).buildFuture());
-        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(data).buildFuture());
-        when(listener.sendRequest(any(), eq(EditConfig.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(CopyConfig.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(DiscardChanges.QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Validate.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Lock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Unlock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Commit.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+    @BeforeEach
+    void setUp() {
         final var rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, new NetconfMessageTransformer(
             MountPointContext.of(SCHEMA_CONTEXT), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of()))));
@@ -117,119 +113,151 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testLock() throws Exception {
+    void testLock() {
+        mockLock();
         baseOps.lock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
         verifyMessageSent("lock", Lock.QNAME);
     }
 
     @Test
-    public void testLockCandidate() throws Exception {
+    void testLockCandidate() {
+        mockLock();
         baseOps.lockCandidate(callback);
         verifyMessageSent("lock", Lock.QNAME);
     }
 
     @Test
-    public void testUnlock() throws Exception {
+    void testUnlock() {
+        mockUnlock();
         baseOps.unlock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
         verifyMessageSent("unlock", Unlock.QNAME);
     }
 
     @Test
-    public void testUnlockCandidate() throws Exception {
+    void testUnlockCandidate() {
+        mockUnlock();
         baseOps.unlockCandidate(callback);
         verifyMessageSent("unlock", Unlock.QNAME);
     }
 
     @Test
-    public void testLockRunning() throws Exception {
+    void testLockRunning() {
+        mockLock();
         baseOps.lockRunning(callback);
         verifyMessageSent("lock-running", Lock.QNAME);
     }
 
     @Test
-    public void testUnlockRunning() throws Exception {
+    void testUnlockRunning() {
+        mockUnlock();
         baseOps.unlockRunning(callback);
         verifyMessageSent("unlock-running", Unlock.QNAME);
     }
 
     @Test
-    public void testDiscardChanges() throws Exception {
+    void testDiscardChanges() {
+        when(listener.sendRequest(any(), eq(DiscardChanges.QNAME)))
+            .thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE).buildFuture());
         baseOps.discardChanges(callback);
         verifyMessageSent("discardChanges", DiscardChanges.QNAME);
     }
 
     @Test
-    public void testCommit() throws Exception {
+    void testCommit() {
+        when(listener.sendRequest(any(), eq(Commit.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.commit(callback);
         verifyMessageSent("commit", Commit.QNAME);
     }
 
     @Test
-    public void testValidateCandidate() throws Exception {
+    void testValidateCandidate() {
+        when(listener.sendRequest(any(), eq(Validate.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.validateCandidate(callback);
         verifyMessageSent("validate", Validate.QNAME);
     }
 
     @Test
-    public void testValidateRunning() throws Exception {
+    void testValidateRunning() {
+        when(listener.sendRequest(any(), eq(Validate.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.validateRunning(callback);
         verifyMessageSent("validate-running", Validate.QNAME);
     }
 
 
     @Test
-    public void testCopyConfig() throws Exception {
+    void testCopyConfig() {
+        when(listener.sendRequest(any(), eq(CopyConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.copyConfig(callback, NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID,
                 NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
         verifyMessageSent("copy-config", CopyConfig.QNAME);
     }
 
     @Test
-    public void testCopyRunningToCandidate() throws Exception {
+    void testCopyRunningToCandidate() {
+        when(listener.sendRequest(any(), eq(CopyConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.copyRunningToCandidate(callback);
         verifyMessageSent("copy-config", CopyConfig.QNAME);
     }
 
     @Test
-    public void testGetConfigRunningData() throws Exception {
+    void testGetConfigRunningData() throws Exception {
+        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
         assertEquals(Data.QNAME, dataOpt.orElseThrow().name().getNodeType());
     }
 
     @Test
-    public void testGetData() throws Exception {
+    void testGetData() throws Exception {
+        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
         assertEquals(Data.QNAME, dataOpt.orElseThrow().name().getNodeType());
     }
 
     @Test
-    public void testGetConfigRunning() throws Exception {
+    void testGetConfigRunning() {
+        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         baseOps.getConfigRunning(callback, Optional.empty());
         verifyMessageSent("getConfig", GetConfig.QNAME);
     }
 
     @Test
-    public void testGetConfigCandidate() throws Exception {
+    void testGetConfigCandidate() {
+        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         baseOps.getConfigCandidate(callback, Optional.empty());
         verifyMessageSent("getConfig_candidate", GetConfig.QNAME);
     }
 
     @Test
-    public void testGetConfigCandidateWithFilter() throws Exception {
+    void testGetConfigCandidateWithFilter() {
+        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         baseOps.getConfigCandidate(callback, Optional.of(YangInstanceIdentifier.of(CONTAINER_C_QNAME)));
         verifyMessageSent("getConfig_candidate-filter", GetConfig.QNAME);
     }
 
     @Test
-    public void testGet() throws Exception {
+    void testGet() {
+        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         baseOps.get(callback, Optional.empty());
         verifyMessageSent("get", Get.QNAME);
     }
 
     @Test
-    public void testEditConfigCandidate() throws Exception {
+    void testEditConfigCandidate() {
+        when(listener.sendRequest(any(), eq(EditConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(
             Optional.of(ImmutableNodes.leafNode(LEAF_A_NID, "leaf-value")),
             Optional.of(EffectiveOperation.REPLACE), YangInstanceIdentifier.builder()
@@ -240,14 +268,18 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testDeleteContainerNodeCandidate() throws Exception {
+    void testDeleteContainerNodeCandidate() {
+        when(listener.sendRequest(any(), eq(EditConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(Optional.empty(),
             Optional.of(EffectiveOperation.DELETE), YangInstanceIdentifier.of(CONTAINER_C_QNAME)), true);
         verifyMessageSent("edit-config-delete-container-node-candidate", EditConfig.QNAME);
     }
 
     @Test
-    public void testDeleteLeafNodeCandidate() throws Exception {
+    void testDeleteLeafNodeCandidate() {
+        when(listener.sendRequest(any(), eq(EditConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(Optional.empty(),
             Optional.of(EffectiveOperation.DELETE),
             YangInstanceIdentifier.builder().node(CONTAINER_C_QNAME).node(LEAF_A_NID).build()), true);
@@ -255,7 +287,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testEditConfigRunning() throws Exception {
+    void testEditConfigRunning() {
+        when(listener.sendRequest(any(), eq(EditConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
         baseOps.editConfigRunning(callback, baseOps.createEditConfigStructure(
             Optional.of(ImmutableNodes.leafNode(LEAF_A_NID, "leaf-value")),
             Optional.of(EffectiveOperation.REPLACE),
@@ -265,7 +299,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetWithFields() throws ExecutionException, InterruptedException {
+    void testGetWithFields() throws Exception {
+        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONTAINER_C_NID);
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(LEAF_A_NID);
         final YangInstanceIdentifier leafBField = YangInstanceIdentifier.of(LEAF_B_NID);
@@ -275,7 +311,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetConfigWithFields() throws ExecutionException, InterruptedException {
+    void testGetConfigWithFields() throws Exception {
+        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONTAINER_C_NID);
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(LEAF_A_NID);
         final YangInstanceIdentifier leafBField = YangInstanceIdentifier.of(LEAF_B_NID);
@@ -285,19 +323,21 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetDataWithoutFields() {
+    void testGetDataWithoutFields() {
         assertThrows(ExecutionException.class, () -> baseOps.getData(callback,
                 Optional.of(YangInstanceIdentifier.of()), List.of()).get());
     }
 
     @Test
-    public void getConfigRunningDataWithoutFields() {
+    void getConfigRunningDataWithoutFields() {
         assertThrows(ExecutionException.class, () -> baseOps.getConfigRunningData(callback,
                 Optional.of(YangInstanceIdentifier.of()), List.of()).get());
     }
 
     @Test
-    public void testGetWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+    void testGetWithFieldsAndEmptyParentPath() throws Exception {
+        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(CONTAINER_C_NID, LEAF_A_NID);
         final YangInstanceIdentifier leafXField = YangInstanceIdentifier.of(
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
@@ -309,7 +349,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetConfigWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+    void testGetConfigWithFieldsAndEmptyParentPath() throws Exception {
+        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(CONTAINER_C_NID, LEAF_A_NID);
         final YangInstanceIdentifier leafXField = YangInstanceIdentifier.of(
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
@@ -322,12 +364,24 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetWithRootFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+    void testGetWithRootFieldsAndEmptyParentPath() throws Exception {
+        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_DATA_MESSAGE)
+            .buildFuture());
         final YangInstanceIdentifier contCField = YangInstanceIdentifier.of(CONTAINER_C_NID);
         final YangInstanceIdentifier contDField = YangInstanceIdentifier.of(CONTAINER_E_NID);
 
         baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()), List.of(contCField, contDField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-root-subtrees.xml"), eq(Get.QNAME));
+    }
+
+    private void mockLock() {
+        when(listener.sendRequest(any(), eq(Lock.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
+    }
+
+    private void mockUnlock() {
+        when(listener.sendRequest(any(), eq(Unlock.QNAME))).thenReturn(RpcResultBuilder.success(NETCONF_OK_MESSAGE)
+            .buildFuture());
     }
 
     private void verifyMessageSent(final String fileName, final QName name) {
@@ -378,5 +432,4 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
             return copy;
         }
     }
-
 }

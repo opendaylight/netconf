@@ -9,8 +9,8 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -101,7 +101,7 @@ class DefaultSslContextFactoryProviderTest {
     }
 
     @Test
-    void testKeystoreAdapterInit() throws Exception {
+    void testKeystoreAdapterInit() {
         try (var keystoreAdapter = newProvider()) {
             final var ex = assertThrows(KeyStoreException.class, () -> keystoreAdapter.getJavaKeyStore(Set.of()));
             assertThat(ex.getMessage(), startsWith("No keystore private key found"));
