@@ -19,13 +19,13 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -48,8 +48,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     @Mock
     private Rpcs.Normalized rpcService;
     @Captor
@@ -58,8 +58,8 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     private AbstractNetconfDataTreeService netconService;
     private NetconfMessageTransformer netconfMessageTransformer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
         netconService = getNetconService();
         final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class);
@@ -68,13 +68,13 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void lock() {
+    void lock() {
         netconService.lock();
         verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
     }
 
     @Test
-    public void unlock() {
+    void unlock() {
         netconService.lock();
         netconService.unlock();
         verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
@@ -82,25 +82,25 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void discardChanges() {
+    void discardChanges() {
         netconService.discardChanges();
         verify(rpcService).invokeNetconf(eq(DiscardChanges.QNAME), any());
     }
 
     @Test
-    public void get() {
+    void get() {
         netconService.get(null);
         verify(rpcService).invokeNetconf(eq(Get.QNAME), any());
     }
 
     @Test
-    public void getConfig() {
+    void getConfig() {
         netconService.getConfig(null);
         verify(rpcService).invokeNetconf(eq(GetConfig.QNAME), any());
     }
 
     @Test
-    public void merge() {
+    void merge() {
         netconService.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
                 Optional.empty());
         verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
@@ -111,7 +111,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void replace() {
+    void replace() {
         netconService.replace(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
                 Optional.empty());
         verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
@@ -122,7 +122,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         netconService.create(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
             Optional.empty());
         verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
@@ -133,7 +133,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         netconService.delete(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
         verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
 
@@ -143,7 +143,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void remove() {
+    void remove() {
         netconService.remove(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
         verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
 
@@ -153,7 +153,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void commit() {
+    void commit() {
         netconService.commit();
         verify(rpcService).invokeNetconf(eq(Commit.QNAME), any());
     }
