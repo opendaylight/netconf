@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
@@ -31,13 +31,13 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.Element;
 import org.xmlunit.builder.DiffBuilder;
 
-public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
+class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
     private final BaseRpcSchemalessTransformer transformer =
         new BaseRpcSchemalessTransformer(BASE_SCHEMAS.baseSchemaForCapabilities(
             NetconfSessionPreferences.fromStrings(Set.of())), new MessageCounter());
 
     @Test
-    public void toRpcRequest() throws Exception {
+    void toRpcRequest() throws Exception {
         final var msg = transformer.toRpcRequest(EditConfig.QNAME,
             ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID)
@@ -81,11 +81,11 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     @Test
-    public void toRpcResult() throws Exception {
+    void toRpcResult() throws Exception {
         final var doc = XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>");
         final var dataElement = XmlUtil.readXmlToElement(
@@ -104,6 +104,6 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 }
