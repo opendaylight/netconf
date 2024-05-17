@@ -88,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9953276_7af5137f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-05-17T13:27:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a50082b_62b39888",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20b2e036_4865ee0b",
@@ -101,6 +119,24 @@
       "writtenOn": "2024-05-16T14:52:21Z",
       "side": 1,
       "message": "IMHO: let\u0027s keep the methods static https://git.opendaylight.org/gerrit/c/netconf/+/109685",
+      "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "673a2dc9_fa600d5f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-05-17T13:27:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20b2e036_4865ee0b",
       "revId": "1cf1e912af5c42eefbac3de4cb1e5402559a9694",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
