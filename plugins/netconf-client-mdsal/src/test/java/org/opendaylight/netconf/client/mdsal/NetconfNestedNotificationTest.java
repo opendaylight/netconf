@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
+class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
     private static final QName INTERFACES_QNAME = QName
             .create("org:opendaylight:notification:test:ns:yang:nested-notification", "2014-07-08", "interfaces");
     private static final QName INTERFACE_QNAME = QName.create(INTERFACES_QNAME, "interface");
@@ -37,7 +37,7 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
             .create(INTERFACE_QNAME, "interface-enabled");
 
     @Test
-    public void testNestedNotificationToNotificationFunction() throws Exception {
+    void testNestedNotificationToNotificationFunction() throws Exception {
         final var context = YangParserTestUtils.parseYangResources(
             NetconfNestedNotificationTest.class, "/schemas/nested-notification.yang");
 
