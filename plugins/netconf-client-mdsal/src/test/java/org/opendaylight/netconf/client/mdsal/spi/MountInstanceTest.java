@@ -13,12 +13,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.InetSocketAddress;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -36,8 +36,8 @@ import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class MountInstanceTest {
+@ExtendWith(MockitoExtension.class)
+class MountInstanceTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
@@ -59,13 +59,13 @@ public class MountInstanceTest {
 
     private NetconfDeviceMount mountInstance;
 
-    @BeforeClass
-    public static void suiteSetUp() throws Exception {
+    @BeforeAll
+    static void suiteSetUp() {
         SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(service.createMountPoint(any(YangInstanceIdentifier.class))).thenReturn(mountPointBuilder);
         when(mountPointBuilder.register()).thenReturn(registration);
 
@@ -75,7 +75,7 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testOnTopologyDeviceConnected() {
+    void testOnTopologyDeviceConnected() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
@@ -85,7 +85,7 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testOnTopologyDeviceConnectedWithNetconfService() {
+    void testOnTopologyDeviceConnectedWithNetconfService() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, null, netconfService);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
@@ -95,7 +95,7 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testOnTopologyDeviceDisconnected() {
+    void testOnTopologyDeviceDisconnected() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         mountInstance.onDeviceDisconnected();
@@ -105,7 +105,7 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testClose() {
+    void testClose() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         mountInstance.close();
@@ -113,7 +113,7 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testPublishNotification() {
+    void testPublishNotification() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());

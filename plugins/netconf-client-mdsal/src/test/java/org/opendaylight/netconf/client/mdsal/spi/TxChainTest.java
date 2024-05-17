@@ -7,20 +7,20 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.FutureCallback;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -28,8 +28,8 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class TxChainTest {
+@ExtendWith(MockitoExtension.class)
+class TxChainTest {
     @Mock
     private DOMDataBroker broker;
     @Mock
@@ -52,20 +52,18 @@ public class TxChainTest {
     private ArgumentCaptor<TxListener> captor;
     private TxChain chain;
 
-    @Before
-    public void setUp() {
-        when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
-        when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1)
-                .thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);
-        when(writeOnlyTx1.addListener(any())).thenReturn(registration1);
-        when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
-        when(writeOnlyTx3.addListener(any())).thenReturn(registration3);
+    @BeforeEach
+    void setUp() {
         chain = new TxChain(broker);
         chain.addCallback(listener);
     }
 
     @Test
-    public void testNewReadOnlyTransactionPrevSubmitted() {
+    void testNewReadOnlyTransactionPrevSubmitted() {
+        when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
+        when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1)
+            .thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);
+        when(writeOnlyTx1.addListener(any())).thenReturn(registration1);
         chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         captor.getValue().onTransactionSubmitted(writeOnlyTx1);
@@ -73,13 +71,17 @@ public class TxChainTest {
     }
 
     @Test
-    public void testNewReadOnlyTransactionPrevNotSubmitted() {
+    void testNewReadOnlyTransactionPrevNotSubmitted() {
+        mockRegistration1();
         chain.newWriteOnlyTransaction();
         assertThrows(IllegalStateException.class, chain::newReadOnlyTransaction);
     }
 
     @Test
-    public void testNewReadWriteTransactionPrevSubmitted() {
+    void testNewReadWriteTransactionPrevSubmitted() {
+        when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
+        mockRegistration1();
+        when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
         chain.newReadWriteTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         captor.getValue().onTransactionSubmitted(writeOnlyTx1);
@@ -87,13 +89,17 @@ public class TxChainTest {
     }
 
     @Test
-    public void testNewReadWriteTransactionPrevNotSubmitted() {
+    void testNewReadWriteTransactionPrevNotSubmitted() {
+        when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
+        mockRegistration1();
         chain.newReadWriteTransaction();
         assertThrows(IllegalStateException.class, chain::newReadWriteTransaction);
     }
 
     @Test
-    public void testNewWriteOnlyTransactionPrevSubmitted() {
+    void testNewWriteOnlyTransactionPrevSubmitted() {
+        mockRegistration1();
+        when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
         chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         captor.getValue().onTransactionSubmitted(writeOnlyTx1);
@@ -101,20 +107,22 @@ public class TxChainTest {
     }
 
     @Test
-    public void testNewWriteOnlyTransactionPrevNotSubmitted() {
+    void testNewWriteOnlyTransactionPrevNotSubmitted() {
+        mockRegistration1();
         chain.newWriteOnlyTransaction();
         assertThrows(IllegalStateException.class, chain::newWriteOnlyTransaction);
     }
 
     @Test
-    public void testCloseAfterFinished() {
+    void testCloseAfterFinished() {
         chain.close();
         verify(listener).onSuccess(Empty.value());
         assertThrows(DOMTransactionChainClosedException.class, chain::newReadOnlyTransaction);
     }
 
     @Test
-    public void testChainFail() {
+    void testChainFail() {
+        mockRegistration1();
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         writeTx.commit();
@@ -125,7 +133,8 @@ public class TxChainTest {
     }
 
     @Test
-    public void testChainSuccess() {
+    void testChainSuccess() {
+        mockRegistration1();
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         chain.close();
         verify(writeOnlyTx1).addListener(captor.capture());
@@ -136,7 +145,11 @@ public class TxChainTest {
     }
 
     @Test
-    public void testCancel() {
+    void testCancel() {
+        when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1)
+            .thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);
+        when(writeOnlyTx1.addListener(any())).thenReturn(registration1);
+        when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         writeTx.cancel();
@@ -145,7 +158,8 @@ public class TxChainTest {
     }
 
     @Test
-    public void testMultiplePendingTransactions() {
+    void testMultiplePendingTransactions() {
+        mockAllRegistrations();
         //create 1st tx
         final AbstractWriteTx writeTx1 = chain.newWriteOnlyTransaction();
         final var captor1 = ArgumentCaptor.forClass(TxListener.class);
@@ -184,7 +198,8 @@ public class TxChainTest {
     }
 
     @Test
-    public void testMultiplePendingTransactionsFail() {
+    void testMultiplePendingTransactionsFail() {
+        mockAllRegistrations();
         //create 1st tx
         final AbstractWriteTx writeTx1 = chain.newWriteOnlyTransaction();
         final var captor1 = ArgumentCaptor.forClass(TxListener.class);
@@ -223,5 +238,17 @@ public class TxChainTest {
         verify(listener).onFailure(cause1);
         // 1 transaction failed, onTransactionChainSuccessful must not be called
         verify(listener, never()).onSuccess(any());
+    }
+
+    private void mockRegistration1() {
+        when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1).thenReturn(writeOnlyTx2)
+            .thenReturn(writeOnlyTx3);
+        when(writeOnlyTx1.addListener(any())).thenReturn(registration1);
+    }
+
+    private void mockAllRegistrations() {
+        mockRegistration1();
+        when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
+        when(writeOnlyTx3.addListener(any())).thenReturn(registration3);
     }
 }
