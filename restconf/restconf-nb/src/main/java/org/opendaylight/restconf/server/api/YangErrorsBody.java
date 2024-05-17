@@ -18,6 +18,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
+import org.opendaylight.yangtools.yang.data.codec.gson.DefaultJSONValueWriter;
 
 /**
  * A {@link FormattableBody} of <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.9">yang-errors</a> data
@@ -82,7 +83,7 @@ public final class YangErrorsBody extends FormattableBody {
                 if (errorPath != null) {
                     writer.name(ERROR_PATH);
                     errorPath.databind().jsonCodecs().instanceIdentifierCodec()
-                        .writeValue(writer, errorPath.path());
+                        .writeValue(new DefaultJSONValueWriter(writer), errorPath.path());
                 }
                 writer.name(ERROR_TYPE).value(error.type().elementBody());
                 writer.endObject();
