@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bd6b4d6_71d16415",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-17T14:17:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ecfbc23_add393fb",
+      "range": {
+        "startLine": 9,
+        "startChar": 6,
+        "endLine": 9,
+        "endChar": 15
+      },
+      "revId": "64cd073da8ef761d26df1c34844023599a3cd641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "208055f3_5efff8bd",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-17T13:37:57Z",
       "side": 1,
       "message": "to provide",
+      "range": {
+        "startLine": 11,
+        "startChar": 26,
+        "endLine": 11,
+        "endChar": 35
+      },
+      "revId": "64cd073da8ef761d26df1c34844023599a3cd641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ef45044_78a93352",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-17T14:17:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "208055f3_5efff8bd",
       "range": {
         "startLine": 11,
         "startChar": 26,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e90aae3_1f790f36",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-17T14:17:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e56a522a_abfc2726",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 24
+      },
+      "revId": "64cd073da8ef761d26df1c34844023599a3cd641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe078659_f17dee59",
@@ -93,6 +165,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33402c79_1cb166a3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-17T14:17:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe078659_f17dee59",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 12
+      },
+      "revId": "64cd073da8ef761d26df1c34844023599a3cd641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72d6bd44_b050ce96",
@@ -106,6 +202,30 @@
       "writtenOn": "2024-05-17T13:39:44Z",
       "side": 1,
       "message": "final",
+      "range": {
+        "startLine": 27,
+        "startChar": 13,
+        "endLine": 27,
+        "endChar": 22
+      },
+      "revId": "64cd073da8ef761d26df1c34844023599a3cd641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8628dadf_4484a810",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/MetadataEntity.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-17T14:17:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72d6bd44_b050ce96",
       "range": {
         "startLine": 27,
         "startChar": 13,
