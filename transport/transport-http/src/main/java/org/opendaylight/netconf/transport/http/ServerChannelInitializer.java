@@ -51,11 +51,16 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
     private static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
 
     private final SettableFuture<Void> completeFuture = SettableFuture.create();
-    private final ChannelHandler authHandler;
+    private final AuthHandlerFactory authHandlerFactory;
     private final RequestDispatcher dispatcher;
 
+    ServerChannelInitializer(final AuthHandlerFactory authHandlerFactory, final RequestDispatcher dispatcher) {
+        this.authHandlerFactory = authHandlerFactory;
+        this.dispatcher = dispatcher;
+    }
+
     ServerChannelInitializer(final HttpServerGrouping httpParams, final RequestDispatcher dispatcher) {
-        authHandler = BasicAuthHandler.ofNullable(httpParams);
+        authHandlerFactory = BasicAuthHandlerFactory.ofNullable(httpParams);
         this.dispatcher = dispatcher;
     }
 
@@ -88,8 +93,8 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
     }
 
     private void configureEndOfPipeline(final ChannelPipeline pipeline) {
-        if (authHandler != null) {
-            pipeline.addLast(authHandler);
+        if (authHandlerFactory != null) {
+            pipeline.addLast(authHandlerFactory.create());
         }
         pipeline.addLast(serverHandler(dispatcher));
     }
