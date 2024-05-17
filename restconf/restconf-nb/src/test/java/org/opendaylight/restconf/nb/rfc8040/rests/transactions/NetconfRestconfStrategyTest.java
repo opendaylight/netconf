@@ -50,10 +50,11 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -99,8 +100,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         final var songListWildcardPath = songListPath.node(NodeIdentifierWithPredicates.of(SONG_QNAME));
         final var song1Path = songListPath.node(SONG1.name());
         final var song2Path = songListPath.node(SONG2.name());
-        final var songListData = Builders.orderedMapBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(SONG_QNAME))
+        final var songListData = ImmutableNodes.newUserMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
             .withChild(SONG1).withChild(SONG2).build();
         final var songKeyFields = List.of(YangInstanceIdentifier.of(SONG_INDEX_QNAME));
 
