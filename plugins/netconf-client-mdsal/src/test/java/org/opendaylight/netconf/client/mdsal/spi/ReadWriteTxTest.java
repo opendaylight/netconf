@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.FluentFuture;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -26,21 +26,21 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ReadWriteTxTest {
+@ExtendWith(MockitoExtension.class)
+class ReadWriteTxTest {
     @Mock
     private DOMDataTreeReadTransaction delegateReadTx;
     @Mock
     private DOMDataTreeWriteTransaction delegateWriteTx;
     private ReadWriteTx<?> tx;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         tx = new ReadWriteTx<>(delegateReadTx, delegateWriteTx);
     }
 
     @Test
-    public void submit() throws Exception {
+    void submit() {
         final YangInstanceIdentifier id1 = TxTestUtils.getContainerId();
         final ContainerNode containerNode = TxTestUtils.getContainerNode();
         tx.put(LogicalDatastoreType.CONFIGURATION, id1, containerNode);
@@ -56,19 +56,19 @@ public class ReadWriteTxTest {
     }
 
     @Test
-    public void cancel() throws Exception {
+    void cancel() {
         tx.cancel();
         verify(delegateWriteTx).cancel();
     }
 
     @Test
-    public void read() throws Exception {
+    void read() throws Exception {
         tx.read(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId());
         verify(delegateReadTx).read(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId());
     }
 
     @Test
-    public void exists() throws Exception {
+    void exists() throws Exception {
         final YangInstanceIdentifier id = TxTestUtils.getContainerId();
         when(delegateReadTx.exists(LogicalDatastoreType.CONFIGURATION, id)).thenReturn(
             FluentFutures.immediateTrueFluentFuture());
@@ -77,7 +77,7 @@ public class ReadWriteTxTest {
     }
 
     @Test
-    public void getIdentifier() throws Exception {
+    void getIdentifier() {
         final ReadWriteTx<?> tx2 = new ReadWriteTx<>(delegateReadTx, delegateWriteTx);
         assertNotEquals(tx.getIdentifier(), tx2.getIdentifier());
     }

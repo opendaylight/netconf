@@ -16,11 +16,11 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
@@ -32,8 +32,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class WriteRunningTxTest extends AbstractTestModelTest {
+@ExtendWith(MockitoExtension.class)
+class WriteRunningTxTest extends AbstractTestModelTest {
     private final RemoteDeviceId id =
         new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
 
@@ -41,14 +41,14 @@ public class WriteRunningTxTest extends AbstractTestModelTest {
     private Rpcs.Normalized rpc;
     private NetconfBaseOps netconfOps;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
         netconfOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));
     }
 
     @Test
-    public void testSubmit() throws Exception {
+    void testSubmit() throws Exception {
         final WriteRunningTx tx = new WriteRunningTx(id, netconfOps, true, true);
         tx.init();
 
