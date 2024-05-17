@@ -41,7 +41,7 @@ class NetconfDeviceNotificationServiceTest {
     private Registration registration;
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    void beforeEach() {
         service.registerNotificationListener(listener1, PATH1);
         registration = service.registerNotificationListener(listener2, PATH2);
 
@@ -49,7 +49,7 @@ class NetconfDeviceNotificationServiceTest {
     }
 
     @Test
-    void testPublishNotification() throws Exception {
+    void testPublishNotification() {
         doReturn(PATH1).when(notification1).getType();
 
         service.publishNotification(notification1);
@@ -62,7 +62,7 @@ class NetconfDeviceNotificationServiceTest {
     }
 
     @Test
-    void testCloseRegistration() throws Exception {
+    void testCloseRegistration() {
         service.publishNotification(notification2);
         registration.close();
         service.publishNotification(notification2);
