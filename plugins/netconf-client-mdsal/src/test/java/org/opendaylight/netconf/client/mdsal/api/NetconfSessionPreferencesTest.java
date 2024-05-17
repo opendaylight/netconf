@@ -9,17 +9,17 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 
-public class NetconfSessionPreferencesTest {
+class NetconfSessionPreferencesTest {
     @Test
-    public void testMerge() {
+    void testMerge() {
         final var sessionCaps1 = NetconfSessionPreferences.fromStrings(List.of(
             "namespace:1?module=module1&revision=2012-12-12",
             "namespace:2?module=module2&amp;revision=2012-12-12",
@@ -47,7 +47,7 @@ public class NetconfSessionPreferencesTest {
     }
 
     @Test
-    public void testReplace() throws Exception {
+    void testReplace() {
         final var sessionCaps1 = NetconfSessionPreferences.fromStrings(List.of(
             "namespace:1?module=module1&revision=2012-12-12",
             "namespace:2?module=module2&amp;revision=2012-12-12",
@@ -66,7 +66,7 @@ public class NetconfSessionPreferencesTest {
     }
 
     @Test
-    public void testNonModuleMerge() throws Exception {
+    void testNonModuleMerge() {
         final var sessionCaps1 = NetconfSessionPreferences.fromStrings(List.of(
             "namespace:1?module=module1&revision=2012-12-12",
             "namespace:2?module=module2&amp;revision=2012-12-12",
@@ -102,7 +102,7 @@ public class NetconfSessionPreferencesTest {
     }
 
     @Test
-    public void testNonmoduleReplace() throws Exception {
+    void testNonmoduleReplace() {
         final var sessionCaps1 = NetconfSessionPreferences.fromStrings(List.of(
             "namespace:1?module=module1&revision=2012-12-12",
             "namespace:2?module=module2&amp;revision=2012-12-12",
@@ -129,7 +129,7 @@ public class NetconfSessionPreferencesTest {
     }
 
     @Test
-    public void testCapabilityNoRevision() throws Exception {
+    void testCapabilityNoRevision() {
         assertCaps(NetconfSessionPreferences.fromStrings(List.of(
             "namespace:2?module=module2",
             "namespace:2?module=module2&amp;revision=2012-12-12",
