@@ -70,7 +70,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 
 @ExtendWith(MockitoExtension.class)
-public class HttpClientServerTest {
+class HttpClientServerTest {
 
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$W0rd";
@@ -79,6 +79,14 @@ public class HttpClientServerTest {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final String[] METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE"};
     private static final String RESPONSE_TEMPLATE = "Method: %s URI: %s Payload: %s";
+
+    private static final AuthHandlerFactory CUSTOM_AUTH_HANDLER_FACTORY =
+        () -> new AbstractBasicAuthHandler<String>() {
+            @Override
+            protected String authenticate(final String username, final String password) {
+                return USERNAME.equals(username) && PASSWORD.equals(password) ? username : null;
+            }
+        };
 
     private static ScheduledExecutorService scheduledExecutor;
     private static RequestDispatcher requestDispatcher;
@@ -144,6 +152,16 @@ public class HttpClientServerTest {
         integrationTest(http2);
     }
 
+    @ParameterizedTest(name = "TCP with custom auth handler factory, HTTP/2: {0}")
+    @ValueSource(booleans = {false, true})
+    void customAuthTcp(final boolean http2) throws Exception {
+        final var localPort = freePort();
+        doReturn(serverTransportTcp(localAddress, localPort)).when(serverConfig).getTransport();
+        doReturn(clientTransportTcp(localAddress, localPort, USERNAME, PASSWORD))
+            .when(clientConfig).getTransport();
+        integrationTest(http2, CUSTOM_AUTH_HANDLER_FACTORY);
+    }
+
     @ParameterizedTest(name = "TLS with no authorization, HTTP/2: {0}")
     @ValueSource(booleans = {false, true})
     void noAuthTls(final boolean http2) throws Exception {
@@ -167,9 +185,25 @@ public class HttpClientServerTest {
         integrationTest(http2);
     }
 
+    @ParameterizedTest(name = "TLS with custom auth handler factory, HTTP/2: {0}")
+    @ValueSource(booleans = {false, true})
+    void customAuthTls(final boolean http2) throws Exception {
+        final var certData = generateX509CertData("RSA");
+        final var localPort = freePort();
+        doReturn(serverTransportTls(localAddress, localPort, certData.certificate(), certData.privateKey()))
+            .when(serverConfig).getTransport();
+        doReturn(clientTransportTls(localAddress, localPort, certData.certificate(), USERNAME, PASSWORD))
+            .when(clientConfig).getTransport();
+        integrationTest(http2, CUSTOM_AUTH_HANDLER_FACTORY);
+    }
+
     private void integrationTest(final boolean http2) throws Exception {
+        integrationTest(http2, null);
+    }
+
+    private void integrationTest(final boolean http2, final AuthHandlerFactory authHandlerFactory) throws Exception {
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
-            serverConfig, requestDispatcher).get(2, TimeUnit.SECONDS);
+            serverConfig, requestDispatcher, authHandlerFactory).get(2, TimeUnit.SECONDS);
         try {
             final var client = HTTPClient.connect(clientTransportListener, bootstrapFactory.newBootstrap(),
                     clientConfig, http2).get(2, TimeUnit.SECONDS);
