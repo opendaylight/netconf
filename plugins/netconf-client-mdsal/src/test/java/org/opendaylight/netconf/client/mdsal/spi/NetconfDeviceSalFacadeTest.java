@@ -9,18 +9,17 @@ package org.opendaylight.netconf.client.mdsal.spi;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.net.InetSocketAddress;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -34,7 +33,7 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfDeviceSalFacadeTest {
     private final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", new InetSocketAddress("127.0.0.1", 8000));
 
@@ -43,10 +42,8 @@ public class NetconfDeviceSalFacadeTest {
 
     private NetconfDeviceSalFacade deviceFacade;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        doNothing().when(mountInstance).onDeviceDisconnected();
-
         deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, mountInstance, true);
     }
 
@@ -66,7 +63,7 @@ public class NetconfDeviceSalFacadeTest {
     }
 
     @Test
-    public void testOnDeviceClose() throws Exception {
+    public void testOnDeviceClose() {
         deviceFacade.close();
         verify(mountInstance).close();
     }
@@ -86,7 +83,7 @@ public class NetconfDeviceSalFacadeTest {
     }
 
     @Test
-    public void testOnDeviceNotification() throws Exception {
+    public void testOnDeviceNotification() {
         final DOMNotification domNotification = mock(DOMNotification.class);
         deviceFacade.onNotification(domNotification);
         verify(mountInstance).publish(domNotification);

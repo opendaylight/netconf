@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atMost;
@@ -25,12 +25,11 @@ import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -56,7 +55,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     private static final RemoteDeviceId ID = new RemoteDeviceId("test-mount", new InetSocketAddress(99));
     private static final YangInstanceIdentifier STATE = YangInstanceIdentifier.of(NetconfState.QNAME);
@@ -64,8 +63,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Mock
     private Rpcs.Normalized rpc;
 
-    @Before
-    public void setUp() {
+    private void mockFuture() {
         final var successFuture = Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null));
         doReturn(successFuture, Futures.immediateFailedFuture(new IllegalStateException("Failed tx")), successFuture)
             .when(rpc).invokeNetconf(any(), any());
@@ -79,6 +77,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testIgnoreNonVisibleData() {
+        mockFuture();
         final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
         tx.init();
 
@@ -93,6 +92,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChanges() {
+        mockFuture();
         final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
         tx.init();
         final var future = tx.commit();
@@ -144,7 +144,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testListenerSuccess() throws Exception {
+    public void testListenerSuccess() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .when(rpc).invokeNetconf(any(), any());
         final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
@@ -161,7 +161,8 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testListenerCancellation() throws Exception {
+    public void testListenerCancellation() {
+        mockFuture();
         final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
         tx.init();
 
@@ -176,7 +177,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testListenerFailure() throws Exception {
+    public void testListenerFailure() {
         final var cause = new IllegalStateException("Failed tx");
         doReturn(Futures.immediateFailedFuture(cause)).when(rpc).invokeNetconf(any(), any());
         final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);

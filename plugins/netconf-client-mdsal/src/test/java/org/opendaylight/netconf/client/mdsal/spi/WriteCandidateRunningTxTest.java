@@ -17,11 +17,11 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
@@ -41,14 +41,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
     @Mock
     private Rpcs.Normalized rpc;
     private NetconfBaseOps netconfOps;
     private RemoteDeviceId id;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
         netconfOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));

@@ -13,12 +13,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.InetSocketAddress;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class MountInstanceTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -59,12 +59,12 @@ public class MountInstanceTest {
 
     private NetconfDeviceMount mountInstance;
 
-    @BeforeClass
-    public static void suiteSetUp() throws Exception {
+    @BeforeAll
+    public static void suiteSetUp() {
         SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(service.createMountPoint(any(YangInstanceIdentifier.class))).thenReturn(mountPointBuilder);
         when(mountPointBuilder.register()).thenReturn(registration);
