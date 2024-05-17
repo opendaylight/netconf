@@ -7,15 +7,15 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class SchemalessMessageTransformerTest {
+class SchemalessMessageTransformerTest {
 
     static {
         XMLUnit.setIgnoreWhitespace(true);
@@ -52,13 +52,13 @@ public class SchemalessMessageTransformerTest {
 
     private SchemalessMessageTransformer transformer;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         transformer = new SchemalessMessageTransformer(new MessageCounter());
     }
 
     @Test
-    public void toNotification() throws Exception {
+    void toNotification() throws Exception {
         final Document payload = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"));
         final NetconfMessage netconfMessage = new NetconfMessage(payload);
         final DOMNotification domNotification = transformer.toNotification(netconfMessage);
@@ -69,30 +69,30 @@ public class SchemalessMessageTransformerTest {
         final DOMSourceAnyxmlNode dataContainerChild = (DOMSourceAnyxmlNode) domNotification.getBody()
                 .getChildByArg(new NodeIdentifier(qName));
         final Diff diff = XMLUnit.compareXML(payload, dataContainerChild.body().getNode().getOwnerDocument());
-        assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.similar(), diff.toString());
 
     }
 
     @Test
-    public void toRpcRequest() throws Exception {
+    void toRpcRequest() throws Exception {
         final Node src = XmlUtil.readXmlToDocument("<test-rpc xmlns=\"test-ns\"><input>aaa</input></test-rpc>");
         final NetconfMessage netconfMessage = transformer.toRpcRequest(TEST_RPC, new DOMSource(src));
         final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REQUEST), netconfMessage.getDocument());
-        assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.similar(), diff.toString());
     }
 
     @Test
-    public void toRpcResult() throws Exception {
+    void toRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(EXP_REPLY);
         final NetconfMessage netconfMessage = new NetconfMessage(doc);
         final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(netconfMessage).build(), TEST_RPC);
         final Document domSourceDoc = (Document) result.getNode();
         final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REPLY), domSourceDoc);
-        assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.similar(), diff.toString());
     }
 
     @Test
-    public void toEmptyRpcResult() throws Exception {
+    void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
         final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(new NetconfMessage(doc)).build(),
             Commit.QNAME);

@@ -7,12 +7,11 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
@@ -21,7 +20,6 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.createEditConfigStructure;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toFilterStructure;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +28,10 @@ import java.util.Set;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -86,9 +84,8 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
-public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
+class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     private static final String REVISION_EXAMPLE_SERVER_FARM = "2018-08-07";
     private static final String URN_EXAMPLE_SERVER_FARM = "urn:example:server-farm";
@@ -162,8 +159,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     private NetconfMessageTransformer actionNetconfMessageTransformer;
     private NetconfMessageTransformer netconfMessageTransformer;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         PARTIAL_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(NetconfState.class);
         SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class,
             NetconfConfigChange.class);
@@ -173,15 +170,15 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             "/schemas/rpcs-actions-outputs.yang");
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterClass() {
         PARTIAL_SCHEMA = null;
         SCHEMA = null;
         ACTION_SCHEMA = null;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
         XMLUnit.setIgnoreComments(true);
@@ -192,7 +189,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testLockRequestBaseSchemaNotPresent() throws Exception {
+    void testLockRequestBaseSchemaNotPresent() {
         final var transformer = getTransformer(PARTIAL_SCHEMA);
         final var netconfMessage = transformer.toRpcRequest(Lock.QNAME,
             NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
@@ -208,7 +205,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
+    void testCreateSubscriberNotificationSchemaNotPresent() {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(
                 Set.of(CapabilityURN.NOTIFICATION))));
@@ -223,7 +220,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testLockSchemaRequest() throws Exception {
+    void testLockSchemaRequest() throws Exception {
         final var transformer = getTransformer(PARTIAL_SCHEMA);
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
@@ -233,7 +230,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testRpcEmptyBodyWithOutputDefinedSchemaResult() throws Exception {
+    void testRpcEmptyBodyWithOutputDefinedSchemaResult() throws Exception {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         final var domRpcResult = actionNetconfMessageTransformer.toRpcResult(
@@ -243,7 +240,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testRpcEmptyBodyWithoutOutputDefinedSchemaResult() throws Exception {
+    void testRpcEmptyBodyWithoutOutputDefinedSchemaResult() throws Exception {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         final var domRpcResult = actionNetconfMessageTransformer.toRpcResult(
@@ -253,7 +250,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testDiscardChangesRequest() throws Exception {
+    void testDiscardChangesRequest() {
         final var netconfMessage = netconfMessageTransformer.toRpcRequest(DiscardChanges.QNAME, null);
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
@@ -263,7 +260,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetSchemaRequest() throws Exception {
+    void testGetSchemaRequest() throws Exception {
         final var netconfMessage = netconfMessageTransformer.toRpcRequest(GetSchema.QNAME,
                 MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12")));
         assertSimilarXml(netconfMessage, """
@@ -277,7 +274,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetSchemaResponse() throws Exception {
+    void testGetSchemaResponse() throws Exception {
         final var transformer = getTransformer(SCHEMA);
         final var response = new NetconfMessage(XmlUtil.readXmlToDocument("""
             <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -299,7 +296,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetConfigResponse() throws Exception {
+    void testGetConfigResponse() throws Exception {
         final var response = new NetconfMessage(XmlUtil.readXmlToDocument("""
             <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <data>
@@ -348,7 +345,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetConfigLeafRequest() throws Exception {
+    void testGetConfigLeafRequest() throws Exception {
         final var filter = toFilterStructure(YangInstanceIdentifier.of(
             new NodeIdentifier(NetconfState.QNAME),
             new NodeIdentifier(Schemas.QNAME),
@@ -381,7 +378,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetConfigRequest() throws Exception {
+    void testGetConfigRequest() throws Exception {
         final var filter = toFilterStructure(YangInstanceIdentifier.of(NetconfState.QNAME, Schemas.QNAME), SCHEMA);
 
         final var source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
@@ -405,7 +402,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testEditConfigRequest() throws Exception {
+    void testEditConfigRequest() throws Exception {
         final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12"))
             .body();
 
@@ -455,14 +452,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static void assertSimilarXml(final NetconfMessage netconfMessage, final String xmlContent)
-            throws SAXException, IOException {
+            throws Exception {
         final Diff diff = XMLUnit.compareXML(netconfMessage.getDocument(), XmlUtil.readXmlToDocument(xmlContent));
         diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
-        assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.similar(), diff.toString());
     }
 
     @Test
-    public void testGetRequest() throws Exception {
+    void testGetRequest() throws Exception {
         final var capability = QName.create(Capabilities.QNAME, "capability");
         final var filter = toFilterStructure(YangInstanceIdentifier.of(
             new NodeIdentifier(NetconfState.QNAME),
@@ -488,7 +485,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetLeafList() throws IOException, SAXException {
+    void testGetLeafList() throws Exception {
         final var filter = toFilterStructure(YangInstanceIdentifier.of(
             NetconfState.QNAME,
             Capabilities.QNAME,
@@ -511,7 +508,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testGetList() throws IOException, SAXException {
+    void testGetList() throws Exception {
         final var filter = toFilterStructure(YangInstanceIdentifier.of(
             NetconfState.QNAME,
             Datastores.QNAME,
@@ -539,7 +536,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testCommitResponse() throws Exception {
+    void testCommitResponse() throws Exception {
         final var compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"))).build(),
@@ -549,7 +546,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getActionsTest() {
+    void getActionsTest() {
         final var schemaPaths = Set.of(RESET_SERVER_PATH, START_DEVICE_PATH, ENABLE_INTERFACE_PATH, OPEN_BOXES_PATH,
             KILL_SERVER_APP_PATH, XYZZY_FOO_PATH, XYZZY_BAR_PATH, CHOICE_ACTION_PATH, DISABLE_INTERFACE_PATH,
             CHECK_WITH_OUTPUT_INTERFACE_PATH, CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
@@ -558,12 +555,12 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertEquals(schemaPaths.size(), actions.size());
 
         for (var path : schemaPaths) {
-            assertNotNull("Action for " + path + " not found", actions.get(path));
+            assertNotNull(actions.get(path), "Action for " + path + " not found");
         }
     }
 
     @Test
-    public void toActionRequestListTopLevelTest() {
+    void toActionRequestListTopLevelTest() {
         QName nameQname = QName.create(SERVER_QNAME, "name");
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(new NodeIdentifier(SERVER_QNAME));
@@ -590,7 +587,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestContainerTopLevelTest() {
+    void toActionRequestContainerTopLevelTest() {
         List<PathArgument> nodeIdentifiers = List.of(NodeIdentifier.create(DEVICE_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
@@ -607,7 +604,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestContainerInContainerTest() {
+    void toActionRequestContainerInContainerTest() {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(BOX_OUT_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(BOX_IN_QNAME));
@@ -631,7 +628,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestListInContainerTest() {
+    void toActionRequestListInContainerTest() {
         QName nameQname = QName.create(INTERFACE_QNAME, "name");
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
@@ -665,7 +662,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestListInContainerAugmentedIntoListTest() {
+    void toActionRequestListInContainerAugmentedIntoListTest() {
         QName serverNameQname = QName.create(SERVER_QNAME, "name");
         QName applicationNameQname = QName.create(APPLICATION_QNAME, "name");
 
@@ -713,7 +710,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestConflictingInListTest() {
+    void toActionRequestConflictingInListTest() {
         QName barInputQname = QName.create(BAR_QNAME, "bar");
         QName barIdQname = QName.create(BAR_QNAME, "bar-id");
         Byte barInput = 1;
@@ -749,7 +746,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestConflictingInContainerTest() {
+    void toActionRequestConflictingInContainerTest() {
         QName fooInputQname = QName.create(FOO_QNAME, "foo");
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
@@ -771,7 +768,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionRequestChoiceTest() {
+    void toActionRequestChoiceTest() {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(CONFLICT_CHOICE_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(CHOICE_CONT_QNAME));
@@ -792,7 +789,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toAugmentedActionRequestListInContainerTest() {
+    void toAugmentedActionRequestListInContainerTest() {
         QName nameQname = QName.create(INTERFACE_QNAME, "name");
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
@@ -826,7 +823,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionResultTest() throws Exception {
+    void toActionResultTest() throws Exception {
         var message = new NetconfMessage(XmlUtil.readXmlToDocument("""
             <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <reset-finished-at xmlns="urn:example:server-farm">now</reset-finished-at>
@@ -839,7 +836,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionEmptyBodyWithOutputDefinedResultTest() throws Exception {
+    void toActionEmptyBodyWithOutputDefinedResultTest() throws Exception {
         final var message = new NetconfMessage(XmlUtil.readXmlToDocument("""
             <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <ok/>
@@ -851,7 +848,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void toActionEmptyBodyWithoutOutputDefinedResultTest() throws Exception {
+    void toActionEmptyBodyWithoutOutputDefinedResultTest() throws Exception {
         final var message = new NetconfMessage(XmlUtil.readXmlToDocument("""
             <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <ok/>
@@ -863,7 +860,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getTwoNonOverlappingFieldsTest() throws IOException, SAXException {
+    void getTwoNonOverlappingFieldsTest() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
         final var netconfStartTimeField = YangInstanceIdentifier.of(Statistics.QNAME,
@@ -893,7 +890,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getOverlappingFieldsTest() throws IOException, SAXException {
+    void getOverlappingFieldsTest() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
         final var capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
@@ -930,7 +927,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getOverlappingFieldsWithEmptyFieldTest() throws IOException, SAXException {
+    void getOverlappingFieldsWithEmptyFieldTest() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
         final var capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
@@ -954,7 +951,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getSpecificFieldsUnderListTest() throws IOException, SAXException {
+    void getSpecificFieldsUnderListTest() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(
             new NodeIdentifier(NetconfState.QNAME),
@@ -993,7 +990,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getSpecificFieldsUnderMultipleLists() throws IOException, SAXException {
+    void getSpecificFieldsUnderMultipleLists() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Datastores.QNAME);
         final var partialLockYiid = YangInstanceIdentifier.of(
@@ -1038,7 +1035,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getWholeListsUsingFieldsTest() throws IOException, SAXException {
+    void getWholeListsUsingFieldsTest() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
         final var datastoreListField = YangInstanceIdentifier.of(
@@ -1075,7 +1072,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void getSpecificListEntriesWithSpecificFieldsTest() throws IOException, SAXException {
+    void getSpecificListEntriesWithSpecificFieldsTest() throws Exception {
         // preparation of the fields
         final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Sessions.QNAME);
         final var sessionId = QName.create(Session.QNAME, "session-id");
@@ -1116,7 +1113,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     // Proof that YANGTOOLS-1362 works on DOM level
-    public void testConfigChangeToNotification() throws SAXException, IOException {
+    void testConfigChangeToNotification() throws Exception {
         final var message = new NetconfMessage(XmlUtil.readXmlToDocument(
             "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">\n"
             + " <eventTime>2021-11-11T11:26:16Z</eventTime> \n"
@@ -1136,14 +1133,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final var change = netconfMessageTransformer.toNotification(message).getBody();
         final var editList = change.getChildByArg(new NodeIdentifier(Edit.QNAME));
-        assertThat(editList, instanceOf(UnkeyedListNode.class));
-        final var edits = ((UnkeyedListNode) editList).body();
+        final var unkeyedListNode = assertInstanceOf(UnkeyedListNode.class, editList);
+        final var edits = unkeyedListNode.body();
         assertEquals(1, edits.size());
         final var edit = edits.iterator().next();
         final var target = edit.getChildByArg(new NodeIdentifier(QName.create(Edit.QNAME, "target"))).body();
-        assertThat(target, instanceOf(YangInstanceIdentifier.class));
+        final var identifier = assertInstanceOf(YangInstanceIdentifier.class, target);
 
-        final var args = ((YangInstanceIdentifier) target).getPathArguments();
+        final var args = identifier.getPathArguments();
         assertEquals(4, args.size());
     }
 

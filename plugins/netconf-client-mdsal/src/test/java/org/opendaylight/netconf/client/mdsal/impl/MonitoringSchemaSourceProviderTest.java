@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.Set;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ class MonitoringSchemaSourceProviderTest {
     private MonitoringSchemaSourceProvider provider;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(getNode(), Set.of()))).when(service)
             .invokeNetconf(any(), any());
 
@@ -59,7 +58,7 @@ class MonitoringSchemaSourceProviderTest {
             MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Revision.of("2016-02-08")));
     }
 
-    private static ContainerNode getNode() throws ParserConfigurationException {
+    private static ContainerNode getNode() {
         final var id = new NodeIdentifier(
             QName.create("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring", "2010-10-04", "output"));
         final var childId = new NodeIdentifier(

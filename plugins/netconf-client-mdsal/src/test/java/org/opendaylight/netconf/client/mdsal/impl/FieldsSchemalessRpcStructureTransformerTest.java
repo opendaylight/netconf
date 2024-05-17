@@ -77,7 +77,7 @@ class FieldsSchemalessRpcStructureTransformerTest {
     private final SchemalessRpcStructureTransformer transformer = new SchemalessRpcStructureTransformer();
 
     @Test
-    void toFilterStructureWithSingleRootTest() throws Exception {
+    void toFilterStructureWithSingleRootTest() {
         final var rootPath = YangInstanceIdentifier.of(C1_NID);
         final var leaf1Field = YangInstanceIdentifier.of(LEAF1_NID);
         final var leaf3Field = YangInstanceIdentifier.of(NodeIdentifierWithPredicates.of(
@@ -91,7 +91,7 @@ class FieldsSchemalessRpcStructureTransformerTest {
     }
 
     @Test
-    void toFilterStructureWithTwoRootContainersTest() throws Exception {
+    void toFilterStructureWithTwoRootContainersTest() {
         final var c1RootPath = YangInstanceIdentifier.of(C1_NID);
         final var cxRootPath = YangInstanceIdentifier.of(CX_NID);
         final var c2Field = YangInstanceIdentifier.of(LIST1_NID, C2_NID);
@@ -104,8 +104,7 @@ class FieldsSchemalessRpcStructureTransformerTest {
         assertSimilar("two-roots-filter.xml", filterStructure);
     }
 
-    private static void assertSimilar(final String filterFileName, final DOMSourceAnyxmlNode filterStructure)
-            throws Exception {
+    private static void assertSimilar(final String filterFileName, final DOMSourceAnyxmlNode filterStructure) {
         final var diff = DiffBuilder.compare(FieldsSchemalessRpcStructureTransformerTest.class.getResourceAsStream(
             "/schemaless/filter/" + filterFileName))
             .withTest(XmlUtil.toString((Element) filterStructure.body().getNode()))
