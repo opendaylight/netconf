@@ -7,18 +7,18 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 
-public class LibraryModulesSchemasTest {
+class LibraryModulesSchemasTest {
 
     @Test
-    public void testCreate() throws Exception {
+    void testCreate() throws Exception {
         // test create from xml
         LibraryModulesSchemas libraryModulesSchemas =
                 LibraryModulesSchemas.create(getClass().getResource("/yang-library.xml").toString());
@@ -45,7 +45,7 @@ public class LibraryModulesSchemasTest {
     }
 
     @Test
-    public void testCreateInvalidModulesEntries() throws Exception {
+    void testCreateInvalidModulesEntries() throws Exception {
         LibraryModulesSchemas libraryModulesSchemas =
                 LibraryModulesSchemas.create(getClass().getResource("/yang-library-fail.xml").toString());
 
@@ -54,7 +54,7 @@ public class LibraryModulesSchemasTest {
     }
 
     @Test
-    public void testCreateFromInvalidAll() throws Exception {
+    void testCreateFromInvalidAll() {
         // test bad yang lib url
         LibraryModulesSchemas libraryModulesSchemas = LibraryModulesSchemas.create("ObviouslyBadUrl");
         assertEquals(Map.of(), libraryModulesSchemas.getAvailableModels());

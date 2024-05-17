@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import java.util.Collection;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
-public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
+class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     private static final String TEST_MODEL_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:rpc-test";
     private static final String REVISION = "2014-07-14";
@@ -49,8 +49,8 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     private  NetconfMessageTransformer messageTransformer;
 
-    @BeforeClass
-    public static void setup() {
+    @BeforeAll
+    static void setup() {
         final Collection<? extends Module> notifModules = YangParserTestUtils.parseYangResource(
             "/schemas/rpc-notification-subscription.yang").getModules();
         assertTrue(!notifModules.isEmpty());
@@ -59,14 +59,14 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
             "/schemas/config-test-rpc.yang", "/schemas/rpc-notification-subscription.yang");
     }
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(cfgCtx), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test
-    public void testUserDefinedRpcCall() throws Exception {
+    void testUserDefinedRpcCall() {
         final ContainerNode root = ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(toId(SUBSCRIBE_RPC_NAME))
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME, "NETCONF"))
@@ -88,7 +88,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testRpcResponse() throws Exception {
+    void testRpcResponse() throws Exception {
         final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-5\">\n"
                         + "<data xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">"
