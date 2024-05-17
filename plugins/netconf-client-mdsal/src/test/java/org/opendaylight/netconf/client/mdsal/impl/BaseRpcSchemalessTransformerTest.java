@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
@@ -81,7 +81,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     @Test
@@ -104,6 +104,6 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 }

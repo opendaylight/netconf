@@ -9,9 +9,9 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
@@ -54,7 +54,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Set.of(
         "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
@@ -66,7 +66,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Mock
     private NetconfRpcService rpc;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
@@ -79,7 +79,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testTesolveMonitoringSources() throws Exception {
+    public void testTesolveMonitoringSources() {
         final var providedSchemas = NetconfStateSchemasResolverImpl.resolveMonitoringSources(DEVICE_ID, rpc,
             SCHEMAS_PAYLOAD);
 
@@ -92,8 +92,8 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    @Ignore("We cannot handle a container as data -- only anyxml")
-    public void testCreate2() throws Exception {
+    @Disabled("We cannot handle a container as data -- only anyxml")
+    public void testCreate2() {
         final ContainerNode rpcReply = ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                 .withChild(ImmutableNodes.newContainerBuilder()
@@ -115,20 +115,20 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testCreateMonitoringNotSupported() throws Exception {
+    public void testCreateMonitoringNotSupported() {
         final var stateSchemas = assertSchemas(NetconfSessionPreferences.fromStrings(Set.of()));
         assertEquals(Set.of(), availableYangSchemasQNames(stateSchemas.providedSources()));
     }
 
     @Test
-    public void testCreateFail() throws Exception {
+    public void testCreateFail() {
         final var domEx = new DOMRpcImplementationNotAvailableException("not available");
         doReturn(Futures.immediateFailedFuture(domEx)).when(rpc).invokeNetconf(eq(Get.QNAME), any());
         assertSame(domEx, assertSchemasFailure());
     }
 
     @Test
-    public void testCreateRpcError() throws Exception {
+    public void testCreateRpcError() {
         final var rpcError = RpcResultBuilder.newError(ErrorType.RPC, new ErrorTag("fail"), "fail");
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
             .invokeNetconf(eq(Get.QNAME), any());

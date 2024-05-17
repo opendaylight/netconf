@@ -9,10 +9,10 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
@@ -30,10 +30,10 @@ import java.util.Set;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -162,7 +162,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     private NetconfMessageTransformer actionNetconfMessageTransformer;
     private NetconfMessageTransformer netconfMessageTransformer;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         PARTIAL_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(NetconfState.class);
         SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class,
@@ -173,14 +173,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             "/schemas/rpcs-actions-outputs.yang");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() {
         PARTIAL_SCHEMA = null;
         SCHEMA = null;
         ACTION_SCHEMA = null;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
@@ -192,7 +192,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testLockRequestBaseSchemaNotPresent() throws Exception {
+    public void testLockRequestBaseSchemaNotPresent() {
         final var transformer = getTransformer(PARTIAL_SCHEMA);
         final var netconfMessage = transformer.toRpcRequest(Lock.QNAME,
             NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
@@ -208,7 +208,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
+    public void testCreateSubscriberNotificationSchemaNotPresent() {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(
                 Set.of(CapabilityURN.NOTIFICATION))));
@@ -253,7 +253,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testDiscardChangesRequest() throws Exception {
+    public void testDiscardChangesRequest() {
         final var netconfMessage = netconfMessageTransformer.toRpcRequest(DiscardChanges.QNAME, null);
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
@@ -458,7 +458,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             throws SAXException, IOException {
         final Diff diff = XMLUnit.compareXML(netconfMessage.getDocument(), XmlUtil.readXmlToDocument(xmlContent));
         diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
-        assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.similar(), diff.toString());
     }
 
     @Test
@@ -558,7 +558,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertEquals(schemaPaths.size(), actions.size());
 
         for (var path : schemaPaths) {
-            assertNotNull("Action for " + path + " not found", actions.get(path));
+            assertNotNull(actions.get(path), "Action for " + path + " not found");
         }
     }
 

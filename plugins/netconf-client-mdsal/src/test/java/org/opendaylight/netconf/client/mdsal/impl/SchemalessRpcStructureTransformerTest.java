@@ -7,22 +7,21 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.xml.transform.dom.DOMSource;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -33,68 +32,45 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 import org.xmlunit.builder.DiffBuilder;
 
-@RunWith(Parameterized.class)
+@ExtendWith(MockitoExtension.class)
 public class SchemalessRpcStructureTransformerTest {
     private static final String NAMESPACE = "http://example.com/schema/1.2/config";
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters() {
-        return Arrays.asList(new Object[][] {
-            { YangInstanceIdentifier.builder()
-                .node(createNodeId("top"))
-                .node(createNodeId("users"))
-                .build(), "container.xml", null
-            },
-            { YangInstanceIdentifier.builder()
+    private final SchemalessRpcStructureTransformer adapter = new SchemalessRpcStructureTransformer();
+
+    @MethodSource
+    public static Stream<Arguments> parameters() {
+        return Stream.of(Arguments.of(
+                YangInstanceIdentifier.builder()
+                    .node(createNodeId("top"))
+                    .node(createNodeId("users"))
+                    .build(), "container.xml", null),
+            Arguments.of(YangInstanceIdentifier.builder()
                 .node(createNodeId("top"))
                 .node(createNodeId("users"))
                 .node(createListNodeId("user", "key", "k1"))
-                .build(), "keyed-list.xml", null
-            },
-            { YangInstanceIdentifier.builder()
+                .build(), "keyed-list.xml", null),
+            Arguments.of(YangInstanceIdentifier.builder()
                 .node(createNodeId("top"))
                 .node(createNodeId("users"))
                 .node(createListNodeId("user",
                     ImmutableMap.of(QName.create(NAMESPACE, "key1"), "k1", QName.create(NAMESPACE, "key2"), "k2")))
-                .build(), "keyed-list-compound-key.xml", null
-            },
-            { YangInstanceIdentifier.builder()
+                .build(), "keyed-list-compound-key.xml", null),
+            Arguments.of(YangInstanceIdentifier.builder()
                 .node(createNodeId("top"))
                 .node(createNodeId("users"))
                 .node(createListNodeId("user", "key", "k2"))
-                .build(), "keyed-list-bad-key.xml", IllegalStateException.class
-            }});
+                .build(), "keyed-list-bad-key.xml", IllegalStateException.class));
     }
 
-    private final Class<? extends Exception> expectedException;
-
-    private final String expectedConfig;
-    private final String expectedFilter;
-    private final String getConfigData;
-    private final YangInstanceIdentifier path;
-    private final DOMSource source;
-
-    private final SchemalessRpcStructureTransformer adapter = new SchemalessRpcStructureTransformer();
-
-    public SchemalessRpcStructureTransformerTest(final YangInstanceIdentifier path, final String testDataset,
-            final Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
-        this.path = path;
-        this.expectedException = expectedException;
-        source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
-                .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
-        expectedConfig = Files.readString(
-                Paths.get(getClass().getResource("/schemaless/edit-config/" + testDataset).toURI()));
-        expectedFilter = Files.readString(
-                Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI()));
-        getConfigData = Files.readString(
-                Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI()));
-    }
-
-    @Test
-    public void testCreateEditConfigStructure() throws Exception {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    public void testCreateEditConfigStructure(final YangInstanceIdentifier path, final String testDataset,
+        final Class<? extends Throwable> expectedException) throws Exception {
+        final DOMSource source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
+            .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
         final var data = ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(source)
@@ -108,30 +84,39 @@ public class SchemalessRpcStructureTransformerTest {
 
         final var anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE));
-        final var diff = DiffBuilder.compare(expectedConfig)
+        final var diff = DiffBuilder.compare(Files.readString(Paths.get(getClass()
+                .getResource("/schemaless/edit-config/" + testDataset).toURI())))
             .withTest(anyXmlNode.body().getNode())
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
-    @Test
-    public void testToFilterStructure() throws Exception {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    public void testToFilterStructure(final YangInstanceIdentifier path, final String testDataset,
+            final Class<? extends Throwable> expectedException) throws Exception {
         final var anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
-        final var diff = DiffBuilder.compare(expectedFilter)
+        final var diff = DiffBuilder.compare(Files.readString(
+                Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())))
             .withTest(anyXmlNode.body().getNode())
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
-    @Test
-    public void testSelectFromDataStructure() throws Exception {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    public void testSelectFromDataStructure(final YangInstanceIdentifier path, final String testDataset,
+            final Class<? extends Throwable> expectedException) throws Exception {
+        final DOMSource source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
+            .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
         final var data = ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
-                .withValue(new DOMSource(XmlUtil.readXmlToDocument(getConfigData).getDocumentElement()))
+                .withValue(new DOMSource(XmlUtil.readXmlToDocument(Files.readString(Paths.get(getClass()
+                    .getResource("/schemaless/get-config/" + testDataset).toURI()))).getDocumentElement()))
                 .build();
         final var dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path).orElseThrow();
         final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.body().getNode());
@@ -140,7 +125,7 @@ public class SchemalessRpcStructureTransformerTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     private static NodeIdentifier createNodeId(final String name) {
