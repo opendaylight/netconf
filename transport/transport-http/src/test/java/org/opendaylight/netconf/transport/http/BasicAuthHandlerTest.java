@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opendaylight.netconf.transport.http.BasicAuthHandler.BASIC_AUTH_PREFIX;
+import static org.opendaylight.netconf.transport.http.AbstractBasicAuthHandler.BASIC_AUTH_PREFIX;
 
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultHttpRequest;
@@ -49,7 +49,7 @@ public class BasicAuthHandlerTest {
 
     @BeforeEach
     void beforeEach() {
-        final var authHandler = BasicAuthHandler.ofNullable(new HttpServerGrouping() {
+        final var authHandler = BasicAuthHandlerFactory.ofNullable(new HttpServerGrouping() {
             @Override
             public Class<? extends HttpServerGrouping> implementedInterface() {
                 throw new UnsupportedOperationException();
@@ -95,7 +95,7 @@ public class BasicAuthHandlerTest {
         });
         assertNotNull(authHandler);
 
-        channel = new EmbeddedChannel(authHandler);
+        channel = new EmbeddedChannel(authHandler.newAuthHandler());
     }
 
     @ParameterizedTest(name = "BasicAuth success: {0} password configured")

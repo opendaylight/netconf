@@ -8,32 +8,20 @@
 package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.transport.http.Http2Utils.copyStreamId;
 
 import com.google.common.collect.ImmutableMap;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMessage;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.ReferenceCountUtil;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import io.netty.channel.ChannelHandler;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.Crypt;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.Basic;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Server side Basic Authorization handler.
  */
-final class BasicAuthHandler extends SimpleChannelInboundHandler<HttpMessage> {
+final class BasicAuthHandlerFactory implements AuthHandlerFactory {
     @NonNullByDefault
     private record CryptHash(String salt, String hash) {
         CryptHash {
@@ -42,7 +30,6 @@ final class BasicAuthHandler extends SimpleChannelInboundHandler<HttpMessage> {
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(BasicAuthHandler.class);
     private static final Pattern CRYPT_HASH_PATTERN = Pattern.compile(
         """
             \\$0\\$.*\
@@ -51,16 +38,13 @@ final class BasicAuthHandler extends SimpleChannelInboundHandler<HttpMessage> {
             |\\$6\\$(rounds=\\d+\\$)?[a-zA-Z0-9./]{1,16}\\$[a-zA-Z0-9./]{86}""");
     private static final String DEFAULT_SALT = "$5$rounds=3500$default";
 
-    public static final String BASIC_AUTH_PREFIX = "Basic ";
-    public static final int BASIC_AUTH_CUT_INDEX = BASIC_AUTH_PREFIX.length();
-
     private final ImmutableMap<String, CryptHash> knownHashes;
 
-    private BasicAuthHandler(final ImmutableMap<String, CryptHash> knownHashes) {
+    private BasicAuthHandlerFactory(final ImmutableMap<String, CryptHash> knownHashes) {
         this.knownHashes = requireNonNull(knownHashes);
     }
 
-    static @Nullable BasicAuthHandler ofNullable(final HttpServerGrouping httpParams) {
+    static @Nullable BasicAuthHandlerFactory ofNullable(final HttpServerGrouping httpParams) {
         if (httpParams == null) {
             return null;
         }
@@ -85,36 +69,17 @@ final class BasicAuthHandler extends SimpleChannelInboundHandler<HttpMessage> {
             }
         });
         final var knownHashes = builder.build();
-        return knownHashes.isEmpty() ? null : new BasicAuthHandler(knownHashes);
+        return knownHashes.isEmpty() ? null : new BasicAuthHandlerFactory(knownHashes);
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage msg) throws Exception {
-        if (isAuthorized(msg.headers().get(HttpHeaderNames.AUTHORIZATION))) {
-            ReferenceCountUtil.retain(msg);
-            ctx.fireChannelRead(msg);
-        } else {
-            final var error = new DefaultFullHttpResponse(msg.protocolVersion(), HttpResponseStatus.UNAUTHORIZED,
-                Unpooled.EMPTY_BUFFER);
-            copyStreamId(msg, error);
-            ctx.writeAndFlush(error);
-        }
-    }
-
-    private boolean isAuthorized(final String authHeader) {
-        if (authHeader == null || !authHeader.startsWith(BASIC_AUTH_PREFIX)) {
-            LOG.debug("UNAUTHORIZED: No Authorization (Basic) header");
-            return false;
-        }
-        final String[] credentials;
-        try {
-            final var decoded = Base64.getDecoder().decode(authHeader.substring(BASIC_AUTH_CUT_INDEX));
-            credentials = new String(decoded, StandardCharsets.UTF_8).split(":");
-        } catch (IllegalArgumentException e) {
-            LOG.debug("UNAUTHORIZED: Error decoding credentials", e);
-            return false;
-        }
-        final var found = credentials.length == 2 ? knownHashes.get(credentials[0]) : null;
-        return found != null && found.hash.equals(Crypt.crypt(credentials[1], found.salt));
+    public ChannelHandler newAuthHandler() {
+        return new AbstractBasicAuthHandler() {
+            @Override
+            protected boolean isAuthorized(final String uri, final String username, final String password) {
+                final var found = knownHashes.get(username);
+                return found != null && found.hash.equals(Crypt.crypt(password, found.salt));
+            }
+        };
     }
 }
