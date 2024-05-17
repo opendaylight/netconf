@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import java.util.Collection;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -49,7 +49,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     private  NetconfMessageTransformer messageTransformer;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         final Collection<? extends Module> notifModules = YangParserTestUtils.parseYangResource(
             "/schemas/rpc-notification-subscription.yang").getModules();
@@ -59,14 +59,14 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
             "/schemas/config-test-rpc.yang", "/schemas/rpc-notification-subscription.yang");
     }
 
-    @Before
+    @BeforeEach
     public void before() {
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(cfgCtx), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test
-    public void testUserDefinedRpcCall() throws Exception {
+    public void testUserDefinedRpcCall() {
         final ContainerNode root = ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(toId(SUBSCRIBE_RPC_NAME))
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME, "NETCONF"))

@@ -9,7 +9,7 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,12 +31,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -63,7 +63,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfDeviceTest extends AbstractTestModelTest {
     public static final String TEST_NAMESPACE = "test:namespace";
     public static final String TEST_MODULE = "test-module";
@@ -83,7 +83,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     @Mock
     private DeviceNetconfSchemaProvider schemaProvider;
 
-    @BeforeClass
+    @BeforeAll
     public static final void setupNotification() throws Exception {
         NOTIFICATION = new NetconfMessage(XmlUtil.readXmlToDocument(
             NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
