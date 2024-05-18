@@ -9,9 +9,9 @@ package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.PatchBody.ResourceContext;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -25,7 +25,7 @@ public final class DefaultResourceContext extends ResourceContext {
     }
 
     @Override
-    protected ResourceContext resolveRelative(final ApiPath apiPath) {
+    protected ResourceContext resolveRelative(final ApiPath apiPath) throws ServerException {
         // If subResource is empty just return this resource
         if (apiPath.isEmpty()) {
             return this;
@@ -45,7 +45,7 @@ public final class DefaultResourceContext extends ResourceContext {
         if (resolved instanceof Data dataPath) {
             return new DefaultResourceContext(dataPath);
         }
-        throw new RestconfDocumentedException("Sub-resource '" + apiPath + "' resolves to non-data " + resolved,
-            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+            "Sub-resource '%s' resolves to non-data %s", apiPath, resolved);
     }
 }

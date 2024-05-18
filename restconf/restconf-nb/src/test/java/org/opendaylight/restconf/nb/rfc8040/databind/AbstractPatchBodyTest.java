@@ -36,7 +36,9 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndPath;
 import org.opendaylight.restconf.server.api.PatchBody;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -99,7 +101,12 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
 
         final var strategy = new MdsalRestconfStrategy(IID_DATABIND, dataBroker, ImmutableMap.of(), null, null, null,
             mountPointService);
-        final var stratAndPath = strategy.resolveStrategyPath(apiPath);
+        final StrategyAndPath stratAndPath;
+        try {
+            stratAndPath = strategy.resolveStrategyPath(apiPath);
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             return body.toPatchContext(new DefaultResourceContext(stratAndPath.path()));

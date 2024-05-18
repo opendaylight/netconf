@@ -13,9 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.text.ParseException;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerErrorInfo;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -97,39 +99,39 @@ class NC1265Test {
     @Test
     void noslashInstanceIdentifierKey() {
         final var error = assertRestconfError("nc1265:bar=nc1265:baz=123");
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("Invalid value 'nc1265:baz=123' for (nc1265)key", error.getErrorMessage());
-        assertEquals("""
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
+        assertEquals(new ErrorMessage("Invalid value 'nc1265:baz=123' for (nc1265)key"), error.message());
+        assertEquals(new ServerErrorInfo("""
             Could not parse Instance Identifier 'nc1265:baz=123'. Offset: 0 : Reason: Identifier must start with '/'.\
-            """, error.getErrorInfo());
+            """), error.info());
     }
 
     @Test
     void malformedInstanceIdentifierKey() {
         final var error = assertRestconfError("nc1265:bar=%2Fnc1265:baz[key='abc']");
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("Invalid value '/nc1265:baz[key='abc']' for (nc1265)key", error.getErrorMessage());
-        assertEquals("""
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
+        assertEquals(new ErrorMessage("Invalid value '/nc1265:baz[key='abc']' for (nc1265)key"), error.message());
+        assertEquals(new ServerErrorInfo("""
             Incorrect lexical representation of integer value: abc.
             An integer value can be defined as:
               - a decimal number,
               - a hexadecimal number (prefix 0x),%n  - an octal number (prefix 0).
-            Signed values are allowed. Spaces between digits are NOT allowed.""", error.getErrorInfo());
+            Signed values are allowed. Spaces between digits are NOT allowed."""), error.info());
     }
 
     private static void assertNormalized(final YangInstanceIdentifier expected, final String apiPath) {
-        assertEquals(expected, NORMALIZER.normalizeDataPath(assertApiPath(apiPath)).instance());
+        try {
+            assertEquals(expected, NORMALIZER.normalizeDataPath(assertApiPath(apiPath)).instance());
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
-    private static RestconfError assertRestconfError(final String apiPath) {
+    private static ServerError assertRestconfError(final String apiPath) {
         final var parsed = assertApiPath(apiPath);
-
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> NORMALIZER.normalizeDataPath(parsed));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        return errors.get(0);
+        return assertThrows(ServerException.class, () -> NORMALIZER.normalizeDataPath(parsed)).error();
     }
 
     private static ApiPath assertApiPath(final String apiPath) {
