@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.FormattableBody;
 
 /**
  * Result of a {@code GET} request as defined in
@@ -22,14 +23,14 @@ import org.eclipse.jdt.annotation.Nullable;
  * @param lastModified response {@code Last-Modified} header, or {@code null} if not applicable
  */
 public record DataGetResult(
-        @NonNull DatabindFormattableBody body,
+        @NonNull FormattableBody body,
         @Nullable EntityTag entityTag,
         @Nullable Instant lastModified) implements ConfigurationMetadata {
     public DataGetResult {
         requireNonNull(body);
     }
 
-    public DataGetResult(final @NonNull DatabindFormattableBody body) {
+    public DataGetResult(final @NonNull FormattableBody body) {
         this(body, null, null);
     }
 }

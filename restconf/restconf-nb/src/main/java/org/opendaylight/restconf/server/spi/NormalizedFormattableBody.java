@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.DatabindFormattableBody;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -36,14 +35,15 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
  * A {@link FormattableBody} representing a data resource.
  */
 @NonNullByDefault
-public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode> extends DatabindFormattableBody
+public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode> extends FormattableBody
         permits DataFormattableBody, RootFormattableBody {
     private final NormalizedNodeWriterFactory writerFactory;
+    private final DatabindContext databind;
     private final N data;
 
     NormalizedFormattableBody(final DatabindContext databind, final NormalizedNodeWriterFactory writerFactory,
             final N data) {
-        super(databind);
+        this.databind = requireNonNull(databind);
         this.writerFactory = requireNonNull(writerFactory);
         this.data = requireNonNull(data);
     }
@@ -106,8 +106,7 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     }
 
     @Override
-    protected final void formatToJSON(final DatabindContext databind, final PrettyPrintParam prettyPrint,
-            final OutputStream out) throws IOException {
+    public final void formatToJSON(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         try (var writer = FormattableBodySupport.createJsonWriter(out, prettyPrint)) {
             formatToJSON(databind.jsonCodecs(), data, writer);
         }
@@ -116,8 +115,7 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     protected abstract void formatToJSON(JSONCodecFactory codecs, N data, JsonWriter writer) throws IOException;
 
     @Override
-    protected final void formatToXML(final DatabindContext databind, final PrettyPrintParam prettyPrint,
-            final OutputStream out) throws IOException {
+    public final void formatToXML(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         final var writer = FormattableBodySupport.createXmlWriter(out, prettyPrint);
         try {
             formatToXML(databind.xmlCodecs(), data, writer);
