@@ -87,6 +87,7 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
@@ -203,7 +204,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         operations = new OperationsResource(pathNormalizer);
     }
 
-    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) {
+    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) throws ServerException {
         final var andTail = resolveStrategy(path);
         final var strategy = andTail.strategy();
         return new StrategyAndPath(strategy, strategy.pathNormalizer.normalizeDataPath(andTail.tail()));
@@ -215,34 +216,35 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param path {@link ApiPath} to resolve
      * @return A strategy and the remaining path
      * @throws NullPointerException if {@code path} is {@code null}
+     * @throws ServerException if an error occurs
      */
-    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) {
+    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) throws ServerException {
         var mount = path.indexOf("yang-ext", "mount");
         if (mount == -1) {
             return new StrategyAndTail(this, path);
         }
         if (mountPointService == null) {
-            throw new RestconfDocumentedException("Mount point service is not available",
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                "Mount point service is not available");
         }
         final var mountPath = path.subPath(0, mount);
         final var dataPath = pathNormalizer.normalizeDataPath(path.subPath(0, mount));
         final var mountPoint = mountPointService.getMountPoint(dataPath.instance())
-            .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + mountPath + "' does not exist",
-                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
+                "Mount point '%s' does not exist", mountPath));
 
-        return createStrategy(mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
+        return createStrategy(databind, mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
     }
 
-    private static @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint) {
+    private static @NonNull RestconfStrategy createStrategy(final DatabindContext databind, final ApiPath mountPath,
+            final DOMMountPoint mountPoint) throws ServerException {
         final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
-            .orElseThrow(() -> new RestconfDocumentedException(
-                "Mount point '" + mountPath + "' does not expose DOMSchemaService",
-                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
+                "Mount point '%s' does not expose DOMSchemaService", mountPath));
         final var mountModelContext = mountSchemaService.getGlobalContext();
         if (mountModelContext == null) {
-            throw new RestconfDocumentedException("Mount point '" + mountPath + "' does not have any models",
-                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
+                "Mount point '%s' does not have any models", mountPath);
         }
         final var mountDatabind = DatabindContext.ofModel(mountModelContext);
         final var mountPointService = mountPoint.getService(DOMMountPointService.class).orElse(null);
@@ -263,8 +265,9 @@ public abstract class RestconfStrategy implements DatabindAware {
                 actionService, sourceProvider, mountPointService);
         }
         LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
-        throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
-            ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountPoint.getIdentifier());
+        throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+            new ServerErrorPath(databind, mountPoint.getIdentifier()),
+            "Could not find a supported access interface in mount point");
     }
 
     @Override
@@ -335,8 +338,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final Insert insert;
@@ -581,8 +584,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final NormalizedNode data;
@@ -599,8 +602,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final PatchContext patch;
@@ -828,8 +831,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         // FIXME: reject empty YangInstanceIdentifier, as datastores may not be deleted
@@ -845,8 +848,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final DataGetParams getParams;
@@ -1282,8 +1285,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final ContainerNode data;
@@ -1408,8 +1411,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final InstanceReference path;
         try {
             path = pathNormalizer.normalizeDataOrActionPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         if (path instanceof Data dataPath) {
             try (var resourceBody = body.toResource()) {

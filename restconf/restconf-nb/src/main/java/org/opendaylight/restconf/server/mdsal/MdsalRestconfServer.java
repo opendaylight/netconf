@@ -50,6 +50,7 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -147,8 +148,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return stratAndTail.strategy().dataDELETE(request, stratAndTail.tail());
     }
@@ -163,8 +164,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return stratAndTail.strategy().dataGET(request, stratAndTail.tail());
     }
@@ -180,8 +181,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
     }
@@ -197,8 +198,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
     }
@@ -214,8 +215,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return strategyAndTail.strategy().dataPOST(request, strategyAndTail.tail(), body);
     }
@@ -231,8 +232,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return strategyAndTail.strategy().dataPUT(request, strategyAndTail.tail(), body);
     }
@@ -276,8 +277,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(mountPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         // FIXME: require remnant to be empty
         return modulesGET(stratAndTail.strategy(), fileName, revision, representation);
@@ -327,8 +328,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(operation);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final var strategy = strategyAndTail.strategy();
@@ -342,8 +343,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         final var strategy = strategyAndTail.strategy();
         return strategy.operationsPOST(request, restconfURI, strategyAndTail.tail(), body);

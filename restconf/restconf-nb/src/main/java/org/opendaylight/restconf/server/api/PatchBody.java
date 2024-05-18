@@ -43,9 +43,9 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
          *
          * @param apiPath sub-resource
          * @return A {@link ResourceContext}
-         * @throws RestconfDocumentedException if the sub-resource cannot be resolved
+         * @throws ServerException if the sub-resource cannot be resolved
          */
-        protected abstract ResourceContext resolveRelative(ApiPath apiPath);
+        protected abstract ResourceContext resolveRelative(ApiPath apiPath) throws ServerException;
     }
 
     PatchBody(final InputStream inputStream) {
@@ -81,7 +81,7 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
         final Data result;
         try {
             result = resource.resolveRelative(targetPath).path;
-        } catch (RestconfDocumentedException e) {
+        } catch (ServerException e) {
             throw new RestconfDocumentedException("Invalid edit target '" + targetPath + "'",
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);
         }

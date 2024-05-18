@@ -17,6 +17,8 @@ import java.io.ObjectStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -63,12 +65,17 @@ public final class ServerException extends Exception {
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable Throwable cause) {
-        this(requireNonNull(message), new ServerError(type, tag, message), cause);
+        this(requireNonNull(message),
+            new ServerError(type, tag, new ErrorMessage(message), null, null, errorInfoOf(cause)), cause);
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String format,
             final Object @Nullable ... args) {
         this(type, tag, format.formatted(args));
+    }
+
+    public ServerException(final ErrorType type, final ErrorTag tag, final ServerErrorPath path, final String message) {
+        this(message, new ServerError(type, tag, new ErrorMessage(message), null, requireNonNull(path), null), null);
     }
 
     /**
@@ -78,6 +85,23 @@ public final class ServerException extends Exception {
      */
     public ServerError error() {
         return error;
+    }
+
+    @Deprecated
+    public RestconfDocumentedException toLegacy() {
+        final var message = error.message();
+        final var info = error.info();
+        final var path = error.path();
+        if (path != null) {
+            return new RestconfDocumentedException(this,
+                new RestconfError(error.type(), error.tag(), message != null ? message.elementBody() : null,
+                    error.appTag(), info != null ? info.elementBody() : null, path.path()),
+                path.databind().modelContext());
+        } else {
+            return new RestconfDocumentedException(this,
+                new RestconfError(error.type(), error.tag(), message != null ? message.elementBody() : null,
+                    error.appTag(), info != null ? info.elementBody() : null, null));
+        }
     }
 
     @java.io.Serial
@@ -93,6 +117,16 @@ public final class ServerException extends Exception {
     @java.io.Serial
     private void writeObject(final ObjectOutputStream stream) throws IOException {
         throw new NotSerializableException();
+    }
+
+    private static @Nullable ServerErrorInfo errorInfoOf(final @Nullable Throwable cause) {
+        if (cause != null) {
+            final var message = cause.getMessage();
+            if (message != null) {
+                return new ServerErrorInfo(message);
+            }
+        }
+        return null;
     }
 
     private static ErrorTag errorTagOf(final @Nullable Throwable cause) {

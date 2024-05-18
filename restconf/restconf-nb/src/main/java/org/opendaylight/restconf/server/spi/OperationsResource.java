@@ -18,9 +18,9 @@ import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -73,8 +73,8 @@ public final class OperationsResource implements HttpGetResource {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return RestconfFuture.of(new OneOperation(path.inference().modelContext(), path.rpc().argument()));
     }
