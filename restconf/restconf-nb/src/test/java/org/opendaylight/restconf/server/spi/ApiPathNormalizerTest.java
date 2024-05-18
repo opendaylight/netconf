@@ -16,11 +16,13 @@ import com.google.common.collect.ImmutableMap;
 import java.text.ParseException;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerErrorInfo;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -228,9 +230,9 @@ class ApiPathNormalizerTest {
     @Test
     void prepareQnameNotExistingPrefixNegativeTest() {
         final var error = assertErrorPath("not-existing:contA");
-        assertEquals("Failed to lookup for module with name 'not-existing'.", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.getErrorTag());
+        assertEquals(new ErrorMessage("Failed to lookup for module with name 'not-existing'."), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.tag());
     }
 
     /**
@@ -241,9 +243,10 @@ class ApiPathNormalizerTest {
     @Test
     public void prepareQnameNotValidContainerNameNegativeTest() {
         final var error = assertErrorPath("deserializer-test:contA/leafB");
-        assertEquals("Schema for '(deserializer:test?revision=2016-06-06)leafB' not found", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+        assertEquals(new ErrorMessage("Schema for '(deserializer:test?revision=2016-06-06)leafB' not found"),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
     }
 
     /**
@@ -254,9 +257,10 @@ class ApiPathNormalizerTest {
     @Test
     void prepareQnameNotValidListNameNegativeTest() {
         final var error = assertErrorPath("deserializer-test:list-no-key/disabled=false");
-        assertEquals("Schema for '(deserializer:test?revision=2016-06-06)disabled' not found", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+        assertEquals(new ErrorMessage("Schema for '(deserializer:test?revision=2016-06-06)disabled' not found"),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
     }
 
     /**
@@ -266,11 +270,11 @@ class ApiPathNormalizerTest {
     @Test
     void prepareIdentifierNotKeyedEntryNegativeTest() {
         final var error = assertErrorPath("deserializer-test:list-one-key");
-        assertEquals("""
+        assertEquals(new ErrorMessage("""
             Entry '(deserializer:test?revision=2016-06-06)list-one-key' requires key or value predicate to be \
-            present.""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MISSING_ATTRIBUTE, error.getErrorTag());
+            present."""), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MISSING_ATTRIBUTE, error.tag());
     }
 
     /**
@@ -280,11 +284,11 @@ class ApiPathNormalizerTest {
     @Test
     void deserializeKeysEndsWithCommaTooManyNegativeTest() {
         final var error = assertErrorPath("deserializer-test:list-multiple-keys=value,100,false,");
-        assertEquals("""
-            Schema for (deserializer:test?revision=2016-06-06)list-multiple-keys requires 3 key values, 4 supplied""",
-            error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.UNKNOWN_ATTRIBUTE, error.getErrorTag());
+        assertEquals(new ErrorMessage("""
+            Schema for (deserializer:test?revision=2016-06-06)list-multiple-keys requires 3 key values, 4 supplied"""),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.UNKNOWN_ATTRIBUTE, error.tag());
     }
 
     /**
@@ -294,10 +298,12 @@ class ApiPathNormalizerTest {
     @Test
     void deserializeKeysEndsWithCommaIllegalNegativeTest() {
         final var error = assertErrorPath("deserializer-test:list-multiple-keys=value,100,");
-        assertEquals("Invalid value '' for (deserializer:test?revision=2016-06-06)enabled", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("Invalid value '' for boolean type. Allowed values are 'true' and 'false'", error.getErrorInfo());
+        assertEquals(new ErrorMessage("Invalid value '' for (deserializer:test?revision=2016-06-06)enabled"),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
+        assertEquals(new ServerErrorInfo("Invalid value '' for boolean type. Allowed values are 'true' and 'false'"),
+            error.info());
     }
 
     /**
@@ -331,11 +337,11 @@ class ApiPathNormalizerTest {
     @Test
     void notAllListKeysEncodedNegativeTest() {
         final var error = assertErrorPath("deserializer-test:list-multiple-keys=%3Afoo/string-value");
-        assertEquals("""
-            Schema for (deserializer:test?revision=2016-06-06)list-multiple-keys requires 3 key values, 1 supplied""",
-            error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MISSING_ATTRIBUTE, error.getErrorTag());
+        assertEquals(new ErrorMessage("""
+            Schema for (deserializer:test?revision=2016-06-06)list-multiple-keys requires 3 key values, 1 supplied"""),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MISSING_ATTRIBUTE, error.tag());
     }
 
     /**
@@ -379,10 +385,10 @@ class ApiPathNormalizerTest {
     @Test
     void leafListMissingKeyNegativeTest() {
         final var error = assertErrorPath("deserializer-test:leaf-list-0=");
-        assertEquals("Invalid value '' for (deserializer:test?revision=2016-06-06)leaf-list-0",
-            error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals(new ErrorMessage("Invalid value '' for (deserializer:test?revision=2016-06-06)leaf-list-0"),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**
@@ -441,20 +447,25 @@ class ApiPathNormalizerTest {
             "deserializer-test-included:refs/list-with-identityref=deserializer-test:derived-identity/foo");
     }
 
-    private static RestconfError assertErrorPath(final String path) {
+    private static ServerError assertErrorPath(final String path) {
         final var apiPath = assertApiPath(path);
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> NORMALIZER.normalizePath(apiPath));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        return errors.get(0);
+        return assertThrows(ServerException.class, () -> NORMALIZER.normalizePath(apiPath)).error();
     }
 
     private static Action assertNormalizedAction(final String path) {
-        return assertInstanceOf(Action.class, NORMALIZER.normalizePath(assertApiPath(path)));
+        try {
+            return assertInstanceOf(Action.class, NORMALIZER.normalizePath(assertApiPath(path)));
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static YangInstanceIdentifier assertNormalizedPath(final String path) {
-        return assertInstanceOf(Data.class, NORMALIZER.normalizePath(assertApiPath(path))).instance();
+        try {
+            return assertInstanceOf(Data.class, NORMALIZER.normalizePath(assertApiPath(path))).instance();
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static ApiPath assertApiPath(final String path) {

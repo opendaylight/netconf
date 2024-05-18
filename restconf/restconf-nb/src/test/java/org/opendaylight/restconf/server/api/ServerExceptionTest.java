@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -58,7 +59,10 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message", cause);
         assertEquals("some message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "some message"), ex.error());
+        assertEquals(
+            new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("some message"), null,
+                null, new ServerErrorInfo("cause message")),
+            ex.error());
     }
 
     @Test
@@ -67,7 +71,8 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message", cause);
         assertEquals("some message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, "some message"), ex.error());
+        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, new ErrorMessage("some message"),
+            null, null, new ServerErrorInfo("cause message")), ex.error());
     }
 
     @Test
@@ -76,7 +81,9 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message", cause);
         assertEquals("some message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, "some message"),
+        assertEquals(
+            new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, new ErrorMessage("some message"),
+                null, null, new ServerErrorInfo("cause message")),
             ex.error());
     }
 

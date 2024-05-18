@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,11 +46,11 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -419,7 +420,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void testGetRestconfStrategyLocal() {
+    public void testGetRestconfStrategyLocal() throws Exception {
         final var strategy = jukeboxStrategy();
         assertEquals(new StrategyAndTail(strategy, ApiPath.empty()), strategy.resolveStrategy(ApiPath.empty()));
     }
@@ -472,13 +473,12 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         final var strategy = jukeboxStrategy();
         final var mountPath = ApiPath.parse("yang-ext:mount");
 
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> strategy.resolveStrategy(mountPath));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
-        assertEquals("Could not find a supported access interface in mount point", error.getErrorMessage());
-        assertEquals(JUKEBOX_IID, error.getErrorPath());
+        final var error = assertThrows(ServerException.class, () -> strategy.resolveStrategy(mountPath)).error();
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.tag());
+        assertEquals(new ErrorMessage("Could not find a supported access interface in mount point"), error.message());
+        final var path = error.path();
+        assertNotNull(path);
+        assertEquals(JUKEBOX_IID, path.path());
     }
 }
