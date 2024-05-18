@@ -49,6 +49,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -83,6 +84,9 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerErrorInfo;
+import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
@@ -633,7 +637,7 @@ public abstract class RestconfStrategy implements DatabindAware {
                             tx.create(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
+                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -642,7 +646,7 @@ public abstract class RestconfStrategy implements DatabindAware {
                             tx.delete(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
+                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -652,7 +656,7 @@ public abstract class RestconfStrategy implements DatabindAware {
                             tx.merge(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
+                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -661,7 +665,7 @@ public abstract class RestconfStrategy implements DatabindAware {
                             tx.replace(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
+                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -670,13 +674,13 @@ public abstract class RestconfStrategy implements DatabindAware {
                             tx.remove(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
+                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
                             noError = false;
                         }
                         break;
                     default:
                         editCollection.add(new PatchStatusEntity(editId, false, List.of(
-                            new RestconfError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                            new ServerError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
                                 "Not supported Yang Patch operation"))));
                         noError = false;
                         break;
@@ -691,7 +695,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         if (!noError) {
             tx.cancel();
             ret.set(new DataYangPatchResult(
-                new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false, null)));
+                new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, null)));
             return ret;
         }
 
@@ -699,19 +703,36 @@ public abstract class RestconfStrategy implements DatabindAware {
             @Override
             public void onSuccess(final CommitInfo result) {
                 ret.set(new DataYangPatchResult(
-                    new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), true, null)));
+                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), true, null)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 ret.set(new DataYangPatchResult(
-                    new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false,
-                        TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors())));
+                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, convertErrors(
+                        TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors()))));
             }
         }, MoreExecutors.directExecutor());
 
         return ret;
+    }
+
+    @Deprecated
+    private ServerError convertError(final RestconfError error) {
+        final var message = error.getErrorMessage();
+        final var path = error.getErrorPath();
+        final var info = error.getErrorInfo();
+
+        return new ServerError(error.getErrorType(), error.getErrorTag(),
+            message != null ? new ErrorMessage(message) : null, error.getErrorAppTag(),
+            path != null ? new ServerErrorPath(databind, path) : null,
+            info != null ? new ServerErrorInfo(info) : null);
+    }
+
+    @Deprecated
+    private List<ServerError> convertErrors(final List<RestconfError> errors) {
+        return errors.stream().map(this::convertError).collect(Collectors.toUnmodifiableList());
     }
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,

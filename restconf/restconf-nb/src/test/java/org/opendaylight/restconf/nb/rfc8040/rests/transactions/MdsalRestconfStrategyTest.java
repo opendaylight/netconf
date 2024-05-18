@@ -42,6 +42,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -230,9 +231,9 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         final var editErrors = edit.getEditErrors();
         assertEquals(1, editErrors.size());
         final var editError = editErrors.get(0);
-        assertEquals("Data does not exist", editError.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, editError.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, editError.getErrorTag());
+        assertEquals(new ErrorMessage("Data does not exist"), editError.message());
+        assertEquals(ErrorType.PROTOCOL, editError.type());
+        assertEquals(ErrorTag.DATA_MISSING, editError.tag());
     }
 
     @Override

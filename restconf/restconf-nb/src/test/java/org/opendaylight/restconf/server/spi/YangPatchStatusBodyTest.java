@@ -7,33 +7,28 @@
  */
 package org.opendaylight.restconf.server.spi;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
-    private final RestconfError error = new RestconfError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
+    private final ServerError error = new ServerError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
         "Data already exists");
     private final PatchStatusEntity statusEntity = new PatchStatusEntity("patch1", true, null);
     private final PatchStatusEntity statusEntityError = new PatchStatusEntity("patch1", false, List.of(error));
-    private final DatabindContext databind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
 
     /**
      * Test if per-operation status is omitted if global error is present.
      */
     @Test
     public void testOutputWithGlobalError() throws IOException {
-        final var body = new YangPatchStatusBody(new PatchStatusContext(databind, "patch", List.of(statusEntity), false,
+        final var body = new YangPatchStatusBody(new PatchStatusContext("patch", List.of(statusEntity), false,
             List.of(error)));
 
         assertFormat("""
@@ -67,8 +62,8 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      */
     @Test
     public void testOutputWithoutGlobalError() throws IOException {
-        final var body = new YangPatchStatusBody(new PatchStatusContext(databind,"patch", List.of(statusEntityError),
-            false, null));
+        final var body = new YangPatchStatusBody(new PatchStatusContext("patch", List.of(statusEntityError), false,
+            null));
 
         assertFormat("""
             {

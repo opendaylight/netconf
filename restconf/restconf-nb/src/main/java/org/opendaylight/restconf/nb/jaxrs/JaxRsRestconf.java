@@ -51,7 +51,6 @@ import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
@@ -72,6 +71,7 @@ import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
@@ -455,8 +455,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 return HttpStatusCode.INTERNAL_SERVER_ERROR;
             }
 
-            private @NonNull HttpStatusCode statusOfFirst(final List<RestconfError> error) {
-                return errorTagMapping.statusOf(error.get(0).getErrorTag());
+            private @NonNull HttpStatusCode statusOfFirst(final List<ServerError> error) {
+                return errorTagMapping.statusOf(error.get(0).tag());
             }
         });
     }

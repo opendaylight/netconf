@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
@@ -370,9 +371,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
-        assertEquals("Data does not exist", globalError.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, globalError.getErrorTag());
+        assertEquals(new ErrorMessage("Data does not exist"), globalError.message());
+        assertEquals(ErrorType.PROTOCOL, globalError.type());
+        assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
 
     @Override

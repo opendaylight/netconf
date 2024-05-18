@@ -5,20 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.server.api;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
-import org.opendaylight.restconf.common.errors.RestconfError;
 
 public class PatchStatusEntity {
-
     private final String editId;
-    private final List<RestconfError> editErrors;
+    private final List<ServerError> editErrors;
     private final boolean ok;
 
-    public PatchStatusEntity(final String editId, final boolean ok, final List<RestconfError> editErrors) {
-        this.editId = editId;
+    public PatchStatusEntity(final String editId, final boolean ok, final List<ServerError> editErrors) {
+        this.editId = requireNonNull(editId);
         this.ok = ok;
         this.editErrors = editErrors;
     }
@@ -31,7 +30,7 @@ public class PatchStatusEntity {
         return ok;
     }
 
-    public List<RestconfError> getEditErrors() {
+    public List<ServerError> getEditErrors() {
         return editErrors;
     }
 }
