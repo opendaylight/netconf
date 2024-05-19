@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7608ce1c_9afe25b2",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-19T17:46:46Z",
+      "side": 1,
+      "message": "please do not use lenient mocking",
+      "range": {
+        "startLine": 91,
+        "startChar": 8,
+        "endLine": 91,
+        "endChar": 17
+      },
+      "revId": "2dd594872d43e03c54c033400299d0c3e441efe0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc87d2f8_e2167a38",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-19T17:46:46Z",
+      "side": 1,
+      "message": "this patch has an assigned issue if the mocking of this test is different",
+      "range": {
+        "startLine": 161,
+        "startChar": 4,
+        "endLine": 161,
+        "endChar": 57
+      },
+      "revId": "2dd594872d43e03c54c033400299d0c3e441efe0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
