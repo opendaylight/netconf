@@ -13,9 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -36,26 +34,8 @@ public final class JsonChildBody extends ChildBody {
     }
 
     @Override
-    @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
-        NormalizedNode result;
-        try {
-            result = toNormalizedNode(path, inputStream);
-        } catch (RestconfDocumentedException e) {
-            throw e;
-        } catch (Exception e) {
-            LOG.debug("Error parsing json input", e);
-
-            if (e instanceof ResultAlreadySetException) {
-                throw new RestconfDocumentedException(
-                    "Error parsing json input: Failed to create new parse result data. "
-                        + "Are you creating multiple resources/subresources in POST request?", e);
-            }
-
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, e);
-        }
+    PrefixAndBody toPayload(final Data path, final InputStream inputStream) throws ServerException {
+        var result = toNormalizedNode(path, inputStream);
 
         final var iiToDataList = ImmutableList.<PathArgument>builder();
         while (result instanceof ChoiceNode choice) {
@@ -73,13 +53,25 @@ public final class JsonChildBody extends ChildBody {
         return new PrefixAndBody(iiToDataList.build(), result);
     }
 
+    @SuppressWarnings("checkstyle:illegalCatch")
     private static @NonNull NormalizedNode toNormalizedNode(final DatabindPath.Data path,
-            final InputStream inputStream) {
+            final InputStream inputStream) throws ServerException {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final var jsonParser = JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference());
         final var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        jsonParser.parse(reader);
+
+        try {
+            jsonParser.parse(reader);
+        } catch (Exception e) {
+            LOG.debug("Error parsing json input", e);
+            if (e instanceof ResultAlreadySetException) {
+                throw new ServerException("""
+                    Error parsing json input: Failed to create new parse result data. Are you creating multiple \
+                    resources/subresources in POST request?""", e);
+            }
+            throw path.databind().newApplicationMalformedMessageServerException("Invalid JSON input", e);
+        }
 
         return resultHolder.getResult().data();
     }

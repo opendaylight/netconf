@@ -152,13 +152,14 @@ public class RestconfDocumentedException extends RuntimeException {
         this.modelContext = requireNonNull(modelContext);
     }
 
-    public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
+    public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors,
+            final @Nullable EffectiveModelContext modelContext) {
         super(cause);
         if (errors.isEmpty()) {
             throw new IllegalArgumentException("At least one error is required");
         }
         this.errors = List.copyOf(errors);
-        modelContext = null;
+        this.modelContext = modelContext;
     }
 
     @Override
