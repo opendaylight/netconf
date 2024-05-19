@@ -35,6 +35,10 @@
             <artifactId>rfc6991-ietf-yang-types</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc8040</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-http</artifactId>
         </dependency>
@@ -45,6 +49,34 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tls</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-dom-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-runtime-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-parser-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
         </dependency>
     </dependencies>
 </project>
