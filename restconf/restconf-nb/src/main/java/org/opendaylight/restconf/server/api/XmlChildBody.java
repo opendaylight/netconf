@@ -12,11 +12,10 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -39,27 +38,21 @@ import org.xml.sax.SAXException;
 public final class XmlChildBody extends ChildBody {
     private static final Logger LOG = LoggerFactory.getLogger(XmlChildBody.class);
 
-    public XmlChildBody(final InputStream inputStream) {
+    public XmlChildBody(final @NonNull InputStream inputStream) {
         super(inputStream);
     }
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final Data path, final InputStream inputStream) throws ServerException {
+        final Document doc;
         try {
-            return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
-        } catch (final RestconfDocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
-            LOG.debug("Error parsing xml input", e);
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+            doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
+        } catch (SAXException | IOException e) {
+            LOG.debug("Error parsing XML input", e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Invalid XML input", e);
         }
-    }
 
-    private static @NonNull PrefixAndBody parse(final DatabindPath.Data path, final Document doc)
-            throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var pathInference = path.inference();
 
         final DataSchemaNode parentNode;
@@ -71,6 +64,7 @@ public final class XmlChildBody extends ChildBody {
             if (hackStmt instanceof DataSchemaNode data) {
                 parentNode = data;
             } else {
+                // FIXME: convert this
                 throw new IllegalStateException("Unknown SchemaNode " + hackStmt);
             }
         }
@@ -80,6 +74,7 @@ public final class XmlChildBody extends ChildBody {
         final XMLNamespace docRootNamespace = XMLNamespace.of(doc.getDocumentElement().getNamespaceURI());
         final var context = pathInference.modelContext();
         final var it = context.findModuleStatements(docRootNamespace).iterator();
+        // FIXME: convert this
         checkState(it.hasNext(), "Failed to find module for %s", docRootNamespace);
         final var qname = QName.create(it.next().localQNameModule(), docRootElm);
 
@@ -93,6 +88,7 @@ public final class XmlChildBody extends ChildBody {
             final var next = current instanceof DataSchemaContext.Composite compositeCurrent
                 ? compositeCurrent.enterChild(stack, qname) : null;
             if (next == null) {
+                // FIXME: convert this
                 throw new IllegalStateException(
                     "Child \"" + qname + "\" was not found in parent schema node \"" + schemaNode + "\"");
             }
@@ -111,7 +107,13 @@ public final class XmlChildBody extends ChildBody {
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         final var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), stack.toInference());
-        xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
+        try {
+            xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
+        } catch (XMLStreamException | IOException e) {
+            // FIXME: more descriptive
+            // FIXME: pick up YangErrorAware
+            throw new ServerException(e);
+        }
         var parsed = resultHolder.getResult().data();
 
         // When parsing an XML source with a list root node

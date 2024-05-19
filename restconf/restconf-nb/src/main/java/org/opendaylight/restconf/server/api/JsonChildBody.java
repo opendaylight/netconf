@@ -37,7 +37,7 @@ public final class JsonChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) throws ServerException {
         NormalizedNode result;
         try {
             result = toNormalizedNode(path, inputStream);
