@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.DatabindPath;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -26,8 +26,8 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 class XmlChildBodyTest extends AbstractBodyTest {
     private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
 
-    private static DatabindPath.Data EMPTY_PATH;
-    private static DatabindPath.Data CONT_PATH;
+    private static Data EMPTY_PATH;
+    private static Data CONT_PATH;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -39,12 +39,12 @@ class XmlChildBodyTest extends AbstractBodyTest {
         final var contPath = YangInstanceIdentifier.of(CONT_QNAME);
         final var databind = DatabindContext.ofModel(modelContext);
         final var nodeAndStack = databind.schemaTree().enterPath(contPath).orElseThrow();
-        CONT_PATH = new DatabindPath.Data(databind, nodeAndStack.stack().toInference(), contPath, nodeAndStack.node());
-        EMPTY_PATH = new DatabindPath.Data(DatabindContext.ofModel(modelContext));
+        CONT_PATH = new Data(databind, nodeAndStack.stack().toInference(), contPath, nodeAndStack.node());
+        EMPTY_PATH = new Data(DatabindContext.ofModel(modelContext));
     }
 
     @Test
-    void postXmlTest() {
+    void postXmlTest() throws Exception {
         final var body = new XmlChildBody(stringInputStream("""
             <top-level-list xmlns="foo">
                 <key-leaf>key-value</key-leaf>
@@ -63,7 +63,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerDataPostTest() {
+    void moduleSubContainerDataPostTest() throws Exception {
         final var body = new XmlChildBody(stringInputStream("""
             <cont1 xmlns="instance:identifier:module">
               <lflst11 xmlns="augment:module:leaf:list">lflst11_1</lflst11>
@@ -93,7 +93,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerAugmentDataPostTest() {
+    void moduleSubContainerAugmentDataPostTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_container.xml"));
         final var payload = body.toPayload(CONT_PATH);
@@ -107,7 +107,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerChoiceAugmentDataPostTest() {
+    void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_choice_container.xml"));
         final var payload = body.toPayload(CONT_PATH);
@@ -129,7 +129,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
      * name, but also by correct namespace used in payload.
      */
     @Test
-    void findFooContainerUsingNamespaceTest() {
+    void findFooContainerUsingNamespaceTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml"));
         final var payload = body.toPayload(EMPTY_PATH);
@@ -146,7 +146,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
      * name, but also by correct namespace used in payload.
      */
     @Test
-    void findBarContainerUsingNamespaceTest() {
+    void findBarContainerUsingNamespaceTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml"));
         final var payload = body.toPayload(EMPTY_PATH);

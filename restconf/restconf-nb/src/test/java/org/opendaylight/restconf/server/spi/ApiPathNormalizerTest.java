@@ -449,7 +449,9 @@ class ApiPathNormalizerTest {
 
     private static ServerError assertErrorPath(final String path) {
         final var apiPath = assertApiPath(path);
-        return assertThrows(ServerException.class, () -> NORMALIZER.normalizePath(apiPath)).error();
+        final var errors = assertThrows(ServerException.class, () -> NORMALIZER.normalizePath(apiPath)).errors();
+        assertEquals(1, errors.size());
+        return errors.get(0);
     }
 
     private static Action assertNormalizedAction(final String path) {
