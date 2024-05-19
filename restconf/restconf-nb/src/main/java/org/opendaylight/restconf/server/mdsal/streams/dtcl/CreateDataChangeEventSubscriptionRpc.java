@@ -16,8 +16,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -108,10 +110,16 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
                 new RestconfDocumentedException("missing path", ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT));
         }
 
+        final ApiPath apiPath;
+        try {
+            apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
+
         return streamRegistry.createStream(restconfURI,
             new DataTreeChangeSource(databindProvider, changeService, datastore, path),
-            "Events occuring in " + datastore + " datastore under /"
-                + new ApiPathCanonizer(input.path().databind()).dataToApiPath(path).toString())
+            "Events occuring in " + datastore + " datastore under /" + apiPath.toString())
             .transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))

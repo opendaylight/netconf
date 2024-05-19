@@ -516,9 +516,17 @@ public abstract class RestconfStrategy implements DatabindAware {
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new CreateResourceResult(new ApiPathCanonizer(databind).dataToApiPath(
-                    data instanceof MapNode mapData && !mapData.isEmpty()
-                        ? path.node(mapData.body().iterator().next().name()) : path)));
+                final ApiPath apiPath;
+                try {
+                    apiPath = new ApiPathCanonizer(databind).dataToApiPath(
+                        data instanceof MapNode mapData && !mapData.isEmpty()
+                        ? path.node(mapData.body().iterator().next().name()) : path);
+                } catch (ServerException e) {
+                    // This should never happen
+                    ret.setFailure(e.toLegacy());
+                    return;
+                }
+                ret.set(new CreateResourceResult(apiPath));
             }
 
             @Override
