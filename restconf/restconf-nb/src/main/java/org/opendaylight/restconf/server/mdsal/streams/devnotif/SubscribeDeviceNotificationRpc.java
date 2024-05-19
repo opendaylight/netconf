@@ -13,8 +13,10 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -79,9 +81,15 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
         }
 
+        final ApiPath apiPath;
+        try {
+            apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
+
         return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
-            "All YANG notifications occuring on mount point /"
-                + new ApiPathCanonizer(input.path().databind()).dataToApiPath(path).toString())
+            "All YANG notifications occuring on mount point /" + apiPath.toString())
             .transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
