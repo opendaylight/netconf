@@ -16,10 +16,11 @@ import java.text.ParseException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -110,11 +111,11 @@ class ApiPathCanonizerTest {
             .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
             .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"), Map.of())
             .build());
-        assertEquals("""
+        assertEquals(new ErrorMessage("""
             Argument '(serializer:test?revision=2016-06-06)list-one-key[{}]' does not match required keys \
-            [(serializer:test?revision=2016-06-06)name]""", error.getErrorMessage());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+            [(serializer:test?revision=2016-06-06)name]"""), error.message());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**
@@ -229,12 +230,12 @@ class ApiPathCanonizerTest {
         final var error = assertError(YangInstanceIdentifier.of(
             QName.create("serializer:test", "2016-06-06", "contA"),
             QName.create("serializer:test", "2016-06-06", "not-existing-leaf")));
-        assertEquals("""
+        assertEquals(new ErrorMessage("""
             Invalid input '/(serializer:test?revision=2016-06-06)contA/not-existing-leaf': schema for argument \
-            '(serializer:test?revision=2016-06-06)not-existing-leaf' (after 'serializer-test:contA') not found""",
-            error.getErrorMessage());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.getErrorTag());
+            '(serializer:test?revision=2016-06-06)not-existing-leaf' (after 'serializer-test:contA') not found"""),
+            error.message());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.tag());
     }
 
     /**
@@ -296,13 +297,13 @@ class ApiPathCanonizerTest {
             // child should has different namespace
             .node(QName.create("serializer:test:included", "2016-06-06", "augmented-leaf"))
             .build());
-        assertEquals("""
+        assertEquals(new ErrorMessage("""
             Invalid input '/(serializer:test:included?revision=2016-06-06)augmented-list/augmented-list[{(\
             serializer:test:included?revision=2016-06-06)list-key=100}]/augmented-leaf': schema for argument \
             '(serializer:test:included?revision=2016-06-06)augmented-leaf' (after \
-            'serializer-test-included:augmented-list=100') not found""", error.getErrorMessage());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.getErrorTag());
+            'serializer-test-included:augmented-list=100') not found"""), error.message());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.tag());
     }
 
     /**
@@ -350,7 +351,11 @@ class ApiPathCanonizerTest {
     }
 
     private static void assertApiPath(final String expected, final YangInstanceIdentifier path) {
-        assertEquals(newApiPath(expected), CANONIZER.dataToApiPath(path));
+        try {
+            assertEquals(newApiPath(expected), CANONIZER.dataToApiPath(path));
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static YangInstanceIdentifier assertNormalized(final String str) {
@@ -361,11 +366,8 @@ class ApiPathCanonizerTest {
         }
     }
 
-    private static RestconfError assertError(final YangInstanceIdentifier path) {
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> CANONIZER.dataToApiPath(path));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        return errors.get(0);
+    private static ServerError assertError(final YangInstanceIdentifier path) {
+        return assertThrows(ServerException.class, () -> CANONIZER.dataToApiPath(path)).error();
     }
 
     private static ApiPath newApiPath(final String apiPath) {
