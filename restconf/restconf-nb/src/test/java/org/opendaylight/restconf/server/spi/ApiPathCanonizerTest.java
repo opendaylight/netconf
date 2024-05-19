@@ -367,7 +367,9 @@ class ApiPathCanonizerTest {
     }
 
     private static ServerError assertError(final YangInstanceIdentifier path) {
-        return assertThrows(ServerException.class, () -> CANONIZER.dataToApiPath(path)).error();
+        final var errors = assertThrows(ServerException.class, () -> CANONIZER.dataToApiPath(path)).errors();
+        assertEquals(1, errors.size());
+        return errors.get(0);
     }
 
     private static ApiPath newApiPath(final String apiPath) {

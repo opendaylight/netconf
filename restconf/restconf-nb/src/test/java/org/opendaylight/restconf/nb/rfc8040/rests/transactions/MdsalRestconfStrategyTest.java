@@ -479,7 +479,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         final var strategy = jukeboxStrategy();
         final var mountPath = ApiPath.parse("yang-ext:mount");
 
-        final var error = assertThrows(ServerException.class, () -> strategy.resolveStrategy(mountPath)).error();
+        final var errors = assertThrows(ServerException.class, () -> strategy.resolveStrategy(mountPath)).errors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.type());
         assertEquals(ErrorTag.OPERATION_FAILED, error.tag());
         assertEquals(new ErrorMessage("Could not find a supported access interface in mount point"), error.message());

@@ -38,7 +38,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerDataPostTest() {
+    void moduleSubContainerDataPostTest() throws Exception {
         final var body = new JsonChildBody(stringInputStream("""
             {
               "instance-identifier-module:cont1": {
@@ -62,7 +62,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerAugmentDataPostTest() {
+    void moduleSubContainerAugmentDataPostTest() throws Exception {
         final var body = new JsonChildBody(
             JsonChildBodyTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_container.json"));
         final var payload = body.toPayload(CONT_PATH);
@@ -76,7 +76,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerChoiceAugmentDataPostTest() {
+    void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
         final var body = new JsonChildBody(
             JsonChildBodyTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json"));
         final var payload = body.toPayload(CONT_PATH);

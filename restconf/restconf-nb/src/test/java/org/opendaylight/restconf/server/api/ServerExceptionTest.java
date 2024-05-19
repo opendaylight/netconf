@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -22,7 +23,7 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message");
         assertEquals("some message", ex.getMessage());
         assertNull(ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "some message"), ex.error());
+        assertServerError(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "some message"), ex);
     }
 
     @Test
@@ -31,7 +32,7 @@ class ServerExceptionTest {
         final var ex = new ServerException(cause);
         assertEquals("java.lang.Throwable: cause message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "cause message"), ex.error());
+        assertServerError(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "cause message"), ex);
     }
 
     @Test
@@ -40,7 +41,7 @@ class ServerExceptionTest {
         final var ex = new ServerException(cause);
         assertEquals("java.lang.IllegalArgumentException: cause message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, "cause message"), ex.error());
+        assertServerError(new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, "cause message"), ex);
     }
 
     @Test
@@ -49,8 +50,9 @@ class ServerExceptionTest {
         final var ex = new ServerException(cause);
         assertEquals("java.lang.UnsupportedOperationException: cause message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, "cause message"),
-            ex.error());
+        assertServerError(
+            new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, "cause message"),
+            ex);
     }
 
     @Test
@@ -59,10 +61,10 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message", cause);
         assertEquals("some message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(
+        assertServerError(
             new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("some message"), null,
                 null, new ServerErrorInfo("cause message")),
-            ex.error());
+            ex);
     }
 
     @Test
@@ -71,8 +73,10 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message", cause);
         assertEquals("some message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, new ErrorMessage("some message"),
-            null, null, new ServerErrorInfo("cause message")), ex.error());
+        assertServerError(
+            new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, new ErrorMessage("some message"), null, null,
+                new ServerErrorInfo("cause message")),
+            ex);
     }
 
     @Test
@@ -81,10 +85,10 @@ class ServerExceptionTest {
         final var ex = new ServerException("some message", cause);
         assertEquals("some message", ex.getMessage());
         assertSame(cause, ex.getCause());
-        assertEquals(
+        assertServerError(
             new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, new ErrorMessage("some message"),
                 null, null, new ServerErrorInfo("cause message")),
-            ex.error());
+            ex);
     }
 
     @Test
@@ -92,6 +96,10 @@ class ServerExceptionTest {
         final var ex = new ServerException("huh %s: %s", 1, "hah");
         assertEquals("huh 1: hah", ex.getMessage());
         assertNull(ex.getCause());
-        assertEquals(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "huh 1: hah"), ex.error());
+        assertServerError(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "huh 1: hah"), ex);
+    }
+
+    private static void assertServerError(final ServerError expected, final ServerException ex) {
+        assertEquals(List.of(expected), ex.errors());
     }
 }
