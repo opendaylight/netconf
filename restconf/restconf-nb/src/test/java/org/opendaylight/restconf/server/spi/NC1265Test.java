@@ -131,7 +131,9 @@ class NC1265Test {
 
     private static ServerError assertRestconfError(final String apiPath) {
         final var parsed = assertApiPath(apiPath);
-        return assertThrows(ServerException.class, () -> NORMALIZER.normalizeDataPath(parsed)).error();
+        final var errors = assertThrows(ServerException.class, () -> NORMALIZER.normalizeDataPath(parsed)).errors();
+        assertEquals(1, errors.size());
+        return errors.get(0);
     }
 
     private static ApiPath assertApiPath(final String apiPath) {
