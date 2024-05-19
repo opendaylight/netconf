@@ -13,6 +13,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import org.opendaylight.restconf.common.errors.RestconfCallback;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.ServerException;
 
 /**
  * A {@link RestconfCallback} completing an {@link AsyncResponse}.
@@ -31,8 +32,8 @@ abstract class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
         final Response response;
         try {
             response = transform(result);
-        } catch (RestconfDocumentedException e) {
-            onFailure(e);
+        } catch (ServerException e) {
+            onFailure(e.toLegacy());
             return;
         }
         ar.resume(response);
@@ -43,5 +44,5 @@ abstract class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
         ar.resume(failure);
     }
 
-    abstract Response transform(V result) throws RestconfDocumentedException;
+    abstract Response transform(V result) throws ServerException;
 }

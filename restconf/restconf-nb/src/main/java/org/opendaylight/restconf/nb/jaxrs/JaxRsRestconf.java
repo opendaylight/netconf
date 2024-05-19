@@ -50,7 +50,6 @@ import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
@@ -72,6 +71,7 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
@@ -869,12 +869,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final ModulesGetResult result) {
+            Response transform(final ModulesGetResult result) throws ServerException {
                 final Reader reader;
                 try {
                     reader = result.source().openStream();
                 } catch (IOException e) {
-                    throw new RestconfDocumentedException("Cannot open source", e);
+                    throw new ServerException("Cannot open source", e);
                 }
                 return Response.ok(reader).build();
             }
