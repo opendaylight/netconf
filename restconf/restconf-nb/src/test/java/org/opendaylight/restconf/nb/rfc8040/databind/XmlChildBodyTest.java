@@ -44,7 +44,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void postXmlTest() {
+    void postXmlTest() throws Exception {
         final var body = new XmlChildBody(stringInputStream("""
             <top-level-list xmlns="foo">
                 <key-leaf>key-value</key-leaf>
@@ -63,7 +63,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerDataPostTest() {
+    void moduleSubContainerDataPostTest() throws Exception {
         final var body = new XmlChildBody(stringInputStream("""
             <cont1 xmlns="instance:identifier:module">
               <lflst11 xmlns="augment:module:leaf:list">lflst11_1</lflst11>
@@ -93,7 +93,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerAugmentDataPostTest() {
+    void moduleSubContainerAugmentDataPostTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_container.xml"));
         final var payload = body.toPayload(CONT_PATH);
@@ -107,7 +107,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    void moduleSubContainerChoiceAugmentDataPostTest() {
+    void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_choice_container.xml"));
         final var payload = body.toPayload(CONT_PATH);
@@ -129,7 +129,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
      * name, but also by correct namespace used in payload.
      */
     @Test
-    void findFooContainerUsingNamespaceTest() {
+    void findFooContainerUsingNamespaceTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml"));
         final var payload = body.toPayload(EMPTY_PATH);
@@ -146,7 +146,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
      * name, but also by correct namespace used in payload.
      */
     @Test
-    void findBarContainerUsingNamespaceTest() {
+    void findBarContainerUsingNamespaceTest() throws Exception {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml"));
         final var payload = body.toPayload(EMPTY_PATH);

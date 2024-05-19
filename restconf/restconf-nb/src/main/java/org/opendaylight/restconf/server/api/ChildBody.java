@@ -11,12 +11,14 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import java.io.InputStream;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+@NonNullByDefault
 public abstract sealed class ChildBody extends RequestBody permits JsonChildBody, XmlChildBody {
-    public record PrefixAndBody(@NonNull ImmutableList<PathArgument> prefix, @NonNull NormalizedNode body) {
+    public record PrefixAndBody(ImmutableList<PathArgument> prefix, NormalizedNode body) {
         public PrefixAndBody {
             requireNonNull(prefix);
             requireNonNull(body);
@@ -32,10 +34,11 @@ public abstract sealed class ChildBody extends RequestBody permits JsonChildBody
      *
      * @param path POST request path
      * @return A {@link PrefixAndBody}
+     * @throws ServerException if an error occurs
      */
-    public final @NonNull PrefixAndBody toPayload(final DatabindPath.@NonNull Data path) {
+    public final PrefixAndBody toPayload(final Data path) throws ServerException {
         return toPayload(path, consume());
     }
 
-    abstract @NonNull PrefixAndBody toPayload(DatabindPath.@NonNull Data path, @NonNull InputStream inputStream);
+    abstract PrefixAndBody toPayload(Data path, InputStream inputStream) throws ServerException;
 }
