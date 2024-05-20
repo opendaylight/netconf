@@ -17,9 +17,9 @@ import io.netty.handler.codec.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.password.grouping.password.type.CleartextPassword;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.client.identity.auth.type.Basic;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240316.password.grouping.password.type.CleartextPassword;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240316.HttpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240316.http.client.identity.grouping.client.identity.auth.type.Basic;
 
 /**
  * A client-side channel handler adding HTTP headers.
