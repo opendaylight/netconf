@@ -7,23 +7,19 @@
  */
 package org.opendaylight.netconf.server.spi;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.Collection;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 import org.xmlunit.builder.DiffBuilder;
 
-@RunWith(value = Parameterized.class)
 public class SubtreeFilterRpcTest {
     private final int directoryIndex;
 
-    @Parameters
     public static Collection<Object[]> data() {
         return List.of(
             new Object[] { 0  },
@@ -43,7 +39,8 @@ public class SubtreeFilterRpcTest {
         this.directoryIndex = directoryIndex;
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("data")
     public void test() throws Exception {
         final var diff = DiffBuilder
             .compare(SubtreeFilter.applyRpcSubtreeFilter(getDocument("request.xml"), getDocument("pre-filter.xml")))
@@ -51,7 +48,7 @@ public class SubtreeFilterRpcTest {
             .ignoreWhitespace()
             .checkForSimilar()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     private Document getDocument(final String fileName) throws Exception {

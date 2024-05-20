@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -15,18 +15,18 @@ import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class SendErrorExceptionUtilTest {
     private final DocumentedException exception = new DocumentedException("err");
 
@@ -37,7 +37,7 @@ public class SendErrorExceptionUtilTest {
     @Mock
     Channel channel;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         doReturn(channelFuture).when(netconfSession).sendMessage(any());
         doReturn(channelFuture).when(channelFuture).addListener(any());

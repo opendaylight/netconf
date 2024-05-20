@@ -9,8 +9,8 @@ package org.opendaylight.netconf.server;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
@@ -19,12 +19,12 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
@@ -37,7 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.xmlunit.builder.DiffBuilder;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfServerSessionListenerTest {
     @Mock
     private NetconfOperationRouterImpl router;
@@ -51,7 +51,7 @@ public class NetconfServerSessionListenerTest {
     private EmbeddedChannel channel;
     private NetconfServerSessionListener listener;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         doReturn(monitoringListener).when(monitoring).getSessionListener();
         doNothing().when(monitoringListener).onSessionUp(any());
@@ -101,7 +101,7 @@ public class NetconfServerSessionListenerTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class NetconfServerSessionListenerTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     @Test
