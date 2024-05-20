@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -20,12 +20,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -40,7 +40,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfCapabilityMonitoringServiceTest {
     private static final String TEST_MODULE_CONTENT = "content";
     private static final String TEST_MODULE_CONTENT2 = "content2";
@@ -64,7 +64,7 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     private NetconfCapabilityMonitoringService monitoringService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         moduleCapability1 = new YangModuleCapability(TEST_MODULE_NAMESPACE.getValue(), TEST_MODULE_NAME,
             TEST_MODULE_REV, TEST_MODULE_CONTENT);
