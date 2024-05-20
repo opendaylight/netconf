@@ -16,17 +16,17 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class DeserializerExceptionHandlerTest {
+class DeserializerExceptionHandlerTest {
     private DeserializerExceptionHandler handler;
     private ChannelFuture channelFuture;
     private ChannelHandlerContext context;
     private Channel channel;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         handler = new DeserializerExceptionHandler();
         context = mock(ChannelHandlerContext.class);
         channel = mock(Channel.class);
@@ -37,7 +37,7 @@ public class DeserializerExceptionHandlerTest {
     }
 
     @Test
-    public void testExceptionCaught() throws Exception {
+    void testExceptionCaught() {
         handler.exceptionCaught(context, new Exception());
         verify(context, times(1)).channel();
     }
