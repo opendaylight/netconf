@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.server.mapping.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -23,7 +23,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.GenericFutureListener;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -37,7 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
-public class DefaultCloseSessionTest {
+class DefaultCloseSessionTest {
 
     private static void mockEventLoop(final Channel channel) {
         final var eventLoop = mock(EventLoop.class);
@@ -50,7 +50,7 @@ public class DefaultCloseSessionTest {
     }
 
     @Test
-    public void testDefaultCloseSession() throws Exception {
+    void testDefaultCloseSession() throws Exception {
         AutoCloseable res = mock(AutoCloseable.class);
         doNothing().when(res).close();
         DefaultCloseSession close = new DefaultCloseSession(new SessionIdType(Uint32.TEN), res);
@@ -89,7 +89,7 @@ public class DefaultCloseSessionTest {
     }
 
     @Test
-    public void testDefaultCloseSession2() throws Exception {
+    void testDefaultCloseSession2() throws Exception {
         final var expectedCause = new NetconfDocumentedException("testMessage");
         final var res = mock(AutoCloseable.class);
         doThrow(expectedCause).when(res).close();
