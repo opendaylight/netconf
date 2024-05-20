@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.server.api.operations;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -17,7 +17,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class AbstractSingletonNetconfOperationTest {
+class AbstractSingletonNetconfOperationTest {
     private static final class SingletonNCOperationImpl extends AbstractSingletonNetconfOperation {
         SingletonNCOperationImpl(final SessionIdType sessionId) {
             super(sessionId);
@@ -36,7 +36,7 @@ public class AbstractSingletonNetconfOperationTest {
     }
 
     @Test
-    public void testAbstractSingletonNetconfOperation() throws Exception {
+    void testAbstractSingletonNetconfOperation() {
         SingletonNCOperationImpl operation = new SingletonNCOperationImpl(new SessionIdType(Uint32.TEN));
         assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY, operation.getHandlingPriority());
     }
