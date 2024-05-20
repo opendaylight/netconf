@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1266a50c_9bcffe0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-20T12:37:18Z",
+      "side": 1,
+      "message": "Please adapt to: https://git.opendaylight.org/gerrit/c/netconf/+/111552/7..8\n\nIt seems that YANG patch can be moved into Mdsal strategy - because its not used from Netconf strategy.",
+      "revId": "372f3a03951addb71b03b87f30e5b1f84bae6a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
