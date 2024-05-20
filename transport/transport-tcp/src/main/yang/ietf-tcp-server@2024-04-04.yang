@@ -53,7 +53,7 @@ module ietf-tcp-server {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-04-04 {
     description
       "Initial version";
     reference
@@ -84,25 +84,34 @@ module ietf-tcp-server {
        'tcp-server-parameters').  This model purposely does
        not do this itself so as to provide maximum flexibility
        to consuming models.";
-    leaf local-address {
-      type inet:ip-address;
-      mandatory true;
+    list local-bind {
+      key local-address;
+      min-elements 1;
       description
-        "The local IP address to listen on for incoming
-         TCP client connections.  INADDR_ANY (0.0.0.0) or
-         INADDR6_ANY (0:0:0:0:0:0:0:0 a.k.a. ::) MUST be
-         used when the server is to listen on all IPv4 or
-         IPv6 addresses, respectively.";
-    }
-    leaf local-port {
-      type inet:port-number;
-      default "0";
-      description
-        "The local port number to listen on for incoming TCP
-         client connections.  An invalid default value (0)
-         is used (instead of 'mandatory true') so that an
-         application level data model may 'refine' it with
-         an application specific default port number value.";
+        "A list of bind (listen) points for this server
+         instance.  A server instance may have multiple
+         bind points to support, e.g., the same port in
+         different address families or different ports
+         in the same address family.";
+      leaf local-address {
+        type inet:ip-address;
+        description
+          "The local IP address to listen on for incoming
+           TCP client connections.  To configure listening
+           on all IPv4 addresses the value must be '0.0.0.0'
+           (INADDR_ANY).  To configure listening on all IPv6
+           addresses the value must be '::' (INADDR6_ANY).";
+      }
+      leaf local-port {
+        type inet:port-number;
+        default "0";
+        description
+          "The local port number to listen on for incoming TCP
+           client connections.  An invalid default value (0)
+           is used (instead of 'mandatory true') so that an
+           application level data model may 'refine' it with
+           an application specific default port number value.";
+      }
     }
     uses tcpcmn:tcp-common-grouping {
       refine "keepalives" {

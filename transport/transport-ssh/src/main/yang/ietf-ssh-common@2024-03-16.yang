@@ -73,7 +73,7 @@ module ietf-ssh-common {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-03-16 {
     description
       "Initial version";
     reference
@@ -107,6 +107,139 @@ module ietf-ssh-common {
        'supported-algorithms' container.";
   }
 
+  // Typedefs
+
+  typedef ssh-public-key-algorithm {
+    type union {
+      type sshpka:ssh-public-key-algorithm;
+      type string {
+        length "1..64" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+        pattern ".*@.*" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+      }
+    }
+    description
+      "A type that enables the public key algorithm to be
+       either an IANA-maintained public key algorithm in
+       the 'iana-ssh-public-key-algs' YANG module (RFC EEEE),
+       or a locally-defined algorithm, per Section 4.6.1
+       of RFC 4250.";
+    reference
+      "RFC 4250: SSH Protocol Assigned Numbers
+       RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
+  }
+
+  typedef ssh-key-exchange-algorithm {
+    type union {
+      type sshkea:ssh-key-exchange-algorithm;
+      type string {
+        length "1..64" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+        pattern ".*@.*" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+      }
+    }
+    description
+      "A type that enables the key exchange algorithm to be
+       either an IANA-maintained key exchange algorithm in
+       the 'iana-ssh-key-exchange-algs' YANG module (RFC EEEE),
+       or a locally-defined algorithm, per Section 4.6.1
+       of RFC 4250.";
+    reference
+      "RFC 4250: SSH Protocol Assigned Numbers
+       RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
+  }
+
+  typedef ssh-encryption-algorithm {
+    type union {
+      type sshea:ssh-encryption-algorithm;
+      type string {
+        length "1..64" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+        pattern ".*@.*" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+      }
+    }
+    description
+      "A type that enables the encryption algorithm to be
+       either an IANA-maintained encryption algorithm in
+       the 'iana-ssh-encryption-algs' YANG module (RFC EEEE),
+       or a locally-defined algorithm, per Section 4.6.1
+       of RFC 4250.";
+    reference
+      "RFC 4250: SSH Protocol Assigned Numbers
+       RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
+  }
+
+  typedef ssh-mac-algorithm {
+    type union {
+      type sshma:ssh-mac-algorithm;
+      type string {
+        length "1..64" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+        pattern ".*@.*" {
+          description
+            "Non IANA-maintained algorithms must include the
+             'at-sign' (@) in them, per Section 4.6.1 of RFC
+             4250.";
+          reference
+            "RFC 4250: SSH Protocol Assigned Numbers";
+        }
+      }
+    }
+    description
+      "A type that enables the MAC algorithm to be
+       either an IANA-maintained MAC algorithm in
+       the 'iana-ssh-mac-algs' YANG module (RFC EEEE),
+       or a locally-defined algorithm, per Section 4.6.1
+       of RFC 4250.";
+    reference
+      "RFC 4250: SSH Protocol Assigned Numbers
+       RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
+  }
 
   // Groupings
 
@@ -119,9 +252,7 @@ module ietf-ssh-common {
       description
         "Parameters regarding host key.";
       leaf-list host-key-alg {
-        type identityref {
-          base sshpka:public-key-alg-base;
-        }
+        type ssh-public-key-algorithm;
         ordered-by user;
         description
           "Acceptable host key algorithms in order of decreasing
@@ -138,9 +269,7 @@ module ietf-ssh-common {
       description
         "Parameters regarding key exchange.";
       leaf-list key-exchange-alg {
-        type identityref {
-          base sshkea:key-exchange-alg-base;
-        }
+        type ssh-key-exchange-algorithm;
         ordered-by user;
         description
           "Acceptable key exchange algorithms in order of decreasing
@@ -155,9 +284,7 @@ module ietf-ssh-common {
       description
         "Parameters regarding encryption.";
       leaf-list encryption-alg {
-        type identityref {
-          base sshea:encryption-alg-base;
-        }
+        type ssh-encryption-algorithm;
         ordered-by user;
         description
           "Acceptable encryption algorithms in order of decreasing
@@ -172,9 +299,7 @@ module ietf-ssh-common {
       description
         "Parameters regarding message authentication code (MAC).";
       leaf-list mac-alg {
-        type identityref {
-          base sshma:mac-alg-base;
-        }
+        type ssh-mac-algorithm;
         ordered-by user;
         description
           "Acceptable MAC algorithms in order of decreasing
@@ -199,7 +324,7 @@ module ietf-ssh-common {
         "A container for a list of public key algorithms
          supported by the server.";
       leaf-list supported-algorithm {
-        type sshpka:public-key-algorithm-ref;
+        type ssh-public-key-algorithm;
         description
           "A public key algorithm supported by the server.";
       }
@@ -209,7 +334,7 @@ module ietf-ssh-common {
         "A container for a list of encryption algorithms
          supported by the server.";
       leaf-list supported-algorithm {
-        type sshea:encryption-algorithm-ref;
+        type ssh-encryption-algorithm;
         description
           "An encryption algorithm supported by the server.";
       }
@@ -220,7 +345,7 @@ module ietf-ssh-common {
         "A container for a list of key exchange algorithms
          supported by the server.";
       leaf-list supported-algorithm {
-        type sshkea:key-exchange-algorithm-ref;
+        type ssh-key-exchange-algorithm;
         description
           "A key exchange algorithm supported by the server.";
       }
@@ -231,7 +356,7 @@ module ietf-ssh-common {
         "A container for a list of MAC algorithms
          supported by the server.";
       leaf-list supported-algorithm {
-        type sshma:mac-algorithm-ref;
+        type ssh-mac-algorithm;
         description
           "A MAC algorithm supported by the server.";
       }
@@ -241,11 +366,11 @@ module ietf-ssh-common {
   rpc generate-asymmetric-key-pair {
     if-feature "asymmetric-key-pair-generation";
     description
-      "Requests the device to generate an public key using
+      "Requests the device to generate a public key using
        the specified key algorithm.";
     input {
       leaf algorithm {
-        type sshpka:public-key-algorithm-ref;
+        type ssh-public-key-algorithm;
         mandatory true;
         description
           "The algorithm to be used when generating the key.";
@@ -303,14 +428,34 @@ module ietf-ssh-common {
                  key returned is a placeholder for an internally
                  stored key.  See the 'Support for Built-in Keys'
                  section in RFC CCCC for information about hidden
-                 keys.";
+                 keys.
+
+                 It is expected that the server will instantiate
+                 the hidden key in the same location where built-in
+                 keys are located.  Rather than return the key,
+                 just the key's location is returned in the output.";
             }
           }
         }
       }
     }
     output {
-      uses ct:asymmetric-key-pair-grouping;
+      choice key-or-hidden {
+        case key {
+          uses ct:asymmetric-key-pair-grouping;
+        }
+        case hidden {
+          leaf location {
+            type instance-identifier;
+            description
+              "The location to where a hidden key was created.";
+          }
+        }
+        description
+          "The output can be either a key (for cleartext and
+           encrypted keys) or the location to where the key
+           was created (for hidden keys).";
+      }
     }
   } // end generate-asymmetric-key-pair
 

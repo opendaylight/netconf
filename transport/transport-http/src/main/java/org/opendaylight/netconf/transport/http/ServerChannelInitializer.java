@@ -42,7 +42,7 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.util.AsciiString;
 import io.netty.util.ReferenceCountUtil;
 import java.nio.charset.StandardCharsets;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240316.HttpServerGrouping;
 
 /**
  * Netty channel initializer for Http Server.

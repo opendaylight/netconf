@@ -43,7 +43,7 @@ module ietf-tcp-common {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-04-04 {
     description
       "Initial version";
     reference
@@ -92,7 +92,6 @@ module ietf-tcp-common {
            Section 3.8.4.";
         reference
           "RFC 9293: Transmission Control Protocol (TCP)";
-
       }
       leaf max-probes {
         type uint16 {

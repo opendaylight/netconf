@@ -48,7 +48,7 @@ module ietf-crypto-types {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-03-16 {
     description
       "Initial version";
     reference
@@ -946,7 +946,11 @@ module ietf-crypto-types {
          send notifications is an implementation specific decision,
          but it is RECOMMENDED that a notification be sent once a
          month for 3 months, then once a week for four weeks, and
-         then once a day thereafter until the issue is resolved.";
+         then once a day thereafter until the issue is resolved.
+
+         If the certificate's Issuer maintains a Certificate
+         Revocation List (CRL), the expiration notification MAY
+         be sent if the CRL is about to expire.";
       leaf expiration-date {
         type yang:date-and-time;
         mandatory true;

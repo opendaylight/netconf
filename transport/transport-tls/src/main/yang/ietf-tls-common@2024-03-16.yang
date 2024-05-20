@@ -56,7 +56,7 @@ module ietf-tls-common {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-03-16 {
     description
       "Initial version";
     reference
@@ -66,7 +66,6 @@ module ietf-tls-common {
   // Features
 
   feature tls12 {
-    status "deprecated";
     description
       "TLS Protocol Version 1.2 is supported. TLS 1.2 is obsolete
        and thus it is NOT RECOMMENDED to enable this feature.";
@@ -110,7 +109,6 @@ module ietf-tls-common {
   identity tls12 {
     if-feature "tls12";
     base tls-version-base;
-    status "deprecated";
     description
       "TLS Protocol Version 1.2.";
     reference
@@ -163,27 +161,31 @@ module ietf-tls-common {
                  Version 1.3";
     container tls-versions {
       description
-        "Parameters regarding TLS versions.";
-      leaf-list tls-version {
+        "Parameters limiting which TLS versions, amongst
+         those enabled by 'features', are presented during
+         the TLS handshake.";
+      leaf min {
         type identityref {
           base tls-version-base;
         }
-        ordered-by user;
         description
-          "Acceptable TLS protocol versions.
-
-           If this leaf-list is not configured (has zero elements)
-           the acceptable TLS protocol versions are implementation-
-           defined.";
+          "If not specified, then there is no configured
+           minimum version.";
+      }
+      leaf max {
+        type identityref {
+          base tls-version-base;
+        }
+        description
+          "If not specified, then there is no configured
+           maximum version.";
       }
     }
     container cipher-suites {
       description
         "Parameters regarding cipher suites.";
       leaf-list cipher-suite {
-        type identityref {
-          base tlscsa:cipher-suite-alg-base;
-        }
+        type tlscsa:tls-cipher-suite-algorithm;
         ordered-by user;
         description
           "Acceptable cipher suites in order of descending
@@ -211,7 +213,7 @@ module ietf-tls-common {
       "A container for a list of cipher suite algorithms supported
        by the server.";
     leaf-list supported-algorithm {
-      type tlscsa:cipher-suite-algorithm-ref;
+      type tlscsa:tls-cipher-suite-algorithm;
       description
         "A cipher suite algorithm supported by the server.";
     }
@@ -224,7 +226,7 @@ module ietf-tls-common {
        key using the specified key algorithm.";
     input {
       leaf algorithm {
-        type tlscsa:cipher-suite-algorithm-ref;
+        type tlscsa:tls-cipher-suite-algorithm;
         mandatory true;
         description
           "The cipher suite algorithm that the generated key is
@@ -291,7 +293,22 @@ module ietf-tls-common {
       }
     }
     output {
-      uses ct:asymmetric-key-pair-grouping;
+      choice key-or-hidden {
+        case key {
+          uses ct:asymmetric-key-pair-grouping;
+        }
+        case hidden {
+          leaf location {
+            type instance-identifier;
+            description
+              "The location to where a hidden key was created.";
+          }
+        }
+        description
+          "The output can be either a key (for cleartext and
+           encrypted keys) or the location to where the key
+           was created (for hidden keys).";
+      }
     }
   } // end generate-asymmetric-key-pair
 
