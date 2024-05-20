@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff8a7ec8_856dfc75",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 43
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-20T11:17:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cce97511_fb7f96b7",
+      "revId": "0f5e0fd736186bacba459a45473908a0c67a239a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2abb49fe_04a354e9",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-20T08:54:06Z",
       "side": 1,
       "message": "IMO not useful changes.",
+      "revId": "0f5e0fd736186bacba459a45473908a0c67a239a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3b88d6e_9cfa562c",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-20T11:17:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2abb49fe_04a354e9",
       "revId": "0f5e0fd736186bacba459a45473908a0c67a239a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
