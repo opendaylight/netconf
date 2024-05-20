@@ -16,8 +16,8 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DeserializerExceptionHandlerTest {
     private DeserializerExceptionHandler handler;
@@ -25,7 +25,7 @@ public class DeserializerExceptionHandlerTest {
     private ChannelHandlerContext context;
     private Channel channel;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         handler = new DeserializerExceptionHandler();
         context = mock(ChannelHandlerContext.class);

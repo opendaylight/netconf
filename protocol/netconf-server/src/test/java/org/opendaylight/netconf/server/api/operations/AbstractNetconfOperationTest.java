@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.server.api.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -52,7 +52,7 @@ public class AbstractNetconfOperationTest {
     private final NetconfOperationImpl netconfOperation = new NetconfOperationImpl(new SessionIdType(Uint32.ONE));
     private NetconfOperationChainedExecution operation;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         operation = mock(NetconfOperationChainedExecution.class);
     }

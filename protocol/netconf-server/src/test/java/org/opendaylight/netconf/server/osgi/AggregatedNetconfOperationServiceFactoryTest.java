@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -16,18 +16,18 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.yangtools.concepts.Registration;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class AggregatedNetconfOperationServiceFactoryTest {
 
     private final Set<Capability> factory1Caps = new HashSet<>();
@@ -52,7 +52,7 @@ public class AggregatedNetconfOperationServiceFactoryTest {
 
     private AggregatedNetconfOperationServiceFactory aggregatedFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         factory1Caps.add(new BasicCapability("AAA"));
         factory1Caps.add(new BasicCapability("BBB"));

@@ -7,13 +7,14 @@
  */
 package org.opendaylight.netconf.server.api.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -45,7 +46,7 @@ public class AbstractLastNetconfOperationTest {
 
     LastNetconfOperationImplTest netconfOperation;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         netconfOperation = new LastNetconfOperationImplTest(new SessionIdType(Uint32.ONE));
     }
@@ -57,12 +58,14 @@ public class AbstractLastNetconfOperationTest {
         assertEquals(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY, netconfOperation.getHandlingPriority());
     }
 
-    @Test(expected = DocumentedException.class)
+    @Test
     public void testHandle() throws Exception {
         NetconfOperationChainedExecution operation = mock(NetconfOperationChainedExecution.class);
         doReturn("").when(operation).toString();
 
         doReturn(false).when(operation).isExecutionTermination();
-        netconfOperation.handle(null, null, operation);
+        assertThrows(DocumentedException.class, () -> {
+            netconfOperation.handle(null, null, operation);
+        });
     }
 }
