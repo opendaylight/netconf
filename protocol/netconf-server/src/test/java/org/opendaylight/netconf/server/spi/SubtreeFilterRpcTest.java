@@ -7,54 +7,35 @@
  */
 package org.opendaylight.netconf.server.spi;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.Collection;
-import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 import org.xmlunit.builder.DiffBuilder;
 
-@RunWith(value = Parameterized.class)
-public class SubtreeFilterRpcTest {
-    private final int directoryIndex;
+class SubtreeFilterRpcTest {
 
-    @Parameters
-    public static Collection<Object[]> data() {
-        return List.of(
-            new Object[] { 0  },
-            new Object[] { 1  },
-            new Object[] { 2  },
-            new Object[] { 3  },
-            new Object[] { 4  },
-            new Object[] { 5  },
-            new Object[] { 6  },
-            new Object[] { 7  },
-            new Object[] { 8  },
-            new Object[] { 9  },
-            new Object[] { 10 });
-    }
-
-    public SubtreeFilterRpcTest(final int directoryIndex) {
-        this.directoryIndex = directoryIndex;
-    }
-
-    @Test
-    public void test() throws Exception {
+    @MethodSource
+    @ParameterizedTest
+    void testFilterRpc(final int directoryIndex) throws Exception {
         final var diff = DiffBuilder
-            .compare(SubtreeFilter.applyRpcSubtreeFilter(getDocument("request.xml"), getDocument("pre-filter.xml")))
-            .withTest(getDocument("post-filter.xml"))
+            .compare(SubtreeFilter.applyRpcSubtreeFilter(
+                getDocument(directoryIndex, "request.xml"), getDocument(directoryIndex, "pre-filter.xml")))
+            .withTest(getDocument(directoryIndex, "post-filter.xml"))
             .ignoreWhitespace()
             .checkForSimilar()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
-    private Document getDocument(final String fileName) throws Exception {
+    private static Stream<Integer> testFilterRpc() {
+        return Stream.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    private Document getDocument(final int directoryIndex, final String fileName) throws Exception {
         return XmlUtil.readXmlToDocument(
             SubtreeFilterRpcTest.class.getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" + fileName));
     }
