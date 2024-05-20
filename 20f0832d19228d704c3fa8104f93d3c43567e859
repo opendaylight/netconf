@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3796fd1_50f862f4",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPostTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1ef0183_6ef67afe",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 30
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbb582b0_10007154",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-17T15:06:56Z",
       "side": 1,
       "message": "jupiter.api.Assertions",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 30
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba339b2b_6e982035",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfOperationsPostTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbb582b0_10007154",
       "range": {
         "startLine": 10,
         "startChar": 24,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "36cc2f98_0c60d32c",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/databind/AbstractOperationInputBodyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "600a222b_e2eeda4b",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 30
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b7ac2f5_0508bf61",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-05-17T15:06:56Z",
       "side": 1,
       "message": "migrate these too",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 22
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4603bd19_4a5e338a",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/databind/AbstractOperationInputBodyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b7ac2f5_0508bf61",
       "range": {
         "startLine": 13,
         "startChar": 0,
@@ -116,6 +212,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f47781d_17fdef0a",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/DataTreeChangeStreamTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "This class can\u0027t be migrated because it extends test class from md-sal, that would need to be migrated first.",
+      "parentUuid": "d7c55bc1_9d86941b",
+      "range": {
+        "startLine": 13,
+        "startChar": 24,
+        "endLine": 13,
+        "endChar": 30
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc6a3662_d0453e25",
@@ -129,6 +249,30 @@
       "writtenOn": "2024-05-17T15:06:56Z",
       "side": 1,
       "message": "migrate these too",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 22
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8dc8612_0b0d59d8",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/DataTreeChangeStreamTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "This can\u0027t be migrated.",
+      "parentUuid": "bc6a3662_d0453e25",
       "range": {
         "startLine": 25,
         "startChar": 0,
@@ -162,6 +306,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ba5aac5_40dc6528",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/server/spi/NormalizedNodeWriterParametersTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c997858_bafae8a7",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 22
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e04e693_c99d2d3d",
@@ -175,6 +343,30 @@
       "writtenOn": "2024-05-17T15:06:56Z",
       "side": 1,
       "message": "migrate this",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 22
+      },
+      "revId": "20f0832d19228d704c3fa8104f93d3c43567e859",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "286c217a_44334af1",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/server/spi/YangPatchStatusBodyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T07:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e04e693_c99d2d3d",
       "range": {
         "startLine": 14,
         "startChar": 0,
