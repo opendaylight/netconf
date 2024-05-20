@@ -7,15 +7,15 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
-public class ExiEncodeDecodeTest {
+class ExiEncodeDecodeTest {
     @Test
-    public void encodeExi() throws Exception {
+    void encodeExi() throws Exception {
 
         String startExiString = XmlFileLoader.xmlFileToString("netconfMessages/startExi.xml");
         assertNotNull(startExiString);

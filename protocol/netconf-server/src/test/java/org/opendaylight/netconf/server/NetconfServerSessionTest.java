@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -16,11 +17,11 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
@@ -37,8 +38,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfServerSessionTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfServerSessionTest {
     private static final String HOST = "127.0.0.1";
     private static final String PORT = "17830";
     private static final String SSH_TRANSPORT = "ssh";
@@ -52,23 +53,23 @@ public class NetconfServerSessionTest {
     @Mock
     private NetconfServerSessionListener listener;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         final var header = new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, SSH_TRANSPORT, SESSION_ID);
         channel = new EmbeddedChannel();
         session = new NetconfServerSession(listener, channel, new SessionIdType(Uint32.ONE), header);
-        doNothing().when(listener).onSessionUp(any());
         msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply></rpc-reply>"));
     }
 
     @Test
-    public void testSessionUp() throws Exception {
+    void testSessionUp() {
+        doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         verify(listener).onSessionUp(session);
     }
 
     @Test
-    public void testDelayedClose() throws Exception {
+    void testDelayedClose() {
         doNothing().when(listener).onSessionTerminated(eq(session), any());
         session.delayedClose();
         session.sendMessage(msg);
@@ -78,14 +79,14 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testSendMessage() throws Exception {
+    void testSendMessage() {
         session.sendMessage(msg);
         channel.runPendingTasks();
         assertEquals(msg, channel.readOutbound());
     }
 
     @Test
-    public void testSendNotification() throws Exception {
+    void testSendNotification() throws Exception {
         doNothing().when(listener).onNotification(any(), any());
         final var msgDoc = XmlUtil.readXmlToDocument("<notification></notification>");
         final var notif = NotificationMessage.ofNotificationContent(msgDoc);
@@ -96,7 +97,8 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testOnIncommingRpcSuccess() throws Exception {
+    void testOnIncommingRpcSuccess() {
+        doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         final var managementSession = session.toManagementSession();
         session.onIncommingRpcSuccess();
@@ -106,7 +108,8 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testOnIncommingRpcFail() throws Exception {
+    void testOnIncommingRpcFail() {
+        doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         final var managementSession = session.toManagementSession();
         session.onIncommingRpcFail();
@@ -116,7 +119,8 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testOnOutgoingRpcError() throws Exception {
+    void testOnOutgoingRpcError() {
+        doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         final var managementSession = session.toManagementSession();
         session.onOutgoingRpcError();
@@ -126,7 +130,8 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testToManagementSession() throws Exception {
+    void testToManagementSession() {
+        doNothing().when(listener).onSessionUp(any());
         final var header = new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, TCP_TRANSPORT, SESSION_ID);
         final var ch = new EmbeddedChannel();
         final var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
@@ -138,18 +143,19 @@ public class NetconfServerSessionTest {
         assertEquals(NetconfTcp.VALUE, managementSession.getTransport());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testToManagementSessionUnknownTransport() throws Exception {
+    @Test
+    void testToManagementSessionUnknownTransport() {
+        doNothing().when(listener).onSessionUp(any());
         final var header = new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, "http", SESSION_ID);
         final var ch = new EmbeddedChannel();
-        try (var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header)) {
-            tcpSession.sessionUp();
-            tcpSession.toManagementSession();
-        }
+        var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
+        tcpSession.sessionUp();
+        assertThrows(IllegalArgumentException.class, tcpSession::toManagementSession);
     }
 
     @Test
-    public void testToManagementSessionIpv6() throws Exception {
+    void testToManagementSessionIpv6() {
+        doNothing().when(listener).onSessionUp(any());
         final var header = new NetconfHelloMessageAdditionalHeader(USER, "::1", PORT, SSH_TRANSPORT, SESSION_ID);
         final var ch = new EmbeddedChannel();
         var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
@@ -162,12 +168,12 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testThisInstance() throws Exception {
+    void testThisInstance() {
         assertEquals(session, session.thisInstance());
     }
 
     @Test
-    public void testAddExiHandlers() throws Exception {
+    void testAddExiHandlers() throws Exception {
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
                 new NetconfXMLToMessageDecoder());
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
@@ -177,7 +183,7 @@ public class NetconfServerSessionTest {
     }
 
     @Test
-    public void testStopExiCommunication() throws Exception {
+    void testStopExiCommunication() {
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
             new ChannelInboundHandlerAdapter());
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
