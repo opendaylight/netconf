@@ -7,15 +7,16 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 
-public class AdditionalHeaderParserTest {
+class AdditionalHeaderParserTest {
 
     @Test
-    public void testParsing() throws Exception {
+    void testParsing() throws Exception {
         String message = "[netconf;10.12.0.102:48528;ssh;;;;;;]";
         NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(message);
         assertEquals("netconf", header.getUserName());
@@ -24,7 +25,7 @@ public class AdditionalHeaderParserTest {
     }
 
     @Test
-    public void testParsing2() throws Exception {
+    void testParsing2() throws Exception {
         String message = "[tomas;10.0.0.0/10000;tcp;1000;1000;;/home/tomas;;]";
         NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(message);
         assertEquals("tomas", header.getUserName());
@@ -32,9 +33,11 @@ public class AdditionalHeaderParserTest {
         assertEquals("tcp", header.getTransport());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testParsingNoUsername() throws Exception {
+    @Test
+    void testParsingNoUsername() throws Exception {
         String message = "[10.12.0.102:48528;ssh;;;;;;]";
-        NetconfHelloMessageAdditionalHeader.fromString(message);
+        assertThrows(IllegalArgumentException.class, () -> {
+            NetconfHelloMessageAdditionalHeader.fromString(message);
+        });
     }
 }

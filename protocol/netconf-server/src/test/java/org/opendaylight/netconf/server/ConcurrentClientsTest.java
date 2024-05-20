@@ -87,7 +87,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 @ExtendWith(MockitoExtension.class)
-public class ConcurrentClientsTest {
+class ConcurrentClientsTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConcurrentClientsTest.class);
 
     private static final int CONCURRENCY = 32;
@@ -118,7 +118,7 @@ public class ConcurrentClientsTest {
     private TestingNetconfOperation testingNetconfOperation;
 
     @BeforeAll
-    public static void beforeAll() throws Exception {
+    static void beforeAll() throws Exception {
         timer = new DefaultNetconfTimer();
         clientExecutor = Executors.newFixedThreadPool(CONCURRENCY, new ThreadFactory() {
             int index = 1;

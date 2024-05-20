@@ -7,20 +7,20 @@
  */
 package org.opendaylight.netconf.server.api.monitoring;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class SessionEventTest {
+@ExtendWith(MockitoExtension.class)
+class SessionEventTest {
     @Mock
     private NetconfManagementSession session;
 
     @Test
-    public void test() {
+    void test() {
         assertEquals(SessionEvent.Type.IN_RPC_FAIL, SessionEvent.inRpcFail(session).getType());
         assertEquals(SessionEvent.Type.IN_RPC_SUCCESS, SessionEvent.inRpcSuccess(session).getType());
         assertEquals(SessionEvent.Type.NOTIFICATION, SessionEvent.notification(session).getType());

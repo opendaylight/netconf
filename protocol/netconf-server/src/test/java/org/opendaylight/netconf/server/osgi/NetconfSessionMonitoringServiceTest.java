@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -20,13 +20,13 @@ import static org.mockito.Mockito.verify;
 import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -37,8 +37,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfSessionMonitoringServiceTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfSessionMonitoringServiceTest {
     private static final Session SESSION_1 = new SessionBuilder()
             .setSessionId(Uint32.valueOf(1))
             .setSourceHost(new Host(new IpAddress(new Ipv4Address("0.0.0.0"))))
@@ -61,19 +61,18 @@ public class NetconfSessionMonitoringServiceTest {
 
     private NetconfSessionMonitoringService monitoringService;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doReturn(SESSION_1).when(sessionMock1).toManagementSession();
-        doReturn(SESSION_2).when(sessionMock2).toManagementSession();
         doNothing().when(listener).onSessionStarted(any());
-        doNothing().when(listener).onSessionEnded(any());
 
         monitoringService = new NetconfSessionMonitoringService.WithoutUpdates();
         monitoringService.registerListener(listener);
     }
 
     @Test
-    public void testListeners() {
+    void testListeners() {
+        doNothing().when(listener).onSessionEnded(any());
         monitoringService.onSessionUp(sessionMock1);
         monitoringService.onSessionDown(sessionMock1);
         verify(listener).onSessionStarted(any());
@@ -81,7 +80,7 @@ public class NetconfSessionMonitoringServiceTest {
     }
 
     @Test
-    public void testClose() {
+    void testClose() {
         monitoringService.onSessionUp(sessionMock1);
         assertEquals(1, monitoringService.getSessions().nonnullSession().size());
         monitoringService.close();
@@ -89,7 +88,8 @@ public class NetconfSessionMonitoringServiceTest {
     }
 
     @Test
-    public void testOnSessionUpAndDown() {
+    void testOnSessionUpAndDown() {
+        doNothing().when(listener).onSessionEnded(any());
         monitoringService.onSessionUp(sessionMock1);
         final var sessionUpCaptor = ArgumentCaptor.forClass(Session.class);
         verify(listener).onSessionStarted(sessionUpCaptor.capture());
@@ -108,7 +108,8 @@ public class NetconfSessionMonitoringServiceTest {
     }
 
     @Test
-    public void testListenerUpdateSession() {
+    void testListenerUpdateSession() {
+        doReturn(SESSION_2).when(sessionMock2).toManagementSession();
         final var executor = Executors.newScheduledThreadPool(1);
         try {
             try (var service = new NetconfSessionMonitoringService.WithUpdates(executor, 1, TimeUnit.SECONDS)) {

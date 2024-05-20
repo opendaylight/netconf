@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.server.mapping.operations;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.NetconfServerSession;
@@ -26,9 +26,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
-public class DefaultStopExiTest {
+class DefaultStopExiTest {
     @Test
-    public void testHandleWithNoSubsequentOperations() throws Exception {
+    void testHandleWithNoSubsequentOperations() throws Exception {
         final DefaultStopExi exi = new DefaultStopExi(new SessionIdType(Uint32.ONE));
         final Document doc = XmlUtil.newDocument();
         Channel channel = mock(Channel.class);
