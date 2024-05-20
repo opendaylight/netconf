@@ -16,6 +16,24 @@
       "message": "usage of lenient",
       "revId": "c196560e005721936fa234e3b2b476eb52456dda",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80947049_a675bbfa",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPostTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-20T10:12:04Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "3e87b152_82b8f93c",
+      "revId": "c196560e005721936fa234e3b2b476eb52456dda",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
