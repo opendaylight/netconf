@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -16,19 +16,19 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.yangtools.concepts.Registration;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class AggregatedNetconfOperationServiceFactoryTest {
+@ExtendWith(MockitoExtension.class)
+class AggregatedNetconfOperationServiceFactoryTest {
 
     private final Set<Capability> factory1Caps = new HashSet<>();
     private final Set<Capability> factory2Caps = new HashSet<>();
@@ -52,8 +52,8 @@ public class AggregatedNetconfOperationServiceFactoryTest {
 
     private AggregatedNetconfOperationServiceFactory aggregatedFactory;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         factory1Caps.add(new BasicCapability("AAA"));
         factory1Caps.add(new BasicCapability("BBB"));
 
@@ -67,21 +67,15 @@ public class AggregatedNetconfOperationServiceFactoryTest {
 
         doReturn(reg1).when(factory1).registerCapabilityListener(listener1);
         doReturn(reg2).when(factory1).registerCapabilityListener(listener2);
-        doReturn(factory1Caps).when(factory1).getCapabilities();
 
         doReturn(reg1).when(factory2).registerCapabilityListener(listener1);
         doReturn(reg2).when(factory2).registerCapabilityListener(listener2);
-        doReturn(factory2Caps).when(factory2).getCapabilities();
-
-        doNothing().when(reg1).close();
-        doNothing().when(reg2).close();
-
-        doReturn(reg3).when(factory1).registerCapabilityListener(listener3);
-        doReturn(reg3).when(factory2).registerCapabilityListener(listener3);
     }
 
     @Test
-    public void testOnAddAndOnRemove() throws Exception {
+    void testOnAddAndOnRemove() {
+        doNothing().when(reg1).close();
+        doNothing().when(reg2).close();
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
 
@@ -98,7 +92,9 @@ public class AggregatedNetconfOperationServiceFactoryTest {
     }
 
     @Test
-    public void testGetCapabilities() throws Exception {
+    void testGetCapabilities() {
+        doReturn(factory1Caps).when(factory1).getCapabilities();
+        doReturn(factory2Caps).when(factory2).getCapabilities();
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
         final Set<Capability> actual = aggregatedFactory.getCapabilities();
@@ -107,7 +103,9 @@ public class AggregatedNetconfOperationServiceFactoryTest {
     }
 
     @Test
-    public void testRegisterCapabilityListener() throws Exception {
+    void testRegisterCapabilityListener() {
+        doReturn(reg3).when(factory1).registerCapabilityListener(listener3);
+        doReturn(reg3).when(factory2).registerCapabilityListener(listener3);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
         aggregatedFactory.registerCapabilityListener(listener3);
@@ -117,7 +115,9 @@ public class AggregatedNetconfOperationServiceFactoryTest {
     }
 
     @Test
-    public void testClose() throws Exception {
+    void testClose() {
+        doNothing().when(reg1).close();
+        doNothing().when(reg2).close();
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
         aggregatedFactory.close();

@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -18,13 +18,13 @@ import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.operations.HandlingPriority;
@@ -37,8 +37,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfOperationRouterImplTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfOperationRouterImplTest {
     private static final String TEST_RPC =
         "<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><test/></rpc>\n";
     private static final String MAX_PRIORITY_REPLY = "<high/>";
@@ -58,23 +58,14 @@ public class NetconfOperationRouterImplTest {
     private NetconfOperationRouterImpl operationRouter;
     private NetconfOperationRouterImpl emptyOperationRouter;
 
-    @BeforeClass
-    public static void suiteSetUp() throws IOException, SAXException {
+    @BeforeAll
+    static void suiteSetUp() throws IOException, SAXException {
         TEST_RPC_DOC = XmlUtil.readXmlToDocument(TEST_RPC);
     }
 
-    @Before
-    public void setUp() throws Exception {
-        doReturn(HandlingPriority.HANDLE_WITH_MAX_PRIORITY).when(maxPrioMock).canHandle(any(Document.class));
-        doReturn(XmlUtil.readXmlToDocument(MAX_PRIORITY_REPLY)).when(maxPrioMock).handle(any(Document.class),
-                any(NetconfOperationChainedExecution.class));
-
-        doReturn(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY).when(defaultPrioMock).canHandle(any(Document.class));
-        doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class),
-                any(NetconfOperationChainedExecution.class));
-
+    @BeforeEach
+    void setUp() {
         doReturn(Set.of(maxPrioMock, defaultPrioMock)).when(operationService).getNetconfOperations();
-        doNothing().when(operationService).close();
 
         final var sessionId = new SessionIdType(Uint32.ONE);
         operationRouter = new NetconfOperationRouterImpl(operationService, null, sessionId);
@@ -83,7 +74,14 @@ public class NetconfOperationRouterImplTest {
     }
 
     @Test
-    public void testOnNetconfMessage() throws Exception {
+    void testOnNetconfMessage() throws Exception {
+        doReturn(HandlingPriority.HANDLE_WITH_MAX_PRIORITY).when(maxPrioMock).canHandle(any(Document.class));
+        doReturn(XmlUtil.readXmlToDocument(MAX_PRIORITY_REPLY)).when(maxPrioMock).handle(any(Document.class),
+            any(NetconfOperationChainedExecution.class));
+
+        doReturn(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY).when(defaultPrioMock).canHandle(any(Document.class));
+        doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class),
+            any(NetconfOperationChainedExecution.class));
         final ArgumentCaptor<NetconfOperationChainedExecution> highPriorityChainEx =
                 ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
         final ArgumentCaptor<NetconfOperationChainedExecution> defaultPriorityChainEx =
@@ -108,14 +106,15 @@ public class NetconfOperationRouterImplTest {
     }
 
     @Test
-    public void testOnNetconfMessageFail() throws Exception {
+    void testOnNetconfMessageFail() {
         final DocumentedException ex =  assertThrows(DocumentedException.class,
             () -> emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null));
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
     }
 
     @Test
-    public void testClose() throws Exception {
+    void testClose() {
+        doNothing().when(operationService).close();
         operationRouter.close();
         verify(operationService).close();
     }
