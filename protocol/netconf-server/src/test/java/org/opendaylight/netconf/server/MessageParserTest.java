@@ -7,18 +7,18 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
@@ -32,7 +32,7 @@ import org.xmlunit.builder.DiffBuilder;
 public class MessageParserTest {
     private NetconfMessage msg;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         msg = XmlFileLoader.xmlFileToNetconfMessage("netconfMessages/getConfig.xml");
     }
@@ -86,7 +86,7 @@ public class MessageParserTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class MessageParserTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
     private static long getHeaderLength(final byte[] bytes) {

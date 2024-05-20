@@ -7,9 +7,10 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 
 public class AdditionalHeaderParserTest {
@@ -32,9 +33,11 @@ public class AdditionalHeaderParserTest {
         assertEquals("tcp", header.getTransport());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testParsingNoUsername() throws Exception {
         String message = "[10.12.0.102:48528;ssh;;;;;;]";
-        NetconfHelloMessageAdditionalHeader.fromString(message);
+        assertThrows(IllegalArgumentException.class, () -> {
+            NetconfHelloMessageAdditionalHeader.fromString(message);
+        });
     }
 }
