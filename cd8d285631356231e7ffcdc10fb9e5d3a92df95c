@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "439a9277_3286c487",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/NetconfSessionPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-20T09:10:00Z",
+      "side": 1,
+      "message": "This is always ANDed with isNotificationsSupported. Do we need it?",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2271834_30ff9bd5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceMount.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-20T09:10:00Z",
+      "side": 1,
+      "message": "IMO I would add if here if notifications are supported and create new NetconfDeviceNotificationService() directly in place.",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b0d383e_e32c4e6c",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-20T09:10:00Z",
+      "side": 1,
+      "message": "Why device does fail?",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
