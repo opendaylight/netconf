@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f5fab7_a46a4fa7",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-20T06:59:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "749dd554_f796563f",
+      "range": {
+        "startLine": 114,
+        "startChar": 52,
+        "endLine": 114,
+        "endChar": 62
+      },
+      "revId": "2dd594872d43e03c54c033400299d0c3e441efe0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7608ce1c_9afe25b2",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-19T17:46:46Z",
       "side": 1,
       "message": "please do not use lenient mocking",
+      "range": {
+        "startLine": 91,
+        "startChar": 8,
+        "endLine": 91,
+        "endChar": 17
+      },
+      "revId": "2dd594872d43e03c54c033400299d0c3e441efe0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b18f2db4_afa37f40",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-20T06:59:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7608ce1c_9afe25b2",
       "range": {
         "startLine": 91,
         "startChar": 8,
