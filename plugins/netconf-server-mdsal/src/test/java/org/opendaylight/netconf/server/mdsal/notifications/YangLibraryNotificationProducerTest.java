@@ -12,11 +12,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
@@ -25,8 +25,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class YangLibraryNotificationProducerTest {
+@ExtendWith(MockitoExtension.class)
+class YangLibraryNotificationProducerTest {
     @Mock
     private YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
     @Mock
@@ -38,8 +38,8 @@ public class YangLibraryNotificationProducerTest {
 
     private YangLibraryNotificationProducer yangLibraryNotificationProducer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doNothing().when(yangLibraryPublisherRegistration).onYangLibraryChange(any(YangLibraryChange.class));
         doReturn(yangLibraryPublisherRegistration).when(netconfNotificationCollector)
                 .registerYangLibraryPublisher();
@@ -49,7 +49,7 @@ public class YangLibraryNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataTreeChanged() {
+    void testOnDataTreeChanged() {
         final String moduleSetId = "1";
         final var modulesStateAfter = new ModulesStateBuilder().setModuleSetId(moduleSetId).build();
 
