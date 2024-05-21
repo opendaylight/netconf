@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34bad931_b510909a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-05-21T11:31:17Z",
+      "side": 1,
+      "message": "PS1 adds unit tests pointing to the problem and PS2 contains fix",
+      "revId": "c438265bee1188750be1d136d119801f5a15844d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
