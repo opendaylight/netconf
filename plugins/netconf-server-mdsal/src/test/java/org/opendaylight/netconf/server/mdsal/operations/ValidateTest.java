@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -20,12 +20,12 @@ import static org.opendaylight.netconf.server.mdsal.operations.AbstractNetconfOp
 
 import java.util.List;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.w3c.dom.Document;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class ValidateTest {
     @Mock
     private DOMDataTransactionValidator noopValidator;
@@ -49,17 +49,13 @@ public class ValidateTest {
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     private DOMDataBroker dataBroker;
 
-    @Before
-    public void setUp() {
-        doReturn(FluentFutures.immediateNullFluentFuture()).when(noopValidator).validate(any());
-        doReturn(FluentFutures.immediateFailedFluentFuture(new ValidationFailedException("invalid data")))
-            .when(failingValidator).validate(any());
-        doReturn(readWriteTx).when(dataBroker).newReadWriteTransaction();
+    @BeforeAll
+    static void setUp() {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test
-    public void testValidateUnsupported() throws Exception {
+    void testValidateUnsupported() {
         whenValidatorIsNotDefined();
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate.xml"));
@@ -69,7 +65,7 @@ public class ValidateTest {
     }
 
     @Test
-    public void testSourceMissing() throws Exception {
+    void testSourceMissing() {
         whenUsingValidator(noopValidator);
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate_no_source.xml"));
@@ -79,7 +75,7 @@ public class ValidateTest {
     }
 
     @Test
-    public void testSourceRunning() throws Exception {
+    void testSourceRunning() {
         whenUsingValidator(noopValidator);
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate_running.xml"));
@@ -89,14 +85,16 @@ public class ValidateTest {
     }
 
     @Test
-    public void testValidateEmptyTx() throws Exception {
+    void testValidateEmptyTx() throws Exception {
         whenUsingValidator(noopValidator);
         verifyResponse(validate("messages/mapping/validate/validate.xml"), RPC_REPLY_OK);
         verifyNoMoreInteractions(noopValidator);
     }
 
     @Test
-    public void testValidate() throws Exception {
+    void testValidate() throws Exception {
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(noopValidator).validate(any());
+        doReturn(readWriteTx).when(dataBroker).newReadWriteTransaction();
         whenUsingValidator(noopValidator);
         final TransactionProvider transactionProvider = initCandidateTransaction();
         verifyResponse(validate("messages/mapping/validate/validate.xml", transactionProvider), RPC_REPLY_OK);
@@ -104,7 +102,10 @@ public class ValidateTest {
     }
 
     @Test
-    public void testValidateFailed() throws Exception {
+    void testValidateFailed() {
+        doReturn(FluentFutures.immediateFailedFluentFuture(new ValidationFailedException("invalid data")))
+                .when(failingValidator).validate(any());
+        doReturn(readWriteTx).when(dataBroker).newReadWriteTransaction();
         whenUsingValidator(failingValidator);
         final TransactionProvider transactionProvider = initCandidateTransaction();
         final DocumentedException e = assertThrows(DocumentedException.class,

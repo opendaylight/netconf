@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
+class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     private static final String TARGET_KEY = "target";
     private static final String FILTER_NODE = "filter";
     private static final String GET_CONFIG = "get-config";
@@ -57,14 +57,14 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
             YangInstanceIdentifier.builder().node(TOP).node(MODULES).build();
 
     @Test
-    public void testEmptyDatastore() throws Exception {
+    void testEmptyDatastore() throws Exception {
         assertEmptyDatastore(get());
         assertEmptyDatastore(getConfigCandidate());
         assertEmptyDatastore(getConfigRunning());
     }
 
     @Test
-    public void testIncorrectGet() throws Exception {
+    void testIncorrectGet() {
         DocumentedException ex = assertThrows(DocumentedException.class,
             () -> executeOperation(new GetConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
                     getTransactionProvider()), "messages/mapping/bad_getConfig.xml"));
@@ -81,7 +81,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testConfigMissing() throws Exception {
+    void testConfigMissing() {
         final DocumentedException ex = assertThrows(DocumentedException.class,
             () -> edit("messages/mapping/editConfigs/editConfig_no_config.xml"));
         assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
@@ -90,7 +90,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testEditRunning() throws Exception {
+    void testEditRunning() {
         final DocumentedException ex = assertThrows(DocumentedException.class,
             () -> edit("messages/mapping/editConfigs/editConfig_running.xml"));
         assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
@@ -99,13 +99,13 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testCommitWithoutOpenTransaction() throws Exception {
+    void testCommitWithoutOpenTransaction() throws Exception {
         verifyResponse(commit(), RPC_REPLY_OK);
         assertEmptyDatastore(getConfigCandidate());
     }
 
     @Test
-    public void testCandidateTransaction() throws Exception {
+    void testCandidateTransaction() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
@@ -116,7 +116,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testEditWithCommit() throws Exception {
+    void testEditWithCommit() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
@@ -129,7 +129,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testKeyOrder() throws Exception {
+    void testKeyOrder() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_keys_1.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
         final Document configRunning = getConfigRunning();
@@ -141,14 +141,14 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         final int key1 = responseAsString.indexOf("key1");
         final int key2 = responseAsString.indexOf("key2");
 
-        assertTrue(String.format("Key ordering invalid, should be key3(%d) < key1(%d) < key2(%d)", key3, key1, key2),
-                key3 < key1 && key1 < key2);
+        assertTrue(key3 < key1 && key1 < key2,
+            String.format("Key ordering invalid, should be key3(%d) < key1(%d) < key2(%d)", key3, key1, key2));
 
         deleteDatastore();
     }
 
     @Test
-    public void testMultipleEditsWithMerge() throws Exception {
+    void testMultipleEditsWithMerge() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_1.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/editConfigs/editConfig_merge_multiple_control_1.xml"));
@@ -165,7 +165,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testMoreComplexEditConfigs() throws Exception {
+    void testMoreComplexEditConfigs() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_1.xml"), RPC_REPLY_OK);
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_single_1.xml"), RPC_REPLY_OK);
 
@@ -197,7 +197,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testOrderedListEdits() throws Exception {
+    void testOrderedListEdits() throws Exception {
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_ordered_list_create.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -209,7 +209,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testAugmentedOrderedListEdits() throws Exception {
+    void testAugmentedOrderedListEdits() throws Exception {
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_augmented_ordered_list_create.xml"),
                 RPC_REPLY_OK);
@@ -223,7 +223,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testAugmentedContainerReplace() throws Exception {
+    void testAugmentedContainerReplace() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_empty_modules_create.xml"),
                 RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -236,7 +236,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testLeafFromAugmentReplace() throws Exception {
+    void testLeafFromAugmentReplace() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_empty_modules_create.xml"),
                 RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -249,7 +249,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testLock() throws Exception {
+    void testLock() throws Exception {
         verifyResponse(lockCandidate(), RPC_REPLY_OK);
 
         DocumentedException ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::lock);
@@ -449,8 +449,8 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
                 XmlFileLoader.xmlFileToDocument("messages/mapping/get-config-map-entry.xml"));
     }
 
-    @Ignore("Needs to have YIID parsing fixed, currently everything is a NodeIdentifier which breaks"
-            + "SchemaInferenceStack")
+    @Disabled("Needs to have YIID parsing fixed, currently everything is a NodeIdentifier which breaks"
+        + "SchemaInferenceStack")
     @Test
     public void testFiltering() throws Exception {
         assertEmptyDatastore(getConfigCandidate());
