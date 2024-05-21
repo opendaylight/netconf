@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ed31aa3_6b0f8e40",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/controller-all-width-one.json",
+        "patchSetId": 21
+      },
+      "lineNbr": 3439,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:15:33Z",
+      "side": 1,
+      "message": "new line at end",
+      "revId": "bb43a1ccebd9a782b43072a664ffbf533001ff46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba06299b_e688ad98",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/device-all-width-one.json",
+        "patchSetId": 21
+      },
+      "lineNbr": 3467,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:15:33Z",
+      "side": 1,
+      "message": "new line at end",
+      "revId": "bb43a1ccebd9a782b43072a664ffbf533001ff46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

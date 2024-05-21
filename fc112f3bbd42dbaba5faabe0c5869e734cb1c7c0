@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2aa3ea0_542ef39f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/NodeSchemaEntity.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:15:33Z",
+      "side": 1,
+      "message": "here you can use method widthList too",
+      "revId": "fc112f3bbd42dbaba5faabe0c5869e734cb1c7c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52982998_e6ea15ef",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:15:33Z",
+      "side": 1,
+      "message": "widthList",
+      "revId": "fc112f3bbd42dbaba5faabe0c5869e734cb1c7c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2735955_8a3297e8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/RpcSchemaEntity.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:15:33Z",
+      "side": 1,
+      "message": "widthList",
+      "revId": "fc112f3bbd42dbaba5faabe0c5869e734cb1c7c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
