@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
 import com.google.common.io.CharSource;
@@ -29,11 +29,11 @@ import javax.xml.transform.stream.StreamResult;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
@@ -59,8 +59,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public abstract class AbstractNetconfOperationTest {
+@ExtendWith(MockitoExtension.class)
+abstract class AbstractNetconfOperationTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfOperationTest.class);
     protected static final SessionIdType SESSION_ID_FOR_REPORTING = new SessionIdType(Uint32.valueOf(123));
     private static final String RPC_REPLY_ELEMENT = "rpc-reply";
@@ -72,19 +72,19 @@ public abstract class AbstractNetconfOperationTest {
     private CurrentSchemaContext currentSchemaContext;
     private TransactionProvider transactionProvider;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         SCHEMA_CONTEXT = parseYangResources(AbstractNetconfOperationTest.class,
             "/yang/mdsal-netconf-mapping-test.yang");
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterClass() {
         SCHEMA_CONTEXT = null;
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 

@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -28,14 +28,14 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -72,8 +72,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class RuntimeRpcTest {
+@ExtendWith(MockitoExtension.class)
+class RuntimeRpcTest {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpcTest.class);
     private static final SessionIdType SESSION_ID_FOR_REPORTING = new SessionIdType(Uint32.valueOf(123));
     private static final Document RPC_REPLY_OK = getReplyOk();
@@ -148,18 +148,18 @@ public class RuntimeRpcTest {
     @Mock
     private YangTextSourceExtension sourceProvider;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeAll() {
         SCHEMA_CONTEXT = YangParserTestUtils.parseYangResource("/yang/mdsal-netconf-rpc-test.yang");
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterAll() {
         SCHEMA_CONTEXT = null;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         doNothing().when(registration).close();
         doAnswer(invocationOnMock -> {
             ((Consumer<EffectiveModelContext>) invocationOnMock.getArgument(0)).accept(SCHEMA_CONTEXT);
@@ -176,13 +176,13 @@ public class RuntimeRpcTest {
         currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         currentSchemaContext.close();
     }
 
     @Test
-    public void testVoidOutputRpc() throws Exception {
+    void testVoidOutputRpc() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_VOID_INVOKER);
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-output.xml");
@@ -195,7 +195,7 @@ public class RuntimeRpcTest {
     }
 
     @Test
-    public void testSuccesfullNonVoidInvocation() throws Exception {
+    void testSuccesfullNonVoidInvocation() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(
             SESSION_ID_FOR_REPORTING, currentSchemaContext, rpcServiceSuccessfulInvocation);
 
@@ -208,7 +208,7 @@ public class RuntimeRpcTest {
     }
 
     @Test
-    public void testSuccesfullContainerInvocation() throws Exception {
+    void testSuccesfullContainerInvocation() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(
             SESSION_ID_FOR_REPORTING, currentSchemaContext, rpcServiceSuccessfulInvocation);
 
@@ -221,7 +221,7 @@ public class RuntimeRpcTest {
     }
 
     @Test
-    public void testFailedInvocation() throws Exception {
+    void testFailedInvocation() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(
                 SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_FAILED_INVOCATION);
 
@@ -238,7 +238,7 @@ public class RuntimeRpcTest {
     }
 
     @Test
-    public void testVoidInputOutputRpc() throws Exception {
+    void testVoidInputOutputRpc() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_VOID_INVOKER);
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-input-output.xml");
@@ -251,7 +251,7 @@ public class RuntimeRpcTest {
     }
 
     @Test
-    public void testBadNamespaceInRpc() throws Exception {
+    void testBadNamespaceInRpc() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_VOID_INVOKER);
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-bad-namespace.xml");
 
@@ -267,7 +267,7 @@ public class RuntimeRpcTest {
         final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         //we care about order so response has to be identical
-        assertTrue(dd.toString(), dd.identical());
+        assertTrue(dd.identical(), dd.toString());
     }
 
     private static RpcDefinition getRpcDefinitionFromModule(final Module module, final XMLNamespace namespaceURI,

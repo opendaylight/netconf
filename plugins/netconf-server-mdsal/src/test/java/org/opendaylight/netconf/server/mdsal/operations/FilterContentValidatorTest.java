@@ -9,9 +9,10 @@ package org.opendaylight.netconf.server.mdsal.operations;
 
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assume.assumeThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -19,15 +20,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.model.InitializationError;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -37,40 +37,31 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
-@RunWith(value = Parameterized.class)
-public class FilterContentValidatorTest {
+class FilterContentValidatorTest {
     private static final int TEST_CASE_COUNT = 13;
     private static final Pattern LIST_ENTRY_PATTERN =
             Pattern.compile("(?<listName>.*)\\[\\{(?<keys>(.*)(, .*)*)\\}\\]");
     private static final Pattern KEY_VALUE_PATTERN =
             Pattern.compile("(?<key>\\(.*\\).*)=(?<value>.*)");
-    private final XmlElement filterContent;
-    private final String expected;
     private FilterContentValidator validator;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() throws Exception {
-        final var result = new ArrayList<Object[]>();
+    static Stream<Arguments> data() throws Exception {
+        final var result = new ArrayList<Arguments>();
         final var expected = Files.readAllLines(
             Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI()));
         if (expected.size() != TEST_CASE_COUNT) {
-            throw new InitializationError("Number of lines in results file must be same as test case count");
+            throw new IllegalArgumentException("Number of lines in results file must be same as test case count");
         }
         for (int i = 1; i <= TEST_CASE_COUNT; i++) {
             final var document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class.getResourceAsStream(
                     "/filter/f" + i + ".xml"));
-            result.add(new Object[]{document, expected.get(i - 1)});
+            result.add(arguments(document, expected.get(i - 1)));
         }
-        return result;
+        return result.stream();
     }
 
-    public FilterContentValidatorTest(final Document filterContent, final String expected) {
-        this.filterContent = XmlElement.fromDomDocument(filterContent);
-        this.expected = expected;
-    }
-
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         final var context = YangParserTestUtils.parseYangResources(FilterContentValidatorTest.class,
             "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
             "/yang/mdsal-netconf-mapping-test.yang");
@@ -80,20 +71,24 @@ public class FilterContentValidatorTest {
         validator = new FilterContentValidator(currentContext);
     }
 
-    @Test
-    public void testValidateSuccess() throws DocumentedException {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testValidateSuccess(final Document filterContent, final String expected) throws DocumentedException {
+        final var filter = XmlElement.fromDomDocument(filterContent);
         assumeThat(expected, startsWith("success"));
 
         final String expId = expected.replace("success=", "");
-        final var actual = validator.validate(filterContent);
+        final var actual = validator.validate(filter);
         assertEquals(fromString(expId), actual);
     }
 
-    @Test
-    public void testValidateError() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testValidateError(final Document filterContent, final String expected) {
+        final var filter = XmlElement.fromDomDocument(filterContent);
         assumeThat(expected, startsWith("error"));
 
-        final var ex = assertThrows(DocumentedException.class, () -> validator.validate(filterContent));
+        final var ex = assertThrows(DocumentedException.class, () -> validator.validate(filter));
         final String expectedExceptionClass = expected.replace("error=", "");
         assertEquals(expectedExceptionClass, ex.getClass().getName());
     }
