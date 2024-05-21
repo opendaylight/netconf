@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class Netconf538Test {
+class Netconf538Test {
     private static final SessionIdType SESSION_ID_FOR_REPORTING = new SessionIdType(Uint32.valueOf(123));
     private static final QName BASE = QName.create("urn:dummy:list", "2019-08-21", "user");
     private static final QName NAME_QNAME = QName.create(BASE, "name");
@@ -40,7 +40,7 @@ public class Netconf538Test {
     private TransactionProvider transactionProvider;
 
     @Test
-    public void testRootMap() throws Exception {
+    void testRootMap() throws Exception {
         final var context = YangParserTestUtils.parseYangResources(Netconf538Test.class, "/yang/simple-list.yang");
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();

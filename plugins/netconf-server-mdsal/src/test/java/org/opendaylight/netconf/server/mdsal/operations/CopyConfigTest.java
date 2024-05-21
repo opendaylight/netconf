@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import java.nio.file.Path;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
@@ -28,11 +28,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class CopyConfigTest extends AbstractNetconfOperationTest {
-    @Rule
-    public TemporaryFolder tmpDir = new TemporaryFolder();
 
     @Test
-    public void testTargetMissing() {
+    void testTargetMissing() {
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> copyConfig("messages/mapping/copyConfigs/copyConfig_no_target.xml"));
 
@@ -42,7 +40,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testSourceMissing() {
+    void testSourceMissing() {
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> copyConfig("messages/mapping/copyConfigs/copyConfig_no_source.xml"));
 
@@ -62,7 +60,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testRunning() {
+    void testRunning() {
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> copyConfig("messages/mapping/copyConfigs/copyConfig_running.xml"));
 
@@ -72,7 +70,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testCandidateTransaction() throws Exception {
+    void testCandidateTransaction() throws Exception {
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_top_modules.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
             "messages/mapping/copyConfigs/copyConfig_top_modules_control.xml"));
@@ -94,7 +92,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testDeleteSubtree() throws Exception {
+    void testDeleteSubtree() throws Exception {
         // Initialize datastore
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_delete_setup.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -109,7 +107,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testList() throws Exception {
+    void testList() throws Exception {
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_list_setup.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
         verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument(
@@ -122,7 +120,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testOrderedList() throws Exception {
+    void testOrderedList() throws Exception {
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_ordered_list_setup.xml"),
             RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -137,7 +135,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testToplevelList() throws Exception {
+    void testToplevelList() throws Exception {
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_toplevel_list_setup.xml"),
             RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -152,7 +150,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testEmptyContainer() throws Exception {
+    void testEmptyContainer() throws Exception {
         // Check that empty non-presence container is removed.
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_empty_container.xml"),
             RPC_REPLY_OK);
@@ -162,7 +160,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testEmptyPresenceContainer() throws Exception {
+    void testEmptyPresenceContainer() throws Exception {
         // Check that empty presence container is not removed.
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_empty_presence_container.xml"),
             RPC_REPLY_OK);
@@ -172,7 +170,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testAugmentations() throws Exception {
+    void testAugmentations() throws Exception {
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_top_augmentation.xml"),
             RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
@@ -181,7 +179,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testChoices() throws Exception {
+    void testChoices() throws Exception {
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_choices1.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_choices2.xml"), RPC_REPLY_OK);
@@ -195,7 +193,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testConfigFromFile() throws Exception {
+    void testConfigFromFile() throws Exception {
         // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
         final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
         final URI uri = getClass().getClassLoader()
@@ -209,18 +207,18 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testConfigFromInvalidUrl() {
+    void testConfigFromInvalidUrl() {
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> copyConfig("messages/mapping/copyConfigs/copyConfig_invalid_url.xml"));
 
         assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
         assertEquals(e.getErrorTag(), ErrorTag.INVALID_VALUE);
         assertEquals(e.getErrorType(), ErrorType.APPLICATION);
-        assertTrue(e.getCause() instanceof MalformedURLException);
+        assertInstanceOf(MalformedURLException.class, e.getCause());
     }
 
     @Test
-    public void testExternalConfigInvalid() throws Exception {
+    void testExternalConfigInvalid() throws Exception {
         // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
         final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
         final URI uri = getClass().getClassLoader()
@@ -234,11 +232,11 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
         assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
         assertEquals(e.getErrorTag(), ErrorTag.OPERATION_FAILED);
         assertEquals(e.getErrorType(), ErrorType.APPLICATION);
-        assertTrue(e.getCause() instanceof SAXException);
+        assertInstanceOf(SAXException.class, e.getCause());
     }
 
     @Test
-    public void testCopyToFile() throws Exception {
+    void testCopyToFile(@TempDir Path tmpDir) throws Exception {
         // Initialize config:
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_top_modules.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
@@ -246,7 +244,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
 
         // Load copy-config template and replace URL with the URI of target file:
         final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file.xml");
-        final File outFile = new File(tmpDir.getRoot(),"test-copy-to-file.xml");
+        final File outFile = new File(tmpDir.toFile(),"test-copy-to-file.xml");
         final String copyConfig = template.replaceFirst("URL", outFile.toURI().toString());
         final Document request = XmlUtil.readXmlToDocument(copyConfig);
 
@@ -259,7 +257,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testUnsupportedTargetUrlProtocol() {
+    void testUnsupportedTargetUrlProtocol() {
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> copyConfig("messages/mapping/copyConfigs/copyConfig_to_unsupported_url_protocol.xml"));
 
@@ -269,11 +267,11 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testCopyToFileFromRunning() throws Exception {
+    void testCopyToFileFromRunning(@TempDir Path tmpDir) throws Exception {
         // Load copy-config template and replace URL with the URI of target file:
         final String template =
             XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file_from_running.xml");
-        final File outFile = new File(tmpDir.getRoot(),"test-copy-to-file-from-running.xml");
+        final File outFile = new File(tmpDir.toFile(),"test-copy-to-file-from-running.xml");
         final String copyConfig = template.replaceFirst("URL", outFile.toURI().toString());
         final Document request = XmlUtil.readXmlToDocument(copyConfig);
 
@@ -288,7 +286,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testRemoteToRemoteOperationIsNotSupported() {
+    void testRemoteToRemoteOperationIsNotSupported() {
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> copyConfig("messages/mapping/copyConfigs/copyConfig_url_remote_to_remote.xml"));
 

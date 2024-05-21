@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
@@ -19,11 +19,11 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class Netconf506Test {
+class Netconf506Test {
     private static final QName BASE = QName.create("urn:dummy:mod-0", "2016-03-01", "mainroot");
 
     @Test
-    public void testValidateTypes() throws Exception {
+    void testValidateTypes() throws Exception {
         final var context = YangParserTestUtils.parseYangResources(Bug8084.class,
                 "/yang/filter-validator-test-mod-0.yang", "/yang/mdsal-netconf-mapping-test.yang");
         final var currentContext = mock(CurrentSchemaContext.class);
