@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.server.mdsal.notifications;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -15,8 +15,8 @@ import static org.mockito.Mockito.withSettings;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.opendaylight.mdsal.binding.dom.codec.impl.di.DefaultBindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
@@ -32,7 +32,7 @@ import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
-public class NotificationsTransformUtilTest {
+class NotificationsTransformUtilTest {
     private static final Instant EVENT_TIME = Instant.now();
     private static final String INNER_NOTIFICATION = """
             <netconf-capability-change xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications">
@@ -50,14 +50,14 @@ public class NotificationsTransformUtilTest {
 
     private static NotificationsTransformUtil UTIL;
 
-    @BeforeClass
-    public static void beforeClass() throws YangParserException {
+    @BeforeAll
+    static void beforeAll() throws YangParserException {
         UTIL = new NotificationsTransformUtil(new DefaultYangParserFactory(), new DefaultBindingRuntimeGenerator(),
             new DefaultBindingDOMCodecFactory());
     }
 
     @Test
-    public void testTransform() throws Exception {
+    void testTransform() {
         final var capabilityChange = mock(NetconfCapabilityChange.class,
             withSettings().extraInterfaces(EventInstantAware.class).defaultAnswer(Answers.CALLS_REAL_METHODS));
         doReturn(Set.of(new Uri("uri1"))).when(capabilityChange).getAddedCapability();
@@ -73,20 +73,20 @@ public class NotificationsTransformUtilTest {
     }
 
     @Test
-    public void testTransformFromDOM() throws Exception {
+    void testTransformFromDOM() throws Exception {
         final var notification = NotificationMessage.ofNotificationContent(
             XmlUtil.readXmlToDocument(INNER_NOTIFICATION), EVENT_TIME);
 
         compareXml(EXPECTED_NOTIFICATION, notification.toString());
     }
 
-    private static void compareXml(final String expected, final String actual) throws Exception {
+    private static void compareXml(final String expected, final String actual) {
         final var diff = DiffBuilder.compare(expected)
             .withTest(actual)
             .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
             .checkForSimilar()
             .build();
 
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 }
