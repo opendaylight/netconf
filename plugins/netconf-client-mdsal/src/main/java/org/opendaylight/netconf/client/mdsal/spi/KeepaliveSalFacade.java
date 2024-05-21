@@ -151,7 +151,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         if (localTask != null) {
             LOG.debug("{}: Netconf session initiated, starting keepalives", deviceId);
             LOG.trace("{}: Scheduling keepalives every {}s", deviceId, keepaliveDelaySeconds);
-            localTask.enableKeepalive();
+            localTask.reschedule();
         }
     }
 
@@ -210,6 +210,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         @GuardedBy("this")
         private boolean suppressed = false;
 
+        @GuardedBy("this")
+        private int suppressedCounter = 0;
+
         private volatile long lastActivity;
 
         KeepaliveTask(final Rpcs devRpc) {
@@ -235,10 +238,16 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         synchronized void disableKeepalive() {
             // unsuppressed -> suppressed
             suppressed = true;
+            suppressedCounter++;
         }
 
         synchronized void enableKeepalive() {
             recordActivity();
+            suppressedCounter--;
+            if (suppressedCounter > 0) {
+                LOG.debug("{}: Skipping to enable keepalive while expecting {} RPC reply", deviceId, suppressedCounter);
+                return;
+            }
             if (suppressed) {
                 // suppressed -> unsuppressed
                 suppressed = false;
