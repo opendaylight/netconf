@@ -13,11 +13,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -29,8 +29,8 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Element;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class CreateSubscriptionTest {
+@ExtendWith(MockitoExtension.class)
+class CreateSubscriptionTest {
     private static final String CREATE_SUBSCRIPTION_XML = "<create-subscription\n"
             + "xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\" "
             + "xmlns:netconf=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -40,15 +40,15 @@ public class CreateSubscriptionTest {
     @Mock
     private NetconfNotificationRegistry notificationRegistry;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doReturn(true).when(notificationRegistry).isStreamAvailable(any(StreamNameType.class));
         doReturn(mock(Registration.class)).when(notificationRegistry)
                 .registerNotificationListener(any(StreamNameType.class), any(NetconfNotificationListener.class));
     }
 
     @Test
-    public void testHandleWithNoSubsequentOperations() throws Exception {
+    void testHandleWithNoSubsequentOperations() throws Exception {
         final CreateSubscription createSubscription = new CreateSubscription(new SessionIdType(Uint32.TEN),
             notificationRegistry);
         createSubscription.setSession(mock(NetconfSession.class));

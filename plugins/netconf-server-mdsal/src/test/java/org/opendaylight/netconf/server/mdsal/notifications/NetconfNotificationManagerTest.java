@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.server.mdsal.notifications;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -22,9 +22,9 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.dom.codec.impl.di.DefaultBindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
@@ -40,12 +40,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NetconfNotificationManagerTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfNotificationManagerTest {
     public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
     @Test
-    public void testEventTime() throws Exception {
+    void testEventTime() throws Exception {
         //Testing values with SimpleDateFormat
         final var iterator = List.of(
                 "2001-07-04T12:08:56.235-07:00",
@@ -120,7 +120,7 @@ public class NetconfNotificationManagerTest {
     }
 
     @Test
-    public void testNotificationListeners() throws Exception {
+    void testNotificationListeners() throws Exception {
         final NetconfNotificationManager netconfNotificationManager = createManager();
         final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration =
                 netconfNotificationManager.registerBaseNotificationPublisher();
@@ -144,7 +144,7 @@ public class NetconfNotificationManagerTest {
     }
 
     @Test
-    public void testCustomNotificationListeners() throws Exception {
+    void testCustomNotificationListeners() throws Exception {
         final NetconfNotificationManager netconfNotificationManager = createManager();
 
         final StreamNameType testStreamName = new StreamNameType("TEST_STREAM");
@@ -173,7 +173,7 @@ public class NetconfNotificationManagerTest {
     }
 
     @Test
-    public void testClose() throws Exception {
+    void testClose() throws Exception {
         final NetconfNotificationManager netconfNotificationManager = createManager();
 
         final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration =
@@ -202,7 +202,7 @@ public class NetconfNotificationManagerTest {
     }
 
     @Test
-    public void testStreamListeners() throws Exception {
+    void testStreamListeners() throws Exception {
         final NetconfNotificationManager netconfNotificationManager = createManager();
 
         final NetconfNotificationCollector.NetconfNotificationStreamListener streamListener =
