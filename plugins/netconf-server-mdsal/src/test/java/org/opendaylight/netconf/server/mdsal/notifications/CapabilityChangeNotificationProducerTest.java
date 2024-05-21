@@ -17,11 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
@@ -42,8 +42,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class CapabilityChangeNotificationProducerTest {
+@ExtendWith(MockitoExtension.class)
+class CapabilityChangeNotificationProducerTest {
     @Mock
     private BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     @Mock
@@ -55,8 +55,8 @@ public class CapabilityChangeNotificationProducerTest {
 
     private CapabilityChangeNotificationProducer capabilityChangeNotificationProducer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doReturn(listenerRegistration).when(dataBroker).registerTreeChangeListener(any(DataTreeIdentifier.class),
                 any(DataTreeChangeListener.class));
 
@@ -70,7 +70,7 @@ public class CapabilityChangeNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataChangedCreate() {
+    void testOnDataChangedCreate() {
         final InstanceIdentifier<Capabilities> capabilitiesIdentifier =
                 InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
         final Set<Uri> newCapabilitiesList = Set.of(new Uri("newCapability"), new Uri("createdCapability"));
@@ -82,7 +82,7 @@ public class CapabilityChangeNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataChangedUpdate() {
+    void testOnDataChangedUpdate() {
         Capabilities originalCapabilities = new CapabilitiesBuilder()
             .setCapability(Set.of(new Uri("originalCapability"), new Uri("anotherOriginalCapability")))
             .build();
@@ -94,13 +94,19 @@ public class CapabilityChangeNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataChangedDelete() {
+    void testOnDataChangedDelete() {
         final Set<Uri> originalCapabilitiesList =
             Set.of(new Uri("originalCapability"), new Uri("anotherOriginalCapability"));
         final Capabilities originalCapabilities =
             new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
-        verifyDataTreeChange(DataObjectModification.ModificationType.DELETE, originalCapabilities, null,
-            changedCapabilitesFrom(Set.of(), originalCapabilitiesList));
+        final DataTreeModification<Capabilities> treeChange2 = mock(DataTreeModification.class);
+        final DataObjectModification<Capabilities> objectChange2 = mock(DataObjectModification.class);
+        doReturn(DataObjectModification.ModificationType.DELETE).when(objectChange2).modificationType();
+        doReturn(objectChange2).when(treeChange2).getRootNode();
+        doReturn(originalCapabilities).when(objectChange2).dataBefore();
+        capabilityChangeNotificationProducer.onDataTreeChanged(List.of(treeChange2));
+        verify(baseNotificationPublisherRegistration)
+            .onCapabilityChanged(changedCapabilitesFrom(Set.of(), originalCapabilitiesList));
     }
 
     @SuppressWarnings("unchecked")

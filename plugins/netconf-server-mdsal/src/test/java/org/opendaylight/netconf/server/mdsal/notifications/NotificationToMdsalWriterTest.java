@@ -14,11 +14,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -31,8 +31,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NotificationToMdsalWriterTest {
+@ExtendWith(MockitoExtension.class)
+class NotificationToMdsalWriterTest {
     @Mock
     private DataBroker dataBroker;
     @Mock
@@ -40,23 +40,22 @@ public class NotificationToMdsalWriterTest {
 
     private NotificationToMdsalWriter writer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         final NetconfNotificationCollector notificationCollector = mock(NetconfNotificationCollector.class);
 
         doReturn(registration).when(notificationCollector).registerStreamListener(any());
-
-        WriteTransaction tx = mock(WriteTransaction.class);
-        doNothing().when(tx).merge(any(), any(), any());
-        doNothing().when(tx).delete(any(), any());
-        doReturn(emptyFluentFuture()).when(tx).commit();
-        doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
         writer = new NotificationToMdsalWriter(notificationCollector, dataBroker);
     }
 
     @Test
-    public void testStreamRegisteration() {
+    void testStreamRegistration() {
+        WriteTransaction tx = mock(WriteTransaction.class);
+        doNothing().when(tx).merge(any(), any(), any());
+        doNothing().when(tx).delete(any(), any());
+        doReturn(emptyFluentFuture()).when(tx).commit();
+        doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
         final var testStreamName = new StreamNameType("TESTSTREAM");
         final var testStream = new StreamBuilder().setName(testStreamName).build();
         final var streamIdentifier = InstanceIdentifier.create(Netconf.class)
@@ -73,7 +72,11 @@ public class NotificationToMdsalWriterTest {
     }
 
     @Test
-    public void testClose() {
+    void testClose() {
+        WriteTransaction tx = mock(WriteTransaction.class);
+        doNothing().when(tx).delete(any(), any());
+        doReturn(emptyFluentFuture()).when(tx).commit();
+        doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(registration).close();
 
         final var streamIdentifier = InstanceIdentifier.create(Netconf.class);

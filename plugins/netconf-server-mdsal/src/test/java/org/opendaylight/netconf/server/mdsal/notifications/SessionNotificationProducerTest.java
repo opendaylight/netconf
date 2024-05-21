@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.server.mdsal.notifications;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -16,12 +16,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
@@ -43,8 +43,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class SessionNotificationProducerTest {
+@ExtendWith(MockitoExtension.class)
+class SessionNotificationProducerTest {
     private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducerTest.class);
 
     @Mock
@@ -58,12 +58,10 @@ public class SessionNotificationProducerTest {
 
     private SessionNotificationProducer publisher;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class),
                 any(DataTreeChangeListener.class));
-        doNothing().when(registration).onSessionStarted(any());
-        doNothing().when(registration).onSessionEnded(any());
 
         doReturn(registration).when(netconfNotificationCollector).registerBaseNotificationPublisher();
 
@@ -71,7 +69,8 @@ public class SessionNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataChangedSessionCreated() throws Exception {
+    void testOnDataChangedSessionCreated() {
+        doNothing().when(registration).onSessionStarted(any());
         final Session session = createSession(Uint32.ONE);
         final DataTreeModification<Session> treeChange = getTreeModification(session, ModificationType.WRITE);
         publisher.onDataTreeChanged(List.of(treeChange));
@@ -84,7 +83,7 @@ public class SessionNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataChangedSessionUpdated() throws Exception {
+    void testOnDataChangedSessionUpdated() {
         final DataTreeModification<Session> treeChange = mock(DataTreeModification.class);
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         final Session sessionBefore = createSessionWithInRpcCount(Uint32.ONE, Uint32.ZERO);
@@ -100,7 +99,8 @@ public class SessionNotificationProducerTest {
     }
 
     @Test
-    public void testOnDataChangedSessionDeleted() throws Exception {
+    void testOnDataChangedSessionDeleted() {
+        doNothing().when(registration).onSessionEnded(any());
         final Session session = createSession(Uint32.ONE);
         final DataTreeModification<Session> data = getTreeModification(session, ModificationType.DELETE);
         publisher.onDataTreeChanged(List.of(data));
