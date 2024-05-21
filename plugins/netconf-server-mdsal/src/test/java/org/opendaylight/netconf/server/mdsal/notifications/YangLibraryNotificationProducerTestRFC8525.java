@@ -12,11 +12,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
@@ -25,8 +25,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdateBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class YangLibraryNotificationProducerTestRFC8525 {
+@ExtendWith(MockitoExtension.class)
+class YangLibraryNotificationProducerTestRFC8525 {
     @Mock
     private YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
     @Mock
@@ -38,8 +38,8 @@ public class YangLibraryNotificationProducerTestRFC8525 {
 
     private YangLibraryNotificationProducerRFC8525 yangLibraryNotificationProducer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         doNothing().when(yangLibraryPublisherRegistration).onYangLibraryUpdate(any());
         doReturn(yangLibraryPublisherRegistration).when(netconfNotificationCollector).registerYangLibraryPublisher();
         doReturn(registration).when(dataBroker).registerDataListener(any(), any());
@@ -49,7 +49,7 @@ public class YangLibraryNotificationProducerTestRFC8525 {
     }
 
     @Test
-    public void testOnDataTreeChanged() {
+    void testOnDataTreeChanged() {
         final String contentId = "1";
 
         yangLibraryNotificationProducer.dataChangedTo(new YangLibraryBuilder().setContentId(contentId).build());
