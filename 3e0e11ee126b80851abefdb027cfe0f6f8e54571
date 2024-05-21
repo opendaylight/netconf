@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8548e5c_b014d417",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/controller-all-depth-one.json",
+        "patchSetId": 43
+      },
+      "lineNbr": 4401,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:19:56Z",
+      "side": 1,
+      "message": "new line at end of file",
+      "revId": "3e0e11ee126b80851abefdb027cfe0f6f8e54571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ce4eaba_19420966",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/controller-all-width-and-depth-one.json",
+        "patchSetId": 43
+      },
+      "lineNbr": 2213,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:19:56Z",
+      "side": 1,
+      "message": "new line at end of file",
+      "revId": "3e0e11ee126b80851abefdb027cfe0f6f8e54571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b678231f_8fa8d2e4",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/device-all-depth-one.json",
+        "patchSetId": 43
+      },
+      "lineNbr": 4429,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:19:56Z",
+      "side": 1,
+      "message": "new line at end of file",
+      "revId": "3e0e11ee126b80851abefdb027cfe0f6f8e54571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e8fd695_751425e5",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/device-all-width-and-depth-one.json",
+        "patchSetId": 43
+      },
+      "lineNbr": 2241,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-21T09:19:56Z",
+      "side": 1,
+      "message": "new line at end of file",
+      "revId": "3e0e11ee126b80851abefdb027cfe0f6f8e54571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
