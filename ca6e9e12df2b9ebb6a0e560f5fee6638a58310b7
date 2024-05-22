@@ -33,6 +33,29 @@
       "message": "rename to testFilterNotification(), removing the need to specify @MethodSource name. also make private.",
       "revId": "ca6e9e12df2b9ebb6a0e560f5fee6638a58310b7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e644245_019dad29",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/spi/SubtreeFilterRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-22T15:54:04Z",
+      "side": 1,
+      "message": "same as in the other class",
+      "range": {
+        "startLine": 39,
+        "startChar": 27,
+        "endLine": 39,
+        "endChar": 41
+      },
+      "revId": "ca6e9e12df2b9ebb6a0e560f5fee6638a58310b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
