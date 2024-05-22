@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3059e4e7_85b3a049",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-05-22T14:05:56Z",
+      "side": 1,
+      "message": "In general - it works. But it\u0027s very rough in this state and I don\u0027t recommend merging it without polishing.",
+      "revId": "7f4d1d2e2d3663c8d731e7be078ba7023a7586a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
