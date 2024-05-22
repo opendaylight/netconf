@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19aed728_37206feb",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/spi/SubtreeFilterNotificationTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-22T16:34:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e9bbf75_980d57cb",
+      "revId": "ca6e9e12df2b9ebb6a0e560f5fee6638a58310b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e644245_019dad29",
@@ -48,6 +66,30 @@
       "writtenOn": "2024-05-22T15:54:04Z",
       "side": 1,
       "message": "same as in the other class",
+      "range": {
+        "startLine": 39,
+        "startChar": 27,
+        "endLine": 39,
+        "endChar": 41
+      },
+      "revId": "ca6e9e12df2b9ebb6a0e560f5fee6638a58310b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36d536df_0cb6939d",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/spi/SubtreeFilterRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-22T16:34:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e644245_019dad29",
       "range": {
         "startLine": 39,
         "startChar": 27,
