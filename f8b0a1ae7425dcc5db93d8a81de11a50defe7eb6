@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d196d48b_16aac81e",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/SchemalessRpcStructureTransformerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-23T09:44:06Z",
+      "side": 1,
+      "message": "tab",
+      "revId": "f8b0a1ae7425dcc5db93d8a81de11a50defe7eb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54b69d96_887cf74b",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/SchemalessRpcStructureTransformerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-23T09:44:06Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 72,
+        "startChar": 14,
+        "endLine": 72,
+        "endChar": 24
+      },
+      "revId": "f8b0a1ae7425dcc5db93d8a81de11a50defe7eb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

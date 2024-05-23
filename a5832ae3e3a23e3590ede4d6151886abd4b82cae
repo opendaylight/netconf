@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b6ed320_bb045c07",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 1139,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-23T09:44:06Z",
+      "side": 0,
+      "message": "please use org.junit.jupiter.api.Assertions.assertInstanceOf;",
+      "revId": "a5832ae3e3a23e3590ede4d6151886abd4b82cae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54929a6b_937501d6",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 1144,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-23T09:44:06Z",
+      "side": 0,
+      "message": "please use org.junit.jupiter.api.Assertions.assertInstanceOf;",
+      "revId": "a5832ae3e3a23e3590ede4d6151886abd4b82cae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
