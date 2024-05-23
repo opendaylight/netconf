@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2792facd_15fa7850",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/NetconfSessionPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-05-23T10:51:07Z",
+      "side": 1,
+      "message": "I think it\u0027s better to keep the methods separated. As interleave capability and could be necessary later if there is some effort to make notification support possible without interleave capability.\n\nBut yes, could be joined in to isNotificationsSupported() if it\u0027s problem this way.",
+      "parentUuid": "439a9277_3286c487",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f2271834_30ff9bd5",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceMount.java",
         "patchSetId": 10
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3cc73b75_9b0bd333",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceMount.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-05-23T10:51:07Z",
+      "side": 1,
+      "message": "To be able to do it like this I would have to create another parameter as we have no access to NetconfSessionPreferences here. It also might create some conflict like what to do if the newNotificationService !\u003d null but this new parameter is false. \n\nAlso this method seem to be used only in Tests to pass existing NetconfDeviceNotificationService. Although this patch change it and I used it in ntconf-topology-singleton since there was no access to NetconfSessionPreferences.",
+      "parentUuid": "f2271834_30ff9bd5",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b0d383e_e32c4e6c",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
         "patchSetId": 10
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-20T09:10:00Z",
       "side": 1,
       "message": "Why device does fail?",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b357f28_ec904aed",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-05-23T10:51:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b0d383e_e32c4e6c",
       "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
