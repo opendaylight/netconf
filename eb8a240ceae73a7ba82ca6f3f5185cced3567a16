@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "eb8a240ceae73a7ba82ca6f3f5185cced3567a16",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cef0db6_f4581f2e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-23T10:32:57Z",
+      "side": 1,
+      "message": "import static org.junit.Assert.fail;\nin DataTreeChangeStreamTest",
+      "revId": "eb8a240ceae73a7ba82ca6f3f5185cced3567a16",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
