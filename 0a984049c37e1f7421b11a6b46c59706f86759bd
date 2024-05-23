@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b9640d1_f87bf75f",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-23T09:54:39Z",
+      "side": 0,
+      "message": "import static org.junit.jupiter.api.Assertions.assertInstanceOf;",
+      "revId": "0a984049c37e1f7421b11a6b46c59706f86759bd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "869a6346_6508a847",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-23T09:54:39Z",
+      "side": 0,
+      "message": "assertInstanceOf",
+      "revId": "0a984049c37e1f7421b11a6b46c59706f86759bd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
