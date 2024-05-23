@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea14f262_7f3b8548",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceDataBrokerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-23T10:02:50Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "a83bc62d_847a7bf8",
+      "revId": "3d9e920d8134307399817c1234a6a6a10c868a6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21f5076c_bf7f3c9a",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-23T09:49:53Z",
       "side": 0,
       "message": "import static org.junit.jupiter.api.Assertions.assertNotNull;",
+      "revId": "3d9e920d8134307399817c1234a6a6a10c868a6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27833fb5_b490be84",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceDataBrokerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-23T10:02:50Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "21f5076c_bf7f3c9a",
       "revId": "3d9e920d8134307399817c1234a6a6a10c868a6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
