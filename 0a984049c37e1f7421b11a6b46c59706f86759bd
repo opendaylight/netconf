@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "098e5b3e_0815ad68",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-23T10:06:54Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "8b9640d1_f87bf75f",
+      "revId": "0a984049c37e1f7421b11a6b46c59706f86759bd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "869a6346_6508a847",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-23T09:54:39Z",
       "side": 0,
       "message": "assertInstanceOf",
+      "revId": "0a984049c37e1f7421b11a6b46c59706f86759bd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afad3879_97a5640f",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-23T10:06:54Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "869a6346_6508a847",
       "revId": "0a984049c37e1f7421b11a6b46c59706f86759bd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
