@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "775bd703_b8fde038",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-27T17:40:37Z",
+      "side": 1,
+      "message": "finally { ... }\n\notherwise enableKeepalive() could swallow this event by throwing",
+      "range": {
+        "startLine": 341,
+        "startChar": 12,
+        "endLine": 341,
+        "endChar": 35
+      },
+      "revId": "3a42cb0a0711e5d905de746398dc5cc474d270eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "68a08aab_6e1577f9",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
         "patchSetId": 3
