@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import dk.brics.automaton.RegExp;
+import dk.brics.automaton.State;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -705,10 +706,14 @@ public class DefinitionGenerator {
             lengthConstraints = type.getLengthConstraint();
         }
 
+        var minLength = 0;
+        var maxLength = Integer.MAX_VALUE;
         if (lengthConstraints.isPresent()) {
             final Range<Integer> range = lengthConstraints.orElseThrow().getAllowedRanges().span();
-            putIfNonNull(property, MIN_LENGTH_KEY, range.lowerEndpoint());
-            putIfNonNull(property, MAX_LENGTH_KEY, range.upperEndpoint());
+            minLength = range.lowerEndpoint();
+            maxLength = range.upperEndpoint();
+            putIfNonNull(property, MIN_LENGTH_KEY, minLength);
+            putIfNonNull(property, MAX_LENGTH_KEY, maxLength);
         }
 
         if (type.getPatternConstraints().iterator().hasNext()) {
@@ -721,8 +726,12 @@ public class DefinitionGenerator {
             }
             String defaultValue = "";
             try {
-                final RegExp regExp = new RegExp(regex);
-                defaultValue = regExp.toAutomaton().getShortestExample(true);
+                final var automaton = new RegExp(regex).toAutomaton();
+                if (minLength > 0) {
+                    defaultValue = prepareExample(defaultValue, automaton.getInitialState(), minLength, maxLength);
+                } else {
+                    defaultValue = automaton.getShortestExample(true);
+                }
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
@@ -875,4 +884,28 @@ public class DefinitionGenerator {
         property.put(DEFAULT_KEY, value);
     }
 
+    private static String prepareExample(final String strMatch, final State state, final int minLength,
+        final int maxLength) {
+        final var transitions = state.getSortedTransitions(false);
+
+        if (state.isAccept() && strMatch.length() >= minLength) {
+            return strMatch;
+        }
+
+        if (transitions.isEmpty()) {
+            return strMatch;
+        }
+
+        // Always choose the first transition and the minimum character
+        final var firstTransition = transitions.get(0);
+        final var firstChar = firstTransition.getMin();
+        final var result = prepareExample(strMatch + firstChar, firstTransition.getDest(), minLength, maxLength);
+
+        if (minLength <= result.length() && result.length() <= maxLength) {
+            return result;
+        }
+
+        // If the resulting string does not satisfy the length constraints, return the current string
+        return strMatch;
+    }
 }
