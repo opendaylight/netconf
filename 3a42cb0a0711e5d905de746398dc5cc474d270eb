@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68a08aab_6e1577f9",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-27T17:39:25Z",
+      "side": 1,
+      "message": "can we keep this as a mock with a delegate, please?",
+      "range": {
+        "startLine": 205,
+        "startChar": 31,
+        "endLine": 205,
+        "endChar": 57
+      },
+      "revId": "3a42cb0a0711e5d905de746398dc5cc474d270eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
