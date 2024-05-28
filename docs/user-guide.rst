@@ -2479,7 +2479,9 @@ OpenAPI URLs in that case would look like this:
 
 -  http://localhost:8181/openapi/api/v3/mounts/1 for JSON data
 
--  `http://localhost:8181/openapi/api/v3/mounts/1/toaster(2009-11-20) <http://localhost:8181/openapi/api/v3/mounts/1/toaster(2009-11-20)>`__ JSON data for given model
+-  `http://localhost:8181/openapi/api/v3/mounts/1/toaster?revision=2009-11-20 <http://localhost:8181/openapi/api/v3/mounts/1/toaster?revision=2009-11-20>`__ JSON data for given model
+
+-  `http://localhost:8181/openapi/api/v3/mounts/1/definition-test <http://localhost:8181/openapi/api/v3/mounts/1/definition-test>`__ JSON data for given model without revision
 
 .. note::
 
