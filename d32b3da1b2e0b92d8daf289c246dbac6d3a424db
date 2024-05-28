@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "172dd9cf_7c704f49",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/netty/package-info.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-28T14:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31b79d7a_e0f1cbc9",
+      "range": {
+        "startLine": 11,
+        "startChar": 8,
+        "endLine": 11,
+        "endChar": 43
+      },
+      "revId": "d32b3da1b2e0b92d8daf289c246dbac6d3a424db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b2877e6_46659a2a",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-22T08:23:58Z",
       "side": 1,
       "message": "this should be in restconf-server and should be taking the corresponding \u0027Listen\u0027 configuration",
+      "range": {
+        "startLine": 63,
+        "startChar": 11,
+        "endLine": 63,
+        "endChar": 26
+      },
+      "revId": "d32b3da1b2e0b92d8daf289c246dbac6d3a424db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e88da77_0b24dce5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/NettyNorthbound.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-28T14:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b2877e6_46659a2a",
       "range": {
         "startLine": 63,
         "startChar": 11,
