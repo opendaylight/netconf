@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6754d3c_df22eccb",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-05-28T11:32:55Z",
+      "side": 1,
+      "message": "at the bottom",
+      "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c684631d_0806ac45",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-05-28T11:32:55Z",
+      "side": 1,
+      "message": "wouldn\u0027t these be better as some static attributes? \nor do we need new one every time?",
+      "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "504cf374_407902c2",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-05-28T11:32:55Z",
+      "side": 1,
+      "message": "imo just throws Exception",
+      "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
