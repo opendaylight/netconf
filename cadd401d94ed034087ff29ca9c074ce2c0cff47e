@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c963ae0_c769eee0",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-29T09:43:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6754d3c_df22eccb",
+      "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c684631d_0806ac45",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c4b6ac0_92e20156",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-29T09:43:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c684631d_0806ac45",
+      "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "504cf374_407902c2",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-28T11:32:55Z",
       "side": 1,
       "message": "imo just throws Exception",
+      "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02e2c6d6_e3d4e189",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-29T09:43:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "504cf374_407902c2",
       "revId": "cadd401d94ed034087ff29ca9c074ce2c0cff47e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
