@@ -22,6 +22,30 @@
       },
       "revId": "4eeb383c7ffe7a2121766961b059de9158ba2406",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac5c99b0_6c8ff49d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-05-29T15:51:23Z",
+      "side": 1,
+      "message": "suppressed is also set in sendKeepalive() line 264. So there are like two layers of decisions in enableKeepalive():\n1. did we receive all replies? based on suppressedCounter\n2. should we schedule new keepalive or just enable execution of already scheduled? based on suppressed",
+      "parentUuid": "5d7957a5_bb243884",
+      "range": {
+        "startLine": 214,
+        "startChar": 20,
+        "endLine": 214,
+        "endChar": 37
+      },
+      "revId": "4eeb383c7ffe7a2121766961b059de9158ba2406",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
