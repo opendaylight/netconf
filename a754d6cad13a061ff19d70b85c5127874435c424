@@ -16,6 +16,24 @@
       "message": "Can we avoid using the reset method?\nhttps://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#reset(java.lang.Object[])\nin documentation said that\n`Smart Mockito users hardly use this feature because they know it could be a sign of poor tests. Normally, you don\u0027t need to reset your mocks, just create new mocks for each test method.`",
       "revId": "a754d6cad13a061ff19d70b85c5127874435c424",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3841cf3c_8c524d19",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeActorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-29T09:23:16Z",
+      "side": 1,
+      "message": "Usages of Mockito.reset() will be avoided in another patches.",
+      "parentUuid": "7307598d_51c922bf",
+      "revId": "a754d6cad13a061ff19d70b85c5127874435c424",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
