@@ -22,6 +22,30 @@
       },
       "revId": "cfea3cd58e1c809ebf0731d5d78f484844f0ccd3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d9a2c39_4f2e3248",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-29T13:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9269f4e_3e5b4575",
+      "range": {
+        "startLine": 398,
+        "startChar": 12,
+        "endLine": 398,
+        "endChar": 24
+      },
+      "revId": "cfea3cd58e1c809ebf0731d5d78f484844f0ccd3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
