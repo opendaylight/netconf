@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9269f4e_3e5b4575",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-05-29T13:18:24Z",
+      "side": 1,
+      "message": "assertInstanceOf",
+      "range": {
+        "startLine": 398,
+        "startChar": 12,
+        "endLine": 398,
+        "endChar": 24
+      },
+      "revId": "cfea3cd58e1c809ebf0731d5d78f484844f0ccd3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
