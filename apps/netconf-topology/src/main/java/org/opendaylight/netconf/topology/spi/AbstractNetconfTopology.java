@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -40,6 +41,7 @@ public abstract class AbstractNetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
     private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
+    private final Map<NodeId, RemoteDeviceHandler> remoteDeviceHandlers = new HashMap<>();
     private final NetconfClientFactory clientFactory;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
@@ -118,17 +120,11 @@ public abstract class AbstractNetconfTopology {
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
 
-        final NetconfNodeHandler nodeHandler;
-        try {
-            nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider, schemaManager,
-                schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode,
-                nodeOptional);
-        } catch (IllegalStateException e) {
-            // This is a workaround for NETCONF-1114 when we fail to decrypt the password
-            LOG.warn("RemoteDevice{{}} failed to connect, removing from operational datastore", nodeId, e);
-            deviceSalFacade.close();
-            return;
-        }
+        remoteDeviceHandlers.put(nodeId, deviceSalFacade);
+
+        final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
+            schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
+            netconfNode, nodeOptional);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);
@@ -150,11 +146,17 @@ public abstract class AbstractNetconfTopology {
         if (connectorDTO != null) {
             connectorDTO.close();
         }
+        if (remoteDeviceHandlers.containsKey(nodeId)) {
+            remoteDeviceHandlers.remove(nodeId).close();
+        }
     }
 
     protected final synchronized void deleteAllNodes() {
         activeConnectors.values().forEach(NetconfNodeHandler::close);
         activeConnectors.clear();
+
+        remoteDeviceHandlers.values().forEach(RemoteDeviceHandler::close);
+        remoteDeviceHandlers.clear();
     }
 
     protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
