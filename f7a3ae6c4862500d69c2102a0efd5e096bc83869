@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33e28ede_44b954f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-30T15:46:52Z",
+      "side": 1,
+      "message": "What was the way to deal with these schemas in NETCONF 6 and NETCONF 5. Why do we need map of map now?",
+      "revId": "f7a3ae6c4862500d69c2102a0efd5e096bc83869",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
