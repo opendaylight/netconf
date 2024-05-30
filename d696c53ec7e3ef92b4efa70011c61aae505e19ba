@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be3c1ac6_105c8b11",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-30T14:57:49Z",
+      "side": 1,
+      "message": "Can we do it without checking transaction class type?",
+      "revId": "d696c53ec7e3ef92b4efa70011c61aae505e19ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
