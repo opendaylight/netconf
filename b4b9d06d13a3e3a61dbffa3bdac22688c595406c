@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "086ca925_3ad0c3f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-31T09:56:19Z",
+      "side": 1,
+      "message": "Trying with junos model returns a lot of missing schemas, but rebase on this patch to avoid it.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/111679",
+      "revId": "b4b9d06d13a3e3a61dbffa3bdac22688c595406c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
