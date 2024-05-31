@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "09eb4432_13181f85",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T23:38:55Z",
+      "side": 1,
+      "message": "multiple things wrong here:\n- this class only needs a Shiro SecurityManager, hence there needs to be such a constructor\n- that constructor needs to be @Inject, as this constructor only caters to OSGi (obvious from what provides AAAShiroWebEnvironment)\n- this construtor needs to just extract the security manager",
+      "range": {
+        "startLine": 41,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 5
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d942c4dc_3a1ad79f",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
         "patchSetId": 8
