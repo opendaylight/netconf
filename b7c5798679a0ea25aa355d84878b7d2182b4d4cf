@@ -16,6 +16,92 @@
       "message": "Some more tunning is planned for this.",
       "revId": "b7c5798679a0ea25aa355d84878b7d2182b4d4cf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6f0831e_7c92091d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T09:35:26Z",
+      "side": 1,
+      "message": "wrong line separation above (class start) and below (instance state)",
+      "range": {
+        "startLine": 38,
+        "startChar": 32,
+        "endLine": 38,
+        "endChar": 35
+      },
+      "revId": "b7c5798679a0ea25aa355d84878b7d2182b4d4cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f0a19bb_8dc29297",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T09:35:26Z",
+      "side": 1,
+      "message": "should be private",
+      "range": {
+        "startLine": 39,
+        "startChar": 4,
+        "endLine": 39,
+        "endChar": 9
+      },
+      "revId": "b7c5798679a0ea25aa355d84878b7d2182b4d4cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7738ae68_ff50b836",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T09:35:26Z",
+      "side": 1,
+      "message": "superfluous line",
+      "revId": "b7c5798679a0ea25aa355d84878b7d2182b4d4cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc2c3556_fe2d7389",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T09:35:26Z",
+      "side": 1,
+      "message": "Could not, and it should be a warning as per logging rules",
+      "range": {
+        "startLine": 76,
+        "startChar": 23,
+        "endLine": 76,
+        "endChar": 31
+      },
+      "revId": "b7c5798679a0ea25aa355d84878b7d2182b4d4cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
