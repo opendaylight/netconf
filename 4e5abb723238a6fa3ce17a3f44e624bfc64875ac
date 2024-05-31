@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4047b868_6e115328",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-05-31T10:02:37Z",
+      "side": 1,
+      "message": "To load the Junos model, we need to configure width, otherwise we will not be able to load the ui, but it looks good. IMHO: good feature will be the ability to reconfigure the width in the path.",
+      "revId": "4e5abb723238a6fa3ce17a3f44e624bfc64875ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
