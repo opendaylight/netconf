@@ -45,6 +45,75 @@
       },
       "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15320d70_5c015bcd",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T23:46:11Z",
+      "side": 1,
+      "message": "err... this mixes apples, oranges, carrots and onions.\n\nmethod, contentType, basePath, request, requestBody \u003d\u003d request details\ndefaultContentType \u003d\u003d ???\n\ncallback on the other hand is something to invoke at the end.\n\nis this really just an indirection over\n\nvoid invoke( requestParameters (90% of this interface), callback)\n\n?\n\nHow does this relate to ServerRequest?",
+      "range": {
+        "startLine": 27,
+        "startChar": 10,
+        "endLine": 27,
+        "endChar": 24
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4ce9992_8b37182f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T23:46:11Z",
+      "side": 1,
+      "message": "examples",
+      "range": {
+        "startLine": 51,
+        "startChar": 77,
+        "endLine": 51,
+        "endChar": 105
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83454ffa_17e7a506",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-05-31T23:46:11Z",
+      "side": 1,
+      "message": "i.e. is this the same thing as !contextPath.isEmpty() ?",
+      "range": {
+        "startLine": 65,
+        "startChar": 12,
+        "endLine": 65,
+        "endChar": 26
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
