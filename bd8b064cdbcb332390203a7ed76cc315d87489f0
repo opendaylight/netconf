@@ -229,6 +229,121 @@
       },
       "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b13ae71d_76816b71",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-01T00:10:01Z",
+      "side": 1,
+      "message": "\"hidden on purpose\"\n\ndo not try to be creative in these comments which have a *very* specific context and purpose",
+      "range": {
+        "startLine": 29,
+        "startChar": 11,
+        "endLine": 29,
+        "endChar": 24
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a18629cc_ff3bfd88",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-01T00:10:01Z",
+      "side": 1,
+      "message": "this is an atrocious name for a function\n\ndid you mean to say \u0027extractApiPath\u0027?\nand since this is taking a pattern and context: isn\u0027t this really what you are after with the whole RequestProcessor.matches() thing?!",
+      "range": {
+        "startLine": 32,
+        "startChar": 19,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cea35971_584630d7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-01T00:10:01Z",
+      "side": 1,
+      "message": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/regex/Matcher.html#group(int) says:\n\n    IndexOutOfBoundsException - If there is no capturing group in the pattern with the given index\n\nhow do we know there is even a capturing group?",
+      "range": {
+        "startLine": 34,
+        "startChar": 33,
+        "endLine": 34,
+        "endChar": 49
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e68ba88_c43fd9d9",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-01T00:10:01Z",
+      "side": 1,
+      "message": "looking up group(1) twice, why?!",
+      "range": {
+        "startLine": 36,
+        "startChar": 37,
+        "endLine": 36,
+        "endChar": 53
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "472e49d2_822c1db7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-01T00:10:01Z",
+      "side": 1,
+      "message": "let\u0027s not introduce new unchecked exception in invcation path, okay?\n\nif you think about  this particular case, a ServerException is called for, isn\u0027t it?",
+      "range": {
+        "startLine": 39,
+        "startChar": 16,
+        "endLine": 39,
+        "endChar": 50
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
