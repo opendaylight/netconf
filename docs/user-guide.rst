@@ -801,8 +801,7 @@ notifications about data manipulation (insert, change, delete) which are
 done on any specified **path** of any specified **datastore** with
 specific **scope**. In following examples *{odlAddress}* is address of
 server where ODL is running and *{odlPort}* is port on which
-OpenDaylight is running. OpenDaylight offers two methods for receiving notifications:
-Server-Sent Events (SSE) and WebSocket. SSE is the default notification mechanism used in OpenDaylight.
+OpenDaylight is running. OpenDaylight offers Server-Sent Events (SSE) method for receiving notifications.
 
 SSE notifications subscription process
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -858,7 +857,7 @@ The response should look something like this:
 
     {
         "sal-remote:output": {
-            "stream-name": "data-change-event-subscription/toaster:toaster/toaster:toasterStatus/datastore=CONFIGURATION/scope=SUBTREE"
+            "stream-name": "urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
         }
     }
 
@@ -875,7 +874,7 @@ Subscribe to stream
 
 In order to subscribe to stream and obtain SSE location you need
 to call *GET* on your stream path. The URI should generally be
-`http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/{streamName}`,
+`http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream={streamName}`,
 where *{streamName}* is the *stream-name* parameter contained in
 response from *create-data-change-event-subscription* RPC from the
 previous step.
@@ -883,8 +882,7 @@ previous step.
 ::
 
    OPERATION: GET
-   URI: http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE
-
+   URI: http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171
 The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
 
 -  `filter <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4>`__
@@ -910,233 +908,40 @@ The response should look something like this:
 .. code-block:: json
 
     {
-        "subscribe-to-notification:location": "http://localhost:8181/rests/notif/data-change-event-subscription/network-topology:network-topology/datastore=CONFIGURATION/scope=SUBTREE"
+    "ietf-restconf-monitoring:stream": [
+        {
+            "name": "urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171",
+            "access": [
+                {
+                    "encoding": "json",
+                    "location": "http://127.0.0.1:8181/rests/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
+                },
+                {
+                    "encoding": "xml",
+                    "location": "http://127.0.0.1:8181/rests/streams/xml/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
+                }
+            ],
+            "description": "Events occuring in OPERATIONAL datastore under /toaster:toaster/toasterStatus"
+        }
+    ]
     }
 
 .. note::
 
     During this phase there is an internal check for to see if a
-    listener for the *stream-name* from the URI exists. If not, new a
+    listener for the *stream-name* from the URI exists. If not,
     new listener is registered with the DOM data broker.
 
 Receive notifications
 ^^^^^^^^^^^^^^^^^^^^^
 
 Once you got SSE location you can now connect to it and
-start receiving data change events. The request should look something like this:
+start receiving data change events. You can choose which encoding to use.
+The request should look something like this:
 
 ::
 
-    curl -v -X GET  http://localhost:8181/rests/notif/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
-
-
-WebSocket notifications subscription process
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Enabling WebSocket notifications in OpenDaylight requires a manual setup before starting the application.
-The following steps can be followed to enable WebSocket notifications in OpenDaylight:
-
-1. Open the file `org.opendaylight.restconf.nb.rfc8040.cfg`, at `etc/` folder inside your Karaf distribution. Or create in case it does not exist.
-2. Locate the `use-sse` configuration parameter and change its value from `true` to `false`. Or add ``use-sse=false`` as new line in case this parameter is not present.
-3. Save the changes made to the `org.opendaylight.restconf.nb.rfc8040.cfg` file.
-4. Restart OpenDaylight if it is already running.
-
-Once these steps are completed, WebSocket notifications will be enabled in OpenDaylight,
-and they can be used for receiving notifications instead of SSE.
-
-WebSocket Notifications subscription process is the same as SSE until you receive a location of WebSocket.
-You can follow steps given above and after subscribing to a notification stream over WebSocket,
-you will receive a response indicating that the subscription was successful:
-
-.. code-block:: json
-
-    {
-        "subscribe-to-notification:location": "ws://localhost:8181/rests/notif/data-change-event-subscription/network-topology:network-topology/datastore=CONFIGURATION/scope=SUBTREE"
-    }
-
-You can use this WebSocket to listen to data
-change notifications. To listen to notifications you can use a
-JavaScript client or if you are using chrome browser you can use the
-`Simple WebSocket
-Client <https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo>`__.
-
-Also, for testing purposes, there is simple Java application named
-WebSocketClient. The application is placed in the
-*/restconf/websocket-client* project. It accepts a WebSocket URI
-as an input parameter. After starting the utility (WebSocketClient
-class directly in Eclipse/InteliJ Idea) received notifications should be
-displayed in console.
-
-Notifications are always in XML format and look like this:
-
-.. code-block:: xml
-
-    <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
-        <eventTime>2014-09-11T09:58:23+02:00</eventTime>
-        <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
-            <data-change-event>
-                <path xmlns:meae="http://netconfcentral.org/ns/toaster">/meae:toaster</path>
-                <operation>updated</operation>
-                <data>
-                   <!-- updated data -->
-                </data>
-            </data-change-event>
-        </data-changed-notification>
-    </notification>
-
-Example use case
-~~~~~~~~~~~~~~~~
-
-The typical use case is listening to data change events to update web
-page data in real time. In this tutorial we will be using toaster as the
-base.
-
-When you call *make-toast* RPC, it sets *toasterStatus* to "down" to
-reflect that the toaster is busy making toast. When it finishes,
-*toasterStatus* is set to "up" again. We will listen to these toaster
-status changes in data store and will reflect it on our web page in
-real-time thanks to WebSocket data change notification.
-
-Simple javascript client implementation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We will create a simple JavaScript web application that will listen for
-updates on *toasterStatus* leaf and update some elements of our web page
-according to the new toaster status state.
-
-Create stream
-^^^^^^^^^^^^^
-
-First you need to create stream that you are planning to subscribe to.
-This can be achieved by invoking "create-data-change-event-subscription"
-RPC on RESTCONF via AJAX request. You need to provide data store
-**path** that you plan to listen on, **data store type** and **scope**.
-If the request is successful you can extract the **stream-name** from
-the response and use that to subscribe to the newly created stream. The
-*{username}* and *{password}* fields represent the credentials that you
-use to connect to OpenDaylight via RESTCONF:
-
-.. note::
-
-    The default user name and password are "admin".
-
-.. code-block:: javascript
-
-    function createStream() {
-        $.ajax(
-            {
-                url: 'http://{odlAddress}:{odlPort}/rests/operations/sal-remote:create-data-change-event-subscription',
-                type: 'POST',
-                headers: {
-                  'Authorization': 'Basic ' + btoa('{username}:{password}'),
-                  'Content-Type': 'application/json'
-                },
-                data: JSON.stringify(
-                    {
-                        'input': {
-                            'path': '/toaster:toaster/toaster:toasterStatus',
-                            'sal-remote-augment:datastore': 'OPERATIONAL',
-                            'sal-remote-augment:scope': 'ONE'
-                        }
-                    }
-                )
-            }).done(function (data) {
-                // this function will be called when ajax call is executed successfully
-                subscribeToStream(data.output['stream-name']);
-            }).fail(function (data) {
-                // this function will be called when ajax call fails
-                console.log("Create stream call unsuccessful");
-            })
-    }
-
-Subscribe to stream
-^^^^^^^^^^^^^^^^^^^
-
-The Next step is to subscribe to the stream. To subscribe to the stream
-you need to call *GET* on
-*http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/{stream-name}*.
-If the call is successful, you get WebSocket address for this stream in
-**Location** parameter inside response header. You can get response
-header by calling *getResponseHeader(\ *Location*)* on HttpRequest
-object inside *done()* function call:
-
-.. code-block:: javascript
-
-    function subscribeToStream(streamName) {
-        $.ajax(
-            {
-                url: 'http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/' + streamName;
-                type: 'GET',
-                headers: {
-                  'Authorization': 'Basic ' + btoa('{username}:{password}'),
-                }
-            }
-        ).done(function (data, textStatus, httpReq) {
-            // we need function that has http request object parameter in order to access response headers.
-            listenToNotifications(httpReq.getResponseHeader('Location'));
-        }).fail(function (data) {
-            console.log("Subscribe to stream call unsuccessful");
-        });
-    }
-
-Receive notifications
-^^^^^^^^^^^^^^^^^^^^^
-
-Once you have WebSocket server location you can now connect to it and
-start receiving data change events. You need to define functions that
-will handle events on WebSocket. In order to process incoming events
-from OpenDaylight you need to provide a function that will handle
-*onmessage* events. The function must have one parameter that represents
-the received event object. The event data will be stored in
-*event.data*. The data will be in an XML format that you can then easily
-parse using jQuery.
-
-.. code-block:: javascript
-
-    function listenToNotifications(socketLocation) {
-        try {
-            var notificatinSocket = new WebSocket(socketLocation);
-
-            notificatinSocket.onmessage = function (event) {
-                // we process our received event here
-                console.log('Received toaster data change event.');
-                $($.parseXML(event.data)).find('data-change-event').each(
-                    function (index) {
-                        var operation = $(this).find('operation').text();
-                        if (operation == 'updated') {
-                            // toaster status was updated so we call function that gets the value of toasterStatus leaf
-                            updateToasterStatus();
-                            return false;
-                        }
-                    }
-                );
-            }
-            notificatinSocket.onerror = function (error) {
-                console.log("Socket error: " + error);
-            }
-            notificatinSocket.onopen = function (event) {
-                console.log("Socket connection opened.");
-            }
-            notificatinSocket.onclose = function (event) {
-                console.log("Socket connection closed.");
-            }
-            // if there is a problem on socket creation we get exception (i.e. when socket address is incorrect)
-        } catch(e) {
-            alert("Error when creating WebSocket" + e );
-        }
-    }
-
-The *updateToasterStatus()* function represents function that calls
-*GET* on the path that was modified and sets toaster status in some web
-page element according to received data. After the WebSocket connection
-has been established you can test events by calling make-toast RPC via
-RESTCONF.
-
-.. note::
-
-    for more information about WebSockets in JavaScript visit `Writing
-    WebSocket client
-    applications <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications>`__
+    curl -v -X GET  http://localhost:8181/rests/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
 
 Netconf-connector + Netopeer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1515,22 +1320,18 @@ set:
 * ``idle-timeout``, which defaults to ``30000``
 * ``ping-executor-name-prefix``, which defaults to ``ping-executor``
 * ``max-thread-count``, which defaults to ``1``
-* ``use-sse``, which defaults to ``true``
 * ``restconf``, which defaults to ``rests``
 
-*maximum-fragment-length* — Maximum web-socket fragment length in number of Unicode code units (characters)
+*maximum-fragment-length* — Maximum SSE fragment length in number of Unicode code units (characters)
 (exceeded message length leads to fragmentation of messages)
 
 *heartbeat-interval* — Interval in milliseconds between sending of ping control frames.
 
-*idle-timeout* — Maximum idle time of web-socket session before the session is closed (milliseconds).
+*idle-timeout* — Maximum idle time of SSE session before the session is closed (milliseconds).
 
 *ping-executor-name-prefix* — Name of thread group Ping Executor will be run with.
 
 *max-thread-count* — Number of threads Ping Executor will be run with.
-
-*use-sse* — In case of ``true`` access to notification streams will be via Server-Sent Events.
-Otherwise web-socket servlet will be initialized.
 
 *restconf* — The value of RFC8040 restconf URI template, pointing to the root resource. Must not end with '/'.
 
@@ -1544,7 +1345,6 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     idle-timeout=30000
     ping-executor-name-prefix=ping-executor
     max-thread-count=1
-    use-sse=true
     restconf=rests
 
 Or use Karaf CLI:
@@ -1557,7 +1357,6 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set idle-timeout 30000
     opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
     opendaylight-user@root>config:property-set max-thread-count 1
-    opendaylight-user@root>config:property-set use-sse true
     opendaylight-user@root>config:property-set restconf "rests"
     opendaylight-user@root>config:update
 
