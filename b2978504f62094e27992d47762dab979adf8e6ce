@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fec25c9b_581d9d0e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "updated to package private, used in ClientAuthProvider and tests",
+      "parentUuid": "069bbfc2_06991bf4",
+      "range": {
+        "startLine": 28,
+        "startChar": 31,
+        "endLine": 28,
+        "endChar": 48
+      },
+      "revId": "b2978504f62094e27992d47762dab979adf8e6ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f62b683_8153097d",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-31T23:26:26Z",
       "side": 1,
       "message": "so this really should be part of AuthHandler\n\nfurthermore, a simple boolean is not enough here: in case of success, we need",
+      "range": {
+        "startLine": 44,
+        "startChar": 20,
+        "endLine": 44,
+        "endChar": 32
+      },
+      "revId": "b2978504f62094e27992d47762dab979adf8e6ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0df410b8_4984e44c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f62b683_8153097d",
       "range": {
         "startLine": 44,
         "startChar": 20,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0960d48a_044e6b59",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "updated API to use request object as input,\nthis allows request modification in case the \nauthn data has to be passed to service layer",
+      "parentUuid": "830baa65_adc41df3",
+      "range": {
+        "startLine": 60,
+        "startChar": 23,
+        "endLine": 60,
+        "endChar": 30
+      },
+      "revId": "b2978504f62094e27992d47762dab979adf8e6ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e730eab6_39d7d94a",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-05-31T23:26:26Z",
       "side": 1,
       "message": "\"Auth\" is a bad prefix, as there are two distinct concepts:\n- authentication (authn), i.e. login/password, resulting in a java.security.Principal \n- authorization (authz), i.e. can access RESTCONF endpoint, resulting something like a org.apache.shiro.subject.Subject -- something that can check things like \"can this user access this RESTCONF endpoint\"?, \"can this user access this datastore?\", etc.\n\nI suspect this wants to be authN, but then we also need a layer which attaches current authZ context to each request we process. That includes dealing with things like \"we have authN from TLS, but we also have authN from HTTP Basic Auth\" -- i.e. given a set of authentications, find the effective one and create authZ based on it.\n\nWe know *now* that we will need this via the FIXME in ServerRequest, so this needs to have infra in place from day one.",
+      "range": {
+        "startLine": 17,
+        "startChar": 17,
+        "endLine": 17,
+        "endChar": 21
+      },
+      "revId": "b2978504f62094e27992d47762dab979adf8e6ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7186e859_0010f44a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AuthHandlerFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "api updated, includes both authentication and authorization stages\nno reason for separate handlers/factories",
+      "parentUuid": "e730eab6_39d7d94a",
       "range": {
         "startLine": 17,
         "startChar": 17,
@@ -116,6 +212,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa9d5768_583720a3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AuthHandlerFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "624ecd06_b8b2d91a",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 27
+      },
+      "revId": "b2978504f62094e27992d47762dab979adf8e6ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b716352d_f716fe01",
@@ -129,6 +249,30 @@
       "writtenOn": "2024-05-31T23:26:26Z",
       "side": 1,
       "message": "a dedicated class implementing AuthHandler",
+      "range": {
+        "startLine": 77,
+        "startChar": 20,
+        "endLine": 77,
+        "endChar": 43
+      },
+      "revId": "b2978504f62094e27992d47762dab979adf8e6ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d896eaa5_eac309c1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/BasicAuthHandlerFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "updated to output AuthHandler instance\ndedicated class seems extra",
+      "parentUuid": "b716352d_f716fe01",
       "range": {
         "startLine": 77,
         "startChar": 20,

@@ -22,6 +22,30 @@
       },
       "revId": "5f412df33f81bf29129e8753b3f3f4250dc2b948",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7415a6d_f45f2586",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerChannelInitializer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-03T15:34:32Z",
+      "side": 1,
+      "message": "TLS mutual authentication is not a part of http transport\n\ncertificate-based client identity is part of restconf protocol\nhttps://datatracker.ietf.org/doc/html/rfc8040#section-2.5\nso it should be resolved via restconf-server identification.\n\nThis can be done either by separate handler injected by\ntransport channel listener or by implementing composite \nAuthHandler to check both TLS and HTTP authentication schemes\n\nout of scope for current task",
+      "parentUuid": "a3686bf9_1652d72d",
+      "range": {
+        "startLine": 63,
+        "startChar": 29,
+        "endLine": 63,
+        "endChar": 52
+      },
+      "revId": "5f412df33f81bf29129e8753b3f3f4250dc2b948",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
