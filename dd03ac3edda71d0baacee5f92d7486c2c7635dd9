@@ -16,6 +16,46 @@
       "message": "recheck",
       "revId": "dd03ac3edda71d0baacee5f92d7486c2c7635dd9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e19aceba_7d902e1c",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/NetconfXMLToHelloMessageDecoderTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-03T09:50:30Z",
+      "side": 1,
+      "message": "can be replaced with\n`final HelloMessage message \u003d assertInstanceOf(HelloMessage.class, out.get(0));`",
+      "revId": "dd03ac3edda71d0baacee5f92d7486c2c7635dd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17ecb883_5ec1c432",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/NetconfXMLToHelloMessageDecoderTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-03T09:50:30Z",
+      "side": 1,
+      "message": "can be replaced with\n`final HelloMessage message \u003d assertInstanceOf(HelloMessage.class, out.get(0));`",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 61
+      },
+      "revId": "dd03ac3edda71d0baacee5f92d7486c2c7635dd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
