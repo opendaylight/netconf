@@ -172,5 +172,14 @@ module typed-params {
                 type string;
             }
         }
+        list anydata {
+            key key;
+            leaf key {
+                type string;
+            }
+            anydata value {
+                description "Anydata value.";
+            }
+        }
     }
 }

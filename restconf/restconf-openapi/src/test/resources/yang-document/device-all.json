@@ -12420,6 +12420,181 @@
         ],
         "parameters": []
       }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/anydata={key}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "summary": "DELETE - 123 - typed-params - anydata",
+        "tags": [
+          "123 typed-params"
+        ]
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "anydata": {
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_anydata",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_anydata"
+                }
+              }
+            },
+            "description": "200"
+          }
+        },
+        "summary": "GET - 123 - typed-params - anydata",
+        "tags": [
+          "123 typed-params"
+        ]
+      },
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:anydata": {
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_anydata",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_anydata"
+              }
+            }
+          },
+          "description": "anydata"
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PATCH - typed-params - 123 - anydata",
+        "tags": [
+          "123 typed-params"
+        ]
+      },
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:anydata": {
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_anydata",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_anydata"
+              }
+            }
+          },
+          "description": "anydata"
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PUT - typed-params - 123 - anydata",
+        "tags": [
+          "123 typed-params"
+        ]
+      }
     }
   },
   "components": {
@@ -12691,6 +12866,13 @@
             "items": {
               "$ref": "#/components/schemas/typed-params_typed_bits"
             }
+          },
+          "anydata": {
+            "description": "",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_anydata"
+            },
+            "type": "array"
           }
         },
         "xml": {
@@ -14388,6 +14570,26 @@
         "xml": {
           "name": "first",
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "typed-params_typed_anydata": {
+        "properties": {
+          "key": {
+            "description": "",
+            "example": "Some key",
+            "type": "string"
+          },
+          "value": {
+            "description": "Anydata value. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "title": "typed-params_typed_anydata",
+        "type": "object",
+        "xml": {
+          "name": "anydata",
+          "namespace": "urn:typed-params"
         }
       }
     },

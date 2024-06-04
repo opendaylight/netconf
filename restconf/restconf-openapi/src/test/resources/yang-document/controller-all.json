@@ -12392,6 +12392,181 @@
         ],
         "parameters": []
       }
+    },
+    "/rests/data/typed-params:typed/anydata={key}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - typed-params - Controller - anydata",
+        "requestBody": {
+          "description": "anydata",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:anydata": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_anydata",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_anydata"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - typed-params - Controller - anydata",
+        "requestBody": {
+          "description": "anydata",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:anydata": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_anydata",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_anydata"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - Controller - typed-params - anydata",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "Controller typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - Controller - typed-params - anydata",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_anydata"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "anydata": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_anydata",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Controller typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -12663,6 +12838,13 @@
             "items": {
               "$ref": "#/components/schemas/typed-params_typed_uint32"
             }
+          },
+          "anydata": {
+            "description": "",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_anydata"
+            },
+            "type": "array"
           }
         },
         "xml": {
@@ -14360,6 +14542,26 @@
         "xml": {
           "name": "first",
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "typed-params_typed_anydata": {
+        "properties": {
+          "key": {
+            "description": "",
+            "example": "Some key",
+            "type": "string"
+          },
+          "value": {
+            "description": "Anydata value. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "title": "typed-params_typed_anydata",
+        "type": "object",
+        "xml": {
+          "name": "anydata",
+          "namespace": "urn:typed-params"
         }
       }
     },

@@ -295,11 +295,12 @@ public class PropertyEntity {
         assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
 
         final var leafDescription = leafNode.getDescription().orElse("");
-        generator.writeStringField(DESCRIPTION, leafDescription);
+        generator.writeStringField(DESCRIPTION,
+            leafDescription + " (This is unknown data, need to be filled by user.)");
 
-        final var localName = leafNode.getQName().getLocalName();
-        generator.writeStringField(EXAMPLE, String.format("<%s> ... </%s>", localName, localName));
-        generator.writeStringField(TYPE, STRING_TYPE);
+        generator.writeObjectFieldStart("example");
+        generator.writeEndObject();
+        generator.writeStringField(TYPE, OBJECT_TYPE);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
             buildXmlParameter(leafNode);
