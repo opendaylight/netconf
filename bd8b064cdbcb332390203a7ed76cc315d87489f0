@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3203b299_05a0ada3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09eb4432_13181f85",
+      "range": {
+        "startLine": 41,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 5
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d942c4dc_3a1ad79f",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-31T23:30:55Z",
       "side": 1,
       "message": "on success the subject needs to be remembered, as we will need to talk to its https://javadoc.io/static/org.apache.shiro/shiro-core/2.0.1/org/apache/shiro/subject/Subject.html#checkPermission(org.apache.shiro.authz.Permission) for access control (as mentioned in ServerRequest\u0027s top FIXME.\n\nthis really needs to be in place from day one.",
+      "range": {
+        "startLine": 57,
+        "startChar": 27,
+        "endLine": 57,
+        "endChar": 47
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b737d3_d3bfd0fe",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "it\u0027s a new functionality which does not exist in restconf-nb.\nit should not be requirement/blocker for transport layer migration task",
+      "parentUuid": "d942c4dc_3a1ad79f",
       "range": {
         "startLine": 57,
         "startChar": 27,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4d3ab6d_248d88f7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AbstractRequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "because it\u0027s used by inherited classes",
+      "parentUuid": "767142ae_0bf86bf1",
+      "range": {
+        "startLine": 22,
+        "startChar": 4,
+        "endLine": 22,
+        "endChar": 13
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9248117_4f0468b0",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-06-01T00:39:59Z",
       "side": 1,
       "message": "\"Regex\" is ambiguous -- it should be \"Pattern\"\n\nbut then ... why do we needs a Pattern? JaxRsRestconf layout seems to suggest that we just needs String.startsWith() match before further deciding whether to extract an ApiPath or not...",
+      "range": {
+        "startLine": 26,
+        "startChar": 42,
+        "endLine": 26,
+        "endChar": 56
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dffec8a_e291a672",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AbstractRequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "startsWith is not sufficient for reliable path pattern match\n`\"/datawhatever\".startsWith(\"/data\") \u003d true`",
+      "parentUuid": "d9248117_4f0468b0",
       "range": {
         "startLine": 26,
         "startChar": 42,
@@ -116,6 +212,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ae1aff4_bb5cfc20",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "as it says in javadoc: it aggregates request and configuration parameters, \nso we can use single parameter object in API instead of multiple\n\nrenamed to RequestParametrs for clear meaning, also converted class\n\n\u003e void invoke( requestParameters (90% of this interface), callback)\n\nit\u0027s just not true, you may also need path-api, request body, request headers,\nbase path as well\n\n\u003e How does this relate to ServerRequest?\n\nit does not. \nServerRequest is just an extra wrapper over RequestParameters\ni see no reason for this object to exist, it provides extra handling\nfor pretty print parameter which is only used for response body encoding\nand never used within RestconfServer (restonf-nb) implementation",
+      "parentUuid": "15320d70_5c015bcd",
+      "range": {
+        "startLine": 27,
+        "startChar": 10,
+        "endLine": 27,
+        "endChar": 24
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4ce9992_8b37182f",
@@ -129,6 +249,30 @@
       "writtenOn": "2024-05-31T23:46:11Z",
       "side": 1,
       "message": "examples",
+      "range": {
+        "startLine": 51,
+        "startChar": 77,
+        "endLine": 51,
+        "endChar": 105
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e47a431_f5dec12b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4ce9992_8b37182f",
       "range": {
         "startLine": 51,
         "startChar": 77,
@@ -162,6 +306,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc86fc57_09abb275",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "83454ffa_17e7a506",
+      "range": {
+        "startLine": 65,
+        "startChar": 12,
+        "endLine": 65,
+        "endChar": 26
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e41f7082_1beb5329",
@@ -175,6 +343,30 @@
       "writtenOn": "2024-05-31T23:48:35Z",
       "side": 1,
       "message": "either this is:\n- findMatching() with findAny()\n- findFirstMatching() with findFirst()",
+      "range": {
+        "startLine": 25,
+        "startChar": 39,
+        "endLine": 25,
+        "endChar": 51
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e1e4fad_b7e83460",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestMapping.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e41f7082_1beb5329",
       "range": {
         "startLine": 25,
         "startChar": 39,
@@ -208,6 +400,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50d0b80b_c357482f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestMapping.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4f3f72ed_bc26cea9",
+      "range": {
+        "startLine": 27,
+        "startChar": 61,
+        "endLine": 27,
+        "endChar": 70
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54ea34ce_92847040",
@@ -231,6 +447,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b73d644_3f96a3c3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestMapping.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "54ea34ce_92847040",
+      "range": {
+        "startLine": 35,
+        "startChar": 13,
+        "endLine": 35,
+        "endChar": 55
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "002d73ed_ddf53158",
@@ -244,6 +484,30 @@
       "writtenOn": "2024-05-31T23:51:11Z",
       "side": 1,
       "message": "sooo... basically we do first matches(context) and then execute process(server, context)?\nwhy do we want to do that in two steps?\nwhat happens if matches(context) \u003d\u003d false and but someone calls process() nevertheless?",
+      "range": {
+        "startLine": 23,
+        "startChar": 4,
+        "endLine": 23,
+        "endChar": 44
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17173851_a8d7ac02",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "because \n- searching for processor is lightweight operation, processing the request could be resource intensive.\n- search for processor is performed for each request, processing is invoked only if matched. so there could be thousands of matches() and single process() or even none.\n\n\u003e what happens if matches(context) \u003d\u003d false and but someone calls process() nevertheless?\n\nwhat the reason to invoke processor which is not matching the request? \nRestconfRequestDispatcher is the only place the processor invocation is expected from.",
+      "parentUuid": "002d73ed_ddf53158",
       "range": {
         "startLine": 23,
         "startChar": 4,
@@ -279,6 +543,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1f4ef8cf_cdb5dce4",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "it\u0027s a service, not server. \ncalling variable server confusing and misleading.\nRestconfServer of restconf-nb require to be renamed to RestconfService \nbc it describes service layer",
+      "parentUuid": "fb5d05b6_befaf616",
+      "range": {
+        "startLine": 31,
+        "startChar": 32,
+        "endLine": 31,
+        "endChar": 47
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b13ae71d_76816b71",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
         "patchSetId": 8
@@ -290,6 +578,30 @@
       "writtenOn": "2024-06-01T00:10:01Z",
       "side": 1,
       "message": "\"hidden on purpose\"\n\ndo not try to be creative in these comments which have a *very* specific context and purpose",
+      "range": {
+        "startLine": 29,
+        "startChar": 11,
+        "endLine": 29,
+        "endChar": 24
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf2ced9f_ba518c32",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "why is it an issue?",
+      "parentUuid": "b13ae71d_76816b71",
       "range": {
         "startLine": 29,
         "startChar": 11,
@@ -323,6 +635,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad4030d2_bb612643",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "same pattern is being used for different puproses: path match validation \nand api-path value extraction. using separate patterns is not justified, \nbecause the difference in negligible (with groups vs without)\n\nmethod renamed",
+      "parentUuid": "a18629cc_ff3bfd88",
+      "range": {
+        "startLine": 32,
+        "startChar": 19,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cea35971_584630d7",
@@ -336,6 +672,30 @@
       "writtenOn": "2024-06-01T00:10:01Z",
       "side": 1,
       "message": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/regex/Matcher.html#group(int) says:\n\n    IndexOutOfBoundsException - If there is no capturing group in the pattern with the given index\n\nhow do we know there is even a capturing group?",
+      "range": {
+        "startLine": 34,
+        "startChar": 33,
+        "endLine": 34,
+        "endChar": 49
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bea41f5c_61385d54",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "because we only invoke the method using patterns with groups.\nadded group count validation",
+      "parentUuid": "cea35971_584630d7",
       "range": {
         "startLine": 34,
         "startChar": 33,
@@ -369,6 +729,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a49a081b_2159ad28",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Updated",
+      "parentUuid": "6e68ba88_c43fd9d9",
+      "range": {
+        "startLine": 36,
+        "startChar": 37,
+        "endLine": 36,
+        "endChar": 53
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "472e49d2_822c1db7",
@@ -382,6 +766,30 @@
       "writtenOn": "2024-06-01T00:10:01Z",
       "side": 1,
       "message": "let\u0027s not introduce new unchecked exception in invcation path, okay?\n\nif you think about  this particular case, a ServerException is called for, isn\u0027t it?",
+      "range": {
+        "startLine": 39,
+        "startChar": 16,
+        "endLine": 39,
+        "endChar": 50
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33b4d7db_11017619",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-04T12:36:28Z",
+      "side": 1,
+      "message": "Nothing new is being introduces, it\u0027s a legacy behavior reproduces\nsee JaxRsRestconf#API_PATH_CONVERTER\n\nServerException is checked exception, which will cause necessity to add `throws` \nto API methods, bringing more complexity for no reason.",
+      "parentUuid": "472e49d2_822c1db7",
       "range": {
         "startLine": 39,
         "startChar": 16,
