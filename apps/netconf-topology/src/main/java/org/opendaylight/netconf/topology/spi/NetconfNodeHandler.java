@@ -108,11 +108,13 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     private final @NonNull List<Registration> yanglibRegistrations;
     private final @NonNull NetconfClientFactory clientFactory;
-    private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
     private final @NonNull NetconfTimer timer;
     private final @NonNull RemoteDeviceId deviceId;
+    private final @NonNull NetconfNode node;
+    private final @NonNull NodeId nodeId;
+    private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
 
     private final long maxBackoff;
     private final long maxAttempts;
@@ -120,6 +122,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final double backoffMultiplier;
     private final double jitter;
 
+    private NetconfClientConfiguration clientConfig;
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
@@ -138,6 +141,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         this.timer = requireNonNull(timer);
         this.delegate = requireNonNull(delegate);
         this.deviceId = requireNonNull(deviceId);
+        this.node = requireNonNull(node);
+        this.nodeId = requireNonNull(nodeId);
+        this.builderFactory = requireNonNull(builderFactory);
 
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minBackoff = node.requireMinBackoffMillis().toJava();
@@ -194,10 +200,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(communicator);
         }
-
-        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-            .withSessionListener(communicator)
-            .build();
     }
 
     public synchronized void connect() {
@@ -210,8 +212,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private void lockedConnect() {
         final ListenableFuture<NetconfClientSession> connectFuture;
         try {
+            if (clientConfig == null) {
+                clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+                    .withSessionListener(communicator)
+                    .build();
+            }
             connectFuture = clientFactory.createClient(clientConfig);
-        } catch (UnsupportedConfigurationException e) {
+        } catch (IllegalArgumentException | IllegalStateException | UnsupportedConfigurationException e) {
+            LOG.warn("RemoteDevice{{}} failed to connect", nodeId, e);
             onDeviceFailed(e);
             return;
         }
