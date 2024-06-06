@@ -59,11 +59,13 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
     private final @NonNull NetconfClientDispatcher clientDispatcher;
-    private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
     private final @NonNull EventExecutor eventExecutor;
     private final @NonNull RemoteDeviceId deviceId;
+    private final @NonNull NetconfNode node;
+    private final @NonNull NodeId nodeId;
+    private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
 
     private final long maxSleep;
     private final long maxAttempts;
@@ -71,6 +73,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final double sleepFactor;
     private final double jitter;
 
+    @GuardedBy("this")
+    private NetconfClientConfiguration clientConfig;
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
@@ -89,6 +93,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         this.eventExecutor = requireNonNull(eventExecutor);
         this.delegate = requireNonNull(delegate);
         this.deviceId = requireNonNull(deviceId);
+        this.node = requireNonNull(node);
+        this.nodeId = requireNonNull(nodeId);
+        this.builderFactory = requireNonNull(builderFactory);
 
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minSleep = node.requireBetweenAttemptsTimeoutMillis().toJava();
@@ -145,10 +152,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(communicator);
         }
-
-        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-            .withSessionListener(communicator)
-            .build();
     }
 
     public synchronized void connect() {
@@ -159,6 +162,17 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     @Holding("this")
     private void lockedConnect() {
+        if (clientConfig == null) {
+            try {
+                clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+                    .withSessionListener(communicator)
+                    .build();
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                LOG.warn("RemoteDevice{{}} failed to connect", nodeId, e);
+                onDeviceFailed(e);
+                return;
+            }
+        }
         currentTask = clientDispatcher.createClient(clientConfig);
         currentTask.addListener(this::connectComplete);
     }
