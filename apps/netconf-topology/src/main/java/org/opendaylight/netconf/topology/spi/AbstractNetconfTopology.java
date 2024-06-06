@@ -118,6 +118,7 @@ public abstract class AbstractNetconfTopology {
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
 
+<<<<<<< Updated upstream
         final NetconfNodeHandler nodeHandler;
         try {
             nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider, schemaManager,
@@ -129,6 +130,11 @@ public abstract class AbstractNetconfTopology {
             deviceSalFacade.close();
             return;
         }
+=======
+        final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
+            schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
+            netconfNode, nodeOptional);
+>>>>>>> Stashed changes
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);

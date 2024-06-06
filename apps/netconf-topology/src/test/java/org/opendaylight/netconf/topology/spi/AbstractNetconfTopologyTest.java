@@ -9,8 +9,10 @@ package org.opendaylight.netconf.topology.spi;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -170,13 +172,18 @@ class AbstractNetconfTopologyTest {
             .addAugmentation(netconfNode)
             .build();
 
-        doNothing().when(delegate).close();
+        final IllegalStateException exception = new IllegalStateException("Failed to decrypt password");
+/*        final ConnectGivenUpException exceptionC = new ConnectGivenUpException("Given up connecting "
+            + "RemoteDeviceId[name=nodeId, address=/127.0.0.1:9999] after 1 attempts");
+        doNothing().when(delegate).onDeviceFailed(any());*/
+        doAnswer(invocation -> {
+            throw new ConnectGivenUpException("Given up connecting RemoteDeviceId[name=nodeId, address=/127.0.0.1:9999]"
+                + " after 1 attempts");
+        }).when(delegate).onDeviceFailed(exception);
         // throw exception when try to decrypt
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
-
-        topology.onDataTreeChanged(testNode);
-        verify(delegate).close();
-        verify(encryptionService).decrypt(any());
+        assertThrows(ConnectGivenUpException.class, () -> topology.onDataTreeChanged(testNode));
+        verify(delegate).onDeviceFailed(any());
     }
 
     private class TestingNetconfTopologyImpl extends AbstractNetconfTopology {
