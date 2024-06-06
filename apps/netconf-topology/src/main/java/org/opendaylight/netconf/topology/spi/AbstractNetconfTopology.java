@@ -120,17 +120,9 @@ public abstract class AbstractNetconfTopology {
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
             netconfNode.requireLockDatastore());
 
-        final NetconfNodeHandler nodeHandler;
-        try {
-            nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider, schemaManager,
-                schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode,
-                nodeOptional);
-        } catch (IllegalStateException e) {
-            // This is a workaround for NETCONF-1114 when we fail to decrypt the password
-            LOG.warn("RemoteDevice{{}} failed to connect, removing from operational datastore", nodeId, e);
-            deviceSalFacade.close();
-            return;
-        }
+        final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
+            schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
+            netconfNode, nodeOptional);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,10 +22,13 @@ import java.security.GeneralSecurityException;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -82,6 +86,9 @@ class AbstractNetconfTopologyTest {
     private WriteTransaction wtx;
     @Mock
     private RemoteDeviceHandler delegate;
+
+    @Captor
+    private ArgumentCaptor<Throwable> exceptionCaptor;
 
     @Test
     void hideCredentials() {
@@ -171,13 +178,19 @@ class AbstractNetconfTopologyTest {
             .addAugmentation(netconfNode)
             .build();
 
+        doNothing().when(delegate).onDeviceFailed(exceptionCaptor.capture());
         doNothing().when(delegate).close();
-        // throw exception when try to decrypt
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
-        topology.onDataTreeChanged(testNode);
-        verify(delegate).close();
+        topology.onDataTreeChanged(testNode, ModificationType.WRITE);
         verify(encryptionService).decrypt(any());
+        verify(delegate).onDeviceFailed(any(ConnectGivenUpException.class));
+
+        assertEquals("Given up connecting RemoteDeviceId[name=nodeId, address=/127.0.0.1:9999] after 1 attempts",
+            exceptionCaptor.getValue().getMessage());
+
+        topology.onDataTreeChanged(testNode, ModificationType.DELETE);
+        verify(delegate).close();
     }
 
     private class TestingNetconfTopologyImpl extends AbstractNetconfTopology {
@@ -192,8 +205,12 @@ class AbstractNetconfTopologyTest {
         }
 
         // Want to simulate on data tree change
-        public void onDataTreeChanged(final Node node) {
-            ensureNode(node);
+        public void onDataTreeChanged(final Node node, final ModificationType type) {
+            switch (type) {
+                case WRITE -> ensureNode(node);
+                case DELETE -> deleteNode(node.getNodeId());
+                default -> throw new IllegalArgumentException("Unexpected modification type: " + type);
+            }
         }
 
         @Override
