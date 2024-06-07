@@ -567,6 +567,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "34fa5d1e_6701cc4a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-07T11:58:42Z",
+      "side": 1,
+      "message": "Two points:\n- it is the API definition of what a RESTCONF server needs to implement\n- if it becomes RestconfService, what will be the name of the API definition of what a RESTCONF client needs to implement?",
+      "parentUuid": "1f4ef8cf_cdb5dce4",
+      "range": {
+        "startLine": 31,
+        "startChar": 32,
+        "endLine": 31,
+        "endChar": 47
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b13ae71d_76816b71",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
         "patchSetId": 8
