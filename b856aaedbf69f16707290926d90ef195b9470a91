@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b098974_294c2de3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-07T06:20:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95d307b6_ed2251b8",
+      "range": {
+        "startLine": 125,
+        "startChar": 39,
+        "endLine": 125,
+        "endChar": 51
+      },
+      "revId": "b856aaedbf69f16707290926d90ef195b9470a91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8a842fd_0463b7a6",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-06T18:16:14Z",
       "side": 1,
       "message": "this is coming from the builder, right?\nif so, it should have a dedicated try/catch block with its own warning message",
+      "range": {
+        "startLine": 221,
+        "startChar": 17,
+        "endLine": 221,
+        "endChar": 65
+      },
+      "revId": "b856aaedbf69f16707290926d90ef195b9470a91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "652987db_63f21b88",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-07T06:20:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8a842fd_0463b7a6",
       "range": {
         "startLine": 221,
         "startChar": 17,
