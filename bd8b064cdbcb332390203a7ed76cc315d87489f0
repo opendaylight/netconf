@@ -191,6 +191,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d3d6b999_cf02dfed",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AbstractRequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-07T12:12:23Z",
+      "side": 1,
+      "message": "right, it starts with /data and then you proceed to decide whether it is:\n- \"/data\", i.e. the datastore\n- \"/data/\u003capiPath\u003e\u0027, i.e. a resources\n\nStill way more performant than pattern match.\n\nAlso I am serious about the variable name.",
+      "parentUuid": "8dffec8a_e291a672",
+      "range": {
+        "startLine": 26,
+        "startChar": 42,
+        "endLine": 26,
+        "endChar": 56
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "15320d70_5c015bcd",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
         "patchSetId": 8
@@ -226,6 +250,30 @@
       "side": 1,
       "message": "as it says in javadoc: it aggregates request and configuration parameters, \nso we can use single parameter object in API instead of multiple\n\nrenamed to RequestParametrs for clear meaning, also converted class\n\n\u003e void invoke( requestParameters (90% of this interface), callback)\n\nit\u0027s just not true, you may also need path-api, request body, request headers,\nbase path as well\n\n\u003e How does this relate to ServerRequest?\n\nit does not. \nServerRequest is just an extra wrapper over RequestParameters\ni see no reason for this object to exist, it provides extra handling\nfor pretty print parameter which is only used for response body encoding\nand never used within RestconfServer (restonf-nb) implementation",
       "parentUuid": "15320d70_5c015bcd",
+      "range": {
+        "startLine": 27,
+        "startChar": 10,
+        "endLine": 27,
+        "endChar": 24
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93a9925a_63335d6f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-07T12:12:23Z",
+      "side": 1,
+      "message": "ServerRequest is bound to be way more, as evidenced in the FIXMEs there",
+      "parentUuid": "1ae1aff4_bb5cfc20",
       "range": {
         "startLine": 27,
         "startChar": 10,
@@ -508,6 +556,30 @@
       "side": 1,
       "message": "because \n- searching for processor is lightweight operation, processing the request could be resource intensive.\n- search for processor is performed for each request, processing is invoked only if matched. so there could be thousands of matches() and single process() or even none.\n\n\u003e what happens if matches(context) \u003d\u003d false and but someone calls process() nevertheless?\n\nwhat the reason to invoke processor which is not matching the request? \nRestconfRequestDispatcher is the only place the processor invocation is expected from.",
       "parentUuid": "002d73ed_ddf53158",
+      "range": {
+        "startLine": 23,
+        "startChar": 4,
+        "endLine": 23,
+        "endChar": 44
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9876b79b_57a715ff",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-07T12:12:23Z",
+      "side": 1,
+      "message": "that does not explain it: process() can indicate whether it matched the request (and processed) -- halting the search. i.e. the \"can I process this request\" is the first question implementations of process() will do and decide based on that.\n\nwe do not need a reason \"why would you\" ... answers can be \"because a bug\" or whatever -- modelling this as two intertwined calls just opens the possibility for misunderstanding/misusing the API",
+      "parentUuid": "17173851_a8d7ac02",
       "range": {
         "startLine": 23,
         "startChar": 4,
