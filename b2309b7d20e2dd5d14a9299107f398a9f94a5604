@@ -68,6 +68,29 @@
       },
       "revId": "b2309b7d20e2dd5d14a9299107f398a9f94a5604",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27651474_233cae52",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/impl/MappingTestUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-07T12:02:24Z",
+      "side": 1,
+      "message": "looks like an abstract base class to me",
+      "range": {
+        "startLine": 38,
+        "startChar": 12,
+        "endLine": 38,
+        "endChar": 28
+      },
+      "revId": "b2309b7d20e2dd5d14a9299107f398a9f94a5604",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
