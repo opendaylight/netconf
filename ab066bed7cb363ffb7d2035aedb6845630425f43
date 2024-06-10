@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e56100e_91718bf7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-10T13:42:38Z",
+      "side": 1,
+      "message": "This patch introduces very different behavior compared to master version.",
+      "revId": "ab066bed7cb363ffb7d2035aedb6845630425f43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
