@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2b94b4cf_fe792afb",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeActorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-10T09:46:02Z",
+      "side": 1,
+      "message": "remove this line as well",
+      "range": {
+        "startLine": 319,
+        "startChar": 0,
+        "endLine": 319,
+        "endChar": 36
+      },
+      "revId": "810d938ebc1f9e5c990319b88fb4d7f2e2aa76ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9b10d492_bd77e2d3",
         "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfServiceTest.java",
         "patchSetId": 5
