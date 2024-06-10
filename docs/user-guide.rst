@@ -1247,7 +1247,7 @@ Mounting netopeer NETCONF server using key-based authentication TLS
    ::
 
        docker pull sysrepo/sysrepo-netopeer2
-       docker run -it --name sysrepo -p 830:830 --rm sysrepo/sysrepo-netopeer2:latest
+       docker run -it --name sysrepo -p 830:830 -p 6513:6513 --rm sysrepo/sysrepo-netopeer2:latest
 
 3. Enable TLS communication on server netopeer2
 
@@ -1264,7 +1264,7 @@ Mounting netopeer NETCONF server using key-based authentication TLS
 
 -  :~/netconf/karaf/target/assembly/bin$ ./karaf
 
--  feature:install odl-netconf-topology odl-restconf-nb-bierman02 odl-mdsal-apidocs
+-  feature:install odl-netconf-topology odl-restconf-nb
 
 5. Set up ODL netconf keystore
 
@@ -1283,7 +1283,7 @@ In the payload change the:
 
 -  ip to localhost
 
--  port to 830.
+-  port to 6513.
 
 After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
