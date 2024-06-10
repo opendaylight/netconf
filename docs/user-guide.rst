@@ -773,8 +773,7 @@ The request for xml encoding and **stream-name** from previous example would loo
 
     GET
     http://localhost:8181/rests/streams/xml/urn:uuid:91e630ec-1324-4f57-bae3-0925b6d11ffd
-    Content-Type: application/xml
-    Accept: application/xml
+    Accept: text/event-stream
 
 
 .. code-block:: xml
