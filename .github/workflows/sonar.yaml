@@ -20,6 +20,9 @@ jobs:
         distribution: 'adopt'
         java-version: '17'
 
+    - name: Set JAVA_HOME
+      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
+
     - name: Verify Java Version
       run: java -version
 
@@ -31,3 +34,11 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+    - name: Archive Surefire Reports
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: surefire-reports
+        path: |
+          **/target/surefire-reports/
