@@ -27,6 +27,12 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.install.skip>true</maven.install.skip>
     </properties>
+ <properties>
+    <sonar.projectKey>spring_boot_jpa1</sonar.projectKey>
+    <sonar.host.url>http://localhost:9000/</sonar.host.url>
+    <sonar.login>sqp_1629173d76e38fc9badd97712acab09e4f4998d3</sonar.login>
+</properties>
+
 
     <modules>
         <module>artifacts</module>
