@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "010667cb_fcd5138c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-11T14:04:07Z",
+      "side": 1,
+      "message": "What is the meaning of changes in StressClient? Are they related?",
+      "revId": "4c9ebefc09cdb288e49134454db13ac4806bb6d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
