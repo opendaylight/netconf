@@ -13,6 +13,8 @@ import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -75,9 +77,12 @@ final class DefaultMapBodyOrder extends MapBodyOrder {
         }
 
         // Make sure key iteration order matches qnames, if not go through a sort
-        if (!Iterators.elementsEqual(qnames.iterator(),
-            Iterators.transform(keys.iterator(), DefaultMapBodyOrder::qnameOf))) {
-            sortKeys(keys, qnames);
+        if (!Iterators.elementsEqual(
+                qnames.iterator(),
+                Iterators.transform(keys.iterator(), DefaultMapBodyOrder::qnameOf))) {
+            // FIXME: Java 21: 'qnames' should be an ordered collection with indexOf() or similar, right?
+            final var tmp = List.copyOf(qnames);
+            keys.sort(Comparator.comparingInt(k -> tmp.indexOf(qnameOf(k))));
         }
 
         return Iterables.concat(keys, others);
@@ -109,10 +114,6 @@ final class DefaultMapBodyOrder extends MapBodyOrder {
         } else {
             throw new IOException("Child " + child + " is not a leaf");
         }
-    }
-
-    private static void sortKeys(final ArrayList<LeafNode<?>> keys, final Set<QName> qnames) {
-        throw new UnsupportedOperationException();
     }
 
     private static QName qnameOf(final NormalizedNode node) {
