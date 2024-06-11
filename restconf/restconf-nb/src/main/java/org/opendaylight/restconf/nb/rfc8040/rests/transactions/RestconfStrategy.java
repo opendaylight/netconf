@@ -353,8 +353,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
         return putData(path.instance(), data, insert);
     }
@@ -600,8 +600,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         return merge(path.instance(), data);

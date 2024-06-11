@@ -34,7 +34,7 @@ public final class JsonOperationInputBody extends OperationInputBody {
                 .parse(new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)));
         } catch (JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);
-            throw databind.newApplicationMalformedMessageServerException("Invalid JSON", e);
+            throw databind.newProtocolMalformedMessageServerException("Invalid JSON", unmaskIOException(e));
         }
     }
 }

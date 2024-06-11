@@ -7,17 +7,13 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
@@ -35,23 +31,17 @@ public final class JsonResourceBody extends ResourceBody {
     }
 
     @Override
-    void streamTo(final DatabindPath.Data path, final PathArgument name, final InputStream inputStream,
-            final NormalizedNodeStreamWriter writer) throws IOException {
+    void streamTo(final Data path, final PathArgument name, final InputStream inputStream,
+            final NormalizedNodeStreamWriter writer) throws ServerException {
         try (var jsonParser = newParser(path, writer)) {
             try (var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 jsonParser.parse(reader);
-            } catch (JsonParseException e) {
-                LOG.debug("Error parsing JSON input", e);
-                throw newRDE(e);
             }
+        } catch (IllegalArgumentException | IOException | JsonParseException e) {
+            LOG.debug("Error parsing JSON input", e);
+            throw path.databind().newProtocolMalformedMessageServerException("Error parsing input",
+                unmaskIOException(e));
         }
-    }
-
-    private static @NonNull RestconfDocumentedException newRDE(final JsonParseException cause) {
-        final var root = cause instanceof JsonIOException jsonIO && jsonIO.getCause() instanceof IOException io ? io
-            : cause;
-        return new RestconfDocumentedException("Error parsing input: " + root.getMessage(), ErrorType.PROTOCOL,
-            ErrorTag.MALFORMED_MESSAGE, cause);
     }
 
     private static JsonParserStream newParser(final DatabindPath.Data path, final NormalizedNodeStreamWriter writer) {

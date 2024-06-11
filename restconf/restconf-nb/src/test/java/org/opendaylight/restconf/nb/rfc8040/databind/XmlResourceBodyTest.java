@@ -22,7 +22,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -75,13 +76,15 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     private void assertThrowsException(final String uriPath, final String expectedErrorMessage) {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parse(uriPath, """
+        final var ex = assertThrows(ServerException.class, () -> parse(uriPath, """
                 <cont1 xmlns="instance:identifier:module"/>"""));
-        final var restconfError = ex.getErrors().get(0);
-        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
-        assertEquals(expectedErrorMessage, restconfError.getErrorMessage());
+        final var errors = ex.errors();
+        assertEquals(1, errors.size());
+
+        final var error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
+        assertEquals(new ErrorMessage(expectedErrorMessage), error.message());
     }
 
     @Test
@@ -198,11 +201,11 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
     void testMismatchedInput() throws Exception {
         final var error = assertError(() -> parse("base:cont", """
             <restconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"/>"""));
-        assertEquals("""
+        assertEquals(new ErrorMessage("""
             Incorrect message root element (urn:ietf:params:xml:ns:yang:ietf-restconf)restconf-state, should be \
-            (ns)cont""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+            (ns)cont"""), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 
     @Test
@@ -211,10 +214,10 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
                 <depth2-list2 xmlns="urn:nested:module">
                   <depth3-lf1-key>one</depth3-lf1-key>
                 </depth2-list2>"""));
-        assertEquals("""
+        assertEquals(new ErrorMessage("""
             Error parsing input: List entry (urn:nested:module?revision=2014-06-03)depth2-list2 is missing leaf values \
-            for [depth3-lf2-key]""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+            for [depth3-lf2-key]"""), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 }
