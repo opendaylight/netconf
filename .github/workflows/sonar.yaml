@@ -3,7 +3,7 @@ name: CI/CD workflow for Maven Build and SonarQube Scan
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
@@ -19,6 +19,9 @@ jobs:
       with:
         distribution: 'adopt'
         java-version: '17'
+
+    - name: Verify Java Version
+      run: java -version
 
     - name: Build with Maven
       run: mvn clean install
