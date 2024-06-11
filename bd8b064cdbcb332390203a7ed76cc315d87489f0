@@ -213,6 +213,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "969be0f5_eec8dab1",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AbstractRequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "refactored to use direct string match,\nvar name is apiResource\nmerged to RestconfProcessor which became class",
+      "parentUuid": "d3d6b999_cf02dfed",
+      "range": {
+        "startLine": 26,
+        "startChar": 42,
+        "endLine": 26,
+        "endChar": 56
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15320d70_5c015bcd",
@@ -274,6 +298,30 @@
       "side": 1,
       "message": "ServerRequest is bound to be way more, as evidenced in the FIXMEs there",
       "parentUuid": "1ae1aff4_bb5cfc20",
+      "range": {
+        "startLine": 27,
+        "startChar": 10,
+        "endLine": 27,
+        "endChar": 24
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edf0f63b_b387f830",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "cannot rely on functionality which does not exist yet,\nonce service layer updated, the mapping part expected to be adopted",
+      "parentUuid": "93a9925a_63335d6f",
       "range": {
         "startLine": 27,
         "startChar": 10,
@@ -592,6 +640,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "caef55de_b3aee5d6",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "this became theological.\n\nas you properly noticed, the request processing is being performed in 2 stages:\n- finding appropriate piece of logic\n- executing it with provided parameters\n\nThe approach is also known as Strategy design pattern. Stage 1 in our case is determining the strategy based on a context. In order to make the code more simple and easier to maintain the suitable strategy is being filtered out using a predicate method, the approach also known as Specification pattern.\n\nThe question regarding someone executes wrong strategy ignoring the context just because the object has an execute() method assumes the developer is not qualified to make changes to other\u0027s code. Method exposure does not mean it should be executed \"nevertheless\". Unit tests and code review are there to prevent code vandalism like this.\n\nAnyway, the solution proposed is to use one method instead of two so the API became \"clear\". It also assumes the check for logic being suitable to request parameters  should be performed as part of main logic execution. The approach when every item is being invoked and each item decides by itself either to perform any action or not is known as Visitor design pattern. But to avoid extra invocations we need to take into account the execution result and to terminate the items iteration after one performs the action. Then Visitor suddenly became Chain of Responsibility.\n\nIn practicality design difference just means the difference of where the condition check is being called from: external logic or internal one. No difference in performance is being expected here. If design change brings no benefit then there is no reason to change it.\n\nThe issue of same regex being invoked twice while this could be avoided, this issue should be pointed directly, not covered with \"two methods are bad, one is good\" complain. This one is religion based.",
+      "parentUuid": "9876b79b_57a715ff",
+      "range": {
+        "startLine": 23,
+        "startChar": 4,
+        "endLine": 23,
+        "endChar": 44
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fb5d05b6_befaf616",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
         "patchSetId": 8
@@ -651,6 +723,30 @@
       "side": 1,
       "message": "Two points:\n- it is the API definition of what a RESTCONF server needs to implement\n- if it becomes RestconfService, what will be the name of the API definition of what a RESTCONF client needs to implement?",
       "parentUuid": "1f4ef8cf_cdb5dce4",
+      "range": {
+        "startLine": 31,
+        "startChar": 32,
+        "endLine": 31,
+        "endChar": 47
+      },
+      "revId": "bd8b064cdbcb332390203a7ed76cc315d87489f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b61e2db1_f4681bee",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestProcessor.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "The only API that matters is REST API defined by specification. It guarantees our implementation will be compatible with any other. By other words our RESTCONF server should serve REST requests predictable way for any client implementation including generic HTTP clients. It also means our RESTCONF client expected to operate properly with any RESTCONF server implementation if it follows the specification.\n\nJava interface we use here (no matter how we call it and what methods we define there) has no relation to RESTCONF protocol API (which is the REST one), it contributes _nothing_ to compatibility mentioned above. This interface is for current implementation only and the only purpose is to make transport and service layers compatible. It\u0027s for internal use and for those who wants to integrate/ extend on current implementation.\n\nThe similar purpose interface (transport to service bridge) for NETCONF protocol is NetconfSessionListener interface. It\u0027s ugly, not clearly described and needs renaming/refactoring as well (as it\u0027s mentioned in FIXME there).\n\nRegarding the interface for client there is no requirement for interface the client should implement, any HTTP client could be a RESTCONF client. It does not mean we shouldn\u0027t use any. Once the RESTCONF client implements _same_ RestconfService interface then it became possible to use the client instance as a service - the way to access _any_ external RESTCONF server the way we prefer, using the API we defined for our needs. \n\nIt\u0027s absolutely same approach we use for NETCONF protocol case. The client used in topology is NetconfDeviceCommunicator which implements NetconfClientSessionListener",
+      "parentUuid": "34fa5d1e_6701cc4a",
       "range": {
         "startLine": 31,
         "startChar": 32,

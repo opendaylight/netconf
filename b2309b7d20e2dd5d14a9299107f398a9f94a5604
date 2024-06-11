@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53689049_99a67da5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/ContentTypes.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b83c5e67_b4c5b8f0",
+      "range": {
+        "startLine": 18,
+        "startChar": 11,
+        "endLine": 18,
+        "endChar": 24
+      },
+      "revId": "b2309b7d20e2dd5d14a9299107f398a9f94a5604",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8abb4305_1909ece3",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-07T12:01:20Z",
       "side": 1,
       "message": "please don\u0027t. there should pretty much be a single caller and that caller should perform an exhaustive match",
+      "range": {
+        "startLine": 67,
+        "startChar": 26,
+        "endLine": 67,
+        "endChar": 32
+      },
+      "revId": "b2309b7d20e2dd5d14a9299107f398a9f94a5604",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93bb51ba_0dc8308b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/ContentTypes.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8abb4305_1909ece3",
       "range": {
         "startLine": 67,
         "startChar": 26,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1f2314c_363a5e34",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "while it\u0027s planned to carry authn object via ServerRequest\nit makes sense to place the authn extraction from a request headers\nwhere the ServerRequest is being built #buildServerRequest()\n\nthe value is populated by authHandler -- see AAAShiroAuthHandlerFactory",
+      "parentUuid": "13405e13_5e5659d3",
+      "range": {
+        "startLine": 27,
+        "startChar": 48,
+        "endLine": 27,
+        "endChar": 66
+      },
+      "revId": "b2309b7d20e2dd5d14a9299107f398a9f94a5604",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27651474_233cae52",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-06-07T12:02:24Z",
       "side": 1,
       "message": "looks like an abstract base class to me",
+      "range": {
+        "startLine": 38,
+        "startChar": 12,
+        "endLine": 38,
+        "endChar": 28
+      },
+      "revId": "b2309b7d20e2dd5d14a9299107f398a9f94a5604",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd1c6573_3ab9164c",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/impl/MappingTestUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-11T10:51:10Z",
+      "side": 1,
+      "message": "I see no pros doing this.\nImo abstract test classes are only justified if share @Test methods",
+      "parentUuid": "27651474_233cae52",
       "range": {
         "startLine": 38,
         "startChar": 12,
