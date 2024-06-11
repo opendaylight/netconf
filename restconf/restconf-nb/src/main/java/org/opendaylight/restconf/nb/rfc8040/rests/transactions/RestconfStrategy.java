@@ -1301,10 +1301,9 @@ public abstract class RestconfStrategy implements DatabindAware {
         final ContainerNode data;
         try {
             data = body.toContainerNode(path);
-        } catch (IOException e) {
+        } catch (ServerException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final var type = path.rpc().argument();
@@ -1475,10 +1474,9 @@ public abstract class RestconfStrategy implements DatabindAware {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
-        } catch (IOException e) {
+        } catch (ServerException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         if (actionService == null) {

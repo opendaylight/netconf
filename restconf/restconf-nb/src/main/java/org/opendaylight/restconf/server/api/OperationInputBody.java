@@ -33,9 +33,9 @@ public abstract sealed class OperationInputBody extends RequestBody
      *
      * @param path The {@link OperationPath} of the operation invocation
      * @return The document body, or an empty container node
-     * @throws IOException when an I/O error occurs
+     * @throws ServerException when an I/O error occurs
      */
-    public @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws IOException {
+    public final @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws ServerException {
         try (var is = new PushbackInputStream(consume())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
@@ -50,9 +50,11 @@ public abstract sealed class OperationInputBody extends RequestBody
                 streamTo(path, is, streamWriter);
             }
             return (ContainerNode) holder.getResult().data();
+        } catch (IOException e) {
+            throw path.databind().newApplicationMalformedMessageServerException("Invalid input", e);
         }
     }
 
     abstract void streamTo(@NonNull OperationPath path, @NonNull InputStream inputStream,
-        @NonNull NormalizedNodeStreamWriter writer) throws IOException;
+        @NonNull NormalizedNodeStreamWriter writer) throws ServerException;
 }
