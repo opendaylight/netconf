@@ -50,6 +50,23 @@
       "message": "Using `this.` in this case is not necessary.",
       "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df3decf8_1e5c3f6e",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 19
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-11T13:48:10Z",
+      "side": 1,
+      "message": "https://docs.opendaylight.org/projects/netconf/en/latest/user-guide.html#connecting-to-a-device-supporting-only-netconf-1-0",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
