@@ -28,14 +28,16 @@ abstract sealed class RequestBody extends ConsumableBody
      * Throw a {@link RestconfDocumentedException} if the specified exception has a {@link YangNetconfError} attachment.
      *
      * @param cause Proposed cause of a RestconfDocumentedException
+     * @deprecated Migrate to using {@link ServerException} instead
      */
+    @Deprecated
     static void throwIfYangError(final Exception cause) {
         if (cause instanceof YangNetconfErrorAware infoAware) {
             throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
                 .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
                     // FIXME: pass down error info
                     null, error.path()))
-                .toList());
+                .toList(), null);
         }
     }
 }

@@ -61,6 +61,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.server.api.ChildBody;
+import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -1300,10 +1301,9 @@ public abstract class RestconfStrategy implements DatabindAware {
         final ContainerNode data;
         try {
             data = body.toContainerNode(path);
-        } catch (IOException e) {
+        } catch (ServerException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         final var type = path.rpc().argument();
@@ -1452,7 +1452,12 @@ public abstract class RestconfStrategy implements DatabindAware {
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
-        final var payload = body.toPayload(path);
+        final PrefixAndBody payload;
+        try {
+            payload = body.toPayload(path);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
         return postData(concat(path.instance(), payload.prefix()), payload.body(), insert);
     }
 
@@ -1469,10 +1474,9 @@ public abstract class RestconfStrategy implements DatabindAware {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
-        } catch (IOException e) {
+        } catch (ServerException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+            return RestconfFuture.failed(e.toLegacy());
         }
 
         if (actionService == null) {

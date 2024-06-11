@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server.api;
 
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ErrorMessage;
@@ -21,6 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * A server-side processing exception, reporting a single {@link ServerError}. This exception is not serializable on
@@ -31,11 +35,17 @@ public final class ServerException extends Exception {
     @java.io.Serial
     private static final long serialVersionUID = 0L;
 
-    private final ServerError error;
+    private final List<ServerError> errors;
+
+    ServerException(final String message, final List<ServerError> errors, final @Nullable Throwable cause) {
+        super(message, cause);
+        this.errors = requireNonNull(errors);
+        verify(!errors.isEmpty());
+    }
 
     private ServerException(final String message, final ServerError error, final @Nullable Throwable cause) {
         super(message, cause);
-        this.error = requireNonNull(error);
+        errors = List.of(error);
     }
 
     public ServerException(final String message) {
@@ -83,25 +93,31 @@ public final class ServerException extends Exception {
      *
      * @return the reported {@link ServerError}
      */
-    public ServerError error() {
-        return error;
+    public List<ServerError> errors() {
+        return errors;
     }
 
     @Deprecated
     public RestconfDocumentedException toLegacy() {
-        final var message = error.message();
-        final var info = error.info();
-        final var path = error.path();
-        if (path != null) {
-            return new RestconfDocumentedException(this,
-                new RestconfError(error.type(), error.tag(), message != null ? message.elementBody() : null,
-                    error.appTag(), info != null ? info.elementBody() : null, path.path()),
-                path.databind().modelContext());
-        } else {
-            return new RestconfDocumentedException(this,
-                new RestconfError(error.type(), error.tag(), message != null ? message.elementBody() : null,
-                    error.appTag(), info != null ? info.elementBody() : null, null));
+        final var restconfErrors = new ArrayList<RestconfError>(errors.size());
+        EffectiveModelContext modelContext = null;
+
+        for (var error : errors) {
+            final var message = error.message();
+            final var info = error.info();
+            final var path = error.path();
+
+            if (path != null && modelContext == null) {
+                modelContext = path.databind().modelContext();
+            }
+
+            restconfErrors.add(new RestconfError(error.type(), error.tag(),
+                message != null ? message.elementBody() : null, error.appTag(),
+                    info != null ? info.elementBody() : null, path != null ? path.path() : null));
+
         }
+
+        return new RestconfDocumentedException(this, restconfErrors, modelContext);
     }
 
     @java.io.Serial

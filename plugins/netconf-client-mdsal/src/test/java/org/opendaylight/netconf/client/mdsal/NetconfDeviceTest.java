@@ -7,9 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,12 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -63,18 +62,14 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfDeviceTest extends AbstractTestModelTest {
-    public static final String TEST_NAMESPACE = "test:namespace";
-    public static final String TEST_MODULE = "test-module";
-    public static final String TEST_REVISION = "2013-07-22";
-    public static final SourceIdentifier TEST_SID = new SourceIdentifier(TEST_MODULE, TEST_REVISION);
-    public static final String TEST_CAPABILITY =
+@ExtendWith(MockitoExtension.class)
+class NetconfDeviceTest extends AbstractTestModelTest {
+    private static final String TEST_NAMESPACE = "test:namespace";
+    private static final String TEST_MODULE = "test-module";
+    private static final String TEST_REVISION = "2013-07-22";
+    private static final SourceIdentifier TEST_SID = new SourceIdentifier(TEST_MODULE, TEST_REVISION);
+    private static final String TEST_CAPABILITY =
             TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION;
-
-    public static final SourceIdentifier TEST_SID2 = new SourceIdentifier(TEST_MODULE + "2", TEST_REVISION);
-    public static final String TEST_CAPABILITY2 =
-            TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
     private static NetconfMessage NOTIFICATION;
 
@@ -82,20 +77,23 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     private SchemaSourceRegistry schemaRegistry;
     @Mock
     private DeviceNetconfSchemaProvider schemaProvider;
+    @Mock
+    private RemoteDeviceHandler facade;
+    @Mock
+    private NetconfDeviceCommunicator listener;
+    @Mock
+    private EffectiveModelContextFactory schemaFactory;
+    @Mock
+    private DeviceNetconfSchemaProvider deviceSchemaProvider;
 
-    @BeforeClass
-    public static final void setupNotification() throws Exception {
+    @BeforeAll
+    static void setupNotification() throws Exception {
         NOTIFICATION = new NetconfMessage(XmlUtil.readXmlToDocument(
             NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
     }
 
     @Test
-    public void testNetconfDeviceFailFirstSchemaFailSecondEmpty() throws Exception {
-        final var facade = getFacade();
-        final var listener = getListener();
-
-        final var schemaFactory = getSchemaFactory();
-
+    void testNetconfDeviceFailFirstSchemaFailSecondEmpty() {
         // Make fallback attempt to fail due to empty resolved sources
         final var schemaResolutionException = new SchemaResolutionException("fail first",
             new SourceIdentifier("test-module", "2013-07-22"), new Throwable());
@@ -116,7 +114,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(facade, timeout(5000)).onDeviceFailed(captor.capture());
-        assertThat(captor.getValue(), instanceOf(EmptySchemaContextException.class));
+        assertInstanceOf(EmptySchemaContextException.class, captor.getValue());
 
         verify(listener, timeout(5000)).close();
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
@@ -131,9 +129,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testNotificationBeforeSchema() throws Exception {
-        final var facade = getFacade();
-        final var deviceSchemaProvider = mock(DeviceNetconfSchemaProvider.class);
+    void testNotificationBeforeSchema() {
+        final var remoteDeviceHandler = mockRemoteDeviceHandler();
+        doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         final var schemaFuture = SettableFuture.<DeviceNetconfSchema>create();
         doReturn(schemaFuture).when(deviceSchemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any(), any());
 
@@ -142,32 +140,36 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             .setDeviceSchemaProvider(deviceSchemaProvider)
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
-            .setSalFacade(facade)
+            .setSalFacade(remoteDeviceHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
 
         final var sessionCaps = getSessionCaps(true, TEST_CAPABILITY);
-        device.onRemoteSessionUp(sessionCaps, getListener());
+        device.onRemoteSessionUp(sessionCaps, listener);
 
         device.onNotification(NOTIFICATION);
         device.onNotification(NOTIFICATION);
-        verify(facade, times(0)).onNotification(any(DOMNotification.class));
+        verify(remoteDeviceHandler, times(0)).onNotification(any(DOMNotification.class));
 
         // Now enable schema
         schemaFuture.set(new DeviceNetconfSchema(NetconfDeviceCapabilities.empty(),
             NetconfToNotificationTest.getNotificationSchemaContext(NetconfDeviceTest.class, false)));
 
-        verify(facade, timeout(10000).times(2)).onNotification(any(DOMNotification.class));
+        verify(remoteDeviceHandler, timeout(10000).times(2))
+            .onNotification(any(DOMNotification.class));
 
         device.onNotification(NOTIFICATION);
-        verify(facade, times(3)).onNotification(any(DOMNotification.class));
+        verify(remoteDeviceHandler, times(3)).onNotification(any(DOMNotification.class));
+    }
+
+    private RemoteDeviceHandler mockRemoteDeviceHandler() {
+        doNothing().when(facade).onDeviceConnected(
+            any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
+        return facade;
     }
 
     @Test
-    public void testNetconfDeviceReconnect() throws Exception {
-        final var facade = getFacade();
-        final var listener = getListener();
-
+    void testNetconfDeviceReconnect() {
         doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
 
         final var device = new NetconfDeviceBuilder()
@@ -195,8 +197,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testNetconfDeviceDisconnectListenerCallCancellation() throws Exception {
-        final var facade = getFacade();
+    void testNetconfDeviceDisconnectListenerCallCancellation() {
+        doNothing().when(facade).onDeviceDisconnected();
         final var schemaFuture = SettableFuture.<DeviceNetconfSchema>create();
         doReturn(schemaFuture).when(schemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any(), any());
 
@@ -210,7 +212,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             .build();
         //session up, start schema resolution
         device.onRemoteSessionUp(getSessionCaps(true,
-            TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION), getListener());
+            TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION),
+            listener);
         //session closed
         device.onRemoteSessionDown();
         verify(facade, timeout(5000)).onDeviceDisconnected();
@@ -221,20 +224,16 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testNetconfDeviceReconnectBeforeSchemaSetup() throws Exception {
-        final var facade = getFacade();
-
-        final var schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
+    void testNetconfDeviceReconnectBeforeSchemaSetup() {
         final var schemaFuture = SettableFuture.<EffectiveModelContext>create();
-        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
+        doReturn(schemaFuture).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
-        final var listener = getListener();
         doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(),
-                schemaContextProviderFactory))
+                schemaFactory))
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
@@ -253,16 +252,14 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         // complete schema setup
         schemaFuture.set(SCHEMA_CONTEXT);
         // schema setup performed twice
-        verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
+        verify(schemaFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
         // onDeviceConnected called once
         verify(facade, timeout(5000)).onDeviceConnected(
             any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
     }
 
     @Test
-    public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
-        final var facade = getFacade();
-        final var listener = getListener();
+    void testNetconfDeviceAvailableCapabilitiesBuilding() {
         doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
 
         final var netconfSpy = spy(new NetconfDeviceBuilder()
@@ -283,8 +280,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
-        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
-            any(RemoteDeviceServices.class));
+        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(),
+            any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
         assertEquals(Set.of(
             new AvailableCapabilityBuilder()
@@ -298,8 +295,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testNetconfDeviceNotificationsModelNotPresentWithCapability() throws Exception {
-        final var facade = getFacade();
+    void testNetconfDeviceNotificationsModelNotPresentWithCapability() {
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
             .setProcessingExecutor(MoreExecutors.directExecutor())
@@ -308,7 +304,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
-        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION), getListener());
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION),
+            listener);
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
@@ -324,10 +321,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testNetconfDeviceNotificationsModelIsPresent() throws Exception {
-        final var facade = getFacade();
-        final var listener = getListener();
-
+    void testNetconfDeviceNotificationsModelIsPresent() {
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
             .setProcessingExecutor(MoreExecutors.directExecutor())
@@ -358,27 +352,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
-    private static EffectiveModelContextFactory getSchemaFactory() {
-        final var schemaFactory = mock(EffectiveModelContextFactory.class);
+    private EffectiveModelContextFactory getSchemaFactory() {
         doReturn(Futures.immediateFuture(SCHEMA_CONTEXT))
                 .when(schemaFactory).createEffectiveModelContext(anyCollection());
         return schemaFactory;
-    }
-
-    private static RemoteDeviceHandler getFacade() throws Exception {
-        final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
-        doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
-        doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
-        doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
-        return remoteDeviceHandler;
-    }
-
-    private static <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass)
-            throws Exception {
-        final T mock = mock(remoteDeviceHandlerClass);
-        doNothing().when(mock).close();
-        return mock;
     }
 
     private DeviceNetconfSchemaProvider mockDeviceNetconfSchemaProvider() {
@@ -386,15 +363,15 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     private DeviceNetconfSchemaProvider mockDeviceNetconfSchemaProvider(final SchemaRepository schemaRepository,
-            final EffectiveModelContextFactory schemaFactory) {
-        return new DefaultDeviceNetconfSchemaProvider(schemaRegistry, schemaRepository, schemaFactory);
+            final EffectiveModelContextFactory modelContextFactory) {
+        return new DefaultDeviceNetconfSchemaProvider(schemaRegistry, schemaRepository, modelContextFactory);
     }
 
-    public RemoteDeviceId getId() {
+    private static RemoteDeviceId getId() {
         return new RemoteDeviceId("test-D", InetSocketAddress.createUnresolved("localhost", 22));
     }
 
-    public NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
+    private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
             final String... additionalCapabilities) {
         final var capabilities = new ArrayList<String>();
         capabilities.add(CapabilityURN.BASE);
@@ -404,9 +381,5 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         }
         capabilities.addAll(List.of(additionalCapabilities));
         return NetconfSessionPreferences.fromStrings(capabilities);
-    }
-
-    public NetconfDeviceCommunicator getListener() throws Exception {
-        return mockCloseableClass(NetconfDeviceCommunicator.class);
     }
 }

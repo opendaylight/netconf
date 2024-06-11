@@ -10,11 +10,8 @@ package org.opendaylight.restconf.server.api;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.slf4j.Logger;
@@ -29,18 +26,17 @@ public final class XmlOperationInputBody extends OperationInputBody {
 
     @Override
     void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
-            throws IOException {
+            throws ServerException {
         final var stack = path.inference().toSchemaInferenceStack();
         stack.enterDataTree(path.inputStatement().argument());
 
+        final var databind = path.databind();
         try {
-            XmlParserStream.create(writer, path.databind().xmlCodecs(), stack.toInference())
+            XmlParserStream.create(writer, databind.xmlCodecs(), stack.toInference())
                 .parse(UntrustedXML.createXMLStreamReader(inputStream));
-        } catch (XMLStreamException e) {
+        } catch (IOException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+            throw databind.newApplicationMalformedMessageServerException("Invalid XML", e);
         }
     }
 }

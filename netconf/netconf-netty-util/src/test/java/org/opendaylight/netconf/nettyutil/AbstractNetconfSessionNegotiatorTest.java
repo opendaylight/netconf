@@ -7,10 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -40,12 +39,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
@@ -57,8 +56,8 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class AbstractNetconfSessionNegotiatorTest {
+@ExtendWith(MockitoExtension.class)
+class AbstractNetconfSessionNegotiatorTest {
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
     @Mock
@@ -75,8 +74,8 @@ public class AbstractNetconfSessionNegotiatorTest {
     private HelloMessage helloBase11;
     private NetconfXMLToHelloMessageDecoder xmlToHello;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         channel = new EmbeddedChannel();
         xmlToHello = new NetconfXMLToHelloMessageDecoder();
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
@@ -86,19 +85,18 @@ public class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
-        doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
 
     @Test
-    public void testStartNegotiation() {
+    void testStartNegotiation() {
         enableTimerTask();
         negotiator.startNegotiation();
         assertEquals(helloBase11, channel.readOutbound());
     }
 
     @Test
-    public void testStartNegotiationSsl() throws Exception {
+    void testStartNegotiationSsl() throws Exception {
         doReturn(true).when(sslHandler).isSharable();
         doNothing().when(sslHandler).handlerAdded(any());
         doNothing().when(sslHandler).write(any(), any(), any());
@@ -113,7 +111,7 @@ public class AbstractNetconfSessionNegotiatorTest {
     }
 
     @Test
-    public void testStartNegotiationNotEstablished() throws Exception {
+    void testStartNegotiationNotEstablished() throws Exception {
         final ChannelOutboundHandler closedDetector = spy(new CloseDetector());
         channel.pipeline().addLast("closedDetector", closedDetector);
         doReturn(false).when(promise).isDone();
@@ -129,28 +127,27 @@ public class AbstractNetconfSessionNegotiatorTest {
     }
 
     @Test
-    public void testGetSessionForHelloMessage() throws Exception {
+    void testGetSessionForHelloMessage() throws Exception {
         enableTimerTask();
         negotiator.startNegotiation();
         final TestingNetconfSession session = negotiator.getSessionForHelloMessage(hello);
         assertNotNull(session);
-        assertThat(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR), instanceOf(NetconfEOMAggregator.class));
-        assertThat(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER), instanceOf(EOMFramingMechanismEncoder.class));
+        assertInstanceOf(NetconfEOMAggregator.class, channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR));
+        assertInstanceOf(EOMFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER));
     }
 
     @Test
-    public void testGetSessionForHelloMessageBase11() throws Exception {
+    void testGetSessionForHelloMessageBase11() throws Exception {
         enableTimerTask();
         negotiator.startNegotiation();
         final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloBase11);
         assertNotNull(session);
-        assertThat(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR), instanceOf(NetconfChunkAggregator.class));
-        assertThat(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER),
-            instanceOf(ChunkedFramingMechanismEncoder.class));
+        assertInstanceOf(NetconfChunkAggregator.class, channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR));
+        assertInstanceOf(ChunkedFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER));
     }
 
     @Test
-    public void testReplaceHelloMessageInboundHandler() throws Exception {
+    void testReplaceHelloMessageInboundHandler() throws Exception {
         final List<Object> out = new ArrayList<>();
         final byte[] msg = "<rpc/>".getBytes();
         final ByteBuf msgBuf = Unpooled.wrappedBuffer(msg);
@@ -168,7 +165,9 @@ public class AbstractNetconfSessionNegotiatorTest {
     }
 
     @Test
-    public void testNegotiationFail() {
+    void testNegotiationFail() {
+        doReturn(promise).when(promise).setFailure(any());
+
         enableTimerTask();
         doReturn(true).when(timeout).cancel();
         negotiator.startNegotiation();
