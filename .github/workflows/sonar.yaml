@@ -3,7 +3,7 @@ name: CI/CD workflow for Maven Build and SonarQube Scan
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
