@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.function.Function;
@@ -26,12 +25,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndPath;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -79,7 +78,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
     }
 
-    final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws IOException {
+    final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws ServerException {
         final ApiPath apiPath;
         try {
             apiPath = ApiPath.parse(uriPath);
@@ -101,18 +100,18 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         }
     }
 
-    static final RestconfError assertError(final Executable executable) {
-        final var ex = assertThrows(RestconfDocumentedException.class, executable);
-        final var errors = ex.getErrors();
+    static final ServerError assertError(final Executable executable) {
+        final var ex = assertThrows(ServerException.class, executable);
+        final var errors = ex.errors();
         assertEquals(1, errors.size());
         return errors.get(0);
     }
 
     static final void assertRangeViolation(final Executable executable) {
         final var error = assertError(executable);
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("bar error app tag", error.getErrorAppTag());
-        assertEquals("bar error message", error.getErrorMessage());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
+        assertEquals("bar error app tag", error.appTag());
+        assertEquals(new ErrorMessage("bar error message"), error.message());
     }
 }

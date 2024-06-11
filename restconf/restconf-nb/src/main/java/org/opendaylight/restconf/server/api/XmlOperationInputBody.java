@@ -34,9 +34,9 @@ public final class XmlOperationInputBody extends OperationInputBody {
         try {
             XmlParserStream.create(writer, databind.xmlCodecs(), stack.toInference())
                 .parse(UntrustedXML.createXMLStreamReader(inputStream));
-        } catch (IOException | XMLStreamException e) {
+        } catch (IllegalArgumentException | IOException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            throw databind.newApplicationMalformedMessageServerException("Invalid XML", e);
+            throw databind.newProtocolMalformedMessageServerException("Invalid XML", e);
         }
     }
 }

@@ -111,7 +111,7 @@ public final class DatabindContext {
     /**
      * Return a new {@link ServerException} constructed from the combination of a message and a caught exception.
      * Provided exception and its causal chain will be examined for well-known constructs in an attempt to extract
-     * error information. If no such information is found an error with type {@link ErrorType#APPLICATION} and tag
+     * error information. If no such information is found an error with type {@link ErrorType#PROTOCOL} and tag
      * {@link ErrorTag#MALFORMED_MESSAGE} will be reported.
      *
      * @param messagePrefix exception message prefix
@@ -119,15 +119,15 @@ public final class DatabindContext {
      * @return A new {@link ServerException}
      */
     @NonNullByDefault
-    public ServerException newApplicationMalformedMessageServerException(final String messagePrefix,
+    public ServerException newProtocolMalformedMessageServerException(final String messagePrefix,
             final Exception caught) {
-        return newServerParseException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, messagePrefix, caught);
+        return newServerParseException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, messagePrefix, caught);
     }
 
     @NonNullByDefault
     private ServerException newServerParseException(final ErrorType type, final ErrorTag tag,
             final String messagePrefix, final Exception caught) {
-        final var message = requireNonNull(messagePrefix) + ":" + caught.getMessage();
+        final var message = requireNonNull(messagePrefix) + ": " + caught.getMessage();
         final var errors = exceptionErrors(caught);
         return new ServerException(message, errors != null ? errors : List.of(new ServerError(type, tag, message)),
             caught);
