@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9267d9c_d5c37b70",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-11T12:59:05Z",
+      "side": 1,
+      "message": "\"\"\" \nMulti\nline string\"\"\"",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07a0c879_037e8764",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-11T12:59:05Z",
+      "side": 1,
+      "message": "IMO in the next task we can get rid of this builder and just forward configuration.",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe8c7be3_5c3679b3",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-11T12:59:05Z",
+      "side": 1,
+      "message": "Using `this.` in this case is not necessary.",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
