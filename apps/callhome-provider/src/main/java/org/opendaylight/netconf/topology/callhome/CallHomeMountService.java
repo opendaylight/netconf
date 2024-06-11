@@ -25,11 +25,13 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -58,17 +60,17 @@ import org.osgi.service.component.annotations.Reference;
  *
  * <p>
  * To manage remote device as a topology node the topology component (based on
- * {@link org.opendaylight.netconf.topology.spi.AbstractNetconfTopology AbstractNetconfTopology}) creates an instance
- * of {@link org.opendaylight.netconf.topology.spi.NetconfNodeHandler NetconfNodeHandler} based on provided
+ * {@link AbstractNetconfTopology AbstractNetconfTopology}) creates an instance
+ * of {@link NetconfNodeHandler NetconfNodeHandler} based on provided
  * {@link Node}.
  *
  * <p>
  * The mentioned NetconfNodeHandler initializes connection to remote device via sequence of following actions (see
- * {@link org.opendaylight.netconf.topology.spi.AbstractNetconfTopology#ensureNode(Node) ensureNode(Node)} and
+ * {@link AbstractNetconfTopology#ensureNode(Node) ensureNode(Node)} and
  * {@link NetconfNodeHandler#lockedConnect() connect()}):
  *
  * <ul>
- *     <li>Builds an instance of {@link org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator
+ *     <li>Builds an instance of {@link NetconfDeviceCommunicator
  *     NetconfDeviceCommunicator} implementation of {@link NetconfClientSessionListener} which is used to check the
  *     NETCONF session state and communicate with device using NETCONF protocol </li>
  *     <li>Builds Netconf client configuration using provided {@link NetconfClientConfigurationBuilderFactory}</li>
