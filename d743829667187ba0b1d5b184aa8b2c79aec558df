@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce97e2f4_1310ade6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "private static final\n\u003cempty line\u003e\nprivate static \n\u003cempty line\u003e\nprivate",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fd3f6ae_09d62ed7",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "BASIC_AUTH_CUT_INDEX BASIC_AUTH_CUT_INDEX can be removed. It has only one usage.",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a635e02_a97506ca",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "We do not need this empty lines.",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5887484b_e8a65940",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "We do not need this empty lines.",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2f64ec1_310e9c37",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AuthHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "@NonNull HttpRequest - then Objects.requireNonNull() in implementation.",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce00eafc_173257b1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AuthHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "@NonNull HttpRequest - then Objects.requireNonNull() in implementation.",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "530b6d6f_aa87730c",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T11:42:27Z",
+      "side": 1,
+      "message": "// hidden on purpose",
+      "revId": "d743829667187ba0b1d5b184aa8b2c79aec558df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
