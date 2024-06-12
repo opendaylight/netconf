@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c1685554_36846282",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/PathParameters.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T12:46:11Z",
+      "side": 1,
+      "message": "private static final",
+      "revId": "d909021c1fb716f482e139ef7d36d3941dd821a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f2358b80_f38ad43c",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RestconfRequestDispatcher.java",
         "patchSetId": 12
