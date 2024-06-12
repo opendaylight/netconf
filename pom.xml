@@ -26,6 +26,9 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.install.skip>true</maven.install.skip>
+        <sonar.host.url>
+            http://localhost:9000
+        </sonar.host.url>
     </properties>
         <repositories>
         <repository>
