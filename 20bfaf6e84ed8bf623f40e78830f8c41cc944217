@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f3fda77_71f1524f",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-06-12T11:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9267d9c_d5c37b70",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07a0c879_037e8764",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-11T12:59:05Z",
       "side": 1,
       "message": "IMO in the next task we can get rid of this builder and just forward configuration.",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a063897a_1b492860",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-06-12T11:35:27Z",
+      "side": 1,
+      "message": "there is still for example authProvider, statusRecorder ... which are not contained in configuration.",
+      "parentUuid": "07a0c879_037e8764",
       "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3420242b_946aca23",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-06-12T11:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe8c7be3_5c3679b3",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df3decf8_1e5c3f6e",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-06-11T13:48:10Z",
       "side": 1,
       "message": "https://docs.opendaylight.org/projects/netconf/en/latest/user-guide.html#connecting-to-a-device-supporting-only-netconf-1-0",
+      "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f671b43b_a0eb3373",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 19
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-06-12T11:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3decf8_1e5c3f6e",
       "revId": "20bfaf6e84ed8bf623f40e78830f8c41cc944217",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
