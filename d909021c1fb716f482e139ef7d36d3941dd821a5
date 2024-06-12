@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a6398a7c_08edfdcf",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/PathParameters.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T12:48:24Z",
+      "side": 1,
+      "message": "with non-matching base path - should\u0027 we throw some error instead?",
+      "revId": "d909021c1fb716f482e139ef7d36d3941dd821a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c1685554_36846282",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/PathParameters.java",
         "patchSetId": 12
