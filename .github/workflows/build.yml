@@ -17,6 +17,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
+          distribution: 'temurin' # You can specify a specific distribution, 'temurin' is commonly used
           java-version: 17
 
       - name: Cache SonarQube packages
