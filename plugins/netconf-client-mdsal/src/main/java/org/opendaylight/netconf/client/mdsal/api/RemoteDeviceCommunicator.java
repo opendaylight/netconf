@@ -16,7 +16,7 @@ public interface RemoteDeviceCommunicator extends AutoCloseable {
      * Send request message to current client session.
      *
      * @param message {@link NetconfMessage} to be sent
-     * @return A {@link ListenableFuture} which completes with result of sending give message
+     * @return A {@link ListenableFuture} which completes with result of sending given message
      *         represented by {@link RpcResult}
      */
     ListenableFuture<RpcResult<NetconfMessage>> sendRequest(NetconfMessage message);
