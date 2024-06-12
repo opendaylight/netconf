@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d2c97b88_cc8ef2e6",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/AAAShiroAuthHandlerFactory.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-12T13:36:03Z",
+      "side": 1,
+      "message": "We can use SecurityUtils#getSubject and simplify this code.",
+      "revId": "d909021c1fb716f482e139ef7d36d3941dd821a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a6398a7c_08edfdcf",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/PathParameters.java",
         "patchSetId": 12
