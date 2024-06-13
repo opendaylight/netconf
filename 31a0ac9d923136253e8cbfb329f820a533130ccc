@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "548074c4_74fab180",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:59:43Z",
+      "side": 1,
+      "message": "Please see:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/111763/comments/bba49e24_97dfb5fc\n\nIf we do not need this, we can merge those commits.",
+      "range": {
+        "startLine": 340,
+        "startChar": 0,
+        "endLine": 344,
+        "endChar": 13
+      },
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9c7e8f3_f0ce42d0",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:59:43Z",
+      "side": 1,
+      "message": "Please use \u0027var\u0027 here.",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 90
+      },
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32b4274b_ad80fd4c",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:59:43Z",
+      "side": 1,
+      "message": "Please change this variable to \"private final\"",
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d288869_c9ce20a0",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:59:43Z",
+      "side": 1,
+      "message": "Please use final in method parameters. To maintain consistent code style.\nSame on line 193 and 198.",
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "831e09e5_9a0674a5",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:59:43Z",
+      "side": 1,
+      "message": "Can we use instead:\n\nif (task.getClass().getCanonicalName().contains(\"KeepaliveSalFacade.KeepaliveTask\")) {\n\nThis way we would not need to change visibility of KeepaliveTask class.",
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
