@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30bdb74c_067ced51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-13T15:30:29Z",
+      "side": 1,
+      "message": "Missing unit test.",
+      "revId": "502857c20c1bf6990b0b2f1ba7c0abeeb9d3f957",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6d865de_435f7169",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-13T15:30:29Z",
+      "side": 1,
+      "message": "1. anydata - should be written as empty object\n2. put comment inside - not object with comment",
+      "revId": "502857c20c1bf6990b0b2f1ba7c0abeeb9d3f957",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
