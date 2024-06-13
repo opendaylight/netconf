@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "811c1867_821d23e1",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-13T13:40:27Z",
+      "side": 1,
+      "message": "this needs a comment on what we are actually doing -- a STM/WRITE does not mean that the data values actually changed.\n\nalso shouldn\u0027t this be part of the CallHomeTlsSessionContextManager classes (like above)?",
+      "range": {
+        "startLine": 264,
+        "startChar": 20,
+        "endLine": 264,
+        "endChar": 40
+      },
+      "revId": "39eee7b6f049ee1232c4dfd31183b6e836043d8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
