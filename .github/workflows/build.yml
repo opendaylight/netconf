@@ -1,47 +1,26 @@
-
-name: CI/CD workflow for Maven Build and SonarQube Scan
+name: Build
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
+
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '17'
-
-    - name: Set JAVA_HOME
-      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
-
-    - name: Verify Java Version
-      run: java -version
-
-    - name: Build with Maven
-      run: mvn clean install
-      continue-on-error: true
-
-    - name: SonarQube Scan
-      run: mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_8da908e1c8cd1fc65a0243098fe39646aa4a0f22
-      continue-on-error: true
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-    - name: Archive Surefire Reports
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: surefire-reports
-        path: |
-          **/target/surefire-reports/
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # - uses: sonarsource/sonarqube-quality-gate-action@master
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
