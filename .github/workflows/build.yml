@@ -60,6 +60,14 @@ jobs:
         run: mvn clean install -U --settings ~/.m2/settings.xml
         continue-on-error: true
 
+      - name: Archive Surefire Reports
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: surefire-reports
+          path: |
+            **/target/surefire-reports/
+
       - name: Install SonarQube Scanner
         run: |
           sudo apt-get update
@@ -74,15 +82,9 @@ jobs:
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.java.binaries=target
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Archive Surefire Reports
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: surefire-reports
-          path: |
-            **/target/surefire-reports/
+        continue-on-error: true
