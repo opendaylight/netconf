@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bba49e24_97dfb5fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:55:49Z",
+      "side": 1,
+      "message": "It seems like this patch also resolves NETCONF-1308 from the previous commit. After this change, I am able to revert the fix from the previous commit:\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/111623/4/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java#340\n\nI ran all the provided tests without any failures and did not observe any warning loops during manual testing.\n\nIs this correct? Do we still need the fix?",
+      "revId": "12c985d087a5cb4fe3cb3b5d4c7f0419e3f28e04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d603dd1_d5062d5d",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-13T15:55:49Z",
+      "side": 1,
+      "message": "Please fix the code style.\n- Use \u0027var\u0027 for all variable declarations. For example, line 236 and others.\n- Using \u0027final\u0027.  Additionally, it is not used in the method parameters \"public void onSuccess(DOMRpcResult domRpcResult))\"\n\nPlease fix this in all places to maintain consistent code style.",
+      "revId": "12c985d087a5cb4fe3cb3b5d4c7f0419e3f28e04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
