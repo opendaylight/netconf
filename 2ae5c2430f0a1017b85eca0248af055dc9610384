@@ -16,6 +16,24 @@
       "message": "Can we pass here  paginationContext, and use it fields inside OpenApiDataStream?",
       "revId": "2ae5c2430f0a1017b85eca0248af055dc9610384",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa4986d7_21d7dfaa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-14T07:15:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39201529_e59f6622",
+      "revId": "2ae5c2430f0a1017b85eca0248af055dc9610384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
