@@ -13,7 +13,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
@@ -70,12 +69,12 @@ public record YangLibraryVersionResource(DatabindContext databind, Inference res
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
-        return RestconfFuture.of(new DataFormattableBody<>(databind, restconf, leaf));
+    public void httpGET(final ServerRequest<FormattableBody> request) {
+        request.completeWith(new DataFormattableBody<>(databind, restconf, leaf));
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request, final ApiPath apiPath) {
+    public void httpGET(final ServerRequest<FormattableBody> request, final ApiPath apiPath) {
         throw new UnsupportedOperationException();
     }
 }
