@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -65,7 +65,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
     }
 
     @Override
-    public RestconfFuture<ContainerNode> invoke(final URI restconfURI, final OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var qnames = ((LeafSetNode<String>) body.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
@@ -79,18 +79,21 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
         for (var qname : qnames) {
             final var optModule = modelContext.findModuleStatement(qname.getModule());
             if (optModule.isEmpty()) {
-                return RestconfFuture.failed(new RestconfDocumentedException(qname + " refers to an unknown module",
+                request.completeWith(new RestconfDocumentedException(qname + " refers to an unknown module",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+                return;
             }
             final var module = optModule.orElseThrow();
             final var optStmt = module.findSchemaTreeNode(qname);
             if (optStmt.isEmpty()) {
-                return RestconfFuture.failed(new RestconfDocumentedException(
+                request.completeWith(new RestconfDocumentedException(
                     qname + " refers to an unknown notification", ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+                return;
             }
             if (!(optStmt.orElseThrow() instanceof NotificationEffectiveStatement)) {
-                return RestconfFuture.failed(new RestconfDocumentedException(qname + " refers to a non-notification",
+                request.completeWith(new RestconfDocumentedException(qname + " refers to a non-notification",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+                return;
             }
 
             if (haveFirst) {
@@ -103,11 +106,11 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
         }
         description.append("\n}");
 
-        return streamRegistry.createStream(restconfURI,
-            new NotificationSource(databindProvider, notificationService, qnames), description.toString())
-            .transform(stream -> ImmutableNodes.newContainerBuilder()
+        streamRegistry.createStream(request.transform(
+            stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
-                .build());
+                .build()),
+            restconfURI, new NotificationSource(databindProvider, notificationService, qnames), description.toString());
     }
 }

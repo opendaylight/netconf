@@ -23,9 +23,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
@@ -61,8 +60,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @Override
-    public final <T> RestconfFuture<RestconfStream<T>> createStream(final URI restconfURI, final Source<T> source,
-            final String description) {
+    public final <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final Source<T> source, final String description) {
         final var baseStreamLocation = baseStreamLocation(restconfURI);
         final var stream = allocateStream(source);
         final var name = stream.name();
@@ -70,23 +69,21 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             throw new IllegalArgumentException("Description must be descriptive");
         }
 
-        final var ret = new SettableRestconfFuture<RestconfStream<T>>();
         Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation, stream.encodings())),
             new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(final Object result) {
                     LOG.debug("Stream {} added", name);
-                    ret.set(stream);
+                    request.completeWith(stream);
                 }
 
                 @Override
                 public void onFailure(final Throwable cause) {
                     LOG.debug("Failed to add stream {}", name, cause);
                     streams.remove(name, stream);
-                    ret.setFailure(new RestconfDocumentedException("Failed to allocate stream " + name, cause));
+                    request.completeWith(new RestconfDocumentedException("Failed to allocate stream " + name, cause));
                 }
             }, MoreExecutors.directExecutor());
-        return ret;
     }
 
     private <T> RestconfStream<T> allocateStream(final Source<T> source) {

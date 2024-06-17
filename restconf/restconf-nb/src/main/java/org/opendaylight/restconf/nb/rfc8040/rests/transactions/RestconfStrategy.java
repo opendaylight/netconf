@@ -45,7 +45,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
@@ -54,8 +53,6 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
@@ -79,6 +76,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeResult;
+import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -104,7 +102,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -299,22 +296,16 @@ public abstract class RestconfStrategy implements DatabindAware {
     /**
      * Check if data already exists in the configuration datastore.
      *
+     * @param request {@link ServerRequest} for this request
      * @param path the data object path
-     * @return a ListenableFuture containing the result of the check
      */
     // FIXME: this method should be hosted in RestconfTransaction
     // FIXME: this method should only be needed in MdsalRestconfStrategy
     abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
 
     @VisibleForTesting
-    final @NonNull RestconfFuture<DataPatchResult> merge(final YangInstanceIdentifier path, final NormalizedNode data) {
-        final var ret = new SettableRestconfFuture<DataPatchResult>();
-        merge(ret, requireNonNull(path), requireNonNull(data));
-        return ret;
-    }
-
-    private void merge(final @NonNull SettableRestconfFuture<DataPatchResult> future,
-            final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data) {
+    final void merge(final ServerRequest<DataPatchResult> request, final YangInstanceIdentifier path,
+            final NormalizedNode data) {
         final var tx = prepareWriteExecution();
         // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
         tx.ensureParentsByMerge(path);
@@ -323,50 +314,53 @@ public abstract class RestconfStrategy implements DatabindAware {
             @Override
             public void onSuccess(final CommitInfo result) {
                 // TODO: extract details once CommitInfo can communicate them
-                future.set(PATCH_EMPTY);
+                request.completeWith(PATCH_EMPTY);
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext()));
+                request.completeWith(TransactionUtil.decodeException(cause, "MERGE", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
     }
 
-    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath apiPath,
+    public final void dataPUT(final ServerRequest<DataPutResult> request, final ApiPath apiPath,
             final ResourceBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         final Insert insert;
         try {
             insert = Insert.of(databind, request.queryParameters());
         } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+            request.completeWith(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            return;
         }
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
-        return putData(path.instance(), data, insert);
+        putData(request, path.instance(), data, insert);
     }
 
     /**
      * Check mount point and prepare variables for put data to DS.
      *
-     * @param path    path of data
-     * @param data    data
-     * @param insert  {@link Insert}
-     * @return A {@link DataPutResult}
+     * @param request {@link ServerRequest} for this request
+     * @param path path of data
+     * @param data data
+     * @param insert {@link Insert}
      */
-    public final @NonNull RestconfFuture<DataPutResult> putData(final YangInstanceIdentifier path,
+    public final void putData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
             final NormalizedNode data, final @Nullable Insert insert) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
@@ -379,21 +373,17 @@ public abstract class RestconfStrategy implements DatabindAware {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
-        final var ret = new SettableRestconfFuture<DataPutResult>();
-
         Futures.addCallback(commitFuture, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(exists ? PUT_REPLACED : PUT_CREATED);
+                request.completeWith(exists ? PUT_REPLACED : PUT_CREATED);
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                ret.setFailure(TransactionUtil.decodeException(cause, "PUT", path, modelContext()));
+                request.completeWith(TransactionUtil.decodeException(cause, "PUT", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
-
-        return ret;
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,
@@ -497,13 +487,13 @@ public abstract class RestconfStrategy implements DatabindAware {
     /**
      * Check mount point and prepare variables for post data.
      *
-     * @param path    path
-     * @param data    data
-     * @param insert  {@link Insert}
-     * @return A {@link RestconfFuture}
+     * @param request {@link ServerRequest} for this request
+     * @param path path
+     * @param data data
+     * @param insert {@link Insert}
      */
-    public final @NonNull RestconfFuture<CreateResourceResult> postData(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @Nullable Insert insert) {
+    public final void postData(final ServerRequest<? super CreateResourceResult> request,
+            final YangInstanceIdentifier path, final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             checkListAndOrderedType(path);
@@ -512,7 +502,6 @@ public abstract class RestconfStrategy implements DatabindAware {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
 
-        final var ret = new SettableRestconfFuture<CreateResourceResult>();
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -523,19 +512,18 @@ public abstract class RestconfStrategy implements DatabindAware {
                         ? path.node(mapData.body().iterator().next().name()) : path);
                 } catch (ServerException e) {
                     // This should never happen
-                    ret.setFailure(e.toLegacy());
+                    request.completeWith(e);
                     return;
                 }
-                ret.set(new CreateResourceResult(apiPath));
+                request.completeWith(new CreateResourceResult(apiPath));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                ret.setFailure(TransactionUtil.decodeException(cause, "POST", path, modelContext()));
+                request.completeWith(TransactionUtil.decodeException(cause, "POST", path, modelContext()));
             }
 
         }, MoreExecutors.directExecutor());
-        return ret;
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
@@ -583,35 +571,40 @@ public abstract class RestconfStrategy implements DatabindAware {
      * Merge data into the configuration datastore, as outlined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040 section 4.6.1</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param apiPath Path to merge
      * @param body Data to merge
-     * @return A {@link RestconfFuture}
      * @throws NullPointerException if any argument is {@code null}
      */
-    public final @NonNull RestconfFuture<DataPatchResult> dataPATCH(final ApiPath apiPath, final ResourceBody body) {
+    public final void dataPATCH(final ServerRequest<DataPatchResult> request, final ApiPath apiPath,
+            final ResourceBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
-        return merge(path.instance(), data);
+        merge(request, path.instance(), data);
     }
 
-    public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath, final PatchBody body) {
+    public final void dataPATCH(final ServerRequest<DataYangPatchResult> request, final ApiPath apiPath,
+            final PatchBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         final PatchContext patch;
@@ -619,19 +612,20 @@ public abstract class RestconfStrategy implements DatabindAware {
             patch = body.toPatchContext(new DefaultResourceContext(path));
         } catch (ServerException e) {
             LOG.debug("Error parsing YANG Patch input", e);
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
-        return patchData(patch);
+        patchData(request, patch);
     }
 
     /**
      * Process edit operations of one {@link PatchContext}.
      *
+     * @param request {@link ServerRequest} for this request
      * @param patch Patch context to be processed
-     * @return {@link PatchStatusContext}
      */
     @VisibleForTesting
-    public final @NonNull RestconfFuture<DataYangPatchResult> patchData(final PatchContext patch) {
+    final void patchData(final ServerRequest<DataYangPatchResult> request, final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -700,32 +694,29 @@ public abstract class RestconfStrategy implements DatabindAware {
             }
         }
 
-        final var ret = new SettableRestconfFuture<DataYangPatchResult>();
         // We have errors
         if (!noError) {
             tx.cancel();
-            ret.set(new DataYangPatchResult(
+            request.completeWith(new DataYangPatchResult(
                 new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, null)));
-            return ret;
+            return;
         }
 
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new DataYangPatchResult(
+                request.completeWith(new DataYangPatchResult(
                     new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), true, null)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new DataYangPatchResult(
+                request.completeWith(new DataYangPatchResult(
                     new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, convertErrors(
                         TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors()))));
             }
         }, MoreExecutors.directExecutor());
-
-        return ret;
     }
 
     @Deprecated
@@ -828,62 +819,65 @@ public abstract class RestconfStrategy implements DatabindAware {
      * Delete data from the configuration datastore. If the data does not exist, this operation will fail, as outlined
      * in <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.7">RFC8040 section 4.7</a>
      *
+     * @param request {@link ServerRequest} for this request
      * @param apiPath Path to delete
-     * @return A {@link RestconfFuture}
      * @throws NullPointerException if {@code apiPath} is {@code null}
      */
     @NonNullByDefault
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public final RestconfFuture<Empty> dataDELETE(final ServerRequest request, final ApiPath apiPath) {
+    public final void dataDELETE(final ServerRequest<Empty> request, final ApiPath apiPath) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         // FIXME: reject empty YangInstanceIdentifier, as datastores may not be deleted
-        final var ret = new SettableRestconfFuture<Empty>();
-        delete(ret, request, path.instance());
-        return ret;
+        delete(request, path.instance());
     }
 
     @NonNullByDefault
-    abstract void delete(SettableRestconfFuture<Empty> future, ServerRequest request, YangInstanceIdentifier path);
+    abstract void delete(ServerRequest<Empty> request, YangInstanceIdentifier path);
 
-    public final @NonNull RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final ApiPath apiPath) {
+    public final void dataGET(final ServerRequest<DataGetResult> request, final ApiPath apiPath) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         final DataGetParams getParams;
         try {
             getParams = DataGetParams.of(request.queryParameters());
         } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e,
+            request.completeWith(new RestconfDocumentedException(e,
                 new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Invalid GET /data parameters", null,
                     e.getMessage())));
+            return;
         }
-        return dataGET(request, path, getParams);
+        dataGET(request, path, getParams);
     }
 
-    abstract @NonNull RestconfFuture<DataGetResult> dataGET(ServerRequest request, Data path, DataGetParams params);
+    abstract void dataGET(ServerRequest<DataGetResult> request, Data path, DataGetParams params);
 
     @NonNullByDefault
-    static final RestconfFuture<DataGetResult> completeDataGET(final @Nullable NormalizedNode node, final Data path,
-            final NormalizedNodeWriterFactory writerFactory, final @Nullable ConfigurationMetadata metadata) {
+    static final void completeDataGET(final ServerRequest<DataGetResult> request, final @Nullable NormalizedNode node,
+            final Data path, final NormalizedNodeWriterFactory writerFactory,
+            final @Nullable ConfigurationMetadata metadata) {
         // Non-existing data
         if (node == null) {
-            return RestconfFuture.failed(new RestconfDocumentedException(
+            request.completeWith(new RestconfDocumentedException(
                 "Request could not be completed because the relevant data model content does not exist",
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
+            return;
         }
 
         final var body = NormalizedFormattableBody.of(path, node, writerFactory);
-        return RestconfFuture.of(metadata == null ? new DataGetResult(body)
+        request.completeWith(metadata == null ? new DataGetResult(body)
             : new DataGetResult(body, metadata.entityTag(), metadata.lastModified()));
     }
 
@@ -1278,22 +1272,23 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request) {
-        return operations.httpGET(request);
+    public void operationsGET(final ServerRequest<FormattableBody> request) {
+        operations.httpGET(request);
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request, final ApiPath apiPath) {
-        return operations.httpGET(request, apiPath);
+    public void operationsGET(final ServerRequest<FormattableBody> request, final ApiPath apiPath) {
+        operations.httpGET(request, apiPath);
     }
 
-    public @NonNull RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
-            final ApiPath apiPath, final OperationInputBody body) {
+    public void operationsPOST(final ServerRequest<InvokeResult> request, final URI restconfURI, final ApiPath apiPath,
+            final OperationInputBody body) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         final ContainerNode data;
@@ -1301,31 +1296,34 @@ public abstract class RestconfStrategy implements DatabindAware {
             data = body.toContainerNode(path);
         } catch (ServerException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         final var type = path.rpc().argument();
         final var local = localRpcs.get(type);
         if (local != null) {
-            return local.invoke(restconfURI, new OperationInput(path, data))
-                .transform(output -> outputToInvokeResult(path, output));
-        }
-        if (rpcService == null) {
-            LOG.debug("RPC invocation is not available");
-            return RestconfFuture.failed(new RestconfDocumentedException("RPC invocation is not available",
-                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
+            local.invoke(request.transform(result -> outputToInvokeResult(path, result)), restconfURI,
+                new OperationInput(path, data));
+            return;
         }
 
-        final var ret = new SettableRestconfFuture<InvokeResult>();
+        if (rpcService == null) {
+            LOG.debug("RPC invocation is not available");
+            request.completeWith(new RestconfDocumentedException("RPC invocation is not available",
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
+            return;
+        }
+
         Futures.addCallback(rpcService.invokeRpc(type, data), new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult response) {
                 final var errors = response.errors();
                 if (errors.isEmpty()) {
-                    ret.set(outputToInvokeResult(path, response.value()));
+                    request.completeWith(outputToInvokeResult(path, response.value()));
                 } else {
                     LOG.debug("RPC invocation reported {}", response.errors());
-                    ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
+                    request.completeWith(new RestconfDocumentedException("RPC implementation reported errors", null,
                         response.errors()));
                 }
             }
@@ -1334,15 +1332,14 @@ public abstract class RestconfStrategy implements DatabindAware {
             public void onFailure(final Throwable cause) {
                 LOG.debug("RPC invocation failed, cause");
                 if (cause instanceof RestconfDocumentedException ex) {
-                    ret.setFailure(ex);
+                    request.completeWith(ex);
                 } else {
                     // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                    ret.setFailure(new RestconfDocumentedException(cause,
+                    request.completeWith(new RestconfDocumentedException(cause,
                         new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
                 }
             }
         }, MoreExecutors.directExecutor());
-        return ret;
     }
 
     private static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
@@ -1351,53 +1348,56 @@ public abstract class RestconfStrategy implements DatabindAware {
             : new InvokeResult(NormalizedFormattableBody.of(path, value));
     }
 
-    public @NonNull RestconfFuture<CharSource> resolveSource(final SourceIdentifier source,
+    public void resolveSource(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
             final Class<? extends SourceRepresentation> representation) {
         final var src = requireNonNull(source);
         if (YangTextSource.class.isAssignableFrom(representation)) {
             if (sourceProvider != null) {
-                final var ret = new SettableRestconfFuture<CharSource>();
                 Futures.addCallback(sourceProvider.getYangTexttSource(src), new FutureCallback<>() {
                     @Override
                     public void onSuccess(final YangTextSource result) {
-                        ret.set(result);
+                        request.completeWith(new ModulesGetResult(result));
                     }
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        ret.setFailure(cause instanceof RestconfDocumentedException e ? e
+                        request.completeWith(cause instanceof RestconfDocumentedException e ? e
                             : new RestconfDocumentedException(cause.getMessage(), ErrorType.RPC,
                                 ErrorTag.OPERATION_FAILED, cause));
                     }
                 }, MoreExecutors.directExecutor());
-                return ret;
+                return;
             }
-            return exportSource(modelContext(), src, YangCharSource::new, YangCharSource::new);
+            exportSource(request, modelContext(), src, YangCharSource::new, YangCharSource::new);
+        } else if (YinTextSource.class.isAssignableFrom(representation)) {
+            exportSource(request, modelContext(), src, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
+        } else {
+            request.completeWith(new RestconfDocumentedException(
+                "Unsupported source representation " + representation.getName()));
         }
-        if (YinTextSource.class.isAssignableFrom(representation)) {
-            return exportSource(modelContext(), src, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
-        }
-        return RestconfFuture.failed(new RestconfDocumentedException(
-            "Unsupported source representation " + representation.getName()));
     }
 
-    private static @NonNull RestconfFuture<CharSource> exportSource(final EffectiveModelContext modelContext,
-            final SourceIdentifier source, final Function<ModuleEffectiveStatement, CharSource> moduleCtor,
+    private static void exportSource(final ServerRequest<ModulesGetResult> request,
+            final EffectiveModelContext modelContext, final SourceIdentifier source,
+            final Function<ModuleEffectiveStatement, CharSource> moduleCtor,
             final BiFunction<ModuleEffectiveStatement, SubmoduleEffectiveStatement, CharSource> submoduleCtor) {
         // If the source identifies a module, things are easy
         final var name = source.name().getLocalName();
         final var optRevision = Optional.ofNullable(source.revision());
         final var optModule = modelContext.findModule(name, optRevision);
         if (optModule.isPresent()) {
-            return RestconfFuture.of(moduleCtor.apply(optModule.orElseThrow().asEffectiveStatement()));
+            request.completeWith(new ModulesGetResult(
+                moduleCtor.apply(optModule.orElseThrow().asEffectiveStatement())));
+            return;
         }
 
         // The source could be a submodule, which we need to hunt down
         for (var module : modelContext.getModules()) {
             for (var submodule : module.getSubmodules()) {
                 if (name.equals(submodule.getName()) && optRevision.equals(submodule.getRevision())) {
-                    return RestconfFuture.of(submoduleCtor.apply(module.asEffectiveStatement(),
-                        submodule.asEffectiveStatement()));
+                    request.completeWith(new ModulesGetResult(submoduleCtor.apply(module.asEffectiveStatement(),
+                        submodule.asEffectiveStatement())));
+                    return;
                 }
             }
         }
@@ -1405,58 +1405,63 @@ public abstract class RestconfStrategy implements DatabindAware {
         final var sb = new StringBuilder().append("Source ").append(source.name().getLocalName());
         optRevision.ifPresent(rev -> sb.append('@').append(rev));
         sb.append(" not found");
-        return RestconfFuture.failed(new RestconfDocumentedException(sb.toString(),
+        request.completeWith(new RestconfDocumentedException(sb.toString(),
             ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
     }
 
-    public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ServerRequest request,
-            final ApiPath apiPath, final DataPostBody body) {
+    public final void dataPOST(final ServerRequest<DataPostResult> request, final ApiPath apiPath,
+            final DataPostBody body) {
         if (apiPath.isEmpty()) {
-            return dataCreatePOST(request, body.toResource());
+            dataCreatePOST(request, body.toResource());
+            return;
         }
         final InstanceReference path;
         try {
             path = pathNormalizer.normalizeDataOrActionPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
         if (path instanceof Data dataPath) {
             try (var resourceBody = body.toResource()) {
-                return dataCreatePOST(request, dataPath, resourceBody);
+                dataCreatePOST(request, dataPath, resourceBody);
+                return;
             }
         }
         if (path instanceof Action actionPath) {
             try (var inputBody = body.toOperationInput()) {
-                return dataInvokePOST(actionPath, inputBody);
+                dataInvokePOST(request, actionPath, inputBody);
+                return;
             }
         }
         // Note: this should never happen
         // FIXME: we should be able to eliminate this path with Java 21+ pattern matching
-        return RestconfFuture.failed(new RestconfDocumentedException("Unhandled path " + path));
+        request.completeWith(new RestconfDocumentedException("Unhandled path " + path));
     }
 
-    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
+    public void dataCreatePOST(final ServerRequest<? super CreateResourceResult> request, final ChildBody body) {
+        dataCreatePOST(request, new DatabindPath.Data(databind), body);
+    }
+
+    private void dataCreatePOST(final ServerRequest<? super CreateResourceResult> request, final DatabindPath.Data path,
             final ChildBody body) {
-        return dataCreatePOST(request, new DatabindPath.Data(databind), body);
-    }
-
-    private @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
-            final DatabindPath.Data path, final ChildBody body) {
         final Insert insert;
         try {
             insert = Insert.of(path.databind(), request.queryParameters());
         } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+            request.completeWith(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            return;
         }
 
         final PrefixAndBody payload;
         try {
             payload = body.toPayload(path);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
-        return postData(concat(path.instance(), payload.prefix()), payload.body(), insert);
+        postData(request, concat(path.instance(), payload.prefix()), payload.body(), insert);
     }
 
     private static YangInstanceIdentifier concat(final YangInstanceIdentifier parent, final List<PathArgument> args) {
@@ -1467,22 +1472,24 @@ public abstract class RestconfStrategy implements DatabindAware {
         return ret;
     }
 
-    private @NonNull RestconfFuture<InvokeResult> dataInvokePOST(final @NonNull Action path,
-            final @NonNull OperationInputBody body) {
+    @NonNullByDefault
+    private void dataInvokePOST(final ServerRequest<? super InvokeResult> request, final Action path,
+            final OperationInputBody body) {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
         } catch (ServerException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
         if (actionService == null) {
-            return RestconfFuture.failed(new RestconfDocumentedException("DOMActionService is missing."));
+            request.completeWith(new ServerException("DOMActionService is missing."));
+            return;
         }
 
-        return dataInvokePOST(actionService, path, input)
-            .transform(result -> outputToInvokeResult(path, result.value()));
+        dataInvokePOST(request, actionService, path, input);
     }
 
     /**
@@ -1494,10 +1501,8 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param actionService action service to invoke action
      * @return {@link DOMRpcResult}
      */
-    private static RestconfFuture<DOMRpcResult> dataInvokePOST(final DOMActionService actionService,
-            final Action path, final @NonNull ContainerNode input) {
-        final var ret = new SettableRestconfFuture<DOMRpcResult>();
-
+    private static void dataInvokePOST(final ServerRequest<? super InvokeResult> request,
+            final DOMActionService actionService, final Action path, final @NonNull ContainerNode input) {
         Futures.addCallback(actionService.invokeAction(
             path.inference().toSchemaInferenceStack().toSchemaNodeIdentifier(),
             DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
@@ -1507,28 +1512,27 @@ public abstract class RestconfStrategy implements DatabindAware {
                     final var errors = result.errors();
                     LOG.debug("InvokeAction Error Message {}", errors);
                     if (errors.isEmpty()) {
-                        ret.set(result);
+                        request.completeWith(outputToInvokeResult(path, result.value()));
                     } else {
-                        ret.setFailure(new RestconfDocumentedException("InvokeAction Error Message ", null, errors));
+                        request.completeWith(new RestconfDocumentedException("InvokeAction Error Message ", null,
+                            errors));
                     }
                 }
 
                 @Override
                 public void onFailure(final Throwable cause) {
                     if (cause instanceof DOMActionException) {
-                        ret.set(new DefaultDOMRpcResult(List.of(RpcResultBuilder.newError(
-                            ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))));
+                        request.completeWith(new RestconfDocumentedException(new RestconfError(
+                            ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
                     } else if (cause instanceof RestconfDocumentedException e) {
-                        ret.setFailure(e);
+                        request.completeWith(e);
                     } else if (cause instanceof CancellationException) {
-                        ret.setFailure(new RestconfDocumentedException("Action cancelled while executing",
+                        request.completeWith(new RestconfDocumentedException("Action cancelled while executing",
                             ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, cause));
                     } else {
-                        ret.setFailure(new RestconfDocumentedException("Invocation failed", cause));
+                        request.completeWith(new RestconfDocumentedException("Invocation failed", cause));
                     }
                 }
             }, MoreExecutors.directExecutor());
-
-        return ret;
     }
 }

@@ -39,13 +39,16 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.AbstractServerRequest;
+import org.opendaylight.restconf.server.api.DataPostResult;
+import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -61,7 +64,8 @@ import org.w3c.dom.DOMException;
 final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Mock
     private NetconfDataTreeService netconfService;
-
+    @Mock
+    private AbstractServerRequest<Empty> emptyRequest;
 
     @Override
     RestconfStrategy newStrategy(final DatabindContext databind) {
@@ -109,7 +113,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, song2Path);
 
-        jukeboxStrategy().delete(new SettableRestconfFuture<>(), null, songListPath);
+        jukeboxStrategy().delete(emptyRequest, songListPath);
         verify(netconfService).getConfig(songListWildcardPath, songKeyFields);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song1Path);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song2Path);
@@ -177,11 +181,12 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        jukeboxStrategy().putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        jukeboxStrategy().putData(dataPutRequest, JUKEBOX_IID, EMPTY_JUKEBOX, null);
         verify(netconfService).lock();
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Test
@@ -192,10 +197,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        jukeboxStrategy().putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        jukeboxStrategy().putData(dataPutRequest, JUKEBOX_IID, EMPTY_JUKEBOX, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Test
@@ -205,9 +211,10 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        jukeboxStrategy().putData(GAP_IID, GAP_LEAF, null);
+        jukeboxStrategy().putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Test
@@ -218,9 +225,10 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        jukeboxStrategy().putData(GAP_IID, GAP_LEAF, null);
+        jukeboxStrategy().putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Test
@@ -230,10 +238,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        jukeboxStrategy().putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        jukeboxStrategy().putData(dataPutRequest, JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     /**
@@ -257,11 +266,22 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
         // Inserting new song at 3rd position (aka as last element)
-        spyStrategy.dataPUT(ServerRequest.of(QueryParameters.of(
+        final var request = spy(new AbstractServerRequest<DataPutResult>(QueryParameters.of(
             // insert new item after last existing item in list
             InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
-            PrettyPrintParam.TRUE),
-            ApiPath.parse("example-jukebox:jukebox/playlist=0/song=3"),
+            PrettyPrintParam.TRUE) {
+                @Override
+                protected void onSuccess(final DataPutResult result) {
+                    // To be verified
+                }
+
+                @Override
+                protected void onFailure(final RestconfDocumentedException failure) {
+                    // To be verified
+                }
+        });
+
+        spyStrategy.dataPUT(request, ApiPath.parse("example-jukebox:jukebox/playlist=0/song=3"),
             new JsonResourceBody(stringInputStream("""
                 {
                   "example-jukebox:song" : [
@@ -296,10 +316,21 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
+        final var request = spy(new AbstractServerRequest<DataPostResult>(QueryParameters.of(InsertParam.AFTER,
+            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE) {
+                @Override
+                protected void onSuccess(final DataPostResult result) {
+                    // To be verified
+                }
+
+                @Override
+                protected void onFailure(final RestconfDocumentedException failure) {
+                    // To be verified
+                }
+        });
+
         // Inserting new song at 3rd position (aka as last element)
-        spyStrategy.dataPOST(ServerRequest.of(QueryParameters.of(InsertParam.AFTER,
-            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE),
-            ApiPath.parse("example-jukebox:jukebox/playlist=0"),
+        spyStrategy.dataPOST(request, ApiPath.parse("example-jukebox:jukebox/playlist=0"),
             // insert new item after last existing item in list
             new JsonDataPostBody(stringInputStream("""
                 {
@@ -323,10 +354,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        jukeboxStrategy().putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        jukeboxStrategy().putData(dataPutRequest, JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Override

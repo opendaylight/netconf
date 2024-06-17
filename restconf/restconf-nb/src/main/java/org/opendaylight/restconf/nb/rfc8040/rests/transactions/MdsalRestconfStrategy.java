@@ -36,8 +36,6 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -79,8 +77,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final ServerRequest request) {
-        return yangLibraryVersion.httpGET(request);
+    public void yangLibraryVersionGET(final ServerRequest<FormattableBody> request) {
+        yangLibraryVersion.httpGET(request);
     }
 
     @Override
@@ -89,8 +87,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void delete(final SettableRestconfFuture<Empty> future, final ServerRequest request,
-            final YangInstanceIdentifier path) {
+    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = dataBroker.newReadWriteTransaction();
         tx.exists(CONFIGURATION, path).addCallback(new FutureCallback<>() {
             @Override
@@ -105,13 +102,13 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
                 tx.commit().addCallback(new FutureCallback<CommitInfo>() {
                     @Override
                     public void onSuccess(final CommitInfo result) {
-                        future.set(Empty.value());
+                        request.completeWith(Empty.value());
                     }
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        future.setFailure(new RestconfDocumentedException("Transaction to delete " + path + " failed",
-                            cause));
+                        request.completeWith(new RestconfDocumentedException(
+                            "Transaction to delete " + path + " failed", cause));
                     }
                 }, MoreExecutors.directExecutor());
             }
@@ -123,21 +120,21 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
             private void cancelTx(final RestconfDocumentedException ex) {
                 tx.cancel();
-                future.setFailure(ex);
+                request.completeWith(ex);
             }
         }, MoreExecutors.directExecutor());
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
+    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var depth = params.depth();
         final var fields = params.fields();
         final var writerFactory = fields == null ? NormalizedNodeWriterFactory.of(depth)
             : new MdsalNormalizedNodeWriterFactory(
                 translateFieldsParam(path.inference().modelContext(), path.schema(), fields), depth);
 
-        return completeDataGET(readData(params.content(), path.instance(), params.withDefaults()), path, writerFactory,
-            null);
+        completeDataGET(request, readData(params.content(), path.instance(), params.withDefaults()), path,
+            writerFactory, null);
     }
 
     @Override

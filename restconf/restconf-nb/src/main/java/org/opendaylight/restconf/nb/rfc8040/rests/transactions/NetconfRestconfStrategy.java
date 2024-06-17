@@ -38,8 +38,6 @@ import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -84,25 +82,24 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void delete(final SettableRestconfFuture<Empty> future, final ServerRequest request,
-            final YangInstanceIdentifier path) {
+    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
         tx.delete(path);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                future.set(Empty.value());
+                request.completeWith(Empty.value());
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "DELETE", path, modelContext()));
+                request.completeWith(TransactionUtil.decodeException(cause, "DELETE", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
+    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
@@ -110,7 +107,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             try {
                 tmp = fieldsParamToPaths(path.inference().modelContext(), path.schema(), fields);
             } catch (RestconfDocumentedException e) {
-                return RestconfFuture.failed(e);
+                request.completeWith(e);
+                return;
             }
             fieldPaths = tmp.isEmpty() ? null : tmp;
         } else {
@@ -123,7 +121,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         } else {
             node = readData(params.content(), path.instance(), params.withDefaults());
         }
-        return completeDataGET(node, path, NormalizedNodeWriterFactory.of(params.depth()), null);
+        completeDataGET(request, node, path, NormalizedNodeWriterFactory.of(params.depth()), null);
     }
 
     @Override
