@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ab12a50_ba14a153",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 48
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-17T11:06:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e88c450d_3811e333",
+      "range": {
+        "startLine": 13,
+        "startChar": 8,
+        "endLine": 13,
+        "endChar": 21
+      },
+      "revId": "ffb246ea96abc58166d2bb4d5ad4cdfa0281118b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe1da75d_e33dfcdc",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-17T09:05:42Z",
       "side": 1,
       "message": "incorrectly aligned",
+      "range": {
+        "startLine": 15,
+        "startChar": 4,
+        "endLine": 15,
+        "endChar": 17
+      },
+      "revId": "ffb246ea96abc58166d2bb4d5ad4cdfa0281118b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc8778c8_6bb9005e",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 48
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-17T11:06:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe1da75d_e33dfcdc",
       "range": {
         "startLine": 15,
         "startChar": 4,
