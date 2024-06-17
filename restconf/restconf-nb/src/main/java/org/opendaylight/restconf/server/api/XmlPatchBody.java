@@ -17,7 +17,6 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public final class XmlPatchBody extends PatchBody {
@@ -44,18 +42,19 @@ public final class XmlPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream) throws IOException {
+    PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream)
+            throws IOException, ServerException {
         try {
             return parse(resource, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (XMLStreamException | SAXException | URISyntaxException e) {
             LOG.debug("Failed to parse YANG Patch XML", e);
-            throw new RestconfDocumentedException("Error parsing YANG Patch XML: " + e.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing YANG Patch XML: " + e.getMessage(), e);
         }
     }
 
     private static @NonNull PatchContext parse(final ResourceContext resource, final Document doc)
-            throws XMLStreamException, IOException, SAXException, URISyntaxException {
+            throws IOException, ServerException, XMLStreamException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
@@ -108,18 +107,17 @@ public final class XmlPatchBody extends PatchBody {
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation) {
-        final Node valueNode = element.getElementsByTagName("value").item(0);
+    private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation)
+            throws ServerException {
+        final var valueNode = element.getElementsByTagName("value").item(0);
 
         final boolean isWithValue = requiresValue(operation);
         if (isWithValue && valueNode == null) {
-            throw new RestconfDocumentedException("Error parsing input",
-                    ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
         }
 
         if (!isWithValue && valueNode != null) {
-            throw new RestconfDocumentedException("Error parsing input",
-                    ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
         }
 
         if (valueNode == null) {

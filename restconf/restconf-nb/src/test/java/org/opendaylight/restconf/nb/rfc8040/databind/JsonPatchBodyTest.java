@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -102,11 +102,11 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
 
     /**
      * Test trying to use Patch create operation which requires value without value. Test should fail with
-     * {@link RestconfDocumentedException} with error code 400.
+     * {@link ServerException} with error code 400.
      */
     @Test
     public final void modulePatchValueMissingNegativeTest() throws Exception {
-        final var ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(ServerException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -122,16 +122,16 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                     ]
                   }
                 }"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.error().tag());
     }
 
     /**
      * Test trying to use value with Patch delete operation which does not support value. Test should fail with
-     * {@link RestconfDocumentedException} with error code 400.
+     * {@link ServerException} with error code 400.
      */
     @Test
     public final void modulePatchValueNotSupportedNegativeTest() throws Exception {
-        final var ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(ServerException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -154,7 +154,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                     ]
                   }
                 }"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.error().tag());
     }
 
     /**
