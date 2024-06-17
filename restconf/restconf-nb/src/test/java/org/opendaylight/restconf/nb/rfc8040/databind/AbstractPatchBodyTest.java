@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.function.Function;
@@ -61,7 +60,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     }
 
     final @NonNull PatchContext parse(final String prefix, final String suffix, final String patchBody)
-            throws IOException {
+            throws ServerException {
         final String uriPath;
         if (prefix.isEmpty()) {
             uriPath = suffix;

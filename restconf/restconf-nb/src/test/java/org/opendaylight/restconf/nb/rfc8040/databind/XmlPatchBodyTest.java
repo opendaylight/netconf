@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -61,7 +61,7 @@ class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     final void moduleDataValueMissingNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(ServerException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                     <patch-id>test-patch</patch-id>
@@ -72,7 +72,7 @@ class XmlPatchBodyTest extends AbstractPatchBodyTest {
                         <target>/my-list2</target>
                     </edit>
                 </yang-patch>"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.errors().get(0).tag());
     }
 
     /**
@@ -81,7 +81,7 @@ class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     final void moduleDataNotValueNotSupportedNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(ServerException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                     <patch-id>test-patch</patch-id>
@@ -99,7 +99,7 @@ class XmlPatchBodyTest extends AbstractPatchBodyTest {
                         </value>
                     </edit>
                 </yang-patch>"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.errors().get(0).tag());
     }
 
     /**

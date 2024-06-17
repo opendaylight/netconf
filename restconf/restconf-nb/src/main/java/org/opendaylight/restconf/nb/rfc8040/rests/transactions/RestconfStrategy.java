@@ -18,7 +18,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -618,10 +617,9 @@ public abstract class RestconfStrategy implements DatabindAware {
         final PatchContext patch;
         try {
             patch = body.toPatchContext(new DefaultResourceContext(path));
-        } catch (IOException e) {
+        } catch (ServerException e) {
             LOG.debug("Error parsing YANG Patch input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+            return RestconfFuture.failed(e.toLegacy());
         }
         return patchData(patch);
     }
