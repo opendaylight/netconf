@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -41,7 +40,7 @@ public final class OperationsResource implements HttpGetResource {
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
+    public void httpGET(final ServerRequest<FormattableBody> request) {
         // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
         final var table = new HashMap<XMLNamespace, Map<Revision, ImmutableSet<QName>>>();
         final var modelContext = pathNormalizer.databind().modelContext();
@@ -65,17 +64,18 @@ public final class OperationsResource implements HttpGetResource {
                 .findFirst()
                 .ifPresent(row -> rpcs.putAll(QNameModule.ofRevision(entry.getKey(), row.getKey()), row.getValue()));
         }
-        return RestconfFuture.of(new AllOperations(modelContext, rpcs.build()));
+        request.completeWith(new AllOperations(modelContext, rpcs.build()));
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request, final ApiPath apiPath) {
+    public void httpGET(final ServerRequest<FormattableBody> request, final ApiPath apiPath) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
-        return RestconfFuture.of(new OneOperation(path.inference().modelContext(), path.rpc().argument()));
+        request.completeWith(new OneOperation(path.inference().modelContext(), path.rpc().argument()));
     }
 }

@@ -24,8 +24,8 @@ import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -145,13 +145,13 @@ public final class RestconfStream<T> {
          * create the corresponding instance and register it.
          *
          * @param <T> Stream type
+         * @param request {@link ServerRequest} for this invocation.
          * @param restconfURI resolved {@code {+restconf}} resource name
          * @param source Stream instance
          * @param description Stream descriptiion
-         * @return A future {@link RestconfStream} instance
          * @throws NullPointerException if any argument is {@code null}
          */
-        <T> @NonNull RestconfFuture<RestconfStream<T>> createStream(URI restconfURI, Source<T> source,
+        <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
     }
 

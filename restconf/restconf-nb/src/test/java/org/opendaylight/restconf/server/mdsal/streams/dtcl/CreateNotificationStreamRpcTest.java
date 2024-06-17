@@ -41,6 +41,7 @@ import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.testlib.CompletingServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
@@ -65,6 +66,8 @@ class CreateNotificationStreamRpcTest {
     private static final URI RESTCONF_URI = URI.create("/rests/");
     private static final YangInstanceIdentifier TOASTER = YangInstanceIdentifier.of(
         QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"));
+
+    private final CompletingServerRequest<ContainerNode> request = new CompletingServerRequest<>();
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -92,14 +95,14 @@ class CreateNotificationStreamRpcTest {
     }
 
     @Test
-    void createStreamTest() {
+    void createStreamTest() throws Exception {
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(tx).put(eq(LogicalDatastoreType.OPERATIONAL), pathCaptor.capture(), dataCaptor.capture());
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        final var output = assertInstanceOf(ContainerNode.class, rpc.invoke(RESTCONF_URI, createInput("path", TOASTER))
-            .getOrThrow());
+        rpc.invoke(request, RESTCONF_URI, createInput("path", TOASTER));
 
+        final var output = request.getResult();
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
         assertEquals(1, output.size());
 
@@ -146,18 +149,26 @@ class CreateNotificationStreamRpcTest {
 
     @Test
     void createStreamWrongValueTest() {
-        final var payload = createInput("path", "String value");
-        final var ex = assertThrows(IllegalArgumentException.class, () -> rpc.invoke(RESTCONF_URI, payload));
+        rpc.invoke(request, RESTCONF_URI, createInput("path", "String value"));
+
+        final var ex = assertThrows(RestconfDocumentedException.class, request::getResult);
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(ErrorTag.BAD_ELEMENT, error.getErrorTag());
         assertEquals("""
             Bad child leafNode (urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote@2014-01-14)path = \
             "String value"\
-            """, ex.getMessage());
+            """, error.getErrorMessage());
     }
 
     @Test
     void createStreamWrongInputRpcTest() {
-        final var future = rpc.invoke(RESTCONF_URI, createInput(null, null));
-        final var errors = assertThrows(RestconfDocumentedException.class, future::getOrThrow).getErrors();
+        rpc.invoke(request, RESTCONF_URI, createInput(null, null));
+
+        final var ex = assertThrows(RestconfDocumentedException.class, request::getResult);
+        final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
