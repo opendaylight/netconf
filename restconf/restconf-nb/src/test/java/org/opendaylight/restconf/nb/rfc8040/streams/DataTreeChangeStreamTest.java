@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
@@ -26,6 +27,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -43,6 +46,7 @@ import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
+import org.opendaylight.restconf.server.testlib.CompletingServerRequest;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.PatchCase1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice2.PatchCase11Builder;
@@ -58,6 +62,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -65,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.assertj.XmlAssert;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private static final class TestHandler implements Sender {
         private CountDownLatch notificationLatch = new CountDownLatch(1);
@@ -203,6 +209,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
+    private final CompletingServerRequest<RestconfStream<List<DataTreeCandidate>>> request =
+        new CompletingServerRequest<>();
+
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;
@@ -229,11 +238,12 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType, final boolean leafNodesOnly, final boolean skipNotificationData,
             final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws Exception {
-        final var stream = streamRegistry.createStream(URI.create("baseURI"),
+        streamRegistry.createStream(request, URI.create("baseURI"),
             new DataTreeChangeSource(databindProvider,
                 domDataBroker.extension(DataTreeChangeExtension.class),
-                LogicalDatastoreType.CONFIGURATION, path), "test")
-            .getOrThrow();
+                LogicalDatastoreType.CONFIGURATION, path), "test");
+
+        final var stream = request.getResult();
         final var handler = new TestHandler();
         stream.addSubscriber(handler,
             switch (outputType) {

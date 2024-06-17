@@ -15,8 +15,8 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -60,39 +60,45 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
     }
 
     @Override
-    public RestconfFuture<ContainerNode> invoke(final URI restconfURI, final OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var pathLeaf = body.childByArg(DEVICE_NOTIFICATION_PATH_NODEID);
         if (pathLeaf == null) {
-            return RestconfFuture.failed(new RestconfDocumentedException("No path specified", ErrorType.APPLICATION,
+            request.completeWith(new RestconfDocumentedException("No path specified", ErrorType.APPLICATION,
                 ErrorTag.MISSING_ELEMENT));
+            return;
         }
         final var pathLeafBody = pathLeaf.body();
         if (!(pathLeafBody instanceof YangInstanceIdentifier path)) {
-            return RestconfFuture.failed(new RestconfDocumentedException("Unexpected path " + pathLeafBody,
+            request.completeWith(new RestconfDocumentedException("Unexpected path " + pathLeafBody,
                 ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT));
+            return;
         }
         if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
-            return RestconfFuture.failed(new RestconfDocumentedException(path + " does not refer to a list item",
+            request.completeWith(new RestconfDocumentedException(path + " does not refer to a list item",
                 ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT));
+            return;
         }
         if (listId.size() != 1) {
-            return RestconfFuture.failed(new RestconfDocumentedException(path + " uses multiple keys",
+            request.completeWith(new RestconfDocumentedException(path + " uses multiple keys",
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            return;
         }
 
         final ApiPath apiPath;
         try {
             apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
-        return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
-            "All YANG notifications occuring on mount point /" + apiPath.toString())
-            .transform(stream -> ImmutableNodes.newContainerBuilder()
+        streamRegistry.createStream(
+            request.transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
-                .build());
+                .build()),
+            restconfURI, new DeviceNotificationSource(mountPointService, path),
+            "All YANG notifications occuring on mount point /" + apiPath.toString());
     }
 }

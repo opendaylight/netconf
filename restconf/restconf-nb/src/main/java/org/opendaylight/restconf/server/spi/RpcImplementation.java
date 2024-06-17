@@ -13,7 +13,7 @@ import com.google.common.base.MoreObjects;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -43,11 +43,11 @@ public abstract class RpcImplementation {
      * Asynchronously invoke this implementation. Implementations are expected to report all results via the returned
      * future, e.g. not throw exceptions.
      *
+     * @param request {@link ServerRequest} for this invocation.
      * @param restconfURI Request URI trimmed to the root RESTCONF endpoint, resolved {@code {+restconf}} resource name
      * @param input RPC input
-     * @return Future RPC output
      */
-    public abstract RestconfFuture<ContainerNode> invoke(URI restconfURI, OperationInput input);
+    public abstract void invoke(ServerRequest<ContainerNode> request, URI restconfURI, OperationInput input);
 
     @Override
     public final String toString() {
