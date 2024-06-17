@@ -18,8 +18,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -73,8 +73,18 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
     }
 
     /**
-     * Create data-change-event stream with POST operation via RPC.
+     * Create data-change-event stream with POST operation via RPC. Example of produced output in JSON:
+     * <pre>
+     *   {@code
+     *     {
+     *       "output": {
+     *         "stream-name": "toaster:toaster/toaster:toasterStatus/datastore=OPERATIONAL/scope=ONE"
+     *       }
+     *     }
+     *   }
+     * </pre>
      *
+     * @param request {@link ServerRequest} for this invocation.
      * @param input Input of RPC - example in JSON (data-change-event stream):
      *              <pre>
      *              {@code
@@ -86,43 +96,43 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
      *                  }
      *              }
      *              </pre>
-     * @return Future output of RPC - example in JSON:
-     *     <pre>
-     *     {@code
-     *         {
-     *             "output": {
-     *                 "stream-name": "toaster:toaster/toaster:toasterStatus/datastore=OPERATIONAL/scope=ONE"
-     *             }
-     *         }
-     *     }
-     *     </pre>
      */
     @Override
-    public RestconfFuture<ContainerNode> invoke(final URI restconfURI, final OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var datastoreName = leaf(body, DATASTORE_NODEID, String.class);
         final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
 
-        final var path = leaf(body, PATH_NODEID, YangInstanceIdentifier.class);
+        final YangInstanceIdentifier path;
+        try {
+            path = leaf(body, PATH_NODEID, YangInstanceIdentifier.class);
+        } catch (IllegalArgumentException e) {
+            request.completeWith(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            return;
+        }
+
         if (path == null) {
-            return RestconfFuture.failed(
-                new RestconfDocumentedException("missing path", ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT));
+            request.completeWith(new RestconfDocumentedException("missing path",
+                ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT));
+            return;
         }
 
         final ApiPath apiPath;
         try {
             apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
         } catch (ServerException e) {
-            return RestconfFuture.failed(e.toLegacy());
+            request.completeWith(e);
+            return;
         }
 
-        return streamRegistry.createStream(restconfURI,
-            new DataTreeChangeSource(databindProvider, changeService, datastore, path),
-            "Events occuring in " + datastore + " datastore under /" + apiPath.toString())
-            .transform(stream -> ImmutableNodes.newContainerBuilder()
+        streamRegistry.createStream(
+            request.transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
-                .build());
+                .build()),
+            restconfURI, new DataTreeChangeSource(databindProvider, changeService, datastore, path),
+            "Events occuring in " + datastore + " datastore under /" + apiPath.toString());
     }
 }

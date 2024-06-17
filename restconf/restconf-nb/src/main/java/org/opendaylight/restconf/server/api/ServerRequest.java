@@ -7,36 +7,37 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static java.util.Objects.requireNonNull;
-
+import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing binding to
  * HTTP transport layer. This includes:
  * <ul>
  *   <li>HTTP request {@link #queryParameters() query parameters},</li>
- *   <li>{@link #prettyPrint() pretty printing}, including affected by query parameters<li>
  * </ul>
  * It notably does <b>not</b> hold the HTTP request path, nor the request body. Those are passed as separate arguments
  * to server methods as implementations of those methods are expected to act on them.
+ *
+ * @param <T> type of reported result
  */
 @NonNullByDefault
-public record ServerRequest(QueryParameters queryParameters, PrettyPrintParam prettyPrint) {
-    // TODO: this is where a binding to security principal and access control should be:
-    //       - we would like to be able to have java.security.Principal#name() for logging purposes
-    //       - we need to have a NACM-capable interface, through which we can check permissions (such as data PUT) and
-    //         establish output filters (i.e. excluding paths inaccessible path to user from a data GET a ContainerNode)
-    public ServerRequest {
-        requireNonNull(queryParameters);
-        requireNonNull(prettyPrint);
+public sealed interface ServerRequest<T> permits AbstractServerRequest, TransformedServerRequest {
+
+    QueryParameters queryParameters();
+
+    void completeWith(T result);
+
+    // FIXME: NETCONF-1188: remove in favor of ServerException
+    void completeWith(RestconfDocumentedException failure);
+
+    default void completeWith(final ServerException failure) {
+        completeWith(failure.toLegacy());
     }
 
-    public static ServerRequest of(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
-        final var prettyPrint = queryParameters.lookup(PrettyPrintParam.uriName, PrettyPrintParam::forUriValue);
-        return prettyPrint == null ? new ServerRequest(queryParameters, defaultPrettyPrint)
-            : new ServerRequest(queryParameters.withoutParam(PrettyPrintParam.uriName), prettyPrint);
+    default <O> ServerRequest<O> transform(final Function<O, T> function) {
+        return new TransformedServerRequest<>(this, function);
     }
 }

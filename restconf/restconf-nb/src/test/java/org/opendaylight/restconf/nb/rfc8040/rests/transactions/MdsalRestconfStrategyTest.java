@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -46,6 +47,7 @@ import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
+import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
@@ -137,9 +139,10 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        jukeboxStrategy().putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        jukeboxStrategy().putData(dataPutRequest, JUKEBOX_IID, EMPTY_JUKEBOX, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Test
@@ -150,11 +153,11 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        jukeboxStrategy().putData(GAP_IID, GAP_LEAF, null);
+        jukeboxStrategy().putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
-
 
     @Test
     void testPutListData() {
@@ -165,9 +168,10 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        jukeboxStrategy().putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        jukeboxStrategy().putData(dataPutRequest, JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
     @Override
