@@ -61,36 +61,17 @@ public final class JsonPatchBody extends PatchBody {
 
         while (in.hasNext()) {
             switch (in.peek()) {
-                case STRING:
-                case NUMBER:
-                    in.nextString();
-                    break;
-                case BOOLEAN:
-                    Boolean.toString(in.nextBoolean());
-                    break;
-                case NULL:
-                    in.nextNull();
-                    break;
-                case BEGIN_ARRAY:
-                    in.beginArray();
-                    break;
-                case BEGIN_OBJECT:
-                    in.beginObject();
-                    break;
-                case END_DOCUMENT:
-                    break;
-                case NAME:
-                    parseByName(in.nextName(), edit, in, resource, edits, patchId);
-                    break;
-                case END_OBJECT:
-                    in.endObject();
-                    break;
-                case END_ARRAY:
-                    in.endArray();
-                    break;
-
-                default:
-                    break;
+                case NUMBER, STRING -> in.nextString();
+                case BOOLEAN -> Boolean.toString(in.nextBoolean());
+                case NULL -> in.nextNull();
+                case BEGIN_ARRAY -> in.beginArray();
+                case BEGIN_OBJECT -> in.beginObject();
+                case NAME -> parseByName(in.nextName(), edit, in, resource, edits, patchId);
+                case END_OBJECT -> in.endObject();
+                case END_ARRAY -> in.endArray();
+                default -> {
+                    // No-op, including END_DOCUMENT
+                }
             }
         }
 
@@ -103,7 +84,7 @@ public final class JsonPatchBody extends PatchBody {
             final @NonNull Builder<PatchEntity> resultCollection, final @NonNull AtomicReference<String> patchId)
                 throws IOException {
         switch (name) {
-            case "edit":
+            case "edit" -> {
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
                     in.beginArray();
 
@@ -119,13 +100,11 @@ public final class JsonPatchBody extends PatchBody {
                     resultCollection.add(prepareEditOperation(edit));
                     edit.clear();
                 }
-
-                break;
-            case "patch-id":
-                patchId.set(in.nextString());
-                break;
-            default:
-                break;
+            }
+            case "patch-id" -> patchId.set(in.nextString());
+            default -> {
+                // No-op
+            }
         }
     }
 
@@ -140,13 +119,9 @@ public final class JsonPatchBody extends PatchBody {
         while (in.hasNext()) {
             final String editDefinition = in.nextName();
             switch (editDefinition) {
-                case "edit-id":
-                    edit.setId(in.nextString());
-                    break;
-                case "operation":
-                    edit.setOperation(Operation.ofName(in.nextString()));
-                    break;
-                case "target":
+                case "edit-id" -> edit.setId(in.nextString());
+                case "operation" -> edit.setOperation(Operation.ofName(in.nextString()));
+                case "target" -> {
                     // target can be specified completely in request URI
                     final var target = parsePatchTarget(resource, in.nextString());
                     edit.setTarget(target.instance());
@@ -160,9 +135,8 @@ public final class JsonPatchBody extends PatchBody {
                         verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                     }
                     edit.setTargetSchemaNode(stack.toInference());
-
-                    break;
-                case "value":
+                }
+                case "value" -> {
                     checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
                     if (edit.getTargetSchemaNode() == null) {
@@ -173,10 +147,10 @@ public final class JsonPatchBody extends PatchBody {
                         // We have a target schema node, reuse this reader without buffering the value.
                         edit.setData(readEditData(in, edit.getTargetSchemaNode(), codecs));
                     }
-                    break;
-                default:
+                }
+                default -> {
                     // FIXME: this does not look right, as it can wreck our logic
-                    break;
+                }
             }
         }
 
@@ -197,10 +171,10 @@ public final class JsonPatchBody extends PatchBody {
      */
     private static String readValueNode(final @NonNull JsonReader in) throws IOException {
         in.beginObject();
-        final StringBuilder sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
+        final var sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
 
         switch (in.peek()) {
-            case BEGIN_ARRAY:
+            case BEGIN_ARRAY -> {
                 in.beginArray();
                 sb.append('[');
 
@@ -217,10 +191,8 @@ public final class JsonPatchBody extends PatchBody {
 
                 in.endArray();
                 sb.append(']');
-                break;
-            default:
-                readValueObject(sb, in);
-                break;
+            }
+            default -> readValueObject(sb, in);
         }
 
         in.endObject();
@@ -248,10 +220,8 @@ public final class JsonPatchBody extends PatchBody {
             sb.append('"').append(in.nextName()).append("\":");
 
             switch (in.peek()) {
-                case STRING:
-                    sb.append('"').append(in.nextString()).append('"');
-                    break;
-                case BEGIN_ARRAY:
+                case STRING -> sb.append('"').append(in.nextString()).append('"');
+                case BEGIN_ARRAY -> {
                     in.beginArray();
                     sb.append('[');
 
@@ -269,9 +239,8 @@ public final class JsonPatchBody extends PatchBody {
 
                     in.endArray();
                     sb.append(']');
-                    break;
-                default:
-                    readValueObject(sb, in);
+                }
+                default -> readValueObject(sb, in);
             }
 
             if (in.peek() != JsonToken.END_OBJECT) {
