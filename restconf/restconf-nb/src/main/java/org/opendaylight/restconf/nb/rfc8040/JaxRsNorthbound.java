@@ -23,10 +23,9 @@ import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.jaxrs.JsonJaxRsFormattableBodyWriter;
 import org.opendaylight.restconf.nb.jaxrs.XmlJaxRsFormattableBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.RestconfDocumentedExceptionMapper;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ServerExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
-import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -46,8 +45,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
     public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            @Reference final DatabindProvider databindProvider, @Reference final RestconfServer server,
-            @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
+            @Reference final RestconfServer server, @Reference final RestconfStreamServletFactory servletFactory)
+                throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
             .contextPath("/" + servletFactory.restconf())
@@ -62,7 +61,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
-                                new RestconfDocumentedExceptionMapper(databindProvider, errorTagMapping),
+                                new ServerExceptionMapper(errorTagMapping),
                                 new JaxRsRestconf(server, errorTagMapping, servletFactory.prettyPrint()));
                         }
                     }).build())
