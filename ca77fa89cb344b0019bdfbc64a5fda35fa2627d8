@@ -39,6 +39,30 @@
       },
       "revId": "ca77fa89cb344b0019bdfbc64a5fda35fa2627d8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf8e2ef6_90217f31",
+        "filename": "plugins/netconf-server-mdsal/src/test/java/org/opendaylight/netconf/server/mdsal/notifications/NotificationToMdsalWriterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-06-18T14:14:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d9b455f_7dc5d7d6",
+      "range": {
+        "startLine": 54,
+        "startChar": 8,
+        "endLine": 54,
+        "endChar": 27
+      },
+      "revId": "ca77fa89cb344b0019bdfbc64a5fda35fa2627d8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
