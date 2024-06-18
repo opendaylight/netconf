@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -132,10 +133,11 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                     }
                   }
                 }"""), uriInfo, ar));
-        assertEquals("No implementation of RPC (invoke:rpc:module?revision=2013-12-03)rpc-test available.",
-            error.getErrorMessage());
-        assertEquals(ErrorType.RPC, error.getErrorType());
-        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
+        assertEquals(
+            new ErrorMessage("No implementation of RPC (invoke:rpc:module?revision=2013-12-03)rpc-test available."),
+            error.message());
+        assertEquals(ErrorType.RPC, error.type());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.tag());
     }
 
     @Test
@@ -185,9 +187,9 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "invoke-rpc-module:input" : {
                       }
                     }"""), uriInfo, ar));
-        assertEquals("RPC invocation is not available", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.getErrorTag());
+        assertEquals(new ErrorMessage("RPC invocation is not available"), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.tag());
     }
 
     @Test
