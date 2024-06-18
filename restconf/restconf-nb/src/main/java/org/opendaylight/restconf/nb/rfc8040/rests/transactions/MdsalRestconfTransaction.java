@@ -61,8 +61,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             rwTx.delete(CONFIGURATION, path);
         } else {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, new ServerErrorPath(databind, path),
-                "Data does not exist");
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
+                new ServerErrorPath(databind, path));
         }
     }
 
@@ -96,8 +96,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
             // ... finally collect existence checks and abort the transaction if any of them failed.
             if (getOrThrow(check) instanceof Conflict conflict) {
-                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                    new ServerErrorPath(databind, conflict.path()), "Data already exists");
+                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
+                    new ServerErrorPath(databind, conflict.path()));
             }
         } else {
             RestconfStrategy.checkItemDoesNotExists(databind, verifyNotNull(rwTx).exists(CONFIGURATION, path), path);

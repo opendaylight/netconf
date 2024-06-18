@@ -39,7 +39,6 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
@@ -48,6 +47,8 @@ import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.testlib.CompletingServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -62,10 +63,10 @@ import org.w3c.dom.DOMException;
 
 @ExtendWith(MockitoExtension.class)
 final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
+    private final CompletingServerRequest<Empty> emptyRequest = new CompletingServerRequest<>();
+
     @Mock
     private NetconfDataTreeService netconfService;
-    @Mock
-    private AbstractServerRequest<Empty> emptyRequest;
 
     @Override
     RestconfStrategy newStrategy(final DatabindContext databind) {
@@ -175,7 +176,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Test
-    void testPutCreateContainerData() {
+    void testPutCreateContainerData() throws Exception {
         mockLockUnlockCommit();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -186,11 +187,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
-        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+        assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
-    void testPutReplaceContainerData() {
+    void testPutReplaceContainerData() throws Exception {
         mockLockUnlockCommit();
         doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
@@ -201,11 +202,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
-        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+        assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
-    void testPutCreateLeafData() {
+    void testPutCreateLeafData() throws Exception {
         mockLockUnlockCommit();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -214,11 +215,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         jukeboxStrategy().putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
-        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+        assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
-    void testPutReplaceLeafData() {
+    void testPutReplaceLeafData() throws Exception {
         mockLockUnlockCommit();
         doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(GAP_IID);
@@ -228,11 +229,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         jukeboxStrategy().putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
-        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+        assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
-    void testPutCreateListData() {
+    void testPutCreateListData() throws Exception {
         mockLockUnlockCommit();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -242,7 +243,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
-        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+        assertNotNull(dataPutRequest.getResult());
     }
 
     /**
@@ -276,7 +277,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 }
 
                 @Override
-                protected void onFailure(final RestconfDocumentedException failure) {
+                protected void onFailure(final ServerException failure) {
                     // To be verified
                 }
         });
@@ -324,7 +325,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 }
 
                 @Override
-                protected void onFailure(final RestconfDocumentedException failure) {
+                protected void onFailure(final ServerException failure) {
                     // To be verified
                 }
         });
@@ -347,7 +348,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Test
-    void testPutReplaceListData() {
+    void testPutReplaceListData() throws Exception {
         mockLockUnlockCommit();
         doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
@@ -358,7 +359,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
-        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+        assertNotNull(dataPutRequest.getResult());
     }
 
     @Override

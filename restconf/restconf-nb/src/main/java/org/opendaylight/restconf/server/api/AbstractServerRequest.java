@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * Abstract base class for {@link ServerRequest} implementations.
@@ -60,7 +59,7 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
     }
 
     @Override
-    public final void completeWith(final RestconfDocumentedException failure) {
+    public final void completeWith(final ServerException failure) {
         onFailure(requireNonNull(failure));
     }
 
@@ -75,5 +74,5 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
 
     protected abstract void onSuccess(T result);
 
-    protected abstract void onFailure(RestconfDocumentedException failure);
+    protected abstract void onFailure(ServerException failure);
 }
