@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ServerError;
@@ -64,15 +62,14 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
     @Override
     public void onFailure(final Throwable cause) {
         if (cause instanceof DOMActionException e) {
-            request.completeWith(new RestconfDocumentedException(new RestconfError(
-                ErrorType.RPC, ErrorTag.OPERATION_FAILED, e.getMessage())));
-        } else if (cause instanceof RestconfDocumentedException e) {
+            request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, e));
+        } else if (cause instanceof ServerException e) {
             request.completeWith(e);
         } else if (cause instanceof CancellationException e) {
-            request.completeWith(new RestconfDocumentedException("Action cancelled while executing",
-                ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, e));
+            request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.PARTIAL_OPERATION,
+                "Action cancelled while executing", e));
         } else {
-            request.completeWith(new RestconfDocumentedException("Invocation failed", cause));
+            request.completeWith(new ServerException("Invocation failed", cause));
         }
     }
 }

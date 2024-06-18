@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
@@ -275,7 +274,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             final String fileName, final String revision, final Class<? extends SourceRepresentation> representation) {
         final var mountOffset = mountPath.indexOf("yang-ext", "mount");
         if (mountOffset != mountPath.steps().size() - 1) {
-            request.completeWith(new RestconfDocumentedException("Mount path has to end with yang-ext:mount"));
+            request.completeWith(new ServerException("Mount path has to end with yang-ext:mount"));
             return;
         }
 
@@ -294,23 +293,23 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             final String moduleName, final String revisionStr,
             final Class<? extends SourceRepresentation> representation) {
         if (moduleName == null) {
-            request.completeWith(new RestconfDocumentedException("Module name must be supplied",
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Module name must be supplied"));
             return;
         }
         if (moduleName.isEmpty() || !YangNames.IDENTIFIER_START.matches(moduleName.charAt(0))) {
-            request.completeWith(new RestconfDocumentedException(
-                "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Identifier must start with character from set 'a-zA-Z_"));
             return;
         }
         if (moduleName.toUpperCase(Locale.ROOT).startsWith("XML")) {
-            request.completeWith(new RestconfDocumentedException(
-                "Identifier must NOT start with XML ignore case", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Identifier must NOT start with XML ignore case"));
             return;
         }
         if (YangNames.NOT_IDENTIFIER_PART.matchesAnyOf(moduleName.substring(1))) {
-            request.completeWith(new RestconfDocumentedException(
-                "Supplied name has not expected identifier format", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Supplied name has not expected identifier format"));
             return;
         }
 
@@ -319,9 +318,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             revision = Revision.ofNullable(revisionStr).orElse(null);
         } catch (final DateTimeParseException e) {
-            request.completeWith(new RestconfDocumentedException(
-                "Supplied revision is not in expected date format YYYY-mm-dd",
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Supplied revision is not in expected date format YYYY-mm-dd", e));
             return;
         }
 
