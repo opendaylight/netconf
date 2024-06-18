@@ -100,7 +100,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(TransactionUtil.decodeException(cause, "DELETE", path, modelContext()));
+                request.completeWith(decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -197,7 +197,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
             final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields)
                 throws ServerException {
-        return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
+        return syncAccess(read(store, path, fields), path).orElse(null);
     }
 
     @Override

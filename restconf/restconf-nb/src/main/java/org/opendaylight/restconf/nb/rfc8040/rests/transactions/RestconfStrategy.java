@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.FutureCallback;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -43,6 +46,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
@@ -317,7 +322,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(TransactionUtil.decodeException(cause, "MERGE", path, modelContext()));
+                request.completeWith(decodeException(cause, "MERGE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -361,7 +366,7 @@ public abstract class RestconfStrategy implements DatabindAware {
             final NormalizedNode data, final @Nullable Insert insert) {
         Boolean exists;
         try {
-            exists = TransactionUtil.syncAccess(exists(path), path);
+            exists = syncAccess(exists(path), path);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
@@ -389,7 +394,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(TransactionUtil.decodeException(cause, "PUT", path, modelContext()));
+                request.completeWith(decodeException(cause, "PUT", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -555,7 +560,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(TransactionUtil.decodeException(cause, "POST", path, modelContext()));
+                request.completeWith(decodeException(cause, "POST", path));
             }
 
         }, MoreExecutors.directExecutor());
@@ -772,7 +777,7 @@ public abstract class RestconfStrategy implements DatabindAware {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 request.completeWith(new DataYangPatchResult(
                     new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, convertErrors(
-                        TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors()))));
+                        decodeException(cause, "PATCH", null).getErrors()))));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -856,7 +861,7 @@ public abstract class RestconfStrategy implements DatabindAware {
      */
     static void checkItemDoesNotExists(final DatabindContext databind, final ListenableFuture<Boolean> existsFuture,
             final YangInstanceIdentifier path) throws ServerException {
-        if (TransactionUtil.syncAccess(existsFuture, path)) {
+        if (syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
                 new ServerErrorPath(databind, path));
@@ -962,7 +967,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
     private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) throws ServerException {
-        return TransactionUtil.syncAccess(read(store, path), path).orElse(null);
+        return syncAccess(read(store, path), path).orElse(null);
     }
 
     final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
@@ -1557,5 +1562,56 @@ public abstract class RestconfStrategy implements DatabindAware {
             path.inference().toSchemaInferenceStack().toSchemaNodeIdentifier(),
             DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
             new DOMRpcResultCallback(request, path), MoreExecutors.directExecutor());
+    }
+
+    /**
+     * Synchronize access to a path resource, translating any failure to a {@link ServerException}.
+     *
+     * @param <T> The type being accessed
+     * @param future Access future
+     * @param path Path being accessed
+     * @return The accessed value
+     * @throws ServerException if commit fails
+     */
+    static final <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
+            throws ServerException {
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            throw new ServerException("Failed to access " + path, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ServerException("Interrupted while accessing " + path, e);
+        }
+    }
+
+    final @NonNull RestconfDocumentedException decodeException(final Throwable ex, final String txType,
+            final YangInstanceIdentifier path) {
+        if (ex instanceof TransactionCommitFailedException) {
+            // If device send some error message we want this message to get to client and not just to throw it away
+            // or override it with new generic message. We search for NetconfDocumentedException that was send from
+            // netconfSB and we create RestconfDocumentedException accordingly.
+            for (var error : Throwables.getCausalChain(ex)) {
+                if (error instanceof DocumentedException documentedError) {
+                    final ErrorTag errorTag = documentedError.getErrorTag();
+                    if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
+                        LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
+                        return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
+                            ErrorTag.DATA_EXISTS, "Data already exists", path), modelContext());
+                    } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
+                        LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+                        return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
+                            ErrorTag.DATA_MISSING, "Data does not exist", path), modelContext());
+                    }
+                } else if (error instanceof NetconfDocumentedException netconfError) {
+                    return new RestconfDocumentedException(netconfError.getMessage(), netconfError.getErrorType(),
+                        netconfError.getErrorTag(), ex);
+                }
+            }
+
+            return new RestconfDocumentedException("Transaction(" + txType + ") not committed correctly", ex);
+        }
+
+        return new RestconfDocumentedException("Transaction(" + txType + ") failed", ex);
     }
 }
