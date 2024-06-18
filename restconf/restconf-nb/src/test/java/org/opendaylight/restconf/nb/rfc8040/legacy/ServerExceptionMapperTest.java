@@ -22,15 +22,17 @@ import javax.ws.rs.core.Response.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerErrorInfo;
+import org.opendaylight.restconf.server.api.ServerErrorPath;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -39,20 +41,15 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-class RestconfDocumentedExceptionMapperTest {
+class ServerExceptionMapperTest {
     private static final QNameModule MONITORING_MODULE_INFO =
         QNameModule.ofRevision("instance:identifier:patch:module", "2015-11-21");
+    private static final DatabindContext DATABIND = DatabindContext.ofModel(
+        YangParserTestUtils.parseYangResources(ServerExceptionMapperTest.class,
+            "/restconf/impl/ietf-restconf@2017-01-26.yang",
+            "/instanceidentifier/yang/instance-identifier-patch-module.yang"));
 
-    private static RestconfDocumentedExceptionMapper exceptionMapper;
-
-    @BeforeAll
-    static void setupExceptionMapper() {
-        final var schemaContext = YangParserTestUtils.parseYangResources(
-                RestconfDocumentedExceptionMapperTest.class, "/restconf/impl/ietf-restconf@2017-01-26.yang",
-                "/instanceidentifier/yang/instance-identifier-patch-module.yang");
-        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext),
-            ErrorTagMapping.RFC8040);
-    }
+    private final ServerExceptionMapper exceptionMapper = new ServerExceptionMapper(ErrorTagMapping.RFC8040);
 
     /**
      * Testing entries 0 - 6: testing of media types and empty responses.
@@ -62,25 +59,26 @@ class RestconfDocumentedExceptionMapperTest {
      * @return Testing data for parametrized test.
      */
     static Stream<Arguments> data() {
-        final RestconfDocumentedException sampleComplexError =
-            new RestconfDocumentedException("general message", new IllegalStateException("cause"), List.of(
-                new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1", "app tag #1"),
-                new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                    "message 2", "app tag #2", "my info"),
-                new RestconfError(ErrorType.RPC, ErrorTag.DATA_MISSING,
-                    "message 3", " app tag #3", "my error info", YangInstanceIdentifier.builder()
+        final var sampleComplexError = new ServerException(List.of(
+            new ServerError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, new ErrorMessage("message 1"), "app tag #1",
+                null, null),
+            new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("message 2"),
+                "app tag #2", null, new ServerErrorInfo("my info")),
+            new ServerError(ErrorType.RPC, ErrorTag.DATA_MISSING, new ErrorMessage("message 3"), " app tag #3",
+                new ServerErrorPath(DATABIND, YangInstanceIdentifier.builder()
                     .node(QName.create(MONITORING_MODULE_INFO, "patch-cont"))
                     .node(QName.create(MONITORING_MODULE_INFO, "my-list1"))
                     .nodeWithKey(QName.create(MONITORING_MODULE_INFO, "my-list1"),
                         QName.create(MONITORING_MODULE_INFO, "name"), "sample")
                     .node(QName.create(MONITORING_MODULE_INFO, "my-leaf12"))
-                    .build())));
+                    .build()), new ServerErrorInfo("my error info"))),
+            new IllegalStateException("cause"), "general message");
 
         return Stream.of(
             arguments(
                 "Mapping of the exception with one error entry but null status code. This status code should"
                     + " be derived from single error entry; JSON output",
-                new RestconfDocumentedException("Sample error message"),
+                new ServerException("Sample error message"),
                 mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(JaxRsMediaTypes.APPLICATION_YANG_PATCH_JSON)),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
                     .type(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON)
@@ -101,9 +99,10 @@ class RestconfDocumentedExceptionMapperTest {
             arguments(
                 "Mapping of the exception with two error entries but null status code. This status code should"
                     + "be derived from the first error entry that is specified; XML output",
-                new RestconfDocumentedException("general message", new IllegalStateException("cause"), List.of(
-                    new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1"),
-                    new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "message 2"))),
+                new ServerException(List.of(
+                    new ServerError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1"),
+                    new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "message 2")),
+                    new IllegalStateException("cause"), "general message"),
                 mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(JaxRsMediaTypes.APPLICATION_YANG_PATCH_XML)),
                 Response.status(Status.BAD_REQUEST)
                     .type(JaxRsMediaTypes.APPLICATION_YANG_DATA_XML)
@@ -195,8 +194,8 @@ class RestconfDocumentedExceptionMapperTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    void testMappingOfExceptionToResponse(String testDescription, RestconfDocumentedException thrownException,
-        HttpHeaders httpHeaders, Response expectedResponse) throws JSONException {
+    void testMappingOfExceptionToResponse(final String testDescription, final ServerException thrownException,
+            final HttpHeaders httpHeaders, final Response expectedResponse) throws JSONException {
         exceptionMapper.setHttpHeaders(httpHeaders);
         final Response response = exceptionMapper.toResponse(thrownException);
         compareResponseWithExpectation(expectedResponse, response);
@@ -204,8 +203,8 @@ class RestconfDocumentedExceptionMapperTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    void testFormattingJson(String testDescription, RestconfDocumentedException thrownException,
-        HttpHeaders httpHeaders, Response expectedResponse) throws JSONException {
+    void testFormattingJson(final String testDescription, final ServerException thrownException,
+        final HttpHeaders httpHeaders, final Response expectedResponse) throws JSONException {
         assumeTrue(expectedResponse.getMediaType().equals(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON));
 
         exceptionMapper.setHttpHeaders(httpHeaders);
