@@ -445,11 +445,6 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>restconf-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
