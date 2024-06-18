@@ -13,7 +13,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -44,7 +46,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         static final @NonNull Success INSTANCE = new Success();
     }
 
-    private final SettableRestconfFuture<Result> future;
+    private final CompletableFuture<Result> future;
     private final AtomicInteger counter;
     private final @NonNull YangInstanceIdentifier parentPath;
     private final @NonNull YangInstanceIdentifier path;
@@ -52,7 +54,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
     //    private final @NonNull DatabindContext databind;
     private final boolean expected;
 
-    private ExistenceCheck(final DatabindContext databind, final SettableRestconfFuture<Result> future,
+    private ExistenceCheck(final DatabindContext databind, final CompletableFuture<Result> future,
             final AtomicInteger counter, final YangInstanceIdentifier parentPath, final YangInstanceIdentifier path,
             final boolean expected) {
         // FIXME: NETCONF-1188: needed for ServerErrorPath propagation
@@ -64,10 +66,10 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         this.expected = expected;
     }
 
-    static RestconfFuture<Result> start(final DatabindContext databind, final DOMDataTreeReadOperations tx,
+    static Future<Result> start(final DatabindContext databind, final DOMDataTreeReadOperations tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath, final boolean expected,
             final Collection<? extends @NonNull NormalizedNode> children) {
-        final var future = new SettableRestconfFuture<Result>();
+        final var future = new CompletableFuture<Result>();
         final var counter = new AtomicInteger(children.size());
 
         for (var child : children) {
@@ -84,7 +86,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         if (expected != result) {
             // This is okay to race with onFailure(): we either report this or failure, the end result is failure,
             // though slightly different. This a result of datastore timing, hence there is nothing we can do about it.
-            future.set(new Conflict(path));
+            future.complete(new Conflict(path));
             // Failure is set first, before a parallel success can see counter being 0, hence we win
             counter.decrementAndGet();
             return;
@@ -93,7 +95,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         final int count = counter.decrementAndGet();
         if (count == 0) {
             // Everything else was a success, we ware done.
-            future.set(Success.INSTANCE);
+            future.complete(Success.INSTANCE);
         }
     }
 
@@ -105,7 +107,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         // We are not decrementing the counter here to ensure onSuccess() does not attempt to set success. Failure paths
         // are okay -- they differ only in what we report. We rely on SettableFuture's synchronization faculties to
         // reconcile any conflict with onSuccess() failure path.
-        future.setFailure(new ServerException(cause.getErrorList().stream()
+        future.completeExceptionally(new ServerException(cause.getErrorList().stream()
             .map(ServerError::ofRpcError)
             .collect(Collectors.toList()), cause, "Could not determine the existence of path %s", parentPath));
     }
