@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A {@link ServerRequest} transformed through a {@link Function}.
@@ -37,7 +36,7 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     }
 
     @Override
-    public void completeWith(final RestconfDocumentedException failure) {
+    public void completeWith(final ServerException failure) {
         delegate.completeWith(failure);
     }
 }
