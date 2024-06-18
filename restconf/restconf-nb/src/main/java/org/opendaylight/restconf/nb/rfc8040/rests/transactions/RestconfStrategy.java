@@ -336,8 +336,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         try {
             insert = Insert.of(databind, request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
         final NormalizedNode data;
@@ -919,9 +918,8 @@ public abstract class RestconfStrategy implements DatabindAware {
             final @Nullable ConfigurationMetadata metadata) {
         // Non-existing data
         if (node == null) {
-            request.completeWith(new RestconfDocumentedException(
-                "Request could not be completed because the relevant data model content does not exist",
-                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                "Request could not be completed because the relevant data model content does not exist"));
             return;
         }
 
@@ -1359,8 +1357,8 @@ public abstract class RestconfStrategy implements DatabindAware {
 
         if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
-            request.completeWith(new RestconfDocumentedException("RPC invocation is not available",
-                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                "RPC invocation is not available"));
             return;
         }
 
@@ -1373,12 +1371,11 @@ public abstract class RestconfStrategy implements DatabindAware {
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.debug("RPC invocation failed, cause");
-                if (cause instanceof RestconfDocumentedException ex) {
+                if (cause instanceof ServerException ex) {
                     request.completeWith(ex);
                 } else {
                     // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                    request.completeWith(new RestconfDocumentedException(cause,
-                        new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
+                    request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
                 }
             }
         }, MoreExecutors.directExecutor());
@@ -1428,8 +1425,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         } else if (YinTextSource.class.isAssignableFrom(representation)) {
             exportSource(request, modelContext(), src, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
         } else {
-            request.completeWith(new RestconfDocumentedException(
-                "Unsupported source representation " + representation.getName()));
+            request.completeWith(new ServerException("Unsupported source representation " + representation.getName()));
         }
     }
 
@@ -1461,8 +1457,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         final var sb = new StringBuilder().append("Source ").append(source.name().getLocalName());
         optRevision.ifPresent(rev -> sb.append('@').append(rev));
         sb.append(" not found");
-        request.completeWith(new RestconfDocumentedException(sb.toString(),
-            ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
+        request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
     }
 
     public final void dataPOST(final ServerRequest<DataPostResult> request, final ApiPath apiPath,
@@ -1492,7 +1487,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         }
         // Note: this should never happen
         // FIXME: we should be able to eliminate this path with Java 21+ pattern matching
-        request.completeWith(new RestconfDocumentedException("Unhandled path " + path));
+        request.completeWith(new ServerException("Unhandled path " + path));
     }
 
     public void dataCreatePOST(final ServerRequest<? super CreateResourceResult> request, final ChildBody body) {
@@ -1505,8 +1500,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         try {
             insert = Insert.of(path.databind(), request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
 
