@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41f6b6fc_aa883dcf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-06-18T12:21:19Z",
+      "side": 1,
+      "message": "perhaps not... we need to check what ExistenceCheck/RestconfTransaction really needs",
+      "revId": "5e8e87e82d91ae83044dd7bb6a55c4dfcfaa427a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
