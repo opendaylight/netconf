@@ -35,9 +35,10 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -151,29 +152,29 @@ class CreateNotificationStreamRpcTest {
     void createStreamWrongValueTest() {
         rpc.invoke(request, RESTCONF_URI, createInput("path", "String value"));
 
-        final var ex = assertThrows(RestconfDocumentedException.class, request::getResult);
-        final var errors = ex.getErrors();
+        final var ex = assertThrows(ServerException.class, request::getResult);
+        final var errors = ex.errors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.BAD_ELEMENT, error.getErrorTag());
-        assertEquals("""
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.BAD_ELEMENT, error.tag());
+        assertEquals(new ErrorMessage("""
             Bad child leafNode (urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote@2014-01-14)path = \
             "String value"\
-            """, error.getErrorMessage());
+            """), error.message());
     }
 
     @Test
     void createStreamWrongInputRpcTest() {
         rpc.invoke(request, RESTCONF_URI, createInput(null, null));
 
-        final var ex = assertThrows(RestconfDocumentedException.class, request::getResult);
-        final var errors = ex.getErrors();
+        final var ex = assertThrows(ServerException.class, request::getResult);
+        final var errors = ex.errors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.MISSING_ELEMENT, error.getErrorTag());
-        assertEquals("missing path", error.getErrorMessage());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.MISSING_ELEMENT, error.tag());
+        assertEquals(new ErrorMessage("missing path"), error.message());
     }
 
     private OperationInput createInput(final @Nullable String leafName, final Object leafValue) {

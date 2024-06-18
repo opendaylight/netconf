@@ -16,8 +16,8 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,18 +46,19 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
         super(queryParameters, defaultPrettyPrint);
     }
 
-    public T getResult() throws InterruptedException, TimeoutException {
+    public T getResult() throws ServerException, InterruptedException, TimeoutException {
         return getResult(1, TimeUnit.SECONDS);
     }
 
     @SuppressWarnings("checkstyle:avoidHidingCauseException")
-    public T getResult(final int timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
+    public T getResult(final int timeout, final TimeUnit unit)
+            throws ServerException, InterruptedException, TimeoutException {
         try {
             return future.get(timeout, unit);
         } catch (ExecutionException e) {
             LOG.debug("Request failed", e);
             final var cause = e.getCause();
-            Throwables.throwIfInstanceOf(cause, RestconfDocumentedException.class);
+            Throwables.throwIfInstanceOf(cause, ServerException.class);
             Throwables.throwIfUnchecked(cause);
             throw new UncheckedExecutionException(cause);
         }
@@ -69,7 +70,7 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     @Override
-    protected void onFailure(final RestconfDocumentedException failure) {
+    protected void onFailure(final ServerException failure) {
         future.completeExceptionally(failure);
     }
 }
