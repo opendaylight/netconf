@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
@@ -81,7 +81,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onFailure(final Throwable cause) {
                     LOG.debug("Failed to add stream {}", name, cause);
                     streams.remove(name, stream);
-                    request.completeWith(new RestconfDocumentedException("Failed to allocate stream " + name, cause));
+                    request.completeWith(new ServerException("Failed to allocate stream " + name, cause));
                 }
             }, MoreExecutors.directExecutor());
     }

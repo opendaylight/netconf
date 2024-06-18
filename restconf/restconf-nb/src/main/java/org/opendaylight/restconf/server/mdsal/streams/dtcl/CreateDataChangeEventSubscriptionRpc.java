@@ -17,7 +17,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
@@ -108,14 +107,12 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
         try {
             path = leaf(body, PATH_NODEID, YangInstanceIdentifier.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
 
         if (path == null) {
-            request.completeWith(new RestconfDocumentedException("missing path",
-                ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT));
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "missing path"));
             return;
         }
 
