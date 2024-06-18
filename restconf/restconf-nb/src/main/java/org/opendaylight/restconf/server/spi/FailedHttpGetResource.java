@@ -12,11 +12,11 @@ import static java.util.Objects.requireNonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 
 @NonNullByDefault
-public record FailedHttpGetResource(RestconfDocumentedException cause) implements HttpGetResource {
+public record FailedHttpGetResource(ServerException cause) implements HttpGetResource {
     public FailedHttpGetResource {
         requireNonNull(cause);
     }
