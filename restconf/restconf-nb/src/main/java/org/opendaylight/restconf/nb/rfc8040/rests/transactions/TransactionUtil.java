@@ -16,6 +16,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -34,22 +35,23 @@ final class TransactionUtil {
     }
 
     /**
-     * Synchronize access to a path resource, translating any failure to a {@link RestconfDocumentedException}.
+     * Synchronize access to a path resource, translating any failure to a {@link ServerException}.
      *
      * @param <T> The type being accessed
      * @param future Access future
      * @param path Path being accessed
      * @return The accessed value
-     * @throws RestconfDocumentedException if commit fails
+     * @throws ServerException if commit fails
      */
-    static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path) {
+    static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
+            throws ServerException {
         try {
             return future.get();
         } catch (ExecutionException e) {
-            throw new RestconfDocumentedException("Failed to access " + path, e);
+            throw new ServerException("Failed to access " + path, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
+            throw new ServerException("Interrupted while accessing " + path, e);
         }
     }
 
