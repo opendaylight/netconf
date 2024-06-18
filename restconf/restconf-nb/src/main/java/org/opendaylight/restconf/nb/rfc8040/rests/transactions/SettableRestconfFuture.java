@@ -5,9 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.errors;
+package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
+
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A {@link RestconfFuture} which allows the result to be set via {@link #set(Object)} and
@@ -15,7 +17,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <V> resulting value type
  */
-public final class SettableRestconfFuture<V> extends RestconfFuture<V> {
+final class SettableRestconfFuture<V> extends RestconfFuture<V> {
     @Override
     public boolean set(final V value) {
         return super.set(requireNonNull(value));
