@@ -15,6 +15,7 @@ import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.query.FieldsParam;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -26,7 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 class MdsalFieldsParamTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
     protected List<Set<QName>> translateFields(final EffectiveModelContext modelContext,
-            final DataSchemaContext startNode, final FieldsParam fields) {
+            final DataSchemaContext startNode, final FieldsParam fields) throws ServerException {
         return MdsalRestconfStrategy.translateFieldsParam(modelContext, startNode, fields);
     }
 

@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -96,7 +97,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void deleteImpl(final YangInstanceIdentifier path) {
+    void deleteImpl(final YangInstanceIdentifier path) throws ServerException {
         if (isListPath(path, databind.modelContext())) {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
@@ -111,7 +112,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void removeImpl(final YangInstanceIdentifier path) {
+    void removeImpl(final YangInstanceIdentifier path) throws ServerException {
         if (isListPath(path, databind.modelContext())) {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
@@ -126,7 +127,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
+    @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws ServerException {
         // reading list is mainly invoked for subsequent removal,
         // cache data to avoid extra read invocation on delete/remove
         final var result =  TransactionUtil.syncAccess(read(path), path);
@@ -134,7 +135,8 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         return (NormalizedNodeContainer<?>) result.orElse(null);
     }
 
-    private @NonNull Collection<? extends NormalizedNode> getListItemsForRemove(final YangInstanceIdentifier path) {
+    private @NonNull Collection<? extends NormalizedNode> getListItemsForRemove(final YangInstanceIdentifier path)
+            throws ServerException {
         final var cached = readListCache.remove(path);
         if (cached != null) {
             return cached;

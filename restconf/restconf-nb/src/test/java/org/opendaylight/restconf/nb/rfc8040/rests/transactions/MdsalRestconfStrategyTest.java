@@ -361,7 +361,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Test
-    void readLeafWithDefaultParameters() {
+    void readLeafWithDefaultParameters() throws Exception {
         final var data = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
@@ -377,7 +377,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Test
-    void readContainerWithDefaultParameters() {
+    void readContainerWithDefaultParameters() throws Exception {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
         final var data = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
@@ -407,7 +407,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Test
-    void readLeafInListWithDefaultParameters() {
+    void readLeafInListWithDefaultParameters() throws Exception {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
         final var content = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))

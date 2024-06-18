@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -34,7 +33,6 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -102,15 +100,12 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture())
             .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
 
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> restconf
-            .postDataJSON(stringInputStream("""
+        final var error = assertError(ar -> restconf.postDataJSON(stringInputStream("""
                 {
                   "example-jukebox:jukebox" : {
                   }
                 }"""),
-            uriInfo, asyncResponse));
-
-        final var error = ex.getErrors().get(0);
+            uriInfo, ar));
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
     }
@@ -122,7 +117,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
 
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> restconf.postDataJSON(JUKEBOX_API_PATH,
+        final var error = assertError(ar -> restconf.postDataJSON(JUKEBOX_API_PATH,
             stringInputStream("""
                 {
                   "example-jukebox:playlist" : {
@@ -130,8 +125,8 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                     "description" : "band description"
                   }
                 }"""),
-                uriInfo, asyncResponse));
-        final var actualPath = ex.getErrors().get(0).getErrorPath();
+                uriInfo, ar));
+        final var actualPath = error.getErrorPath();
         final var expectedPath = YangInstanceIdentifier.builder(PLAYLIST_IID)
             .nodeWithKey(PLAYLIST_QNAME, QName.create(JUKEBOX_QNAME, "name"), "name of band")
             .build();
