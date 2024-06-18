@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.CancellationException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -1368,15 +1366,8 @@ public abstract class RestconfStrategy implements DatabindAware {
 
         Futures.addCallback(rpcService.invokeRpc(type, data), new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(final DOMRpcResult response) {
-                final var errors = response.errors();
-                if (errors.isEmpty()) {
-                    request.completeWith(outputToInvokeResult(path, response.value()));
-                } else {
-                    LOG.debug("RPC invocation reported {}", response.errors());
-                    request.completeWith(new RestconfDocumentedException("RPC implementation reported errors", null,
-                        response.errors()));
-                }
+            public void onSuccess(final DOMRpcResult result) {
+                completeRequest(request, path, result);
             }
 
             @Override
@@ -1393,7 +1384,21 @@ public abstract class RestconfStrategy implements DatabindAware {
         }, MoreExecutors.directExecutor());
     }
 
-    private static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
+    @NonNullByDefault
+    static void completeRequest(final ServerRequest<? super InvokeResult> request, final OperationPath path,
+            final DOMRpcResult rpcResult) {
+        final var errors = rpcResult.errors();
+        if (errors.isEmpty()) {
+            request.completeWith(outputToInvokeResult(path, rpcResult.value()));
+        } else {
+            LOG.debug("RPC invocation reported {}", rpcResult.errors());
+            request.completeWith(new ServerException(rpcResult.errors().stream()
+                .map(ServerError::ofRpcError)
+                .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
+        }
+    }
+
+    static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
             final @Nullable ContainerNode value) {
         return value == null || value.isEmpty() ? InvokeResult.EMPTY
             : new InvokeResult(NormalizedFormattableBody.of(path, value));
@@ -1557,33 +1562,6 @@ public abstract class RestconfStrategy implements DatabindAware {
         Futures.addCallback(actionService.invokeAction(
             path.inference().toSchemaInferenceStack().toSchemaNodeIdentifier(),
             DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
-            new FutureCallback<DOMRpcResult>() {
-                @Override
-                public void onSuccess(final DOMRpcResult result) {
-                    final var errors = result.errors();
-                    LOG.debug("InvokeAction Error Message {}", errors);
-                    if (errors.isEmpty()) {
-                        request.completeWith(outputToInvokeResult(path, result.value()));
-                    } else {
-                        request.completeWith(new RestconfDocumentedException("InvokeAction Error Message ", null,
-                            errors));
-                    }
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    if (cause instanceof DOMActionException) {
-                        request.completeWith(new RestconfDocumentedException(new RestconfError(
-                            ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
-                    } else if (cause instanceof RestconfDocumentedException e) {
-                        request.completeWith(e);
-                    } else if (cause instanceof CancellationException) {
-                        request.completeWith(new RestconfDocumentedException("Action cancelled while executing",
-                            ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, cause));
-                    } else {
-                        request.completeWith(new RestconfDocumentedException("Invocation failed", cause));
-                    }
-                }
-            }, MoreExecutors.directExecutor());
+            new DOMRpcResultCallback(request, path), MoreExecutors.directExecutor());
     }
 }
