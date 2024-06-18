@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.api;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing binding to
@@ -30,12 +29,7 @@ public sealed interface ServerRequest<T> permits AbstractServerRequest, Transfor
 
     void completeWith(T result);
 
-    // FIXME: NETCONF-1188: remove in favor of ServerException
-    void completeWith(RestconfDocumentedException failure);
-
-    default void completeWith(final ServerException failure) {
-        completeWith(failure.toLegacy());
-    }
+    void completeWith(ServerException failure);
 
     default <O> ServerRequest<O> transform(final Function<O, T> function) {
         return new TransformedServerRequest<>(this, function);

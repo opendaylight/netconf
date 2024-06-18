@@ -31,6 +31,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -200,10 +201,11 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         final var error = assertError(ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals("Request could not be completed because the relevant data model content does not exist",
-            error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
+        assertEquals(
+            new ErrorMessage("Request could not be completed because the relevant data model content does not exist"),
+            error.message());
     }
 
     /**

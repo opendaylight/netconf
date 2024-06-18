@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A {@link JaxRsServerRequest} resulting in a {@link FormattableBody}.
@@ -24,7 +23,7 @@ final class FormattableJaxRsServerRequest extends JaxRsServerRequest<Formattable
     }
 
     @Override
-    Response transform(final FormattableBody result) throws RestconfDocumentedException {
+    Response transform(final FormattableBody result) {
         return Response.ok().entity(new JaxRsFormattableBody(result, prettyPrint())).build();
     }
 }

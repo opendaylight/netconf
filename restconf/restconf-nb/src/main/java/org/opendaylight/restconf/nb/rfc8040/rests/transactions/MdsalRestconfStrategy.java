@@ -35,11 +35,11 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.HttpGetResource;
@@ -94,8 +94,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             @Override
             public void onSuccess(final Boolean result) {
                 if (!result) {
-                    cancelTx(new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL,
-                        ErrorTag.DATA_MISSING, path));
+                    cancelTx(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
+                        new ServerErrorPath(databind(), path)));
                     return;
                 }
 
@@ -108,18 +108,17 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        request.completeWith(new RestconfDocumentedException(
-                            "Transaction to delete " + path + " failed", cause));
+                        request.completeWith(new ServerException("Transaction to delete " + path + " failed", cause));
                     }
                 }, MoreExecutors.directExecutor());
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancelTx(new RestconfDocumentedException("Failed to access " + path, cause));
+                cancelTx(new ServerException("Failed to access " + path, cause));
             }
 
-            private void cancelTx(final RestconfDocumentedException ex) {
+            private void cancelTx(final ServerException ex) {
                 tx.cancel();
                 request.completeWith(ex);
             }
