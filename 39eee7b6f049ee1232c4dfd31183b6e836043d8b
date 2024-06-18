@@ -22,6 +22,30 @@
       },
       "revId": "39eee7b6f049ee1232c4dfd31183b6e836043d8b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "600b79b4_4cab5928",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-18T13:28:08Z",
+      "side": 1,
+      "message": "1. Deleting a node from the topology ensures that any outdated configuration is removed. When the node is re-added or reconnected, it is done with a fresh configuration and state\n2. CallHomeMountService handle both SSH and TLS connections for allowed devices.",
+      "parentUuid": "811c1867_821d23e1",
+      "range": {
+        "startLine": 264,
+        "startChar": 20,
+        "endLine": 264,
+        "endChar": 40
+      },
+      "revId": "39eee7b6f049ee1232c4dfd31183b6e836043d8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
