@@ -50,12 +50,9 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
@@ -86,7 +83,6 @@ import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.ServerError;
-import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -266,8 +262,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         }
         LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
         throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-            new ServerErrorPath(databind, mountPoint.getIdentifier()),
-            "Could not find a supported access interface in mount point");
+            "Could not find a supported access interface in mount point",
+            new ServerErrorPath(databind, mountPoint.getIdentifier()));
     }
 
     @Override
@@ -718,23 +714,13 @@ public abstract class RestconfStrategy implements DatabindAware {
                         }
                         break;
                     case Merge:
-                        try {
-                            tx.ensureParentsByMerge(targetNode);
-                            tx.merge(targetNode, patchEntity.getNode());
-                            editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
-                            noError = false;
-                        }
+                        tx.ensureParentsByMerge(targetNode);
+                        tx.merge(targetNode, patchEntity.getNode());
+                        editCollection.add(new PatchStatusEntity(editId, true, null));
                         break;
                     case Replace:
-                        try {
-                            tx.replace(targetNode, patchEntity.getNode());
-                            editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
-                            noError = false;
-                        }
+                        tx.replace(targetNode, patchEntity.getNode());
+                        editCollection.add(new PatchStatusEntity(editId, true, null));
                         break;
                     case Remove:
                         try {
@@ -776,27 +762,10 @@ public abstract class RestconfStrategy implements DatabindAware {
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 request.completeWith(new DataYangPatchResult(
-                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, convertErrors(
-                        decodeException(cause, "PATCH", null).getErrors()))));
+                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
+                        decodeException(cause, "PATCH", null).errors())));
             }
         }, MoreExecutors.directExecutor());
-    }
-
-    @Deprecated
-    private ServerError convertError(final RestconfError error) {
-        final var message = error.getErrorMessage();
-        final var path = error.getErrorPath();
-        final var info = error.getErrorInfo();
-
-        return new ServerError(error.getErrorType(), error.getErrorTag(),
-            message != null ? new ErrorMessage(message) : null, error.getErrorAppTag(),
-            path != null ? new ServerErrorPath(databind, path) : null,
-            info != null ? new ServerErrorInfo(info) : null);
-    }
-
-    @Deprecated
-    private List<ServerError> convertErrors(final List<RestconfError> errors) {
-        return errors.stream().map(this::convertError).collect(Collectors.toUnmodifiableList());
     }
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
@@ -907,9 +876,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         try {
             getParams = DataGetParams.of(request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RestconfDocumentedException(e,
-                new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Invalid GET /data parameters", null,
-                    e.getMessage())));
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Invalid GET /data parameters", e));
             return;
         }
         dataGET(request, path, getParams);
@@ -1419,9 +1387,8 @@ public abstract class RestconfStrategy implements DatabindAware {
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        request.completeWith(cause instanceof RestconfDocumentedException e ? e
-                            : new RestconfDocumentedException(cause.getMessage(), ErrorType.RPC,
-                                ErrorTag.OPERATION_FAILED, cause));
+                        request.completeWith(cause instanceof ServerException e ? e
+                            : new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
                     }
                 }, MoreExecutors.directExecutor());
                 return;
@@ -1585,7 +1552,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         }
     }
 
-    final @NonNull RestconfDocumentedException decodeException(final Throwable ex, final String txType,
+    final @NonNull ServerException decodeException(final Throwable ex, final String txType,
             final YangInstanceIdentifier path) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
@@ -1593,25 +1560,24 @@ public abstract class RestconfStrategy implements DatabindAware {
             // netconfSB and we create RestconfDocumentedException accordingly.
             for (var error : Throwables.getCausalChain(ex)) {
                 if (error instanceof DocumentedException documentedError) {
-                    final ErrorTag errorTag = documentedError.getErrorTag();
+                    final var errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-                        return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_EXISTS, "Data already exists", path), modelContext());
+                        return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
+                            path != null ? new ServerErrorPath(databind, path) : null, ex);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-                        return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_MISSING, "Data does not exist", path), modelContext());
+                        return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                            "Data does not exist", path != null ? new ServerErrorPath(databind, path) : null, ex);
                     }
                 } else if (error instanceof NetconfDocumentedException netconfError) {
-                    return new RestconfDocumentedException(netconfError.getMessage(), netconfError.getErrorType(),
-                        netconfError.getErrorTag(), ex);
+                    return new ServerException(netconfError.getErrorType(), netconfError.getErrorTag(), ex);
                 }
             }
 
-            return new RestconfDocumentedException("Transaction(" + txType + ") not committed correctly", ex);
+            return new ServerException("Transaction(" + txType + ") not committed correctly", ex);
         }
 
-        return new RestconfDocumentedException("Transaction(" + txType + ") failed", ex);
+        return new ServerException("Transaction(" + txType + ") failed", ex);
     }
 }

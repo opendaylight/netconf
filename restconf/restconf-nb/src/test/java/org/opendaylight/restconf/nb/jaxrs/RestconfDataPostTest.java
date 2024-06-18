@@ -106,8 +106,8 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                   }
                 }"""),
             uriInfo, ar));
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_EXISTS, error.tag());
     }
 
     @Test
@@ -126,11 +126,9 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                   }
                 }"""),
                 uriInfo, ar));
-        final var actualPath = error.getErrorPath();
-        final var expectedPath = YangInstanceIdentifier.builder(PLAYLIST_IID)
+        assertEquals(YangInstanceIdentifier.builder(PLAYLIST_IID)
             .nodeWithKey(PLAYLIST_QNAME, QName.create(JUKEBOX_QNAME, "name"), "name of band")
-            .build();
-        assertEquals(expectedPath, actualPath);
+            .build(), error.path().path());
     }
 
     @Test

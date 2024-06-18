@@ -14,7 +14,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,24 +23,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
-import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.ServerError;
-import org.opendaylight.restconf.server.api.ServerErrorInfo;
-import org.opendaylight.restconf.server.api.ServerErrorPath;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
-import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An {@link ExceptionMapper} that is responsible for transformation of thrown {@link RestconfDocumentedException} to
- * {@code errors} structure that is modelled by RESTCONF module (see section 8 of RFC-8040).
+ * An {@link ExceptionMapper} that is responsible for transformation of thrown {@link ServerException} to {@code errors}
+ * structure that is modelled by RESTCONF module (see section 8 of RFC-8040).
  *
  * @see Errors
  */
@@ -50,62 +43,27 @@ import org.slf4j.LoggerFactory;
 //                      with sufficient context to send it to JSON or XML -- very similar to a NormalizedNodePayload
 @Deprecated
 @Provider
-public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<RestconfDocumentedException> {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
+public final class ServerExceptionMapper implements ExceptionMapper<ServerException> {
+    private static final Logger LOG = LoggerFactory.getLogger(ServerExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
 
-    private final DatabindProvider databindProvider;
     private final ErrorTagMapping errorTagMapping;
 
     @Context
     private HttpHeaders headers;
 
-    /**
-     * Initialization of the exception mapper.
-     *
-     * @param databindProvider A {@link DatabindProvider}
-     */
-    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider,
-            final ErrorTagMapping errorTagMapping) {
-        this.databindProvider = requireNonNull(databindProvider);
+    public ServerExceptionMapper(final ErrorTagMapping errorTagMapping) {
         this.errorTagMapping = requireNonNull(errorTagMapping);
     }
 
     @Override
     @SuppressFBWarnings(value = "SLF4J_MANUALLY_PROVIDED_MESSAGE", justification = "In the debug messages "
             + "we don't to have full stack trace - getMessage(..) method provides finer output.")
-    public Response toResponse(final RestconfDocumentedException exception) {
+    public Response toResponse(final ServerException exception) {
         final var msg = exception.getMessage();
         LOG.debug("Starting to map received exception to error response: {}", msg);
 
-        // Convert RestconfError to ServerError
-        final var legacyErrors = exception.getErrors();
-        final var builder = new ArrayList<ServerError>(legacyErrors.size());
-        DatabindContext databind = null;
-        for (var legacy : legacyErrors) {
-            final ServerErrorPath path;
-            final var legacyPath = legacy.getErrorPath();
-            if (legacyPath != null) {
-                if (databind == null) {
-                    final var modelContext = exception.modelContext();
-                    databind = modelContext != null ? DatabindContext.ofModel(modelContext)
-                        : databindProvider.currentDatabind();
-                }
-                path = new ServerErrorPath(databind, legacyPath);
-            } else {
-                path = null;
-            }
-
-            final var legacyMessage = legacy.getErrorMessage();
-            final var legacyInfo = legacy.getErrorInfo();
-            builder.add(new ServerError(legacy.getErrorType(), legacy.getErrorTag(),
-                legacyMessage != null ? new ErrorMessage(legacyMessage) : null,
-                legacy.getErrorAppTag(),
-                path,
-                legacyInfo != null ? new ServerErrorInfo(legacyInfo) : null));
-        }
-
-        final var body = new YangErrorsBody(builder);
+        final var body = new YangErrorsBody(exception.errors());
         final var errors = body.errors();
         final var statusCodes = errors.stream()
             .map(restconfError -> errorTagMapping.statusOf(restconfError.tag()))
@@ -150,7 +108,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     private MediaType getSupportedMediaType() {
         final var acceptableAndSupportedMediaTypes = headers.getAcceptableMediaTypes().stream()
-            .filter(RestconfDocumentedExceptionMapper::isCompatibleMediaType)
+            .filter(ServerExceptionMapper::isCompatibleMediaType)
             .collect(Collectors.toSet());
         if (acceptableAndSupportedMediaTypes.isEmpty()) {
             // check content type of the request
@@ -207,17 +165,17 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     private static Optional<MediaType> chooseMediaType(final List<MediaType> options) {
         return options.stream()
-                .filter(RestconfDocumentedExceptionMapper::isJsonCompatibleMediaType)
+                .filter(ServerExceptionMapper::isJsonCompatibleMediaType)
                 .findFirst()
                 .map(Optional::of)
                 .orElse(options.stream()
-                        .filter(RestconfDocumentedExceptionMapper::isXmlCompatibleMediaType)
+                        .filter(ServerExceptionMapper::isXmlCompatibleMediaType)
                         .findFirst());
     }
 
     /**
-     * Mapping of JSON-compatible type to {@link RestconfDocumentedExceptionMapper#YANG_DATA_JSON_TYPE}
-     * or XML-compatible type to {@link RestconfDocumentedExceptionMapper#YANG_DATA_XML_TYPE}.
+     * Mapping of JSON-compatible type to {@link ServerExceptionMapper#YANG_DATA_JSON_TYPE}
+     * or XML-compatible type to {@link ServerExceptionMapper#YANG_DATA_XML_TYPE}.
      *
      * @param mediaTypeBase Base media type from which the response media-type is built.
      * @return Derived media type.
