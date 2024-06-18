@@ -5,22 +5,23 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.errors;
+package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import com.google.common.util.concurrent.FutureCallback;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A {@link FutureCallback} tied to a {@link RestconfFuture}.
  *
  * @param <V> value type
  */
-public abstract class RestconfCallback<V> implements FutureCallback<@NonNull V> {
+abstract class RestconfCallback<V> implements FutureCallback<@NonNull V> {
     @Override
     public final void onFailure(final Throwable cause) {
         onFailure(cause instanceof RestconfDocumentedException rde ? rde
             : new RestconfDocumentedException("Unexpected failure", cause));
     }
 
-    protected abstract void onFailure(@NonNull RestconfDocumentedException failure);
+    abstract void onFailure(@NonNull RestconfDocumentedException failure);
 }
