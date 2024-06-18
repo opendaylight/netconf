@@ -98,7 +98,7 @@ class NC1265Test {
 
     @Test
     void noslashInstanceIdentifierKey() {
-        final var error = assertRestconfError("nc1265:bar=nc1265:baz=123");
+        final var error = assertError("nc1265:bar=nc1265:baz=123");
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
         assertEquals(new ErrorMessage("Invalid value 'nc1265:baz=123' for (nc1265)key"), error.message());
@@ -109,7 +109,7 @@ class NC1265Test {
 
     @Test
     void malformedInstanceIdentifierKey() {
-        final var error = assertRestconfError("nc1265:bar=%2Fnc1265:baz[key='abc']");
+        final var error = assertError("nc1265:bar=%2Fnc1265:baz[key='abc']");
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
         assertEquals(new ErrorMessage("Invalid value '/nc1265:baz[key='abc']' for (nc1265)key"), error.message());
@@ -129,7 +129,7 @@ class NC1265Test {
         }
     }
 
-    private static ServerError assertRestconfError(final String apiPath) {
+    private static ServerError assertError(final String apiPath) {
         final var parsed = assertApiPath(apiPath);
         final var errors = assertThrows(ServerException.class, () -> NORMALIZER.normalizeDataPath(parsed)).errors();
         assertEquals(1, errors.size());
