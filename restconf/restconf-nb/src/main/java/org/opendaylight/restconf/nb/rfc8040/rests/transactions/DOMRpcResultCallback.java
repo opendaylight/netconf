@@ -55,7 +55,7 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
         if (errors.isEmpty()) {
             request.completeWith(RestconfStrategy.outputToInvokeResult(path, result.value()));
         } else {
-            request.completeWith(new ServerException("Invocation failed", errors));
+            request.completeWith(new ServerException(errors, null, "Invocation failed"));
         }
     }
 
