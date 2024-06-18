@@ -13,7 +13,6 @@ import java.io.Serializable;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
@@ -108,37 +107,6 @@ public class RestconfError implements Serializable {
         this.errorAppTag = errorAppTag;
         this.errorInfo = errorInfo;
         this.errorPath = errorPath;
-    }
-
-    /**
-     * Constructs a RestConfError object from an RpcError.
-     */
-    public RestconfError(final RpcError rpcError) {
-        errorType = rpcError.getErrorType();
-
-        final var tag = rpcError.getTag();
-        errorTag = tag != null ? tag : ErrorTag.OPERATION_FAILED;
-
-        errorMessage = rpcError.getMessage();
-        errorAppTag = rpcError.getApplicationTag();
-        errorInfo = rpcErrorInfo(rpcError);
-        errorPath = null;
-    }
-
-    private static String rpcErrorInfo(final RpcError rpcError) {
-        final var info = rpcError.getInfo();
-        if (info != null) {
-            return info;
-        }
-        final var cause = rpcError.getCause();
-        if (cause != null) {
-            return cause.getMessage();
-        }
-        final var severity = rpcError.getSeverity();
-        if (severity != null) {
-            return "<severity>" + severity.elementBody() + "</severity>";
-        }
-        return null;
     }
 
     public @NonNull ErrorType getErrorType() {

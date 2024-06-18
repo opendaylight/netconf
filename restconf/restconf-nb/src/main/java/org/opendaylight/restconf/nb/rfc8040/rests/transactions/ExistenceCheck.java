@@ -15,11 +15,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -45,10 +48,15 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
     private final AtomicInteger counter;
     private final @NonNull YangInstanceIdentifier parentPath;
     private final @NonNull YangInstanceIdentifier path;
+    // FIXME: NETCONF-1188: needed for ServerErrorPath propagation
+    //    private final @NonNull DatabindContext databind;
     private final boolean expected;
 
-    private ExistenceCheck(final SettableRestconfFuture<Result> future, final AtomicInteger counter,
-            final YangInstanceIdentifier parentPath, final YangInstanceIdentifier path, final boolean expected) {
+    private ExistenceCheck(final DatabindContext databind, final SettableRestconfFuture<Result> future,
+            final AtomicInteger counter, final YangInstanceIdentifier parentPath, final YangInstanceIdentifier path,
+            final boolean expected) {
+        // FIXME: NETCONF-1188: needed for ServerErrorPath propagation
+        //      this.databind = requireNonNull(databind);
         this.future = requireNonNull(future);
         this.counter = requireNonNull(counter);
         this.parentPath = requireNonNull(parentPath);
@@ -56,7 +64,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         this.expected = expected;
     }
 
-    static RestconfFuture<Result> start(final DOMDataTreeReadOperations tx,
+    static RestconfFuture<Result> start(final DatabindContext databind, final DOMDataTreeReadOperations tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath, final boolean expected,
             final Collection<? extends @NonNull NormalizedNode> children) {
         final var future = new SettableRestconfFuture<Result>();
@@ -64,8 +72,9 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
 
         for (var child : children) {
             final var path = parentPath.node(child.name());
-            tx.exists(datastore, path).addCallback(new ExistenceCheck(future, counter, parentPath, path, expected),
-                MoreExecutors.directExecutor());
+            tx.exists(datastore, path)
+                .addCallback(new ExistenceCheck(databind, future, counter, parentPath, path, expected),
+                    MoreExecutors.directExecutor());
         }
         return future;
     }
@@ -96,7 +105,8 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         // We are not decrementing the counter here to ensure onSuccess() does not attempt to set success. Failure paths
         // are okay -- they differ only in what we report. We rely on SettableFuture's synchronization faculties to
         // reconcile any conflict with onSuccess() failure path.
-        future.setFailure(new RestconfDocumentedException("Could not determine the existence of path " + parentPath,
-            cause, cause.getErrorList()));
+        future.setFailure(new ServerException(cause.getErrorList().stream()
+            .map(ServerError::ofRpcError)
+            .collect(Collectors.toList()), cause, "Could not determine the existence of path %s", parentPath));
     }
 }

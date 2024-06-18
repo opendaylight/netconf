@@ -9,21 +9,21 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.ServerException;
 
 /**
  * A {@link RestconfFuture} which allows the result to be set via {@link #set(Object)} and
- * {@link #setFailure(RestconfDocumentedException)}.
+ * {@link #setFailure(ServerException)}.
  *
  * @param <V> resulting value type
  */
 final class SettableRestconfFuture<V> extends RestconfFuture<V> {
     @Override
-    public boolean set(final V value) {
+    protected boolean set(final V value) {
         return super.set(requireNonNull(value));
     }
 
-    public boolean setFailure(final RestconfDocumentedException cause) {
+    boolean setFailure(final ServerException cause) {
         return setException(requireNonNull(cause));
     }
 }

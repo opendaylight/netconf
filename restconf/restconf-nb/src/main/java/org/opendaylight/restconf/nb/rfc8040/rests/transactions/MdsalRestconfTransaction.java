@@ -82,7 +82,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
 
             // Fire off an existence check
-            final var check = ExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, false, children);
+            final var check = ExistenceCheck.start(databind, verifyNotNull(rwTx), CONFIGURATION, path, false, children);
 
             // ... and perform any put() operations, which happen-after existence check
             for (var child : children) {
