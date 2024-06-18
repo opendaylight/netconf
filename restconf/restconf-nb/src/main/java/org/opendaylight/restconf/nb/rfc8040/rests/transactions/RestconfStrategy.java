@@ -362,13 +362,24 @@ public abstract class RestconfStrategy implements DatabindAware {
      */
     public final void putData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
             final NormalizedNode data, final @Nullable Insert insert) {
-        final var exists = TransactionUtil.syncAccess(exists(path), path);
+        Boolean exists;
+        try {
+            exists = TransactionUtil.syncAccess(exists(path), path);
+        } catch (ServerException e) {
+            request.completeWith(e);
+            return;
+        }
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
         if (insert != null) {
             final var parentPath = path.coerceParent();
-            checkListAndOrderedType(parentPath);
-            commitFuture = insertAndCommitPut(path, data, insert, parentPath);
+            try {
+                checkListAndOrderedType(parentPath);
+                commitFuture = insertAndCommitPut(path, data, insert, parentPath);
+            } catch (ServerException e) {
+                request.completeWith(e);
+                return;
+            }
         } else {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
@@ -387,35 +398,48 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath)
+                throws ServerException {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = tx.readList(parentPath);
-                if (readData == null || readData.isEmpty()) {
-                    yield replaceAndCommit(tx, path, data);
+                try {
+                    final var readData = tx.readList(parentPath);
+                    if (readData == null || readData.isEmpty()) {
+                        yield replaceAndCommit(tx, path, data);
+                    }
+                    tx.remove(parentPath);
+                    tx.replace(path, data);
+                    tx.replace(parentPath, readData);
+                } catch (ServerException e) {
+                    throw e;
                 }
-                tx.remove(parentPath);
-                tx.replace(path, data);
-                tx.replace(parentPath, readData);
                 yield tx.commit();
             }
             case LAST -> replaceAndCommit(tx, path, data);
             case BEFORE -> {
-                final var readData = tx.readList(parentPath);
-                if (readData == null || readData.isEmpty()) {
-                    yield replaceAndCommit(tx, path, data);
+                try {
+                    final var readData = tx.readList(parentPath);
+                    if (readData == null || readData.isEmpty()) {
+                        yield replaceAndCommit(tx, path, data);
+                    }
+                    insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
+                } catch (ServerException e) {
+                    throw e;
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
                 yield tx.commit();
             }
             case AFTER -> {
-                final var readData = tx.readList(parentPath);
-                if (readData == null || readData.isEmpty()) {
-                    yield replaceAndCommit(tx, path, data);
+                try {
+                    final var readData = tx.readList(parentPath);
+                    if (readData == null || readData.isEmpty()) {
+                        yield replaceAndCommit(tx, path, data);
+                    }
+                    insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
+                } catch (ServerException e) {
+                    throw e;
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
                 yield tx.commit();
             }
         };
@@ -423,7 +447,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
     private void insertWithPointPut(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final @NonNull PathArgument pointArg, final NormalizedNodeContainer<?> readList,
-            final boolean before) {
+            final boolean before) throws ServerException {
         tx.remove(path.getParent());
 
         int lastItemPosition = 0;
@@ -463,7 +487,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         return tx.commit();
     }
 
-    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) {
+    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) throws ServerException {
         // FIXME: we have this available in InstanceIdentifierContext
         final var dataSchemaNode = databind.schemaTree().findChild(path).orElseThrow().dataSchemaNode();
 
@@ -481,7 +505,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         } else {
             message = "Insert parameter can be used only with list or leaf-list";
         }
-        throw new RestconfDocumentedException(message, ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, message);
     }
 
     /**
@@ -496,10 +520,24 @@ public abstract class RestconfStrategy implements DatabindAware {
             final YangInstanceIdentifier path, final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
-            checkListAndOrderedType(path);
-            future = insertAndCommitPost(path, data, insert);
+            try {
+                checkListAndOrderedType(path);
+                future = insertAndCommitPost(path, data, insert);
+            } catch (ServerException e) {
+                request.completeWith(e);
+                return;
+            }
         } else {
-            future = createAndCommit(prepareWriteExecution(), path, data);
+            final var tx = prepareWriteExecution();
+            try {
+                tx.create(path, data);
+            } catch (ServerException e) {
+                tx.cancel();
+                request.completeWith(e);
+                return;
+            }
+
+            future = tx.commit();
         }
 
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
@@ -527,40 +565,63 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert) {
+            final NormalizedNode data, final @NonNull Insert insert) throws ServerException {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = tx.readList(path);
-                if (readData == null || readData.isEmpty()) {
-                    tx.replace(path, data);
-                } else {
-                    checkListDataDoesNotExist(path, data);
-                    tx.remove(path);
-                    tx.replace(path, data);
-                    tx.replace(path, readData);
+                try {
+                    final var readData = tx.readList(path);
+                    if (readData == null || readData.isEmpty()) {
+                        tx.replace(path, data);
+                    } else {
+                        checkListDataDoesNotExist(path, data);
+                        tx.remove(path);
+                        tx.replace(path, data);
+                        tx.replace(path, readData);
+                    }
+                } catch (ServerException e) {
+                    tx.cancel();
+                    throw e;
                 }
                 yield tx.commit();
             }
-            case LAST -> createAndCommit(tx, path, data);
+            case LAST -> {
+                try {
+                    tx.create(path, data);
+                } catch (ServerException e) {
+                    tx.cancel();
+                    throw e;
+                }
+                yield tx.commit();
+            }
             case BEFORE -> {
-                final var readData = tx.readList(path);
-                if (readData == null || readData.isEmpty()) {
-                    tx.replace(path, data);
-                } else {
-                    checkListDataDoesNotExist(path, data);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
+                try {
+                    final var readData = tx.readList(path);
+                    if (readData == null || readData.isEmpty()) {
+                        tx.replace(path, data);
+                    } else {
+                        checkListDataDoesNotExist(path, data);
+                        insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
+                    }
+                } catch (ServerException e) {
+                    tx.cancel();
+                    throw e;
                 }
                 yield tx.commit();
             }
             case AFTER -> {
-                final var readData = tx.readList(path);
-                if (readData == null || readData.isEmpty()) {
-                    tx.replace(path, data);
-                } else {
-                    checkListDataDoesNotExist(path, data);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
+                try {
+                    final var readData = tx.readList(path);
+                    if (readData == null || readData.isEmpty()) {
+                        tx.replace(path, data);
+                    } else {
+                        checkListDataDoesNotExist(path, data);
+                        insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
+                    }
+                } catch (ServerException e) {
+                    tx.cancel();
+                    throw e;
                 }
                 yield tx.commit();
             }
@@ -640,8 +701,8 @@ public abstract class RestconfStrategy implements DatabindAware {
                         try {
                             tx.create(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
+                        } catch (ServerException e) {
+                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                             noError = false;
                         }
                         break;
@@ -649,8 +710,8 @@ public abstract class RestconfStrategy implements DatabindAware {
                         try {
                             tx.delete(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
+                        } catch (ServerException e) {
+                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                             noError = false;
                         }
                         break;
@@ -677,8 +738,8 @@ public abstract class RestconfStrategy implements DatabindAware {
                         try {
                             tx.remove(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, convertErrors(e.getErrors())));
+                        } catch (ServerException e) {
+                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                             noError = false;
                         }
                         break;
@@ -738,7 +799,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final PathArgument pointArg, final NormalizedNodeContainer<?> readList,
-            final boolean before) {
+            final boolean before) throws ServerException {
         tx.remove(path);
 
         int lastItemPosition = 0;
@@ -769,33 +830,22 @@ public abstract class RestconfStrategy implements DatabindAware {
         }
     }
 
-    private static ListenableFuture<? extends CommitInfo> createAndCommit(final RestconfTransaction tx,
-            final YangInstanceIdentifier path, final NormalizedNode data) {
-        try {
-            tx.create(path, data);
-        } catch (RestconfDocumentedException e) {
-            // close transaction if any and pass exception further
-            tx.cancel();
-            throw e;
-        }
-
-        return tx.commit();
-    }
-
     /**
      * Check if child items do NOT already exists in List at specified {@code path}.
      *
      * @param data Data to be checked
      * @param path Path to be checked
-     * @throws RestconfDocumentedException if data already exists.
+     * @throws ServerException if data already exists.
      */
-    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data) {
+    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data)
+            throws ServerException {
         if (data instanceof NormalizedNodeContainer<?> dataNode) {
             for (final var node : dataNode.body()) {
-                checkItemDoesNotExists(exists(path.node(node.name())), path.node(node.name()));
+                final var nodePath = path.node(node.name());
+                checkItemDoesNotExists(databind, exists(nodePath), nodePath);
             }
         } else {
-            throw new RestconfDocumentedException("Unexpected node type: " + data.getClass().getName());
+            throw new ServerException("Unexpected node type: " + data.getClass().getName());
         }
     }
 
@@ -803,15 +853,16 @@ public abstract class RestconfStrategy implements DatabindAware {
      * Check if items do NOT already exists at specified {@code path}.
      *
      * @param existsFuture if checked data exists
-     * @param path         Path to be checked
-     * @throws RestconfDocumentedException if data already exists.
+     * @paran databind the {@link DatabindContext}
+     * @param path path to be checked
+     * @throws ServerException if data already exists.
      */
-    static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
-            final YangInstanceIdentifier path) {
+    static void checkItemDoesNotExists(final DatabindContext databind, final ListenableFuture<Boolean> existsFuture,
+            final YangInstanceIdentifier path) throws ServerException {
         if (TransactionUtil.syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                path);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
+                new ServerErrorPath(databind, path));
         }
     }
 
@@ -893,7 +944,7 @@ public abstract class RestconfStrategy implements DatabindAware {
     // FIXME: NETCONF-1155: this method should asynchronous
     @VisibleForTesting
     final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
+            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) throws ServerException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -914,17 +965,17 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path) throws ServerException {
         return TransactionUtil.syncAccess(read(store, path), path).orElse(null);
     }
 
     final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
-            final WithDefaultsMode defaultsMode) {
+            final WithDefaultsMode defaultsMode) throws ServerException {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;
-            case ReportAll, ReportAllTagged -> throw new RestconfDocumentedException(
-                "Unsupported with-defaults value " + defaultsMode.getName());
+            case ReportAll, ReportAllTagged ->
+                throw new ServerException("Unsupported with-defaults value %s", defaultsMode.getName());
         };
 
         // FIXME: we have this readily available in InstanceIdentifierContext
@@ -1077,7 +1128,7 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     static final NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
-            final NormalizedNode configDataNode) {
+            final NormalizedNode configDataNode) throws ServerException {
         if (stateDataNode == null) {
             // No state, return config
             return configDataNode;
@@ -1097,8 +1148,8 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param configDataNode data node of config data
      * @return {@link NormalizedNode}
      */
-    private static @NonNull NormalizedNode mergeStateAndConfigData(
-            final @NonNull NormalizedNode stateDataNode, final @NonNull NormalizedNode configDataNode) {
+    private static @NonNull NormalizedNode mergeStateAndConfigData(final @NonNull NormalizedNode stateDataNode,
+            final @NonNull NormalizedNode configDataNode) throws ServerException {
         validateNodeMerge(stateDataNode, configDataNode);
         // FIXME: this check is bogus, as it confuses yang.data.api (NormalizedNode) with yang.model.api (RpcDefinition)
         if (configDataNode instanceof RpcDefinition) {
@@ -1115,11 +1166,11 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param configDataNode data node of config data
      */
     private static void validateNodeMerge(final @NonNull NormalizedNode stateDataNode,
-                                          final @NonNull NormalizedNode configDataNode) {
+                                          final @NonNull NormalizedNode configDataNode) throws ServerException {
         final QNameModule moduleOfStateData = stateDataNode.name().getNodeType().getModule();
         final QNameModule moduleOfConfigData = configDataNode.name().getNodeType().getModule();
         if (!moduleOfStateData.equals(moduleOfConfigData)) {
-            throw new RestconfDocumentedException("Unable to merge data from different modules.");
+            throw new ServerException("Unable to merge data from different modules.");
         }
     }
 
@@ -1213,7 +1264,7 @@ public abstract class RestconfStrategy implements DatabindAware {
             mapValueToBuilder(configEntry.body(), ((UnkeyedListEntryNode) stateDataNode).body(), builder);
             return builder.build();
         } else {
-            throw new RestconfDocumentedException("Unexpected node type: " + configDataNode.getClass().getName());
+            throw new IllegalStateException("Unexpected node type: " + configDataNode.getClass().getName());
         }
     }
 

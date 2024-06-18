@@ -40,6 +40,7 @@ import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
@@ -129,12 +130,30 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var depth = params.depth();
         final var fields = params.fields();
-        final var writerFactory = fields == null ? NormalizedNodeWriterFactory.of(depth)
-            : new MdsalNormalizedNodeWriterFactory(
-                translateFieldsParam(path.inference().modelContext(), path.schema(), fields), depth);
 
-        completeDataGET(request, readData(params.content(), path.instance(), params.withDefaults()), path,
-            writerFactory, null);
+        final NormalizedNodeWriterFactory writerFactory;
+        if (fields != null) {
+            final List<Set<QName>> translated;
+            try {
+                translated = translateFieldsParam(path.inference().modelContext(), path.schema(), fields);
+            } catch (ServerException e) {
+                request.completeWith(e);
+                return;
+            }
+            writerFactory = new MdsalNormalizedNodeWriterFactory(translated, depth);
+        } else {
+            writerFactory = NormalizedNodeWriterFactory.of(depth);
+        }
+
+        final NormalizedNode data;
+        try {
+            data = readData(params.content(), path.instance(), params.withDefaults());
+        } catch (ServerException e) {
+            request.completeWith(e);
+            return;
+        }
+
+        completeDataGET(request, data, path, writerFactory, null);
     }
 
     @Override
@@ -174,7 +193,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
      */
     @VisibleForTesting
     public static @NonNull List<Set<QName>> translateFieldsParam(final @NonNull EffectiveModelContext modelContext,
-            final DataSchemaContext startNode, final @NonNull FieldsParam input) {
+            final DataSchemaContext startNode, final @NonNull FieldsParam input) throws ServerException {
         final var parsed = new ArrayList<Set<QName>>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(), startNode,
             input.nodeSelectors(), 0);
@@ -183,7 +202,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     private static void processSelectors(final List<Set<QName>> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final DataSchemaContext startNode, final List<NodeSelector> selectors,
-            final int index) {
+            final int index) throws ServerException {
         final Set<QName> startLevel;
         if (parsed.size() <= index) {
             startLevel = new HashSet<>();
@@ -270,22 +289,20 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
      * @return {@link DataSchemaContextNode}
      */
     private static DataSchemaContext addChildToResult(final DataSchemaContext currentNode, final QName childQName,
-            final Set<QName> level) {
+            final Set<QName> level) throws ServerException {
         // resolve parent node
         final var parentNode = resolveMixinNode(currentNode, level, currentNode.dataSchemaNode().getQName());
         if (parentNode == null) {
-            throw new RestconfDocumentedException(
-                    "Not-mixin node missing in " + currentNode.getPathStep().getNodeType().getLocalName(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                    "Not-mixin node missing in %s", currentNode.getPathStep().getNodeType().getLocalName());
         }
 
         // resolve child node
-        final DataSchemaContext childNode = resolveMixinNode(childByQName(parentNode, childQName), level, childQName);
+        final var childNode = resolveMixinNode(childByQName(parentNode, childQName), level, childQName);
         if (childNode == null) {
-            throw new RestconfDocumentedException(
-                    "Child " + childQName.getLocalName() + " node missing in "
-                            + currentNode.getPathStep().getNodeType().getLocalName(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Child %s node missing in %s", childQName.getLocalName(),
+                currentNode.getPathStep().getNodeType().getLocalName());
         }
 
         // add final childNode node to level nodes
