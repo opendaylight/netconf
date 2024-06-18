@@ -29,7 +29,6 @@
 
     <modules>
         <module>restconf-common-models</module>
-        <module>restconf-common</module>
         <module>restconf-nb</module>
         <module>sal-rest-connector-config</module>
         <module>restconf-openapi</module>
