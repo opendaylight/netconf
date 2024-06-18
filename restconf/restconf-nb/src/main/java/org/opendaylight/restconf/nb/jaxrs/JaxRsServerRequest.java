@@ -16,7 +16,6 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -58,14 +57,14 @@ abstract class JaxRsServerRequest<T> extends AbstractServerRequest<T> {
         try {
             response = transform(result);
         } catch (ServerException e) {
-            onFailure(e.toLegacy());
+            onFailure(e);
             return;
         }
         ar.resume(response);
     }
 
     @Override
-    protected void onFailure(final RestconfDocumentedException ex) {
+    protected void onFailure(final ServerException ex) {
         ar.resume(ex);
     }
 

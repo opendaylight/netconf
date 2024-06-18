@@ -30,8 +30,9 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -89,9 +90,9 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     void toSchemaExportContextFromIdentifierNotFoundTest() {
         final var error = assertError(ar -> restconf.modulesYinGET("not-existing-module", "2016-01-01", ar));
-        assertEquals("Source not-existing-module@2016-01-01 not found", error.getErrorMessage());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(new ErrorMessage("Source not-existing-module@2016-01-01 not found"), error.message());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
     }
 
     /**
@@ -102,9 +103,9 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
         final var error = assertError(ar -> restconf.modulesYangGET(TEST_MODULE_REVISION, TEST_MODULE_NAME, ar));
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**
@@ -139,9 +140,9 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
 
         final var error = assertError(
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, "not-existing-module", "2016-01-01", ar));
-        assertEquals("Source not-existing-module@2016-01-01 not found", error.getErrorMessage());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(new ErrorMessage("Source not-existing-module@2016-01-01 not found"), error.message());
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
     }
 
     /**
@@ -155,9 +156,9 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
 
         final var error = assertError(
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, TEST_MODULE_REVISION, TEST_MODULE_NAME, ar));
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     @Test
@@ -167,10 +168,11 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
 
         final var error = assertError(
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, TEST_MODULE_NAME, TEST_MODULE_REVISION, ar));
-        assertEquals("Mount point 'mount-point:mount-container/point-number' does not have any models",
-            error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
+        assertEquals(
+            new ErrorMessage("Mount point 'mount-point:mount-container/point-number' does not have any models"),
+            error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.tag());
     }
 
     /**
@@ -225,7 +227,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     void validateAndGetRevisionNotParsableTest() {
         final var error = assertInvalidValue("module", "not-parsable-as-date");
-        assertEquals("Supplied revision is not in expected date format YYYY-mm-dd", error.getErrorMessage());
+        assertEquals(new ErrorMessage("Supplied revision is not in expected date format YYYY-mm-dd"), error.message());
     }
 
     /**
@@ -235,7 +237,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     void validateAndGetModulNameNotSuppliedTest() {
         final var error = assertInvalidValue(null, null);
-        assertEquals("Module name must be supplied", error.getErrorMessage());
+        assertEquals(new ErrorMessage("Module name must be supplied"), error.message());
     }
 
     /**
@@ -246,7 +248,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     void validateAndGetModuleNameNotParsableFirstTest() {
         final var error = assertInvalidValue("01-not-parsable-as-name-on-first-char", null);
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
+        assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
     }
 
     /**
@@ -257,7 +259,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     public void validateAndGetModuleNameNotParsableNextTest() {
         final var error = assertInvalidValue("not-parsable-as-name-after-first-char*", null);
-        assertEquals("Supplied name has not expected identifier format", error.getErrorMessage());
+        assertEquals(new ErrorMessage("Supplied name has not expected identifier format"), error.message());
     }
 
     /**
@@ -267,7 +269,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     @Test
     void validateAndGetModuleNameEmptyTest() {
         final var error = assertInvalidValue("", null);
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
+        assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
     }
 
     private String assertYang(final ApiPath mountPath, final String fileName, final String revision) {
@@ -281,10 +283,10 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
         }
     }
 
-    private RestconfError assertInvalidValue(final String fileName, final String revision) {
+    private ServerError assertInvalidValue(final String fileName, final String revision) {
         final var error = assertError(ar -> restconf.modulesYangGET(fileName, revision, ar));
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
         return error;
     }
 }
