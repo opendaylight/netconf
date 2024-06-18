@@ -11,14 +11,18 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Conflict;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Result;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
@@ -91,7 +95,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             }
 
             // ... finally collect existence checks and abort the transaction if any of them failed.
-            if (check.getOrThrow() instanceof Conflict conflict) {
+            if (getOrThrow(check) instanceof Conflict conflict) {
                 throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
                     new ServerErrorPath(databind, conflict.path()), "Data already exists");
             }
@@ -101,6 +105,19 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
+
+    private static @NonNull Result getOrThrow(final Future<Result> future) throws ServerException {
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ServerException("Interrupted while waiting", e);
+        } catch (ExecutionException e) {
+            Throwables.throwIfInstanceOf(e.getCause(), ServerException.class);
+            throw new ServerException("Operation failed", e);
+        }
+    }
+
 
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
