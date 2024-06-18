@@ -57,7 +57,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     void deleteImpl(final YangInstanceIdentifier path) throws ServerException {
-        if (TransactionUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
+        if (RestconfStrategy.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             rwTx.delete(CONFIGURATION, path);
         } else {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
@@ -182,6 +182,6 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws ServerException {
-        return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
+        return (NormalizedNodeContainer<?>) RestconfStrategy.syncAccess(read(path), path).orElse(null);
     }
 }
