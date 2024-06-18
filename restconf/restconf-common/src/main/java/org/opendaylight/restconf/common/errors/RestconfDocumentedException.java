@@ -9,13 +9,10 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -117,26 +114,6 @@ public class RestconfDocumentedException extends RuntimeException {
         }
 
         modelContext = null;
-    }
-
-    /**
-     * Constructs an instance with the given RpcErrors.
-     */
-    public RestconfDocumentedException(final String message, final Throwable cause,
-                                       final Collection<? extends RpcError> rpcErrors) {
-        this(message, cause, convertToRestconfErrors(rpcErrors));
-    }
-
-    private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
-        if (rpcErrors == null || rpcErrors.isEmpty()) {
-            return List.of();
-        }
-
-        final var errorList = new ArrayList<RestconfError>();
-        for (var rpcError : rpcErrors) {
-            errorList.add(new RestconfError(rpcError));
-        }
-        return errorList;
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
