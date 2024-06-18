@@ -22,6 +22,30 @@
       },
       "revId": "bfbde353b7471d1192b6b396280916497d944e09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de6d2e3c_4c07dfdd",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfServiceTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-18T06:00:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "495a53b6_fbae8d29",
+      "range": {
+        "startLine": 270,
+        "startChar": 40,
+        "endLine": 270,
+        "endChar": 59
+      },
+      "revId": "bfbde353b7471d1192b6b396280916497d944e09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
