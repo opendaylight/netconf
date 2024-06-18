@@ -12,11 +12,11 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.ServerException;
 
 /**
- * A {@link ListenableFuture} specialization, which fails only with {@link RestconfDocumentedException} and does not
- * produce {@code null} values.
+ * A {@link ListenableFuture} specialization, which fails only with {@link ServerException} and does not produce
+ * {@code null} values.
  *
  * @param <V> resulting value type
  */
@@ -34,17 +34,17 @@ sealed class RestconfFuture<V> extends AbstractFuture<@NonNull V> permits Settab
      * Get the result.
      *
      * @return The result
-     * @throws RestconfDocumentedException if this future failed or this call is interrupted.
+     * @throws ServerException if this future failed or this call is interrupted
      */
-    final @NonNull V getOrThrow() {
+    final @NonNull V getOrThrow() throws ServerException {
         try {
             return get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RestconfDocumentedException("Interrupted while waiting", e);
+            throw new ServerException("Interrupted while waiting", e);
         } catch (ExecutionException e) {
-            Throwables.throwIfInstanceOf(e.getCause(), RestconfDocumentedException.class);
-            throw new RestconfDocumentedException("Operation failed", e);
+            Throwables.throwIfInstanceOf(e.getCause(), ServerException.class);
+            throw new ServerException("Operation failed", e);
         }
     }
 }

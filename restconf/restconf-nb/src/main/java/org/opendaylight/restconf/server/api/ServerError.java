@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.RpcError;
 
 /**
  * Encapsulates a single {@code error} within the
@@ -45,6 +46,15 @@ public record ServerError(
         this(type, tag, new ErrorMessage(message), null, null, null);
     }
 
+    public static ServerError ofRpcError(final RpcError rpcError) {
+        final var tag = rpcError.getTag();
+        final var errorTag = tag != null ? tag : ErrorTag.OPERATION_FAILED;
+        final var errorMessage = rpcError.getMessage();
+        return new ServerError(rpcError.getErrorType(), errorTag,
+            errorMessage != null ? new ErrorMessage(errorMessage) : null, rpcError.getApplicationTag(), null,
+            extractErrorInfo(rpcError));
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).omitNullValues()
@@ -55,5 +65,14 @@ public record ServerError(
             .add("path", path)
             .add("info", info)
             .toString();
+    }
+
+    private static @Nullable ServerErrorInfo extractErrorInfo(final RpcError rpcError) {
+        final var info = rpcError.getInfo();
+        if (info != null) {
+            return new ServerErrorInfo(info);
+        }
+        final var cause = rpcError.getCause();
+        return cause != null ? new ServerErrorInfo(cause.getMessage()) : null;
     }
 }

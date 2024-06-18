@@ -88,6 +88,15 @@ public final class ServerException extends Exception {
         this(message, new ServerError(type, tag, new ErrorMessage(message), null, requireNonNull(path), null), null);
     }
 
+    public ServerException(final List<ServerError> errors, final @Nullable Throwable cause, final String message) {
+        this(message, errors, cause);
+    }
+
+    public ServerException(final List<ServerError> errors, final @Nullable Throwable cause, final String format,
+            final Object... args) {
+        this(errors, cause, format.formatted(args));
+    }
+
     /**
      * Return the reported {@link ServerError}.
      *
