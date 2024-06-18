@@ -171,9 +171,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         if (semaphore != null) {
                             semaphore.release();
                         }
-                    } else if (r.future.isCancelled()) {
-                        // This just does some house-cleaning
-                        it.remove();
                     }
                 }
 
