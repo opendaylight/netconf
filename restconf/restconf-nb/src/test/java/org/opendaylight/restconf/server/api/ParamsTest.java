@@ -122,7 +122,7 @@ class ParamsTest {
      * Test of parsing user defined parameters from URI request.
      */
     @Test
-    void parseUriParametersUserDefinedTest() {
+    void parseUriParametersUserDefinedTest() throws Exception {
         final QName containerChild = QName.create("ns", "container-child");
 
         final var params = assertParams(DataGetParams::of, QueryParameters.of(
