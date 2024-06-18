@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.AbstractFuture;
 final class UncancellableFuture<V> extends AbstractFuture<V> {
     private volatile boolean uncancellable = false;
 
+    // FIXME rework this class be have uncancellable always true
     UncancellableFuture(final boolean uncancellable) {
         this.uncancellable = uncancellable;
     }

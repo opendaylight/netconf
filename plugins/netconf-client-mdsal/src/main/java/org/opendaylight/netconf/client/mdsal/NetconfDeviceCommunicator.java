@@ -164,17 +164,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 final var it = requests.iterator();
                 while (it.hasNext()) {
                     final var r = it.next();
-                    if (r.future.isUncancellable()) {
-                        futuresToCancel.add(r.future);
-                        it.remove();
-                        // we have just removed one request from the queue
-                        // we can also release one permit
-                        if (semaphore != null) {
-                            semaphore.release();
-                        }
-                    } else if (r.future.isCancelled()) {
-                        // This just does some house-cleaning
-                        it.remove();
+                    futuresToCancel.add(r.future);
+                    it.remove();
+                    // we have just removed one request from the queue
+                    // we can also release one permit
+                    if (semaphore != null) {
+                        semaphore.release();
                     }
                 }
 
@@ -265,7 +260,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         sessionLock.lock();
         try {
             var request = requests.peek();
-            if (request != null && request.future.isUncancellable()) {
+            if (request != null) {
                 request = requests.poll();
                 // we have just removed one request from the queue
                 // we can also release one permit
