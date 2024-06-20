@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7bd8ead_bbfd0264",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-20T15:30:20Z",
+      "side": 1,
+      "message": "Good catch, it seems like this change is not necessary anymore. I am abandoning this commit and all changes are merged in https://git.opendaylight.org/gerrit/c/netconf/+/111763\nIt also contains all suggested changes from the review except comment regarding visibility of KeepaliveTask where I still think changing the visibility and marking it with @VisibleForTesting is better approach than hardcoding class name.",
+      "parentUuid": "548074c4_74fab180",
+      "range": {
+        "startLine": 340,
+        "startChar": 0,
+        "endLine": 344,
+        "endChar": 13
+      },
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9c7e8f3_f0ce42d0",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-13T15:59:43Z",
       "side": 1,
       "message": "Please use \u0027var\u0027 here.",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 90
+      },
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a6bd15b_8cbd01c8",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-20T15:30:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9c7e8f3_f0ce42d0",
       "range": {
         "startLine": 119,
         "startChar": 0,
@@ -64,6 +112,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "925cf65f_a2c259b3",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-20T15:30:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32b4274b_ad80fd4c",
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d288869_c9ce20a0",
@@ -81,6 +147,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "878800c1_af10a2d7",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-20T15:30:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d288869_c9ce20a0",
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "831e09e5_9a0674a5",
@@ -94,6 +178,24 @@
       "writtenOn": "2024-06-13T15:59:43Z",
       "side": 1,
       "message": "Can we use instead:\n\nif (task.getClass().getCanonicalName().contains(\"KeepaliveSalFacade.KeepaliveTask\")) {\n\nThis way we would not need to change visibility of KeepaliveTask class.",
+      "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ae49258_08b945f9",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-20T15:30:20Z",
+      "side": 1,
+      "message": "I think changing the visibility and marking it with @VisibleForTesting is a better approach than hardcoding the class name. I think Sonar should catch it if someone uses it in production code. Anyway, if a committer insists on hardcoding it, I will change it then.",
+      "parentUuid": "831e09e5_9a0674a5",
       "revId": "31a0ac9d923136253e8cbfb329f820a533130ccc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
