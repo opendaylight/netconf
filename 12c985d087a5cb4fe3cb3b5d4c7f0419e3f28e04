@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "203b530f_eedffb0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-20T15:39:50Z",
+      "side": 1,
+      "message": "Thank you for catching this and suggestions in review. The previous commit has been abandoned and other changes have been merged into this commit.",
+      "parentUuid": "bba49e24_97dfb5fc",
+      "revId": "12c985d087a5cb4fe3cb3b5d4c7f0419e3f28e04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d603dd1_d5062d5d",
