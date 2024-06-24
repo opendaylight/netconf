@@ -16,6 +16,24 @@
       "message": "IMHO: Write a javadoc for each method where width is used, to make it clearer, or at least make a reference to this explanation.",
       "revId": "c48a6db5445231e57d9b987c465ea7613fd0d32d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa5bbae2_a80db590",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-06-24T16:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e675a4a7_f44a9596",
+      "revId": "c48a6db5445231e57d9b987c465ea7613fd0d32d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
