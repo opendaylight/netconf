@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18b2fa72_91a37228",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-24T12:01:54Z",
+      "side": 1,
+      "message": "https://cbea.ms/git-commit/",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70e51670_25fdddfe",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-24T12:01:54Z",
+      "side": 1,
+      "message": "Instead of introducing counters we can try to avoid using multiple keepalive tasks by removing enable/disable logic, fix some FIXMEs and just record activity when we interact with the device.\n\nIMO:iInteraction with device \u003d\u003d keepalive.\n\nPlease consider proposal at https://git.opendaylight.org/gerrit/c/netconf/+/112268.",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
