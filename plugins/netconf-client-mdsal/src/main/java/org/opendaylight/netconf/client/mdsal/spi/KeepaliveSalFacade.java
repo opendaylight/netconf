@@ -106,20 +106,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
     }
 
-    private void disableKeepalive() {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.disableKeepalive();
-        }
-    }
-
-    private void enableKeepalive() {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.enableKeepalive();
-        }
-    }
-
     private void disconnect() {
         checkState(listener != null, "%s: Unable to reconnect, session listener is missing", deviceId);
         stopKeepalives();
@@ -347,7 +333,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             // No matter what response we got,
             // rpc-reply or rpc-error, we got it from device so the netconf session is OK.
             userFuture.set(result);
-            enableKeepalive();
+            task.recordActivity();
         }
 
         @Override
@@ -379,8 +365,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
-            disableKeepalive();
+            task.recordActivity();
             return scheduleTimeout(delegate.invokeNetconf(type, input));
         }
 
@@ -399,8 +384,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
-            disableKeepalive();
+            task.recordActivity();
             return scheduleTimeout(delegate.invokeRpc(type, input));
         }
 
@@ -426,8 +410,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
-            disableKeepalive();
+            task.recordActivity();
             return scheduleTimeout(delegate.invokeNetconf(type, input));
         }
 
@@ -446,8 +429,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource payload) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
-            disableKeepalive();
+            task.recordActivity();
             return scheduleTimeout(delegate.invokeRpc(type, payload));
         }
     }
