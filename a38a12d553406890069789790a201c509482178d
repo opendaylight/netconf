@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3aca9fbd_9f353080",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-06-24T15:33:13Z",
+      "side": 1,
+      "message": "Instead of copy-pasting here use part from old description pls. \"...listing APIs for all modules of mount point\"",
+      "range": {
+        "startLine": 105,
+        "startChar": 7,
+        "endLine": 105,
+        "endChar": 47
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bb1ce5ea_3a9281c4",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
         "patchSetId": 13
