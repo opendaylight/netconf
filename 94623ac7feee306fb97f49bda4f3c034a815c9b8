@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "267c0c98_1f689854",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-24T13:47:27Z",
+      "side": 1,
+      "message": "add tests for BaseYangOpenApiGenerator#getPortionOfModels(), which is responsible for selecting modules for given offset/limit; incl edge cases.\n\nit\u0027s easier to validate the expected collection of modules returned (comparing to to raw json), also easier to maintain.",
+      "revId": "94623ac7feee306fb97f49bda4f3c034a815c9b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
