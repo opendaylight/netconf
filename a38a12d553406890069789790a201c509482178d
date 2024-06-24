@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb1ce5ea_3a9281c4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-24T13:20:07Z",
+      "side": 1,
+      "message": "1. rename to getModelsSublist(...)\n2. use List\u003c\u003e instead of Set\u003c\u003e\n\nAPI issue here: offset and limit are reasonable if only applied to ordered collections otherwise the result will not be consistent. Using set Set\u003c\u003e and Collection\u003c\u003e in API means  no guarantee of items order consistency.\n\nprior implementation did use TreeSet\u003c\u003e (implements SortedSet\u003c\u003e) to achieve the order consistency - see `MountPointOpenApi#filterByRange()` (deleted in this change)\n\nAs a possible solution the `getModulesWithoutDuplications()`  method (above) could be updated (or merged with current method accepting modelContext as input) to produce consistent ordered collection, so we can apply sublist() reliably. Current implementation using LinkedHashMap/Set is only guarantees preserving same order returned by `modelContext.getModules()`.\n\nSuggested: updating `getModulesWithoutDuplications()` method to return List\u003c\u003e, use explicit sort by module name inside, prefer returning immutable instance",
+      "range": {
+        "startLine": 119,
+        "startChar": 47,
+        "endLine": 119,
+        "endChar": 111
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f2f523f_dbfb62ec",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-24T13:20:07Z",
+      "side": 1,
+      "message": "use `int` instead of `@NonNull Integer`\nthis will do primitive values unboxing once, not every time var is referenced\nhttps://stackoverflow.com/questions/39004292/why-do-we-prefer-primitives-to-boxed-primitives-in-java",
+      "range": {
+        "startLine": 120,
+        "startChar": 1,
+        "endLine": 120,
+        "endChar": 74
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd4b35e4_d9d4c499",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-06-24T13:20:07Z",
+      "side": 1,
+      "message": "augmentation modules should be just excluded as not being expandable (having own module root level sub-path elements)\n\nincluding augmenting modules each page request makes no sense. \nif there are 100 modules, 50 augmenting and page size is 20, then for each of 5 pages requested the list of 70 modules will be returned, where 50 are always the same.\n\nthis seems like a new functionality, what\u0027s the reason to include these?",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 129,
+        "endChar": 59
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
