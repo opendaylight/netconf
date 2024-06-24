@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b98289da_faa246b2",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-24T08:56:12Z",
+      "side": 1,
+      "message": "Why do we disconnect after each request?",
+      "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5d12bff_ce683121",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-24T08:56:12Z",
+      "side": 1,
+      "message": "Check if we can send more requests?",
+      "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb8aca66_97c005a0",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-24T08:56:12Z",
+      "side": 1,
+      "message": "\"spySession,  times\" -\u003e \"spySession, times\"",
+      "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
