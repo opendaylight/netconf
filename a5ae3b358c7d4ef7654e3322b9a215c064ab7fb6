@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa1c8499_6f81c9a7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-24T08:57:44Z",
+      "side": 1,
+      "message": "How do we know all are isUncancellable?\nThen why doe we need this check here?",
+      "revId": "a5ae3b358c7d4ef7654e3322b9a215c064ab7fb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
