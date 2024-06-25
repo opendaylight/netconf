@@ -16,6 +16,24 @@
       "message": "How do we know all are isUncancellable?\nThen why doe we need this check here?",
       "revId": "a5ae3b358c7d4ef7654e3322b9a215c064ab7fb6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64a4212b_5c020a8f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-25T08:39:53Z",
+      "side": 1,
+      "message": "1) Correct me if I\u0027m wrong, or if I have missed something:\n - The requests attribute is a private final class attribute.\n - The only method that adds to this queue is called here:\nhttps://github.com/opendaylight/netconf/blob/d5babfc15a7557557a18f46a44229add2c35c1d8/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java#L387-L388\n```\n final var req \u003d new Request(new UncancellableFuture\u003c\u003e(true), message);\n        requests.add(req);\n```\n\n2) I have kept this because it is also checked by the pollRequest method, and I do \nnot want to interfere with this method.\nI have removed it.",
+      "parentUuid": "aa1c8499_6f81c9a7",
+      "revId": "a5ae3b358c7d4ef7654e3322b9a215c064ab7fb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
