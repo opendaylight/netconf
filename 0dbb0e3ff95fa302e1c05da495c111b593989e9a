@@ -69,6 +69,23 @@
       "parentUuid": "cc4bac12_aeb56db6",
       "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c05f6a90_396fa991",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-25T14:28:50Z",
+      "side": 1,
+      "message": "Do we really need to use after() instead of timeout()?",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

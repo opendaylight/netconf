@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77d5e7a1_244cc1de",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-25T14:28:50Z",
+      "side": 0,
+      "message": "This change seems to be unrelated.",
+      "revId": "1741cf9f0c419d3bd00b526b847963cbd11f6bc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
