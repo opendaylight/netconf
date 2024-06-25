@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e0513e1_1bdf65cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-25T08:01:49Z",
+      "side": 1,
+      "message": "Keep-alive task seems to be always only one.\nTry to create a sate transition table and find out:\n- why do we need to count anything\n- are we setting states correctly\n- why is there a reschedule method which creates new timer",
+      "revId": "3b9e0158f0998c6ddaf45c3b5d466496a5249c3c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
