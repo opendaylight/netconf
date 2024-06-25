@@ -342,6 +342,7 @@ Payload for key-based authentication via TLS:
            <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
            <protocol xmlns="urn:opendaylight:netconf-node-topology">
              <name xmlns="urn:opendaylight:netconf-node-topology">TLS</name>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</key-id>
            </protocol>
          </node>
 
@@ -375,6 +376,7 @@ Payload for key-based authentication via TLS:
                      "netconf-node-topology:keepalive-delay": 120,
                      "protocol": {
                         "name": "TLS"
+                        "key-id": "key-id"
                      }
                  }
              ]
