@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edc6c08a_ed7ad6ee",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-25T08:09:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e4b9970_7bba3210",
+      "range": {
+        "startLine": 44,
+        "startChar": 3,
+        "endLine": 44,
+        "endChar": 21
+      },
+      "revId": "08f020342513599b23d41afca1a49859bd9cfb5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33855b28_1e7fe78f",
@@ -54,6 +78,30 @@
       "writtenOn": "2024-06-25T06:59:48Z",
       "side": 1,
       "message": "no reason to set a method in main code if you can set it directly in test",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 5
+      },
+      "revId": "08f020342513599b23d41afca1a49859bd9cfb5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53764a14_f667d671",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-06-25T08:09:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33855b28_1e7fe78f",
       "range": {
         "startLine": 182,
         "startChar": 0,
