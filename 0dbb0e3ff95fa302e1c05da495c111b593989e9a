@@ -33,6 +33,24 @@
       "message": "Instead of introducing counters we can try to avoid using multiple keepalive tasks by removing enable/disable logic, fix some FIXMEs and just record activity when we interact with the device.\n\nIMO:iInteraction with device \u003d\u003d keepalive.\n\nPlease consider proposal at https://git.opendaylight.org/gerrit/c/netconf/+/112268.",
       "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc4bac12_aeb56db6",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-25T08:49:08Z",
+      "side": 1,
+      "message": "I think it is a bit more complicated than it looks at first. The keepalive is:\n1. sending keepalive request + expecting keepalive response\n2. sending any RPC request + expecting RPC reply/error\n3. receiving notification from device\n\nThe goal of current implementation is not to send keepalive request (1.) if there was other interaction (2. or 3.). Also if other interaction finished we want to send keepalive request (1.) in case there is no other interaction.\n\nMy intent is to fix the problem without introducing bigger changes to current implementation so it does not introduce new kind of problems and I hoped it is easier to get merged.\n\nIMO this is serious problem in many ODL releases and should be fixed first before bigger changes are made on master.",
+      "parentUuid": "70e51670_25fdddfe",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
