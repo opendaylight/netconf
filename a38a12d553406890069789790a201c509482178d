@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c40bc8b_0946f382",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-25T10:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3aca9fbd_9f353080",
+      "range": {
+        "startLine": 105,
+        "startChar": 7,
+        "endLine": 105,
+        "endChar": 47
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb1ce5ea_3a9281c4",
@@ -70,6 +94,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e6378c7_dee5c85a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-25T10:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f2f523f_dbfb62ec",
+      "range": {
+        "startLine": 120,
+        "startChar": 1,
+        "endLine": 120,
+        "endChar": 74
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd4b35e4_d9d4c499",
@@ -83,6 +131,30 @@
       "writtenOn": "2024-06-24T13:20:07Z",
       "side": 1,
       "message": "augmentation modules should be just excluded as not being expandable (having own module root level sub-path elements)\n\nincluding augmenting modules each page request makes no sense. \nif there are 100 modules, 50 augmenting and page size is 20, then for each of 5 pages requested the list of 70 modules will be returned, where 50 are always the same.\n\nthis seems like a new functionality, what\u0027s the reason to include these?",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 129,
+        "endChar": 59
+      },
+      "revId": "a38a12d553406890069789790a201c509482178d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef1bb1e5_68868e91",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-25T10:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd4b35e4_d9d4c499",
       "range": {
         "startLine": 129,
         "startChar": 0,
