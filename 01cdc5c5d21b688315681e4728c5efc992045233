@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "638a1d3e_5cef87df",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-25T08:38:08Z",
+      "side": 1,
+      "message": "As mentioned in the Jira description, this issue may occur when the default-request-timeout-millis is exceeded.\n\nWhen this happens, the RequestTimeoutTask fails and calls the disconnect method, which leads to the NetconfDeviceCommunicator disconnect method.\nhttps://github.com/opendaylight/netconf/blob/v7.0.7/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java#L352\n\n\nThis use-case simulates the following scenario: Send request -\u003e disconnect -\u003e The NetconfDeviceCommunicator disconnect method calls the \u0027sessionLock.lock()\u0027 method before the pollRequest method, which is initiated by the reply message.",
+      "parentUuid": "b98289da_faa246b2",
+      "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5d12bff_ce683121",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b6488e6_b3176263",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-25T08:38:08Z",
+      "side": 1,
+      "message": "Description updated.",
+      "parentUuid": "f5d12bff_ce683121",
+      "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb8aca66_97c005a0",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-06-24T08:56:12Z",
       "side": 1,
       "message": "\"spySession,  times\" -\u003e \"spySession, times\"",
+      "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63566da0_81593e28",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-06-25T08:38:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb8aca66_97c005a0",
       "revId": "01cdc5c5d21b688315681e4728c5efc992045233",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
