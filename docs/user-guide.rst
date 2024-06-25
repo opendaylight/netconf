@@ -328,7 +328,7 @@ Payload for key-based authentication via TLS:
            <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
            <key-based xmlns="urn:opendaylight:netconf-node-topology">
              <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
-             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</key-id>
            </key-based>
            <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
            <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
@@ -342,6 +342,8 @@ Payload for key-based authentication via TLS:
            <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
            <protocol xmlns="urn:opendaylight:netconf-node-topology">
              <name xmlns="urn:opendaylight:netconf-node-topology">TLS</name>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id1</key-id>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id2</key-id>
            </protocol>
          </node>
 
@@ -374,7 +376,8 @@ Payload for key-based authentication via TLS:
                      "netconf-node-topology:backoff-multiplier": 1.5,
                      "netconf-node-topology:keepalive-delay": 120,
                      "protocol": {
-                        "name": "TLS"
+                        "name": "TLS",
+                        "key-id": ["key-id1", "key-id2"]
                      }
                  }
              ]
@@ -382,7 +385,10 @@ Payload for key-based authentication via TLS:
 
 
 Note that the device name in <node-id> element must match the last
-element of the restconf URL.
+element of the restconf URL. <key-id> inside protocol node is optional and
+used only in case of TLS protocol to specify set of keys that will be used 
+for TLS connection. Also <key-id> for key based credentials and <key-id>
+inside protocol node may or may not refer to the same key.
 
 Reconfiguring an existing connector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
