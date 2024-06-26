@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class OperationalDocumentTest extends AbstractDocumentTest {
+class OperationalDocumentTest extends AbstractDocumentTest {
     /**
      * Model action-types is used for test correct generating of action statements for openapi.
      */
@@ -26,7 +26,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
     private static final String OPERATIONAL = "operational";
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         initializeClass("/operational/");
     }
 
@@ -34,7 +34,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/single' endpoint.
      */
     @Test
-    public void getAllModulesDocTest() throws Exception {
+    void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/controller-all.json");
         final var allModulesDoc = getAllModulesDoc();
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
@@ -45,7 +45,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
      */
     @ParameterizedTest
     @MethodSource("getOperationalParameters")
-    public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+    void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
         final var moduleDoc = getDocByModule(moduleName, revision);
@@ -64,7 +64,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/mounts/1' endpoint.
      */
     @Test
-    public void getMountDocTest() throws Exception {
+    void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/device-all.json");
         final var allModulesDoc = getMountDoc();
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
@@ -75,7 +75,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
      */
     @ParameterizedTest
     @MethodSource("getOperationalMountParameters")
-    public void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+    void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
         final var moduleDoc = getMountDocByModule(moduleName, revision);

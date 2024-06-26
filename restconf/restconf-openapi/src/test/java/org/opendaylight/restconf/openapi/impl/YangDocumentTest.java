@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class YangDocumentTest extends AbstractDocumentTest {
+class YangDocumentTest extends AbstractDocumentTest {
     /**
      * Model action-types is used for test correct generating of action statements for openapi.
      */
@@ -109,7 +109,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/single' endpoint.
      */
     @Test
-    public void getAllModulesDocTest() throws Exception {
+    void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/controller-all.json");
         final var allModulesDoc = getAllModulesDoc();
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
@@ -120,7 +120,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
      */
     @ParameterizedTest
     @MethodSource("getOperationalParameters")
-    public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+    void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
         final var moduleDoc = getDocByModule(moduleName, revision);
