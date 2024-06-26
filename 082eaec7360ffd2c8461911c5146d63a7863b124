@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5910db6c_49a092de",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-26T12:35:26Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "282b3e17_0aa16166",
+      "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "648bae01_2a9d912c",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5d27861_8f270deb",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-26T12:35:26Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "648bae01_2a9d912c",
+      "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0658c44e_dbebfecb",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-06-26T11:36:06Z",
       "side": 0,
       "message": "if we use same name for source as for test, JUnit5 automatically set source. We can use this in all tests and also make source methods private.",
+      "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a9a6b07_a537b4c8",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-26T12:35:26Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "0658c44e_dbebfecb",
       "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
