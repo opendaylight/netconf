@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class YangDocumentTest extends AbstractDocumentTest {
+class YangDocumentTest extends AbstractDocumentTest {
     /**
      * Model action-types is used for test correct generating of action statements for openapi.
      */
@@ -101,7 +101,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
     private static final String TYPED_PARAMS_REV = "2023-10-24";
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         initializeClass("/yang/");
     }
 
@@ -109,7 +109,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/single' endpoint.
      */
     @Test
-    public void getAllModulesDocTest() throws Exception {
+    void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/controller-all.json");
         final var allModulesDoc = getAllModulesDoc();
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
@@ -119,15 +119,15 @@ public class YangDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/moduleName' endpoint.
      */
     @ParameterizedTest
-    @MethodSource("getOperationalParameters")
-    public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+    @MethodSource
+    void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
         final var moduleDoc = getDocByModule(moduleName, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
-    private static Stream<Arguments> getOperationalParameters() {
+    private static Stream<Arguments> getDocByModuleTest() {
         return Stream.of(
             Arguments.of(ACTION_TYPES, null, "controller-action-types.json"),
             Arguments.of(CHOICE_TEST, null, "controller-choice-test.json"),
@@ -154,7 +154,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/mounts/1' endpoint.
      */
     @Test
-    public void getMountDocTest() throws Exception {
+    void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/device-all.json");
         final var allModulesDoc = getMountDoc();
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
@@ -164,15 +164,15 @@ public class YangDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/mounts/1/moduleName' endpoint.
      */
     @ParameterizedTest
-    @MethodSource("getOperationalMountParameters")
-    public void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+    @MethodSource
+    void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
         final var moduleDoc = getMountDocByModule(moduleName, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
-    private static Stream<Arguments> getOperationalMountParameters() {
+    private static Stream<Arguments> getMountDocByModuleTest() {
         return Stream.of(
             Arguments.of(ACTION_TYPES, null, "device-action-types.json"),
             Arguments.of(CHOICE_TEST, null, "device-choice-test.json"),
