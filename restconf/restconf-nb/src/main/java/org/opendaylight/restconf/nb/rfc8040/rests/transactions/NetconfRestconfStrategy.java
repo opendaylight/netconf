@@ -65,7 +65,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
  *
  * @see NetconfDataTreeService
  */
-public final class NetconfRestconfStrategy extends RestconfStrategy {
+public final class NetconfRestconfStrategy extends DefaultRestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
     public NetconfRestconfStrategy(final DatabindContext databind, final NetconfDataTreeService netconfService,
@@ -77,12 +77,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfTransaction prepareWriteExecution() {
+    public RestconfTransaction prepareWriteExecution() {
         return new NetconfRestconfTransaction(databind(), netconfService);
     }
 
     @Override
-    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
+    public void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
         try {
             tx.delete(path);
@@ -106,7 +106,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
+    public void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
@@ -137,7 +137,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return switch (store) {
             case CONFIGURATION -> netconfService.getConfig(path);
@@ -155,7 +155,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     /**
      * Read specific type of data from data store via transaction with specified subtrees that should only be read.
-     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
+     * Close {@link DOMTransactionChain} inside of object {@link DefaultRestconfStrategy} provided as a parameter.
      *
      * @param content  type of data to read (config, state, all)
      * @param path     the parent path to read
@@ -186,7 +186,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     /**
-     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
+     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link DefaultRestconfStrategy} with
      * specified subtrees that should only be read.
      *
      * @param store                 datastore type
@@ -201,7 +201,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
+    public ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
         return Futures.transform(remapException(netconfService.getConfig(path)),
             optionalNode -> optionalNode != null && optionalNode.isPresent(),
             MoreExecutors.directExecutor());

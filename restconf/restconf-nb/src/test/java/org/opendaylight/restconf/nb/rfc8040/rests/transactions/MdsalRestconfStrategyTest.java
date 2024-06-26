@@ -46,7 +46,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.DefaultRestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -85,17 +85,17 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private NetconfDataTreeService netconfService;
 
     @Override
-    RestconfStrategy newStrategy(final DatabindContext databind) {
+    DefaultRestconfStrategy newStrategy(final DatabindContext databind) {
         return new MdsalRestconfStrategy(databind, dataBroker, ImmutableMap.of(), rpcService, null, null,
             mountPointService);
     }
 
-    private @NonNull RestconfStrategy modulesStrategy() {
+    private @NonNull DefaultRestconfStrategy modulesStrategy() {
         return newStrategy(MODULES_DATABIND);
     }
 
     @Override
-    RestconfStrategy testDeleteDataStrategy() {
+    DefaultRestconfStrategy testDeleteDataStrategy() {
         // assert that data to delete exists
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
@@ -105,7 +105,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testNegativeDeleteDataStrategy() {
+    DefaultRestconfStrategy testNegativeDeleteDataStrategy() {
         // assert that data to delete does NOT exist
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
@@ -114,7 +114,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
+    DefaultRestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
@@ -123,7 +123,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
+    DefaultRestconfStrategy testPostDataFailStrategy(final DOMException domException) {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateFailedFluentFuture(domException)).when(readWrite).commit();
@@ -175,7 +175,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostContainerDataStrategy() {
+    DefaultRestconfStrategy testPostContainerDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
@@ -184,35 +184,35 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchContainerDataStrategy() {
+    DefaultRestconfStrategy testPatchContainerDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxStrategy();
     }
 
     @Override
-    RestconfStrategy testPatchLeafDataStrategy() {
+    DefaultRestconfStrategy testPatchLeafDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxStrategy();
     }
 
     @Override
-    RestconfStrategy testPatchListDataStrategy() {
+    DefaultRestconfStrategy testPatchListDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxStrategy();
     }
 
     @Override
-    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
+    DefaultRestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxStrategy();
     }
 
     @Override
-    RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
+    DefaultRestconfStrategy testPatchDataCreateAndDeleteStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
@@ -222,14 +222,14 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchMergePutContainerStrategy() {
+    DefaultRestconfStrategy testPatchMergePutContainerStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxStrategy();
     }
 
     @Override
-    RestconfStrategy deleteNonexistentDataTestStrategy() {
+    DefaultRestconfStrategy deleteNonexistentDataTestStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             CREATE_AND_DELETE_TARGET);
@@ -248,7 +248,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataConfigTestStrategy() {
+    DefaultRestconfStrategy readDataConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -256,7 +256,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
+    DefaultRestconfStrategy readAllHavingOnlyConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -266,7 +266,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
+    DefaultRestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
@@ -276,7 +276,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataNonConfigTestStrategy() {
+    DefaultRestconfStrategy readDataNonConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
@@ -284,7 +284,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readContainerDataAllTestStrategy() {
+    DefaultRestconfStrategy readContainerDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -294,7 +294,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
+    DefaultRestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -304,7 +304,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readListDataAllTestStrategy() {
+    DefaultRestconfStrategy readListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
@@ -314,7 +314,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readOrderedListDataAllTestStrategy() {
+    DefaultRestconfStrategy readOrderedListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
@@ -324,7 +324,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readUnkeyedListDataAllTestStrategy() {
+    DefaultRestconfStrategy readUnkeyedListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
@@ -334,7 +334,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readLeafListDataAllTestStrategy() {
+    DefaultRestconfStrategy readLeafListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, LEAF_SET_NODE_PATH);
@@ -344,7 +344,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readOrderedLeafListDataAllTestStrategy() {
+    DefaultRestconfStrategy readOrderedLeafListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, LEAF_SET_NODE_PATH);
@@ -354,7 +354,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
+    DefaultRestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.empty())).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH_2);
         return mockStrategy();

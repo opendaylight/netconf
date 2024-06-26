@@ -53,7 +53,7 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
             .map(ServerError::ofRpcError)
             .collect(Collectors.toList());
         if (errors.isEmpty()) {
-            request.completeWith(RestconfStrategy.outputToInvokeResult(path, result.value()));
+            request.completeWith(DefaultRestconfStrategy.outputToInvokeResult(path, result.value()));
         } else {
             request.completeWith(new ServerException("Invocation failed", errors));
         }

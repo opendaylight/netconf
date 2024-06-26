@@ -64,7 +64,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @see DOMTransactionChain
  * @see DOMDataTreeReadWriteTransaction
  */
-public final class MdsalRestconfStrategy extends RestconfStrategy {
+public final class MdsalRestconfStrategy extends DefaultRestconfStrategy {
     private final @NonNull HttpGetResource yangLibraryVersion;
     private final @NonNull DOMDataBroker dataBroker;
 
@@ -83,12 +83,12 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfTransaction prepareWriteExecution() {
+    public RestconfTransaction prepareWriteExecution() {
         return new MdsalRestconfTransaction(databind(), dataBroker);
     }
 
     @Override
-    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
+    public void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = dataBroker.newReadWriteTransaction();
         tx.exists(CONFIGURATION, path).addCallback(new FutureCallback<>() {
             @Override
@@ -127,7 +127,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
+    public void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var depth = params.depth();
         final var fields = params.fields();
 
@@ -157,7 +157,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
@@ -165,7 +165,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
+    public ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.exists(LogicalDatastoreType.CONFIGURATION, path);
         }
