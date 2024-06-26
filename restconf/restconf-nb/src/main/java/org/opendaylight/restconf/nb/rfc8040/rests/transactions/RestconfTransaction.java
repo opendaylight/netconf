@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: it seems the first two operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-abstract class RestconfTransaction {
+public abstract class RestconfTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransaction.class);
 
     final @NonNull DatabindContext databind;

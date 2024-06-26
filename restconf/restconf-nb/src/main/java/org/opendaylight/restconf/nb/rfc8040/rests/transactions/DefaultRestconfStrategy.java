@@ -70,7 +70,6 @@ import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
-import org.opendaylight.restconf.server.api.DatabindAware;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
@@ -85,6 +84,7 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.RestconfStrategy;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
@@ -152,9 +152,10 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy implements DatabindAware {
+public abstract sealed class DefaultRestconfStrategy implements RestconfStrategy
+        permits MdsalRestconfStrategy, NetconfRestconfStrategy {
     @NonNullByDefault
-    public record StrategyAndPath(RestconfStrategy strategy, Data path) {
+    public record StrategyAndPath(DefaultRestconfStrategy strategy, Data path) {
         public StrategyAndPath {
             requireNonNull(strategy);
             requireNonNull(path);
@@ -169,14 +170,14 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param tail the {@link ApiPath} tail to use with the strategy
      */
     @NonNullByDefault
-    public record StrategyAndTail(RestconfStrategy strategy, ApiPath tail) {
+    public record StrategyAndTail(DefaultRestconfStrategy strategy, ApiPath tail) {
         public StrategyAndTail {
             requireNonNull(strategy);
             requireNonNull(tail);
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultRestconfStrategy.class);
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
     private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
@@ -190,7 +191,7 @@ public abstract class RestconfStrategy implements DatabindAware {
     private final DOMRpcService rpcService;
     private final HttpGetResource operations;
 
-    RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
+    DefaultRestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
             final @Nullable YangTextSourceExtension sourceProvider,
             final @Nullable DOMMountPointService mountPointService) {
@@ -236,8 +237,8 @@ public abstract class RestconfStrategy implements DatabindAware {
         return createStrategy(databind, mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
     }
 
-    private static @NonNull RestconfStrategy createStrategy(final DatabindContext databind, final ApiPath mountPath,
-            final DOMMountPoint mountPoint) throws ServerException {
+    private static @NonNull DefaultRestconfStrategy createStrategy(final DatabindContext databind,
+            final ApiPath mountPath, final DOMMountPoint mountPoint) throws ServerException {
         final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
             .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
                 "Mount point '%s' does not expose DOMSchemaService", mountPath));
@@ -278,33 +279,6 @@ public abstract class RestconfStrategy implements DatabindAware {
     public final @NonNull EffectiveModelContext modelContext() {
         return databind.modelContext();
     }
-
-    /**
-     * Lock the entire datastore.
-     *
-     * @return A {@link RestconfTransaction}. This transaction needs to be either committed or canceled before doing
-     *         anything else.
-     */
-    abstract RestconfTransaction prepareWriteExecution();
-
-    /**
-     * Read data from the datastore.
-     *
-     * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @return a ListenableFuture containing the result of the read
-     */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
-
-    /**
-     * Check if data already exists in the configuration datastore.
-     *
-     * @param request {@link ServerRequest} for this request
-     * @param path the data object path
-     */
-    // FIXME: this method should be hosted in RestconfTransaction
-    // FIXME: this method should only be needed in MdsalRestconfStrategy
-    abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
 
     @VisibleForTesting
     final void merge(final ServerRequest<DataPatchResult> request, final YangInstanceIdentifier path,
@@ -891,9 +865,6 @@ public abstract class RestconfStrategy implements DatabindAware {
         delete(request, path.instance());
     }
 
-    @NonNullByDefault
-    abstract void delete(ServerRequest<Empty> request, YangInstanceIdentifier path);
-
     public final void dataGET(final ServerRequest<DataGetResult> request, final ApiPath apiPath) {
         final Data path;
         try {
@@ -915,8 +886,6 @@ public abstract class RestconfStrategy implements DatabindAware {
         dataGET(request, path, getParams);
     }
 
-    abstract void dataGET(ServerRequest<DataGetResult> request, Data path, DataGetParams params);
-
     @NonNullByDefault
     static final void completeDataGET(final ServerRequest<DataGetResult> request, final @Nullable NormalizedNode node,
             final Data path, final NormalizedNodeWriterFactory writerFactory,
@@ -935,7 +904,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
     /**
      * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
-     * inside of object {@link RestconfStrategy} provided as a parameter.
+     * inside of object {@link DefaultRestconfStrategy} provided as a parameter.
      *
      * @param content      type of data to read (config, state, all)
      * @param path         the path to read

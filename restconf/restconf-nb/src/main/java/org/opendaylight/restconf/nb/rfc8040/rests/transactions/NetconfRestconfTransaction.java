@@ -130,7 +130,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws ServerException {
         // reading list is mainly invoked for subsequent removal,
         // cache data to avoid extra read invocation on delete/remove
-        final var result =  RestconfStrategy.syncAccess(read(path), path);
+        final var result =  DefaultRestconfStrategy.syncAccess(read(path), path);
         readListCache.put(path, result.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of()));
         return (NormalizedNodeContainer<?>) result.orElse(null);
     }
@@ -148,7 +148,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             // on building get-config filter
             : netconfService.getConfig(
                 path.node(NodeIdentifierWithPredicates.of(path.getLastPathArgument().getNodeType())), keyFields);
-        final var retrieved = RestconfStrategy.syncAccess(future, path);
+        final var retrieved = DefaultRestconfStrategy.syncAccess(future, path);
         return retrieved.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of());
     }
 

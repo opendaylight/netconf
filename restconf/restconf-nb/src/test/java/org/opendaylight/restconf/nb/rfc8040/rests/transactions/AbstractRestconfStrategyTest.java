@@ -243,13 +243,13 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         mockDatabind = DatabindContext.ofModel(mockSchemaContext);
     }
 
-    abstract @NonNull RestconfStrategy newStrategy(DatabindContext databind);
+    abstract @NonNull DefaultRestconfStrategy newStrategy(DatabindContext databind);
 
-    final @NonNull RestconfStrategy jukeboxStrategy() {
+    final @NonNull DefaultRestconfStrategy jukeboxStrategy() {
         return newStrategy(JUKEBOX_DATABIND);
     }
 
-    final @NonNull RestconfStrategy mockStrategy() {
+    final @NonNull DefaultRestconfStrategy mockStrategy() {
         return newStrategy(mockDatabind);
     }
 
@@ -262,7 +262,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         verify(dataDeleteRequest).completeWith(Empty.value());
     }
 
-    abstract @NonNull RestconfStrategy testDeleteDataStrategy();
+    abstract @NonNull DefaultRestconfStrategy testDeleteDataStrategy();
 
     /**
      * Negative test for DELETE operation when data to delete does not exist. Error DATA_MISSING is expected.
@@ -281,14 +281,14 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
     }
 
-    abstract @NonNull RestconfStrategy testNegativeDeleteDataStrategy();
+    abstract @NonNull DefaultRestconfStrategy testNegativeDeleteDataStrategy();
 
     @Test
     final void testPostContainerData() {
         testPostContainerDataStrategy().postData(dataPostRequest, JUKEBOX_IID, EMPTY_JUKEBOX, null);
     }
 
-    abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPostContainerDataStrategy();
 
     @Test
     final void testPostListData() {
@@ -296,7 +296,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .postData(dataPostRequest, PLAYLIST_IID, PLAYLIST, null);
     }
 
-    abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
+    abstract @NonNull DefaultRestconfStrategy testPostListDataStrategy(MapEntryNode entryNode,
+            YangInstanceIdentifier node);
 
     @Test
     final void testPostDataFail() {
@@ -311,7 +312,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertThat(errors.get(0).getErrorInfo(), containsString(domException.getMessage()));
     }
 
-    abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
+    abstract @NonNull DefaultRestconfStrategy testPostDataFailStrategy(DOMException domException);
 
     @Test
     final void testPatchContainerData() {
@@ -319,7 +320,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         verify(dataPatchRequest).completeWith(dataPatchCaptor.capture());
     }
 
-    abstract @NonNull RestconfStrategy testPatchContainerDataStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPatchContainerDataStrategy();
 
     @Test
     final void testPatchLeafData() {
@@ -327,7 +328,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         verify(dataPatchRequest).completeWith(dataPatchCaptor.capture());
     }
 
-    abstract @NonNull RestconfStrategy testPatchLeafDataStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPatchLeafDataStrategy();
 
     @Test
     final void testPatchListData() {
@@ -335,7 +336,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         verify(dataPatchRequest).completeWith(dataPatchCaptor.capture());
     }
 
-    abstract @NonNull RestconfStrategy testPatchListDataStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPatchListDataStrategy();
 
     @Test
     final void testPatchDataReplaceMergeAndRemove() {
@@ -355,7 +356,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
 
-    abstract @NonNull RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy();
 
     @Test
     final void testPatchDataCreateAndDelete() {
@@ -365,7 +366,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             testPatchDataCreateAndDeleteStrategy(), true);
     }
 
-    abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPatchDataCreateAndDeleteStrategy();
 
     @Test
     final void testPatchMergePutContainer() {
@@ -373,7 +374,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             testPatchMergePutContainerStrategy(), false);
     }
 
-    abstract @NonNull RestconfStrategy testPatchMergePutContainerStrategy();
+    abstract @NonNull DefaultRestconfStrategy testPatchMergePutContainerStrategy();
 
     @Test
     final void testDeleteNonexistentData() {
@@ -391,7 +392,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertTestDeleteNonexistentData(status, edit);
     }
 
-    abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy deleteNonexistentDataTestStrategy();
 
     abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status, @NonNull PatchStatusEntity edit);
 
@@ -400,28 +401,28 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertEquals(DATA_3, readData(ContentParam.CONFIG, PATH, readDataConfigTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readDataConfigTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readDataConfigTestStrategy();
 
     @Test
     final void readAllHavingOnlyConfigTest() {
         assertEquals(DATA_3, readData(ContentParam.ALL, PATH, readAllHavingOnlyConfigTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readAllHavingOnlyConfigTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readAllHavingOnlyConfigTestStrategy();
 
     @Test
     final void readAllHavingOnlyNonConfigTest() {
         assertEquals(DATA_2, readData(ContentParam.ALL, PATH_2, readAllHavingOnlyNonConfigTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readAllHavingOnlyNonConfigTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readAllHavingOnlyNonConfigTestStrategy();
 
     @Test
     final void readDataNonConfigTest() {
         assertEquals(DATA_2, readData(ContentParam.NONCONFIG, PATH_2, readDataNonConfigTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readDataNonConfigTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readDataNonConfigTestStrategy();
 
     @Test
     final void readContainerDataAllTest() {
@@ -432,7 +433,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, PATH, readContainerDataAllTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readContainerDataAllTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readContainerDataAllTestStrategy();
 
     @Test
     final void readContainerDataConfigNoValueOfContentTest() {
@@ -443,7 +444,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, PATH, readContainerDataConfigNoValueOfContentTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy();
 
     @Test
     final void readListDataAllTest() {
@@ -453,7 +454,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, PATH_3, readListDataAllTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readListDataAllTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readListDataAllTestStrategy();
 
     @Test
     final void readOrderedListDataAllTest() {
@@ -463,7 +464,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, PATH_3, readOrderedListDataAllTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readOrderedListDataAllTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readOrderedListDataAllTestStrategy();
 
     @Test
     void readUnkeyedListDataAllTest() {
@@ -477,7 +478,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, PATH_3, readUnkeyedListDataAllTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readUnkeyedListDataAllTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readUnkeyedListDataAllTestStrategy();
 
     @Test
     final void readLeafListDataAllTest() {
@@ -490,7 +491,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, LEAF_SET_NODE_PATH, readLeafListDataAllTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readLeafListDataAllTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readLeafListDataAllTestStrategy();
 
     @Test
     final void readOrderedLeafListDataAllTest() {
@@ -503,24 +504,24 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build(), readData(ContentParam.ALL, LEAF_SET_NODE_PATH, readOrderedLeafListDataAllTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readOrderedLeafListDataAllTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readOrderedLeafListDataAllTestStrategy();
 
     @Test
     void readDataWrongPathOrNoContentTest() {
         assertNull(readData(ContentParam.CONFIG, PATH_2, readDataWrongPathOrNoContentTestStrategy()));
     }
 
-    abstract @NonNull RestconfStrategy readDataWrongPathOrNoContentTestStrategy();
+    abstract @NonNull DefaultRestconfStrategy readDataWrongPathOrNoContentTestStrategy();
 
     /**
      * Read specific type of data from data store via transaction.
      *
      * @param content        type of data to read (config, state, all)
-     * @param strategy       {@link RestconfStrategy} - wrapper for variables
+     * @param strategy       {@link DefaultRestconfStrategy} - wrapper for variables
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
+            final YangInstanceIdentifier path, final @NonNull DefaultRestconfStrategy strategy) {
         try {
             return strategy.readData(content, path, null);
         } catch (ServerException e) {
@@ -528,7 +529,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         }
     }
 
-    private void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
+    private void patch(final PatchContext patchContext, final DefaultRestconfStrategy strategy, final boolean failed) {
         strategy.patchData(dataYangPatchRequest, patchContext);
         verify(dataYangPatchRequest).completeWith(dataYangPatchCaptor.capture());
         final var patchStatusContext = dataYangPatchCaptor.getValue().status();
