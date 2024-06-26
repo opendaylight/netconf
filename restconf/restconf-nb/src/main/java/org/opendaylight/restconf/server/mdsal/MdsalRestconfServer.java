@@ -30,9 +30,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.DefaultRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.DefaultRestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -289,8 +289,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         modulesGET(request, stratAndTail.strategy(), fileName, revision, representation);
     }
 
-    private static void modulesGET(final ServerRequest<ModulesGetResult> request, final RestconfStrategy strategy,
-            final String moduleName, final String revisionStr,
+    private static void modulesGET(final ServerRequest<ModulesGetResult> request,
+            final DefaultRestconfStrategy strategy, final String moduleName, final String revisionStr,
             final Class<? extends SourceRepresentation> representation) {
         if (moduleName == null) {
             request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
