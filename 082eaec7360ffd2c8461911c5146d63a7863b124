@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "282b3e17_0aa16166",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-26T11:36:06Z",
+      "side": 0,
+      "message": "access modifier",
+      "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "648bae01_2a9d912c",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-26T11:36:06Z",
+      "side": 0,
+      "message": "@ParameterizedTest\n    @MethodSource\n    public void getMountDocByModuleTest() {}\n\n    private static Stream\u003cArguments\u003e getMountDocByModuleTest() {}",
+      "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0658c44e_dbebfecb",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-26T11:36:06Z",
+      "side": 0,
+      "message": "if we use same name for source as for test, JUnit5 automatically set source. We can use this in all tests and also make source methods private.",
+      "revId": "082eaec7360ffd2c8461911c5146d63a7863b124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
