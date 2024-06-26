@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class ToasterDocumentTest extends AbstractDocumentTest {
+class ToasterDocumentTest extends AbstractDocumentTest {
     /**
      * Model toaster@2009-11-20 is used for test correct generating of complex openapi object.
      */
@@ -28,7 +28,7 @@ public class ToasterDocumentTest extends AbstractDocumentTest {
     private static final String TOASTER_OLD_REV = "2009-11-19";
 
     @BeforeAll
-    public static void beforeClass() {
+    static void beforeClass() {
         initializeClass("/toaster-document/");
     }
 
@@ -36,7 +36,7 @@ public class ToasterDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/single' endpoint.
      */
     @Test
-    public void getAllModulesDocTest() throws Exception {
+    void getAllModulesDocTest() throws Exception {
         final var jsonControllerDoc = getAllModulesDoc();
         final var expectedJson = getExpectedDoc("toaster-document/controller-all.json");
         JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
@@ -46,14 +46,14 @@ public class ToasterDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/toaster@revision' endpoint.
      */
     @ParameterizedTest
-    @MethodSource("getToasterRevisions")
-    public void getDocByModuleTest(final String revision, final String jsonPath) throws Exception {
+    @MethodSource
+    void getDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
         final var moduleDoc = getDocByModule(TOASTER, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
-    static Stream<Arguments> getToasterRevisions() {
+    private static Stream<Arguments> getDocByModuleTest() {
         // moduleName, revision, jsonPath
         return Stream.of(
             Arguments.of(TOASTER_REV, "controller-toaster.json"),
@@ -65,24 +65,24 @@ public class ToasterDocumentTest extends AbstractDocumentTest {
      * Tests the swagger document that is result of the call to the '/mounts/1' endpoint.
      */
     @Test
-    public void getMountDocTest() throws Exception {
+    void getMountDocTest() throws Exception {
         final var jsonDeviceDoc = getMountDoc();
         final var expectedJson = getExpectedDoc("toaster-document/device-all.json");
         JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
     }
 
     /**
-     * Tests the swagger document that is result of the call to the '/toaster@revision' endpoint.
+     * Tests the swagger document that is result of the call to the '/mounts/1/toaster@revision' endpoint.
      */
     @ParameterizedTest
-    @MethodSource("getMountToasterRevisions")
-    public void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
+    @MethodSource
+    void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
         final var moduleDoc = getMountDocByModule(TOASTER, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
-    static Stream<Arguments> getMountToasterRevisions() {
+    private static Stream<Arguments> getMountDocByModuleTest() {
         // moduleName, revision, jsonPath
         return Stream.of(
             Arguments.of(TOASTER_REV, "device-toaster.json"),

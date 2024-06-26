@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public abstract class AbstractDocumentTest {
+abstract class AbstractDocumentTest {
     protected static final ObjectMapper MAPPER = new ObjectMapper();
     /**
      * We want flexibility in comparing the resulting JSONs by not enforcing strict ordering of array contents.
@@ -85,7 +85,6 @@ public abstract class AbstractDocumentTest {
             StandardCharsets.UTF_8);
     }
 
-
     protected static String getMountDoc() throws Exception {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
@@ -95,7 +94,6 @@ public abstract class AbstractDocumentTest {
             StandardCharsets.UTF_8);
     }
 
-
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
         final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
         final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice);
@@ -104,15 +102,15 @@ public abstract class AbstractDocumentTest {
             StandardCharsets.UTF_8);
     }
 
-    public static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
-        final java.net.URI uri = new URI(urlPrefix);
-        final UriBuilder mockBuilder = mock(UriBuilder.class);
+    protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
+        final var uri = new URI(urlPrefix);
+        final var mockBuilder = mock(UriBuilder.class);
 
-        final ArgumentCaptor<String> subStringCapture = ArgumentCaptor.forClass(String.class);
+        final var subStringCapture = ArgumentCaptor.forClass(String.class);
         when(mockBuilder.path(subStringCapture.capture())).thenReturn(mockBuilder);
         when(mockBuilder.build()).then(invocation -> java.net.URI.create(uri + "/" + subStringCapture.getValue()));
 
-        final UriInfo info = mock(UriInfo.class);
+        final var info = mock(UriInfo.class);
         when(info.getRequestUriBuilder()).thenReturn(mockBuilder);
         when(mockBuilder.replaceQuery(any())).thenReturn(mockBuilder);
         when(info.getBaseUri()).thenReturn(uri);
