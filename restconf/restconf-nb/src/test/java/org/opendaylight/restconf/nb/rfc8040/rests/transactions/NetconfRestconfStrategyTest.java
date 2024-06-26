@@ -68,12 +68,12 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private AbstractServerRequest<Empty> emptyRequest;
 
     @Override
-    RestconfStrategy newStrategy(final DatabindContext databind) {
+    DefaultRestconfStrategy newStrategy(final DatabindContext databind) {
         return new NetconfRestconfStrategy(databind, netconfService, null, null, null, null);
     }
 
     @Override
-    RestconfStrategy testDeleteDataStrategy() {
+    DefaultRestconfStrategy testDeleteDataStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
@@ -81,7 +81,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testNegativeDeleteDataStrategy() {
+    DefaultRestconfStrategy testNegativeDeleteDataStrategy() {
         mockLockUnlockDiscard();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
@@ -121,7 +121,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostContainerDataStrategy() {
+    DefaultRestconfStrategy testPostContainerDataStrategy() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -130,7 +130,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
+    DefaultRestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             // FIXME: exact match
@@ -142,7 +142,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
+    DefaultRestconfStrategy testPostDataFailStrategy(final DOMException domException) {
         mockLockUnlockDiscard();
         doReturn(immediateFailedFluentFuture(domException)).when(netconfService)
             // FIXME: exact match
@@ -151,7 +151,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchContainerDataStrategy() {
+    DefaultRestconfStrategy testPatchContainerDataStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
             any());
@@ -159,7 +159,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchLeafDataStrategy() {
+    DefaultRestconfStrategy testPatchLeafDataStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(), any(), any());
@@ -167,7 +167,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchListDataStrategy() {
+    DefaultRestconfStrategy testPatchListDataStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
@@ -362,7 +362,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
+    DefaultRestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
             any(), any());
@@ -375,7 +375,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
+    DefaultRestconfStrategy testPatchDataCreateAndDeleteStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
@@ -385,7 +385,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchMergePutContainerStrategy() {
+    DefaultRestconfStrategy testPatchMergePutContainerStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
             any(), any());
@@ -393,7 +393,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy deleteNonexistentDataTestStrategy() {
+    DefaultRestconfStrategy deleteNonexistentDataTestStrategy() {
         mockLockUnlockDiscard();
         doReturn(Futures.immediateFailedFuture(
             new TransactionCommitFailedException("Commit of transaction " + this + " failed",
@@ -417,68 +417,68 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataConfigTestStrategy() {
+    DefaultRestconfStrategy readDataConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
+    DefaultRestconfStrategy readAllHavingOnlyConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
+    DefaultRestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readDataNonConfigTestStrategy() {
+    DefaultRestconfStrategy readDataNonConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readContainerDataAllTestStrategy() {
+    DefaultRestconfStrategy readContainerDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
+    DefaultRestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readListDataAllTestStrategy() {
+    DefaultRestconfStrategy readListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(netconfService).get(PATH_3);
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(netconfService).getConfig(PATH_3);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readOrderedListDataAllTestStrategy() {
+    DefaultRestconfStrategy readOrderedListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(netconfService).get(PATH_3);
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(netconfService).getConfig(PATH_3);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readUnkeyedListDataAllTestStrategy() {
+    DefaultRestconfStrategy readUnkeyedListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(netconfService).get(PATH_3);
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(netconfService).getConfig(PATH_3);
         return mockStrategy();
     }
 
     @Override
-    RestconfStrategy readLeafListDataAllTestStrategy() {
+    DefaultRestconfStrategy readLeafListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(netconfService)
             .get(LEAF_SET_NODE_PATH);
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(netconfService)
@@ -487,7 +487,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readOrderedLeafListDataAllTestStrategy() {
+    DefaultRestconfStrategy readOrderedLeafListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(netconfService)
             .get(LEAF_SET_NODE_PATH);
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(netconfService)
@@ -496,7 +496,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
+    DefaultRestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
         return mockStrategy();
     }
