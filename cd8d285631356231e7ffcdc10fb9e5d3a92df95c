@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42c3374c_cf0f8663",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/NetconfSessionPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-26T13:41:32Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2792facd_15fa7850",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2271834_30ff9bd5",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "To be able to do it like this I would have to create another parameter as we have no access to NetconfSessionPreferences here. It also might create some conflict like what to do if the newNotificationService !\u003d null but this new parameter is false. \n\nAlso this method seem to be used only in Tests to pass existing NetconfDeviceNotificationService. Although this patch change it and I used it in ntconf-topology-singleton since there was no access to NetconfSessionPreferences.",
       "parentUuid": "f2271834_30ff9bd5",
+      "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fed67f2_3789a2f3",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceMount.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-26T13:41:32Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3cc73b75_9b0bd333",
       "revId": "cd8d285631356231e7ffcdc10fb9e5d3a92df95c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
