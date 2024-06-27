@@ -89,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6191c5a_57b31d98",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-27T11:23:49Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1fad6597_d84cecc4",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c05f6a90_396fa991",
