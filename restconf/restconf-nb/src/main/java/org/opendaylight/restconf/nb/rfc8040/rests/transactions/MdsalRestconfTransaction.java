@@ -12,7 +12,6 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.ArrayList;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -128,28 +127,11 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     // FIXME: this method should only be invoked if we are crossing an implicit list.
     @Override
     void ensureParentsByMerge(final YangInstanceIdentifier path) {
-        final var normalizedPathWithoutChildArgs = new ArrayList<YangInstanceIdentifier.PathArgument>();
-        YangInstanceIdentifier rootNormalizedPath = null;
-
-        final var it = path.getPathArguments().iterator();
-
-        while (it.hasNext()) {
-            final var pathArgument = it.next();
-            if (rootNormalizedPath == null) {
-                rootNormalizedPath = YangInstanceIdentifier.of(pathArgument);
-            }
-
-            if (it.hasNext()) {
-                normalizedPathWithoutChildArgs.add(pathArgument);
-            }
+        final var parent = path.getParent();
+        if (parent != null) {
+            final var rootNormalizedPath = path.getAncestor(1);
+            merge(rootNormalizedPath, fromInstanceId(databind.modelContext(), parent));
         }
-
-        if (normalizedPathWithoutChildArgs.isEmpty()) {
-            return;
-        }
-
-        merge(rootNormalizedPath,
-            fromInstanceId(databind.modelContext(), YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
 
     @Override
