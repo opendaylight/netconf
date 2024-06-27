@@ -14,12 +14,14 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.base.CharMatcher;
@@ -72,6 +74,7 @@ import org.w3c.dom.Element;
 public class NetconfDeviceCommunicatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicatorTest.class);
     private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
+    private static final int RPC_MESSAGE_LIMIT = 10;
 
     @Mock
     private RemoteDevice<NetconfDeviceCommunicator> mockDevice;
@@ -81,8 +84,8 @@ public class NetconfDeviceCommunicatorTest {
 
     @Before
     public void setUp() throws Exception {
-        communicator = new NetconfDeviceCommunicator(
-                new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
+        communicator = new NetconfDeviceCommunicator(new RemoteDeviceId("test",
+            InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT);
         spySession = spy(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
             SESSION_ID, Set.of()));
     }
@@ -193,6 +196,40 @@ public class NetconfDeviceCommunicatorTest {
     public void testClose() throws Exception {
         communicator.close();
         verify(mockDevice, never()).onRemoteSessionDown();
+    }
+
+    @Test
+    public void testMessageLimitAfterDisconnect() {
+        // Prepare environment.
+        setupSession();
+        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
+        final var mockChannelFuture = mock(ChannelFuture.class);
+        doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
+        final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
+        doReturn(true).when(spySession).isUp();
+        doAnswer(invocationOnMock -> {
+            communicator.onSessionTerminated(spySession,  new NetconfTerminationReason("Session closed"));
+            return null;
+        }).when(spySession).close();
+        final var rpc = QName.create("", "mockRpc");
+
+        // Reach max-connection-attempts.
+        for (int i = 1; i <= RPC_MESSAGE_LIMIT; i++) {
+            final var resultFuture = communicator.sendRequest(message, rpc);
+            assertTrue(String.format("The resultFuture has an incorrect type: %s", resultFuture),
+                resultFuture instanceof UncancellableFuture);
+            verify(spySession, times(i)).sendMessage(same(message));
+            communicator.disconnect();
+            communicator.onSessionUp(spySession);
+        }
+
+        // Verify that more requests can be sent because the semaphore counter is not 0.
+        final var resultFuture = communicator.sendRequest(message, rpc);
+        assertTrue(String.format("The resultFuture has an incorrect type: %s", resultFuture),
+            resultFuture instanceof UncancellableFuture);
+        verify(spySession, times(RPC_MESSAGE_LIMIT + 1)).sendMessage(same(message));
+        verify(mockChannelFuture, times(RPC_MESSAGE_LIMIT + 1)).addListener(futureListener.capture());
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -391,7 +428,7 @@ public class NetconfDeviceCommunicatorTest {
         setupSession();
         ArrayList<String> messageID = new ArrayList<>();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < RPC_MESSAGE_LIMIT; i++) {
             messageID.add(UUID.randomUUID().toString());
             ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID.get(i), false);
             assertEquals("ListenableFuture is null", true, resultFuture instanceof UncancellableFuture);
