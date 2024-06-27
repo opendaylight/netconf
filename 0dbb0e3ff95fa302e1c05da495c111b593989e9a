@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5914f3aa_58a76a9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-27T11:31:18Z",
+      "side": 1,
+      "message": "Improved commit msg - hope chatGPT did better job than me 😊. If it is not sufficient, all suggestions are welcome.",
+      "parentUuid": "18b2fa72_91a37228",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70e51670_25fdddfe",
@@ -120,6 +138,24 @@
       "writtenOn": "2024-06-25T14:28:50Z",
       "side": 1,
       "message": "Do we really need to use after() instead of timeout()?",
+      "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "991a9594_0961d3c2",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-06-27T11:31:18Z",
+      "side": 1,
+      "message": "removed all unnecessary after()",
+      "parentUuid": "c05f6a90_396fa991",
       "revId": "0dbb0e3ff95fa302e1c05da495c111b593989e9a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
