@@ -16,6 +16,24 @@
       "message": "copyright",
       "revId": "fa1fa0fc3c23907106b4dd39165a64827f1ca237",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e18d967_c8e2adf3",
+        "filename": "features/odl-netconf-callhome-ssh/src/main/feature/feature.xml",
+        "patchSetId": 21
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-06-27T13:26:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d4738b1_7347cddc",
+      "revId": "fa1fa0fc3c23907106b4dd39165a64827f1ca237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
