@@ -167,6 +167,11 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                     if (r.future.isUncancellable()) {
                         futuresToCancel.add(r.future);
                         it.remove();
+                        // we have just removed one request from the queue
+                        // we can also release one permit
+                        if (semaphore != null) {
+                            semaphore.release();
+                        }
                     } else if (r.future.isCancelled()) {
                         // This just does some house-cleaning
                         it.remove();
