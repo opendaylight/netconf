@@ -13,8 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
@@ -154,6 +157,22 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         jukeboxStrategy().putData(dataPutRequest, GAP_IID, GAP_LEAF);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
+        assertNotNull(dataPutRequest.getResult());
+    }
+
+    @Test
+    void testEnsureParentsByMerge() throws Exception {
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        final var strategy = spy(jukeboxStrategy());
+        final var tx = spy(jukeboxStrategy().prepareWriteExecution());
+        doReturn(tx).when(strategy).prepareWriteExecution();
+
+        strategy.putData(dataPutRequest, GAP_IID, GAP_LEAF);
+        verify(tx).merge(eq(GAP_IID.getAncestor(1)), any());
         assertNotNull(dataPutRequest.getResult());
     }
 
