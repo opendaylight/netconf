@@ -7,45 +7,24 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.util.concurrent.AbstractFuture;
 
+/**
+ * A future that cannot be cancelled.
+ *
+ * <p>
+ * Used to communicate with the device and wait for a response.
+ * The only way how to complete it is to call {@link #set(Object)}.
+ */
 final class UncancellableFuture<V> extends AbstractFuture<V> {
-    private volatile boolean uncancellable = false;
-
-    // FIXME rework this class be have uncancellable always true
-    UncancellableFuture(final boolean uncancellable) {
-        this.uncancellable = uncancellable;
-    }
-
-    public boolean setUncancellable() {
-        if (isCancelled()) {
-            return false;
-        }
-
-        uncancellable = true;
-        return true;
-    }
-
-    public boolean isUncancellable() {
-        return uncancellable;
-    }
 
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
-        return !uncancellable && super.cancel(mayInterruptIfRunning);
+        return false;
     }
 
     @Override
-    public boolean set(final V value) {
-        checkState(uncancellable);
+    public boolean set(V value) {
         return super.set(value);
-    }
-
-    @Override
-    protected boolean setException(final Throwable throwable) {
-        checkState(uncancellable);
-        return super.setException(throwable);
     }
 }
