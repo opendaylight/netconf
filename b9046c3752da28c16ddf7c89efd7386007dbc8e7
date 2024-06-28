@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd427032_375f165d",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-06-28T13:01:04Z",
+      "side": 1,
+      "message": "Why these are removed?",
+      "revId": "b9046c3752da28c16ddf7c89efd7386007dbc8e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
