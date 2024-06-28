@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.EOFException;
 import java.lang.invoke.MethodHandles;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceCommunicator implements NetconfClientSessionListener, RemoteDeviceCommunicator {
     private record Request(
-            @NonNull UncancellableFuture<RpcResult<NetconfMessage>> future,
+            @NonNull SettableFuture<RpcResult<NetconfMessage>> future,
             @NonNull NetconfMessage request) {
         Request {
             requireNonNull(future);
@@ -151,7 +152,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.warn("It's curious that no one to close the session but tearDown is called!");
         }
         LOG.debug("Tearing down {}", reason);
-        final var futuresToCancel = new ArrayList<UncancellableFuture<RpcResult<NetconfMessage>>>();
+        final var futuresToCancel = new ArrayList<SettableFuture<RpcResult<NetconfMessage>>>();
         sessionLock.lock();
         try {
             if (currentSession != null) {
@@ -378,7 +379,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             return Futures.immediateFuture(createSessionDownRpcResult());
         }
 
-        final var req = new Request(new UncancellableFuture<>(true), message);
+        final var req = new Request(SettableFuture.create(), message);
         requests.add(req);
 
         currentSession.sendMessage(req.request).addListener(future -> {

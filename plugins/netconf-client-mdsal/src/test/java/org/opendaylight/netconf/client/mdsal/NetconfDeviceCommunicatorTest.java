@@ -30,6 +30,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
@@ -232,7 +233,7 @@ class NetconfDeviceCommunicatorTest {
         // Reach max-connection-attempts.
         for (int i = 1; i <= RPC_MESSAGE_LIMIT; i++) {
             final var resultFuture = communicator.sendRequest(message);
-            assertInstanceOf(UncancellableFuture.class, resultFuture,
+            assertInstanceOf(SettableFuture.class, resultFuture,
                 String.format("The resultFuture has an incorrect type: %s", resultFuture));
             verify(spySession, times(i)).sendMessage(same(message));
             communicator.disconnect();
@@ -241,7 +242,7 @@ class NetconfDeviceCommunicatorTest {
 
         // Verify that more requests can be sent because the semaphore counter is not 0.
         final var resultFuture = communicator.sendRequest(message);
-        assertInstanceOf(UncancellableFuture.class, resultFuture,
+        assertInstanceOf(SettableFuture.class, resultFuture,
             String.format("The resultFuture has an incorrect type: %s", resultFuture));
         verify(spySession, times(RPC_MESSAGE_LIMIT + 1)).sendMessage(same(message));
         verify(mockChannelFuture, times(RPC_MESSAGE_LIMIT + 1)).addListener(futureListener.capture());
@@ -426,12 +427,12 @@ class NetconfDeviceCommunicatorTest {
         for (int i = 0; i < RPC_MESSAGE_LIMIT; i++) {
             messageID.add(UUID.randomUUID().toString());
             final var resultFuture = sendRequest(messageID.get(i), false);
-            assertInstanceOf(UncancellableFuture.class, resultFuture, "ListenableFuture is null");
+            assertInstanceOf(SettableFuture.class, resultFuture, "ListenableFuture is null");
         }
 
         final var notWorkingMessageID = UUID.randomUUID().toString();
         var resultFuture = sendRequestWithoutMocking(notWorkingMessageID, false);
-        assertFalse(resultFuture instanceof UncancellableFuture, "ListenableFuture is null");
+        assertFalse(resultFuture instanceof SettableFuture, "ListenableFuture is null");
 
         communicator.onMessage(spySession, createSuccessResponseMessage(messageID.get(0)));
 
