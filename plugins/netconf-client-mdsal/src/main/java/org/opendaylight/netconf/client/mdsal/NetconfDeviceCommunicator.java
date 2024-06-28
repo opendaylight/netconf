@@ -378,7 +378,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             return Futures.immediateFuture(createSessionDownRpcResult());
         }
 
-        final var req = new Request(new UncancellableFuture<>(true), message);
+        final var req = new Request(new UncancellableFuture<>(), message);
         requests.add(req);
 
         currentSession.sendMessage(req.request).addListener(future -> {
