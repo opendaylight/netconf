@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.singleton.impl.EOSClusterSingletonServiceProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+//TODO: Migrate this test to JUnit5 after migrating the mdsal tests.
 public class YangLibraryWriterSingletonIntegrationTest extends AbstractConcurrentDataBrokerTest {
     private final DOMEntityOwnershipService eos = new SimpleDOMEntityOwnershipService();
 

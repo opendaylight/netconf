@@ -42,7 +42,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
-public class TCPClientServerTest {
+class TCPClientServerTest {
     @Mock
     private TcpClientGrouping clientGrouping;
     @Mock
@@ -55,18 +55,18 @@ public class TCPClientServerTest {
     private static EventLoopGroup group;
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         group = NettyTransportSupport.newEventLoopGroup("IntegrationTest");
     }
 
     @AfterAll
-    public static void afterAll() {
+    static void afterAll() {
         group.shutdownGracefully();
         group = null;
     }
 
     @Test
-    public void integrationTest() throws Exception {
+    void integrationTest() throws Exception {
         // localhost address, so we do not leak things around
         final var loopbackAddr = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
 

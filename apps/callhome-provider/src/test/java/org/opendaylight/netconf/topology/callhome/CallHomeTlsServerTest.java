@@ -80,7 +80,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
-public class CallHomeTlsServerTest {
+class CallHomeTlsServerTest {
     private static final Logger LOG = LoggerFactory.getLogger("TEST");
 
     private static final AtomicInteger COUNTER = new AtomicInteger();

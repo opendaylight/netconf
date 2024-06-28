@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class AbstractBasicAuthHandlerTest {
+class AbstractBasicAuthHandlerTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$W0rd!";
     private static final String GRANTED_URI = "/granted";
