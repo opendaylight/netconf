@@ -38,7 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 @ExtendWith(MockitoExtension.class)
-public class CallHomeMountServiceTest {
+class CallHomeMountServiceTest {
 
     private static final SocketAddress SOCKET_ADDRESS = new InetSocketAddress("127.0.0.1", 12345);
     private static final String ID1 = "id1";

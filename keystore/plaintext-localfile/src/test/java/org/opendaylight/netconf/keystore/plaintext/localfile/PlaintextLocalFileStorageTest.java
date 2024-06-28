@@ -40,7 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
 
 @ExtendWith(MockitoExtension.class)
-public class PlaintextLocalFileStorageTest {
+class PlaintextLocalFileStorageTest {
 
     private static final StorageEntry ENTRY_1 = storageEntry("key-1", "value-1");
     private static final StorageEntry ENTRY_1_MODIFIED = storageEntry("key-1", "value-1-modified");
