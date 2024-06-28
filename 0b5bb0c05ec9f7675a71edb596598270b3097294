@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a51ff59_1406d73b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-06-28T10:07:30Z",
+      "side": 1,
+      "message": "just small issue, otherwise OK for me \nmaybe you can use var also in OpenApiServiceImpl, but it was like this before so IDK\nalso left suggestion for simplifying containsDataOrOperation method",
+      "revId": "0b5bb0c05ec9f7675a71edb596598270b3097294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "309138b6_be4a9628",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiDataStream.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-06-28T10:07:30Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 44,
+        "startChar": 14,
+        "endLine": 44,
+        "endChar": 31
+      },
+      "revId": "0b5bb0c05ec9f7675a71edb596598270b3097294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77dc3930_69e40851",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PaginationService.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-06-28T10:07:30Z",
+      "side": 1,
+      "message": "I think this can be simplified to:\n\nreturn !module.getRpcs().isEmpty() || module.getChildNodes().stream().anyMatch(...)",
+      "range": {
+        "startLine": 162,
+        "startChar": 7,
+        "endLine": 167,
+        "endChar": 97
+      },
+      "revId": "0b5bb0c05ec9f7675a71edb596598270b3097294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
