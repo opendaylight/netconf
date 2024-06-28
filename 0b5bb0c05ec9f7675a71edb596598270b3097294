@@ -43,6 +43,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "16c88b7d_c08e81cf",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiDataStream.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-06-28T10:20:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "309138b6_be4a9628",
+      "range": {
+        "startLine": 44,
+        "startChar": 14,
+        "endLine": 44,
+        "endChar": 31
+      },
+      "revId": "0b5bb0c05ec9f7675a71edb596598270b3097294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "77dc3930_69e40851",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PaginationService.java",
         "patchSetId": 21
