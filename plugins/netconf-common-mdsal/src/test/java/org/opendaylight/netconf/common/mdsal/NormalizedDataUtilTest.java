@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.common.mdsal;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
 import javax.xml.transform.dom.DOMResult;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
@@ -27,9 +27,9 @@ import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
-public class NormalizedDataUtilTest {
+class NormalizedDataUtilTest {
     @Test
-    public void testWriteNormalizedNode() throws Exception {
+    void testWriteNormalizedNode() throws Exception {
         final var context = BindingRuntimeHelpers.createEffectiveModel(List.of(YangModuleInfoImpl.getInstance()));
         final var result = new DOMResult(XmlUtil.newDocument());
         NormalizedDataUtil.writeNormalizedNode(ImmutableNodes.newContainerBuilder()
@@ -58,6 +58,6 @@ public class NormalizedDataUtilTest {
             .checkForSimilar()
             .build();
 
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 }

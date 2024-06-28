@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.assertj.XmlAssert;
 
+//TODO: Migrate this test to JUnit5 after migrating the mdsal tests.
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private static final class TestHandler implements Sender {

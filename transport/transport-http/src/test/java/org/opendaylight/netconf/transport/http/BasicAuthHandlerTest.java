@@ -35,7 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.basic.basic.PasswordBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 
-public class BasicAuthHandlerTest {
+class BasicAuthHandlerTest {
     private static final String USERNAME1 = "username-1";
     private static final String USERNAME2 = "username-2";
     private static final String PASSWORD1 = "pa$$W0rd!1";

@@ -62,7 +62,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
-public class CallHomeSshServerTest {
+class CallHomeSshServerTest {
     private static final long TIMEOUT = 5000L;
     private static final Capabilities EMPTY_CAPABILITIES = new CapabilitiesBuilder().setCapability(Set.of()).build();
     private static final String USERNAME = "username";
