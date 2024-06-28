@@ -32,10 +32,12 @@ import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.DeleteEntity;
 import org.opendaylight.restconf.openapi.model.GetEntity;
 import org.opendaylight.restconf.openapi.model.GetRootEntity;
+import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.ParameterEntity;
 import org.opendaylight.restconf.openapi.model.ParameterSchemaEntity;
 import org.opendaylight.restconf.openapi.model.PatchEntity;
 import org.opendaylight.restconf.openapi.model.PathEntity;
+import org.opendaylight.restconf.openapi.model.PathsEntity;
 import org.opendaylight.restconf.openapi.model.PostEntity;
 import org.opendaylight.restconf.openapi.model.PutEntity;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -113,8 +115,8 @@ public final class PathsStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (iterator.hasNext()) {
-                reader = new BufferedReader(
-                    new InputStreamReader(new PathStream(toPaths(iterator.next()), writer), StandardCharsets.UTF_8));
+                reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(
+                    writeNextEntity(new PathsEntity(toPaths(iterator.next())))), StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
             }
@@ -143,7 +145,8 @@ public final class PathsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (iterator.hasNext()) {
-                channel = Channels.newChannel(new PathStream(toPaths(iterator.next()), writer));
+                channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
+                    new PathsEntity(toPaths(iterator.next())))));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -155,6 +158,11 @@ public final class PathsStream extends InputStream {
             return channel.read(ByteBuffer.wrap(array, off, len));
         }
         return read;
+    }
+
+    private byte[] writeNextEntity(final OpenApiEntity entity) throws IOException {
+        writer.writeTo(entity, null, null, null, null, null, null);
+        return writer.readFrom();
     }
 
     private Deque<PathEntity> toPaths(final Module module) {
