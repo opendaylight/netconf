@@ -16,6 +16,24 @@
       "message": "This definitely does not work.",
       "revId": "be90e4a3b1eb6e51de69966caae056916b7c6d72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58967223_760a44bc",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-01T18:29:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91b127b5_9d336681",
+      "revId": "be90e4a3b1eb6e51de69966caae056916b7c6d72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
