@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c97fa0f_978f435e",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-02T08:27:46Z",
+      "side": 1,
+      "message": "Is this necessary?",
+      "revId": "a6a3ca5642129746f1fdbe72879dc4232417dc26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "886a8d99_9db464d6",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-02T08:27:46Z",
+      "side": 1,
+      "message": "Missing ,",
+      "revId": "a6a3ca5642129746f1fdbe72879dc4232417dc26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
