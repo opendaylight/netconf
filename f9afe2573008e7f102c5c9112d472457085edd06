@@ -33,6 +33,40 @@
       "message": "recheck",
       "revId": "f9afe2573008e7f102c5c9112d472457085edd06",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "933c7454_85ef5ac9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-02T19:56:40Z",
+      "side": 1,
+      "message": "It looks like Unit Tests don\u0027t cover ensureParentsByMerge method. I would have added unit tests for this method.",
+      "revId": "f9afe2573008e7f102c5c9112d472457085edd06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0631891_3c71741b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfTransaction.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-02T19:56:40Z",
+      "side": 1,
+      "message": "path.getAncestor(0) returns \"/\".\nuse getAncestor(1)",
+      "revId": "f9afe2573008e7f102c5c9112d472457085edd06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
