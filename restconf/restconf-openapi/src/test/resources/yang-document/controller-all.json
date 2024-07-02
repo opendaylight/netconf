@@ -52,12 +52,41 @@
         "description": "Queries the config (startup) datastore on the mounted hosted.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "properties": {
+                  }
+                }
+              }
+            }
           }
         },
         "summary": "GET - Controller - datastore - data",
         "tags": [
           "Controller root"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
         ]
       }
     },
@@ -66,7 +95,19 @@
         "description": "Queries the available operations (RPC calls) on the mounted hosted.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {}
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "properties": {}
+                }
+              }
+            }
           }
         },
         "summary": "GET - Controller - datastore - operations",
