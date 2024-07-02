@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e89f3b61_8d0405e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-02T18:50:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ecea922_75810dd6",
+      "range": {
+        "startLine": 10,
+        "startChar": 25,
+        "endLine": 10,
+        "endChar": 38
+      },
+      "revId": "7d13ff5722ee0bb14e092d156daf21e22391ed0d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ff905057_5e0c5f04",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -54,6 +78,24 @@
       "writtenOn": "2024-06-28T04:56:32Z",
       "side": 1,
       "message": "one extra empty line",
+      "revId": "7d13ff5722ee0bb14e092d156daf21e22391ed0d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b8b1f05_42eac5c8",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/DefaultRestconfStrategy.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-02T18:50:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "433d1a32_6b283273",
       "revId": "7d13ff5722ee0bb14e092d156daf21e22391ed0d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
