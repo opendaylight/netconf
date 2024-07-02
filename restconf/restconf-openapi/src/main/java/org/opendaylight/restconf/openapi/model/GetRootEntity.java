@@ -12,14 +12,16 @@ import static javax.ws.rs.core.Response.Status.OK;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 import org.eclipse.jdt.annotation.NonNull;
 
 public final class GetRootEntity extends GetEntity {
     private final String type;
 
     public GetRootEntity(final @NonNull String deviceName, final @NonNull String type) {
-        super(null, deviceName, "", null, null, false);
+        super(null, deviceName, "", new ArrayList<>(), null, false);
         this.type = requireNonNull(type);
     }
 
@@ -32,6 +34,20 @@ public final class GetRootEntity extends GetEntity {
         generator.writeObjectFieldStart(RESPONSES);
         generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
         generator.writeStringField(DESCRIPTION, "OK");
+        generator.writeObjectFieldStart(CONTENT);
+        generator.writeObjectFieldStart(MediaType.APPLICATION_JSON);
+        generator.writeObjectFieldStart(SCHEMA);
+        generator.writeObjectFieldStart(PROPERTIES);
+        generator.writeEndObject(); // end of properties
+        generator.writeEndObject(); // end of json schema
+        generator.writeEndObject(); //end of json
+        generator.writeObjectFieldStart(MediaType.APPLICATION_XML);
+        generator.writeObjectFieldStart(SCHEMA);
+        generator.writeObjectFieldStart(PROPERTIES);
+        generator.writeEndObject(); // end of properties
+        generator.writeEndObject(); // end of xml schema
+        generator.writeEndObject(); // end of xml
+        generator.writeEndObject(); //end of content
         generator.writeEndObject(); //end of 200
         generator.writeEndObject(); // end of responses
         final var summary = HttpMethod.GET + " - " + deviceName() + " - datastore - " + type;
@@ -39,6 +55,9 @@ public final class GetRootEntity extends GetEntity {
         generator.writeArrayFieldStart("tags");
         generator.writeString(deviceName() + " root");
         generator.writeEndArray(); //end of tags
+        if (!type.equals("operations")) {
+            generateParams(generator);
+        }
         generator.writeEndObject(); //end of get
     }
 }
