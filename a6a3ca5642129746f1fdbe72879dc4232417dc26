@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c15c8af1_9247cb99",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-02T08:36:42Z",
+      "side": 1,
+      "message": "This is a typo - I know it\u0027s not part of the task, let\u0027s do it once to make this example correct. We don\u0027t have typo correction tasks, so this will be here forever if it\u0027s not addressed.",
+      "parentUuid": "2c97fa0f_978f435e",
+      "revId": "a6a3ca5642129746f1fdbe72879dc4232417dc26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "886a8d99_9db464d6",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-02T08:27:46Z",
       "side": 1,
       "message": "Missing ,",
+      "revId": "a6a3ca5642129746f1fdbe72879dc4232417dc26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f10618e0_4426d889",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-02T08:36:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "886a8d99_9db464d6",
       "revId": "a6a3ca5642129746f1fdbe72879dc4232417dc26",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
