@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce0296ef_a8b44e9f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/UncancellableFuture.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-07-02T11:07:14Z",
+      "side": 1,
+      "message": "seems redundant to me \nhttps://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.8.8",
+      "revId": "0ab7670054f48441bc840e29ec0991d65d3e5748",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6996d9e3_2d1e8bf6",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/UncancellableFuture.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-07-02T11:07:14Z",
+      "side": 1,
+      "message": "does this override serve any purpose?",
+      "revId": "0ab7670054f48441bc840e29ec0991d65d3e5748",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
