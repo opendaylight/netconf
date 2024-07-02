@@ -16,6 +16,24 @@
       "message": "Maybe some explanation into text for key-id option would be great.",
       "revId": "f5ef34468d3e2303d32c4ffd5010b3a6dc53b0dd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3144d70a_89ad7e23",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-02T08:59:34Z",
+      "side": 1,
+      "message": "Added some info after the example on how to use it in the request payload.",
+      "parentUuid": "8a9cb782_cb44838b",
+      "revId": "f5ef34468d3e2303d32c4ffd5010b3a6dc53b0dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
