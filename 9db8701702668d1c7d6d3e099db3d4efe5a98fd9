@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c678387_0ae7d8e2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-02T08:58:12Z",
+      "side": 1,
+      "message": "Used for what?",
+      "revId": "9db8701702668d1c7d6d3e099db3d4efe5a98fd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
