@@ -16,6 +16,24 @@
       "message": "Used for what?",
       "revId": "9db8701702668d1c7d6d3e099db3d4efe5a98fd9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da8c8faa_95e61a90",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-02T09:05:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c678387_0ae7d8e2",
+      "revId": "9db8701702668d1c7d6d3e099db3d4efe5a98fd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
