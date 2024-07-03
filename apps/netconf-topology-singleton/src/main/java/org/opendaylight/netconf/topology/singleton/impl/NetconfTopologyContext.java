@@ -9,9 +9,9 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonService;

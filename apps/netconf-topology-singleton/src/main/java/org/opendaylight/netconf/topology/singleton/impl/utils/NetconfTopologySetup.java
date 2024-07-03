@@ -9,8 +9,8 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import static java.util.Objects.requireNonNull;
 
-import akka.actor.ActorSystem;
 import java.time.Duration;
+import org.apache.pekko.actor.ActorSystem;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
