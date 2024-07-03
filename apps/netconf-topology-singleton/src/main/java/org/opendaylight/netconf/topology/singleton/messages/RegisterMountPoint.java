@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import akka.actor.ActorRef;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import org.apache.pekko.actor.ActorRef;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 
 /**
