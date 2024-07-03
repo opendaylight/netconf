@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import akka.actor.ActorRef;
-import akka.actor.Status.Failure;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.Status.Failure;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;

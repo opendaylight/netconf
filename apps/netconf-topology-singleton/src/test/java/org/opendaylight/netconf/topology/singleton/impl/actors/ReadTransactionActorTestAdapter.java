@@ -14,11 +14,11 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Status.Failure;
-import akka.testkit.TestProbe;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Status.Failure;
+import org.apache.pekko.testkit.TestProbe;
+import org.apache.pekko.util.Timeout;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;

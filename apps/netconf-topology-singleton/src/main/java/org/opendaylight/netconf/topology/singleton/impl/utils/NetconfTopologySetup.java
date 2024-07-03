@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import static java.util.Objects.requireNonNull;
 
-import akka.actor.ActorSystem;
+import org.apache.pekko.actor.ActorSystem;
 import java.time.Duration;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
