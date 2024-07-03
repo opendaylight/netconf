@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.singleton.messages;
 
 import static java.util.Objects.requireNonNull;
 
-import akka.util.Timeout;
+import org.apache.pekko.util.Timeout;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 

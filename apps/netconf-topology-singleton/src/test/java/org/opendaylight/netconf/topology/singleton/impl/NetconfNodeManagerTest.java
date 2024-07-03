@@ -21,13 +21,6 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.cluster.Cluster;
-import akka.dispatch.Dispatchers;
-import akka.testkit.TestActorRef;
-import akka.testkit.javadsl.TestKit;
-import akka.util.Timeout;
 import com.google.common.collect.Iterables;
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
@@ -39,6 +32,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.cluster.Cluster;
+import org.apache.pekko.dispatch.Dispatchers;
+import org.apache.pekko.testkit.TestActorRef;
+import org.apache.pekko.testkit.javadsl.TestKit;
+import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -23,8 +23,6 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
-import akka.actor.ActorSystem;
-import akka.util.Timeout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +31,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
