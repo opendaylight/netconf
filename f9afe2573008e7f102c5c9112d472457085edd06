@@ -67,6 +67,24 @@
       "message": "path.getAncestor(0) returns \"/\".\nuse getAncestor(1)",
       "revId": "f9afe2573008e7f102c5c9112d472457085edd06",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be6c7a4d_4d55452a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfTransaction.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-03T07:44:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0631891_3c71741b",
+      "revId": "f9afe2573008e7f102c5c9112d472457085edd06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
