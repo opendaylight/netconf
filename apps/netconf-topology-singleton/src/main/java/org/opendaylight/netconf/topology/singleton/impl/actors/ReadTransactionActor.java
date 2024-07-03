@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import akka.actor.Props;
-import akka.actor.UntypedAbstractActor;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.UntypedAbstractActor;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 

@@ -7,12 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.Status.Failure;
-import akka.actor.Status.Success;
-import akka.pattern.AskTimeoutException;
-import akka.util.Timeout;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -22,6 +16,12 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.Status.Failure;
+import org.apache.pekko.actor.Status.Success;
+import org.apache.pekko.pattern.AskTimeoutException;
+import org.apache.pekko.util.Timeout;
 import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;

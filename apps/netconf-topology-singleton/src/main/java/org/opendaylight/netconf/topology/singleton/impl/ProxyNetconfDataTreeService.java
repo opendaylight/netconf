@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import akka.actor.ActorRef;
-import akka.pattern.Patterns;
-import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Optional;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.pattern.Patterns;
+import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
