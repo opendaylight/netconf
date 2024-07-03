@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import akka.actor.ActorRef;
+import org.apache.pekko.actor.ActorRef;
 import java.io.Serial;
 import java.io.Serializable;
 

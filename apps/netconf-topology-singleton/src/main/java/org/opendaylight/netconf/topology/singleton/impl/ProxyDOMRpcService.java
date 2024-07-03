@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.dispatch.OnComplete;
-import akka.pattern.Patterns;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.dispatch.OnComplete;
+import org.apache.pekko.pattern.Patterns;
+import org.apache.pekko.util.Timeout;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;

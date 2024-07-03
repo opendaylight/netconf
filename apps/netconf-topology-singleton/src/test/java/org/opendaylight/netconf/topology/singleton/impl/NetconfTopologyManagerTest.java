@@ -23,8 +23,8 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
-import akka.actor.ActorSystem;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.util.Timeout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

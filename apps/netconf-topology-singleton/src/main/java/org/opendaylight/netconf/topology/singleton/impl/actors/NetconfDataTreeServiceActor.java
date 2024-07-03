@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.ReceiveTimeout;
-import akka.actor.Status;
-import akka.actor.UntypedAbstractActor;
-import akka.util.JavaDurationConverters;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.ReceiveTimeout;
+import org.apache.pekko.actor.Status;
+import org.apache.pekko.actor.UntypedAbstractActor;
+import org.apache.pekko.util.JavaDurationConverters;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;

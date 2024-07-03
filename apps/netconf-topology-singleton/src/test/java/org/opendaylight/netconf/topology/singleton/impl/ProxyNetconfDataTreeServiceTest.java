@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import akka.actor.ActorSystem;
-import akka.actor.Status;
-import akka.testkit.TestProbe;
-import akka.testkit.javadsl.TestKit;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Status;
+import org.apache.pekko.testkit.TestProbe;
+import org.apache.pekko.testkit.javadsl.TestKit;
+import org.apache.pekko.util.Timeout;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;

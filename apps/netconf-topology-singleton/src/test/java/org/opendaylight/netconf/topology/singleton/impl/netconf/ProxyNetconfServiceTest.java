@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import akka.actor.ActorSystem;
-import akka.actor.Status;
-import akka.dispatch.Futures;
-import akka.testkit.TestProbe;
-import akka.testkit.javadsl.TestKit;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Status;
+import org.apache.pekko.dispatch.Futures;
+import org.apache.pekko.testkit.TestProbe;
+import org.apache.pekko.testkit.javadsl.TestKit;
+import org.apache.pekko.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.List;

@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
-import akka.actor.ActorRef;
-import akka.dispatch.OnComplete;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.dispatch.OnComplete;
+import org.apache.pekko.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;

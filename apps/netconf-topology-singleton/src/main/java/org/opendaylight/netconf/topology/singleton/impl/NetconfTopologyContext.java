@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import akka.util.Timeout;
+import org.apache.pekko.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
