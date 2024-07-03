@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b739b37_6f3ea688",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/api/RestconfStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-03T12:17:00Z",
+      "side": 1,
+      "message": "RestconfStrategy is *not* something exposed to server.api users",
+      "range": {
+        "startLine": 8,
+        "startChar": 8,
+        "endLine": 8,
+        "endChar": 45
+      },
+      "revId": "9ca586b09a92c08bdfa40e00c3985a83e6795b73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
