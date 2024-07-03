@@ -8,9 +8,9 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import akka.actor.ActorRef;
 import java.io.Serial;
 import java.io.Serializable;
+import org.apache.pekko.actor.ActorRef;
 
 /**
  * After master is connected, slaves send the message to master and master triggers registering slave mount point
