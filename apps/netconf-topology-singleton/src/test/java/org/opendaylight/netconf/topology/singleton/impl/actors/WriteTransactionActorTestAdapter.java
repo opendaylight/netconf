@@ -18,11 +18,11 @@ import static org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransa
 import static org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActorTestAdapter.STORE;
 import static org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActorTestAdapter.TIMEOUT;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Status.Failure;
-import akka.actor.Status.Success;
-import akka.testkit.TestProbe;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Status.Failure;
+import org.apache.pekko.actor.Status.Success;
+import org.apache.pekko.testkit.TestProbe;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;

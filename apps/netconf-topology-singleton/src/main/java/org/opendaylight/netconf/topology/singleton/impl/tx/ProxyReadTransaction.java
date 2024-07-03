@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
-import akka.actor.ActorRef;
-import akka.util.Timeout;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import scala.concurrent.ExecutionContext;
