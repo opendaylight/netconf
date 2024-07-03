@@ -7,15 +7,15 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
-import akka.actor.ActorRef;
-import akka.dispatch.OnComplete;
-import akka.pattern.AskTimeoutException;
-import akka.pattern.Patterns;
-import akka.util.Timeout;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.dispatch.OnComplete;
+import org.apache.pekko.pattern.AskTimeoutException;
+import org.apache.pekko.pattern.Patterns;
+import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;

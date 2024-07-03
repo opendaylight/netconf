@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.util.Timeout;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
