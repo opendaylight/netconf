@@ -16,6 +16,24 @@
       "message": "missing Jira link",
       "revId": "f24cfa6b4153275fdac453e43a5c7d905b01cc4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db04b88b_29dafe60",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-03T12:38:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88b6bf04_7f8435a6",
+      "revId": "f24cfa6b4153275fdac453e43a5c7d905b01cc4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
