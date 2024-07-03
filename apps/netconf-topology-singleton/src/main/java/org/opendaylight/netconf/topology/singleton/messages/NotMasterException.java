@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import akka.actor.ActorRef;
 import java.io.Serial;
+import org.apache.pekko.actor.ActorRef;
 
 /**
  * Exception reply indicating the recipient is not the master.
