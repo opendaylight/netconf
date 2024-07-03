@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import akka.actor.Props;
-import akka.actor.ReceiveTimeout;
-import akka.actor.UntypedAbstractActor;
-import akka.util.JavaDurationConverters;
 import java.time.Duration;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.ReceiveTimeout;
+import org.apache.pekko.actor.UntypedAbstractActor;
+import org.apache.pekko.util.JavaDurationConverters;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
 import org.slf4j.Logger;

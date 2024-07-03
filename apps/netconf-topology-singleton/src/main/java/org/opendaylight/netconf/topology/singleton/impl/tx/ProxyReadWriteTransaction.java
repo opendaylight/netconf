@@ -7,9 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
-import akka.actor.ActorRef;
-import akka.dispatch.OnComplete;
-import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -19,6 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.dispatch.OnComplete;
+import org.apache.pekko.util.Timeout;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
