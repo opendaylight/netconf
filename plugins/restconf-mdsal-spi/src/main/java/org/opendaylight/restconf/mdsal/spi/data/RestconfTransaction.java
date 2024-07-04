@@ -119,8 +119,4 @@ abstract class RestconfTransaction {
     abstract @Nullable NormalizedNodeContainer<?> readList(@NonNull YangInstanceIdentifier path) throws ServerException;
 
     abstract ListenableFuture<Optional<NormalizedNode>> read(YangInstanceIdentifier path);
-
-    void ensureParentsByMerge(final YangInstanceIdentifier path) {
-        // no-op
-    }
 }
