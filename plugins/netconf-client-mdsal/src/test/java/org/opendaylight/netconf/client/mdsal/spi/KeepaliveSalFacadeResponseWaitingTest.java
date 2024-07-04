@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.spi;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -236,6 +237,8 @@ class KeepaliveSalFacadeResponseWaitingTest {
         doReturn(getSettableFuture).when(deviceDomRpc).invokeRpc(Get.QNAME, null);
         final var getConfigSettableFuture = SettableFuture.create();
         doReturn(getConfigSettableFuture).when(deviceDomRpc).invokeRpc(GetConfig.QNAME, null);
+        final var future = SettableFuture.create();
+        doReturn(future).when(deviceRpc).invokeNetconf(any(), any());
         doReturn(deviceDomRpc).when(deviceRpc).domRpcService();
 
         // Schedule KeepaliveTask to run in 2sec.
@@ -253,22 +256,16 @@ class KeepaliveSalFacadeResponseWaitingTest {
         // Wait 3sec
         TimeUnit.SECONDS.sleep(3);
 
-        // After 3sec (keepalive is 2sec) we should see that the KeepaliveTask is done (no keepalive is sent)
-        // and no other KeepaliveTask is scheduled because we are waiting for RPC get, get-config replies
-        Assertions.assertEquals(1, timer.keepaliveTasks.size());
+        // After 3sec (keepalive is 2sec) we should see that the KeepaliveTask is done
+        // and another KeepaliveTask is scheduled
+        Assertions.assertEquals(2, timer.keepaliveTasks.size());
         Assertions.assertTrue(timer.keepaliveTasks.get(0).isExpired());
+        Assertions.assertFalse(timer.keepaliveTasks.get(1).isExpired());
 
-        // Set RPC get result.
+        // Set RPC result.
         getSettableFuture.set(new DefaultDOMRpcResult());
-        // RPC reply for RPC get is received, but it should not schedule another KeepaliveTask because we are still
-        // waiting for RPC get-config reply.
-        Assertions.assertEquals(1, timer.keepaliveTasks.size());
-        Assertions.assertTrue(timer.keepaliveTasks.get(0).isExpired());
-
-        // Set RPC get-config result.
         getConfigSettableFuture.set(new DefaultDOMRpcResult());
-        // RPC reply for RPC get-config is received, and it should schedule another KeepaliveTask because no other
-        // RPC replies are expected.
+
         Assertions.assertEquals(2, timer.keepaliveTasks.size());
         Assertions.assertTrue(timer.keepaliveTasks.get(0).isExpired());
         Assertions.assertFalse(timer.keepaliveTasks.get(1).isExpired());
