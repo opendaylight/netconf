@@ -173,7 +173,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(tx).when(strategy).prepareWriteExecution();
 
         strategy.putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
-        verify(tx).merge(eq(GAP_IID.getAncestor(1)), any());
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION),eq(GAP_IID.getAncestor(1)), any());
         verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
