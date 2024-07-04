@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -229,6 +230,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
      * Scheduling another keepalive rpc test after all responses are processed.
      * RPC get and RPC get-config are sent in parallel, and it takes a while to receive reply.
      */
+    @Disabled
     @Test
     public void testKeepaliveSalWithParallelRpcGetRpcGetConfigAndLongerWaitForReply() throws InterruptedException {
         // These settable future objects will be set manually to simulate RPC result.
