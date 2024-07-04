@@ -72,15 +72,14 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+        ensureParentsByMerge(path);
         verifyNotNull(rwTx).merge(CONFIGURATION, path, data);
     }
 
     @Override
     void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) throws ServerException {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
-            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
-            ensureParentsByMerge(path);
+            mergeImpl(path, data);
 
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
 
@@ -100,7 +99,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             }
         } else {
             RestconfStrategy.checkItemDoesNotExists(databind, verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
-            ensureParentsByMerge(path);
+            mergeImpl(path, data);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
@@ -121,16 +120,14 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubtree = fromInstanceId(databind.modelContext(), path);
-            merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
-            ensureParentsByMerge(path);
+            mergeImpl(path, data);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
         } else {
-            ensureParentsByMerge(path);
+            mergeImpl(path, data);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
@@ -141,12 +138,12 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
      * @param path    path of data
      */
     // FIXME: this method should only be invoked if we are crossing an implicit list.
-    @Override
-    void ensureParentsByMerge(final YangInstanceIdentifier path) {
+    private void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var parent = path.getParent();
         if (parent != null) {
             final var rootNormalizedPath = path.getAncestor(1);
-            merge(rootNormalizedPath, fromInstanceId(databind.modelContext(), parent));
+            verifyNotNull(rwTx).merge(CONFIGURATION, rootNormalizedPath, fromInstanceId(databind.modelContext(),
+                parent));
         }
     }
 
