@@ -123,8 +123,4 @@ public abstract class RestconfTransaction {
         throws RequestException;
 
     protected abstract ListenableFuture<Optional<NormalizedNode>> read(YangInstanceIdentifier path);
-
-    void ensureParentsByMerge(final YangInstanceIdentifier path) {
-        // no-op
-    }
 }
