@@ -22,6 +22,7 @@ import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
@@ -95,31 +96,24 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     /**
      * Cancel current keepalive and free it.
      */
-    private synchronized void stopKeepalives() {
+    private void stopKeepalive() {
         final var localTask = task;
         if (localTask != null) {
-            localTask.disableKeepalive();
+            localTask.stopKeepalive();
             task = null;
         }
     }
 
-    private void disableKeepalive() {
+    private void recordActivity() {
         final var localTask = task;
         if (localTask != null) {
-            localTask.disableKeepalive();
-        }
-    }
-
-    private void enableKeepalive() {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.enableKeepalive();
+            localTask.recordActivity();
         }
     }
 
     private void disconnect() {
         checkState(listener != null, "%s: Unable to reconnect, session listener is missing", deviceId);
-        stopKeepalives();
+        stopKeepalive();
         LOG.info("{}: Reconnecting inactive netconf session", deviceId);
         listener.disconnect();
     }
@@ -143,34 +137,31 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             // FIXME: wrap with keepalive
             services.actions()));
 
-        // We have performed a callback, which might have termined keepalives
+        // We have performed a callback, which might have terminated keepalives
         final var localTask = task;
         if (localTask != null) {
             LOG.debug("{}: Netconf session initiated, starting keepalives", deviceId);
             LOG.trace("{}: Scheduling keepalives every {}s", deviceId, keepaliveDelaySeconds);
-            // schedule first KeepaliveTask and do not decrement suppressedCounter at the same time
+            // Schedule initial KeepaliveTask.
             localTask.reschedule();
         }
     }
 
     @Override
     public void onDeviceDisconnected() {
-        stopKeepalives();
+        stopKeepalive();
         deviceHandler.onDeviceDisconnected();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
-        stopKeepalives();
+        stopKeepalive();
         deviceHandler.onDeviceFailed(throwable);
     }
 
     @Override
     public void onNotification(final DOMNotification domNotification) {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.recordActivity();
-        }
+        recordActivity();
         deviceHandler.onNotification(domNotification);
     }
 
@@ -181,22 +172,52 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     @Override
     public void close() {
-        stopKeepalives();
+        stopKeepalive();
         deviceHandler.close();
     }
 
-    private <T> ListenableFuture<T> onSuccessEnableKeepalive(final ListenableFuture<T> invokedRpc) {
-        return Futures.transform(invokedRpc, result -> {
-            enableKeepalive();
-            return result;
-        }, MoreExecutors.directExecutor());
+    /**
+     * Tracks a user RPC as in-flight so keepalives are deferred until it completes.
+     *
+     * <p>Synchronous failures, including {@link Error}, must clear in-flight tracking before propagating.
+     * Catching both types ensures synchronous delegate failure cannot leave in-flight tracking stuck.
+     */
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    private <T> ListenableFuture<T> trackRpcInvocation(final Supplier<ListenableFuture<T>> invocation) {
+        final var localTask = task;
+        final var tracked = localTask != null && localTask.requestStarted();
+
+        final ListenableFuture<T> invokedRpc;
+        try {
+            invokedRpc = invocation.get();
+        } catch (RuntimeException | Error e) {
+            if (tracked) {
+                localTask.requestFinished();
+            }
+            throw e;
+        }
+
+        if (tracked) {
+            Futures.addCallback(invokedRpc, new FutureCallback<>() {
+                @Override
+                public void onSuccess(final T result) {
+                    localTask.requestFinished();
+                }
+
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    localTask.requestFinished();
+                }
+            }, MoreExecutors.directExecutor());
+        }
+        return invokedRpc;
     }
 
     /**
      * Invoke keepalive RPC and check the response. In case of any received response the keepalive
-     * is considered successful and schedules next keepalive with a fixed delay. If the response is unsuccessful (no
-     * response received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session
-     * is considered inactive/failed.
+     * is considered successful and the next keepalive is scheduled based on the last observed activity.
+     * If the response is unsuccessful (no response received, or the rpc could not even be sent), an
+     * immediate reconnect is triggered as the netconf session is considered inactive/failed.
      */
     @VisibleForTesting
     final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
@@ -206,10 +227,12 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         private final Rpcs devRpc;
 
-        private @GuardedBy("this") boolean suppressed = false;
-        private @GuardedBy("this") int suppressedCounter = 0;
+        @GuardedBy("this")
+        private long lastActivity;
+        @GuardedBy("this")
+        private int inFlightRequests;
 
-        private volatile long lastActivity;
+        private volatile boolean disabled;
 
         KeepaliveTask(final Rpcs devRpc) {
             this.devRpc = requireNonNull(devRpc);
@@ -217,78 +240,103 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public void run(final Timeout timeout) {
-            final long local = lastActivity;
-            final long now = System.nanoTime();
-            final long inFutureNanos = local + delayNanos - now;
-            if (inFutureNanos > 0) {
-                reschedule(inFutureNanos);
+            final long delay;
+            synchronized (this) {
+                // Stop here if a concurrent stopKeepalive() has fired.
+                if (disabled) {
+                    LOG.debug("{}: Keepalive already stopped - ignoring timeout", deviceId);
+                    return;
+                }
+                if (inFlightRequests > 0) {
+                    delay = delayNanos;
+                } else {
+                    final long now = System.nanoTime();
+                    final long inFutureNanos = lastActivity + delayNanos - now;
+                    delay = inFutureNanos > 0 ? inFutureNanos : 0;
+                }
+            }
+            if (delay > 0) {
+                reschedule(delay);
             } else {
-                sendKeepalive(now);
+                sendKeepalive();
             }
         }
 
-        void recordActivity() {
+        synchronized void recordActivity() {
             lastActivity = System.nanoTime();
         }
 
-        synchronized void disableKeepalive() {
-            // unsuppressed -> suppressed
-            suppressed = true;
-            suppressedCounter++;
+        synchronized boolean requestStarted() {
+            if (disabled) {
+                return false;
+            }
+            inFlightRequests++;
+            return true;
         }
 
-        synchronized void enableKeepalive() {
-            recordActivity();
-            suppressedCounter--;
-            if (suppressedCounter > 0) {
-                LOG.debug("{}: Skipping to enable keepalive while expecting {} RPC reply", deviceId, suppressedCounter);
-                return;
-            }
-            if (suppressed) {
-                // suppressed -> unsuppressed
-                suppressed = false;
-            } else {
-                // unscheduled -> unsuppressed
-                reschedule();
-            }
+        synchronized void requestFinished() {
+            checkState(inFlightRequests > 0, "%s: User RPC finished without matching start", deviceId);
+            inFlightRequests--;
+            lastActivity = System.nanoTime();
         }
 
-        private void sendKeepalive(final long now) {
+        void stopKeepalive() {
+            disabled = true;
+        }
+
+        // Treat any synchronous keepalive RPC failure as a session failure requiring reconnect.
+        @SuppressWarnings("checkstyle:IllegalCatch")
+        private void sendKeepalive() {
+            final boolean reschedule;
             synchronized (this) {
-                if (suppressed) {
-                    LOG.debug("{}: Skipping keepalive while disabled", deviceId);
-                    // suppressed -> unscheduled
-                    suppressed = false;
+                // Re-check because run() released the lock before invoking this method.
+                if (disabled) {
                     return;
                 }
+                reschedule = inFlightRequests > 0;
+            }
+            if (reschedule) {
+                reschedule();
+                return;
             }
 
             LOG.trace("{}: Invoking keepalive RPC", deviceId);
-            final var deviceFuture = devRpc.invokeNetconf(GetConfig.QNAME, KEEPALIVE_PAYLOAD);
-            lastActivity = now;
+            final ListenableFuture<? extends DOMRpcResult> deviceFuture;
+            try {
+                deviceFuture = devRpc.invokeNetconf(GetConfig.QNAME, KEEPALIVE_PAYLOAD);
+            } catch (RuntimeException e) {
+                LOG.warn("{}: Keepalive RPC could not be sent. Reconnecting netconf session.", deviceId, e);
+                disconnect();
+                return;
+            }
 
             Futures.addCallback(deviceFuture, this, MoreExecutors.directExecutor());
         }
 
         @Override
         public void onSuccess(final DOMRpcResult result) {
+            if (disabled) {
+                return;
+            }
             // No matter what response we got, rpc-reply or rpc-error,
             // we got it from device so the netconf session is OK
             if (result == null) {
-                LOG.warn("{} Keepalive RPC returned null with response. Reconnecting netconf session", deviceId);
+                LOG.warn("{}: Keepalive RPC returned null with response. Reconnecting netconf session", deviceId);
                 disconnect();
                 return;
             }
 
             if (result.value() != null) {
+                recordActivity();
                 reschedule();
             } else {
                 final var errors = result.errors();
                 if (!errors.isEmpty()) {
                     LOG.warn("{}: Keepalive RPC failed with error: {}", deviceId, errors);
+                    recordActivity();
                     reschedule();
                 } else {
-                    LOG.warn("{} Keepalive RPC returned null with response. Reconnecting netconf session", deviceId);
+                    LOG.warn("{}: Keepalive RPC returned empty response. Reconnecting netconf session", deviceId);
                     disconnect();
                 }
             }
@@ -296,6 +344,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public void onFailure(final Throwable throwable) {
+            if (disabled) {
+                return;
+            }
             if (throwable instanceof CancellationException) {
                 LOG.warn("{}: Keepalive RPC timed out.", deviceId);
             } else {
@@ -308,6 +359,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         private void reschedule(final long delay) {
+            if (disabled) {
+                return;
+            }
             timer.newTimeout(this, delay, TimeUnit.NANOSECONDS);
         }
     }
@@ -327,11 +381,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
-            // Keep-alive messages are temporarily disabled before the RPC invocation.
-            disableKeepalive();
-            // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
-            // an exception, the device will be reconnected. The reconnection logic is handled by the RpcsDecorator.
-            return onSuccessEnableKeepalive(delegate.invokeNetconf(type, input));
+            return trackRpcInvocation(() -> delegate.invokeNetconf(type, input));
         }
 
         @Override
@@ -349,11 +399,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-            // Keep-alive messages are temporarily disabled before the RPC invocation.
-            disableKeepalive();
-            // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
-            // an exception, the device will be reconnected. The reconnection logic is handled by the RpcsDecorator.
-            return onSuccessEnableKeepalive(delegate.invokeRpc(type, input));
+            return trackRpcInvocation(() -> delegate.invokeRpc(type, input));
         }
 
         @Override
@@ -378,11 +424,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
-            // Keep-alive messages are temporarily disabled before the RPC invocation.
-            disableKeepalive();
-            // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
-            // an exception, the device will be reconnected. The reconnection logic is handled by the RpcsDecorator.
-            return onSuccessEnableKeepalive(delegate.invokeNetconf(type, input));
+            return trackRpcInvocation(() -> delegate.invokeNetconf(type, input));
         }
 
         @Override
@@ -400,11 +442,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource payload) {
-            // Keep-alive messages are temporarily disabled before the RPC invocation.
-            disableKeepalive();
-            // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
-            // an exception, the device will be reconnected. The reconnection logic is handled by the RpcsDecorator.
-            return onSuccessEnableKeepalive(delegate.invokeRpc(type, payload));
+            return trackRpcInvocation(() -> delegate.invokeRpc(type, payload));
         }
     }
 }
