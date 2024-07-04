@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7702a006_7ddb3c02",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 18
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "957997ba_3f02d012",
+      "range": {
+        "startLine": 33,
+        "startChar": 12,
+        "endLine": 33,
+        "endChar": 20
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb9cf7e5_c24a1e79",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-25T23:30:45Z",
       "side": 1,
       "message": "this needs a much better description",
+      "range": {
+        "startLine": 37,
+        "startChar": 37,
+        "endLine": 37,
+        "endChar": 62
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f3e6da3_7d479542",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 18
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb9cf7e5_c24a1e79",
       "range": {
         "startLine": 37,
         "startChar": 37,
@@ -93,6 +141,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "264b06a4_ad6e44f1",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0689ed48_38ee0bd3",
+      "range": {
+        "startLine": 150,
+        "startChar": 22,
+        "endLine": 150,
+        "endChar": 52
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "393e788c_c81f613a",
@@ -139,6 +211,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f0ca83a_4bb7e5a9",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/StreamsConfiguration.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "918a65ae_e5c1b9da",
+      "range": {
+        "startLine": 20,
+        "startChar": 14,
+        "endLine": 20,
+        "endChar": 15
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8d2236a_c5f5c228",
@@ -152,6 +248,30 @@
       "writtenOn": "2024-04-25T23:30:45Z",
       "side": 1,
       "message": "hard coded path: NOPE, NEVER",
+      "range": {
+        "startLine": 117,
+        "startChar": 31,
+        "endLine": 118,
+        "endChar": 59
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "542fa86a_8da4aef7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/streams/devnotif/SubscribeDeviceNotificationRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8d2236a_c5f5c228",
       "range": {
         "startLine": 117,
         "startChar": 31,
@@ -185,6 +305,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03460225_d6063f7f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/streams/devnotif/SubscribeDeviceNotificationRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5aff5428_335f1856",
+      "range": {
+        "startLine": 120,
+        "startChar": 72,
+        "endLine": 120,
+        "endChar": 91
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14b304ae_ec92daf2",
@@ -198,6 +342,30 @@
       "writtenOn": "2024-04-25T23:30:45Z",
       "side": 1,
       "message": "what sort of error reporting is this?!",
+      "range": {
+        "startLine": 123,
+        "startChar": 12,
+        "endLine": 123,
+        "endChar": 42
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3de02f10_06d3e2f8",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/streams/devnotif/SubscribeDeviceNotificationRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-04T21:37:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14b304ae_ec92daf2",
       "range": {
         "startLine": 123,
         "startChar": 12,
