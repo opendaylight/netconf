@@ -148,8 +148,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final NormalizedNode data) {
         final var instance = path.instance();
         final var tx = prepareWriteExecution();
-        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(instance);
         tx.merge(instance, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
@@ -480,7 +478,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         }
                         break;
                     case Merge:
-                        tx.ensureParentsByMerge(targetNode);
                         tx.merge(targetNode, patchEntity.getNode());
                         editCollection.add(new PatchStatusEntity(editId, true, null));
                         break;
