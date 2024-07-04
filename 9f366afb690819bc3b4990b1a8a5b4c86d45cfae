@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e9017f3_1e6f7d5f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T13:55:43Z",
+      "side": 1,
+      "message": "IIRC I wanted those separately.",
+      "revId": "9f366afb690819bc3b4990b1a8a5b4c86d45cfae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
