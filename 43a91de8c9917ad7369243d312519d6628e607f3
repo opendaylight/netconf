@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dceb4e22_6a73ecb9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 53
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T13:39:02Z",
+      "side": 1,
+      "message": "This deserves docs as well.",
+      "revId": "43a91de8c9917ad7369243d312519d6628e607f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d511b8a_a9186c3b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 53
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T13:39:02Z",
+      "side": 1,
+      "message": "Nullability of depth could be solved in service implementation.",
+      "revId": "43a91de8c9917ad7369243d312519d6628e607f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
