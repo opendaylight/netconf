@@ -9,7 +9,6 @@ package org.opendaylight.restconf.mdsal.spi.data;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
@@ -110,8 +109,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final NormalizedNode data) {
         final var instance = path.instance();
         final var tx = prepareWriteExecution();
-        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(instance);
         tx.merge(instance, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
@@ -246,8 +243,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = fromInstanceId(databind.modelContext(), path.getParent());
-        tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 tx.replace(path, data);
@@ -424,7 +419,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                     }
                     break;
                 case Merge:
-                    tx.ensureParentsByMerge(targetNode);
                     tx.merge(targetNode, patchEntity.getNode());
                     editCollection.add(new PatchStatusEntity(editId, true, null));
                     break;
