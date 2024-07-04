@@ -9,7 +9,6 @@ package org.opendaylight.restconf.mdsal.spi.data;
 
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
@@ -160,8 +159,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @Override
     void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
-            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
+            merge(path, data);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.node(child.name());
@@ -175,8 +173,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
-            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
+            merge(path, data);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.node(child.name());
