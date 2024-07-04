@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "601a8bfe_d64178c5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T12:59:33Z",
+      "side": 1,
+      "message": "This also deserves docs.",
+      "revId": "9bd612779f0ffdf3ea30f0a9a051b0df04227c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b05dfd1d_87d60bb6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T12:59:33Z",
+      "side": 1,
+      "message": "This could be resolved at one place in service implementation.",
+      "revId": "9bd612779f0ffdf3ea30f0a9a051b0df04227c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c7e605a_c3776ac6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/util/RestDocgenUtil.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T12:59:33Z",
+      "side": 1,
+      "message": "Original idea was to count iterations and break.",
+      "revId": "9bd612779f0ffdf3ea30f0a9a051b0df04227c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a7c0ae3_2b13e240",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/util/RestDocgenUtil.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-04T12:59:33Z",
+      "side": 1,
+      "message": "This is not a way how we write comments in Java.",
+      "revId": "9bd612779f0ffdf3ea30f0a9a051b0df04227c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
