@@ -110,8 +110,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final NormalizedNode data) {
         final var instance = path.instance();
         final var tx = prepareWriteExecution();
-        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(instance);
         tx.merge(instance, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
@@ -419,24 +417,23 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         tx.delete(targetNode);
                         editCollection.add(new PatchStatusEntity(editId, true, null));
                     } catch (RequestException e) {
-                        editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
-                        noError = false;
-                    }
-                    break;
-                case Merge:
-                    tx.ensureParentsByMerge(targetNode);
-                    tx.merge(targetNode, patchEntity.getNode());
-                    editCollection.add(new PatchStatusEntity(editId, true, null));
-                    break;
-                case Replace:
-                    tx.replace(targetNode, patchEntity.getNode());
-                    editCollection.add(new PatchStatusEntity(editId, true, null));
-                    break;
-                case Remove:
-                    try {
-                        tx.remove(targetNode);
+                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
+                            noError = false;
+                        }
+                        break;
+                    case Merge:
+                        tx.merge(targetNode, patchEntity.getNode());
                         editCollection.add(new PatchStatusEntity(editId, true, null));
-                    } catch (RequestException e) {
+                        break;
+                    case Replace:
+                        tx.replace(targetNode, patchEntity.getNode());
+                        editCollection.add(new PatchStatusEntity(editId, true, null));
+                        break;
+                    case Remove:
+                        try {
+                            tx.remove(targetNode);
+                            editCollection.add(new PatchStatusEntity(editId, true, null));
+                        } catch (RequestException e) {
                         editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                         noError = false;
                     }
