@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -285,8 +284,6 @@ public abstract sealed class DefaultRestconfStrategy implements RestconfStrategy
     final void merge(final ServerRequest<DataPatchResult> request, final YangInstanceIdentifier path,
             final NormalizedNode data) {
         final var tx = prepareWriteExecution();
-        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(path);
         tx.merge(path, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
@@ -439,8 +436,6 @@ public abstract sealed class DefaultRestconfStrategy implements RestconfStrategy
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = fromInstanceId(modelContext(), path.getParent());
-        tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 tx.replace(path, data);
@@ -694,7 +689,6 @@ public abstract sealed class DefaultRestconfStrategy implements RestconfStrategy
                         break;
                     case Merge:
                         try {
-                            tx.ensureParentsByMerge(targetNode);
                             tx.merge(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
