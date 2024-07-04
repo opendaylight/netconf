@@ -72,14 +72,13 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+        ensureParentsByMerge(path);
         verifyNotNull(rwTx).merge(CONFIGURATION, path, data);
     }
 
     @Override
     void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) throws ServerException {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
-            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
             ensureParentsByMerge(path);
 
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
@@ -121,8 +120,6 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubtree = fromInstanceId(databind.modelContext(), path);
-            merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
             ensureParentsByMerge(path);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
@@ -141,12 +138,13 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
      * @param path    path of data
      */
     // FIXME: this method should only be invoked if we are crossing an implicit list.
-    @Override
-    void ensureParentsByMerge(final YangInstanceIdentifier path) {
+    private void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var parent = path.getParent();
         if (parent != null && !parent.isEmpty()) {
             final var rootNormalizedPath = path.getAncestor(1);
-            merge(rootNormalizedPath, fromInstanceId(databind.modelContext(), parent));
+            LOG.trace("Merge parent resource {}", rootNormalizedPath);
+            verifyNotNull(rwTx).merge(CONFIGURATION, rootNormalizedPath, fromInstanceId(databind.modelContext(),
+                parent));
         }
     }
 
