@@ -54,10 +54,6 @@
             <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>yang-binding</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6991-ietf-inet-types</artifactId>
         </dependency>
@@ -76,6 +72,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-client-mdsal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>binding-spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

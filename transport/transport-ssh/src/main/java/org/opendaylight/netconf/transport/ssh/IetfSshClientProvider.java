@@ -15,8 +15,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ClientIdentPublickey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.IetfSshClientData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.SshClientKeepalives;
-import org.opendaylight.yangtools.yang.binding.YangFeature;
-import org.opendaylight.yangtools.yang.binding.YangFeatureProvider;
+import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
  * Client features supported by SSH transport.

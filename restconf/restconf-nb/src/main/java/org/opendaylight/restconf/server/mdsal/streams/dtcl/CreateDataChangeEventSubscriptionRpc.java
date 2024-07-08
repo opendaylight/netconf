@@ -27,7 +27,7 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.CreateDataChangeEventSubscriptionInput1;
+import org.opendaylight.yang.svc.v1.urn.sal.restconf.event.subscription.rev231103.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -45,8 +45,8 @@ import org.osgi.service.component.annotations.Reference;
 @Singleton
 @Component(service = RpcImplementation.class)
 public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementation {
-    private static final @NonNull NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(
-        QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern());
+    private static final @NonNull NodeIdentifier DATASTORE_NODEID =
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("datastore"));
     private static final @NonNull NodeIdentifier STREAM_NAME_NODEID =
         NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
     private static final @NonNull NodeIdentifier PATH_NODEID =
