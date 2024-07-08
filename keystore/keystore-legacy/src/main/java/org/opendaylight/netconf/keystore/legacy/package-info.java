@@ -7,8 +7,8 @@
  */
 /**
  * Access to key and trust material stored in
- * {@link org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.NetconfKeystoreData}.
- * The primary access interface is {@link NetconfKeystoreService}, which allows subscription to receive updates about
- * {@link NetconfKeystore}.
+ * {@link org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.NetconfKeystoreData}.
+ * The primary access interface is {@link org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService}, which allows
+ * subscription to receive updates about {@link org.opendaylight.netconf.keystore.legacy.NetconfKeystore}.
  */
 package org.opendaylight.netconf.keystore.legacy;
