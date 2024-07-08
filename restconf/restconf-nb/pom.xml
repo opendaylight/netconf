@@ -176,10 +176,6 @@
       <artifactId>mdsal-dom-spi</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal</groupId>
-      <artifactId>yang-binding</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc6991-ietf-inet-types</artifactId>
     </dependency>
@@ -198,6 +194,10 @@
     <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>binding-spec</artifactId>
     </dependency>
 
     <dependency>

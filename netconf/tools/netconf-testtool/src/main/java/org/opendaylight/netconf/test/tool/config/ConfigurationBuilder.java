@@ -14,7 +14,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenti
 import org.opendaylight.netconf.test.tool.TesttoolParameters;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
-import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 
 public class ConfigurationBuilder {
 

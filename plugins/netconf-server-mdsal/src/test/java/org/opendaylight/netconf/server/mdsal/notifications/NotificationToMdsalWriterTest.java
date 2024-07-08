@@ -47,7 +47,7 @@ class NotificationToMdsalWriterTest {
         final NetconfNotificationCollector notificationCollector = mock(NetconfNotificationCollector.class);
 
         doReturn(registration).when(notificationCollector).registerStreamListener(any());
-        doNothing().when(tx).delete(any(), any());
+        doNothing().when(tx).delete(any(), any(InstanceIdentifier.class));
         doReturn(emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
@@ -56,7 +56,7 @@ class NotificationToMdsalWriterTest {
 
     @Test
     void testStreamRegistration() {
-        doNothing().when(tx).merge(any(), any(), any());
+        doNothing().when(tx).merge(any(), any(InstanceIdentifier.class), any());
         final var testStreamName = new StreamNameType("TESTSTREAM");
         final var testStream = new StreamBuilder().setName(testStreamName).build();
         final var streamIdentifier = InstanceIdentifier.create(Netconf.class)
