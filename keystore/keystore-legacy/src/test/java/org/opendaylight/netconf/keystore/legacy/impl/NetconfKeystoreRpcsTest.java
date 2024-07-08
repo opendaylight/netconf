@@ -37,8 +37,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.rpc.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.rpc.trusted.certificates.TrustedCertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.rpc.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yangtools.binding.DataObject;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
