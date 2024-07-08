@@ -11,14 +11,13 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeFields;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev240611.YangModuleInfoImpl;
+import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -47,25 +46,26 @@ final class PayloadCreator {
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
 
     private static final NodeIdentifier PORT_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "port").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("port"));
     private static final NodeIdentifier HOST_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME,"host").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("host"));
     private static final NodeIdentifier USERNAME_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME,"username").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("username"));
     private static final NodeIdentifier PASSWORD_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "password").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("password"));
     private static final NodeIdentifier CREDENTIALS_NODE_IDENTIFIER =
         // Note: this is an instantiated container, we need to use the proper namespace
-        NodeIdentifier.create(Credentials.QNAME.bindTo(NetconfNodeFields.QNAME.getModule()).intern());
+        NodeIdentifier.create(Credentials.QNAME.bindTo(PORT_NODE_IDENTIFIER.getNodeType().getModule()).intern());
     private static final NodeIdentifier LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER =
         // Note: this is an instantiated container, we need to use the proper namespace
-        NodeIdentifier.create(LoginPasswordUnencrypted.QNAME.bindTo(NetconfNodeFields.QNAME.getModule()).intern());
+        NodeIdentifier.create(LoginPasswordUnencrypted.QNAME.bindTo(
+            PORT_NODE_IDENTIFIER.getNodeType().getModule()).intern());
     private static final NodeIdentifier TCP_ONLY_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "tcp-only").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("tcp-only"));
     private static final NodeIdentifier KEEPALIVE_DELAY_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "keepalive-delay").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("keepalive-delay"));
     private static final NodeIdentifier SCHEMALESS_NODE_IDENTIFIER =
-        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "schemaless").intern());
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("schemaless"));
     private static final String DEFAULT_TOPOLOGY_ID = "topology-netconf";
     private static final String DEFAULT_NODE_PASSWORD = "admin";
     private static final String DEFAULT_NODE_USERNAME = "admin";
