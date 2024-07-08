@@ -58,7 +58,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.client.authentication.users.user.PasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.client.authentication.users.user.PublicKeysBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
-import org.opendaylight.yangtools.yang.binding.util.BindingMap;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 
 public final class TestUtils {
 

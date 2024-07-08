@@ -69,10 +69,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-binding-runtime-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-common-api</artifactId>
         </dependency>
         <dependency>
@@ -134,6 +130,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>rfc6470</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>binding-runtime-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>

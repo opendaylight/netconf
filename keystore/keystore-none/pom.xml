@@ -35,8 +35,8 @@
             <artifactId>keystore-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>yang-binding</artifactId>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>binding-spec</artifactId>
         </dependency>
     </dependencies>
 </project>

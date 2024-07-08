@@ -19,8 +19,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev240208.Tls13$F;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev240208.Tls13$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev240208.TlsVersionBase;
-import org.opendaylight.yangtools.yang.binding.YangFeature;
-import org.opendaylight.yangtools.yang.binding.YangFeatureProvider;
+import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
  * Baseline features supported from {@code ietf-tls-common.yang}.

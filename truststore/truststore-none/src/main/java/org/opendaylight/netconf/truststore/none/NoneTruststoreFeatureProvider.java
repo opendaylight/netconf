@@ -12,8 +12,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.IetfTruststoreData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.InlineDefinitionsSupported;
-import org.opendaylight.yangtools.yang.binding.YangFeature;
-import org.opendaylight.yangtools.yang.binding.YangFeatureProvider;
+import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
  * Simple implementation, which advertizes we do not have a central truststore.

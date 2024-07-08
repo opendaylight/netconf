@@ -13,8 +13,8 @@ import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.ClientIdentX509Cert;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.IetfTlsClientData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.ServerAuthX509Cert;
-import org.opendaylight.yangtools.yang.binding.YangFeature;
-import org.opendaylight.yangtools.yang.binding.YangFeatureProvider;
+import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
  * Baseline features supported from {@code ietf-tls-client.yang}.
