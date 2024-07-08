@@ -82,7 +82,8 @@ class MonitoringToMdsalWriterTest {
         final var capabilitiesId = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
         final var capabilities = new CapabilitiesBuilder().build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
+        doNothing().when(writeTransaction)
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onCapabilitiesChanged(capabilities);
@@ -96,7 +97,8 @@ class MonitoringToMdsalWriterTest {
         final var schemasId = InstanceIdentifier.create(NetconfState.class).child(Schemas.class);
         final var schemas = new SchemasBuilder().build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
+        doNothing().when(writeTransaction)
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSchemasChanged(schemas);
@@ -109,7 +111,8 @@ class MonitoringToMdsalWriterTest {
     void testOnSessionStart() {
         final var session = new SessionBuilder().setSessionId(Uint32.ONE).build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
+        doNothing().when(writeTransaction)
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSessionStarted(session);
@@ -124,7 +127,8 @@ class MonitoringToMdsalWriterTest {
     void testOnSessionEnd() {
         final var session = new SessionBuilder().setSessionId(Uint32.ONE).build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL), any());
+        doNothing().when(writeTransaction)
+            .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSessionEnded(session);
@@ -139,7 +143,8 @@ class MonitoringToMdsalWriterTest {
         final var session1 = new SessionBuilder().setSessionId(Uint32.ONE).build();
         final var session2 = new SessionBuilder().setSessionId(Uint32.TWO).build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
+        doNothing().when(writeTransaction)
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSessionsUpdated(List.of(session1, session2));
