@@ -36,8 +36,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev24
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.rpc.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.rpc.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.binding.Rpc;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
