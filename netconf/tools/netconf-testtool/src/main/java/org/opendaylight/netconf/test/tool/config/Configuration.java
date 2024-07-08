@@ -17,7 +17,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenti
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandlerDefault;
-import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

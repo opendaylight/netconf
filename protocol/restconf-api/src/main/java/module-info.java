@@ -15,7 +15,7 @@ module org.opendaylight.restconf.api {
     requires transitive org.opendaylight.yangtools.concepts;
     requires transitive org.opendaylight.yangtools.yang.common;
     requires org.opendaylight.odlparent.logging.markers;
-    requires org.opendaylight.yangtools.yang.binding;
+    requires org.opendaylight.yangtools.binding.spec;
     requires org.slf4j;
 
     // Annotation-only dependencies
