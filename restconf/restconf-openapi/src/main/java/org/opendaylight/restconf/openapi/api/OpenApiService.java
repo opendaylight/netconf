@@ -52,15 +52,15 @@ public interface OpenApiService {
      * {@code limit}.
      *
      * @param uriInfo Requests {@link UriInfo}.
-     * @param offset First model to read. 0 means read from the first model.
-     * @param limit The number of models to read. 0 means read all models.
      * @param width Width is the number of child nodes processed for each module/node. This means that for example with
      *      width=3 we will process schema only for first 3 nodes in each module and each node that we process after.
      *      Value set to 0 or lesser means ignore width and to process all child nodes of a YANG module.
      * @param depth Depth to which the OpenAPI document is generated, the number of levels of the module that are
-     *      processed in depth. For example, depth=1 means that the module will be processed with it's children, but
+     *      processed in depth. For example, depth=1 means that the module will be processed with its children, but
      *      their children will be ignored. Value set to 0 or lesser means ignore depth and to process all child nodes
      *      of a YANG module.
+     * @param offset First model to read. 0 means read from the first model.
+     * @param limit The number of models to read. 0 means read all models.
      * @return Response containing the OpenAPI document for number of modules specified by {@code offset} and
      *      {@code limit}, with number child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
@@ -147,15 +147,15 @@ public interface OpenApiService {
      *
      * @param instanceNum Instance number of the mount point.
      * @param uriInfo Requests {@link UriInfo}.
-     * @param offset First model to read. 0 means read from the first model.
-     * @param limit The number of models to read. 0 means read all models.
      * @param width Width is the number of child nodes processed for each module/node. This means that for example with
      *      width=3 we will process schema only for first 3 nodes in each module and each node that we process after.
      *      Value set to 0 or lesser means ignore width and to process all child nodes of a YANG module.
      * @param depth Depth to which the OpenAPI document is generated, the number of levels of the module that are
-     *      processed in depth. For example, depth=1 means that the module will be processed with it's children, but
+     *      processed in depth. For example, depth=1 means that the module will be processed with its children, but
      *      their children will be ignored. Value set to 0 or lesser means ignore depth and to process all child nodes
      *      of a YANG module.
+     * @param offset First model to read. 0 means read from the first model.
+     * @param limit The number of models to read. 0 means read all models.
      * @return Response containing the OpenAPI document for number of modules specified by {@code offset}
      *      and {@code limit} with number child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
