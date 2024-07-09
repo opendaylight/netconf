@@ -43,13 +43,17 @@ final class Http2Utils {
      */
     static Http2ConnectionHandler connectionHandler(final boolean server, final int maxContentLength) {
         final var connection = new DefaultHttp2Connection(server);
+        final var frameListener = server
+            ? new InboundHttp2ToHttpAdapterBuilder(connection)
+                .maxContentLength(maxContentLength)
+                .propagateSettings(true)
+                .build()
+            : Http2ToHttpAdapter.builder(connection)
+                .maxContentLength(maxContentLength)
+                .propagateSettings(true)
+                .build();
         return new HttpToHttp2ConnectionHandlerBuilder()
-            .frameListener(new DelegatingDecompressorFrameListener(
-                connection,
-                new InboundHttp2ToHttpAdapterBuilder(connection)
-                    .maxContentLength(maxContentLength)
-                    .propagateSettings(true)
-                    .build()))
+            .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
             .connection(connection)
             .frameLogger(server ? SERVER_FRAME_LOGGER : CLIENT_FRAME_LOGGER)
             .gracefulShutdownTimeoutMillis(0L)
