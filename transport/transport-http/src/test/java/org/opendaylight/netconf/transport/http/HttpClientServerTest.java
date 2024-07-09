@@ -25,38 +25,20 @@ import static org.opendaylight.netconf.transport.http.ConfigUtils.clientTranspor
 import static org.opendaylight.netconf.transport.http.ConfigUtils.clientTransportTls;
 import static org.opendaylight.netconf.transport.http.ConfigUtils.serverTransportTcp;
 import static org.opendaylight.netconf.transport.http.ConfigUtils.serverTransportTls;
+import static org.opendaylight.netconf.transport.http.TestUtils.freePort;
+import static org.opendaylight.netconf.transport.http.TestUtils.generateX509CertData;
+import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.SettableFuture;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
-import java.io.IOException;
-import java.math.BigInteger;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.RSAKeyGenParameterSpec;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,12 +53,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 
 @ExtendWith(MockitoExtension.class)
 class HttpClientServerTest {
-
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$W0rd";
     private static final Map<String, String> USER_HASHES_MAP = Map.of(USERNAME, "$0$" + PASSWORD);
     private static final AtomicInteger COUNTER = new AtomicInteger(0);
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final String[] METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE"};
     private static final String RESPONSE_TEMPLATE = "Method: %s URI: %s Payload: %s";
 
@@ -221,20 +201,7 @@ class HttpClientServerTest {
                         // allow multiple requests on same connections
                         .set(CONNECTION, KEEP_ALIVE);
 
-                    final var future = SettableFuture.<FullHttpResponse>create();
-                    client.invoke(request, new FutureCallback<>() {
-                        @Override
-                        public void onSuccess(final FullHttpResponse result) {
-                            future.set(result.copy());
-                        }
-
-                        @Override
-                        public void onFailure(final Throwable cause) {
-                            future.setException(cause);
-                        }
-                    });
-
-                    final var response = future.get(2, TimeUnit.SECONDS);
+                    final var response = invoke(client, request).get(2, TimeUnit.SECONDS);
                     assertNotNull(response);
                     assertEquals(OK, response.status());
                     final var expected = RESPONSE_TEMPLATE.formatted(method, uri, payload);
@@ -248,49 +215,7 @@ class HttpClientServerTest {
         }
     }
 
-    private static int freePort() throws IOException {
-        // find free port
-        final var socket = new ServerSocket(0);
-        final var localPort = socket.getLocalPort();
-        socket.close();
-        return localPort;
-    }
-
     private static String nextValue(final String prefix) {
         return prefix + COUNTER.incrementAndGet();
-    }
-
-    private static X509CertData generateX509CertData(final String algorithm) throws Exception {
-        final var keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
-        if (isRSA(algorithm)) {
-            keyPairGenerator.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4), SECURE_RANDOM);
-        } else {
-            keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1"), SECURE_RANDOM);
-        }
-        final var keyPair = keyPairGenerator.generateKeyPair();
-        final var certificate = generateCertificate(keyPair, isRSA(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
-        return new X509CertData(certificate, keyPair.getPrivate());
-    }
-
-    private static X509Certificate generateCertificate(final KeyPair keyPair, final String hashAlgorithm)
-            throws Exception {
-        final var now = Instant.now();
-        final var contentSigner = new JcaContentSignerBuilder(hashAlgorithm).build(keyPair.getPrivate());
-
-        final var x500Name = new X500Name("CN=TestCertificate");
-        final var certificateBuilder = new JcaX509v3CertificateBuilder(x500Name,
-            BigInteger.valueOf(now.toEpochMilli()),
-            Date.from(now), Date.from(now.plus(Duration.ofDays(365))),
-            x500Name,
-            keyPair.getPublic());
-        return new JcaX509CertificateConverter()
-            .setProvider(new BouncyCastleProvider()).getCertificate(certificateBuilder.build(contentSigner));
-    }
-
-    private static boolean isRSA(final String algorithm) {
-        return "RSA".equals(algorithm);
-    }
-
-    private record X509CertData(X509Certificate certificate, PrivateKey privateKey) {
     }
 }

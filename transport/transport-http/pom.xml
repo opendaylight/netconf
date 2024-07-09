@@ -22,6 +22,10 @@
     <packaging>bundle</packaging>
     <description>NETCONF HTTP transport</description>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <!-- serves iana-crypt-hash incl `rounds` property for SHA algorithms -->
@@ -29,6 +33,11 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -99,6 +108,10 @@
             <artifactId>draft-ietf-crypto-types</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
