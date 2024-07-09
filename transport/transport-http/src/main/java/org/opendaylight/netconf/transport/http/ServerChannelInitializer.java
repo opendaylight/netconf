@@ -49,6 +49,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
  */
 class ServerChannelInitializer extends ChannelInitializer<Channel> implements HttpChannelInitializer {
     private static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
+    static final String REQUEST_DISPATCHER_HANDLER_NAME = "request-dispatcher";
 
     private final SettableFuture<Void> completeFuture = SettableFuture.create();
     private final AuthHandlerFactory authHandlerFactory;
@@ -96,7 +97,7 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
         if (authHandlerFactory != null) {
             pipeline.addLast(authHandlerFactory.create());
         }
-        pipeline.addLast(serverHandler(dispatcher));
+        pipeline.addLast(REQUEST_DISPATCHER_HANDLER_NAME, serverHandler(dispatcher));
     }
 
     private ChannelHandler apnHandler(final ChannelHandler connectionHandler) {
