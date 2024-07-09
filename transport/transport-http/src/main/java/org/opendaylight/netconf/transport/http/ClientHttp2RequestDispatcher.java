@@ -50,7 +50,7 @@ final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
     @Override
     public void dispatch(final Channel channel, final FullHttpRequest request,
             final FutureCallback<FullHttpResponse> callback) {
-        final var streamId = streamIdCounter.getAndAdd(2);
+        final var streamId = nextStreamId();
         request.headers()
             .setInt(STREAM_ID.text(), streamId)
             .set(SCHEME.text(), ssl ? HttpScheme.HTTPS.name() : HttpScheme.HTTP.name());
@@ -63,6 +63,10 @@ final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
                 callback.onFailure(cause);
             }
         });
+    }
+
+    int nextStreamId() {
+        return streamIdCounter.getAndAdd(2);
     }
 
     @Override
