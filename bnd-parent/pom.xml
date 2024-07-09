@@ -26,6 +26,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <!-- serves iana-crypt-hash incl `rounds` property for SHA algorithms -->
+                <!-- excluded from odl-parent via ODLPARENT-285 -->
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.15</version>
+            </dependency>
+            <dependency>
                 <groupId>org.opendaylight.infrautils</groupId>
                 <artifactId>infrautils-artifacts</artifactId>
                 <version>7.0.2</version>
