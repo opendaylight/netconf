@@ -16,6 +16,23 @@
       "message": "jjb-deploy netconf-csit-1node-callhome-only-calcium",
       "revId": "fa6ec7737610457ba72193ee5f6b4d6d36bcbe43",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e43b6f33_0215919b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-09T08:28:49Z",
+      "side": 1,
+      "message": "jjb-deploy netconf-csit-1node-gate-userfeatures-all-calcium",
+      "revId": "fa6ec7737610457ba72193ee5f6b4d6d36bcbe43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
