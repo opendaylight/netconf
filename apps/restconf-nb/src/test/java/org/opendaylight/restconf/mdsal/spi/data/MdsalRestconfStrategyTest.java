@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +64,7 @@ import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -168,17 +170,46 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
     @Test
     void testEnsureParentsByMerge() throws Exception {
+        final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME, Uint32.ONE))
+            .build();
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, songListPath);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, songListPath, SONG1);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         final var strategy = spy(jukeboxDataOperations());
         final var tx = spy(jukeboxDataOperations().prepareWriteExecution());
         doReturn(tx).when(strategy).prepareWriteExecution();
 
-        strategy.putData(dataPutRequest, GAP_PATH, GAP_LEAF);
-        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(GAP_IID.getAncestor(1)), any());
+        strategy.putData(dataPutRequest, jukeboxPath(songListPath), SONG1);
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(songListPath.getAncestor(1)), any());
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(songListPath), any());
+        assertNotNull(dataPutRequest.getResult());
+    }
+
+    @Test
+    void testEnsureParentsByMergeInvokedOnlyForImplicitLists() throws Exception {
+        final var playlistPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
+            .build();
+        final var playlist = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+            .build();
+
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, playlistPath);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        final var strategy = spy(jukeboxDataOperations());
+        final var tx = spy(jukeboxDataOperations().prepareWriteExecution());
+        doReturn(tx).when(strategy).prepareWriteExecution();
+
+        strategy.putData(dataPutRequest, jukeboxPath(playlistPath), playlist);
+        verify(readWrite, never()).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(playlistPath.getAncestor(1)),
+            any());
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(playlistPath), any());
         assertNotNull(dataPutRequest.getResult());
     }
 
