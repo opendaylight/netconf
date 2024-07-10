@@ -16,6 +16,24 @@
       "message": "Not fully documented commit message according to https://pantheontech.atlassian.net/browse/ODLC-764?focusedCommentId\u003d27043",
       "revId": "f822190ad7a31b10dc78a5990e0d2840d6c26dd2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13ff7b39_36662b79",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-10T07:19:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95214e95_d8237d32",
+      "revId": "f822190ad7a31b10dc78a5990e0d2840d6c26dd2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
