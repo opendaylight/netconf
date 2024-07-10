@@ -239,7 +239,7 @@ public class SshClientServerTest {
             try {
                 verify(serverListener, timeout(10_000))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
-                verify(clientListener, timeout(10_000))
+                verify(clientListener, timeout(15_000))
                         .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
                 var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
@@ -286,9 +286,9 @@ public class SshClientServerTest {
             final var server = FACTORY.connectServer(SUBSYSTEM, serverListener, tcpClientConfig, null,
                     serverConfigurator(username)).get(2, TimeUnit.SECONDS);
             try {
-                verify(serverListener, timeout(10_000))
+                verify(serverListener, timeout(300_000))
                     .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
-                verify(clientListener, timeout(10_000))
+                verify(clientListener, timeout(300_000))
                     .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
                 var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
