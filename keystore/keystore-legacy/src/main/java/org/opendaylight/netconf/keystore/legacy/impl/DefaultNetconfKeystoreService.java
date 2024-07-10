@@ -8,14 +8,14 @@
 package org.opendaylight.netconf.keystore.legacy.impl;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.collect.Maps;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -172,7 +172,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final java.security.PrivateKey privateKey;
             try {
-                privateKey = securityHelper.generatePrivateKey(keyBytes);
+                privateKey = securityHelper.generatePrivateKey(keyBytes, key.requireAlgorithm());
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to generate key for {}", keyName, e);
                 failure = updateFailure(failure, e);
@@ -241,29 +241,29 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         final var creds = Maps.<String, KeyPair>newHashMapWithExpectedSize(newState.credentials.size());
         for (var cred : newState.credentials.values()) {
             final var keyId = cred.requireKeyId();
-            final String passPhrase;
+
+            final byte[] privateKey;
             try {
-                passPhrase = decryptString(requireNonNullElse(new String(cred.getPassphrase(), StandardCharsets.UTF_8),
-                    ""));
-            } catch (GeneralSecurityException e) {
-                LOG.debug("Failed to decrypt pass phrase for {}", keyId, e);
+                privateKey = base64Decode(new String(cred.requirePrivateKey(), StandardCharsets.UTF_8));
+            } catch (IllegalArgumentException e) {
+                LOG.debug("Failed to decode private key", e);
                 failure = updateFailure(failure, e);
                 continue;
             }
 
-            final String privateKey;
+            final byte[] publicKey;
             try {
-                privateKey = decryptString(new String(cred.getPrivateKey(), StandardCharsets.UTF_8));
-            } catch (GeneralSecurityException e) {
-                LOG.debug("Failed to decrypt private key for {}", keyId, e);
+                publicKey = base64Decode(new String(cred.requirePublicKey(), StandardCharsets.UTF_8));
+            } catch (IllegalArgumentException e) {
+                LOG.debug("Failed to decode public key", e);
                 failure = updateFailure(failure, e);
                 continue;
             }
 
             final KeyPair keyPair;
             try {
-                keyPair = securityHelper.decodePrivateKey(privateKey, passPhrase);
-            } catch (IOException e) {
+                keyPair = securityHelper.createKeyPair(privateKey, publicKey, cred.requireAlgorithm());
+            } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to decode key pair for {}", keyId, e);
                 failure = updateFailure(failure, e);
                 continue;
