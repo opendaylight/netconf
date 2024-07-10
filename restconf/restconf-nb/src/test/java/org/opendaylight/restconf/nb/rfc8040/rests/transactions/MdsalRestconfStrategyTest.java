@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +58,7 @@ import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -163,17 +165,46 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
     @Test
     void testEnsureParentsByMerge() {
+        final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME, Uint32.ONE))
+            .build();
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, songListPath);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, songListPath, SONG1);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         final var strategy = spy(jukeboxStrategy());
         final var tx = spy(jukeboxStrategy().prepareWriteExecution());
         doReturn(tx).when(strategy).prepareWriteExecution();
 
-        strategy.putData(dataPutRequest, GAP_IID, GAP_LEAF, null);
-        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(GAP_IID.getAncestor(1)), any());
+        strategy.putData(dataPutRequest, songListPath, SONG1, null);
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(songListPath.getAncestor(1)), any());
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(songListPath), any());
+        verify(dataPutRequest).completeWith(any(DataPutResult.class));
+    }
+
+    @Test
+    void testEnsureParentsByMergeInvokedOnlyForImplicitLists() {
+        final var playlistPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
+            .build();
+        final var playlist = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+            .build();
+
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, playlistPath);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        final var strategy = spy(jukeboxStrategy());
+        final var tx = spy(jukeboxStrategy().prepareWriteExecution());
+        doReturn(tx).when(strategy).prepareWriteExecution();
+
+        strategy.putData(dataPutRequest, playlistPath, playlist, null);
+        verify(readWrite, never()).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(playlistPath.getAncestor(1)),
+            any());
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(playlistPath), any());
         verify(dataPutRequest).completeWith(any(DataPutResult.class));
     }
 
