@@ -121,13 +121,21 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
      *
      * @param path    path of data
      */
-    // FIXME: this method should only be invoked if we are crossing an implicit list.
     private void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var parent = path.getParent();
         if (parent != null) {
-            final var rootNormalizedPath = path.getAncestor(1);
-            verifyNotNull(rwTx).merge(CONFIGURATION, rootNormalizedPath, fromInstanceId(databind.modelContext(),
-                parent));
+            var isListExist = false;
+            for (final var argument : parent.getPathArguments()) {
+                if (argument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
+                    isListExist = true;
+                    break;
+                }
+            }
+            if (isListExist) {
+                final var rootNormalizedPath = path.getAncestor(1);
+                verifyNotNull(rwTx).merge(CONFIGURATION, rootNormalizedPath, fromInstanceId(databind.modelContext(),
+                    parent));
+            }
         }
     }
 
