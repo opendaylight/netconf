@@ -33,6 +33,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,14 +138,30 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
      *
      * @param path    path of data
      */
-    // FIXME: this method should only be invoked if we are crossing an implicit list.
     private void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var parent = path.getParent();
         if (parent != null) {
-            final var rootNormalizedPath = path.getAncestor(1);
-            verifyNotNull(rwTx).merge(CONFIGURATION, rootNormalizedPath, fromInstanceId(databind.modelContext(),
-                parent));
+            var hasListInPath = false;
+            for (final var argument : parent.getPathArguments()) {
+                if (argument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
+                    hasListInPath = true;
+                    break;
+                }
+            }
+            if (hasListInPath || isPresenceContainer(parent)) {
+                final var rootNormalizedPath = path.getAncestor(1);
+                verifyNotNull(rwTx).merge(CONFIGURATION, rootNormalizedPath, fromInstanceId(databind.modelContext(),
+                    parent));
+            }
         }
+    }
+
+    private boolean isPresenceContainer(final YangInstanceIdentifier path) {
+        final var schemaNode = databind.schemaTree().findChild(path);
+        return schemaNode.filter(context -> context
+                .dataSchemaNode() instanceof ContainerSchemaNode containerSchemaNode
+                    && containerSchemaNode.isPresenceContainer())
+            .isPresent();
     }
 
     @Override
