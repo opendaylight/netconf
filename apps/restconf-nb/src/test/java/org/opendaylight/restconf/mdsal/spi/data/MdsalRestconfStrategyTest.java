@@ -72,6 +72,7 @@ import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -88,6 +89,8 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
         YangParserTestUtils.parseYangResourceDirectory("/modules"));
     private static final YangInstanceIdentifier CONT_IID = YangInstanceIdentifier.of(CONT_QNAME);
     private static final Data CONT_DATA = moudlesPath(CONT_IID);
+    private static final QName ROOT_QNAME = QName.create("presence-container:ns", "2024-10-31",
+        "container-root");
 
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
@@ -183,17 +186,94 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
 
     @Test
     void testEnsureParentsByMerge() throws Exception {
+        final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME, Uint32.ONE))
+            .build();
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, songListPath);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, songListPath, SONG1);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         final var strategy = spy(jukeboxDataOperations());
         final var tx = spy(jukeboxDataOperations().prepareWriteExecution());
         doReturn(tx).when(strategy).prepareWriteExecution();
 
-        strategy.putData(dataPutRequest, GAP_PATH, GAP_LEAF);
-        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(GAP_IID.getAncestor(1)), any());
+        strategy.putData(dataPutRequest, jukeboxPath(songListPath), SONG1);
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(songListPath.getAncestor(1)), any());
+        verify(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), eq(songListPath), any());
+        assertNotNull(dataPutRequest.getResult());
+    }
+
+    @Test
+    void testPresenceContainerAsAncestorHigherThanParent() throws Exception {
+        final var containerRoot = QName.create("presence-container:ns", "2024-10-31",
+            "container-root");
+        final var ancestorPath = YangInstanceIdentifier.builder()
+            .node(containerRoot)
+            .node(QName.create(containerRoot, "container-lvl1")) // Presence container
+            .node(QName.create(containerRoot, "container-lvl2"))
+            .node(QName.create(containerRoot, "leaf-lvl2"))
+            .build();
+
+        // Set up mock transactions and expectations
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, ancestorPath);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, ancestorPath,
+            ImmutableNodes.leafNode(QName.create(containerRoot, "leaf-lvl2"), "test-value"));
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+
+        final var restconfStrategy = newDataOperations(MODULES_DATABIND);
+        final var strategy = spy(restconfStrategy);
+        final var tx = spy(restconfStrategy.prepareWriteExecution());
+        doReturn(tx).when(strategy).prepareWriteExecution();
+
+        final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(ancestorPath).orElseThrow();
+        final var path = new DatabindPath.Data(MODULES_DATABIND, childAndStack.stack().toInference(),
+            ancestorPath, childAndStack.node());
+
+        strategy.putData(dataPutRequest, path, ImmutableNodes.leafNode(QName.create(containerRoot, "leaf"
+            + "-lvl2"), "test-value"));
+
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), any(), any());
+        verify(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), eq(ancestorPath), any());
+        assertNotNull(dataPutRequest.getResult());
+    }
+
+    @Test
+    void testPresenceContainerAsDirectParent() throws Exception {
+        // Define path where the presence container is a grandparent
+        final var ancestorPath = YangInstanceIdentifier.builder()
+            .node(ROOT_QNAME)
+            .node(QName.create(ROOT_QNAME, "container-lvl1")) // Presence container
+            .node(QName.create(ROOT_QNAME, "leaf-lvl1"))
+            .build();
+
+        // Set up mock transactions and expectations
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, ancestorPath);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, ancestorPath,
+            ImmutableNodes.leafNode(QName.create(ROOT_QNAME, "leaf-lvl1"), "test-value"));
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+
+        final var restconfStrategy = newDataOperations(MODULES_DATABIND);
+        final var strategy = spy(restconfStrategy);
+        final var tx = spy(restconfStrategy.prepareWriteExecution());
+        doReturn(tx).when(strategy).prepareWriteExecution();
+
+        final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(ancestorPath).orElseThrow();
+        final var path = new DatabindPath.Data(MODULES_DATABIND, childAndStack.stack().toInference(),
+            ancestorPath, childAndStack.node());
+
+        // Perform the operation
+        strategy.putData(dataPutRequest, path, ImmutableNodes.leafNode(QName.create(ROOT_QNAME, "leaf"
+            + "-lvl1"), "test-value"));
+
+        // Verify no merging occurs for presence containers and successful put operation
+        verify(readWrite).merge(eq(LogicalDatastoreType.CONFIGURATION), eq(ancestorPath.getAncestor(1)), any());
+        verify(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), eq(ancestorPath), any());
         assertNotNull(dataPutRequest.getResult());
     }
 
