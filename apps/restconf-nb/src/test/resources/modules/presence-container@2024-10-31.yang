@@ -1,0 +1,29 @@
+module presence-container {
+  namespace "presence-container:ns";
+  prefix pc;
+
+  revision "2024-10-31" {
+    description "Initial version.";
+  }
+
+  container container-root {
+    leaf leaf-root {
+      type string;
+    }
+
+    container container-lvl1 {
+      presence "Test presence container";
+      description "Container with presence substatement";
+
+      leaf leaf-lvl1 {
+        type string;
+      }
+
+      container container-lvl2 {
+        leaf leaf-lvl2 {
+          type string;
+        }
+      }
+    }
+  }
+}
