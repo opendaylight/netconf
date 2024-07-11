@@ -67,6 +67,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ssh.client.grouping.ClientIdentity;
@@ -90,6 +91,8 @@ public class SshClientServerTest {
     private static final AtomicReference<String> USERNAME = new AtomicReference<>(USER);
 
     private static SSHTransportStackFactory FACTORY;
+    private static IpAddress address;
+    private static PortNumber port;
 
     @Mock
     private TcpClientGrouping tcpClientConfig;
@@ -109,11 +112,15 @@ public class SshClientServerTest {
     @Captor
     ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
 
-    private ServerSocket socket;
-
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws Exception {
         FACTORY = new SSHTransportStackFactory("IntegrationTest", 0);
+
+        // create temp socket to get available port for test
+        final var socket = new ServerSocket(0);
+        address = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
+        port = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
+        socket.close();
     }
 
     @AfterAll
@@ -123,21 +130,14 @@ public class SshClientServerTest {
 
     @BeforeEach
     void beforeEach() throws IOException {
-
-        // create temp socket to get available port for test
-        socket = new ServerSocket(0);
-        final var localAddress = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
-        final var localPort = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
-        socket.close();
-
-        when(tcpServerConfig.getLocalAddress()).thenReturn(localAddress);
+        when(tcpServerConfig.getLocalAddress()).thenReturn(address);
         when(tcpServerConfig.requireLocalAddress()).thenCallRealMethod();
-        when(tcpServerConfig.getLocalPort()).thenReturn(localPort);
+        when(tcpServerConfig.getLocalPort()).thenReturn(port);
         when(tcpServerConfig.requireLocalPort()).thenCallRealMethod();
 
-        when(tcpClientConfig.getRemoteAddress()).thenReturn(new Host(localAddress));
+        when(tcpClientConfig.getRemoteAddress()).thenReturn(new Host(address));
         when(tcpClientConfig.requireRemoteAddress()).thenCallRealMethod();
-        when(tcpClientConfig.getRemotePort()).thenReturn(localPort);
+        when(tcpClientConfig.getRemotePort()).thenReturn(port);
         when(tcpClientConfig.requireRemotePort()).thenCallRealMethod();
     }
 
