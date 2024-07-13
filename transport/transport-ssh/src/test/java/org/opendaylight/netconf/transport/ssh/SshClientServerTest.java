@@ -69,8 +69,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
-public class SshClientServerTest {
-
+class SshClientServerTest {
     private static final String RSA = "RSA";
     private static final String EC = "EC";
     private static final String USER = "user";
@@ -92,9 +91,9 @@ public class SshClientServerTest {
     private TransportChannelListener serverListener;
 
     @Captor
-    ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
+    private ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
     @Captor
-    ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
+    private ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
 
     private static EventLoopGroup group;
     private ServerSocket socket;
