@@ -11,10 +11,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -25,16 +24,6 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * A {@link TCPTransportStack} acting as a TCP client.
  */
 public final class TCPClient extends TCPTransportStack {
-    @Sharable
-    private static final class ConnectChannelInitializer extends ChannelInitializer<Channel> {
-        static final ConnectChannelInitializer INSTANCE = new ConnectChannelInitializer();
-
-        @Override
-        protected void initChannel(final Channel ch) {
-            // No-op
-        }
-    }
-
     private static final @NonNull ListenableFuture<Empty> SHUTDOWN_FUTURE = Futures.immediateFuture(Empty.value());
 
     private TCPClient(final TransportChannelListener listener) {
@@ -58,18 +47,28 @@ public final class TCPClient extends TCPTransportStack {
 
         final var ret = SettableFuture.<TCPClient>create();
         bootstrap
-            .handler(ConnectChannelInitializer.INSTANCE)
+            .handler(new ChannelInboundHandlerAdapter() {
+                @Override
+                public void channelActive(final ChannelHandlerContext ctx) throws Exception {
+                    // Order of operations is important here: the stack should be visible before the underlying channel
+                    final var stack = new TCPClient(listener);
+                    ret.set(stack);
+                    final var channel = ctx.channel();
+                    stack.addTransportChannel(new TCPTransportChannel(channel));
+
+                    // forward activation to any added handlers
+                    super.channelActive(ctx);
+
+                    // remove this handler from the picture
+                    channel.pipeline().remove(this);
+                }
+            })
             .connect(
                 socketAddressOf(connectParams.requireRemoteAddress(), connectParams.requireRemotePort()),
                 socketAddressOf(connectParams.getLocalAddress(), connectParams.getLocalPort()))
             .addListener((ChannelFutureListener) future -> {
                 final var cause = future.cause();
-                if (cause == null) {
-                    // Order of operations is important here: the stack should be visible before the underlying channel
-                    final var stack = new TCPClient(listener);
-                    ret.set(stack);
-                    stack.addTransportChannel(new TCPTransportChannel(future.channel()));
-                } else {
+                if (cause != null) {
                     ret.setException(cause);
                 }
             });
