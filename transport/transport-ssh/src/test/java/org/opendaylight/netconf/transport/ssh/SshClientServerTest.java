@@ -45,7 +45,6 @@ import org.apache.commons.codec.digest.Crypt;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,9 +80,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
-// FIXME NETCONF-1348
-@Disabled
-public class SshClientServerTest {
+class SshClientServerTest {
+    // Utility to bridge connectClient()/listenServer()
+    @FunctionalInterface
+    private interface Builder<T extends SSHTransportStack> {
+        ListenableFuture<T> build() throws UnsupportedConfigurationException;
+    }
+
     private static final String RSA = "RSA";
     private static final String EC = "EC";
     private static final String USER = "user";
@@ -108,9 +111,9 @@ public class SshClientServerTest {
     private TransportChannelListener serverListener;
 
     @Captor
-    ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
+    private ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
     @Captor
-    ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
+    private ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
 
     private ServerSocket socket;
 
@@ -408,10 +411,5 @@ public class SshClientServerTest {
         } finally {
             server.shutdown().get(2, TimeUnit.SECONDS);
         }
-    }
-
-    @FunctionalInterface
-    private interface Builder<T extends SSHTransportStack> {
-        ListenableFuture<T> build() throws UnsupportedConfigurationException;
     }
 }
