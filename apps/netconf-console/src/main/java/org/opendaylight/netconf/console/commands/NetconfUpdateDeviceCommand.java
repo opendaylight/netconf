@@ -96,7 +96,7 @@ public class NetconfUpdateDeviceCommand implements Action {
 
     @Option(name = "-sl",
             aliases = { "--schemaless" },
-            description = "Schemaless surpport, true for schemaless",
+            description = "Schemaless support, true for schemaless",
             required = false,
             multiValued = false)
     private String newSchemaless = "false";
