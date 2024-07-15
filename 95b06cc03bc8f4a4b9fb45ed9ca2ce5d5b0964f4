@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26799d67_c175ce23",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/GetRootEntity.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-15T10:36:46Z",
+      "side": 1,
+      "message": "List.of()",
+      "revId": "95b06cc03bc8f4a4b9fb45ed9ca2ce5d5b0964f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "249da375_7fa28e48",
+        "filename": "restconf/restconf-openapi/src/test/resources/operational-document/controller-all.json",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-15T10:36:46Z",
+      "side": 1,
+      "message": "/operations does not support content paramater. only .data does.",
+      "revId": "95b06cc03bc8f4a4b9fb45ed9ca2ce5d5b0964f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
