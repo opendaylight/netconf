@@ -27,16 +27,16 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-common</artifactId>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc8341</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>draft-ietf-netconf-crypto-types</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>rfc8341</artifactId>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-common</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -30,6 +30,14 @@
             <artifactId>org.eclipse.jdt.annotation</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc6243</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc6991-ietf-yang-types</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
             <artifactId>logging-markers</artifactId>
         </dependency>
@@ -40,14 +48,6 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc6991-ietf-yang-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>rfc6243</artifactId>
         </dependency>
     </dependencies>
 </project>
