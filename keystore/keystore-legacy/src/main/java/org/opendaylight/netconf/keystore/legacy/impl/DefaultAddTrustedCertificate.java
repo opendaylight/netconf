@@ -9,7 +9,10 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddTrustedCertificate;
@@ -25,11 +28,11 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class DefaultAddTrustedCertificate extends AbstractRpc implements AddTrustedCertificate {
+final class DefaultAddTrustedCertificate extends AbstractEncryptingRpc implements AddTrustedCertificate {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddTrustedCertificate.class);
 
-    DefaultAddTrustedCertificate(final DataBroker dataBroker) {
-        super(dataBroker);
+    DefaultAddTrustedCertificate(final DataBroker dataBroker, final AAAEncryptionService encryptionService) {
+        super(dataBroker, encryptionService);
     }
 
     @Override
@@ -40,18 +43,29 @@ final class DefaultAddTrustedCertificate extends AbstractRpc implements AddTrust
         }
 
         LOG.debug("Updating trusted certificates: {}", certs);
-        final var tx = newTransaction();
+        final var certificates = new ArrayList<TrustedCertificate>(certs.size());
         for (var certificate : certs.values()) {
-            final var base64certificate = new TrustedCertificateBuilder()
-                .setName(certificate.getName())
-                .setCertificate(certificate.getCertificate().getBytes(StandardCharsets.UTF_8))
-                .build();
-
-            tx.put(LogicalDatastoreType.CONFIGURATION,
-                InstanceIdentifier.create(Keystore.class).child(TrustedCertificate.class, base64certificate.key()),
-                    base64certificate);
+            final var certName = certificate.getName();
+            final TrustedCertificate cert;
+            try {
+                final var validCert = SecurityHelper.decodeCertificate(certificate.getCertificate());
+                cert = new TrustedCertificateBuilder()
+                    .setName(certName)
+                    .setCertificate(encryptEncoded(validCert.getEncoded()))
+                    .build();
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Cannot encrypt certificate {}}", certificate, e);
+                return returnFailed("Failed to encrypt certificate " + certName, e);
+            } catch (IOException e) {
+                LOG.debug("Cannot decode certificate {}}", certificate, e);
+                return returnFailed("Failed to decode certificate " + certName, e);
+            }
+            certificates.add(cert);
         }
 
+        final var tx = newTransaction();
+        certificates.forEach(cert -> tx.put(LogicalDatastoreType.CONFIGURATION,
+            InstanceIdentifier.create(Keystore.class).child(TrustedCertificate.class, cert.key()), cert));
         return tx.commit().transform(commitInfo -> {
             LOG.debug("Updated trusted certificates: {}", certs.keySet());
             return RpcResultBuilder.success(new AddTrustedCertificateOutputBuilder().build()).build();
