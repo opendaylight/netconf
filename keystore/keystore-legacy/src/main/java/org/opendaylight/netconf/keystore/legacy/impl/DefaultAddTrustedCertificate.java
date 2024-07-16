@@ -9,7 +9,9 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddTrustedCertificate;
@@ -28,8 +30,8 @@ import org.slf4j.LoggerFactory;
 final class DefaultAddTrustedCertificate extends AbstractRpc implements AddTrustedCertificate {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddTrustedCertificate.class);
 
-    DefaultAddTrustedCertificate(final DataBroker dataBroker) {
-        super(dataBroker);
+    DefaultAddTrustedCertificate(final DataBroker dataBroker, final AAAEncryptionService encryptionService) {
+        super(dataBroker, encryptionService);
     }
 
     @Override
@@ -42,10 +44,21 @@ final class DefaultAddTrustedCertificate extends AbstractRpc implements AddTrust
         LOG.debug("Updating trusted certificates: {}", certs);
         final var tx = newTransaction();
         for (var certificate : certs.values()) {
-            final var base64certificate = new TrustedCertificateBuilder()
-                .setName(certificate.getName())
-                .setCertificate(certificate.getCertificate().getBytes(StandardCharsets.UTF_8))
-                .build();
+            final var certName = certificate.getName();
+            final TrustedCertificate base64certificate;
+            try {
+                final var validCert = new SecurityHelper().decodeCertificate(certificate.getCertificate());
+                base64certificate = new TrustedCertificateBuilder()
+                    .setName(certName)
+                    .setCertificate(encryptEncoded(validCert.getEncoded()))
+                    .build();
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Cannot encrypt certificate {}}", certificate, e);
+                return returnFailed("Failed to encrypt certificate " + certName, e);
+            } catch (IOException e) {
+                LOG.debug("Cannot decode certificate {}}", certificate, e);
+                return returnFailed("Failed to decode certificate " + certName, e);
+            }
 
             tx.put(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(Keystore.class).child(TrustedCertificate.class, base64certificate.key()),
