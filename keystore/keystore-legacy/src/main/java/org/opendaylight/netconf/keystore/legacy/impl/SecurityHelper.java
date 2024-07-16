@@ -20,6 +20,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -75,6 +77,18 @@ final class SecurityHelper {
             }
 
             return new JcaPEMKeyConverter().getKeyPair(keyPair);
+        }
+    }
+
+    @NonNull X509Certificate decodeCertificate(final String certificate) throws IOException, GeneralSecurityException {
+        try (var certReader = new PEMParser(new StringReader(certificate.replace("\\n", "\n")))) {
+            final var obj = certReader.readObject();
+
+            if (obj instanceof X509CertificateHolder cert) {
+                return new JcaX509CertificateConverter().getCertificate(cert);
+            } else {
+                throw new IOException("Unhandled certificate " + obj.getClass());
+            }
         }
     }
 }

@@ -80,7 +80,7 @@ class NetconfKeystoreRpcsTest {
     void testAddPrivateKey() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
-        final var rpc = new DefaultAddPrivateKey(dataBroker);
+        final var rpc = new DefaultAddPrivateKey(dataBroker, encryptionService);
         final var input = getPrivateKeyInput();
         rpc.invoke(input).get();
 
@@ -119,7 +119,7 @@ class NetconfKeystoreRpcsTest {
     void testAddTrustedCertificate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
-        final var rpc = new DefaultAddTrustedCertificate(dataBroker);
+        final var rpc = new DefaultAddTrustedCertificate(dataBroker, encryptionService);
         final var input = getTrustedCertificateInput();
         rpc.invoke(input).get();
 
