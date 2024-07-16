@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.keystore.legacy.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -20,19 +21,22 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+import org.bouncycastle.util.encoders.DecoderException;
 import org.eclipse.jdt.annotation.NonNull;
 
-final class SecurityHelper {
+public final class SecurityHelper {
     private CertificateFactory certFactory;
     private Provider bcProv;
 
-    @NonNull PrivateKey generatePrivateKey(final byte[] privateKeyBytes, final String algorithm)
+    static @NonNull PrivateKey generatePrivateKey(final byte[] privateKeyBytes, final String algorithm)
             throws GeneralSecurityException {
         return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
     }
@@ -46,15 +50,16 @@ final class SecurityHelper {
         return (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(certificate));
     }
 
-    @NonNull KeyPair generateKeyPair(final byte[] privateKeyBytes, final byte[] publicKeyBytes, final String algorithm)
-        throws GeneralSecurityException {
+    static @NonNull KeyPair generateKeyPair(final byte[] privateKeyBytes, final byte[] publicKeyBytes,
+            final String algorithm) throws GeneralSecurityException {
         final var privateKey = generatePrivateKey(privateKeyBytes, algorithm);
         final var publicKey = KeyFactory.getInstance(algorithm).generatePublic(
             new X509EncodedKeySpec(publicKeyBytes));
         return new KeyPair(publicKey, privateKey);
     }
 
-    @NonNull KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
+    @VisibleForTesting
+    public @NonNull KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
         if (bcProv == null) {
             final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
             bcProv = prov != null ? prov : new BouncyCastleProvider();
@@ -75,6 +80,24 @@ final class SecurityHelper {
             }
 
             return new JcaPEMKeyConverter().getKeyPair(keyPair);
+        } catch (DecoderException e) {
+            throw new IOException("Invalid input.", e);
+        }
+    }
+
+    @VisibleForTesting
+    public static @NonNull X509Certificate decodeCertificate(final String certificate)
+            throws IOException, GeneralSecurityException {
+        try (var certReader = new PEMParser(new StringReader(certificate.replace("\\n", "\n")))) {
+            final var obj = certReader.readObject();
+
+            if (obj instanceof X509CertificateHolder cert) {
+                return new JcaX509CertificateConverter().getCertificate(cert);
+            } else {
+                throw new IOException("Unhandled certificate " + obj.getClass());
+            }
+        } catch (DecoderException e) {
+            throw new IOException("Invalid input.", e);
         }
     }
 }

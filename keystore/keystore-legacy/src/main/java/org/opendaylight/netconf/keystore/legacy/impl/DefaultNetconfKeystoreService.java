@@ -10,12 +10,10 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Maps;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -161,16 +159,16 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final byte[] keyBytes;
             try {
-                keyBytes = base64Decode(new String(key.requireData(), StandardCharsets.UTF_8));
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode private key {}", keyName, e);
+                keyBytes = encryptionService.decrypt(key.requireData());
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Failed to decrypt private key {}", keyName, e);
                 failure = updateFailure(failure, e);
                 continue;
             }
 
             final java.security.PrivateKey privateKey;
             try {
-                privateKey = securityHelper.generatePrivateKey(keyBytes, key.requireAlgorithm());
+                privateKey = SecurityHelper.generatePrivateKey(keyBytes, key.requireAlgorithm());
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to generate key for {}", keyName, e);
                 failure = updateFailure(failure, e);
@@ -187,18 +185,18 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final var certs = new ArrayList<X509Certificate>(certChain.size());
             for (int i = 0, size = certChain.size(); i < size; i++) {
-                final byte[] bytes;
+                final byte[] decryptCertBytes;
                 try {
-                    bytes = base64Decode(new String(certChain.get(i), StandardCharsets.UTF_8));
-                } catch (IllegalArgumentException e) {
-                    LOG.debug("Failed to decode certificate chain item {} for private key {}", i, keyName, e);
+                    decryptCertBytes = encryptionService.decrypt(certChain.get(i));
+                } catch (GeneralSecurityException e) {
+                    LOG.debug("Failed to decrypt certificate chain item {} for private key {}", i, keyName, e);
                     failure = updateFailure(failure, e);
                     continue;
                 }
 
                 final X509Certificate x509cert;
                 try {
-                    x509cert = securityHelper.generateCertificate(bytes);
+                    x509cert = securityHelper.generateCertificate(decryptCertBytes);
                 } catch (GeneralSecurityException e) {
                     LOG.debug("Failed to generate certificate chain item {} for private key {}", i, keyName, e);
                     failure = updateFailure(failure, e);
@@ -215,17 +213,9 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         for (var cert : newState.trustedCertificates.values()) {
             final var certName = cert.requireName();
 
-            final byte[] bytes;
-            try {
-                bytes = base64Decode(new String(cert.requireCertificate(), StandardCharsets.UTF_8));
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode trusted certificate {}", certName, e);
-                failure = updateFailure(failure, e);
-                continue;
-            }
-
             final X509Certificate x509cert;
             try {
+                final var bytes = encryptionService.decrypt(cert.requireCertificate());
                 x509cert = securityHelper.generateCertificate(bytes);
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to generate certificate for {}", certName, e);
@@ -241,25 +231,25 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             final var keyId = cred.requireKeyId();
             final byte[] privateKey;
             try {
-                privateKey = base64Decode(new String(cred.requirePrivateKey(), StandardCharsets.UTF_8));
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode private key", e);
+                privateKey = encryptionService.decrypt(cred.getPrivateKey());
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Failed to decrypt private key", e);
                 failure = updateFailure(failure, e);
                 continue;
             }
 
             final byte[] publicKey;
             try {
-                publicKey = base64Decode(new String(cred.requirePublicKey(), StandardCharsets.UTF_8));
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode public key", e);
+                publicKey = encryptionService.decrypt(cred.getPublicKey());
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Failed to decrypt public key", e);
                 failure = updateFailure(failure, e);
                 continue;
             }
 
             final KeyPair keyPair;
             try {
-                keyPair = securityHelper.generateKeyPair(privateKey, publicKey, cred.requireAlgorithm());
+                keyPair = SecurityHelper.generateKeyPair(privateKey, publicKey, cred.requireAlgorithm());
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to generate key pair for {}", keyId, e);
                 failure = updateFailure(failure, e);
@@ -277,10 +267,6 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         final var newKeystore = new NetconfKeystore(keys, certs, creds);
         keystore.setRelease(newKeystore);
         consumers.forEach(consumer -> consumer.getInstance().accept(newKeystore));
-    }
-
-    private static byte[] base64Decode(final String base64) {
-        return Base64.getMimeDecoder().decode(base64.getBytes(StandardCharsets.UTF_8));
     }
 
     private static @NonNull Throwable updateFailure(final @Nullable Throwable failure, final @NonNull Exception ex) {
