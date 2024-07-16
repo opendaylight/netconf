@@ -7,14 +7,11 @@
  */
 package org.opendaylight.netconf.keystore.legacy.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Base64;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -26,20 +23,16 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredentialBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEntry {
+final class DefaultAddKeystoreEntry extends AbstractEncryptingRpc implements AddKeystoreEntry {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddKeystoreEntry.class);
 
-    private final AAAEncryptionService encryptionService;
-
     DefaultAddKeystoreEntry(final DataBroker dataBroker, final AAAEncryptionService encryptionService) {
-        super(dataBroker);
-        this.encryptionService = requireNonNull(encryptionService);
+        super(dataBroker, encryptionService);
     }
 
     @Override
@@ -54,16 +47,22 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
         for (var credential : plain.values()) {
             final var keyId = credential.getKeyId();
             try {
+                final var keyPair = new SecurityHelper().decodePrivateKey(credential.getPrivateKey(),
+                    credential.getPassphrase());
+                final var priv = keyPair.getPrivate();
+
                 encrypted.add(new KeyCredentialBuilder()
                     .setKeyId(credential.getKeyId())
-                    .setPrivateKey(encryptToBytes(credential.getPrivateKey()))
-                    .setPassphrase(encryptToBytes(credential.getPassphrase()))
+                    .setAlgorithm(priv.getAlgorithm())
+                    .setPrivateKey(encryptEncoded(priv.getEncoded()))
+                    .setPublicKey(encryptEncoded(keyPair.getPublic().getEncoded()))
                     .build());
             } catch (GeneralSecurityException e) {
-                LOG.debug("Cannot decrypt key credential {}}", credential, e);
-                return RpcResultBuilder.<AddKeystoreEntryOutput>failed()
-                    .withError(ErrorType.APPLICATION, "Failed to decrypt key " + keyId, e)
-                    .buildFuture();
+                LOG.debug("Cannot encrypt key credential {}}", credential, e);
+                return returnFailed("Failed to encrypt key credential " + keyId, e);
+            } catch (IOException e) {
+                LOG.debug("Cannot decode private key {}}", keyId, e);
+                return returnFailed("Failed to decode private key " + keyId, e);
             }
         }
 
@@ -77,9 +76,5 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
             LOG.debug("Updated keypairs: {}", plain.keySet());
             return RpcResultBuilder.success(new AddKeystoreEntryOutputBuilder().build()).build();
         }, MoreExecutors.directExecutor());
-    }
-
-    private byte[] encryptToBytes(final String plain) throws GeneralSecurityException {
-        return Base64.getEncoder().encode(encryptionService.encrypt(plain.getBytes(StandardCharsets.UTF_8)));
     }
 }

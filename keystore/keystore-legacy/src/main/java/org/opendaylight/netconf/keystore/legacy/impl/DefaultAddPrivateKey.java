@@ -9,7 +9,13 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddPrivateKey;
@@ -25,11 +31,11 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class DefaultAddPrivateKey extends AbstractRpc implements AddPrivateKey {
+final class DefaultAddPrivateKey extends AbstractEncryptingRpc implements AddPrivateKey {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddPrivateKey.class);
 
-    DefaultAddPrivateKey(final DataBroker dataBroker) {
-        super(dataBroker);
+    DefaultAddPrivateKey(final DataBroker dataBroker, final AAAEncryptionService encryptionService) {
+        super(dataBroker, encryptionService);
     }
 
     @Override
@@ -40,19 +46,67 @@ final class DefaultAddPrivateKey extends AbstractRpc implements AddPrivateKey {
         }
 
         LOG.debug("Adding private keys: {}", keys);
-        final var tx = newTransaction();
+        final var privateKeys = new ArrayList<PrivateKey>(keys.size());
         for (var key : keys.values()) {
-            final var base64key = new PrivateKeyBuilder()
-                .setName(key.getName())
-                .setData(key.getData().getBytes(StandardCharsets.UTF_8))
-                .setCertificateChain(key.getCertificateChain().stream()
-                    .map(cert -> cert.getBytes(StandardCharsets.UTF_8)).toList())
-                .build();
+            final java.security.PrivateKey validPrivateKey;
+            try {
+                validPrivateKey = new SecurityHelper().decodePrivateKey(key.getData(), null).getPrivate();
+            } catch (IOException e) {
+                LOG.debug("Cannot decode private key {}", key, e);
+                return returnFailed("Failed to decode private key " + key.getName(), e);
+            }
 
-            tx.put(LogicalDatastoreType.CONFIGURATION,
-                InstanceIdentifier.create(Keystore.class).child(PrivateKey.class, base64key.key()), base64key);
+            final byte[] encryptedPrivateKey;
+            try {
+                encryptedPrivateKey = encryptEncoded(validPrivateKey.getEncoded());
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Cannot encrypt private key {}", key, e);
+                return returnFailed("Failed to encrypt private key " + key.getName(), e);
+            }
+
+            final List<byte[]> encryptedCerts;
+            final var certChain = key.getCertificateChain();
+            if (certChain != null) {
+                encryptedCerts = new ArrayList<>(certChain.size());
+                for (var cert : certChain) {
+                    final X509Certificate decoded;
+                    try {
+                        decoded = SecurityHelper.decodeCertificate(cert);
+                    } catch (IOException | GeneralSecurityException e) {
+                        return returnFailed("Cannot decode certificate " + cert, e);
+                    }
+
+                    final byte[] encoded;
+                    try {
+                        encoded = decoded.getEncoded();
+                    } catch (CertificateEncodingException e) {
+                        return returnFailed("Cannot re-encode certificate " + decoded, e);
+                    }
+
+                    final byte[] encrypted;
+                    try {
+                        encrypted = encryptEncoded(encoded);
+                    } catch (GeneralSecurityException e) {
+                        return returnFailed("Cannot encrypt certificate " + decoded, e);
+                    }
+
+                    encryptedCerts.add(encrypted);
+                }
+            } else {
+                encryptedCerts = List.of();
+            }
+
+            privateKeys.add(new PrivateKeyBuilder()
+                .setName(key.getName())
+                .setData(encryptedPrivateKey)
+                .setAlgorithm(validPrivateKey.getAlgorithm())
+                .setCertificateChain(encryptedCerts)
+                .build());
         }
 
+        final var tx = newTransaction();
+        privateKeys.forEach(privateKey -> tx.put(LogicalDatastoreType.CONFIGURATION,
+            InstanceIdentifier.create(Keystore.class).child(PrivateKey.class, privateKey.key()), privateKey));
         return tx.commit().transform(commitInfo -> {
             LOG.debug("Added private keys: {}", keys.keySet());
             return RpcResultBuilder.success(new AddPrivateKeyOutputBuilder().build()).build();
