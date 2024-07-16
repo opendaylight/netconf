@@ -22,8 +22,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-model-rfc8341</artifactId>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8341</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
