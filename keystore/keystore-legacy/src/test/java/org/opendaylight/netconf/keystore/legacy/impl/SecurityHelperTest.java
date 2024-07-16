@@ -9,14 +9,19 @@
 package org.opendaylight.netconf.keystore.legacy.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import org.bouncycastle.openssl.EncryptionException;
 import org.junit.jupiter.api.Test;
 
+//TODO: Rework to parameterized test
 class SecurityHelperTest {
     private final SecurityHelper helper = new SecurityHelper();
 
@@ -71,10 +76,49 @@ class SecurityHelperTest {
         assertEquals("exception using cipher - please check password and data.", ex.getMessage());
     }
 
+    @Test
+    void testCertificate() throws Exception {
+        assertNotNull(decodeCertificate("certificate"));
+    }
+
+    @Test
+    void testCertificateWithPrivateKeyInput() {
+        final var ex = assertThrows(IOException.class, () -> helper.decodeCertificate(
+            new String(SecurityHelperTest.class.getResourceAsStream("/pem/rsa").readAllBytes(),
+                StandardCharsets.UTF_8)));
+        assertEquals("Unhandled certificate class org.bouncycastle.openssl.PEMKeyPair", ex.getMessage());
+    }
+
+    @Test
+    void testGenerateKeyPair() throws Exception {
+        final var keyPair = decodePrivateKey("rsa", "");
+        assertInstanceOf(KeyPair.class, helper.generateKeyPair(keyPair.getPrivate().getEncoded(),
+            keyPair.getPublic().getEncoded(), keyPair.getPrivate().getAlgorithm()));
+    }
+
+    @Test
+    void testGeneratePrivateKey() throws Exception {
+        final var keyPair = decodePrivateKey("rsa", "");
+        assertInstanceOf(PrivateKey.class, helper.generatePrivateKey(keyPair.getPrivate().getEncoded(),
+            keyPair.getPrivate().getAlgorithm()));
+    }
+
+    @Test
+    void testGenerateCertificate() throws Exception {
+        final var cert = decodeCertificate("certificate");
+        assertNotNull(helper.generateCertificate(cert.getEncoded()));
+    }
+
     private KeyPair decodePrivateKey(final String resourceName, final String password) throws Exception {
         return helper.decodePrivateKey(
-            new String(SecurityHelperTest.class.getResourceAsStream("/pki/" + resourceName).readAllBytes(),
+            new String(SecurityHelperTest.class.getResourceAsStream("/pem/" + resourceName).readAllBytes(),
                 StandardCharsets.UTF_8),
             password);
+    }
+
+    private X509Certificate decodeCertificate(final String resourceName) throws Exception {
+        return helper.decodeCertificate(
+            new String(SecurityHelperTest.class.getResourceAsStream("/pem/" + resourceName).readAllBytes(),
+                StandardCharsets.UTF_8));
     }
 }
