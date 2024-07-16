@@ -18,8 +18,8 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -30,26 +30,11 @@ import org.eclipse.jdt.annotation.NonNull;
 
 final class SecurityHelper {
     private CertificateFactory certFactory;
-    private KeyFactory dsaFactory;
-    private KeyFactory rsaFactory;
     private Provider bcProv;
 
-    @NonNull PrivateKey generatePrivateKey(final byte[] privateKey) throws GeneralSecurityException {
-        final var keySpec = new PKCS8EncodedKeySpec(privateKey);
-
-        if (rsaFactory == null) {
-            rsaFactory = KeyFactory.getInstance("RSA");
-        }
-        try {
-            return rsaFactory.generatePrivate(keySpec);
-        } catch (InvalidKeySpecException ignore) {
-            // Ignored
-        }
-
-        if (dsaFactory == null) {
-            dsaFactory = KeyFactory.getInstance("DSA");
-        }
-        return dsaFactory.generatePrivate(keySpec);
+    @NonNull PrivateKey generatePrivateKey(final byte[] privateKeyBytes, final String algorithm)
+            throws GeneralSecurityException {
+        return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
     }
 
     @NonNull X509Certificate generateCertificate(final byte[] certificate) throws GeneralSecurityException {
@@ -59,6 +44,14 @@ final class SecurityHelper {
             certFactory = CertificateFactory.getInstance("X.509");
         }
         return (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(certificate));
+    }
+
+    @NonNull KeyPair generateKeyPair(final byte[] privateKeyBytes, final byte[] publicKeyBytes, final String algorithm)
+        throws GeneralSecurityException {
+        final var privateKey = generatePrivateKey(privateKeyBytes, algorithm);
+        final var publicKey = KeyFactory.getInstance(algorithm).generatePublic(
+            new X509EncodedKeySpec(publicKeyBytes));
+        return new KeyPair(publicKey, privateKey);
     }
 
     @NonNull KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {

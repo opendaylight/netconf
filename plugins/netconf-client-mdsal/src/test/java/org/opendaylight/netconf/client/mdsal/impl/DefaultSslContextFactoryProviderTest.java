@@ -170,6 +170,7 @@ class DefaultSslContextFactoryProviderTest {
                 final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent()
                     .getBytes(StandardCharsets.UTF_8);
                 final var certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
+                final var algorithm = element.getElementsByTagName("algorithm").item(0).getTextContent();
                 final var certChain = new ArrayList<byte[]>();
                 for (int j = 0; j < certNodes.getLength(); j++) {
                     if (certNodes.item(j) instanceof Element certNode) {
@@ -181,6 +182,7 @@ class DefaultSslContextFactoryProviderTest {
                     .withKey(new PrivateKeyKey(keyName))
                     .setName(keyName)
                     .setData(keyData)
+                    .setAlgorithm(algorithm)
                     .setCertificateChain(certChain)
                     .build());
             }
