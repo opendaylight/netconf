@@ -177,6 +177,10 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <artifactId>rfc6243</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc6991-ietf-inet-types</artifactId>
     </dependency>
     <dependency>
@@ -185,15 +189,11 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-      <artifactId>rfc8072</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf.model</groupId>
-      <artifactId>rfc6243</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <artifactId>rfc8072</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
