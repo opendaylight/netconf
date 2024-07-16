@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
+import org.opendaylight.netconf.keystore.legacy.impl.SecurityHelper;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKeyBuilder;
@@ -117,6 +117,9 @@ class DefaultSslContextFactoryProviderTest {
 
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(privateKeyModification).dataAfter();
+        doReturn(privateKey.requireData()).when(encryptionService).decrypt(privateKey.requireData());
+        doReturn(privateKey.requireCertificateChain().get(0)).when(encryptionService)
+            .decrypt(privateKey.requireCertificateChain().get(0));
 
         try (var keystoreAdapter = newProvider()) {
             listener.onDataTreeChanged(List.of(dataTreeModification1));
@@ -149,6 +152,12 @@ class DefaultSslContextFactoryProviderTest {
         final var trustedCertificate = getTrustedCertificate();
         doReturn(trustedCertificate).when(trustedCertificateModification).dataAfter();
 
+        doReturn(privateKey.requireData()).when(encryptionService).decrypt(privateKey.requireData());
+        doReturn(privateKey.requireCertificateChain().get(0)).when(encryptionService)
+            .decrypt(privateKey.requireCertificateChain().get(0));
+        doReturn(trustedCertificate.requireCertificate()).when(encryptionService)
+            .decrypt(trustedCertificate.requireCertificate());
+
         try (var keystoreAdapter = newProvider()) {
             // Apply configurations
             listener.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
@@ -167,23 +176,29 @@ class DefaultSslContextFactoryProviderTest {
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i) instanceof Element element) {
                 final var keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-                final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent()
-                    .getBytes(StandardCharsets.UTF_8);
+                final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
                 final var certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-                final var algorithm = element.getElementsByTagName("algorithm").item(0).getTextContent();
-                final var certChain = new ArrayList<byte[]>();
+                final var certChain = new ArrayList<String>();
                 for (int j = 0; j < certNodes.getLength(); j++) {
                     if (certNodes.item(j) instanceof Element certNode) {
-                        certChain.add(certNode.getTextContent().getBytes(StandardCharsets.UTF_8));
+                        certChain.add(certNode.getTextContent());
                     }
                 }
+
+                final var privateKey = new SecurityHelper().decodePrivateKey(keyData, null);
+
+                final var decodedCerts = new ArrayList<byte[]>();
+                for (final var cert : certChain) {
+                    decodedCerts.add(new SecurityHelper().decodeCertificate(cert).getEncoded());
+                }
+
 
                 privateKeys.add(new PrivateKeyBuilder()
                     .withKey(new PrivateKeyKey(keyName))
                     .setName(keyName)
-                    .setData(keyData)
-                    .setAlgorithm(algorithm)
-                    .setCertificateChain(certChain)
+                    .setData(privateKey.getPrivate().getEncoded())
+                    .setAlgorithm(privateKey.getPrivate().getAlgorithm())
+                    .setCertificateChain(decodedCerts)
                     .build());
             }
         }
@@ -198,13 +213,14 @@ class DefaultSslContextFactoryProviderTest {
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i) instanceof Element element) {
                 final var certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-                final var certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent()
-                    .getBytes(StandardCharsets.UTF_8);
+                final var certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
+
+                final var cert = new SecurityHelper().decodeCertificate(certData).getEncoded();
 
                 trustedCertificates.add(new TrustedCertificateBuilder()
                     .withKey(new TrustedCertificateKey(certName))
                     .setName(certName)
-                    .setCertificate(certData)
+                    .setCertificate(cert)
                     .build());
             }
         }
