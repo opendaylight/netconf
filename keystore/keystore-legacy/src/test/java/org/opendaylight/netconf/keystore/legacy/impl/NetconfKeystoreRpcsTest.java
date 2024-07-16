@@ -15,7 +15,6 @@ import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,10 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddKeystoreEntryInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddPrivateKeyInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddPrivateKeyInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.AddTrustedCertificateInput;
@@ -34,11 +34,13 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc._private.keys.PrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc._private.keys.PrivateKeyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.keystore.entry.KeyCredential;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.keystore.entry.KeyCredentialBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.keystore.entry.KeyCredentialKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.trusted.certificates.TrustedCertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.binding.DataObject;
-import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,24 +54,12 @@ class NetconfKeystoreRpcsTest {
     private static final String XML_ELEMENT_TRUSTED_CERT = "trusted-certificate";
     private static final String XML_ELEMENT_CERT = "certificate";
 
-    private static Document KEYSTORE;
-
     @Mock
     private WriteTransaction writeTx;
     @Mock
     private DataBroker dataBroker;
     @Mock
     private AAAEncryptionService encryptionService;
-    @Mock
-    private RpcProviderService rpcProvider;
-    @Mock
-    private ObjectRegistration<?> rpcReg;
-
-    @BeforeAll
-    static void beforeAll() throws Exception {
-        KEYSTORE = XmlUtil.readXmlToDocument(
-            NetconfKeystoreRpcsTest.class.getResourceAsStream("/netconf-keystore.xml"));
-    }
 
     @BeforeEach
     void beforeEach() {
@@ -77,10 +67,40 @@ class NetconfKeystoreRpcsTest {
     }
 
     @Test
+    void testAddKeystoreEntry() throws Exception {
+        doReturn(emptyFluentFuture()).when(writeTx).commit();
+
+        final var rpc = new DefaultAddKeystoreEntry(dataBroker, encryptionService);
+        final var input = getKeystoreEntryInput();
+        rpc.invoke(input).get();
+
+        verify(writeTx, times(input.nonnullKeyCredential().size()))
+            .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+    }
+
+    private static AddKeystoreEntryInput getKeystoreEntryInput() throws Exception {
+        final var entries = new HashMap<KeyCredentialKey, KeyCredential>();
+        final var nodeList = getXmlInput("/keystore-entry.xml").getElementsByTagName("key-credential");
+        if (nodeList.item(0) instanceof Element element) {
+            final var keyName = element.getElementsByTagName("key-id").item(0).getTextContent();
+            final var keyData = element.getElementsByTagName(XML_ELEMENT_PRIVATE_KEY).item(0).getTextContent();
+
+            final var key = new KeyCredentialKey(keyName);
+            entries.put(key, new KeyCredentialBuilder()
+                .setKeyId(keyName)
+                .setPrivateKey(keyData)
+                .setPassphrase("")
+                .build());
+        }
+
+        return new AddKeystoreEntryInputBuilder().setKeyCredential(entries).build();
+    }
+
+    @Test
     void testAddPrivateKey() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
-        final var rpc = new DefaultAddPrivateKey(dataBroker);
+        final var rpc = new DefaultAddPrivateKey(dataBroker, encryptionService);
         final var input = getPrivateKeyInput();
         rpc.invoke(input).get();
 
@@ -90,7 +110,7 @@ class NetconfKeystoreRpcsTest {
 
     private static AddPrivateKeyInput getPrivateKeyInput() throws Exception {
         final var privateKeys = new HashMap<PrivateKeyKey, PrivateKey>();
-        final var nodeList = KEYSTORE.getElementsByTagName(XML_ELEMENT_PRIVATE_KEY);
+        final var nodeList = getXmlInput("/private-key.xml").getElementsByTagName(XML_ELEMENT_PRIVATE_KEY);
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i) instanceof Element element) {
                 final var keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
@@ -119,7 +139,7 @@ class NetconfKeystoreRpcsTest {
     void testAddTrustedCertificate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
-        final var rpc = new DefaultAddTrustedCertificate(dataBroker);
+        final var rpc = new DefaultAddTrustedCertificate(dataBroker, encryptionService);
         final var input = getTrustedCertificateInput();
         rpc.invoke(input).get();
 
@@ -129,7 +149,7 @@ class NetconfKeystoreRpcsTest {
 
     private static AddTrustedCertificateInput getTrustedCertificateInput() throws Exception {
         final var trustedCertificates = new HashMap<TrustedCertificateKey, TrustedCertificate>();
-        final var nodeList = KEYSTORE.getElementsByTagName(XML_ELEMENT_TRUSTED_CERT);
+        final var nodeList = getXmlInput("/trusted-cert.xml").getElementsByTagName(XML_ELEMENT_TRUSTED_CERT);
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i) instanceof Element element) {
                 final var certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
@@ -145,5 +165,9 @@ class NetconfKeystoreRpcsTest {
         }
 
         return new AddTrustedCertificateInputBuilder().setTrustedCertificate(trustedCertificates).build();
+    }
+
+    private static Document getXmlInput(final String resourceName) throws Exception {
+        return XmlUtil.readXmlToDocument(NetconfKeystoreRpcsTest.class.getResourceAsStream(resourceName));
     }
 }
