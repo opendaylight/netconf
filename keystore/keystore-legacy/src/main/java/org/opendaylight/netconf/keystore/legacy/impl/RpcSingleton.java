@@ -54,9 +54,9 @@ final class RpcSingleton implements ClusterSingletonService {
         reg = rpcProvider.registerRpcImplementations(
             new DefaultAddKeystoreEntry(dataBroker, encryptionService),
             new DefaultRemoveKeystoreEntry(dataBroker),
-            new DefaultAddPrivateKey(dataBroker),
+            new DefaultAddPrivateKey(dataBroker, encryptionService),
             new DefaultRemovePrivateKey(dataBroker),
-            new DefaultAddTrustedCertificate(dataBroker),
+            new DefaultAddTrustedCertificate(dataBroker, encryptionService),
             new DefaultRemoveTrustedCertificate(dataBroker));
         LOG.info("This node is now owning NETCONF keystore configuration");
     }
