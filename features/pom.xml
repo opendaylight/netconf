@@ -32,16 +32,6 @@
         <module>features-netconf-experimental</module>
 
         <module>odl-netconf-model-rfc5277</module>
-        <module>odl-netconf-model-rfc6022</module>
-        <module>odl-netconf-model-rfc6241</module>
-        <module>odl-netconf-model-rfc6243</module>
-        <module>odl-netconf-model-rfc6470</module>
-        <module>odl-netconf-model-rfc8040</module>
-        <module>odl-netconf-model-rfc8341</module>
-        <module>odl-netconf-model-rfc8526</module>
-        <module>odl-netconf-model-rfc8639</module>
-        <module>odl-netconf-model-rfc8641</module>
-        <module>odl-netconf-model-rfc8650</module>
 
         <module>odl-aaa-netconf-plugin</module>
         <module>odl-restconf-openapi</module>
