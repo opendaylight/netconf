@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.api.ApiPath.Step;
-import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindAware;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath;
@@ -57,7 +56,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.5.3">RFC8040, section 3.5.3</a>. The URI provides the
  * equivalent of NETCONF XML filter encoding, with data values being escaped RFC7891 strings.
  */
-public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
+public final class ApiPathNormalizer implements DatabindAware, Insert.PointNormalizer {
     private final @NonNull DatabindContext databind;
 
     public ApiPathNormalizer(final DatabindContext databind) {
