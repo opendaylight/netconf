@@ -82,6 +82,14 @@
 
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-dom-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>restconf-api</artifactId>
     </dependency>
     <dependency>
@@ -90,11 +98,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-dom-api</artifactId>
+      <artifactId>restconf-server-api</artifactId>
     </dependency>
 
     <dependency>
@@ -197,11 +201,6 @@
     </dependency>
 
     <dependency>
-      <groupId>net.java.dev.stax-utils</groupId>
-      <artifactId>stax-utils</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.opendaylight.aaa.web</groupId>
       <artifactId>web-api</artifactId>
     </dependency>
@@ -238,6 +237,23 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20240303</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <version>1.5.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa.web</groupId>
+      <artifactId>testutils</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.mdsal</groupId>
       <artifactId>mdsal-binding-api</artifactId>
       <scope>test</scope>
@@ -259,34 +275,32 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.mdsal.model</groupId>
+      <artifactId>ietf-topology</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-test-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20240303</version>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>binding-runtime-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.skyscreamer</groupId>
-      <artifactId>jsonassert</artifactId>
-      <version>1.5.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa.web</groupId>
-      <artifactId>testutils</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>binding-runtime-spi</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-assertj</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

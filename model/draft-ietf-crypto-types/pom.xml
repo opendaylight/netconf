@@ -18,9 +18,10 @@
     </parent>
 
     <groupId>org.opendaylight.netconf.model</groupId>
-    <artifactId>draft-ietf-netconf-crypto-types</artifactId>
+    <artifactId>draft-ietf-crypto-types</artifactId>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
+    <description>ietf-netconf-crypto-types from draft-ietf-crypto-types-24</description>
 
     <dependencies>
         <dependency>

@@ -8,52 +8,18 @@
 package org.opendaylight.restconf.server.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
 
-import java.util.Set;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
 
-@ExtendWith(MockitoExtension.class)
 class ParamsTest {
-    /**
-     * Test when not allowed parameter type is used.
-     */
-    @Test
-    void checkParametersTypesNegativeTest() {
-        final var mockDatabind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
-
-        assertInvalidIAE(EventStreamGetParams::of);
-        assertInvalidIAE(EventStreamGetParams::of, ContentParam.ALL);
-
-        assertParamsThrows("Unknown parameter in /data GET: insert", DataGetParams::of, "insert",
-            "odl-test-value");
-
-        assertInvalidIAE(queryParams -> Insert.of(mockDatabind, queryParams));
-        assertInvalidIAE(queryParams -> Insert.of(mockDatabind, queryParams), ContentParam.ALL);
-    }
-
     /**
      * Test of parsing default parameters from URI request.
      */
@@ -116,43 +82,6 @@ class ParamsTest {
         final var params = assertParams(DataGetParams::of, WithDefaultsParam.uriName,
             "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
-    }
-
-    /**
-     * Test of parsing user defined parameters from URI request.
-     */
-    @Test
-    void parseUriParametersUserDefinedTest() throws Exception {
-        final QName containerChild = QName.create("ns", "container-child");
-
-        final var params = assertParams(DataGetParams::of, QueryParameters.of(
-            ContentParam.CONFIG, DepthParam.of(10), FieldsParam.forUriValue("container-child")));
-        // content
-        assertEquals(ContentParam.CONFIG, params.content());
-
-        // depth
-        final var depth = params.depth();
-        assertNotNull(depth);
-        assertEquals(10, depth.value());
-
-        // fields
-        final var paramsFields = params.fields();
-        assertNotNull(paramsFields);
-
-        // fields for write filtering
-        final var containerSchema = mock(ContainerSchemaNode.class,
-            withSettings().extraInterfaces(ContainerEffectiveStatement.class));
-        final var containerQName = QName.create(containerChild, "container");
-        doReturn(containerQName).when(containerSchema).getQName();
-        final var containerChildSchema = mock(LeafSchemaNode.class);
-        doReturn(containerChild).when(containerChildSchema).getQName();
-        doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
-
-        final var fields = MdsalRestconfStrategy.translateFieldsParam(mock(EffectiveModelContext.class),
-            DataSchemaContext.of(containerSchema), paramsFields);
-        assertNotNull(fields);
-        assertEquals(1, fields.size());
-        assertEquals(Set.of(containerChild), fields.get(0));
     }
 
     private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod,

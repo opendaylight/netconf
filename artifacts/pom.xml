@@ -161,7 +161,14 @@
             <!-- draft-ietf-netconf-crypto-types -->
             <dependency>
                 <groupId>org.opendaylight.netconf.model</groupId>
-                <artifactId>draft-ietf-netconf-crypto-types</artifactId>
+                <artifactId>draft-ietf-crypto-types</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- draft-ietf-netconf-restconf-client-server -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>draft-ietf-restconf-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -451,6 +458,11 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-server-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

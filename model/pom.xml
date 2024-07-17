@@ -30,8 +30,7 @@
 
     <modules>
         <module>rfc5277</module>
-
-        <!-- draft-ietf-netconf-crypto-types-24 -->
-        <module>draft-ietf-netconf-crypto-types</module>
+        <module>draft-ietf-crypto-types</module>
+        <module>draft-ietf-restconf-server</module>
     </modules>
 </project>
