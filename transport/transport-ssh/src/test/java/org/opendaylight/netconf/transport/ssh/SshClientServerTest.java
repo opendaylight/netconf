@@ -243,9 +243,9 @@ class SshClientServerTest {
             // connect with client
             final var client = clientBuilder.build().get(2, TimeUnit.SECONDS);
             try {
-                verify(serverListener, timeout(10_000))
+                verify(serverListener, timeout(2_000))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
-                verify(clientListener, timeout(10_000))
+                verify(clientListener, timeout(2_000))
                         .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
                 var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
