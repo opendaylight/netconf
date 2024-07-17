@@ -38,5 +38,6 @@
         <module>restconf-client</module>
         <module>restconf-server</module>
         <module>restconf-server-api</module>
+        <module>restconf-server-spi</module>
     </modules>
 </project>
