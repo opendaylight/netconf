@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c185d086_80a3245e",
+        "filename": "protocol/restconf-server/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-17T16:21:03Z",
+      "side": 1,
+      "message": "we do not do these sorts of classifications -- we have two groups separated by an empty-line and comment:\n- prod dependencies\n- test dependendies\n\nboth are alpha-sorted by groupId+artifactId, nothing else.",
+      "range": {
+        "startLine": 34,
+        "startChar": 8,
+        "endLine": 34,
+        "endChar": 28
+      },
+      "revId": "399beca379cdcedc1179c56af0b442bfbee810d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
