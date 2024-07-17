@@ -21,7 +21,7 @@
     <artifactId>draft-ietf-crypto-types</artifactId>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
-    <description>ietf-netconf-crypto-types from draft-ietf-crypto-types-24</description>
+    <description>ietf-crypto-types from draft-netconf-ietf-crypto-types-24</description>
 
     <dependencies>
         <dependency>
