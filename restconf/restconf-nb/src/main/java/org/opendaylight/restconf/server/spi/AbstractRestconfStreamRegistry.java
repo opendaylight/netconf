@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
@@ -53,6 +52,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
 
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
+    private final @NonNull String subpath;
+
+    protected AbstractRestconfStreamRegistry(final String subpath) {
+        if (subpath.isEmpty()) {
+            throw new IllegalArgumentException("empty subpath");
+        }
+        this.subpath = subpath;
+    }
 
     @Override
     public final @Nullable RestconfStream<?> lookupStream(final String name) {
@@ -138,12 +145,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * @param restconfURI request base URI, with trailing slash
      * @throws IllegalArgumentException if the result would have been malformed
      */
-    protected static final @NonNull String baseStreamLocation(final URI restconfURI) {
+    protected final @NonNull String baseStreamLocation(final URI restconfURI) {
         var scheme = restconfURI.getScheme();
 
         try {
             return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
-                restconfURI.getPath() + URLConstants.STREAMS_SUBPATH, null, null)
+                restconfURI.getPath() + subpath, null, null)
                 .toString();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Cannot derive streams location", e);
