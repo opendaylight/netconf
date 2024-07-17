@@ -16,6 +16,24 @@
       "message": "perhaps not... we need to check what ExistenceCheck/RestconfTransaction really needs",
       "revId": "5e8e87e82d91ae83044dd7bb6a55c4dfcfaa427a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf29dd6d_37fc7f14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-17T15:24:46Z",
+      "side": 1,
+      "message": "The needs will be addressed later and will end up being based on ServerException or similar.",
+      "parentUuid": "41f6b6fc_aa883dcf",
+      "revId": "5e8e87e82d91ae83044dd7bb6a55c4dfcfaa427a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
