@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server.spi;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerError;

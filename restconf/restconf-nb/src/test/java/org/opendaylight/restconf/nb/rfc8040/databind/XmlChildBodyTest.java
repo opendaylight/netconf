@@ -31,7 +31,7 @@ class XmlChildBodyTest extends AbstractBodyTest {
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        final var testFiles = loadFiles("/instanceidentifier/yang");
+        final var testFiles = loadFiles("/instance-identifier");
         testFiles.addAll(loadFiles("/modules"));
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
         final var modelContext = YangParserTestUtils.parseYangFiles(testFiles);

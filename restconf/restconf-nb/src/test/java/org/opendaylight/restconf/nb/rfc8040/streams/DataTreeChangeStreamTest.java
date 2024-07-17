@@ -23,9 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -38,10 +36,10 @@ import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
-import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.mdsal.streams.dtcl.DataTreeChangeSource;
+import org.opendaylight.restconf.server.spi.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
@@ -63,8 +61,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,8 +203,6 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             .nodeWithKey(MyList1.QNAME, QName.create(PatchCont.QNAME.getModule(), "name"), "Althea")
             .build();
 
-    private static EffectiveModelContext SCHEMA_CONTEXT;
-
     private final CompletingServerRequest<RestconfStream<List<DataTreeCandidate>>> request =
         new CompletingServerRequest<>();
 
@@ -217,21 +211,11 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private DatabindProvider databindProvider;
     private RestconfStream.Registry streamRegistry;
 
-    @BeforeClass
-    public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        SCHEMA_CONTEXT = null;
-    }
-
     @Before
     public void setUp() throws Exception {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
-        databindProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
+        databindProvider = () -> AbstractInstanceIdentifierTest.IID_DATABIND;
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker);
     }
 

@@ -18,20 +18,11 @@ import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Unit tests for {@link AbstractRestconfStreamRegistry}.
  */
 class AbstractRestconfStreamRegistryTest {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamRegistryTest.class);
-    private static final EffectiveModelContext CONTEXT =
-        // TODO: assemble these from dependencies?
-        YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
-
     @Test
     void toStreamEntryNodeTest() throws Exception {
         final var outputType = "XML";

@@ -8,8 +8,6 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
-import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;

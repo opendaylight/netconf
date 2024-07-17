@@ -72,7 +72,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
 
     @BeforeAll
     static final void initModelContext() throws Exception {
-        final var testFiles = loadFiles("/instanceidentifier/yang");
+        final var testFiles = loadFiles("/instance-identifier");
         testFiles.addAll(loadFiles("/modules"));
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
         DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
