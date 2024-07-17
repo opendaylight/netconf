@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.server.spi;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -49,9 +49,9 @@ public abstract class AbstractInstanceIdentifierTest {
     protected static final QName MY_LEAF11_QNAME = QName.create(PATCH_CONT_QNAME, "my-leaf11");
     protected static final QName MY_LEAF12_QNAME = QName.create(PATCH_CONT_QNAME, "my-leaf12");
 
-    protected static final @NonNull EffectiveModelContext IID_SCHEMA =
+    public static final @NonNull EffectiveModelContext IID_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
-    protected static final @NonNull DatabindContext IID_DATABIND = DatabindContext.ofModel(IID_SCHEMA);
+    public static final @NonNull DatabindContext IID_DATABIND = DatabindContext.ofModel(IID_SCHEMA);
 
     protected static final InputStream stringInputStream(final String str) {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
