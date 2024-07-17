@@ -1,0 +1,21 @@
+module map-model {
+  namespace "map:ns";
+  prefix map-model;
+
+  container cont-root {
+    container cont1 {
+      list my-map {
+
+        key "key-leaf";
+
+        leaf key-leaf {
+          type string;
+        }
+
+        leaf data-leaf {
+          type string;
+        }
+      }
+    }
+  }
+}

@@ -7,16 +7,19 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
+import org.opendaylight.restconf.server.spi.AbstractInstanceIdentifierTest;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
 public abstract class AbstractBodyTest extends AbstractInstanceIdentifierTest {
     static final List<File> loadFiles(final String resourceDirectory) throws FileNotFoundException {
-        final String path = AbstractBodyTest.class.getResource(resourceDirectory).getPath();
+        final String path = requireNonNull(AbstractBodyTest.class.getResource(resourceDirectory), resourceDirectory)
+            .getPath();
         final File testDir = new File(path);
         final String[] fileList = testDir.list();
         final List<File> testFiles = new ArrayList<>();

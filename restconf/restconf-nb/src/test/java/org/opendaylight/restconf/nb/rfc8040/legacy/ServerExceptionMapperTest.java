@@ -47,7 +47,7 @@ class ServerExceptionMapperTest {
     private static final DatabindContext DATABIND = DatabindContext.ofModel(
         YangParserTestUtils.parseYangResources(ServerExceptionMapperTest.class,
             "/restconf/impl/ietf-restconf@2017-01-26.yang",
-            "/instanceidentifier/yang/instance-identifier-patch-module.yang"));
+            "/instance-identifier/instance-identifier-patch-module.yang"));
 
     private final ServerExceptionMapper exceptionMapper = new ServerExceptionMapper(ErrorTagMapping.RFC8040);
 

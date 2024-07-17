@@ -27,7 +27,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        final var testFiles = loadFiles("/instanceidentifier/yang");
+        final var testFiles = loadFiles("/instance-identifier");
         testFiles.addAll(loadFiles("/modules"));
         final var modelContext = YangParserTestUtils.parseYangFiles(testFiles);
 
