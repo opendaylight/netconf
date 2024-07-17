@@ -96,7 +96,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>draft-ietf-netconf-crypto-types</artifactId>
+            <artifactId>draft-ietf-crypto-types</artifactId>
         </dependency>
 
         <dependency>
