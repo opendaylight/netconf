@@ -42,7 +42,7 @@ public final class SSEStreamService {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
-    SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
+    public SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
             final StreamsConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
         this.pingExecutor = requireNonNull(pingExecutor);
