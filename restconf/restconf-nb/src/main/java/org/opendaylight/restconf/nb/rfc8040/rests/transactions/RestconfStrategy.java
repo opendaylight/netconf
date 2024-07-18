@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,10 +37,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
@@ -60,11 +57,7 @@ import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
-import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
-import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
-import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -73,12 +66,16 @@ import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.mdsal.MdsalServerActionOperations;
+import org.opendaylight.restconf.server.mdsal.MdsalServerRpcOperations;
 import org.opendaylight.restconf.server.spi.AbstractServerStrategy;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.Insert;
+import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
-import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.restconf.server.spi.ServerActionOperations;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
@@ -134,8 +131,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy extends AbstractServerStrategy
-        implements ServerActionOperations, ServerDataOperations, ServerRpcOperations {
+public abstract class RestconfStrategy extends AbstractServerStrategy implements ServerDataOperations {
     @NonNullByDefault
     public record StrategyAndPath(RestconfStrategy strategy, Data path) {
         public StrategyAndPath {
@@ -164,27 +160,32 @@ public abstract class RestconfStrategy extends AbstractServerStrategy
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
     private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
 
-    private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
+    private final @NonNull ServerActionOperations action;
+    private final @NonNull ServerRpcOperations rpc;
     private final YangTextSourceExtension sourceProvider;
     private final DOMMountPointService mountPointService;
-    private final DOMActionService actionService;
-    private final DOMRpcService rpcService;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
             final @Nullable YangTextSourceExtension sourceProvider,
             final @Nullable DOMMountPointService mountPointService) {
         super(databind);
-        this.localRpcs = requireNonNull(localRpcs);
-        this.rpcService = rpcService;
-        this.actionService = actionService;
+
+        final var rpcDelegate = rpcService != null ? new MdsalServerRpcOperations(rpcService)
+            : NotSupportedServerRpcOperations.INSTANCE;
+        rpc = localRpcs.isEmpty() ? rpcDelegate
+            : new InterceptingServerRpcOperations(path -> localRpcs.get(path.rpc().argument()), rpcDelegate);
+
+        action = actionService != null ? new MdsalServerActionOperations(actionService)
+            : NotSupportedServerActionOperations.INSTANCE;
+
         this.sourceProvider = sourceProvider;
         this.mountPointService = mountPointService;
     }
 
     @Override
     protected final ServerActionOperations action() {
-        return this;
+        return action;
     }
 
     @Override
@@ -194,7 +195,7 @@ public abstract class RestconfStrategy extends AbstractServerStrategy
 
     @Override
     protected final ServerRpcOperations rpc() {
-        return this;
+        return rpc;
     }
 
     public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) throws ServerException {
@@ -1154,63 +1155,6 @@ public abstract class RestconfStrategy extends AbstractServerStrategy
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    @Override
-    public void invokeRpc(final ServerRequest<InvokeResult> request, final URI restconfURI, final Rpc path,
-            final ContainerNode input) {
-        final var type = path.rpc().argument();
-        final var local = localRpcs.get(type);
-        if (local != null) {
-            local.invoke(request.transform(result -> outputToInvokeResult(path, result)), restconfURI,
-                new OperationInput(path, input));
-            return;
-        }
-
-        if (rpcService == null) {
-            LOG.debug("RPC invocation is not available");
-            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
-                "RPC invocation is not available"));
-            return;
-        }
-
-        Futures.addCallback(rpcService.invokeRpc(type, input), new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(final DOMRpcResult result) {
-                completeRequest(request, path, result);
-            }
-
-            @Override
-            public void onFailure(final Throwable cause) {
-                LOG.debug("RPC invocation failed, cause");
-                if (cause instanceof ServerException ex) {
-                    request.completeWith(ex);
-                } else {
-                    // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                    request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
-                }
-            }
-        }, MoreExecutors.directExecutor());
-    }
-
-    @NonNullByDefault
-    static void completeRequest(final ServerRequest<? super InvokeResult> request, final OperationPath path,
-            final DOMRpcResult rpcResult) {
-        final var errors = rpcResult.errors();
-        if (errors.isEmpty()) {
-            request.completeWith(outputToInvokeResult(path, rpcResult.value()));
-        } else {
-            LOG.debug("RPC invocation reported {}", rpcResult.errors());
-            request.completeWith(new ServerException(rpcResult.errors().stream()
-                .map(ServerError::ofRpcError)
-                .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
-        }
-    }
-
-    static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
-            final @Nullable ContainerNode value) {
-        return value == null || value.isEmpty() ? InvokeResult.EMPTY
-            : new InvokeResult(NormalizedFormattableBody.of(path, value));
-    }
-
     public void resolveSource(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
             final Class<? extends SourceRepresentation> representation) {
         final var src = requireNonNull(source);
@@ -1267,33 +1211,6 @@ public abstract class RestconfStrategy extends AbstractServerStrategy
         optRevision.ifPresent(rev -> sb.append('@').append(rev));
         sb.append(" not found");
         request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
-    }
-
-    @Override
-    public final void invokeAction(final ServerRequest<? super InvokeResult> request, final Action path,
-            final ContainerNode input) {
-        if (actionService != null) {
-            dataInvokePOST(request, actionService, path, input);
-        } else {
-            request.completeWith(new ServerException("DOMActionService is missing."));
-        }
-    }
-
-    /**
-     * Invoke Action via ActionServiceHandler.
-     *
-     * @param input input data
-     * @param yangIId invocation context
-     * @param schemaPath schema path of data
-     * @param actionService action service to invoke action
-     * @return {@link DOMRpcResult}
-     */
-    private static void dataInvokePOST(final ServerRequest<? super InvokeResult> request,
-            final DOMActionService actionService, final Action path, final @NonNull ContainerNode input) {
-        Futures.addCallback(actionService.invokeAction(
-            path.inference().toSchemaInferenceStack().toSchemaNodeIdentifier(),
-            DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
-            new DOMRpcResultCallback(request, path), MoreExecutors.directExecutor());
     }
 
     /**
