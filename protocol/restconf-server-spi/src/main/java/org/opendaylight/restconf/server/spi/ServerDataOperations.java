@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.restconf.server.spi;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.CreateResourceResult;
+import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataPatchResult;
+import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.DataYangPatchResult;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.PatchContext;
+import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+
+/**
+ * A concrete implementation of RESTCONF datastore resource, as specified by
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.1">RFC8040 {+restconf}/data</a>, based on
+ * {@code yang-data-api}.
+ */
+@NonNullByDefault
+public interface ServerDataOperations {
+    /**
+     * Create a resource, as specified by
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1">RFC8040 Create Resource Mode</a>.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param path resource path
+     * @param data resource data
+     */
+    void createData(ServerRequest<? super CreateResourceResult> request, YangInstanceIdentifier path,
+        NormalizedNode data);
+
+    /**
+     * Create a resource, as specified by
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1">RFC8040 Create Resource Mode</a>, at specified
+     * insertion point.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param path resource path
+     * @param insert {@link Insert} parameter
+     * @param data resource data
+     */
+    void createData(ServerRequest<? super CreateResourceResult> request, YangInstanceIdentifier path, Insert insert,
+        NormalizedNode data);
+
+    /**
+     * Delete a resource, as specified by
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.7">RFC8040 DELETE</a>.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param path resource path
+     */
+    void deleteData(ServerRequest<Empty> request, YangInstanceIdentifier path);
+
+    /**
+     * Delete a resource, as specified by
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.3">RFC8040 GET</a>.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param path resource path
+     * @param params operation parameters
+     */
+    void getData(ServerRequest<DataGetResult> request, Data path, DataGetParams params);
+
+    void mergeData(ServerRequest<DataPatchResult> request, YangInstanceIdentifier path, NormalizedNode data);
+
+    /**
+     * Process edit operations of one {@link PatchContext}.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param path resource path
+     * @param patch Patch context to be processed
+     */
+    void patchData(ServerRequest<DataYangPatchResult> request, YangInstanceIdentifier path, PatchContext patch);
+
+    /**
+     * Check mount point and prepare variables for put data to DS.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param path path of data
+     * @param data data
+     * @param insert {@link Insert}
+     */
+    void putData(ServerRequest<DataPutResult> request, YangInstanceIdentifier path, NormalizedNode data,
+        @Nullable Insert insert);
+}

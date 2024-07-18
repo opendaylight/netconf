@@ -114,7 +114,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, song2Path);
 
-        jukeboxStrategy().delete(emptyRequest, songListPath);
+        jukeboxStrategy().deleteData(emptyRequest, songListPath);
         verify(netconfService).getConfig(songListWildcardPath, songKeyFields);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song1Path);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song2Path);
