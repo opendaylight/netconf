@@ -78,11 +78,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     @Override
     RestconfTransaction prepareWriteExecution() {
-        return new NetconfRestconfTransaction(databind(), netconfService);
+        return new NetconfRestconfTransaction(databind, netconfService);
     }
 
     @Override
-    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
+    public void deleteData(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
         try {
             tx.delete(path);
@@ -106,7 +106,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
+    public void getData(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
