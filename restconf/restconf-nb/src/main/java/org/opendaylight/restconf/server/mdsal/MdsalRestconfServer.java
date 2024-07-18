@@ -155,7 +155,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataGET(final ServerRequest<DataGetResult> request) {
-        localStrategy().dataGET(request, ApiPath.empty());
+        localStrategy().dataGET(request);
     }
 
     @Override
@@ -172,7 +172,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataPATCH(final ServerRequest<DataPatchResult> request, final ResourceBody body) {
-        localStrategy().dataPATCH(request, ApiPath.empty(), body);
+        localStrategy().dataPATCH(request, body);
     }
 
     @Override
@@ -190,7 +190,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataPATCH(final ServerRequest<DataYangPatchResult> request, final PatchBody body) {
-        localStrategy().dataPATCH(request, ApiPath.empty(), body);
+        localStrategy().dataPATCH(request, body);
     }
 
     @Override
@@ -208,7 +208,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataPOST(final ServerRequest<CreateResourceResult> request, final ChildBody body) {
-        localStrategy().dataCreatePOST(request, body);
+        localStrategy().dataPOST(request, body);
     }
 
     @Override
@@ -226,7 +226,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataPUT(final ServerRequest<DataPutResult> request, final ResourceBody body) {
-        localStrategy().dataPUT(request, ApiPath.empty(), body);
+        localStrategy().dataPUT(request, body);
     }
 
     @Override
