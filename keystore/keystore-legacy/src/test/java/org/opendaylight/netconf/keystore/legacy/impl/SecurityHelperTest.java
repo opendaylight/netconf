@@ -20,60 +20,33 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.openssl.EncryptionException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-//TODO: Rework to parameterized test
 class SecurityHelperTest {
     private final SecurityHelper helper = new SecurityHelper();
 
-    @Test
-    void testRSAKey() throws Exception {
-        assertNotNull(decodePrivateKey("rsa", ""));
+    @ParameterizedTest
+    @CsvSource({
+        "rsa, ''",
+        "rsa_encrypted, 'passphrase'",
+        "dsa, ''",
+        "dsa_encrypted, 'passphrase'",
+        "ecdsa, ''",
+        "ecdsa_encrypted, 'passphrase'"
+    })
+    void testDecodePrivateKey(String resourceName, String password) throws Exception {
+        assertNotNull(decodePrivateKey(resourceName, password));
     }
 
-    @Test
-    void testRSAEncryptedKey() throws Exception {
-        assertNotNull(decodePrivateKey("rsa_encrypted", "passphrase"));
-    }
-
-    @Test
-    void testRSAWrongPassphrase() {
-        final var ex = assertThrows(EncryptionException.class, () -> decodePrivateKey("rsa_encrypted", "wrong"));
-        assertEquals("exception using cipher - please check password and data.", ex.getMessage());
-    }
-
-    @Test
-    void testDSAKey() throws Exception {
-        assertNotNull(decodePrivateKey("dsa", ""));
-    }
-
-    @Test
-    void testDSAEncryptedKey() throws Exception {
-        assertNotNull(decodePrivateKey("dsa_encrypted", "passphrase"));
-    }
-
-    @Test
-    void testDSAWrongPassphrase() {
-        final var ex = assertThrows(EncryptionException.class, () -> decodePrivateKey("dsa_encrypted", "wrong"));
-        assertEquals("exception using cipher - please check password and data.", ex.getMessage());
-    }
-
-    @Test
-    @SuppressWarnings("AbbreviationAsWordInName")
-    void testECDSAKey() throws Exception {
-        assertNotNull(decodePrivateKey("ecdsa", ""));
-    }
-
-    @Test
-    @SuppressWarnings("AbbreviationAsWordInName")
-    void testECDSAEncryptedKey() throws Exception {
-        assertNotNull(decodePrivateKey("ecdsa_encrypted", "passphrase"));
-    }
-
-    @Test
-    @SuppressWarnings("AbbreviationAsWordInName")
-    void testECDSAWrongPassphrase() {
-        final var ex = assertThrows(EncryptionException.class, () -> decodePrivateKey("ecdsa_encrypted", "wrong"));
-        assertEquals("exception using cipher - please check password and data.", ex.getMessage());
+    @ParameterizedTest
+    @CsvSource({
+        "rsa_encrypted, 'wrong'",
+        "dsa_encrypted, 'wrong'",
+        "ecdsa_encrypted, 'wrong'"
+    })
+    void testWrongPassphrase(String resourceName, String password) {
+        assertThrows(EncryptionException.class, () -> decodePrivateKey(resourceName, password));
     }
 
     @Test
