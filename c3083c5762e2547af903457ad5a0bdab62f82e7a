@@ -22,6 +22,30 @@
       },
       "revId": "c3083c5762e2547af903457ad5a0bdab62f82e7a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e6ea2f0_a31963c7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/DefaultRestconfStrategy.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-18T20:24:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f60dfd5_fd29457a",
+      "range": {
+        "startLine": 154,
+        "startChar": 29,
+        "endLine": 154,
+        "endChar": 36
+      },
+      "revId": "c3083c5762e2547af903457ad5a0bdab62f82e7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
