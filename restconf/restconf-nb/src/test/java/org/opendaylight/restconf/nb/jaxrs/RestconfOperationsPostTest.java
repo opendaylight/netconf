@@ -187,7 +187,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "invoke-rpc-module:input" : {
                       }
                     }"""), uriInfo, ar));
-        assertEquals(new ErrorMessage("RPC invocation is not available"), error.message());
+        assertEquals(new ErrorMessage("RPC not supported"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.tag());
     }
