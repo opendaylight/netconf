@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.nb.rfc8040.streams.PingExecutor;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
