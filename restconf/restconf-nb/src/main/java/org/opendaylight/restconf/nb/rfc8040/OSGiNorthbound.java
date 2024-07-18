@@ -77,9 +77,13 @@ public final class OSGiNorthbound {
 
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
     private final ComponentFactory<JaxRsNorthbound> northboundFactory;
+    private final ComponentFactory<DefaultPingExecutor> pingExecutorFactory;
 
     private ComponentInstance<JaxRsNorthbound> northbound;
     private Map<String, ?> northboundProps;
+
+    private ComponentInstance<DefaultPingExecutor> pingExecutor;
+    private Map<String, ?> pingExecutorProps;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
     private Map<String, ?> servletProps;
@@ -88,58 +92,88 @@ public final class OSGiNorthbound {
     public OSGiNorthbound(
             @Reference(target = "(component.factory=" + JaxRsNorthbound.FACTORY_NAME + ")")
             final ComponentFactory<JaxRsNorthbound> northboundFactory,
+            @Reference(target = "(component.factory=" + DefaultPingExecutor.FACTORY_NAME + ")")
+            final ComponentFactory<DefaultPingExecutor> pingExecutorFactory,
             @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
             final Configuration configuration) {
         this.northboundFactory = requireNonNull(northboundFactory);
+        this.pingExecutorFactory = requireNonNull(pingExecutorFactory);
         this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
 
-        servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
-        servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
+        pingExecutorProps = DefaultPingExecutor.props(configuration.ping$_$executor$_$name$_$prefix(),
+            configuration.max$_$thread$_$count());
+        pingExecutor = pingExecutorFactory.newInstance(FrameworkUtil.asDictionary(pingExecutorProps));
 
         northboundProps = JaxRsNorthbound.props(
+            configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()));
+            PrettyPrintParam.of(configuration.pretty$_$print()),
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()));
         northbound = northboundFactory.newInstance(FrameworkUtil.asDictionary(northboundProps));
+
+        servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf());
+        servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
 
         LOG.info("Global RESTCONF northbound pools started");
     }
 
     @Modified
     void modified(final Configuration configuration) {
-        final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
-        if (!newServletProps.equals(servletProps)) {
-            servletProps = newServletProps;
-            servletFactory.dispose();
-            servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
-            LOG.debug("RestconfStreamServletFactory restarted with {}", servletProps);
+        final var newPingExecutorProps = DefaultPingExecutor.props(configuration.ping$_$executor$_$name$_$prefix(),
+            configuration.max$_$thread$_$count());
+        if (!newPingExecutorProps.equals(pingExecutorProps)) {
+            pingExecutor.dispose();
+            pingExecutor = null;
+            pingExecutorProps = newPingExecutorProps;
+            LOG.debug("PingExecutor stopped");
         }
 
         final var newNorthboundProps = JaxRsNorthbound.props(
+            configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()));
+            PrettyPrintParam.of(configuration.pretty$_$print()),
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()));
         if (!newNorthboundProps.equals(northboundProps)) {
-            northboundProps = newNorthboundProps;
             northbound.dispose();
+            northbound = null;
+            northboundProps = newNorthboundProps;
+            LOG.debug("Northbound stopped");
+        }
+
+        final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf());
+        if (!newServletProps.equals(servletProps)) {
+            servletFactory.dispose();
+            servletFactory = null;
+            servletProps = newServletProps;
+            LOG.debug("RestconfStreamServletFactory stopped");
+        }
+
+        if (pingExecutor == null) {
+            pingExecutor = pingExecutorFactory.newInstance(FrameworkUtil.asDictionary(pingExecutorProps));
+            LOG.debug("PingExecutor restarted with {}", pingExecutorProps);
+        }
+        if (northbound == null) {
             northbound = northboundFactory.newInstance(FrameworkUtil.asDictionary(northboundProps));
             LOG.debug("Northbound restarted with {}", northboundProps);
         }
-
+        if (servletFactory == null) {
+            servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
+            LOG.debug("RestconfStreamServletFactory restarted with {}", servletProps);
+        }
         LOG.debug("Applied {}", configuration);
     }
 
     @Deactivate
     void deactivate() {
-        servletFactory.dispose();
-        servletFactory = null;
         northbound.dispose();
         northbound = null;
+        pingExecutor.dispose();
+        pingExecutor = null;
+        servletFactory.dispose();
+        servletFactory = null;
         LOG.info("Global RESTCONF northbound pools stopped");
     }
 }

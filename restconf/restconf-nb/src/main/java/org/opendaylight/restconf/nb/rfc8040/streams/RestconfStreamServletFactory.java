@@ -26,6 +26,4 @@ public interface RestconfStreamServletFactory {
      * @return the value of {@code {+restconf}} macro
      */
     String restconf();
-
-    HttpServlet newStreamServlet();
 }

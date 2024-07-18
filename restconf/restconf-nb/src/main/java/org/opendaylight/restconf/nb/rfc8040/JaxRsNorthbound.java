@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.ServletException;
@@ -25,8 +27,11 @@ import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.jaxrs.JsonJaxRsFormattableBodyWriter;
 import org.opendaylight.restconf.nb.jaxrs.ServerExceptionMapper;
 import org.opendaylight.restconf.nb.jaxrs.XmlJaxRsFormattableBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
+import org.opendaylight.restconf.nb.rfc8040.streams.PingExecutor;
+import org.opendaylight.restconf.nb.rfc8040.streams.SSEStreamService;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,17 +47,20 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
     private static final String PROP_ERROR_TAG_MAPPING = ".errorTagMapping";
     private static final String PROP_PRETTY_PRINT = ".prettyPrint";
+    private static final String PROP_RESTCONF = ".restconf";
+    private static final String PROP_STREAMS_CONFIGURATION = ".streamsConfiguration";
 
     private final Registration discoveryReg;
     private final Registration restconfReg;
 
     public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
             final ServletSupport servletSupport, final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            final RestconfServer server, final RestconfStreamServletFactory servletFactory,
-            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint) throws ServletException {
+            final RestconfServer server, final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
+            final String restconf, final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + servletFactory.restconf())
+            .contextPath("/" + requireNonNull(restconf))
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -70,7 +78,13 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + URLConstants.STREAMS_SUBPATH + "/*")
-                .servlet(servletFactory.newStreamServlet())
+                .servlet(servletSupport.createHttpServletBuilder(
+                    new Application() {
+                        @Override
+                        public Set<Object> getSingletons() {
+                            return Set.of(new SSEStreamService(streamRegistry, pingExecutor, streamsConfiguration));
+                        }
+                    }).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
@@ -96,7 +110,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Object> getSingletons() {
-                            return Set.of(new JaxRsWebHostMetadata(servletFactory.restconf()));
+                            return Set.of(new JaxRsWebHostMetadata(restconf));
                         }
                     }).build())
                 .name("Rootfound")
@@ -111,10 +125,14 @@ public final class JaxRsNorthbound implements AutoCloseable {
     public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            @Reference final RestconfServer server, @Reference final RestconfStreamServletFactory servletFactory,
-            final Map<String, ?> props) throws ServletException {
-        this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, server, servletFactory,
-            (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING), (PrettyPrintParam) props.get(PROP_PRETTY_PRINT));
+            @Reference final RestconfServer server, @Reference final RestconfStream.Registry streamRegistry,
+            @Reference final PingExecutor pingExecutor, final Map<String, ?> props) throws ServletException {
+        this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, server, streamRegistry,
+            pingExecutor,
+            (String) props.get(PROP_RESTCONF),
+            (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING),
+            (PrettyPrintParam) props.get(PROP_PRETTY_PRINT),
+            (StreamsConfiguration) props.get(PROP_STREAMS_CONFIGURATION));
     }
 
     @Deactivate
@@ -124,7 +142,12 @@ public final class JaxRsNorthbound implements AutoCloseable {
         restconfReg.close();
     }
 
-    public static Map<String, ?> props(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint) {
-        return Map.of(PROP_ERROR_TAG_MAPPING, errorTagMapping, PROP_PRETTY_PRINT, prettyPrint);
+    public static Map<String, ?> props(final String restconf, final ErrorTagMapping errorTagMapping,
+            final PrettyPrintParam prettyPrint, final StreamsConfiguration streamsConfiguration) {
+        return Map.of(
+            PROP_ERROR_TAG_MAPPING, errorTagMapping,
+            PROP_PRETTY_PRINT, prettyPrint,
+            PROP_RESTCONF, restconf,
+            PROP_STREAMS_CONFIGURATION, streamsConfiguration);
     }
 }
