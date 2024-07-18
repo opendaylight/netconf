@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
+package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractServerRpcOperations;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -53,8 +54,9 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
             .map(ServerError::ofRpcError)
             .collect(Collectors.toList());
         if (errors.isEmpty()) {
-            request.completeWith(RestconfStrategy.outputToInvokeResult(path, result.value()));
+            request.completeWith(AbstractServerRpcOperations.outputToInvokeResult(path, result.value()));
         } else {
+            LOG.debug("RPC invocation reported {}", errors);
             request.completeWith(new ServerException(errors, null, "Invocation failed"));
         }
     }
