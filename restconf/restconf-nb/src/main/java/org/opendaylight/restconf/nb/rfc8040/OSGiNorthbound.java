@@ -76,24 +76,34 @@ public final class OSGiNorthbound {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
+    private final ComponentFactory<JaxRsNorthbound> northboundFactory;
+
+    private ComponentInstance<JaxRsNorthbound> northbound;
+    private Map<String, ?> northboundProps;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
     private Map<String, ?> servletProps;
 
     @Activate
     public OSGiNorthbound(
+            @Reference(target = "(component.factory=" + JaxRsNorthbound.FACTORY_NAME + ")")
+            final ComponentFactory<JaxRsNorthbound> northboundFactory,
             @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
             final Configuration configuration) {
+        this.northboundFactory = requireNonNull(northboundFactory);
         this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
 
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
         servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
+
+        northboundProps = JaxRsNorthbound.props(
+            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
+            PrettyPrintParam.of(configuration.pretty$_$print()));
+        northbound = northboundFactory.newInstance(FrameworkUtil.asDictionary(northboundProps));
 
         LOG.info("Global RESTCONF northbound pools started");
     }
@@ -101,8 +111,6 @@ public final class OSGiNorthbound {
     @Modified
     void modified(final Configuration configuration) {
         final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
@@ -113,6 +121,16 @@ public final class OSGiNorthbound {
             LOG.debug("RestconfStreamServletFactory restarted with {}", servletProps);
         }
 
+        final var newNorthboundProps = JaxRsNorthbound.props(
+            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
+            PrettyPrintParam.of(configuration.pretty$_$print()));
+        if (!newNorthboundProps.equals(northboundProps)) {
+            northboundProps = newNorthboundProps;
+            northbound.dispose();
+            northbound = northboundFactory.newInstance(FrameworkUtil.asDictionary(northboundProps));
+            LOG.debug("Northbound restarted with {}", northboundProps);
+        }
+
         LOG.debug("Applied {}", configuration);
     }
 
@@ -120,6 +138,8 @@ public final class OSGiNorthbound {
     void deactivate() {
         servletFactory.dispose();
         servletFactory = null;
+        northbound.dispose();
+        northbound = null;
         LOG.info("Global RESTCONF northbound pools stopped");
     }
 }

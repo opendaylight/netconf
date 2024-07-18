@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
-import com.google.common.annotations.Beta;
+import java.util.Map;
 import java.util.Set;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
@@ -19,6 +19,7 @@ import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.jaxrs.JsonJaxRsFormattableBodyWriter;
@@ -35,18 +36,20 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * Main entrypoint into RFC8040 northbound. Take care of wiring up all applications activating them through JAX-RS.
  */
-@Beta
-@Component(service = { })
+@Component(factory = JaxRsNorthbound.FACTORY_NAME, service = { })
 public final class JaxRsNorthbound implements AutoCloseable {
+    public static final String FACTORY_NAME = "org.opendaylight.restconf.nb.rfc8040.JaxRsNorthbound";
+
+    private static final String PROP_ERROR_TAG_MAPPING = ".errorTagMapping";
+    private static final String PROP_PRETTY_PRINT = ".prettyPrint";
+
     private final Registration discoveryReg;
     private final Registration restconfReg;
 
-    @Activate
-    public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
-            @Reference final ServletSupport servletSupport,
-            @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            @Reference final RestconfServer server, @Reference final RestconfStreamServletFactory servletFactory)
-                throws ServletException {
+    public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
+            final ServletSupport servletSupport, final CustomFilterAdapterConfiguration filterAdapterConfiguration,
+            final RestconfServer server, final RestconfStreamServletFactory servletFactory,
+            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint) throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
             .contextPath("/" + servletFactory.restconf())
@@ -57,12 +60,10 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Object> getSingletons() {
-                            final var errorTagMapping = servletFactory.errorTagMapping();
-
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
                                 new ServerExceptionMapper(errorTagMapping),
-                                new JaxRsRestconf(server, errorTagMapping, servletFactory.prettyPrint()));
+                                new JaxRsRestconf(server, errorTagMapping, prettyPrint));
                         }
                     }).build())
                 .asyncSupported(true)
@@ -106,10 +107,24 @@ public final class JaxRsNorthbound implements AutoCloseable {
         discoveryReg = webServer.registerWebContext(discoveryBuilder.build());
     }
 
+    @Activate
+    public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
+            @Reference final ServletSupport servletSupport,
+            @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
+            @Reference final RestconfServer server, @Reference final RestconfStreamServletFactory servletFactory,
+            final Map<String, ?> props) throws ServletException {
+        this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, server, servletFactory,
+            (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING), (PrettyPrintParam) props.get(PROP_PRETTY_PRINT));
+    }
+
     @Deactivate
     @Override
     public void close() {
         discoveryReg.close();
         restconfReg.close();
+    }
+
+    public static Map<String, ?> props(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint) {
+        return Map.of(PROP_ERROR_TAG_MAPPING, errorTagMapping, PROP_PRETTY_PRINT, prettyPrint);
     }
 }
