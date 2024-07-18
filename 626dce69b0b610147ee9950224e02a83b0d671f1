@@ -118,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e70a405_fa7919f3",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-18T19:18:22Z",
+      "side": 1,
+      "message": "In case of notification is subscribed trying to register base netconf stream.",
+      "parentUuid": "279685f7_427cbc34",
+      "range": {
+        "startLine": 73,
+        "startChar": 18,
+        "endLine": 73,
+        "endChar": 49
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0689ed48_38ee0bd3",
@@ -178,6 +202,30 @@
       "writtenOn": "2024-04-25T23:30:45Z",
       "side": 1,
       "message": "not referenced here, this should be living as close to its user as possible",
+      "range": {
+        "startLine": 95,
+        "startChar": 39,
+        "endLine": 95,
+        "endChar": 68
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b96f654_f37d0ef7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8994
+      },
+      "writtenOn": "2024-07-18T19:18:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "393e788c_c81f613a",
       "range": {
         "startLine": 95,
         "startChar": 39,
