@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "19d06746_0f5ebc64",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2RequestDispatcher.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-18T14:47:17Z",
+      "side": 1,
+      "message": "Rather move this to utils?",
+      "revId": "bb7cd05ff73d0bf2ae3f6724958cf1ab0e77087e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9693ba63_c29a5543",
         "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/SseClientServerTest.java",
         "patchSetId": 9
