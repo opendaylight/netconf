@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.core.Application;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -39,12 +37,8 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private static final String PROP_CORE_POOL_SIZE = ".corePoolSize";
     private static final String PROP_STREAMS_CONFIGURATION = ".streamsConfiguration";
     private static final String PROP_RESTCONF = ".restconf";
-    private static final String PROP_PRETTY_PRINT = ".prettyPrint";
-    private static final String PROP_ERROR_TAG_MAPPING = ".errorTagMapping";
 
     private final @NonNull String restconf;
-    private final @NonNull ErrorTagMapping errorTagMapping;
-    private final @NonNull PrettyPrintParam prettyPrint;
     private final RestconfStream.Registry streamRegistry;
     private final ServletSupport servletSupport;
 
@@ -53,8 +47,7 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
 
     public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport, final String restconf,
             final RestconfStream.Registry streamRegistry, final StreamsConfiguration streamsConfiguration,
-            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint, final String namePrefix,
-            final int corePoolSize) {
+            final String namePrefix, final int corePoolSize) {
         this.servletSupport = requireNonNull(servletSupport);
         this.restconf = requireNonNull(restconf);
         if (restconf.endsWith("/")) {
@@ -62,8 +55,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         }
         this.streamRegistry = requireNonNull(streamRegistry);
         this.streamsConfiguration = requireNonNull(streamsConfiguration);
-        this.errorTagMapping = requireNonNull(errorTagMapping);
-        this.prettyPrint = requireNonNull(prettyPrint);
         pingExecutor = new DefaultPingExecutor(namePrefix, corePoolSize);
     }
 
@@ -72,8 +63,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
             @Reference final RestconfStream.Registry streamRegistry, final Map<String, ?> props) {
         this(servletSupport, (String) props.get(PROP_RESTCONF), streamRegistry,
             (StreamsConfiguration) props.get(PROP_STREAMS_CONFIGURATION),
-            (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING),
-            (PrettyPrintParam) props.get(PROP_PRETTY_PRINT),
             (String) props.get(PROP_NAME_PREFIX), (int) requireNonNull(props.get(PROP_CORE_POOL_SIZE)));
     }
 
@@ -94,28 +83,15 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     }
 
     @Override
-    public PrettyPrintParam prettyPrint() {
-        return prettyPrint;
-    }
-
-    @Override
-    public ErrorTagMapping errorTagMapping() {
-        return errorTagMapping;
-    }
-
-    @Override
     @Deactivate
     public void close() {
         pingExecutor.close();
     }
 
-    public static Map<String, ?> props(final String restconf, final ErrorTagMapping errorTagMapping,
-            final PrettyPrintParam prettyPrint, final StreamsConfiguration streamsConfiguration,
+    public static Map<String, ?> props(final String restconf, final StreamsConfiguration streamsConfiguration,
             final String namePrefix, final int corePoolSize) {
         return Map.of(
             PROP_RESTCONF, restconf,
-            PROP_ERROR_TAG_MAPPING, errorTagMapping,
-            PROP_PRETTY_PRINT, prettyPrint,
             PROP_STREAMS_CONFIGURATION, streamsConfiguration,
             PROP_NAME_PREFIX, namePrefix,
             PROP_CORE_POOL_SIZE, corePoolSize);
