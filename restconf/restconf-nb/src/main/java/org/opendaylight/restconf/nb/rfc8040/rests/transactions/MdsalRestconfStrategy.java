@@ -67,6 +67,10 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         yangLibraryVersion = YangLibraryVersionResource.of(databind);
     }
 
+    public DatabindContext databind() {
+        return databind;
+    }
+
     @NonNullByDefault
     public void yangLibraryVersionGET(final ServerRequest<FormattableBody> request) {
         yangLibraryVersion.httpGET(request);
@@ -74,11 +78,11 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     @Override
     RestconfTransaction prepareWriteExecution() {
-        return new MdsalRestconfTransaction(databind(), dataBroker);
+        return new MdsalRestconfTransaction(databind, dataBroker);
     }
 
     @Override
-    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
+    public void deleteData(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = dataBroker.newReadWriteTransaction();
         tx.exists(LogicalDatastoreType.CONFIGURATION, path).addCallback(new FutureCallback<>() {
             @Override
@@ -116,7 +120,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
+    public void getData(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var depth = params.depth();
         final var fields = params.fields();
 
