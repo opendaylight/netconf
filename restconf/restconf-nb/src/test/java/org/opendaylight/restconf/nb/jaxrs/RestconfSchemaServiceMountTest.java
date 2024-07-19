@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEntity;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
 
@@ -130,10 +131,12 @@ class RestconfSchemaServiceMountTest {
         // NULL_MOUNT_POINT contains null schema context
         final var error = assertError(
             ar -> restconf.modulesYangGET(NULL_MOUNT_POINT, "module1-behind-mount-point", "2014-02-03", ar));
-        assertEquals(new ErrorMessage("Mount point 'mount-point-2:cont' does not expose DOMSchemaService"),
-            error.message());
+        assertEquals(new ErrorMessage("Mount point does not expose DOMSchemaService"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.tag());
+        final var errorPath = error.path();
+        assertNotNull(errorPath);
+        assertEquals(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")), errorPath.path());
     }
 
     /**

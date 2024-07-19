@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -27,10 +26,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
@@ -68,11 +63,8 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
-    public NetconfRestconfStrategy(final DatabindContext databind, final NetconfDataTreeService netconfService,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable YangTextSourceExtension sourceProvider,
-            final @Nullable DOMMountPointService mountPointService) {
-        super(databind, ImmutableMap.of(), rpcService, actionService, sourceProvider, mountPointService);
+    public NetconfRestconfStrategy(final DatabindContext databind, final NetconfDataTreeService netconfService) {
+        super(databind);
         this.netconfService = requireNonNull(netconfService);
     }
 

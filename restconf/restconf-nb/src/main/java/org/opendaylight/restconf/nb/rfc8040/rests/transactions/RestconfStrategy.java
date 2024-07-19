@@ -13,8 +13,6 @@ import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fr
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -26,7 +24,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,21 +32,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -58,7 +46,6 @@ import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
-import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
@@ -66,20 +53,11 @@ import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
-import org.opendaylight.restconf.server.mdsal.MdsalServerActionOperations;
-import org.opendaylight.restconf.server.mdsal.MdsalServerRpcOperations;
-import org.opendaylight.restconf.server.spi.AbstractServerStrategy;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.Insert;
-import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
-import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
-import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
-import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.restconf.server.spi.ServerActionOperations;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
-import org.opendaylight.restconf.server.spi.ServerRpcOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -114,154 +92,27 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
-import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
-import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
-import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Baseline execution strategy for various RESTCONF operations.
+ * Baseline class for {@link ServerDataOperations} implementations.
  *
  * @see NetconfRestconfStrategy
  * @see MdsalRestconfStrategy
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy extends AbstractServerStrategy implements ServerDataOperations {
-    @NonNullByDefault
-    public record StrategyAndPath(RestconfStrategy strategy, Data path) {
-        public StrategyAndPath {
-            requireNonNull(strategy);
-            requireNonNull(path);
-        }
-    }
-
-    /**
-     * Result of a partial {@link ApiPath} lookup for the purposes of supporting {@code yang-ext:mount}-delimited mount
-     * points with possible nesting.
-     *
-     * @param strategy the strategy to use
-     * @param tail the {@link ApiPath} tail to use with the strategy
-     */
-    @NonNullByDefault
-    public record StrategyAndTail(RestconfStrategy strategy, ApiPath tail) {
-        public StrategyAndTail {
-            requireNonNull(strategy);
-            requireNonNull(tail);
-        }
-    }
-
+public abstract class RestconfStrategy implements ServerDataOperations {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
     private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
 
-    private final @NonNull ServerActionOperations action;
-    private final @NonNull ServerRpcOperations rpc;
-    private final YangTextSourceExtension sourceProvider;
-    private final DOMMountPointService mountPointService;
+    protected final @NonNull DatabindContext databind;
 
-    RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable YangTextSourceExtension sourceProvider,
-            final @Nullable DOMMountPointService mountPointService) {
-        super(databind);
-
-        final var rpcDelegate = rpcService != null ? new MdsalServerRpcOperations(rpcService)
-            : NotSupportedServerRpcOperations.INSTANCE;
-        rpc = localRpcs.isEmpty() ? rpcDelegate
-            : new InterceptingServerRpcOperations(path -> localRpcs.get(path.rpc().argument()), rpcDelegate);
-
-        action = actionService != null ? new MdsalServerActionOperations(actionService)
-            : NotSupportedServerActionOperations.INSTANCE;
-
-        this.sourceProvider = sourceProvider;
-        this.mountPointService = mountPointService;
-    }
-
-    @Override
-    protected final ServerActionOperations action() {
-        return action;
-    }
-
-    @Override
-    protected final ServerDataOperations data() {
-        return this;
-    }
-
-    @Override
-    protected final ServerRpcOperations rpc() {
-        return rpc;
-    }
-
-    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) throws ServerException {
-        final var andTail = resolveStrategy(path);
-        final var strategy = andTail.strategy();
-        return new StrategyAndPath(strategy, strategy.pathNormalizer.normalizeDataPath(andTail.tail()));
-    }
-
-    /**
-     * Resolve any and all {@code yang-ext:mount} to the target {@link StrategyAndTail}.
-     *
-     * @param path {@link ApiPath} to resolve
-     * @return A strategy and the remaining path
-     * @throws NullPointerException if {@code path} is {@code null}
-     * @throws ServerException if an error occurs
-     */
-    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) throws ServerException {
-        var mount = path.indexOf("yang-ext", "mount");
-        if (mount == -1) {
-            return new StrategyAndTail(this, path);
-        }
-        if (mountPointService == null) {
-            throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                "Mount point service is not available");
-        }
-        final var mountPath = path.subPath(0, mount);
-        final var dataPath = pathNormalizer.normalizeDataPath(path.subPath(0, mount));
-        final var mountPoint = mountPointService.getMountPoint(dataPath.instance())
-            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
-                "Mount point '%s' does not exist", mountPath));
-
-        return createStrategy(databind, mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
-    }
-
-    private static @NonNull RestconfStrategy createStrategy(final DatabindContext databind, final ApiPath mountPath,
-            final DOMMountPoint mountPoint) throws ServerException {
-        final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
-            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
-                "Mount point '%s' does not expose DOMSchemaService", mountPath));
-        final var mountModelContext = mountSchemaService.getGlobalContext();
-        if (mountModelContext == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
-                "Mount point '%s' does not have any models", mountPath);
-        }
-        final var mountDatabind = DatabindContext.ofModel(mountModelContext);
-        final var mountPointService = mountPoint.getService(DOMMountPointService.class).orElse(null);
-        final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
-        final var actionService = mountPoint.getService(DOMActionService.class).orElse(null);
-        final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
-            .flatMap(schema -> Optional.ofNullable(schema.extension(YangTextSourceExtension.class)))
-            .orElse(null);
-
-        final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
-        if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(mountDatabind, netconfService.orElseThrow(), rpcService, actionService,
-                sourceProvider, mountPointService);
-        }
-        final var dataBroker = mountPoint.getService(DOMDataBroker.class);
-        if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), ImmutableMap.of(), rpcService,
-                actionService, sourceProvider, mountPointService);
-        }
-        LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
-        throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-            "Could not find a supported access interface in mount point",
-            new ServerErrorPath(databind, mountPoint.getIdentifier()));
+    RestconfStrategy(final DatabindContext databind) {
+        this.databind = requireNonNull(databind);
     }
 
     /**
@@ -1160,64 +1011,6 @@ public abstract class RestconfStrategy extends AbstractServerStrategy implements
         // it is enough to process only config data because operational contains the same data
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
-    }
-
-    public void resolveSource(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
-            final Class<? extends SourceRepresentation> representation) {
-        final var src = requireNonNull(source);
-        if (YangTextSource.class.isAssignableFrom(representation)) {
-            if (sourceProvider != null) {
-                Futures.addCallback(sourceProvider.getYangTexttSource(src), new FutureCallback<>() {
-                    @Override
-                    public void onSuccess(final YangTextSource result) {
-                        request.completeWith(new ModulesGetResult(result));
-                    }
-
-                    @Override
-                    public void onFailure(final Throwable cause) {
-                        request.completeWith(cause instanceof ServerException e ? e
-                            : new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
-                    }
-                }, MoreExecutors.directExecutor());
-                return;
-            }
-            exportSource(request, src, YangCharSource::new, YangCharSource::new);
-        } else if (YinTextSource.class.isAssignableFrom(representation)) {
-            exportSource(request, src, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
-        } else {
-            request.completeWith(new ServerException("Unsupported source representation " + representation.getName()));
-        }
-    }
-
-    private void exportSource(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
-            final Function<ModuleEffectiveStatement, CharSource> moduleCtor,
-            final BiFunction<ModuleEffectiveStatement, SubmoduleEffectiveStatement, CharSource> submoduleCtor) {
-        final var modelContext = databind.modelContext();
-        // If the source identifies a module, things are easy
-        final var name = source.name().getLocalName();
-        final var optRevision = Optional.ofNullable(source.revision());
-        final var optModule = modelContext.findModule(name, optRevision);
-        if (optModule.isPresent()) {
-            request.completeWith(new ModulesGetResult(
-                moduleCtor.apply(optModule.orElseThrow().asEffectiveStatement())));
-            return;
-        }
-
-        // The source could be a submodule, which we need to hunt down
-        for (var module : modelContext.getModules()) {
-            for (var submodule : module.getSubmodules()) {
-                if (name.equals(submodule.getName()) && optRevision.equals(submodule.getRevision())) {
-                    request.completeWith(new ModulesGetResult(submoduleCtor.apply(module.asEffectiveStatement(),
-                        submodule.asEffectiveStatement())));
-                    return;
-                }
-            }
-        }
-
-        final var sb = new StringBuilder().append("Source ").append(source.name().getLocalName());
-        optRevision.ifPresent(rev -> sb.append('@').append(rev));
-        sb.append(" not found");
-        request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
     }
 
     /**

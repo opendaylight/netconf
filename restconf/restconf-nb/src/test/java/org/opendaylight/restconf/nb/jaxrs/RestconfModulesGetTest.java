@@ -9,6 +9,7 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 
 import com.google.common.io.CharStreams;
@@ -168,11 +169,12 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
 
         final var error = assertError(
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, TEST_MODULE_NAME, TEST_MODULE_REVISION, ar));
-        assertEquals(
-            new ErrorMessage("Mount point 'mount-point:mount-container/point-number' does not have any models"),
-            error.message());
+        assertEquals(new ErrorMessage("Mount point does not have any models"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.tag());
+        final var errorPath = error.path();
+        assertNotNull(errorPath);
+        assertEquals(MOUNT_IID, errorPath.path());
     }
 
     /**
