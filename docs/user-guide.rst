@@ -208,32 +208,9 @@ Payload for password authentication:
     that its length is a multiple of 16 bytes for successful authentication.
 
 There is also option of using key-based authentication instead
-of password. First we need to create key in datastore.
-
-*Adding a client private key credential to the netconf-keystore*
-
-.. code-block::
-
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-keystore-entry
-    Content-Type: application/json
-    Accept: application/json
-
-.. code-block:: json
-
-  {
-    "input": {
-      "key-credential": [
-        {
-          "key-id": "example-client-key-id",
-          "private-key": "PEM-format-private-key",
-          "passphrase": "passphrase"
-        }
-      ]
-    }
-  }
-
-After we can use this key to create connector using this key.
+of password. First we need to create key in datastore. How to do
+this is described in the `Netconf-keystore configuration`_ section,
+where you find the necessary RPC to add keystore entries.
 
 Payload for key-based authentication via SSH:
 
@@ -302,9 +279,9 @@ Payload for key-based authentication via SSH:
          }
 
 Connecting via TLS protocol is similar to SSH. First setup keystore
-by using three RPCs from `Configure device to connect over TLS protocol`_
+by using three RPCs from `Netconf-keystore configuration`_
 to add a client private key, associate a private key with a client and CA
-certificates chain and add a list of trusted CA and server certificates.
+certificate chain, and add a list of trusted CA and server certificates.
 Only after that we can process and create a new NETCONF connector you need
 to send the following PUT request.
 
@@ -950,6 +927,108 @@ The request should look something like this:
 
     curl -v -X GET  http://localhost:8181/rests/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
 
+Netconf-keystore configuration
+------------------------------
+
+To configure the netconf-keystore, you need to send three RPCs
+to add a client private key, associate a private key with a client and CA
+certificate chain, and add a list of trusted CA and server certificates.
+
+.. note::
+
+    The netconf-keystore is a feature that is not enabled by default.
+    To enable it, you need to install the ``odl-netconf-keystore`` feature.
+    If you have already installed the ``odl-netconf-topology`` feature to connect
+    to a device, you do not need to install the ``odl-netconf-keystore`` feature.
+
+*Adding a client private key credential to the netconf-keystore*
+
+.. code-block::
+
+    POST HTTP/1.1
+    /rests/operations/netconf-keystore:add-keystore-entry
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "key-credential": [
+        {
+          "key-id": "example-client-key-id",
+          "private-key": "PEM-format-private-key",
+          "passphrase": "passphrase"
+        }
+      ]
+    }
+  }
+
+*Associate a private key with a client and CA certificates chain*
+
+.. code-block::
+
+    POST HTTP/1.1
+    /rests/operations/netconf-keystore:add-private-key
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "private-key": [
+        {
+          "name": "example-client-key-id",
+          "data": "key-data",
+          "certificate-chain": [
+            "certificate-data"
+          ]
+        }
+      ]
+    }
+  }
+
+*Add a list of trusted CA and server certificates*
+
+.. code-block::
+
+    POST HTTP/1.1
+    /rests/operations/netconf-keystore:add-trusted-certificate
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "trusted-certificate": [
+        {
+          "name": "example-ca-certificate",
+          "certificate": "ca-certificate-data"
+        },
+        {
+          "name": "example-server-certificate",
+          "certificate": "server-certificate-data"
+        }
+      ]
+    }
+  }
+
+.. note::
+
+    All keys and certificates must be in PEM format with valid data,
+    which means that the data must be base64 encoded and wrapped in the
+    appropriate PEM header and footer.
+
+    Example of PEM format:
+
+    .. code-block::
+
+        -----BEGIN CERTIFICATE-----
+        Base64–encoded certificate
+        -----END CERTIFICATE-----
+
 Netconf-connector + Netopeer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1081,7 +1160,7 @@ Mounting netopeer NETCONF server using key-based authentication TLS
 5. Set up ODL netconf keystore
 
    To setup keystore is needed to send three RPCs from
-   `Configure device to connect over TLS protocol`_
+   `Netconf-keystore configuration`_ section
    to add a client private key, associate a private key with a client and CA
    certificates chain and add a list of trusted CA and server certificates.
 
@@ -1614,81 +1693,8 @@ requires proper setup to make two-way TLS authentication possible for client
 and server.
 
 The initial step is to configure certificates and keys for two-way TLS by
-storing them within the netconf-keystore.
-
-*Adding a client private key credential to the netconf-keystore*
-
-.. code-block::
-
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-keystore-entry
-    Content-Type: application/json
-    Accept: application/json
-
-.. code-block:: json
-
-  {
-    "input": {
-      "key-credential": [
-        {
-          "key-id": "example-client-key-id",
-          "private-key": "PEM-format-private-key",
-          "passphrase": "passphrase"
-        }
-      ]
-    }
-  }
-
-*Associate a private key with a client and CA certificates chain*
-
-.. code-block::
-
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-private-key
-    Content-Type: application/json
-    Accept: application/json
-
-.. code-block:: json
-
-  {
-    "input": {
-      "private-key": [
-        {
-          "name": "example-client-key-id",
-          "data": "key-data",
-          "certificate-chain": [
-            "certificate-data"
-          ]
-        }
-      ]
-    }
-  }
-
-*Add a list of trusted CA and server certificates*
-
-.. code-block::
-
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-trusted-certificate
-    Content-Type: application/json
-    Accept: application/json
-
-.. code-block:: json
-
-  {
-    "input": {
-      "trusted-certificate": [
-        {
-          "name": "example-ca-certificate",
-          "certificate": "ca-certificate-data"
-        },
-        {
-          "name": "example-server-certificate",
-          "certificate": "server-certificate-data"
-        }
-      ]
-    }
-  }
+storing them within the netconf-keystore. How to configure keystore is described
+in the `Netconf-keystore configuration`_ section.
 
 In a second step, it is required to create an allowed device associated with
 a server certificate and client key. The server certificate will be used to
