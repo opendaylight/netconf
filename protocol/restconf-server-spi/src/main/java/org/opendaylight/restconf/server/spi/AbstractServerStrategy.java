@@ -32,6 +32,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeResult;
+import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchContext;
@@ -43,6 +44,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
 
 /**
  * Abstract base class for {@link ServerStrategy} implementations based on {@link ServerActionOperations}.
@@ -65,7 +68,11 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
 
     protected abstract @NonNull ServerDataOperations data();
 
+    protected abstract @NonNull ServerModulesOperations modules();
+
     protected abstract @NonNull ServerRpcOperations rpc();
+
+    protected abstract @NonNull ServerMountPointResolver resolver();
 
     @Override
     public final void dataDELETE(final ServerRequest<Empty> request, final ApiPath apiPath) {
@@ -311,5 +318,19 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             return;
         }
         rpc().invokeRpc(request, restconfURI, path, input);
+    }
+
+    @Override
+    public final void modulesGET(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
+            final Class<? extends SourceRepresentation> representation) {
+        modules().getModelSource(request, source, representation);
+    }
+
+    @Override
+    public final StrategyAndPath resolveStrategy(final ApiPath path) throws ServerException {
+        var mount = path.indexOf("yang-ext", "mount");
+        return mount == -1 ? new StrategyAndPath(this, path)
+            : resolver().resolveMountPoint(pathNormalizer.normalizeDataPath(path.subPath(0, mount)))
+                .resolveStrategy(path.subPath(mount + 1));
     }
 }

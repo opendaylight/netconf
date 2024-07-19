@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.function.Function;
@@ -24,12 +23,18 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndPath;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
+import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.AbstractInstanceIdentifierTest;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
+import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
+import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 
 @ExtendWith(MockitoExtension.class)
 abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
@@ -76,17 +81,19 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
             throw new AssertionError(e);
         }
 
-        final var strategy = new MdsalRestconfStrategy(IID_DATABIND, dataBroker, ImmutableMap.of(), null, null, null,
-            mountPointService);
+        final var strategy = new MdsalServerStrategy(IID_DATABIND, new MdsalMountPointResolver(mountPointService),
+            NotSupportedServerActionOperations.INSTANCE, new MdsalRestconfStrategy(IID_DATABIND, dataBroker),
+            NotSupportedServerModulesOperations.INSTANCE, NotSupportedServerRpcOperations.INSTANCE);
         final StrategyAndPath stratAndPath;
         try {
-            stratAndPath = strategy.resolveStrategyPath(apiPath);
+            stratAndPath = strategy.resolveStrategy(apiPath);
         } catch (ServerException e) {
             throw new AssertionError(e);
         }
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toPatchContext(new DefaultResourceContext(stratAndPath.path()));
+            return body.toPatchContext(new DefaultResourceContext(
+                new ApiPathNormalizer(IID_DATABIND).normalizeDataPath(stratAndPath.path())));
         }
     }
 }

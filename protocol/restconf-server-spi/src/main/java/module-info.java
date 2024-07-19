@@ -18,6 +18,7 @@ module org.opendaylight.restconf.server.spi {
     requires org.opendaylight.yang.gen.ietf.restconf.monitoring.rfc8040;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
     requires org.opendaylight.yangtools.yang.data.spi;
+    requires org.opendaylight.yangtools.yang.model.export;
     requires org.slf4j;
 
     // Annotation-only dependencies
