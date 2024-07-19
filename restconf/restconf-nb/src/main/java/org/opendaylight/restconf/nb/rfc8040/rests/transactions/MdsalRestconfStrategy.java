@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -28,7 +27,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -36,11 +34,9 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
-import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.restconf.server.spi.YangLibraryVersionResource;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -55,7 +51,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * @see DOMDataTreeReadWriteTransaction
  */
 public final class MdsalRestconfStrategy extends RestconfStrategy {
-    private final @NonNull HttpGetResource yangLibraryVersion;
     private final @NonNull DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
@@ -64,16 +59,6 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             final @Nullable DOMMountPointService mountPointService) {
         super(databind, localRpcs, rpcService, actionService, sourceProvider, mountPointService);
         this.dataBroker = requireNonNull(dataBroker);
-        yangLibraryVersion = YangLibraryVersionResource.of(databind);
-    }
-
-    public DatabindContext databind() {
-        return databind;
-    }
-
-    @NonNullByDefault
-    public void yangLibraryVersionGET(final ServerRequest<FormattableBody> request) {
-        yangLibraryVersion.httpGET(request);
     }
 
     @Override
@@ -89,7 +74,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             public void onSuccess(final Boolean result) {
                 if (!result) {
                     cancelTx(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
-                        new ServerErrorPath(databind(), path)));
+                        new ServerErrorPath(databind, path)));
                     return;
                 }
 
