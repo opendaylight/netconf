@@ -76,16 +76,27 @@ public final class OSGiNorthbound {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
+    private final ComponentFactory<DefaultPingExecutor> pingExecutorFactory;
+
+    private final ComponentInstance<DefaultPingExecutor> pingExecutor;
+    private final Map<String, ?> pingExecutorProps;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
     private Map<String, ?> servletProps;
 
     @Activate
     public OSGiNorthbound(
-            @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
+            @Reference(target = "(component.factory=" + DefaultPingExecutor.FACTORY_NAME + ")")
+            final ComponentFactory<DefaultPingExecutor> pingExecutorFactory,
+           @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
             final Configuration configuration) {
+        this.pingExecutorFactory = requireNonNull(pingExecutorFactory);
         this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
+
+        pingExecutorProps = DefaultPingExecutor.props(configuration.ping$_$executor$_$name$_$prefix(),
+            configuration.max$_$thread$_$count());
+        pingExecutor = pingExecutorFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
 
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,

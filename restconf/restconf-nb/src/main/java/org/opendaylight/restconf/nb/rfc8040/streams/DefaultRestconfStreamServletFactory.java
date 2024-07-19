@@ -35,8 +35,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     public static final String FACTORY_NAME =
         "org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory";
 
-    private static final String PROP_NAME_PREFIX = ".namePrefix";
-    private static final String PROP_CORE_POOL_SIZE = ".corePoolSize";
     private static final String PROP_STREAMS_CONFIGURATION = ".streamsConfiguration";
     private static final String PROP_RESTCONF = ".restconf";
     private static final String PROP_PRETTY_PRINT = ".prettyPrint";
@@ -48,13 +46,11 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private final RestconfStream.Registry streamRegistry;
     private final ServletSupport servletSupport;
 
-    private final DefaultPingExecutor pingExecutor;
     private final StreamsConfiguration streamsConfiguration;
 
     public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport, final String restconf,
             final RestconfStream.Registry streamRegistry, final StreamsConfiguration streamsConfiguration,
-            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint, final String namePrefix,
-            final int corePoolSize) {
+            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint) {
         this.servletSupport = requireNonNull(servletSupport);
         this.restconf = requireNonNull(restconf);
         if (restconf.endsWith("/")) {
@@ -64,7 +60,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         this.streamsConfiguration = requireNonNull(streamsConfiguration);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
-        pingExecutor = new DefaultPingExecutor(namePrefix, corePoolSize);
     }
 
     @Activate
@@ -73,8 +68,7 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         this(servletSupport, (String) props.get(PROP_RESTCONF), streamRegistry,
             (StreamsConfiguration) props.get(PROP_STREAMS_CONFIGURATION),
             (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING),
-            (PrettyPrintParam) props.get(PROP_PRETTY_PRINT),
-            (String) props.get(PROP_NAME_PREFIX), (int) requireNonNull(props.get(PROP_CORE_POOL_SIZE)));
+            (PrettyPrintParam) props.get(PROP_PRETTY_PRINT));
     }
 
     @Override
@@ -110,14 +104,11 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     }
 
     public static Map<String, ?> props(final String restconf, final ErrorTagMapping errorTagMapping,
-            final PrettyPrintParam prettyPrint, final StreamsConfiguration streamsConfiguration,
-            final String namePrefix, final int corePoolSize) {
+            final PrettyPrintParam prettyPrint, final StreamsConfiguration streamsConfiguration) {
         return Map.of(
             PROP_RESTCONF, restconf,
             PROP_ERROR_TAG_MAPPING, errorTagMapping,
             PROP_PRETTY_PRINT, prettyPrint,
             PROP_STREAMS_CONFIGURATION, streamsConfiguration,
-            PROP_NAME_PREFIX, namePrefix,
-            PROP_CORE_POOL_SIZE, corePoolSize);
     }
 }
