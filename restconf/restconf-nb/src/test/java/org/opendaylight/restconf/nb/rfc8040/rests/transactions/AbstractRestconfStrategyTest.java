@@ -35,6 +35,7 @@ import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.testlib.CompletingServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
@@ -221,13 +222,13 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     final CompletingServerRequest<DataPutResult> dataPutRequest = new CompletingServerRequest<>();
 
-    abstract @NonNull RestconfStrategy newStrategy(DatabindContext databind);
+    abstract @NonNull MdsalServerStrategy newStrategy(DatabindContext databind);
 
-    final @NonNull RestconfStrategy jukeboxStrategy() {
+    final @NonNull MdsalServerStrategy jukeboxStrategy() {
         return newStrategy(JUKEBOX_DATABIND);
     }
 
-    final @NonNull RestconfStrategy mockStrategy() {
+    final @NonNull MdsalServerStrategy mockStrategy() {
         doCallRealMethod().when(mockSchemaContext).getQName();
         return newStrategy(DatabindContext.ofModel(mockSchemaContext));
     }
@@ -241,14 +242,14 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertEquals(Empty.value(), dataDeleteRequest.getResult());
     }
 
-    abstract @NonNull RestconfStrategy testDeleteDataStrategy();
+    abstract @NonNull MdsalServerStrategy testDeleteDataStrategy();
 
     /**
      * Negative test for DELETE operation when data to delete does not exist. Error DATA_MISSING is expected.
      */
     @Test
     final void testNegativeDeleteData() {
-        testNegativeDeleteDataStrategy().dataDELETE(dataDeleteRequest, ApiPath.empty());
+        testNegativeDeleteDataStrategy().deleteData(dataDeleteRequest, YangInstanceIdentifier.of());
 
         final var errors = assertThrows(ServerException.class, dataDeleteRequest::getResult).errors();
         assertEquals(1, errors.size());
