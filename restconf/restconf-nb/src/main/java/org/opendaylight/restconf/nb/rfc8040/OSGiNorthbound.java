@@ -76,23 +76,33 @@ public final class OSGiNorthbound {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
+    private final ComponentFactory<DefaultPingExecutor> pingExecutorFactory;
+
+    private ComponentInstance<DefaultPingExecutor> pingExecutor;
+    private Map<String, ?> pingExecutorProps;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
     private Map<String, ?> servletProps;
 
     @Activate
     public OSGiNorthbound(
+            @Reference(target = "(component.factory=" + DefaultPingExecutor.FACTORY_NAME + ")")
+            final ComponentFactory<DefaultPingExecutor> pingExecutorFactory,
             @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
             final Configuration configuration) {
+        this.pingExecutorFactory = requireNonNull(pingExecutorFactory);
         this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
+
+        pingExecutorProps = DefaultPingExecutor.props(configuration.ping$_$executor$_$name$_$prefix(),
+            configuration.max$_$thread$_$count());
+        pingExecutor = pingExecutorFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
 
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()));
         servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
 
         LOG.info("Global RESTCONF northbound pools started");
@@ -100,15 +110,30 @@ public final class OSGiNorthbound {
 
     @Modified
     void modified(final Configuration configuration) {
+        final var newPingExecutorProps = DefaultPingExecutor.props(configuration.ping$_$executor$_$name$_$prefix(),
+            configuration.max$_$thread$_$count());
         final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()));
+
+        if (!newPingExecutorProps.equals(pingExecutorProps)) {
+            pingExecutorProps = newPingExecutorProps;
+            pingExecutor.dispose();
+            pingExecutor = null;
+        }
         if (!newServletProps.equals(servletProps)) {
             servletProps = newServletProps;
             servletFactory.dispose();
+            servletFactory = null;
+        }
+
+        if (pingExecutor == null) {
+            pingExecutor = pingExecutorFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
+            LOG.debug("PingExecutor restarted with {}", servletProps);
+        }
+        if (servletFactory == null) {
             servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
             LOG.debug("RestconfStreamServletFactory restarted with {}", servletProps);
         }
@@ -120,6 +145,8 @@ public final class OSGiNorthbound {
     void deactivate() {
         servletFactory.dispose();
         servletFactory = null;
+        pingExecutor.dispose();
+        pingExecutor = null;
         LOG.info("Global RESTCONF northbound pools stopped");
     }
 }
