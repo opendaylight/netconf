@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.invoke.MethodHandles;
@@ -23,7 +22,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -32,7 +30,6 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -50,11 +47,16 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.ServerActionOperations;
+import org.opendaylight.restconf.server.spi.ServerRpcOperations;
+import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -78,21 +80,20 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     static {
         try {
             LOCAL_STRATEGY = MethodHandles.lookup()
-                .findVarHandle(MdsalRestconfServer.class, "localStrategy", MdsalRestconfStrategy.class);
+                .findVarHandle(MdsalRestconfServer.class, "localStrategy", MdsalServerStrategy.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
-    private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
-    private final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull MdsalMountPointResolver mountPointResolver;
     private final @NonNull MdsalDatabindProvider databindProvider;
+    private final @NonNull ServerActionOperations action;
+    private final @NonNull ServerRpcOperations rpc;
     private final @NonNull DOMDataBroker dataBroker;
-    private final @Nullable DOMRpcService rpcService;
-    private final @Nullable DOMActionService actionService;
 
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
-    private volatile MdsalRestconfStrategy localStrategy;
+    private volatile MdsalServerStrategy localStrategy;
 
     @Inject
     @Activate
@@ -103,11 +104,16 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             @Reference(policyOption = ReferencePolicyOption.GREEDY) final List<RpcImplementation> localRpcs) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
-        this.rpcService = requireNonNull(rpcService);
-        this.actionService = requireNonNull(actionService);
-        this.mountPointService = requireNonNull(mountPointService);
+        mountPointResolver = new MdsalMountPointResolver(mountPointService);
 
-        this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
+        final var rpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
+        final var rpcDelegate = rpcService != null ? new MdsalServerRpcOperations(rpcService)
+            : NotSupportedServerRpcOperations.INSTANCE;
+        rpc = rpcs.isEmpty() ? rpcDelegate
+            : new InterceptingServerRpcOperations(path -> rpcs.get(path.rpc().argument()), rpcDelegate);
+        action = actionService != null ? new MdsalServerActionOperations(actionService)
+            : NotSupportedServerActionOperations.INSTANCE;
+
         localStrategy = createLocalStrategy(databindProvider.currentDatabind());
     }
 
@@ -117,18 +123,18 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
     }
 
-    private @NonNull MdsalRestconfStrategy createLocalStrategy(final DatabindContext databind) {
-        return new MdsalRestconfStrategy(databind, dataBroker, localRpcs, rpcService, actionService,
-            databindProvider.sourceProvider(), mountPointService);
+    private @NonNull MdsalServerStrategy createLocalStrategy(final @NonNull DatabindContext databind) {
+        return new MdsalServerStrategy(databind, mountPointResolver, action,
+            new MdsalRestconfStrategy(databind, dataBroker), rpc);
     }
 
-    private @NonNull MdsalRestconfStrategy localStrategy() {
-        final var strategy = verifyNotNull((@NonNull MdsalRestconfStrategy) LOCAL_STRATEGY.getAcquire(this));
+    private @NonNull MdsalServerStrategy localStrategy() {
+        final var strategy = verifyNotNull((@NonNull MdsalServerStrategy) LOCAL_STRATEGY.getAcquire(this));
         final var databind = databindProvider.currentDatabind();
         return databind.equals(strategy.databind()) ? strategy : updateLocalStrategy(databind);
     }
 
-    private @NonNull MdsalRestconfStrategy updateLocalStrategy(final DatabindContext databind) {
+    private @NonNull MdsalServerStrategy updateLocalStrategy(final @NonNull DatabindContext databind) {
         final var strategy = createLocalStrategy(databind);
         localStrategy = strategy;
         return strategy;
@@ -143,14 +149,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataDELETE(final ServerRequest<Empty> request, final ApiPath identifier) {
-        final StrategyAndTail stratAndTail;
+        final StrategyAndPath stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        stratAndTail.strategy().dataDELETE(request, stratAndTail.tail());
+        stratAndTail.strategy().dataDELETE(request, stratAndTail.path());
     }
 
     @Override
@@ -160,14 +166,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataGET(final ServerRequest<DataGetResult> request, final ApiPath identifier) {
-        final StrategyAndTail stratAndTail;
+        final StrategyAndPath stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        stratAndTail.strategy().dataGET(request, stratAndTail.tail());
+        stratAndTail.strategy().dataGET(request, stratAndTail.path());
     }
 
     @Override
@@ -178,14 +184,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     @Override
     public void dataPATCH(final ServerRequest<DataPatchResult> request, final ApiPath identifier,
             final ResourceBody body) {
-        final StrategyAndTail strategyAndTail;
+        final StrategyAndPath strategyAndPath;
         try {
-            strategyAndTail = localStrategy().resolveStrategy(identifier);
+            strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        strategyAndTail.strategy().dataPATCH(request, strategyAndTail.tail(), body);
+        strategyAndPath.strategy().dataPATCH(request, strategyAndPath.path(), body);
     }
 
     @Override
@@ -196,14 +202,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     @Override
     public void dataPATCH(final ServerRequest<DataYangPatchResult> request, final ApiPath identifier,
             final PatchBody body) {
-        final StrategyAndTail strategyAndTail;
+        final StrategyAndPath strategyAndPath;
         try {
-            strategyAndTail = localStrategy().resolveStrategy(identifier);
+            strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        strategyAndTail.strategy().dataPATCH(request, strategyAndTail.tail(), body);
+        strategyAndPath.strategy().dataPATCH(request, strategyAndPath.path(), body);
     }
 
     @Override
@@ -214,14 +220,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     @Override
     public void dataPOST(final ServerRequest<DataPostResult> request, final ApiPath identifier,
             final DataPostBody body) {
-        final StrategyAndTail strategyAndTail;
+        final StrategyAndPath strategyAndPath;
         try {
-            strategyAndTail = localStrategy().resolveStrategy(identifier);
+            strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        strategyAndTail.strategy().dataPOST(request, strategyAndTail.tail(), body);
+        strategyAndPath.strategy().dataPOST(request, strategyAndPath.path(), body);
     }
 
     @Override
@@ -231,14 +237,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void dataPUT(final ServerRequest<DataPutResult> request, final ApiPath identifier, final ResourceBody body) {
-        final StrategyAndTail strategyAndTail;
+        final StrategyAndPath strategyAndPath;
         try {
-            strategyAndTail = localStrategy().resolveStrategy(identifier);
+            strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (ServerException e) {
             request.completeWith(e);
             return ;
         }
-        strategyAndTail.strategy().dataPUT(request, strategyAndTail.tail(), body);
+        strategyAndPath.strategy().dataPUT(request, strategyAndPath.path(), body);
     }
 
     @Override
@@ -278,7 +284,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return;
         }
 
-        final StrategyAndTail stratAndTail;
+        final StrategyAndPath stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(mountPath);
         } catch (ServerException e) {
@@ -333,16 +339,16 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public void operationsGET(final ServerRequest<FormattableBody> request, final ApiPath operation) {
-        final StrategyAndTail strategyAndTail;
+        final StrategyAndPath strategyAndPath;
         try {
-            strategyAndTail = localStrategy().resolveStrategy(operation);
+            strategyAndPath = localStrategy().resolveStrategy(operation);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
 
-        final var strategy = strategyAndTail.strategy();
-        final var tail = strategyAndTail.tail();
+        final var strategy = strategyAndPath.strategy();
+        final var tail = strategyAndPath.path();
         if (tail.isEmpty()) {
             strategy.operationsGET(request);
         } else {
@@ -353,14 +359,14 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     @Override
     public void operationsPOST(final ServerRequest<InvokeResult> request, final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
-        final StrategyAndTail strategyAndTail;
+        final StrategyAndPath strategyAndPath;
         try {
-            strategyAndTail = localStrategy().resolveStrategy(apiPath);
+            strategyAndPath = localStrategy().resolveStrategy(apiPath);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        strategyAndTail.strategy().operationsPOST(request, restconfURI, strategyAndTail.tail(), body);
+        strategyAndPath.strategy().operationsPOST(request, restconfURI, strategyAndPath.path(), body);
     }
 
     @Override

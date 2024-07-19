@@ -48,6 +48,7 @@ import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.testlib.CompletingServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -69,12 +70,12 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private NetconfDataTreeService netconfService;
 
     @Override
-    RestconfStrategy newStrategy(final DatabindContext databind) {
-        return new NetconfRestconfStrategy(databind, netconfService, null, null, null, null);
+    MdsalServerStrategy newStrategy(final DatabindContext databind) {
+        return new NetconfRestconfStrategy(databind, netconfService, null, null, null);
     }
 
     @Override
-    RestconfStrategy testDeleteDataStrategy() {
+    MdsalServerStrategy testDeleteDataStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
