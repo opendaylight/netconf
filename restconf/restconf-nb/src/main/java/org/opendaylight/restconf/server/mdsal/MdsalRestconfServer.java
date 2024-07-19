@@ -78,7 +78,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     static {
         try {
             LOCAL_STRATEGY = MethodHandles.lookup()
-                .findVarHandle(MdsalRestconfServer.class, "localStrategy", MdsalRestconfStrategy.class);
+                .findVarHandle(MdsalRestconfServer.class, "localStrategy", MdsalServerStrategy.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -92,7 +92,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     private final @Nullable DOMActionService actionService;
 
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
-    private volatile MdsalRestconfStrategy localStrategy;
+    private volatile MdsalServerStrategy localStrategy;
 
     @Inject
     @Activate
@@ -117,18 +117,19 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
     }
 
-    private @NonNull MdsalRestconfStrategy createLocalStrategy(final DatabindContext databind) {
-        return new MdsalRestconfStrategy(databind, dataBroker, localRpcs, rpcService, actionService,
+    private @NonNull MdsalServerStrategy createLocalStrategy(final @NonNull DatabindContext databind) {
+        final var delegate = new MdsalRestconfStrategy(databind, dataBroker, localRpcs, rpcService, actionService,
             databindProvider.sourceProvider(), mountPointService);
+        return new MdsalServerStrategy(databind, delegate.action(), delegate.data(), delegate.rpc());
     }
 
-    private @NonNull MdsalRestconfStrategy localStrategy() {
-        final var strategy = verifyNotNull((@NonNull MdsalRestconfStrategy) LOCAL_STRATEGY.getAcquire(this));
+    private @NonNull MdsalServerStrategy localStrategy() {
+        final var strategy = verifyNotNull((@NonNull MdsalServerStrategy) LOCAL_STRATEGY.getAcquire(this));
         final var databind = databindProvider.currentDatabind();
         return databind.equals(strategy.databind()) ? strategy : updateLocalStrategy(databind);
     }
 
-    private @NonNull MdsalRestconfStrategy updateLocalStrategy(final DatabindContext databind) {
+    private @NonNull MdsalServerStrategy updateLocalStrategy(final @NonNull DatabindContext databind) {
         final var strategy = createLocalStrategy(databind);
         localStrategy = strategy;
         return strategy;

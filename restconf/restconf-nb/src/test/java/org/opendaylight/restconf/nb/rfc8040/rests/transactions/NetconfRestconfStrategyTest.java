@@ -70,7 +70,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
     @Override
     RestconfStrategy newStrategy(final DatabindContext databind) {
-        return new NetconfRestconfStrategy(databind, netconfService, null, null, null, null);
+        return new NetconfRestconfStrategy(databind, netconfService, null, null, null);
     }
 
     @Override
