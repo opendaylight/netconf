@@ -45,11 +45,11 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndTail;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -430,7 +430,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Test
     void testGetRestconfStrategyLocal() throws Exception {
         final var strategy = jukeboxStrategy();
-        assertEquals(new StrategyAndTail(strategy, ApiPath.empty()), strategy.resolveStrategy(ApiPath.empty()));
+        assertEquals(new StrategyAndPath(strategy, ApiPath.empty()), strategy.resolveStrategy(ApiPath.empty()));
     }
 
     @Test
@@ -446,7 +446,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
         final var strategy = jukeboxStrategy();
         final var result = strategy.resolveStrategy(ApiPath.parse("yang-ext:mount"));
-        assertEquals(ApiPath.empty(), result.tail());
+        assertEquals(ApiPath.empty(), result.path());
         assertNotSame(strategy, assertInstanceOf(MdsalRestconfStrategy.class, result.strategy()));
     }
 
@@ -462,7 +462,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
         final var strategy = jukeboxStrategy();
         final var result = strategy.resolveStrategy(ApiPath.parse("yang-ext:mount"));
-        assertEquals(ApiPath.empty(), result.tail());
+        assertEquals(ApiPath.empty(), result.path());
         assertInstanceOf(NetconfRestconfStrategy.class, result.strategy());
     }
 

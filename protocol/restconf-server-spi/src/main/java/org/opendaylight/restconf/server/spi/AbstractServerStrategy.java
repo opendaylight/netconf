@@ -67,6 +67,8 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
 
     protected abstract @NonNull ServerRpcOperations rpc();
 
+    protected abstract @NonNull ServerMountPointResolver resolver();
+
     @Override
     public final void dataDELETE(final ServerRequest<Empty> request, final ApiPath apiPath) {
         final Data path;
@@ -311,5 +313,15 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             return;
         }
         rpc().invokeRpc(request, restconfURI, path, input);
+    }
+
+    @Override
+    public final StrategyAndPath resolveStrategy(final ApiPath path) throws ServerException {
+        var mount = path.indexOf("yang-ext", "mount");
+        if (mount == -1) {
+            return new StrategyAndPath(this, path);
+        }
+        return resolver().resolveMountPoint(pathNormalizer.normalizeDataPath(path.subPath(0, mount)))
+            .resolveStrategy(path.subPath(mount + 1));
     }
 }
