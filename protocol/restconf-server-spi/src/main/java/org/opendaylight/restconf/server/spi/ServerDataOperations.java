@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -69,6 +70,7 @@ public interface ServerDataOperations {
      * @param path resource path
      * @param params operation parameters
      */
+    @Beta
     void getData(ServerRequest<DataGetResult> request, Data path, DataGetParams params);
 
     /**

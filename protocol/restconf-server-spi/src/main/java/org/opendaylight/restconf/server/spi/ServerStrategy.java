@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.Beta;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -25,6 +27,7 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 
@@ -175,4 +178,30 @@ public interface ServerStrategy {
      */
     void operationsPOST(ServerRequest<InvokeResult> request, URI restconfURI, ApiPath operation,
         OperationInputBody body);
+
+    /**
+     * Resolve any and all {@code yang-ext:mount} to the target {@link StrategyAndPath}.
+     *
+     * @param path {@link ApiPath} to resolve
+     * @return A strategy and the remaining path
+     * @throws NullPointerException if {@code path} is {@code null}
+     * @throws ServerException if an error occurs
+     */
+    @Beta
+    StrategyAndPath resolveStrategy(ApiPath path) throws ServerException;
+
+    /**
+     * Result of a {@link ApiPath} lookup for the purposes of supporting {@code yang-ext:mount}-delimited mount points
+     * with possible nesting.
+     *
+     * @param strategy the strategy to use
+     * @param path the {@link ApiPath} tail to use with the strategy
+     */
+    @Beta
+    record StrategyAndPath(AbstractServerStrategy strategy, ApiPath path) {
+        public StrategyAndPath {
+            requireNonNull(strategy);
+            requireNonNull(path);
+        }
+    }
 }
