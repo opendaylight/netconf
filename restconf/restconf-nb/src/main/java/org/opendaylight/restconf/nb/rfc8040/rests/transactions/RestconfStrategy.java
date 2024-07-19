@@ -1051,54 +1051,66 @@ public abstract class RestconfStrategy extends AbstractServerStrategy implements
     @SuppressWarnings("unchecked")
     private static @NonNull NormalizedNode prepareData(final @NonNull NormalizedNode configDataNode,
                                                        final @NonNull NormalizedNode stateDataNode) {
-        if (configDataNode instanceof UserMapNode configMap) {
-            final var builder = ImmutableNodes.newUserMapBuilder().withNodeIdentifier(configMap.name());
-            mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof SystemMapNode configMap) {
-            final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(configMap.name());
-            mapValueToBuilder(configMap.body(), ((SystemMapNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof MapEntryNode configEntry) {
-            final var builder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(configEntry.name());
-            mapValueToBuilder(configEntry.body(), ((MapEntryNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof ContainerNode configContaienr) {
-            final var builder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(configContaienr.name());
-            mapValueToBuilder(configContaienr.body(), ((ContainerNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof ChoiceNode configChoice) {
-            final var builder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(configChoice.name());
-            mapValueToBuilder(configChoice.body(), ((ChoiceNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof LeafNode configLeaf) {
-            // config trumps oper
-            return configLeaf;
-        } else if (configDataNode instanceof UserLeafSetNode) {
-            final var configLeafSet = (UserLeafSetNode<Object>) configDataNode;
-            final var builder = ImmutableNodes.<Object>newUserLeafSetBuilder().withNodeIdentifier(configLeafSet.name());
-            mapValueToBuilder(configLeafSet.body(), ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof SystemLeafSetNode) {
-            final var configLeafSet = (SystemLeafSetNode<Object>) configDataNode;
-            final var builder = ImmutableNodes.<Object>newSystemLeafSetBuilder()
-                .withNodeIdentifier(configLeafSet.name());
-            mapValueToBuilder(configLeafSet.body(), ((SystemLeafSetNode<Object>) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof LeafSetEntryNode<?> configEntry) {
-            // config trumps oper
-            return configEntry;
-        } else if (configDataNode instanceof UnkeyedListNode configList) {
-            final var builder = ImmutableNodes.newUnkeyedListBuilder().withNodeIdentifier(configList.name());
-            mapValueToBuilder(configList.body(), ((UnkeyedListNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else if (configDataNode instanceof UnkeyedListEntryNode configEntry) {
-            final var builder = ImmutableNodes.newUnkeyedListEntryBuilder().withNodeIdentifier(configEntry.name());
-            mapValueToBuilder(configEntry.body(), ((UnkeyedListEntryNode) stateDataNode).body(), builder);
-            return builder.build();
-        } else {
-            throw new IllegalStateException("Unexpected node type: " + configDataNode.getClass().getName());
-        }
+        return switch (configDataNode) {
+            case UserMapNode configMap -> {
+                final var builder = ImmutableNodes.newUserMapBuilder().withNodeIdentifier(configMap.name());
+                mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case SystemMapNode configMap -> {
+                final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(configMap.name());
+                mapValueToBuilder(configMap.body(), ((SystemMapNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case MapEntryNode configEntry -> {
+                final var builder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(configEntry.name());
+                mapValueToBuilder(configEntry.body(), ((MapEntryNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case ContainerNode configContaienr -> {
+                final var builder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(configContaienr.name());
+                mapValueToBuilder(configContaienr.body(), ((ContainerNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case ChoiceNode configChoice -> {
+                final var builder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(configChoice.name());
+                mapValueToBuilder(configChoice.body(), ((ChoiceNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case UserLeafSetNode<?> userLeafSet -> {
+                final var configLeafSet = (UserLeafSetNode<Object>) userLeafSet;
+                final var builder = ImmutableNodes.<Object>newUserLeafSetBuilder()
+                    .withNodeIdentifier(configLeafSet.name());
+                mapValueToBuilder(configLeafSet.body(), ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case SystemLeafSetNode<?> systemLeafSet -> {
+                final var configLeafSet = (SystemLeafSetNode<Object>) systemLeafSet;
+                final var builder = ImmutableNodes.<Object>newSystemLeafSetBuilder()
+                    .withNodeIdentifier(configLeafSet.name());
+                mapValueToBuilder(configLeafSet.body(), ((SystemLeafSetNode<Object>) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case LeafNode<?> configLeaf -> {
+                // config trumps oper
+                yield configLeaf;
+            }
+            case LeafSetEntryNode<?> configEntry -> {
+                // config trumps oper
+                yield configEntry;
+            }
+            case UnkeyedListNode configList -> {
+                final var builder = ImmutableNodes.newUnkeyedListBuilder().withNodeIdentifier(configList.name());
+                mapValueToBuilder(configList.body(), ((UnkeyedListNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            case UnkeyedListEntryNode configEntry -> {
+                final var builder = ImmutableNodes.newUnkeyedListEntryBuilder().withNodeIdentifier(configEntry.name());
+                mapValueToBuilder(configEntry.body(), ((UnkeyedListEntryNode) stateDataNode).body(), builder);
+                yield builder.build();
+            }
+            default -> throw new IllegalStateException("Unexpected node type: " + configDataNode.getClass().getName());
+        };
     }
 
     /**
