@@ -36,20 +36,15 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -132,14 +127,6 @@ import org.slf4j.LoggerFactory;
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy extends AbstractServerStrategy implements ServerDataOperations {
-    @NonNullByDefault
-    public record StrategyAndPath(RestconfStrategy strategy, Data path) {
-        public StrategyAndPath {
-            requireNonNull(strategy);
-            requireNonNull(path);
-        }
-    }
-
     /**
      * Result of a partial {@link ApiPath} lookup for the purposes of supporting {@code yang-ext:mount}-delimited mount
      * points with possible nesting.
@@ -148,7 +135,7 @@ public abstract class RestconfStrategy extends AbstractServerStrategy implements
      * @param tail the {@link ApiPath} tail to use with the strategy
      */
     @NonNullByDefault
-    public record StrategyAndTail(RestconfStrategy strategy, ApiPath tail) {
+    public record StrategyAndTail(AbstractServerStrategy strategy, ApiPath tail) {
         public StrategyAndTail {
             requireNonNull(strategy);
             requireNonNull(tail);
@@ -163,7 +150,6 @@ public abstract class RestconfStrategy extends AbstractServerStrategy implements
     private final @NonNull ServerActionOperations action;
     private final @NonNull ServerRpcOperations rpc;
     private final YangTextSourceExtension sourceProvider;
-    private final DOMMountPointService mountPointService;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
@@ -184,84 +170,18 @@ public abstract class RestconfStrategy extends AbstractServerStrategy implements
     }
 
     @Override
-    protected final ServerActionOperations action() {
+    public final ServerActionOperations action() {
         return action;
     }
 
     @Override
-    protected final ServerDataOperations data() {
+    public final ServerDataOperations data() {
         return this;
     }
 
     @Override
-    protected final ServerRpcOperations rpc() {
+    public final ServerRpcOperations rpc() {
         return rpc;
-    }
-
-    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) throws ServerException {
-        final var andTail = resolveStrategy(path);
-        final var strategy = andTail.strategy();
-        return new StrategyAndPath(strategy, strategy.pathNormalizer.normalizeDataPath(andTail.tail()));
-    }
-
-    /**
-     * Resolve any and all {@code yang-ext:mount} to the target {@link StrategyAndTail}.
-     *
-     * @param path {@link ApiPath} to resolve
-     * @return A strategy and the remaining path
-     * @throws NullPointerException if {@code path} is {@code null}
-     * @throws ServerException if an error occurs
-     */
-    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) throws ServerException {
-        var mount = path.indexOf("yang-ext", "mount");
-        if (mount == -1) {
-            return new StrategyAndTail(this, path);
-        }
-        if (mountPointService == null) {
-            throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                "Mount point service is not available");
-        }
-        final var mountPath = path.subPath(0, mount);
-        final var dataPath = pathNormalizer.normalizeDataPath(path.subPath(0, mount));
-        final var mountPoint = mountPointService.getMountPoint(dataPath.instance())
-            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
-                "Mount point '%s' does not exist", mountPath));
-
-        return createStrategy(databind, mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
-    }
-
-    private static @NonNull RestconfStrategy createStrategy(final DatabindContext databind, final ApiPath mountPath,
-            final DOMMountPoint mountPoint) throws ServerException {
-        final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
-            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
-                "Mount point '%s' does not expose DOMSchemaService", mountPath));
-        final var mountModelContext = mountSchemaService.getGlobalContext();
-        if (mountModelContext == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
-                "Mount point '%s' does not have any models", mountPath);
-        }
-        final var mountDatabind = DatabindContext.ofModel(mountModelContext);
-        final var mountPointService = mountPoint.getService(DOMMountPointService.class).orElse(null);
-        final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
-        final var actionService = mountPoint.getService(DOMActionService.class).orElse(null);
-        final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
-            .flatMap(schema -> Optional.ofNullable(schema.extension(YangTextSourceExtension.class)))
-            .orElse(null);
-
-        final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
-        if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(mountDatabind, netconfService.orElseThrow(), rpcService, actionService,
-                sourceProvider, mountPointService);
-        }
-        final var dataBroker = mountPoint.getService(DOMDataBroker.class);
-        if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), ImmutableMap.of(), rpcService,
-                actionService, sourceProvider, mountPointService);
-        }
-        LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
-        throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-            "Could not find a supported access interface in mount point",
-            new ServerErrorPath(databind, mountPoint.getIdentifier()));
     }
 
     /**
