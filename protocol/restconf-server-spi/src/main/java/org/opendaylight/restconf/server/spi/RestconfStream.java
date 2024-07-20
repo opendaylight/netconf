@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
@@ -196,7 +195,6 @@ public final class RestconfStream<T> {
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile Subscribers<T> subscribers = Subscribers.empty();
 
-    @GuardedBy("this")
     private Registration registration;
 
     RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {

@@ -8,4 +8,5 @@
 /**
  * Interface towards RestconfServer implementations.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.restconf.server.spi;
