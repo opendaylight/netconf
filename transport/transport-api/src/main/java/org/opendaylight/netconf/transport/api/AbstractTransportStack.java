@@ -19,7 +19,6 @@ import io.netty.util.concurrent.Future;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.Empty;
 
@@ -41,7 +40,6 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
      *   <li>a {@link ListenableFuture} completing when shutdown is complete
      * </ol>
      */
-    @GuardedBy("this")
     private Object state;
 
     protected AbstractTransportStack(final TransportChannelListener listener) {

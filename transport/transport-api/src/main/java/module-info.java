@@ -15,4 +15,5 @@ module org.opendaylight.netconf.transport.api {
 
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;
+    requires static org.osgi.annotation.bundle;
 }

@@ -29,4 +29,5 @@
  *       encountered.</li>
  * </ul>
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.transport.api;
