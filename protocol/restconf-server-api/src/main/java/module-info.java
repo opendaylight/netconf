@@ -28,4 +28,5 @@ module org.opendaylight.restconf.server.api {
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;
     requires static com.github.spotbugs.annotations;
+    requires static org.osgi.annotation.bundle;
 }

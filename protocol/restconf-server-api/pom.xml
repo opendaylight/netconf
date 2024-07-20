@@ -11,14 +11,14 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>bnd-parent</artifactId>
         <version>8.0.0-SNAPSHOT</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../../bnd-parent</relativePath>
     </parent>
 
     <artifactId>restconf-server-api</artifactId>
+    <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-    <packaging>bundle</packaging>
     <description>RESTCONF server API</description>
 
     <dependencies>

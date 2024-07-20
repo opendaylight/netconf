@@ -10,4 +10,5 @@
  * a {@link ServerRequest} coupled with an {@link org.opendaylight.restconf.api.ApiPath} and perhaps a
  * {@link RequestBody}.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.restconf.server.api;
