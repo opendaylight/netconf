@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcb5a518_976f7af8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-20T15:47:40Z",
+      "side": 1,
+      "message": "duplicated code",
+      "range": {
+        "startLine": 98,
+        "startChar": 7,
+        "endLine": 98,
+        "endChar": 71
+      },
+      "revId": "8897e9e63407f69102755a727d8d9bdc55d2220e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28cbf796_830e482c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-20T15:47:40Z",
+      "side": 1,
+      "message": "soo... how does the caller know:\n- when has the request completed?\n- any errors?",
+      "range": {
+        "startLine": 167,
+        "startChar": 17,
+        "endLine": 167,
+        "endChar": 29
+      },
+      "revId": "8897e9e63407f69102755a727d8d9bdc55d2220e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
