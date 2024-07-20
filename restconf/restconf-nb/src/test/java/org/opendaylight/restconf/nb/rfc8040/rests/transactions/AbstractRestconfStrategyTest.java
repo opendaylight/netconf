@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doCallRealMethod;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -214,8 +214,6 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Mock
     private EffectiveModelContext mockSchemaContext;
-    @Mock
-    private QName mockQname;
     private final CompletingServerRequest<Empty> dataDeleteRequest = new CompletingServerRequest<>();
     private final CompletingServerRequest<DataPatchResult> dataPatchRequest = new CompletingServerRequest<>();
     private final CompletingServerRequest<DataPostResult> dataPostRequest = new CompletingServerRequest<>();
@@ -230,7 +228,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     final @NonNull RestconfStrategy mockStrategy() {
-        when(mockSchemaContext.getQName()).thenReturn(mockQname);
+        doCallRealMethod().when(mockSchemaContext).getQName();
         return newStrategy(DatabindContext.ofModel(mockSchemaContext));
     }
 
