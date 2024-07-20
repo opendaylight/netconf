@@ -31,6 +31,7 @@ public final class ServerException extends Exception {
     @java.io.Serial
     private static final long serialVersionUID = 0L;
 
+    @SuppressWarnings("serial")
     private final List<ServerError> errors;
 
     ServerException(final String message, final List<ServerError> errors, final @Nullable Throwable cause) {

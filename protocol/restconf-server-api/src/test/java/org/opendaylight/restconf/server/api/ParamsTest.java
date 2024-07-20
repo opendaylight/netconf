@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 
 class ParamsTest {
@@ -82,16 +81,6 @@ class ParamsTest {
         final var params = assertParams(DataGetParams::of, WithDefaultsParam.uriName,
             "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
-    }
-
-    private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod,
-            final RestconfQueryParam<?> param) {
-        assertParamsThrows("Invalid parameter: " + param.paramName(), paramsMethod, param.paramName(),
-            "odl-test-value");
-    }
-
-    private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod) {
-        assertParamsThrows("Invalid parameter: odl-unknown-param", paramsMethod, "odl-unknown-param", "odl-test-value");
     }
 
     private static void assertParamsThrows(final String expectedMessage,
