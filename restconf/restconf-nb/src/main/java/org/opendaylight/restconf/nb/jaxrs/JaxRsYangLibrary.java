@@ -5,14 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
-import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
-import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -30,13 +28,13 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Singleton
 @Component
-public final class RestconfSchemaSourceUrlProvider implements YangLibrarySchemaSourceUrlProvider {
+public final class JaxRsYangLibrary implements YangLibrarySchemaSourceUrlProvider {
     private final String modulesPath;
 
     @Inject
     @Activate
-    public RestconfSchemaSourceUrlProvider(@Reference final RestconfStreamServletFactory servletFactory) {
-        modulesPath = "/" + servletFactory.restconf() + "/" + URLConstants.MODULES_SUBPATH + "/";
+    public JaxRsYangLibrary(@Reference final RestconfStreamServletFactory servletFactory) {
+        modulesPath = "/" + servletFactory.restconf() + "/" + JaxRsRestconf.MODULES_SUBPATH + "/";
     }
 
     @Override
@@ -45,7 +43,7 @@ public final class RestconfSchemaSourceUrlProvider implements YangLibrarySchemaS
         if ("ODL_modules".equals(moduleSetName)) {
             final var sb = new StringBuilder(modulesPath).append(moduleName);
             if (revision != null) {
-                sb.append("?" + URLConstants.MODULES_REVISION_QUERY + "=").append(revision);
+                sb.append("?" + JaxRsRestconf.MODULES_REVISION_QUERY + "=").append(revision);
             }
             return Set.of(new Uri(sb.toString()));
         }
