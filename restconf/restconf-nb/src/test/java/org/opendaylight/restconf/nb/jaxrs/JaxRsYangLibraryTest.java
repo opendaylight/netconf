@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,16 +27,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yangtools.yang.common.Revision;
 
 @ExtendWith(MockitoExtension.class)
-class RestconfSchemaSourceUrlProviderTest {
+class JaxRsYangLibraryTest {
     @Mock
     private RestconfStreamServletFactory servletFactory;
 
-    private RestconfSchemaSourceUrlProvider urlProvider;
+    private JaxRsYangLibrary urlProvider;
 
     @BeforeEach
     void beforeEach() {
         doReturn("restconf").when(servletFactory).restconf();
-        urlProvider = new RestconfSchemaSourceUrlProvider(servletFactory);
+        urlProvider = new JaxRsYangLibrary(servletFactory);
     }
 
     @Test

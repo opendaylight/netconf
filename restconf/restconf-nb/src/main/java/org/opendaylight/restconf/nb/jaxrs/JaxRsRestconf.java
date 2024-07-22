@@ -49,7 +49,6 @@ import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
-import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -117,6 +116,15 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private final @NonNull RestconfServer server;
     private final @NonNull PrettyPrintParam prettyPrint;
     private final @NonNull ErrorTagMapping errorTagMapping;
+    /**
+     * The second URL path element for YANG library module support, i.e. {@code https://localhost/BASE_PATH/MODULES}.
+     */
+    static final String MODULES_SUBPATH = "modules";
+    /**
+     * The query parameter carrying the optional revision in YANG library module support, i.e.
+     * {@code https://localhost/BASE_PATH/MODULES?REVISION=2023-11-26}.
+     */
+    static final String MODULES_REVISION_QUERY = "revision";
 
     public JaxRsRestconf(final RestconfServer server, final ErrorTagMapping errorTagMapping,
             final PrettyPrintParam prettyPrint) {
@@ -787,7 +795,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    @Path("/" + MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYangGET(@PathParam("fileName") final String fileName,
             @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
         server.modulesYangGET(newModulesGET(ar), fileName, revision);
@@ -803,7 +811,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    @Path("/" + MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
     public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
@@ -819,7 +827,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    @Path("/" + MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYinGET(@PathParam("fileName") final String fileName,
             @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
         server.modulesYinGET(newModulesGET(ar), fileName, revision);
@@ -835,7 +843,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    @Path("/" + MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
     public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
