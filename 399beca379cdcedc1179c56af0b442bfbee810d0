@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b78ed76b_e939971f",
+        "filename": "protocol/restconf-server/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-22T07:03:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c185d086_80a3245e",
+      "range": {
+        "startLine": 34,
+        "startChar": 8,
+        "endLine": 34,
+        "endChar": 28
+      },
+      "revId": "399beca379cdcedc1179c56af0b442bfbee810d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ba37c5b_9b220722",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-07-17T16:41:32Z",
       "side": 1,
       "message": "only called from DataRequestMapping: it should be living in that class, along with its siblings",
+      "range": {
+        "startLine": 50,
+        "startChar": 21,
+        "endLine": 50,
+        "endChar": 30
+      },
+      "revId": "399beca379cdcedc1179c56af0b442bfbee810d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12a39d1d_175f2a02",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RequestUtils.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-22T07:03:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ba37c5b_9b220722",
       "range": {
         "startLine": 50,
         "startChar": 21,
