@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,6 +23,7 @@ import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
@@ -42,7 +43,7 @@ public final class SSEStreamService {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
-    SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
+    public SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
             final StreamsConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
         this.pingExecutor = requireNonNull(pingExecutor);

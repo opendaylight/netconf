@@ -16,6 +16,8 @@ import javax.ws.rs.core.Application;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
+import org.opendaylight.restconf.nb.jaxrs.SSEStreamService;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;

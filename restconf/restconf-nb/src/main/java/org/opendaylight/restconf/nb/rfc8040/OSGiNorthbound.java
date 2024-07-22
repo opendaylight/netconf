@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.rfc8040.streams.DefaultPingExecutor;
+import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultRestconfStreamServletFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.osgi.framework.FrameworkUtil;
