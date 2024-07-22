@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "347963b72f0ab0250e69c29906720489d91dd53a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "624a5751_c54b0b99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-22T21:09:51Z",
+      "side": 1,
+      "message": "build fluke, will merge with a verified parent",
+      "revId": "347963b72f0ab0250e69c29906720489d91dd53a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
