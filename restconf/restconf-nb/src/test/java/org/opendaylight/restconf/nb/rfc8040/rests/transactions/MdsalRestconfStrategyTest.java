@@ -142,7 +142,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_IID, EMPTY_JUKEBOX);
+        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         assertNotNull(dataPutRequest.getResult());
@@ -156,7 +156,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        jukeboxDataOperations().putData(dataPutRequest, GAP_IID, GAP_LEAF);
+        jukeboxDataOperations().putData(dataPutRequest, GAP_PATH, GAP_LEAF);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
         assertNotNull(dataPutRequest.getResult());
@@ -171,7 +171,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
+        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, JUKEBOX_WITH_BANDS);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         assertNotNull(dataPutRequest.getResult());
@@ -499,7 +499,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.tag());
         assertEquals(new ErrorMessage("Data request not supported"), error.message());
-        assertNull(error.path());
+        final var errorPath = error.path();
+        assertNotNull(errorPath);
+        assertEquals(YangInstanceIdentifier.of(), errorPath.path());
     }
 
     private MdsalServerStrategy jukeboxStrategy() {

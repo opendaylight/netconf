@@ -53,6 +53,7 @@ import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractServerDataOperations;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.Insert;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
@@ -103,7 +104,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy implements ServerDataOperations {
+public abstract class RestconfStrategy extends AbstractServerDataOperations {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
@@ -143,12 +144,13 @@ public abstract class RestconfStrategy implements ServerDataOperations {
     abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
 
     @Override
-    public final void mergeData(final ServerRequest<DataPatchResult> request, final YangInstanceIdentifier path,
+    public final void mergeData(final ServerRequest<DataPatchResult> request, final Data path,
             final NormalizedNode data) {
+        final var instance = path.instance();
         final var tx = prepareWriteExecution();
         // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(path);
-        tx.merge(path, data);
+        tx.ensureParentsByMerge(instance);
+        tx.merge(instance, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -158,28 +160,29 @@ public abstract class RestconfStrategy implements ServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "MERGE", path));
+                request.completeWith(decodeException(cause, "MERGE", instance));
             }
         }, MoreExecutors.directExecutor());
     }
 
     @Override
-    public final void putData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
-            final NormalizedNode data) {
+    public final void putData(final ServerRequest<DataPutResult> request, final Data path, final NormalizedNode data) {
+        final var instance = path.instance();
         final Boolean exists;
         try {
-            exists = syncAccess(exists(path), path);
+            exists = syncAccess(exists(instance), instance);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
 
-        completePutData(request, path, exists, replaceAndCommit(prepareWriteExecution(), path, data));
+        completePutData(request, instance, exists, replaceAndCommit(prepareWriteExecution(), instance, data));
     }
 
     @Override
-    public final void putData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
-            final Insert insert, final NormalizedNode data) {
+    public final void putData(final ServerRequest<DataPutResult> request, final Data tmp, final Insert insert,
+            final NormalizedNode data) {
+        final var path = tmp.instance();
         final Boolean exists;
         try {
             exists = syncAccess(exists(path), path);
@@ -327,31 +330,31 @@ public abstract class RestconfStrategy implements ServerDataOperations {
     }
 
     @Override
-    public final void createData(final ServerRequest<? super CreateResourceResult> request,
-            final YangInstanceIdentifier path, final NormalizedNode data) {
+    protected final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
+            final YangInstanceIdentifier parentPath, final NormalizedNode data) {
         final var tx = prepareWriteExecution();
         try {
-            tx.create(path, data);
+            tx.create(parentPath, data);
         } catch (ServerException e) {
             tx.cancel();
             request.completeWith(e);
             return;
         }
-        completeCreateData(request, path, data, tx.commit());
+        completeCreateData(request, parentPath, data, tx.commit());
     }
 
     @Override
-    public final void createData(final ServerRequest<? super CreateResourceResult> request,
-            final YangInstanceIdentifier path, final Insert insert, final NormalizedNode data) {
+    protected final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
+            final Insert insert, final YangInstanceIdentifier parentPath, final NormalizedNode data) {
         final ListenableFuture<? extends CommitInfo> future;
         try {
-            checkListAndOrderedType(path);
-            future = insertAndCommit(path, data, insert);
+            checkListAndOrderedType(parentPath);
+            future = insertAndCommit(parentPath, data, insert);
         } catch (ServerException e) {
             request.completeWith(e);
             return;
         }
-        completeCreateData(request, path, data, future);
+        completeCreateData(request, parentPath, data, future);
     }
 
     private void completeCreateData(final ServerRequest<? super CreateResourceResult> request,
@@ -446,7 +449,7 @@ public abstract class RestconfStrategy implements ServerDataOperations {
     }
 
     @Override
-    public final void patchData(final ServerRequest<DataYangPatchResult> request, final YangInstanceIdentifier path,
+    public final void patchData(final ServerRequest<DataYangPatchResult> request, final Data path,
             final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
@@ -1022,6 +1025,7 @@ public abstract class RestconfStrategy implements ServerDataOperations {
      * @return The accessed value
      * @throws ServerException if commit fails
      */
+    // FIXME: require DatabindPath.Data here
     static final <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
             throws ServerException {
         try {
@@ -1034,6 +1038,7 @@ public abstract class RestconfStrategy implements ServerDataOperations {
         }
     }
 
+    // FIXME: require DatabindPath.Data here
     final @NonNull ServerException decodeException(final Throwable ex, final String txType,
             final YangInstanceIdentifier path) {
         if (ex instanceof TransactionCommitFailedException) {

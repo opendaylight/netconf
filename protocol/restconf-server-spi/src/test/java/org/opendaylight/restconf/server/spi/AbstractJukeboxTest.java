@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.google.common.collect.ImmutableList;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,7 +18,9 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -27,6 +30,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -111,6 +115,18 @@ public abstract class AbstractJukeboxTest {
             "/jukebox-model/ietf-restconf-monitoring@2017-01-26.yang",
             "/jukebox-model/ietf-yang-types.yang");
     protected static final @NonNull DatabindContext JUKEBOX_DATABIND = DatabindContext.ofModel(JUKEBOX_SCHEMA);
+
+    protected static final @NonNull Data JUKEBOX_PATH = jukeboxPath(JUKEBOX_IID);
+    protected static final @NonNull Data GAP_PATH = jukeboxPath(GAP_IID);
+
+    protected static final @NonNull Data jukeboxPath(final YangInstanceIdentifier path) {
+        final var childAndStack = JUKEBOX_DATABIND.schemaTree().enterPath(path).orElseThrow();
+        return new Data(JUKEBOX_DATABIND, childAndStack.stack().toInference(), path, childAndStack.node());
+    }
+
+    protected static final @NonNull PrefixAndBody jukeboxPayload(final NormalizedNode body) {
+        return new PrefixAndBody(ImmutableList.of(), body);
+    }
 
     protected static final InputStream stringInputStream(final String str) {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
