@@ -43,6 +43,7 @@ import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -64,6 +65,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.w3c.dom.DOMException;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,7 +121,12 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, song2Path);
 
-        jukeboxDataOperations().deleteData(emptyRequest, songListPath);
+        jukeboxDataOperations().deleteData(emptyRequest, new Data(
+            JUKEBOX_DATABIND,
+            SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME, PLAYLIST_QNAME, SONG_QNAME)
+                .toInference(),
+            songListPath,
+            JUKEBOX_DATABIND.schemaTree().findChild(songListPath).orElseThrow()));
         verify(netconfService).getConfig(songListWildcardPath, songKeyFields);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song1Path);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song2Path);
@@ -187,7 +194,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_IID, EMPTY_JUKEBOX);
+        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
         verify(netconfService).lock();
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
@@ -203,7 +210,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_IID, EMPTY_JUKEBOX);
+        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
@@ -217,7 +224,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        jukeboxDataOperations().putData(dataPutRequest, GAP_IID, GAP_LEAF);
+        jukeboxDataOperations().putData(dataPutRequest, GAP_PATH, GAP_LEAF);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
         assertNotNull(dataPutRequest.getResult());
@@ -231,7 +238,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        jukeboxDataOperations().putData(dataPutRequest, GAP_IID, GAP_LEAF);
+        jukeboxDataOperations().putData(dataPutRequest, GAP_PATH, GAP_LEAF);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
         assertNotNull(dataPutRequest.getResult());
@@ -244,7 +251,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
+        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, JUKEBOX_WITH_BANDS);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
@@ -368,7 +375,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
+        jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, JUKEBOX_WITH_BANDS);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());

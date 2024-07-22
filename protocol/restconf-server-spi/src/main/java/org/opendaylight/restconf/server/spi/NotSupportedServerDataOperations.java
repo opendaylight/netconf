@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -16,12 +17,12 @@ import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.PatchContext;
+import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
@@ -36,53 +37,50 @@ public final class NotSupportedServerDataOperations implements ServerDataOperati
     }
 
     @Override
-    public void createData(final ServerRequest<? super CreateResourceResult> request, final YangInstanceIdentifier path,
-            final NormalizedNode data) {
-        notSupported(request);
+    public void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
+            final PrefixAndBody data) {
+        notSupported(request, path);
     }
 
     @Override
-    public void createData(final ServerRequest<? super CreateResourceResult> request, final YangInstanceIdentifier path,
-            final Insert insert, final NormalizedNode data) {
-        notSupported(request);
+    public void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
+            final Insert insert, final PrefixAndBody data) {
+        notSupported(request, path);
     }
 
     @Override
-    public void deleteData(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
-        notSupported(request);
+    public void deleteData(final ServerRequest<Empty> request, final Data path) {
+        notSupported(request, path);
     }
 
     @Override
     public void getData(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
-        notSupported(request);
+        notSupported(request, path);
     }
 
     @Override
-    public void mergeData(final ServerRequest<DataPatchResult> request, final YangInstanceIdentifier path,
+    public void mergeData(final ServerRequest<DataPatchResult> request, final Data path, final NormalizedNode data) {
+        notSupported(request, path);
+    }
+
+    @Override
+    public void patchData(final ServerRequest<DataYangPatchResult> request, final Data path, final PatchContext patch) {
+        notSupported(request, path);
+    }
+
+    @Override
+    public void putData(final ServerRequest<DataPutResult> request, final Data path, final NormalizedNode data) {
+        notSupported(request, path);
+    }
+
+    @Override
+    public void putData(final ServerRequest<DataPutResult> request, final Data path, final Insert insert,
             final NormalizedNode data) {
-        notSupported(request);
+        notSupported(request, path);
     }
 
-    @Override
-    public void patchData(final ServerRequest<DataYangPatchResult> request, final YangInstanceIdentifier path,
-            final PatchContext patch) {
-        notSupported(request);
-    }
-
-    @Override
-    public void putData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
-            final NormalizedNode data) {
-        notSupported(request);
-    }
-
-    @Override
-    public void putData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
-            final Insert insert, final NormalizedNode data) {
-        notSupported(request);
-    }
-
-    private static void notSupported(final ServerRequest<?> request) {
+    private static void notSupported(final ServerRequest<?> request, final Data path) {
         request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
-            "Data request not supported"));
+            "Data request not supported", new ServerErrorPath(path), null));
     }
 }

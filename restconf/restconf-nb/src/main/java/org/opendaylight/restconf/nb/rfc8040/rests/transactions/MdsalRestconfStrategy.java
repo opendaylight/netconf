@@ -57,18 +57,18 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public void deleteData(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
+    public void deleteData(final ServerRequest<Empty> request, final Data path) {
         final var tx = dataBroker.newReadWriteTransaction();
-        tx.exists(LogicalDatastoreType.CONFIGURATION, path).addCallback(new FutureCallback<>() {
+        tx.exists(LogicalDatastoreType.CONFIGURATION, path.instance()).addCallback(new FutureCallback<>() {
             @Override
             public void onSuccess(final Boolean result) {
                 if (!result) {
                     cancelTx(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
-                        new ServerErrorPath(databind, path)));
+                        new ServerErrorPath(path)));
                     return;
                 }
 
-                tx.delete(LogicalDatastoreType.CONFIGURATION, path);
+                tx.delete(LogicalDatastoreType.CONFIGURATION, path.instance());
                 tx.commit().addCallback(new FutureCallback<CommitInfo>() {
                     @Override
                     public void onSuccess(final CommitInfo result) {
@@ -77,7 +77,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        request.completeWith(new ServerException("Transaction to delete " + path + " failed", cause));
+                        request.completeWith(new ServerException("Transaction to delete failed",
+                            new ServerErrorPath(path), cause));
                     }
                 }, MoreExecutors.directExecutor());
             }
