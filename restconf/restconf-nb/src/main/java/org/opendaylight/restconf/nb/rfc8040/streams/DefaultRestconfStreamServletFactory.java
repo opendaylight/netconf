@@ -10,19 +10,11 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
-import java.util.Set;
-import javax.servlet.http.HttpServlet;
-import javax.ws.rs.core.Application;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.jaxrs.SSESenderFactory;
-import org.opendaylight.restconf.nb.jaxrs.SSEStreamService;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
-import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Auxiliary interface for instantiating JAX-RS streams.
@@ -43,29 +35,20 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private final @NonNull String restconf;
     private final @NonNull ErrorTagMapping errorTagMapping;
     private final @NonNull PrettyPrintParam prettyPrint;
-    private final RestconfStream.Registry streamRegistry;
-    private final SSESenderFactory senderFactory;
-    private final ServletSupport servletSupport;
 
-    public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport, final String restconf,
-            final RestconfStream.Registry streamRegistry, final SSESenderFactory senderFactory,
-            final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint) {
-        this.servletSupport = requireNonNull(servletSupport);
+    public DefaultRestconfStreamServletFactory(final String restconf, final ErrorTagMapping errorTagMapping,
+            final PrettyPrintParam prettyPrint) {
         this.restconf = requireNonNull(restconf);
         if (restconf.endsWith("/")) {
             throw new IllegalArgumentException("{+restconf} value ends with /");
         }
-        this.streamRegistry = requireNonNull(streamRegistry);
-        this.senderFactory = requireNonNull(senderFactory);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
     }
 
     @Activate
-    public DefaultRestconfStreamServletFactory(@Reference final ServletSupport servletSupport,
-            @Reference final RestconfStream.Registry streamRegistry, @Reference final SSESenderFactory senderFactory,
-            final Map<String, ?> props) {
-        this(servletSupport, (String) props.get(PROP_RESTCONF), streamRegistry, senderFactory,
+    public DefaultRestconfStreamServletFactory(final Map<String, ?> props) {
+        this((String) props.get(PROP_RESTCONF),
             (ErrorTagMapping) props.get(PROP_ERROR_TAG_MAPPING),
             (PrettyPrintParam) props.get(PROP_PRETTY_PRINT));
     }
@@ -73,17 +56,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     @Override
     public String restconf() {
         return restconf;
-    }
-
-    @Override
-    public HttpServlet newStreamServlet() {
-        return servletSupport.createHttpServletBuilder(
-            new Application() {
-                @Override
-                public Set<Object> getSingletons() {
-                    return Set.of(new SSEStreamService(streamRegistry, senderFactory));
-                }
-            }).build();
     }
 
     @Override
