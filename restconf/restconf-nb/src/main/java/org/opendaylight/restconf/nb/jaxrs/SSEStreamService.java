@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.UnsupportedEncodingException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -21,9 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
-import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
@@ -39,16 +36,11 @@ public final class SSEStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(SSEStreamService.class);
 
     private final RestconfStream.Registry streamRegistry;
-    private final PingExecutor pingExecutor;
-    private final int maximumFragmentLength;
-    private final int heartbeatInterval;
+    private final SSESenderFactory senderFactory;
 
-    public SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
-            final StreamsConfiguration configuration) {
+    public SSEStreamService(final RestconfStream.Registry streamRegistry, final SSESenderFactory senderFactory) {
         this.streamRegistry = requireNonNull(streamRegistry);
-        this.pingExecutor = requireNonNull(pingExecutor);
-        heartbeatInterval = configuration.heartbeatInterval();
-        maximumFragmentLength = configuration.maximumFragmentLength();
+        this.senderFactory = requireNonNull(senderFactory);
     }
 
     /**
@@ -76,17 +68,6 @@ public final class SSEStreamService {
         }
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
-        // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
-        //        handler.init()/handler.close()
-        final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, getParams,
-            maximumFragmentLength, heartbeatInterval);
-
-        try {
-            handler.init();
-        } catch (UnsupportedEncodingException e) {
-            throw new NotFoundException("Unsupported encoding " + encodingName.name(), e);
-        } catch (IllegalArgumentException | XPathExpressionException e) {
-            throw new BadRequestException(e.getMessage(), e);
-        }
+        senderFactory.newSSESender(sink, sse, stream, encodingName, getParams);
     }
 }
