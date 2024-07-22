@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dfa930e_57764cb0",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-22T11:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb283373_a560deb3",
+      "revId": "bb7cd05ff73d0bf2ae3f6724958cf1ab0e77087e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19d06746_0f5ebc64",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff40f177_1e07489e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2RequestDispatcher.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-22T11:00:27Z",
+      "side": 1,
+      "message": "stream-id counter is defined on per connection basis, the client must have an ability to reset the counter by reconnecting to server\nsee https://datatracker.ietf.org/doc/html/rfc7540#section-5.1.1\n```\n   Stream identifiers cannot be reused.  Long-lived connections can\n   result in an endpoint exhausting the available range of stream\n   identifiers.  A client that is unable to establish a new stream\n   identifier can establish a new connection for new streams.  A server\n   that is unable to establish a new stream identifier can send a GOAWAY\n   frame so that the client is forced to open a new connection for new\n   streams.\n```\nmaking counter static will require restarting the app in order to reset the counter if overflown\nleft as is",
+      "parentUuid": "19d06746_0f5ebc64",
+      "revId": "bb7cd05ff73d0bf2ae3f6724958cf1ab0e77087e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9693ba63_c29a5543",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-07-18T14:44:07Z",
       "side": 1,
       "message": "package protected is enough",
+      "revId": "bb7cd05ff73d0bf2ae3f6724958cf1ab0e77087e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd6968e8_2fc9d572",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/SseClientServerTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-22T11:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9693ba63_c29a5543",
       "revId": "bb7cd05ff73d0bf2ae3f6724958cf1ab0e77087e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
