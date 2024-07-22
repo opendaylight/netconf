@@ -10,14 +10,10 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
-import java.util.Set;
-import javax.servlet.http.HttpServlet;
-import javax.ws.rs.core.Application;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.jaxrs.SSESenderFactory;
-import org.opendaylight.restconf.nb.jaxrs.SSEStreamService;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
@@ -73,17 +69,6 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     @Override
     public String restconf() {
         return restconf;
-    }
-
-    @Override
-    public HttpServlet newStreamServlet() {
-        return servletSupport.createHttpServletBuilder(
-            new Application() {
-                @Override
-                public Set<Object> getSingletons() {
-                    return Set.of(new SSEStreamService(streamRegistry, senderFactory));
-                }
-            }).build();
     }
 
     @Override

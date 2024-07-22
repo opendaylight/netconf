@@ -29,8 +29,6 @@ public interface RestconfStreamServletFactory {
      */
     String restconf();
 
-    HttpServlet newStreamServlet();
-
     PrettyPrintParam prettyPrint();
 
     ErrorTagMapping errorTagMapping();

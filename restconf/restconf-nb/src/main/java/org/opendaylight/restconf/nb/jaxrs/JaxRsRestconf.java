@@ -18,10 +18,12 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Singleton;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -40,6 +42,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -47,6 +51,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
@@ -56,6 +61,7 @@ import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
@@ -73,6 +79,7 @@ import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -113,9 +120,6 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     };
 
-    private final @NonNull RestconfServer server;
-    private final @NonNull PrettyPrintParam prettyPrint;
-    private final @NonNull ErrorTagMapping errorTagMapping;
     /**
      * The second URL path element for YANG library module support, i.e. {@code https://localhost/BASE_PATH/MODULES}.
      */
@@ -123,16 +127,25 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     /**
      * The second URL path element for streams support, i.e. {@code https://localhost/BASE_PATH/STREAMS}.
      */
-    public static final String STREAMS_SUBPATH = "streams";
+    static final String STREAMS_SUBPATH = "streams";
     /**
      * The query parameter carrying the optional revision in YANG library module support, i.e.
      * {@code https://localhost/BASE_PATH/MODULES?REVISION=2023-11-26}.
      */
     static final String MODULES_REVISION_QUERY = "revision";
 
-    public JaxRsRestconf(final RestconfServer server, final ErrorTagMapping errorTagMapping,
+    private final @NonNull RestconfServer server;
+    private final RestconfStream.@NonNull Registry streamRegistry;
+    private final @NonNull SSESenderFactory senderFactory;
+    private final @NonNull PrettyPrintParam prettyPrint;
+    private final @NonNull ErrorTagMapping errorTagMapping;
+
+    public JaxRsRestconf(final RestconfServer server, final RestconfStream.Registry streamRegistry,
+            final SSESenderFactory senderFactory, final ErrorTagMapping errorTagMapping,
             final PrettyPrintParam prettyPrint) {
         this.server = requireNonNull(server);
+        this.streamRegistry = requireNonNull(streamRegistry);
+        this.senderFactory = requireNonNull(senderFactory);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
 
@@ -868,5 +881,33 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 return Response.ok(reader).build();
             }
         };
+    }
+
+    /**
+     * Attach to a particular notification stream.
+     *
+     * @param streamName path to target
+     */
+    @GET
+    @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void getSSE(@PathParam("encodingName") final RestconfStream.EncodingName encodingName,
+            @PathParam("streamName") final String streamName, @Context final UriInfo uriInfo,
+            @Context final SseEventSink sink, @Context final Sse sse) {
+        final var stream = streamRegistry.lookupStream(streamName);
+        if (stream == null) {
+            LOG.debug("Listener for stream with name {} was not found.", streamName);
+            throw new NotFoundException("No such stream: " + streamName);
+        }
+
+        final EventStreamGetParams getParams;
+        try {
+            getParams = EventStreamGetParams.of(QueryParameters.ofMultiValue(uriInfo.getQueryParameters()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
+
+        LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
+        senderFactory.newSSESender(sink, sse, stream, encodingName, getParams);
     }
 }

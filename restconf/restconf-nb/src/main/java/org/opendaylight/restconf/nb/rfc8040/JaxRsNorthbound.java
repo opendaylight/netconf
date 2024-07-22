@@ -22,10 +22,12 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.jaxrs.JsonJaxRsFormattableBodyWriter;
+import org.opendaylight.restconf.nb.jaxrs.SSESenderFactory;
 import org.opendaylight.restconf.nb.jaxrs.ServerExceptionMapper;
 import org.opendaylight.restconf.nb.jaxrs.XmlJaxRsFormattableBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,8 +47,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
     public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            @Reference final RestconfServer server, @Reference final RestconfStreamServletFactory servletFactory)
-                throws ServletException {
+            @Reference final RestconfServer server, @Reference final RestconfStream.Registry streamRegistry,
+            @Reference final SSESenderFactory senderFactory,
+            @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
             .contextPath("/" + servletFactory.restconf())
@@ -62,15 +65,10 @@ public final class JaxRsNorthbound implements AutoCloseable {
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
                                 new ServerExceptionMapper(errorTagMapping),
-                                new JaxRsRestconf(server, errorTagMapping, servletFactory.prettyPrint()));
+                                new JaxRsRestconf(server, streamRegistry, senderFactory, errorTagMapping,
+                                    servletFactory.prettyPrint()));
                         }
                     }).build())
-                .asyncSupported(true)
-                .build())
-            .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + JaxRsRestconf.STREAMS_SUBPATH + "/*")
-                .servlet(servletFactory.newStreamServlet())
-                .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
 
