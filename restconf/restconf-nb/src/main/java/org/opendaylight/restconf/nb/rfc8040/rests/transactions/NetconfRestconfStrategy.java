@@ -74,10 +74,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public void deleteData(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
+    public void deleteData(final ServerRequest<Empty> request, final Data path) {
         final var tx = prepareWriteExecution();
+        final var instance = path.instance();
         try {
-            tx.delete(path);
+            tx.delete(instance);
         } catch (ServerException e) {
             tx.cancel();
             request.completeWith(e);
@@ -92,7 +93,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "DELETE", path));
+                request.completeWith(decodeException(cause, "DELETE", instance));
             }
         }, MoreExecutors.directExecutor());
     }

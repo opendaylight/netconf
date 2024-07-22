@@ -28,6 +28,7 @@ import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -234,7 +235,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     final void testDeleteData() throws Exception {
-        testDeleteDataStrategy().deleteData(dataDeleteRequest, YangInstanceIdentifier.of());
+        testDeleteDataStrategy().deleteData(dataDeleteRequest, new Data(JUKEBOX_DATABIND));
         assertEquals(Empty.value(), dataDeleteRequest.getResult());
     }
 
@@ -245,7 +246,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     final void testNegativeDeleteData() {
-        testNegativeDeleteDataStrategy().deleteData(dataDeleteRequest, YangInstanceIdentifier.of());
+        testNegativeDeleteDataStrategy().deleteData(dataDeleteRequest, new Data(JUKEBOX_DATABIND));
 
         final var errors = assertThrows(ServerException.class, dataDeleteRequest::getResult).errors();
         assertEquals(1, errors.size());
@@ -258,7 +259,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPostContainerData() {
-        testPostContainerDataStrategy().createData(dataPostRequest, JUKEBOX_IID, EMPTY_JUKEBOX);
+        testPostContainerDataStrategy().createData(dataPostRequest, JUKEBOX_PATH, jukeboxPayload(EMPTY_JUKEBOX));
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
@@ -266,7 +267,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     final void testPostListData() {
         testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name()))
-            .createData(dataPostRequest, PLAYLIST_IID, PLAYLIST);
+            .createData(dataPostRequest, jukeboxPath(PLAYLIST_IID), jukeboxPayload(PLAYLIST));
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
@@ -274,7 +275,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     final void testPostDataFail() {
         final var domException = new DOMException((short) 414, "Post request failed");
-        testPostDataFailStrategy(domException).createData(dataPostRequest, JUKEBOX_IID, EMPTY_JUKEBOX);
+        testPostDataFailStrategy(domException).createData(dataPostRequest, JUKEBOX_PATH, jukeboxPayload(EMPTY_JUKEBOX));
 
         final var errors = assertThrows(ServerException.class, dataPostRequest::getResult).errors();
         assertEquals(1, errors.size());
@@ -285,7 +286,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchContainerData() throws Exception {
-        testPatchContainerDataStrategy().mergeData(dataPatchRequest, JUKEBOX_IID, EMPTY_JUKEBOX);
+        testPatchContainerDataStrategy().mergeData(dataPatchRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
         dataPatchRequest.getResult();
     }
 
@@ -293,7 +294,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchLeafData() throws Exception {
-        testPatchLeafDataStrategy().mergeData(dataPatchRequest, GAP_IID, GAP_LEAF);
+        testPatchLeafDataStrategy().mergeData(dataPatchRequest, GAP_PATH, GAP_LEAF);
         dataPatchRequest.getResult();
     }
 
@@ -301,7 +302,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchListData() throws Exception {
-        testPatchListDataStrategy().mergeData(dataPatchRequest, JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST);
+        testPatchListDataStrategy().mergeData(dataPatchRequest, JUKEBOX_PATH, JUKEBOX_WITH_PLAYLIST);
         dataPatchRequest.getResult();
     }
 
@@ -347,7 +348,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testDeleteNonexistentData() throws Exception {
-        deleteNonexistentDataTestStrategy().patchData(dataYangPatchRequest, YangInstanceIdentifier.of(),
+        deleteNonexistentDataTestStrategy().patchData(dataYangPatchRequest, new Data(JUKEBOX_DATABIND),
             new PatchContext("patchD", List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))));
 
         final var status = dataYangPatchRequest.getResult().status();
@@ -498,7 +499,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     private void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
-        strategy.patchData(dataYangPatchRequest, YangInstanceIdentifier.of(), patchContext);
+        strategy.patchData(dataYangPatchRequest, new Data(strategy.databind), patchContext);
 
         final PatchStatusContext patchStatusContext;
         try {

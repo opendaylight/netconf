@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -19,7 +20,6 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
@@ -37,8 +37,7 @@ public interface ServerDataOperations {
      * @param path resource path
      * @param data resource data
      */
-    void createData(ServerRequest<? super CreateResourceResult> request, YangInstanceIdentifier path,
-        NormalizedNode data);
+    void createData(ServerRequest<? super CreateResourceResult> request, Data path, PrefixAndBody data);
 
     /**
      * Create a resource, as specified by
@@ -50,8 +49,7 @@ public interface ServerDataOperations {
      * @param insert {@link Insert} parameter
      * @param data resource data
      */
-    void createData(ServerRequest<? super CreateResourceResult> request, YangInstanceIdentifier path, Insert insert,
-        NormalizedNode data);
+    void createData(ServerRequest<? super CreateResourceResult> request, Data path, Insert insert, PrefixAndBody data);
 
     /**
      * Delete a resource, as specified by
@@ -60,7 +58,7 @@ public interface ServerDataOperations {
      * @param request {@link ServerRequest} for this request
      * @param path resource path
      */
-    void deleteData(ServerRequest<Empty> request, YangInstanceIdentifier path);
+    void deleteData(ServerRequest<Empty> request, Data path);
 
     /**
      * Get the contents of a resource, as specified by
@@ -81,7 +79,7 @@ public interface ServerDataOperations {
      * @param path resource path
      * @param data resource data
      */
-    void mergeData(ServerRequest<DataPatchResult> request, YangInstanceIdentifier path, NormalizedNode data);
+    void mergeData(ServerRequest<DataPatchResult> request, Data path, NormalizedNode data);
 
     /**
      * Patch a resource, as specified by <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6">RFC8040 PATH</a>
@@ -91,7 +89,7 @@ public interface ServerDataOperations {
      * @param path resource path
      * @param patch {@link PatchContext} to be processed
      */
-    void patchData(ServerRequest<DataYangPatchResult> request, YangInstanceIdentifier path, PatchContext patch);
+    void patchData(ServerRequest<DataYangPatchResult> request, Data path, PatchContext patch);
 
     /**
      * Create or replace a resource, as specified by
@@ -101,7 +99,7 @@ public interface ServerDataOperations {
      * @param path path of data
      * @param data data
      */
-    void putData(ServerRequest<DataPutResult> request, YangInstanceIdentifier path, NormalizedNode data);
+    void putData(ServerRequest<DataPutResult> request, Data path, NormalizedNode data);
 
     /**
      * Create or replace a resource, as specified by
@@ -112,5 +110,5 @@ public interface ServerDataOperations {
      * @param insert {@link Insert} parameter
      * @param data data
      */
-    void putData(ServerRequest<DataPutResult> request, YangInstanceIdentifier path, Insert insert, NormalizedNode data);
+    void putData(ServerRequest<DataPutResult> request, Data path, Insert insert, NormalizedNode data);
 }

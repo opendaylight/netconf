@@ -83,9 +83,13 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             request.completeWith(e);
             return;
         }
-
-        // FIXME: reject empty YangInstanceIdentifier, as datastores may not be deleted
-        data().deleteData(request, path.instance());
+        final var instance = path.instance();
+        if (instance.isEmpty()) {
+            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                "Cannot delete a datastore"));
+            return;
+        }
+        data().deleteData(request, path);
     }
 
     @Override
@@ -144,7 +148,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             request.completeWith(e);
             return;
         }
-        data().mergeData(request, path.instance(), data);
+        data().mergeData(request, path, data);
     }
 
     @Override
@@ -173,7 +177,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             request.completeWith(e);
             return;
         }
-        data().patchData(request, path.instance(), patch);
+        data().patchData(request, path, patch);
     }
 
     @Override
@@ -215,7 +219,6 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
-
         final PrefixAndBody payload;
         try {
             payload = body.toPayload(path);
@@ -224,14 +227,10 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             return;
         }
 
-        var yangDataPath = path.instance();
-        for (var arg : payload.prefix()) {
-            yangDataPath = yangDataPath.node(arg);
-        }
         if (insert != null) {
-            data().createData(request, yangDataPath, insert, payload.body());
+            data().createData(request, path, insert, payload);
         } else {
-            data().createData(request, yangDataPath, payload.body());
+            data().createData(request, path, payload);
         }
     }
 
@@ -266,7 +265,8 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         dataPUT(request, path, body);
     }
 
-    private void dataPUT(final ServerRequest<DataPutResult> request, final Data path,final ResourceBody body) {
+    @NonNullByDefault
+    private void dataPUT(final ServerRequest<DataPutResult> request, final Data path, final ResourceBody body) {
         final Insert insert;
         try {
             insert = Insert.of(databind, request.queryParameters());
@@ -283,9 +283,9 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         }
 
         if (insert != null) {
-            data().putData(request, path.instance(), insert, data);
+            data().putData(request, path, insert, data);
         } else {
-            data().putData(request, path.instance(), data);
+            data().putData(request, path, data);
         }
     }
 
