@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -44,7 +46,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Inject
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker) {
-        super(URLConstants.STREAMS_SUBPATH);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
@@ -62,5 +63,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, RESTCONF_STATE_STREAMS.node(streamName));
         return tx.commit();
+    }
+
+    @Override
+    protected URI baseStreamLocation(final URI restconfURI) throws URISyntaxException {
+        final var scheme = restconfURI.getScheme();
+        return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
+                restconfURI.getPath() + URLConstants.STREAMS_SUBPATH, null, null);
     }
 }
