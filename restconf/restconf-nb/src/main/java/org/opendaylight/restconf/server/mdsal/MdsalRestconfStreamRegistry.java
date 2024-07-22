@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
@@ -43,8 +42,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Inject
     @Activate
-    public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker) {
-        super(URLConstants.STREAMS_SUBPATH);
+    public MdsalRestconfStreamRegistry(@Reference final RestconfStream.LocationProvider locationProvider,
+            @Reference final DOMDataBroker dataBroker) {
+        super(locationProvider);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
