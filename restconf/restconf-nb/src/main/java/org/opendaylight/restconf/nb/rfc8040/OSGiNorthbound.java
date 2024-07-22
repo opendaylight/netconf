@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
+import org.opendaylight.restconf.nb.jaxrs.SSESenderFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultRestconfStreamServletFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.osgi.framework.FrameworkUtil;
@@ -76,23 +77,33 @@ public final class OSGiNorthbound {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
+    private final ComponentFactory<SSESenderFactory> sseSenderFactoryFactory;
+
+    private ComponentInstance<SSESenderFactory> senderFactory;
+    private Map<String, ?> senderProps;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
     private Map<String, ?> servletProps;
 
     @Activate
     public OSGiNorthbound(
+            @Reference(target = "(component.factory=" + SSESenderFactory.FACTORY_NAME + ")")
+            final ComponentFactory<SSESenderFactory> sseSenderFactoryFactory,
             @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
             final Configuration configuration) {
+        this.sseSenderFactoryFactory = requireNonNull(sseSenderFactoryFactory);
         this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
+
+        senderProps = SSESenderFactory.props(
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
+                configuration.heartbeat$_$interval()),
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
+        senderFactory = sseSenderFactoryFactory.newInstance(FrameworkUtil.asDictionary(senderProps));
 
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
+            PrettyPrintParam.of(configuration.pretty$_$print()));
         servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
 
         LOG.info("Global RESTCONF northbound pools started");
@@ -100,15 +111,30 @@ public final class OSGiNorthbound {
 
     @Modified
     void modified(final Configuration configuration) {
+        final var newSenderProps = SSESenderFactory.props(
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
+                configuration.heartbeat$_$interval()),
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
         final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
+            PrettyPrintParam.of(configuration.pretty$_$print()));
+
+        if (!newSenderProps.equals(senderProps)) {
+            senderProps = newSenderProps;
+            senderFactory.dispose();
+            senderFactory = null;
+        }
         if (!newServletProps.equals(servletProps)) {
             servletProps = newServletProps;
             servletFactory.dispose();
+            servletFactory = null;
+        }
+
+        if (senderFactory == null) {
+            senderFactory = sseSenderFactoryFactory.newInstance(FrameworkUtil.asDictionary(senderProps));
+            LOG.debug("SSESenderFactory restarted with {}", senderProps);
+        }
+        if (servletFactory == null) {
             servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
             LOG.debug("RestconfStreamServletFactory restarted with {}", servletProps);
         }
