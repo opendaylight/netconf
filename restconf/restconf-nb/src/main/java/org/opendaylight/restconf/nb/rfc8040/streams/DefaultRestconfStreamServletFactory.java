@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
+import org.opendaylight.restconf.nb.jaxrs.SSESenderFactory;
 import org.opendaylight.restconf.nb.jaxrs.SSEStreamService;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -90,7 +91,8 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
             new Application() {
                 @Override
                 public Set<Object> getSingletons() {
-                    return Set.of(new SSEStreamService(streamRegistry, pingExecutor, streamsConfiguration));
+                    return Set.of(new SSEStreamService(streamRegistry,
+                        new SSESenderFactory(pingExecutor, streamsConfiguration)));
                 }
             }).build();
     }
