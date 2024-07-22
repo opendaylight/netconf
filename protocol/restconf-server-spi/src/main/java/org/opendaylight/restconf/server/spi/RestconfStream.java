@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -61,6 +62,21 @@ public final class RestconfStream<T> {
                 throw new IllegalArgumentException("name must match " + PATTERN);
             }
         }
+    }
+
+    /**
+     * A service which knows where instantiated streams can be located. This is typically tied to a server endpoint
+     * providing access to <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.2">RFC8040 event streams</a>.
+     */
+    @NonNullByDefault
+    public interface LocationProvider {
+        /**
+         * Return the base location URL of the streams service based on request URI.
+         *
+         * @param restconfURI request base URI, with trailing slash
+         * @return base location URL
+         */
+        URI baseStreamLocation(URI restconfURI);
     }
 
     /**

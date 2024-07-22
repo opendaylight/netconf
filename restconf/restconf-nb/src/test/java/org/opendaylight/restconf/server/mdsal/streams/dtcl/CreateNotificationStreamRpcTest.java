@@ -67,6 +67,7 @@ class CreateNotificationStreamRpcTest {
     private static final URI RESTCONF_URI = URI.create("/rests/");
     private static final YangInstanceIdentifier TOASTER = YangInstanceIdentifier.of(
         QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"));
+    private static final String TEST_STREAMS = "test-streams";
 
     private final CompletingServerRequest<ContainerNode> request = new CompletingServerRequest<>();
 
@@ -91,8 +92,8 @@ class CreateNotificationStreamRpcTest {
 
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         doCallRealMethod().when(dataBroker).extension(any());
-        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker), databindProvider,
-            dataBroker);
+        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(
+            restconfURI -> restconfURI.resolve(TEST_STREAMS), dataBroker), databindProvider, dataBroker);
     }
 
     @Test
@@ -137,12 +138,12 @@ class CreateNotificationStreamRpcTest {
                 .withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "json"))
                     .withChild(ImmutableNodes.leafNode(rcEncoding, "json"))
-                    .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/streams/json/" + name))
+                    .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/" + TEST_STREAMS + "/json/" + name))
                     .build())
                 .withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "xml"))
                     .withChild(ImmutableNodes.leafNode(rcEncoding, "xml"))
-                    .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/streams/xml/" + name))
+                    .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/" + TEST_STREAMS + "/xml/" + name))
                     .build())
                 .build())
             .build().prettyTree().toString(), dataCaptor.getValue().prettyTree().toString());

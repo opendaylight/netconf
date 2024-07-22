@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,13 +51,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
 
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final @NonNull String subpath;
+    private final RestconfStream.LocationProvider locationProvider;
 
-    protected AbstractRestconfStreamRegistry(final String subpath) {
-        if (subpath.isEmpty()) {
-            throw new IllegalArgumentException("empty subpath");
-        }
-        this.subpath = subpath;
+    protected AbstractRestconfStreamRegistry(final RestconfStream.LocationProvider locationProvider) {
+        this.locationProvider = requireNonNull(locationProvider);
     }
 
     @Override
@@ -69,15 +65,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @Override
     public final <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
             final Source<T> source, final String description) {
-        final var baseStreamLocation = baseStreamLocation(restconfURI);
+        final var baseStreamLocation = locationProvider.baseStreamLocation(restconfURI);
         final var stream = allocateStream(source);
         final var name = stream.name();
         if (description.isBlank()) {
             throw new IllegalArgumentException("Description must be descriptive");
         }
 
-        Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation, stream.encodings())),
-            new FutureCallback<Object>() {
+        Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation.toString(),
+            stream.encodings())), new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(final Object result) {
                     LOG.debug("Stream {} added", name);
@@ -138,24 +134,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     protected abstract @NonNull ListenableFuture<?> deleteStream(@NonNull NodeIdentifierWithPredicates streamName);
-
-    /**
-     * Return the base location URL of the streams service based on request URI.
-     *
-     * @param restconfURI request base URI, with trailing slash
-     * @throws IllegalArgumentException if the result would have been malformed
-     */
-    protected final @NonNull String baseStreamLocation(final URI restconfURI) {
-        var scheme = restconfURI.getScheme();
-
-        try {
-            return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
-                restconfURI.getPath() + subpath, null, null)
-                .toString();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Cannot derive streams location", e);
-        }
-    }
 
     @VisibleForTesting
     public static final @NonNull MapEntryNode streamEntry(final String name, final String description,

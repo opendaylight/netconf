@@ -68,7 +68,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + URLConstants.STREAMS_SUBPATH + "/*")
+                .addUrlPattern("/" + JaxRsRestconf.STREAMS_SUBPATH + "/*")
                 .servlet(servletFactory.newStreamServlet())
                 .name("notificationServlet")
                 .asyncSupported(true)
