@@ -91,8 +91,8 @@ class CreateNotificationStreamRpcTest {
 
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         doCallRealMethod().when(dataBroker).extension(any());
-        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker), databindProvider,
-            dataBroker);
+        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(x -> x, dataBroker),
+            databindProvider, dataBroker);
     }
 
     @Test
