@@ -62,8 +62,8 @@
             <artifactId>mdsal-binding-test-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-test-models</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>test-models</artifactId>
         </dependency>
     </dependencies>
 </project>
