@@ -11,9 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
-import org.opendaylight.restconf.nb.jaxrs.JaxRsEndpointConfiguration;
-import org.opendaylight.restconf.nb.jaxrs.JaxRsNorthbound;
+import org.opendaylight.restconf.server.jaxrs.DefaultPingExecutor;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
+import org.opendaylight.restconf.server.jaxrs.JaxRsNorthbound;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.Uint16;
