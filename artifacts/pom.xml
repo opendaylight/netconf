@@ -539,11 +539,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>websocket-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-wadl-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
