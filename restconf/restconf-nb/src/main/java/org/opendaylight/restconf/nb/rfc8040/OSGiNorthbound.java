@@ -12,9 +12,12 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
-import org.opendaylight.restconf.nb.rfc8040.streams.DefaultRestconfStreamServletFactory;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsEndpointConfiguration;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsNorthbound;
+import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
@@ -37,22 +40,7 @@ import org.slf4j.LoggerFactory;
 public final class OSGiNorthbound {
     @ObjectClassDefinition
     public @interface Configuration {
-        // FIXME: NETCONF-773: this is solely JAX-RS, Netty uses EventLoop
-        @AttributeDefinition(min = "1")
-        String ping$_$executor$_$name$_$prefix() default DefaultPingExecutor.DEFAULT_NAME_PREFIX;
-
-        // FIXME: this is a misnomer: it specifies the core pool size, i.e. minimum thread count, the maximum is set to
-        //        Integer.MAX_VALUE, which is not what we want
-        // FIXME: NETCONF-773: this is solely JAX-RS, Netty uses EventLoop
-        @AttributeDefinition(min = "0")
-        int max$_$thread$_$count() default DefaultPingExecutor.DEFAULT_CORE_POOL_SIZE;
-
-        // FIXME: NETCONF-773: The rest of these are endpoint parameters and should be separated out to a well-known
-        //                     structure. The starting point should be StreamsConfiguration.
-
-        @AttributeDefinition(name = "{+restconf}", description = """
-            The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
-        String restconf() default "rests";
+        // Note: these are mirrored in EndpointConfiguration
 
         @AttributeDefinition(
             name = "default pretty-print",
@@ -69,58 +57,71 @@ public final class OSGiNorthbound {
                 https://mailarchive.ietf.org/arch/browse/netconf/?gbt=1&index=XcF9r3ek3LvZ4DjF-7_B8kxuiwA""")
         boolean data$_$missing$_$is$_$404() default false;
 
-        @AttributeDefinition(min = "0", max = "" + StreamsConfiguration.MAXIMUM_FRAGMENT_LENGTH_LIMIT)
+        @AttributeDefinition(min = "0", max = "" + EndpointConfiguration.SSE_MAXIMUM_FRAGMENT_LENGTH_MAX)
         int maximum$_$fragment$_$length() default 0;
 
         @AttributeDefinition(min = "0")
         int heartbeat$_$interval() default 10000;
+
+        // Note: these are mirrored in JaxRsEndpointConfiguration
+
+        @AttributeDefinition(name = "{+restconf}", description = """
+            The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
+        String restconf() default "rests";
+
+        @AttributeDefinition(min = "1")
+        String ping$_$executor$_$name$_$prefix() default DefaultPingExecutor.DEFAULT_NAME_PREFIX;
+
+        // FIXME: this is a misnomer: it specifies the core pool size, i.e. minimum thread count, the maximum is set to
+        //        Integer.MAX_VALUE, which is not what we want
+        @AttributeDefinition(min = "0")
+        int max$_$thread$_$count() default DefaultPingExecutor.DEFAULT_CORE_POOL_SIZE;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
-    private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
+    private final ComponentFactory<JaxRsNorthbound> jaxrsFactory;
 
-    private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
-    private Map<String, ?> servletProps;
+    private ComponentInstance<JaxRsNorthbound> jaxrs;
+    private Map<String, ?> jaxrsProps;
 
     @Activate
     public OSGiNorthbound(
-            @Reference(target = "(component.factory=" + DefaultRestconfStreamServletFactory.FACTORY_NAME + ")")
-            final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory,
-            final Configuration configuration) {
-        this.servletFactoryFactory = requireNonNull(servletFactoryFactory);
+            @Reference(target = "(component.factory=" + JaxRsNorthbound.FACTORY_NAME + ")")
+            final ComponentFactory<JaxRsNorthbound> jaxrsFactory, final Configuration configuration) {
+        this.jaxrsFactory = requireNonNull(jaxrsFactory);
 
-        servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
-        servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
+        jaxrsProps = newJaxrsProps(configuration);
+        jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
 
         LOG.info("Global RESTCONF northbound pools started");
     }
 
     @Modified
     void modified(final Configuration configuration) {
-        final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.heartbeat$_$interval()),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
-        if (!newServletProps.equals(servletProps)) {
-            servletProps = newServletProps;
-            servletFactory.dispose();
-            servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
-            LOG.debug("RestconfStreamServletFactory restarted with {}", servletProps);
+        final var newJaxRsProps = newJaxrsProps(configuration);
+        if (!newJaxRsProps.equals(jaxrsProps)) {
+            jaxrs.dispose();
+            jaxrsProps = newJaxRsProps;
+            jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
+            LOG.debug("JAX-RS northbound restarted with {}", jaxrsProps);
         }
-
         LOG.debug("Applied {}", configuration);
     }
 
     @Deactivate
     void deactivate() {
-        servletFactory.dispose();
-        servletFactory = null;
+        jaxrs.dispose();
+        jaxrs = null;
         LOG.info("Global RESTCONF northbound pools stopped");
+    }
+
+    private static Map<String, ?> newJaxrsProps(final Configuration configuration) {
+        return JaxRsNorthbound.props(new JaxRsEndpointConfiguration(
+            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
+            PrettyPrintParam.of(configuration.pretty$_$print()),
+            Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
+            Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.restconf(),
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count()));
     }
 }
