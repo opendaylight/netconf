@@ -9,35 +9,19 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
 
-@ExtendWith(MockitoExtension.class)
 class JaxRsYangLibraryTest {
-    @Mock
-    private RestconfStreamServletFactory servletFactory;
-
-    private JaxRsYangLibrary urlProvider;
-
-    @BeforeEach
-    void beforeEach() {
-        doReturn("restconf").when(servletFactory).restconf();
-        urlProvider = new JaxRsYangLibrary(servletFactory);
-    }
+    private final JaxRsYangLibrary urlProvider = new JaxRsYangLibrary("restconf");
 
     @Test
     @DisplayName("Unsupported module-set name.")
