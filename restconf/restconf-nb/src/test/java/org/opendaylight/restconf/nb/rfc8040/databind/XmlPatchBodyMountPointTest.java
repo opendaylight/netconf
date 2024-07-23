@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 class XmlPatchBodyMountPointTest extends XmlPatchBodyTest {
@@ -27,12 +28,13 @@ class XmlPatchBodyMountPointTest extends XmlPatchBodyTest {
     @BeforeEach
     final void before() {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(new FixedDOMSchemaService(IID_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
     }
 

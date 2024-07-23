@@ -21,6 +21,10 @@
     <name>${project.artifactId}</name>
     <description>RESTCONF server API</description>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.spotbugs</groupId>
