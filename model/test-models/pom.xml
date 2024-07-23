@@ -16,9 +16,11 @@
         <relativePath>../../parent</relativePath>
     </parent>
 
-    <artifactId>netconf-test-models</artifactId>
-    <packaging>bundle</packaging>
+    <groupId>org.opendaylight.netconf.model</groupId>
+    <artifactId>test-models</artifactId>
     <name>${project.artifactId}</name>
+    <packaging>bundle</packaging>
+    <description>OpenDaylight NETCONF project test models</description>
 
     <dependencies>
         <dependency>

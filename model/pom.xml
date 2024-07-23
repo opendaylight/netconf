@@ -33,5 +33,7 @@
         <module>draft-ietf-crypto-types</module>
         <module>draft-ietf-restconf-server</module>
         <module>sal-remote</module>
+
+        <module>test-models</module>
     </modules>
 </project>

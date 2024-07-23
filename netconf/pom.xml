@@ -32,7 +32,5 @@
     <module>netconf-netty-util</module>
     <module>netconf-auth</module>
     <module>tools</module>
-
-    <module>netconf-test-models</module>
   </modules>
 </project>
