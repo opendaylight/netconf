@@ -17,10 +17,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsNorthbound;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
@@ -45,9 +46,14 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Activate
     public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
             final @Reference DOMMountPointService mountPointService,
-            final @Reference RestconfStreamServletFactory context) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, context.restconf()),
-            new OpenApiGeneratorRFC8040(schemaService, context.restconf()));
+            final @Reference JaxRsNorthbound jaxrsNorthbound) {
+        this(schemaService, mountPointService, jaxrsNorthbound.configuration().restconf());
+    }
+
+    private OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
+            final @NonNull String restconf) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, restconf),
+            new OpenApiGeneratorRFC8040(schemaService, restconf));
     }
 
     @VisibleForTesting

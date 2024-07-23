@@ -7,11 +7,12 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
-import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.osgi.service.component.annotations.Activate;
@@ -27,14 +28,18 @@ import org.osgi.service.component.annotations.Reference;
  * {@link JaxRsRestconf#modulesYangGET(String, String, javax.ws.rs.container.AsyncResponse)} et al.
  */
 @Singleton
-@Component
+@Component(immediate = true)
 public final class JaxRsYangLibrary implements YangLibrarySchemaSourceUrlProvider {
     private final String modulesPath;
 
+    public JaxRsYangLibrary(final String restconf) {
+        modulesPath = "/" + requireNonNull(restconf) + "/" + JaxRsRestconf.MODULES_SUBPATH + "/";
+    }
+
     @Inject
     @Activate
-    public JaxRsYangLibrary(@Reference final RestconfStreamServletFactory servletFactory) {
-        modulesPath = "/" + servletFactory.restconf() + "/" + JaxRsRestconf.MODULES_SUBPATH + "/";
+    public JaxRsYangLibrary(@Reference final JaxRsNorthbound northbound) {
+        this(northbound.configuration().restconf());
     }
 
     @Override
