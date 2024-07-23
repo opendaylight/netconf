@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -142,6 +143,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
     @Test
     void invokeRpcViaMountPointTest() throws Exception {
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
@@ -169,6 +171,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
     @Test
     void invokeRpcMissingMountPointServiceTest() {
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);

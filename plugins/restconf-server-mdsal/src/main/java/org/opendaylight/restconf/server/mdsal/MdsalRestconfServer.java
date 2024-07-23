@@ -28,6 +28,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerModulesOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
+import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -45,7 +49,6 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
-import org.opendaylight.restconf.server.mdsal.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.spi.ExportingServerModulesOperations;
 import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
@@ -108,11 +111,11 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         mountPointResolver = new MdsalMountPointResolver(mountPointService);
 
         final var rpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
-        final var rpcDelegate = rpcService != null ? new MdsalServerRpcOperations(rpcService)
+        final var rpcDelegate = rpcService != null ? new DOMServerRpcOperations(rpcService)
             : NotSupportedServerRpcOperations.INSTANCE;
         rpc = rpcs.isEmpty() ? rpcDelegate
             : new InterceptingServerRpcOperations(path -> rpcs.get(path.rpc().argument()), rpcDelegate);
-        action = actionService != null ? new MdsalServerActionOperations(actionService)
+        action = actionService != null ? new DOMServerActionOperations(actionService)
             : NotSupportedServerActionOperations.INSTANCE;
 
         localStrategy = createLocalStrategy(databindProvider.currentDatabind());
@@ -130,7 +133,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
         return new MdsalServerStrategy(databind, mountPointResolver, action,
             new MdsalRestconfStrategy(databind, dataBroker),
-            sourceProvider == null ? sourceExporter : new MdsalServerModulesOperations(sourceProvider, sourceExporter),
+            sourceProvider == null ? sourceExporter : new DOMServerModulesOperations(sourceProvider, sourceExporter),
             rpc);
     }
 

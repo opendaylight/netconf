@@ -18,12 +18,16 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerModulesOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
+import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
+import org.opendaylight.restconf.mdsal.spi.data.NetconfRestconfStrategy;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
-import org.opendaylight.restconf.server.mdsal.data.MdsalRestconfStrategy;
-import org.opendaylight.restconf.server.mdsal.data.NetconfRestconfStrategy;
 import org.opendaylight.restconf.server.spi.ErrorTags;
 import org.opendaylight.restconf.server.spi.ExportingServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
@@ -34,6 +38,7 @@ import org.opendaylight.restconf.server.spi.ServerActionOperations;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.restconf.server.spi.ServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.ServerRpcOperations;
+import org.opendaylight.restconf.server.spi.ServerStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 /**
@@ -46,10 +51,15 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
     }
 
     @Override
-    public MdsalServerStrategy resolveMountPoint(final Data mountPath) throws ServerException {
+    public ServerStrategy resolveMountPoint(final Data mountPath) throws ServerException {
         final var mountPoint = mountPointService.getMountPoint(mountPath.instance())
             .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
                 "Mount point does not exist", new ServerErrorPath(mountPath), null));
+        final var serverStrategy = mountPoint.getService(DOMServerStrategy.class);
+        if (serverStrategy.isPresent()) {
+            return serverStrategy.orElseThrow().serverStrategy();
+        }
+
         final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
             .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
                 "Mount point does not expose DOMSchemaService", new ServerErrorPath(mountPath), null));
@@ -61,7 +71,7 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
         final var sourceExporter = new ExportingServerModulesOperations(mountModelContext);
         final var sourceProvider = mountSchemaService.extension(YangTextSourceExtension.class);
         final var modules = sourceProvider == null ? sourceExporter
-            : new MdsalServerModulesOperations(sourceProvider, sourceExporter);
+            : new DOMServerModulesOperations(sourceProvider, sourceExporter);
 
         final var mountDatabind = DatabindContext.ofModel(mountModelContext);
 
@@ -71,7 +81,7 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
 
     private static ServerActionOperations actionOperationsOf(final DOMMountPoint mountPoint) {
         return mountPoint.getService(DOMActionService.class)
-            .<ServerActionOperations>map(MdsalServerActionOperations::new)
+            .<ServerActionOperations>map(DOMServerActionOperations::new)
             .orElse(NotSupportedServerActionOperations.INSTANCE);
     }
 
@@ -96,7 +106,7 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
 
     private static ServerRpcOperations rpcOperationsOf(final DOMMountPoint mountPoint) {
         return mountPoint.getService(DOMRpcService.class)
-            .<ServerRpcOperations>map(MdsalServerRpcOperations::new)
+            .<ServerRpcOperations>map(DOMServerRpcOperations::new)
             .orElse(NotSupportedServerRpcOperations.INSTANCE);
     }
 }
