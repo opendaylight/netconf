@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.restconf.server.mdsal.streams;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
@@ -14,13 +14,12 @@ import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.restconf.server.mdsal.streams.NotificationFormatterFactory;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-final class XMLNotificationFormatter extends AbstractNotificationFormatter {
+final class XMLNotificationFormatter extends NotificationFormatter {
     @VisibleForTesting
     static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
@@ -51,7 +50,7 @@ final class XMLNotificationFormatter extends AbstractNotificationFormatter {
         final var writer = new StringWriter();
 
         try {
-            final var xmlStreamWriter = AbstractNotificationFormatter.createStreamWriterWithNotification(writer, now);
+            final var xmlStreamWriter = createStreamWriterWithNotification(writer, now);
             try (var nnWriter = NormalizedNodeWriter.forStreamWriter(XMLStreamNormalizedNodeStreamWriter.create(
                     xmlStreamWriter, schemaContext, input.getType()))) {
                 nnWriter.write(input.getBody());

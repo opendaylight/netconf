@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2020 Pantheon.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.restconf.server.mdsal.streams;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -26,10 +27,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.xmlunit.assertj.XmlAssert;
 
 @ExtendWith(MockitoExtension.class)
-class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
+class JSONNotificationFormatterTest extends AbstractNotificationListenerTest {
     @Mock
     private DOMNotification notificationData;
 
@@ -43,10 +43,12 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
         when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
-        assertXmlMatches(prepareXmlResult(schemaPathNotifi), """
-            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">\
-            <eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-leaf xmlns="notifi:mod">\
-            <lf>value</lf></notifi-leaf></notification>""");
+        final String result = prepareJson(schemaPathNotifi);
+
+        assertTrue(result.contains("ietf-restconf:notification"));
+        assertTrue(result.contains("event-time"));
+        assertTrue(result.contains("notifi-module:notifi-leaf"));
+        assertTrue(result.contains("lf" + '"' + ":" + '"' + "value"));
     }
 
     @Test
@@ -60,10 +62,13 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
         when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
-        assertXmlMatches(prepareXmlResult(schemaPathNotifi), """
-            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">\
-            <eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-cont xmlns="notifi:mod">\
-            <cont><lf>value</lf></cont></notifi-cont></notification>""");
+        final String result = prepareJson(schemaPathNotifi);
+
+        assertTrue(result.contains("ietf-restconf:notification"));
+        assertTrue(result.contains("event-time"));
+        assertTrue(result.contains("notifi-module:notifi-cont"));
+        assertTrue(result.contains("cont"));
+        assertTrue(result.contains("lf" + '"' + ":" + '"' + "value"));
     }
 
     @Test
@@ -80,10 +85,13 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
         when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
-        assertXmlMatches(prepareXmlResult(schemaPathNotifi), """
-            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">\
-            <eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-list xmlns="notifi:mod">\
-            <lst><lf>value</lf></lst></notifi-list></notification>""");
+        final String result = prepareJson(schemaPathNotifi);
+
+        assertTrue(result.contains("ietf-restconf:notification"));
+        assertTrue(result.contains("event-time"));
+        assertTrue(result.contains("notifi-module:notifi-list"));
+        assertTrue(result.contains("lst"));
+        assertTrue(result.contains("lf" + '"' + ":" + '"' + "value"));
     }
 
     @Test
@@ -96,10 +104,11 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
         when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
-        assertXmlMatches(prepareXmlResult(schemaPathNotifi), """
-            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">\
-            <eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-grp xmlns="notifi:mod">\
-            <lf>value</lf></notifi-grp></notification>""");
+        final String result = prepareJson(schemaPathNotifi);
+
+        assertTrue(result.contains("ietf-restconf:notification"));
+        assertTrue(result.contains("event-time"));
+        assertTrue(result.contains("lf" + '"' + ":" + '"' + "value"));
     }
 
     @Test
@@ -112,18 +121,11 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
         when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
-        assertXmlMatches(prepareXmlResult(schemaPathNotifi), """
-            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">\
-            <eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-augm xmlns="notifi:mod">\
-            <lf-augm>value</lf-augm></notifi-augm></notification>""");
-    }
+        final String result = prepareJson(schemaPathNotifi);
 
-    private static void assertXmlMatches(final String result, final String control) {
-        XmlAssert.assertThat(result).and(control)
-                // text values have localName null but we want to compare those, ignore only nodes that have localName
-                // with eventTime value
-                .withNodeFilter(node -> node.getLocalName() == null || !node.getLocalName().equals("eventTime"))
-                .areSimilar();
+        assertTrue(result.contains("ietf-restconf:notification"));
+        assertTrue(result.contains("event-time"));
+        assertTrue(result.contains("lf-augm" + '"' + ":" + '"' + "value"));
     }
 
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
@@ -144,8 +146,8 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
         return ImmutableNodes.leafNode(leafQName, "value");
     }
 
-    private String prepareXmlResult(final QName schemaPathNotifi) throws Exception {
-        final var ret = XMLNotificationFormatter.EMPTY.eventData(MODEL_CONTEXT, notificationData, Instant.now());
+    private String prepareJson(final QName schemaPathNotifi) throws Exception {
+        final var ret = JSONNotificationFormatter.EMPTY.eventData(MODEL_CONTEXT, notificationData, Instant.now());
         assertNotNull(ret);
         return ret;
     }
