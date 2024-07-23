@@ -16,6 +16,24 @@
       "message": "Line too long",
       "revId": "20c419163240694f7a2aae71ab95ee480b87e3fc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eafe726b_fbed9ea8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-23T11:12:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3dce1369_5f7aae9e",
+      "revId": "20c419163240694f7a2aae71ab95ee480b87e3fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
