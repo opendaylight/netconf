@@ -23,6 +23,10 @@
     <name>${project.artifactId}</name>
     <description>odl-device-notification model and implementation</description>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.guicedee.services</groupId>
@@ -43,11 +47,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-api</artifactId>
+            <artifactId>restconf-mdsal-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-mdsal</artifactId>
+            <artifactId>restconf-server-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

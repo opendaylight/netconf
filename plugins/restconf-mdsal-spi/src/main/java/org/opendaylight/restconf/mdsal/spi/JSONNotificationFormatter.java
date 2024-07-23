@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams;
+package org.opendaylight.restconf.mdsal.spi;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.stream.JsonWriter;

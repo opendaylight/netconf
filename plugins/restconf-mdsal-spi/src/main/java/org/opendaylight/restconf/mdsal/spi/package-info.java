@@ -11,4 +11,4 @@
  * {@link AbstractNotificationSource}.
  */
 @org.osgi.annotation.bundle.Export
-package org.opendaylight.restconf.server.mdsal.streams;
+package org.opendaylight.restconf.mdsal.spi;
