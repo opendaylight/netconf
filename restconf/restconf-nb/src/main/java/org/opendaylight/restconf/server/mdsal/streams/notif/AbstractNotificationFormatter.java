@@ -14,23 +14,24 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.restconf.server.spi.EventFormatter;
+import org.opendaylight.restconf.server.mdsal.streams.NotificationFormatter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 
-abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
+abstract class AbstractNotificationFormatter extends NotificationFormatter {
     private static final String CREATE_NOTIFICATION_STREAM_ELEMENT = CreateNotificationStream.QNAME.getLocalName();
     private static final String CREATE_NOTIFICATION_STREAM_NS =
         CreateNotificationStream.QNAME.getNamespace().toString();
 
-    NotificationFormatter(final TextParameters textParams) {
+    AbstractNotificationFormatter(final TextParameters textParams) {
         super(textParams);
     }
 
-    NotificationFormatter(final TextParameters textParams, final String xpathFilter) throws XPathExpressionException {
+    AbstractNotificationFormatter(final TextParameters textParams, final String xpathFilter)
+            throws XPathExpressionException {
         super(textParams, xpathFilter);
     }
 

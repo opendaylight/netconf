@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.restconf.server.mdsal.streams;
 
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.EventFormatterFactory;
 
-abstract class NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
-    NotificationFormatterFactory(final EventFormatter<DOMNotification> emptyFormatter) {
+public abstract class NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
+    protected NotificationFormatterFactory(final NotificationFormatter emptyFormatter) {
         super(emptyFormatter);
     }
 }

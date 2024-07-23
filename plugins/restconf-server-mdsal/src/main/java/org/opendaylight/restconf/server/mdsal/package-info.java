@@ -8,4 +8,5 @@
 /**
  * RESTCONF server implementation on top of MD-SAL APIs.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.restconf.server.mdsal;
