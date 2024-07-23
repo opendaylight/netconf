@@ -8,4 +8,4 @@
 /**
  * Support for streams of YANG 1.0 notifications coming from a mounted device.
  */
-package org.opendaylight.restconf.server.mdsal.streams.devnotif;
+package org.opendaylight.netconf.odl.device.notification;
