@@ -22,19 +22,10 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.spotbugs</groupId>
-      <artifactId>spotbugs-annotations</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
@@ -95,6 +86,10 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>restconf-mdsal-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>restconf-server-jaxrs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
@@ -173,26 +168,6 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>binding-spec</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opendaylight.aaa.web</groupId>
-      <artifactId>web-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opendaylight.aaa.web</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>aaa-filterchain</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>yanglib-mdsal-writer</artifactId>
     </dependency>
 
     <!-- Testing Dependencies -->
