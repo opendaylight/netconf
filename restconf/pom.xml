@@ -32,7 +32,6 @@
         <module>sal-rest-connector-config</module>
         <module>restconf-openapi</module>
         <module>wadl-generator</module>
-        <module>websocket-client</module>
         <!--
         FIXME: Needs to be reimplemented to not use YANGTools restconf impl
         <module>sal-restconf-broker</module>
