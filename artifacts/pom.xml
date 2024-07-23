@@ -172,6 +172,13 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- sal-remote.yang and sal-remote-augment.yang -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>sal-remote</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- FIXME: place these models with their users -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
