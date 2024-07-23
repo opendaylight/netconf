@@ -8,4 +8,4 @@
 /**
  * Support for data tree change streams.
  */
-package org.opendaylight.restconf.server.mdsal.streams.dtcl;
+package org.opendaylight.netconf.sal.remote.impl;
