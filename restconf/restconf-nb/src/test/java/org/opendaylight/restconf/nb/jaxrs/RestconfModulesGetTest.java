@@ -32,7 +32,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
-import org.opendaylight.restconf.nb.rfc8040.ErrorTags;
+import org.opendaylight.restconf.api.ErrorTags;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
