@@ -90,10 +90,6 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>restconf-common-models</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>restconf-server-api</artifactId>
     </dependency>
     <dependency>
