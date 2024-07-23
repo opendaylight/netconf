@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.spi.ErrorTags;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -164,6 +165,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
 
     @Test
     void toSchemaExportContextFromIdentifierNullSchemaContextBehindMountPointNegativeTest() {
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(MOUNT_IID);
 
@@ -196,6 +198,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     }
 
     private void mockMountPoint() {
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT_ON_MOUNT_POINT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(MOUNT_IID);
