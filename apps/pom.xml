@@ -35,6 +35,7 @@
         <module>callhome-provider</module>
         <module>netconf-console</module>
         <module>netconf-nb</module>
+        <module>sal-remote-impl</module>
         <module>yanglib-mdsal-writer</module>
     </modules>
 </project>

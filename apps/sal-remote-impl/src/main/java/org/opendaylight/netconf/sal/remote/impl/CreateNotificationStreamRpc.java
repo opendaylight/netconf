@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.netconf.sal.remote.impl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,6 +16,7 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.mdsal.streams.NotificationSource;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;

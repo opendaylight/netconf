@@ -18,7 +18,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.server.mdsal.streams.AbstractNotificationSource;
-import org.opendaylight.restconf.server.mdsal.streams.notif.NotificationSource;
+import org.opendaylight.restconf.server.mdsal.streams.NotificationSource;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.yangtools.concepts.Registration;

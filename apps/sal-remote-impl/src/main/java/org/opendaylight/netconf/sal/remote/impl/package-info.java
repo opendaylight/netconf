@@ -6,6 +6,6 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Support for YANG 1.0 notification streams.
+ * Support for data tree change streams.
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.netconf.sal.remote.impl;
