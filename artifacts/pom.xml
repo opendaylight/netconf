@@ -292,6 +292,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>odl-device-notification</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>sal-remote-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -451,11 +456,6 @@
             </dependency>
 
             <!-- RESTCONF -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>restconf-common-models</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-api</artifactId>
