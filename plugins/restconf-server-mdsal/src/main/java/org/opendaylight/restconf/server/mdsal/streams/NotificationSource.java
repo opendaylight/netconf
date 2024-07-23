@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.restconf.server.mdsal.streams;
 
 import static java.util.Objects.requireNonNull;
 
@@ -14,8 +14,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.restconf.server.mdsal.streams.AbstractNotificationSource;
-import org.opendaylight.restconf.server.mdsal.streams.NotificationFormatterFactory;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
@@ -36,7 +34,7 @@ public final class NotificationSource extends AbstractNotificationSource {
     private final DOMNotificationService notificationService;
     private final ImmutableSet<QName> qnames;
 
-    NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
+    public NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
             final ImmutableSet<QName> qnames) {
         super(ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);
