@@ -20,6 +20,10 @@
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
+  <properties>
+    <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -90,6 +94,10 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
