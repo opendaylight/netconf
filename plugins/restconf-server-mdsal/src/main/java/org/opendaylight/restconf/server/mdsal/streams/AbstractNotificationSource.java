@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.mdsal.streams.notif;
+package org.opendaylight.restconf.server.mdsal.streams;
 
 import static java.util.Objects.requireNonNull;
 
@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.restconf.server.spi.EventFormatterFactory;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
@@ -40,11 +41,8 @@ public abstract class AbstractNotificationSource extends Source<DOMNotification>
         }
     }
 
-    private static final ImmutableMap<EncodingName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
-        EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
-        EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
-
-    protected AbstractNotificationSource() {
-        super(ENCODINGS);
+    protected AbstractNotificationSource(
+            final ImmutableMap<EncodingName, ? extends EventFormatterFactory<DOMNotification>> encodings) {
+        super(encodings);
     }
 }
