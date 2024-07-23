@@ -11,9 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
-import org.opendaylight.restconf.nb.jaxrs.JaxRsEndpointConfiguration;
-import org.opendaylight.restconf.nb.jaxrs.JaxRsNorthbound;
+import org.opendaylight.restconf.server.jaxrs.DefaultPingExecutor;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -80,15 +80,15 @@ public final class OSGiNorthbound {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
-    private final ComponentFactory<JaxRsNorthbound> jaxrsFactory;
+    private final ComponentFactory<JaxRsEndpoint> jaxrsFactory;
 
-    private ComponentInstance<JaxRsNorthbound> jaxrs;
+    private ComponentInstance<JaxRsEndpoint> jaxrs;
     private Map<String, ?> jaxrsProps;
 
     @Activate
     public OSGiNorthbound(
-            @Reference(target = "(component.factory=" + JaxRsNorthbound.FACTORY_NAME + ")")
-            final ComponentFactory<JaxRsNorthbound> jaxrsFactory, final Configuration configuration) {
+            @Reference(target = "(component.factory=" + JaxRsEndpoint.FACTORY_NAME + ")")
+            final ComponentFactory<JaxRsEndpoint> jaxrsFactory, final Configuration configuration) {
         this.jaxrsFactory = requireNonNull(jaxrsFactory);
 
         jaxrsProps = newJaxrsProps(configuration);
@@ -117,7 +117,7 @@ public final class OSGiNorthbound {
     }
 
     private static Map<String, ?> newJaxrsProps(final Configuration configuration) {
-        return JaxRsNorthbound.props(new JaxRsEndpointConfiguration(
+        return JaxRsEndpoint.props(new JaxRsEndpointConfiguration(
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
