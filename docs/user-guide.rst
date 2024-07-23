@@ -1324,7 +1324,6 @@ set:
 
 * ``maximum-fragment-length``, which defaults to ``0``
 * ``heartbeat-interval``, which defaults to ``10000``
-* ``idle-timeout``, which defaults to ``30000``
 * ``ping-executor-name-prefix``, which defaults to ``ping-executor``
 * ``max-thread-count``, which defaults to ``1``
 * ``restconf``, which defaults to ``rests``
@@ -1333,8 +1332,6 @@ set:
 (exceeded message length leads to fragmentation of messages)
 
 *heartbeat-interval* — Interval in milliseconds between sending of ping control frames.
-
-*idle-timeout* — Maximum idle time of SSE session before the session is closed (milliseconds).
 
 *ping-executor-name-prefix* — Name of thread group Ping Executor will be run with.
 
@@ -1349,7 +1346,6 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
 
     maximum-fragment-length=0
     heartbeat-interval=10000
-    idle-timeout=30000
     ping-executor-name-prefix=ping-executor
     max-thread-count=1
     restconf=rests
@@ -1361,7 +1357,6 @@ Or use Karaf CLI:
     opendaylight-user@root>config:edit org.opendaylight.restconf.nb.rfc8040
     opendaylight-user@root>config:property-set maximum-fragment_length 0
     opendaylight-user@root>config:property-set heartbeat-interval 10000
-    opendaylight-user@root>config:property-set idle-timeout 30000
     opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
     opendaylight-user@root>config:property-set max-thread-count 1
     opendaylight-user@root>config:property-set restconf "rests"

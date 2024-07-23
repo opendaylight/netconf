@@ -74,9 +74,6 @@ public final class OSGiNorthbound {
 
         @AttributeDefinition(min = "0")
         int heartbeat$_$interval() default 10000;
-
-        @AttributeDefinition(min = "1")
-        int idle$_$timeout() default 30000;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -96,8 +93,7 @@ public final class OSGiNorthbound {
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
         servletFactory = servletFactoryFactory.newInstance(FrameworkUtil.asDictionary(servletProps));
 
@@ -109,8 +105,7 @@ public final class OSGiNorthbound {
         final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
-                configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
         if (!newServletProps.equals(servletProps)) {
             servletProps = newServletProps;
