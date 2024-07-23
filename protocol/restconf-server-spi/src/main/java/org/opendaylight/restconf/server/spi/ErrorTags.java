@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.server.spi;
 
-import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 /**
@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 public final class ErrorTags {
     /**
      * Error reported when the request is valid, but the resource cannot be accessed. This tag typically maps to
-     * {@link Status#SERVICE_UNAVAILABLE}.
+     * {@link HttpStatusCode#SERVICE_UNAVAILABLE}.
      */
     // FIXME: redefine as SERVICE_UNAVAILABLE? It would be more obvious
     public static final ErrorTag RESOURCE_DENIED_TRANSPORT = new ErrorTag("resource-denied-transport");

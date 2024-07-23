@@ -10,7 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import javax.servlet.http.HttpServlet;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 
 /**

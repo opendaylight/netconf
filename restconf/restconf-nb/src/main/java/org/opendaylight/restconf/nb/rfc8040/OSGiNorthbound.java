@@ -14,6 +14,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.jaxrs.DefaultPingExecutor;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultRestconfStreamServletFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
