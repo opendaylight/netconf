@@ -37,22 +37,18 @@ import org.slf4j.LoggerFactory;
 public final class OSGiNorthbound {
     @ObjectClassDefinition
     public @interface Configuration {
-        @AttributeDefinition(min = "0", max = "" + StreamsConfiguration.MAXIMUM_FRAGMENT_LENGTH_LIMIT)
-        int maximum$_$fragment$_$length() default 0;
-
-        @AttributeDefinition(min = "0")
-        int heartbeat$_$interval() default 10000;
-
-        @AttributeDefinition(min = "1")
-        int idle$_$timeout() default 30000;
-
+        // FIXME: NETCONF-773: this is solely JAX-RS, Netty uses EventLoop
         @AttributeDefinition(min = "1")
         String ping$_$executor$_$name$_$prefix() default DefaultPingExecutor.DEFAULT_NAME_PREFIX;
 
         // FIXME: this is a misnomer: it specifies the core pool size, i.e. minimum thread count, the maximum is set to
         //        Integer.MAX_VALUE, which is not what we want
+        // FIXME: NETCONF-773: this is solely JAX-RS, Netty uses EventLoop
         @AttributeDefinition(min = "0")
         int max$_$thread$_$count() default DefaultPingExecutor.DEFAULT_CORE_POOL_SIZE;
+
+        // FIXME: NETCONF-773: The rest of these are endpoint parameters and should be separated out to a well-known
+        //                     structure. The starting point should be StreamsConfiguration.
 
         @AttributeDefinition(name = "{+restconf}", description = """
             The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
@@ -72,6 +68,15 @@ public final class OSGiNorthbound {
                 For details and reasoning see https://www.rfc-editor.org/errata/eid5565 and
                 https://mailarchive.ietf.org/arch/browse/netconf/?gbt=1&index=XcF9r3ek3LvZ4DjF-7_B8kxuiwA""")
         boolean data$_$missing$_$is$_$404() default false;
+
+        @AttributeDefinition(min = "0", max = "" + StreamsConfiguration.MAXIMUM_FRAGMENT_LENGTH_LIMIT)
+        int maximum$_$fragment$_$length() default 0;
+
+        @AttributeDefinition(min = "0")
+        int heartbeat$_$interval() default 10000;
+
+        @AttributeDefinition(min = "1")
+        int idle$_$timeout() default 30000;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
