@@ -17,7 +17,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.server.mdsal.streams.notif.AbstractNotificationSource;
+import org.opendaylight.restconf.server.mdsal.streams.AbstractNotificationSource;
+import org.opendaylight.restconf.server.mdsal.streams.notif.NotificationSource;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -38,6 +39,7 @@ final class DeviceNotificationSource extends AbstractNotificationSource implemen
     private final YangInstanceIdentifier devicePath;
 
     DeviceNotificationSource(final DOMMountPointService mountPointService, final YangInstanceIdentifier devicePath) {
+        super(NotificationSource.ENCODINGS);
         this.mountPointService = requireNonNull(mountPointService);
         this.devicePath = requireNonNull(devicePath);
     }

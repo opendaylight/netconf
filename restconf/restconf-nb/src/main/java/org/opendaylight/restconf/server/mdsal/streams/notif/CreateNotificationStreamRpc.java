@@ -111,6 +111,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
                 .build()),
-            restconfURI, new NotificationSource(databindProvider, notificationService, qnames), description.toString());
+            restconfURI, new NotificationSource(databindProvider, notificationService, qnames),
+            description.toString());
     }
 }

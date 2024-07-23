@@ -14,12 +14,13 @@ import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.restconf.server.mdsal.streams.NotificationFormatterFactory;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-final class XMLNotificationFormatter extends NotificationFormatter {
+final class XMLNotificationFormatter extends AbstractNotificationFormatter {
     @VisibleForTesting
     static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
@@ -50,7 +51,7 @@ final class XMLNotificationFormatter extends NotificationFormatter {
         final var writer = new StringWriter();
 
         try {
-            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
+            final var xmlStreamWriter = AbstractNotificationFormatter.createStreamWriterWithNotification(writer, now);
             try (var nnWriter = NormalizedNodeWriter.forStreamWriter(XMLStreamNormalizedNodeStreamWriter.create(
                     xmlStreamWriter, schemaContext, input.getType()))) {
                 nnWriter.write(input.getBody());

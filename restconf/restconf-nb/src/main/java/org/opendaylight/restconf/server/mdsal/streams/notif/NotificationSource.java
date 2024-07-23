@@ -10,10 +10,14 @@ package org.opendaylight.restconf.server.mdsal.streams.notif;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.restconf.server.mdsal.streams.AbstractNotificationSource;
+import org.opendaylight.restconf.server.mdsal.streams.NotificationFormatterFactory;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
+import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -23,13 +27,18 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 /**
  * A {@link Source} reporting YANG notifications.
  */
-final class NotificationSource extends AbstractNotificationSource {
+public final class NotificationSource extends AbstractNotificationSource {
+    public static final ImmutableMap<EncodingName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
+        EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
+        EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
+
     private final DatabindProvider databindProvider;
     private final DOMNotificationService notificationService;
     private final ImmutableSet<QName> qnames;
 
     NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
             final ImmutableSet<QName> qnames) {
+        super(ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);
         this.notificationService = requireNonNull(notificationService);
         this.qnames = requireNonNull(qnames);
