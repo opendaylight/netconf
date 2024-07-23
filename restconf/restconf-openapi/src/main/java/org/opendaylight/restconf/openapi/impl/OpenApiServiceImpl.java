@@ -21,10 +21,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.jaxrs.JaxRsNorthbound;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,8 +46,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Activate
     public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
             final @Reference DOMMountPointService mountPointService,
-            final @Reference JaxRsNorthbound jaxrsNorthbound) {
-        this(schemaService, mountPointService, jaxrsNorthbound.configuration().restconf());
+            final @Reference JaxRsEndpoint jaxrsEndpoint) {
+        this(schemaService, mountPointService, jaxrsEndpoint.configuration().restconf());
     }
 
     private OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
