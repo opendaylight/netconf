@@ -468,6 +468,11 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-mdsal-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-nb</artifactId>
                 <version>${project.version}</version>
             </dependency>

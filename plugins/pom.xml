@@ -34,6 +34,7 @@
         <module>netconf-common-mdsal</module>
         <module>netconf-dom-api</module>
         <module>netconf-server-mdsal</module>
+        <module>restconf-mdsal-spi</module>
         <module>restconf-server-mdsal</module>
     </modules>
 </project>
