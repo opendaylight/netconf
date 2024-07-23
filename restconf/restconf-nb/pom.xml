@@ -276,6 +276,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.netconf.model</groupId>
+      <artifactId>test-models</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-test-util</artifactId>
     </dependency>
@@ -297,11 +301,6 @@
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-test-models</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

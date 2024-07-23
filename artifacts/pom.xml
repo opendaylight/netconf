@@ -179,10 +179,9 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- FIXME: place these models with their users -->
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-test-models</artifactId>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>test-models</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
