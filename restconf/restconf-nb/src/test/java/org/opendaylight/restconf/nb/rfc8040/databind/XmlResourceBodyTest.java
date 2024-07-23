@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -42,6 +43,7 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     private void mockMount() {
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(new FixedDOMSchemaService(IID_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
