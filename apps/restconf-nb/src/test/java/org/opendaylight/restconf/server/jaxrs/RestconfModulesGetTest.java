@@ -91,7 +91,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
      */
     @Test
     void toSchemaExportContextFromIdentifierNotFoundTest() {
-        final var error = assertError(ar -> restconf.modulesYinGET("not-existing-module", "2016-01-01", ar));
+        final var error = assertError(409, ar -> restconf.modulesYinGET("not-existing-module", "2016-01-01", ar));
         assertEquals(new ErrorMessage("Source not-existing-module@2016-01-01 not found"), error.message());
         assertEquals(ErrorType.APPLICATION, error.type());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
@@ -104,7 +104,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
      */
     @Test
     void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
-        final var error = assertError(ar -> restconf.modulesYangGET(TEST_MODULE_REVISION, TEST_MODULE_NAME, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET(TEST_MODULE_REVISION, TEST_MODULE_NAME, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -140,7 +140,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
         mockMountPoint();
 
-        final var error = assertError(
+        final var error = assertError(409,
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, "not-existing-module", "2016-01-01", ar));
         assertEquals(new ErrorMessage("Source not-existing-module@2016-01-01 not found"), error.message());
         assertEquals(ErrorType.APPLICATION, error.type());
@@ -156,7 +156,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     void toSchemaExportContextFromIdentifierMountPointInvalidIdentifierNegativeTest() {
         mockMountPoint();
 
-        final var error = assertError(
+        final var error = assertError(400,
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, TEST_MODULE_REVISION, TEST_MODULE_NAME, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
@@ -169,7 +169,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(MOUNT_IID);
 
-        final var error = assertError(
+        final var error = assertError(503,
             ar -> restconf.modulesYangGET(MOUNT_POINT_IDENT, TEST_MODULE_NAME, TEST_MODULE_REVISION, ar));
         assertEquals(new ErrorMessage("Mount point does not have any models"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
@@ -289,7 +289,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     }
 
     private ServerError assertInvalidValue(final String fileName, final String revision) {
-        final var error = assertError(ar -> restconf.modulesYangGET(fileName, revision, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET(fileName, revision, ar));
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
         return error;
