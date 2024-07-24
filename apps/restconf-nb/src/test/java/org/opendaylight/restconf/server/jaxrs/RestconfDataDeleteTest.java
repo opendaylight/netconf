@@ -62,7 +62,7 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
                 .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(true).when(tx).cancel();
 
-        final var error = assertError(ar -> restconf.dataDELETE(JUKEBOX_API_PATH, ar));
+        final var error = assertError(409, ar -> restconf.dataDELETE(JUKEBOX_API_PATH, ar));
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
     }

@@ -100,7 +100,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture())
             .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
 
-        final var error = assertError(ar -> restconf.postDataJSON(stringInputStream("""
+        final var error = assertError(409, ar -> restconf.postDataJSON(stringInputStream("""
                 {
                   "example-jukebox:jukebox" : {
                   }
@@ -117,7 +117,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
 
-        final var error = assertError(ar -> restconf.postDataJSON(JUKEBOX_API_PATH,
+        final var error = assertError(409, ar -> restconf.postDataJSON(JUKEBOX_API_PATH,
             stringInputStream("""
                 {
                   "example-jukebox:playlist" : {
