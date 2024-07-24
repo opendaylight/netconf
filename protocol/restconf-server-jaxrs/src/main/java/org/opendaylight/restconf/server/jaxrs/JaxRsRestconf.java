@@ -160,7 +160,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
     public void dataDELETE(@Encoded @PathParam("identifier") final ApiPath identifier,
             @Suspended final AsyncResponse ar) {
-        server.dataDELETE(new JaxRsServerRequest<>(prettyPrint, ar) {
+        server.dataDELETE(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar) {
             @Override
             Response transform(final Empty result) {
                 return Response.noContent().build();
@@ -210,7 +210,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     @NonNullByDefault
     private JaxRsServerRequest<DataGetResult> newDataGet(final UriInfo uriInfo, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, ar, uriInfo) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
             @Override
             Response transform(final DataGetResult result) throws ServerException {
                 final var builder = Response.ok()
@@ -317,7 +317,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     @NonNullByDefault
     private JaxRsServerRequest<DataPatchResult> newDataPATCH(final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar) {
             @Override
             Response transform(final DataPatchResult result) {
                 final var builder = Response.ok();
@@ -419,7 +419,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     @NonNullByDefault
     private JaxRsServerRequest<DataYangPatchResult> newDataYangPATCH(final UriInfo uriInfo, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, ar, uriInfo) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
             @Override
             Response transform(final DataYangPatchResult result) {
                 final var patchStatus = result.status();
@@ -537,7 +537,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @NonNullByDefault
     private <T extends DataPostResult> JaxRsServerRequest<T> newDataPOST(final UriInfo uriInfo,
             final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, ar, uriInfo) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
             @Override
             Response transform(final DataPostResult result) {
                 if (result instanceof CreateResourceResult createResource) {
@@ -643,7 +643,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     @NonNullByDefault
     private JaxRsServerRequest<DataPutResult> newDataPUT(final UriInfo uriInfo, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, ar, uriInfo) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
             @Override
             Response transform(final DataPutResult result) {
                 // Note: no Location header, as it matches the request path
@@ -666,7 +666,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
     })
     public void operationsGET(@Suspended final AsyncResponse ar) {
-        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, ar));
+        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, ar));
     }
 
     /**
@@ -682,7 +682,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
     })
     public void operationsGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
-        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, ar), operation);
+        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, ar), operation);
     }
 
     /**
@@ -747,7 +747,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @NonNullByDefault
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        server.operationsPOST(new JaxRsServerRequest<>(prettyPrint, ar, uriInfo) {
+        server.operationsPOST(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
             @Override
             Response transform(final InvokeResult result) {
                 final var body = result.output();
@@ -772,7 +772,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void yangLibraryVersionGET(@Suspended final AsyncResponse ar) {
-        server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, ar));
+        server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, ar));
     }
 
     // FIXME: References to these resources are generated by our yang-library implementation. That means:
@@ -856,7 +856,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     @NonNullByDefault
     private JaxRsServerRequest<ModulesGetResult> newModulesGET(final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar) {
             @Override
             Response transform(final ModulesGetResult result) throws ServerException {
                 final Reader reader;
