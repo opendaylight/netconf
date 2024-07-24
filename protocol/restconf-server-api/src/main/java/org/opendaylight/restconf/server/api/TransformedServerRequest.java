@@ -39,4 +39,9 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     public void completeWith(final ServerException failure) {
         delegate.completeWith(failure);
     }
+
+    @Override
+    public void completeWith(final YangErrorsBody errors) {
+        delegate.completeWith(errors);
+    }
 }

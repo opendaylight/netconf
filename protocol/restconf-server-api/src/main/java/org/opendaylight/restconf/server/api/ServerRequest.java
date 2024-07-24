@@ -31,6 +31,8 @@ public sealed interface ServerRequest<T> permits AbstractServerRequest, Transfor
 
     void completeWith(ServerException failure);
 
+    void completeWith(YangErrorsBody errors);
+
     default <O> ServerRequest<O> transform(final Function<O, T> function) {
         return new TransformedServerRequest<>(this, function);
     }

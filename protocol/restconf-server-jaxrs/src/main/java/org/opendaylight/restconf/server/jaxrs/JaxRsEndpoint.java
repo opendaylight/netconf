@@ -88,7 +88,6 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
 
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
-                                new ServerExceptionMapper(errorTagMapping),
                                 new JaxRsRestconf(server, errorTagMapping, configuration.prettyPrint()));
                         }
                     }).build())

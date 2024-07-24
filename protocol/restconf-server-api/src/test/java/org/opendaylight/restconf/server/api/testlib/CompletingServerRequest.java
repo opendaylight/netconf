@@ -18,6 +18,7 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     @Override
-    protected void onFailure(final ServerException failure) {
-        future.completeExceptionally(failure);
+    protected void onFailure(final YangErrorsBody errors) {
+        future.completeExceptionally(new ServerException(errors.errors(), null, "reconstructed for testing"));
     }
 }

@@ -12,14 +12,16 @@ import javax.ws.rs.core.Response;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 
 /**
  * A {@link JaxRsServerRequest} resulting in a {@link FormattableBody}.
  */
 @NonNullByDefault
 final class FormattableJaxRsServerRequest extends JaxRsServerRequest<FormattableBody> {
-    FormattableJaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final AsyncResponse ar) {
-        super(defaultPrettyPrint, ar);
+    FormattableJaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
+            final AsyncResponse ar) {
+        super(defaultPrettyPrint, errorTagMapping, ar);
     }
 
     @Override

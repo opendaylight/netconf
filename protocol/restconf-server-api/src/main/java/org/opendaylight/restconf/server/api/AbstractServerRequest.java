@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for {@link ServerRequest} implementations.
@@ -20,6 +22,8 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
  */
 @NonNullByDefault
 public abstract non-sealed class AbstractServerRequest<T> implements ServerRequest<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractServerRequest.class);
+
     private final QueryParameters queryParameters;
     private final PrettyPrintParam prettyPrint;
 
@@ -63,6 +67,11 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
         onFailure(requireNonNull(failure));
     }
 
+    @Override
+    public final void completeWith(final YangErrorsBody errors) {
+        onFailure(requireNonNull(errors));
+    }
+
     /**
      * Return the effective {@link PrettyPrintParam}.
      *
@@ -74,5 +83,10 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
 
     protected abstract void onSuccess(T result);
 
-    protected abstract void onFailure(ServerException failure);
+    protected final void onFailure(final ServerException failure) {
+        LOG.debug("Request {} failed", this, failure);
+        onFailure(new YangErrorsBody(failure.errors()));
+    }
+
+    protected abstract void onFailure(YangErrorsBody errors);
 }
