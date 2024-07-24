@@ -14,11 +14,14 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
 /**
  * A {@link ServerRequest} originating in {@link JaxRsRestconf}.
@@ -26,21 +29,23 @@ import org.opendaylight.restconf.server.api.ServerRequest;
  * @param T type of reported result
  */
 @NonNullByDefault
-abstract class JaxRsServerRequest<T> extends AbstractServerRequest<T> {
+abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
     private final AsyncResponse ar;
 
-    private JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final AsyncResponse ar,
-            final QueryParameters queryParameters) {
-        super(queryParameters, defaultPrettyPrint);
+    private JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
+            final AsyncResponse ar, final QueryParameters queryParameters) {
+        super(queryParameters, defaultPrettyPrint, errorTagMapping);
         this.ar = requireNonNull(ar);
     }
 
-    JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final AsyncResponse ar) {
-        this(defaultPrettyPrint, ar, QueryParameters.of());
+    JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
+            final AsyncResponse ar) {
+        this(defaultPrettyPrint, errorTagMapping, ar, QueryParameters.of());
     }
 
-    JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final AsyncResponse ar, final UriInfo uriInfo) {
-        this(defaultPrettyPrint, ar, queryParamsOf(uriInfo));
+    JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint,final ErrorTagMapping errorTagMapping,
+            final AsyncResponse ar, final UriInfo uriInfo) {
+        this(defaultPrettyPrint, errorTagMapping, ar, queryParamsOf(uriInfo));
     }
 
     private static QueryParameters queryParamsOf(final UriInfo uriInfo) {
@@ -57,15 +62,15 @@ abstract class JaxRsServerRequest<T> extends AbstractServerRequest<T> {
         try {
             response = transform(result);
         } catch (ServerException e) {
-            onFailure(e);
+            completeWith(e);
             return;
         }
         ar.resume(response);
     }
 
     @Override
-    protected void onFailure(final ServerException ex) {
-        ar.resume(ex);
+    protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
+        ar.resume(Response.status(status.code(), status.phrase()).entity(body).build());
     }
 
     abstract Response transform(T result) throws ServerException;

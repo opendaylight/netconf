@@ -15,9 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -42,6 +39,7 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.spi.AbstractJukeboxTest;
@@ -82,26 +80,6 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return JUKEBOX_SCHEMA;
     }
 
-    static final void assertJson(final String expectedJson, final NormalizedFormattableBody<?> payload) {
-        final var baos = new ByteArrayOutputStream();
-        try {
-            payload.formatToJSON(PrettyPrintParam.FALSE, baos);
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(expectedJson, baos.toString(StandardCharsets.UTF_8));
-    }
-
-    static final void assertXml(final String expectedXml, final NormalizedFormattableBody<?> payload) {
-        final var baos = new ByteArrayOutputStream();
-        try {
-            payload.formatToXML(PrettyPrintParam.FALSE, baos);
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(expectedXml, baos.toString(StandardCharsets.UTF_8));
-    }
-
     @NonNullByDefault
     static final <N extends NormalizedNode> NormalizedFormattableBody<N> assertNormalizedBody(final int status,
             final Consumer<AsyncResponse> invocation) {
@@ -130,23 +108,16 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertResponse(expectedStatus, invocation).getEntity();
     }
 
-    static final ServerError assertError(final Consumer<AsyncResponse> invocation) {
-        final var errors = assertErrors(invocation);
+    static final ServerError assertError(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
+        final var errors = assertErrors(expectedStatus, invocation);
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertNotNull(error);
         return error;
     }
 
-    static final List<ServerError> assertErrors(final Consumer<AsyncResponse> invocation) {
-        final var ar = mock(AsyncResponse.class);
-        doReturn(true).when(ar).resume(any(ServerException.class));
-
-        invocation.accept(ar);
-
-        final var captor = ArgumentCaptor.forClass(ServerException.class);
-        verify(ar).resume(captor.capture());
-        return captor.getValue().errors();
+    static final List<ServerError> assertErrors(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
+        return assertEntity(YangErrorsBody.class, expectedStatus, invocation).errors();
     }
 
     static final Response assertResponse(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
