@@ -9,7 +9,9 @@ package org.opendaylight.restconf.server.api;
 
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 /**
  * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing binding to
@@ -30,6 +32,10 @@ public sealed interface ServerRequest<T> permits AbstractServerRequest, Transfor
     void completeWith(T result);
 
     void completeWith(ServerException failure);
+
+    void completeWith(YangErrorsBody errors);
+
+    void completeWith(ErrorTag errorTag, FormattableBody body);
 
     default <O> ServerRequest<O> transform(final Function<O, T> function) {
         return new TransformedServerRequest<>(this, function);
