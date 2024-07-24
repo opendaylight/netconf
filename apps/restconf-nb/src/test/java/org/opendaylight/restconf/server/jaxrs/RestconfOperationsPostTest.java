@@ -125,7 +125,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                 "No implementation of RPC " + RPC + " available.");
         doReturn(Futures.immediateFailedFuture(exception)).when(rpcService).invokeRpc(RPC, INPUT);
 
-        final var error = assertError(ar -> restconf.operationsJsonPOST(apiPath("invoke-rpc-module:rpc-test"),
+        final var error = assertError(500, ar -> restconf.operationsJsonPOST(apiPath("invoke-rpc-module:rpc-test"),
             stringInputStream("""
                 {
                   "invoke-rpc-module:input" : {
@@ -182,14 +182,13 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of(
             QName.create("urn:ietf:params:xml:ns:yang:ietf-yang-library", "2019-01-04", "modules-state")));
 
-        final var error = assertError(
-            ar -> restconf.operationsJsonPOST(
-                apiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
-                stringInputStream("""
-                    {
-                      "invoke-rpc-module:input" : {
-                      }
-                    }"""), uriInfo, ar));
+        final var error = assertError(501, ar -> restconf.operationsJsonPOST(
+            apiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
+            stringInputStream("""
+                {
+                  "invoke-rpc-module:input" : {
+                  }
+                }"""), uriInfo, ar));
         assertEquals(new ErrorMessage("RPC not supported"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.tag());
@@ -211,10 +210,11 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                   }
                 }"""), uriInfo, ar));
         assertEquals(OUTPUT, body.data());
-        assertJson("""
-            {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", body);
-        assertXml("""
-            <output xmlns="invoke:rpc:module"><cont-out><lf-out>operation result</lf-out></cont-out></output>""", body);
+        assertFormat("""
+            {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", body::formatToJSON, false);
+        assertFormat("""
+            <output xmlns="invoke:rpc:module"><cont-out><lf-out>operation result</lf-out></cont-out></output>""",
+            body::formatToXML, false);
     }
 
     private void prepNNC(final ContainerNode result) {

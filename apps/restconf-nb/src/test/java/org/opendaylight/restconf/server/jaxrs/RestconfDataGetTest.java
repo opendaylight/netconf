@@ -202,7 +202,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        final var error = assertError(ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
+        final var error = assertError(409, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
         assertEquals(

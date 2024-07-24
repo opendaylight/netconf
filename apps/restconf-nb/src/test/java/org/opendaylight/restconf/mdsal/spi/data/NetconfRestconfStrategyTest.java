@@ -35,11 +35,12 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -47,9 +48,10 @@ import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.MappingServerRequest;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
@@ -272,17 +274,17 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
         // Inserting new song at 3rd position (aka as last element)
-        final var request = spy(new AbstractServerRequest<DataPutResult>(QueryParameters.of(
+        final var request = spy(new MappingServerRequest<DataPutResult>(QueryParameters.of(
             // insert new item after last existing item in list
             InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
-            PrettyPrintParam.TRUE) {
+            PrettyPrintParam.TRUE, ErrorTagMapping.RFC8040) {
                 @Override
                 protected void onSuccess(final DataPutResult result) {
                     // To be verified
                 }
 
                 @Override
-                protected void onFailure(final ServerException failure) {
+                protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
                     // To be verified
                 }
         });
@@ -326,15 +328,16 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
-        final var request = spy(new AbstractServerRequest<DataPostResult>(QueryParameters.of(InsertParam.AFTER,
-            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE) {
+        final var request = spy(new MappingServerRequest<DataPostResult>(QueryParameters.of(InsertParam.AFTER,
+            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE,
+            ErrorTagMapping.RFC8040) {
                 @Override
                 protected void onSuccess(final DataPostResult result) {
                     // To be verified
                 }
 
                 @Override
-                protected void onFailure(final ServerException failure) {
+                protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
                     // To be verified
                 }
         });
@@ -520,14 +523,13 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
     }
 
-    private void mockLockUnlockCommit()  {
+    private void mockLockUnlockCommit() {
         mockLockUnlock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
     }
 
-    private void mockLockUnlockDiscard()  {
+    private void mockLockUnlockDiscard() {
         mockLockUnlock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
     }
-
 }

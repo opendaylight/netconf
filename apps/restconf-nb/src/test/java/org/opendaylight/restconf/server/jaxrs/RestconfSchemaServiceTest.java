@@ -95,7 +95,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaForNotExistingModuleTest() {
-        final var error = assertError(ar -> restconf.modulesYinGET("not-existing", "2016-01-01", ar));
+        final var error = assertError(409, ar -> restconf.modulesYinGET("not-existing", "2016-01-01", ar));
         assertEquals(new ErrorMessage("Source not-existing@2016-01-01 not found"), error.message());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
         assertEquals(ErrorType.APPLICATION, error.type());
@@ -107,7 +107,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaWithEmptyIdentifierTest() {
-        final var error = assertError(ar -> restconf.modulesYangGET("", null, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET("", null, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -119,7 +119,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaWithNotParsableIdentifierTest() {
-        final var error = assertError(ar -> restconf.modulesYangGET("01_module", "2016-01-01", ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET("01_module", "2016-01-01", ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -134,7 +134,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaWrongIdentifierTest() {
-        final var error = assertError(ar -> restconf.modulesYangGET("2014-01-01", null, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET("2014-01-01", null, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());

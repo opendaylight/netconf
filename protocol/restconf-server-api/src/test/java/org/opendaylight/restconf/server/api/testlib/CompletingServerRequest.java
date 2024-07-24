@@ -14,10 +14,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.YangErrorsBody;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +73,12 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     @Override
-    protected void onFailure(final ServerException failure) {
-        future.completeExceptionally(failure);
+    protected void onFailure(final YangErrorsBody errors) {
+        future.completeExceptionally(new ServerException(errors.errors(), null, "reconstructed for testing"));
+    }
+
+    @Override
+    public void completeWith(final ErrorTag errorTag, final FormattableBody body) {
+        throw new UnsupportedOperationException();
     }
 }

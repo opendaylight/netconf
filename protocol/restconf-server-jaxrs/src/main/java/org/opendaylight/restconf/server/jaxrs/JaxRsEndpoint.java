@@ -84,12 +84,10 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Object> getSingletons() {
-                            final var errorTagMapping = configuration.errorTagMapping();
-
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
-                                new ServerExceptionMapper(errorTagMapping),
-                                new JaxRsRestconf(server, errorTagMapping, configuration.prettyPrint()));
+                                new JaxRsRestconf(server, configuration.errorTagMapping(),
+                                    configuration.prettyPrint()));
                         }
                     }).build())
                 .asyncSupported(true)
