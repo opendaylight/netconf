@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.mdsal.spi;
 
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public abstract class AbstractNotificationListenerTest {
-    protected static final QNameModule MODULE = QNameModule.ofRevision("notifi:mod", "2016-11-23");
-    protected static final EffectiveModelContext MODEL_CONTEXT =
-        YangParserTestUtils.parseYangResourceDirectory("/notifications");
+abstract class AbstractNotificationListenerTest {
+    static final QNameModule MODULE = QNameModule.ofRevision("notifi:mod", "2016-11-23");
+    static final EffectiveModelContext MODEL_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/notifications");
 }
