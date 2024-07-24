@@ -40,11 +40,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-class ServerExceptionMapperTest {
+class MappingServerRequestTest {
     private static final QNameModule MONITORING_MODULE_INFO =
         QNameModule.ofRevision("instance:identifier:patch:module", "2015-11-21");
     private static final DatabindContext DATABIND = DatabindContext.ofModel(
-        YangParserTestUtils.parseYangResources(ServerExceptionMapperTest.class,
+        YangParserTestUtils.parseYangResources(MappingServerRequestTest.class,
             "/restconf/impl/ietf-restconf@2017-01-26.yang",
             "/instance-identifier/instance-identifier-patch-module.yang"));
 
