@@ -60,6 +60,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c99c641c_e75197ff",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T18:53:43Z",
+      "side": 1,
+      "message": "there are no atomic operations on this field, all it\u0027s being used its volatile.\n\nso either:\n- this is \u0027volatile boolean\u0027, or\n- users need to make atomic transitions via compareAndSet()\n\nSince this is in Netty context, what are the atomics synchronizing with?",
+      "range": {
+        "startLine": 53,
+        "startChar": 18,
+        "endLine": 53,
+        "endChar": 31
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dec9e2b_fbdf4bef",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T18:53:43Z",
+      "side": 1,
+      "message": "two atomic booleans ... can we express these as an \u0027enum State\u0027 to describe logic and then have AtomicReference\u003cState\u003e with atomic transitions?",
+      "range": {
+        "startLine": 54,
+        "startChar": 18,
+        "endLine": 54,
+        "endChar": 31
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6def59bb_32518f11",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
         "patchSetId": 13
