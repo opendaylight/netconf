@@ -60,6 +60,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6def59bb_32518f11",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T18:48:20Z",
+      "side": 1,
+      "message": "time of check ...",
+      "range": {
+        "startLine": 74,
+        "startChar": 13,
+        "endLine": 74,
+        "endChar": 28
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79182648_5dda5166",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T18:48:20Z",
+      "side": 1,
+      "message": "... time of use.\n\nif streaming.set() is called concurrently then this we call onStreamStart().\n\ncan you re-structure this method into multiple methods, please?",
+      "range": {
+        "startLine": 79,
+        "startChar": 16,
+        "endLine": 79,
+        "endChar": 36
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6537b3c_bd58b6f6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T18:48:20Z",
+      "side": 1,
+      "message": "accessing streaming.get() again? we already called it in this thread...",
+      "range": {
+        "startLine": 104,
+        "startChar": 19,
+        "endLine": 104,
+        "endChar": 34
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2779b295_edf68b17",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
         "patchSetId": 13
