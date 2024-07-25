@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableSet;
 import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -45,7 +46,7 @@ final class DeviceNotificationSource extends AbstractNotificationSource implemen
     }
 
     @Override
-    public void onMountPointCreated(final YangInstanceIdentifier path) {
+    public void onMountPointCreated(final DOMMountPoint mountPoint) {
         // No-op
     }
 

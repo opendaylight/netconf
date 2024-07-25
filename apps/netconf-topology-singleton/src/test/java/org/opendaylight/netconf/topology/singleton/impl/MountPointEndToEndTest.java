@@ -49,6 +49,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -197,6 +199,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private SslContextFactoryProvider sslHandlerFactoryProvider;
     @Mock
     private DOMMountPointListener masterMountPointListener;
+    @Captor
+    private ArgumentCaptor<DOMMountPoint> mountPointCaptor;
+
     private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
     private Rpcs.Normalized deviceRpcService;
 
@@ -477,10 +482,12 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 
-        verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
+        verify(masterMountPointListener, timeout(5000)).onMountPointCreated(mountPointCaptor.capture());
+        assertEquals(yangNodeInstanceId, mountPointCaptor.getValue().getIdentifier());
 
         verify(slaveMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
-        verify(slaveMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
+        verify(slaveMountPointListener, timeout(5000)).onMountPointCreated(mountPointCaptor.capture());
+        assertEquals(yangNodeInstanceId, mountPointCaptor.getValue().getIdentifier());
 
         return masterSalFacade;
     }

@@ -79,7 +79,8 @@ public final class MountedDeviceListener implements DOMMountPointListener {
     }
 
     @Override
-    public void onMountPointCreated(final YangInstanceIdentifier path) {
+    public void onMountPointCreated(final DOMMountPoint mountPoint) {
+        final var path = mountPoint.getIdentifier();
         TestUtils.getNodeId(path).ifPresent(nodeId -> {
             if (nodeId.startsWith(TEST_NODE_PREFIX)) {
                 LOG.info("Test node mounted: {}", nodeId);
