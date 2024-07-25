@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc2e6575_88ec2756",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RestconfServerNorthbound.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-25T12:27:04Z",
+      "side": 1,
+      "message": "alt osgi service created in restconf-nb OSGiNorthboundNetty",
+      "parentUuid": "d5847f23_2df40d92",
+      "range": {
+        "startLine": 36,
+        "startChar": 4,
+        "endLine": 36,
+        "endChar": 35
+      },
+      "revId": "bc5ad4375fbf8e24356868e62be72b27626f5c87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "090df785_bcd4cdf0",
@@ -58,6 +82,30 @@
         "id": 9173
       },
       "writtenOn": "2024-07-25T05:37:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "090df785_bcd4cdf0",
+      "range": {
+        "startLine": 84,
+        "startChar": 24,
+        "endLine": 84,
+        "endChar": 40
+      },
+      "revId": "bc5ad4375fbf8e24356868e62be72b27626f5c87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27185476_3987388a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/RestconfServerNorthbound.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-25T12:27:04Z",
       "side": 1,
       "message": "Done",
       "parentUuid": "090df785_bcd4cdf0",
