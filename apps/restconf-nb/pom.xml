@@ -51,6 +51,18 @@
             <artifactId>org.eclipse.jdt.annotation</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.aaa.web</groupId>
+            <artifactId>web-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.aaa.web</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>aaa-filterchain</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-common-api</artifactId>
         </dependency>
