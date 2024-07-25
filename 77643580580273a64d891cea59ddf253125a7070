@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1721f262_ccf20fae",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T16:42:42Z",
+      "side": 1,
+      "message": "unneeded",
+      "range": {
+        "startLine": 114,
+        "startChar": 13,
+        "endLine": 114,
+        "endChar": 31
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2779b295_edf68b17",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
         "patchSetId": 13
@@ -99,6 +122,29 @@
       "writtenOn": "2024-07-25T12:29:13Z",
       "side": 1,
       "message": "unnecessary line",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "080de42f_57fa6474",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-25T16:42:42Z",
+      "side": 1,
+      "message": "try { } catch (IOException e -\u003e throw new AssertionError(e))",
+      "range": {
+        "startLine": 50,
+        "startChar": 26,
+        "endLine": 50,
+        "endChar": 44
+      },
       "revId": "77643580580273a64d891cea59ddf253125a7070",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
