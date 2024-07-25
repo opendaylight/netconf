@@ -33,6 +33,74 @@
       "message": "recheck",
       "revId": "77643580580273a64d891cea59ddf253125a7070",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2779b295_edf68b17",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-25T12:29:13Z",
+      "side": 1,
+      "message": "Client for HTTP 1 contains also uri() method.",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f246535_902cddf2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-25T12:29:13Z",
+      "side": 1,
+      "message": "unnecessary line",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ccc5e25_c669577f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerChannelInitializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-25T12:29:13Z",
+      "side": 1,
+      "message": "private?",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "687b625b_5569b28b",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/SseClientServerTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-25T12:29:13Z",
+      "side": 1,
+      "message": "unnecessary line",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
