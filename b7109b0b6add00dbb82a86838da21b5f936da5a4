@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "b7109b0b6add00dbb82a86838da21b5f936da5a4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f846fde1_e0d83573",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-25T08:15:12Z",
+      "side": 1,
+      "message": "spacing",
+      "revId": "b7109b0b6add00dbb82a86838da21b5f936da5a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
