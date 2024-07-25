@@ -16,7 +16,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * A promise that a {@link SSEStreamService} will be attached.
+ * A promise that a {@link JaxRsRestconf} will be attached, providing stream access.
  */
 @Singleton
 @Component
