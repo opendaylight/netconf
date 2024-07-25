@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -186,7 +187,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     @Override
-    public void onMountPointCreated(final YangInstanceIdentifier path) {
+    public void onMountPointCreated(final DOMMountPoint mountPoint) {
+        final var path = mountPoint.getIdentifier();
         LOG.debug("Mount point {} created", path);
         final Long idLong = idKey.incrementAndGet();
         instanceIdToLongId.put(path, idLong);

@@ -49,6 +49,7 @@ abstract class AbstractDocumentTest {
         when(schemaService.getGlobalContext()).thenReturn(context);
 
         final var mountPoint = mock(DOMMountPoint.class);
+        when(mountPoint.getIdentifier()).thenReturn(INSTANCE_ID);
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
 
         final var service = mock(DOMMountPointService.class);
@@ -56,7 +57,7 @@ abstract class AbstractDocumentTest {
 
         final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service, "rests");
         final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService, "rests");
-        mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(INSTANCE_ID);
+        mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(mountPoint);
         openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
     }
 
