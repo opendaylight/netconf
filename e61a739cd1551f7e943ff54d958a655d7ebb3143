@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9cebe86_0e0a4454",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-25T09:39:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24d332c3_dcaf0d1c",
+      "revId": "e61a739cd1551f7e943ff54d958a655d7ebb3143",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c354ab09_6be07f2e",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-25T07:54:19Z",
       "side": 1,
       "message": "spacing",
+      "revId": "e61a739cd1551f7e943ff54d958a655d7ebb3143",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6dc5a34_513cb3c3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http2ToHttpAdapter.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-25T09:39:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c354ab09_6be07f2e",
       "revId": "e61a739cd1551f7e943ff54d958a655d7ebb3143",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
