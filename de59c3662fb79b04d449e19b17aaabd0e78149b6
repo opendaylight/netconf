@@ -22,6 +22,40 @@
       },
       "revId": "de59c3662fb79b04d449e19b17aaabd0e78149b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b28e2781_3203b357",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/PathParameters.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-25T17:14:57Z",
+      "side": 1,
+      "message": "final?",
+      "revId": "de59c3662fb79b04d449e19b17aaabd0e78149b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d37e0fa_9751847d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-25T17:14:57Z",
+      "side": 1,
+      "message": "why not use switch here?",
+      "revId": "de59c3662fb79b04d449e19b17aaabd0e78149b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
