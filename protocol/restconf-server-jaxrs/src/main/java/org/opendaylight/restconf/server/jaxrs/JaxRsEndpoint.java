@@ -86,22 +86,10 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
                         public Set<Object> getSingletons() {
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
-                                new JaxRsRestconf(server, configuration.errorTagMapping(),
+                                new JaxRsRestconf(server, streamRegistry, sseSender, configuration.errorTagMapping(),
                                     configuration.prettyPrint()));
                         }
                     }).build())
-                .asyncSupported(true)
-                .build())
-            .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + JaxRsRestconf.STREAMS_SUBPATH + "/*")
-                .servlet(servletSupport.createHttpServletBuilder(
-                    new Application() {
-                        @Override
-                        public Set<Object> getSingletons() {
-                            return Set.of(new SSEStreamService(streamRegistry, sseSender));
-                        }
-                    }).build())
-                .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
 

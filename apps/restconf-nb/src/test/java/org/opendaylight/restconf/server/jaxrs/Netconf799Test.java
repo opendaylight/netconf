@@ -38,6 +38,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.spi.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.spi.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream.Registry;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -64,6 +65,10 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
     private ArgumentCaptor<Response> captor;
     @Mock
     private SecurityContext sc;
+    @Mock
+    private Registry streamRegistry;
+    @Mock
+    private SSESenderFactory senderFactory;
 
     @Test
     void testInvokeAction() throws Exception {
@@ -75,7 +80,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
         final var restconf = new JaxRsRestconf(
             new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)),
                 dataBroker, rpcService, actionService, mountPointService),
-            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
+            streamRegistry, senderFactory, ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
@@ -101,7 +106,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
         final var restconf = new JaxRsRestconf(
             new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)),
                 dataBroker, rpcService, actionService, mountPointService),
-            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
+            streamRegistry, senderFactory, ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
 
         final var apiPath = ApiPath.parse("instance-identifier-module:cont/cont1/reset");

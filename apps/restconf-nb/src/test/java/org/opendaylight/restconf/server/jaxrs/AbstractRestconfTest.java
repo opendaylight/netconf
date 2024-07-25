@@ -45,6 +45,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.spi.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
+import org.opendaylight.restconf.server.spi.RestconfStream.Registry;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -67,6 +68,10 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     DOMMountPoint mountPoint;
     @Mock
     SecurityContext sc;
+    @Mock
+    Registry streamRegistry;
+    @Mock
+    SSESenderFactory senderFactory;
 
     JaxRsRestconf restconf;
 
@@ -75,7 +80,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         restconf = new JaxRsRestconf(
             new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())),
                 dataBroker, rpcService, actionService, mountPointService),
-            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
+            streamRegistry, senderFactory, ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
     }
 
     EffectiveModelContext modelContext() {

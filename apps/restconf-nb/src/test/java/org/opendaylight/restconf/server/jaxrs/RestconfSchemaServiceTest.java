@@ -33,6 +33,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream.Registry;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -66,6 +67,10 @@ class RestconfSchemaServiceTest {
     private Reader yangReader;
     @Mock
     private SecurityContext sc;
+    @Mock
+    private Registry streamRegistry;
+    @Mock
+    private SSESenderFactory senderFactory;
 
     // service under test
     private JaxRsRestconf restconf;
@@ -76,7 +81,7 @@ class RestconfSchemaServiceTest {
             new MdsalRestconfServer(new MdsalDatabindProvider(
                 new FixedDOMSchemaService(() -> MODEL_CONTEXT, sourceProvider)), dataBroker, rpcService, actionService,
                 mountPointService),
-            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
+            streamRegistry, senderFactory, ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
     }
 
     /**
