@@ -33,6 +33,121 @@
       "message": "recheck",
       "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e4307b1_11556179",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-26T08:58:31Z",
+      "side": 1,
+      "message": "Pls integrate note below here. It doesn\u0027t make sense to do notes after 1 sentence.",
+      "range": {
+        "startLine": 211,
+        "startChar": 13,
+        "endLine": 211,
+        "endChar": 54
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7f69b5d_0e287994",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-26T08:58:31Z",
+      "side": 1,
+      "message": "certificate - don\u0027t need \u0027s\u0027 here",
+      "range": {
+        "startLine": 938,
+        "startChar": 0,
+        "endLine": 938,
+        "endChar": 13
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "979e6139_b30bebbb",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-26T08:58:31Z",
+      "side": 1,
+      "message": "chain,",
+      "range": {
+        "startLine": 938,
+        "startChar": 13,
+        "endLine": 938,
+        "endChar": 18
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4180e9c_1595a7be",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 945,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-26T08:58:31Z",
+      "side": 1,
+      "message": "If you have already installed the ``odl-netconf-topology`` feature to connect to a device, you do not need to install the ``odl-netconf-keystore`` feature.",
+      "range": {
+        "startLine": 944,
+        "startChar": 4,
+        "endLine": 945,
+        "endChar": 75
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dec058f1_0d4266d5",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-07-26T08:58:31Z",
+      "side": 1,
+      "message": "which",
+      "range": {
+        "startLine": 1024,
+        "startChar": 4,
+        "endLine": 1024,
+        "endChar": 6
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
