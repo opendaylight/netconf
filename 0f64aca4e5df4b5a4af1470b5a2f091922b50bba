@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be181b66_4d946ab6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-26T14:45:07Z",
+      "side": 1,
+      "message": "Please describe the changes in tests.",
+      "revId": "0f64aca4e5df4b5a4af1470b5a2f091922b50bba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5bb497f_be1cf6f3",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-26T14:45:07Z",
+      "side": 1,
+      "message": "We do not know if list exists 😊",
+      "revId": "0f64aca4e5df4b5a4af1470b5a2f091922b50bba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
