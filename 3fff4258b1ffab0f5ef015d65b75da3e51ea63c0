@@ -58,6 +58,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e06b0c29_a7c1e974",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-26T10:05:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e4307b1_11556179",
+      "range": {
+        "startLine": 211,
+        "startChar": 13,
+        "endLine": 211,
+        "endChar": 54
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7f69b5d_0e287994",
@@ -104,6 +128,54 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d80ad66_f46963f5",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-26T10:05:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "979e6139_b30bebbb",
+      "range": {
+        "startLine": 938,
+        "startChar": 13,
+        "endLine": 938,
+        "endChar": 18
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64e5b237_5231cd7c",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-26T10:05:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7f69b5d_0e287994",
+      "range": {
+        "startLine": 938,
+        "startChar": 0,
+        "endLine": 938,
+        "endChar": 13
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4180e9c_1595a7be",
@@ -127,6 +199,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c9eff44_c8cdfd5d",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 945,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-26T10:05:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4180e9c_1595a7be",
+      "range": {
+        "startLine": 944,
+        "startChar": 4,
+        "endLine": 945,
+        "endChar": 75
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dec058f1_0d4266d5",
@@ -140,6 +236,30 @@
       "writtenOn": "2024-07-26T08:58:31Z",
       "side": 1,
       "message": "which",
+      "range": {
+        "startLine": 1024,
+        "startChar": 4,
+        "endLine": 1024,
+        "endChar": 6
+      },
+      "revId": "3fff4258b1ffab0f5ef015d65b75da3e51ea63c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ad8037_5e9bb1e4",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-26T10:05:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dec058f1_0d4266d5",
       "range": {
         "startLine": 1024,
         "startChar": 4,
