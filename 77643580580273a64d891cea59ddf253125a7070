@@ -58,6 +58,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "776faf37_582fbdd5",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1721f262_ccf20fae",
+      "range": {
+        "startLine": 114,
+        "startChar": 13,
+        "endLine": 114,
+        "endChar": 31
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c99c641c_e75197ff",
@@ -71,6 +95,30 @@
       "writtenOn": "2024-07-25T18:53:43Z",
       "side": 1,
       "message": "there are no atomic operations on this field, all it\u0027s being used its volatile.\n\nso either:\n- this is \u0027volatile boolean\u0027, or\n- users need to make atomic transitions via compareAndSet()\n\nSince this is in Netty context, what are the atomics synchronizing with?",
+      "range": {
+        "startLine": 53,
+        "startChar": 18,
+        "endLine": 53,
+        "endChar": 31
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75a17de9_7aee18ec",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "replaced with private enum type type `state` field",
+      "parentUuid": "c99c641c_e75197ff",
       "range": {
         "startLine": 53,
         "startChar": 18,
@@ -104,6 +152,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "749362bd_7a040f4e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4dec9e2b_fbdf4bef",
+      "range": {
+        "startLine": 54,
+        "startChar": 18,
+        "endLine": 54,
+        "endChar": 31
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6def59bb_32518f11",
@@ -117,6 +189,30 @@
       "writtenOn": "2024-07-25T18:48:20Z",
       "side": 1,
       "message": "time of check ...",
+      "range": {
+        "startLine": 74,
+        "startChar": 13,
+        "endLine": 74,
+        "endChar": 28
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "851678ee_51fd9d8c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6def59bb_32518f11",
       "range": {
         "startLine": 74,
         "startChar": 13,
@@ -150,6 +246,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "994650d1_f8691dff",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "replaced with private enum type type `state` field with value copy on method very beginning. no reason to split method for sub-methods, it\u0027s already short enough",
+      "parentUuid": "79182648_5dda5166",
+      "range": {
+        "startLine": 79,
+        "startChar": 16,
+        "endLine": 79,
+        "endChar": 36
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6537b3c_bd58b6f6",
@@ -163,6 +283,30 @@
       "writtenOn": "2024-07-25T18:48:20Z",
       "side": 1,
       "message": "accessing streaming.get() again? we already called it in this thread...",
+      "range": {
+        "startLine": 104,
+        "startChar": 19,
+        "endLine": 104,
+        "endChar": 34
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "897327c2_7f099fa6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a6537b3c_bd58b6f6",
       "range": {
         "startLine": 104,
         "startChar": 19,
@@ -190,6 +334,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b83de07e_0fbbb006",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "uri() for http1 is only used for conflict reporting if there is running stream while new one is requested\nhttp2 client supports multiple concurrent streams, no checks for running streams is needed for http2 client\n\nalso listener is no longer exposed, it handles channel closure internally",
+      "parentUuid": "2779b295_edf68b17",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f246535_902cddf2",
@@ -203,6 +365,24 @@
       "writtenOn": "2024-07-25T12:29:13Z",
       "side": 1,
       "message": "unnecessary line",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e97d4df_64dbc4ba",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseFrameListener.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f246535_902cddf2",
       "revId": "77643580580273a64d891cea59ddf253125a7070",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -224,6 +404,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd361365_25d232c1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerChannelInitializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "it\u0027s used by SseUtils to find a place for SSE handler as request interceptor",
+      "parentUuid": "1ccc5e25_c669577f",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "687b625b_5569b28b",
@@ -241,6 +439,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcf46eed_3714fead",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/SseClientServerTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "687b625b_5569b28b",
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "080de42f_57fa6474",
@@ -254,6 +470,30 @@
       "writtenOn": "2024-07-25T16:42:42Z",
       "side": 1,
       "message": "try { } catch (IOException e -\u003e throw new AssertionError(e))",
+      "range": {
+        "startLine": 50,
+        "startChar": 26,
+        "endLine": 50,
+        "endChar": 44
+      },
+      "revId": "77643580580273a64d891cea59ddf253125a7070",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f0a7038_2cbfc78d",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-26T13:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "080de42f_57fa6474",
       "range": {
         "startLine": 50,
         "startChar": 26,
