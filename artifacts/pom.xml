@@ -172,6 +172,13 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- draft-ietf-netconf-tcp-client-server -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>draft-ietf-netconf-tcp-client-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- sal-remote.yang and sal-remote-augment.yang -->
             <dependency>
                 <groupId>org.opendaylight.netconf.model</groupId>
