@@ -19,4 +19,5 @@
  * The three primary entry points into this package are {@link NettyTransportSupport}, {@link TCPClient} and
  * {@link TCPServer}.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.transport.tcp;

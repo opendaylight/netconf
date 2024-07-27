@@ -31,6 +31,7 @@
     <modules>
         <module>rfc5277</module>
         <module>draft-ietf-crypto-types</module>
+        <module>draft-ietf-netconf-tcp-client-server</module>
         <module>draft-ietf-restconf-server</module>
         <module>sal-remote</module>
 

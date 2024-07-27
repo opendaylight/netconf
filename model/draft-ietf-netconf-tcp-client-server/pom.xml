@@ -17,10 +17,10 @@
     </parent>
 
     <groupId>org.opendaylight.netconf.model</groupId>
-    <artifactId>draft-ietf-restconf-server</artifactId>
+    <artifactId>draft-ietf-netconf-tcp-client-server</artifactId>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
-    <description>ietf-restconf-server from draft-ietf-netconf-restconf-client-server-</description>
+    <description>Models from draft-ietf-netconf-tcp-client-server</description>
 
     <dependencies>
         <dependency>
@@ -28,25 +28,8 @@
             <artifactId>rfc6991-ietf-inet-types</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc6991-ietf-yang-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>draft-ietf-netconf-tcp-client-server</artifactId>
-        </dependency>
-        <!-- FIXME: once the RFCs are published we should just depend on model artifacts -->
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>transport-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>transport-tls</artifactId>
+            <artifactId>draft-ietf-crypto-types</artifactId>
         </dependency>
     </dependencies>
 </project>
