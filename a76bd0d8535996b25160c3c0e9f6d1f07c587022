@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56673fd7_2f976a53",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-07-29T13:31:31Z",
+      "side": 1,
+      "message": "It should be `AtomicReference\u003cSseConsumerState\u003e`",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
