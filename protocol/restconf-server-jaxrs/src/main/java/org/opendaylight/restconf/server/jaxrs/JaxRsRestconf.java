@@ -37,6 +37,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
@@ -153,14 +154,15 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * Delete the target data resource.
      *
      * @param identifier path to target
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @DELETE
     @Path("/data/{identifier:.+}")
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
     public void dataDELETE(@Encoded @PathParam("identifier") final ApiPath identifier,
-            @Suspended final AsyncResponse ar) {
-        server.dataDELETE(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar) {
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.dataDELETE(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar) {
             @Override
             Response transform(final Empty result) {
                 return Response.noContent().build();
@@ -172,6 +174,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * Get target data resource from data root.
      *
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -183,8 +186,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        server.dataGET(newDataGet(uriInfo, ar));
+    public void dataGET(@Context final UriInfo uriInfo, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
+        server.dataGET(newDataGet(uriInfo, sc, ar));
     }
 
     /**
@@ -192,6 +196,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param identifier path to target
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -204,13 +209,14 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
-            @Suspended final AsyncResponse ar) {
-        server.dataGET(newDataGet(uriInfo, ar), identifier);
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.dataGET(newDataGet(uriInfo, sc, ar), identifier);
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataGetResult> newDataGet(final UriInfo uriInfo, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
+    private JaxRsServerRequest<DataGetResult> newDataGet(final UriInfo uriInfo, final SecurityContext sc,
+            final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
             Response transform(final DataGetResult result) throws ServerException {
                 final var builder = Response.ok()
@@ -238,6 +244,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PATCH
@@ -247,9 +254,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataXmlPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataXmlPATCH(final InputStream body, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(ar), xmlBody);
+            server.dataPATCH(newDataPATCH(sc, ar), xmlBody);
         }
     }
 
@@ -259,6 +267,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param identifier path to target
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PATCH
@@ -269,9 +278,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(ar), identifier, xmlBody);
+            server.dataPATCH(newDataPATCH(sc, ar), identifier, xmlBody);
         }
     }
 
@@ -280,6 +289,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PATCH
@@ -288,9 +298,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void dataJsonPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataJsonPATCH(final InputStream body, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(ar), jsonBody);
+            server.dataPATCH(newDataPATCH(sc, ar), jsonBody);
         }
     }
 
@@ -300,6 +311,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param identifier path to target
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PATCH
@@ -309,15 +321,15 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_JSON,
     })
     public void dataJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(ar), identifier, jsonBody);
+            server.dataPATCH(newDataPATCH(sc, ar), identifier, jsonBody);
         }
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataPatchResult> newDataPATCH(final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar) {
+    private JaxRsServerRequest<DataPatchResult> newDataPATCH(final SecurityContext sc, final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar) {
             @Override
             Response transform(final DataPatchResult result) {
                 final var builder = Response.ok();
@@ -333,6 +345,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param body YANG Patch body
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -343,9 +356,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public void dataYangJsonPATCH(final InputStream body, @Context final UriInfo uriInfo,
-            @Suspended final AsyncResponse ar) {
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(uriInfo, ar), jsonBody);
+            server.dataPATCH(newDataYangPATCH(uriInfo, sc, ar), jsonBody);
         }
     }
 
@@ -356,6 +369,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier path to target
      * @param body YANG Patch body
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -366,9 +380,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(uriInfo, ar), identifier, jsonBody);
+            server.dataPATCH(newDataYangPATCH(uriInfo, sc, ar), identifier, jsonBody);
         }
     }
 
@@ -378,6 +392,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param body YANG Patch body
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -388,9 +403,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public void dataYangXmlPATCH(final InputStream body, @Context final UriInfo uriInfo,
-            @Suspended final AsyncResponse ar) {
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(uriInfo, ar), xmlBody);
+            server.dataPATCH(newDataYangPATCH(uriInfo, sc, ar), xmlBody);
         }
     }
 
@@ -401,6 +416,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier path to target
      * @param uriInfo URI info
      * @param body YANG Patch body
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -411,15 +427,16 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(uriInfo, ar), identifier, xmlBody);
+            server.dataPATCH(newDataYangPATCH(uriInfo, sc, ar), identifier, xmlBody);
         }
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataYangPatchResult> newDataYangPATCH(final UriInfo uriInfo, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
+    private JaxRsServerRequest<DataYangPatchResult> newDataYangPATCH(final UriInfo uriInfo, final SecurityContext sc,
+            final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
             Response transform(final DataYangPatchResult result) {
                 final var patchStatus = result.status();
@@ -460,6 +477,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param body data node for put to config DS
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @POST
@@ -468,10 +486,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void postDataJSON(final InputStream body, @Context final UriInfo uriInfo,
+    public void postDataJSON(final InputStream body, @Context final UriInfo uriInfo, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonChildBody(body)) {
-            server.dataPOST(newDataPOST(uriInfo, ar), jsonBody);
+            server.dataPOST(newDataPOST(uriInfo, sc, ar), jsonBody);
         }
     }
 
@@ -481,6 +499,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier path to target
      * @param body data node for put to config DS
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @POST
@@ -490,8 +509,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_JSON,
     })
     public void postDataJSON(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        server.dataPOST(newDataPOST(uriInfo, ar), identifier, new JsonDataPostBody(body));
+            @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.dataPOST(newDataPOST(uriInfo, sc, ar), identifier, new JsonDataPostBody(body));
     }
 
     /**
@@ -499,6 +518,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param body data node for put to config DS
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @POST
@@ -508,9 +528,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void postDataXML(final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+    public void postDataXML(final InputStream body, @Context final UriInfo uriInfo, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlChildBody(body)) {
-            server.dataPOST(newDataPOST(uriInfo, ar), xmlBody);
+            server.dataPOST(newDataPOST(uriInfo, sc, ar), xmlBody);
         }
     }
 
@@ -520,6 +541,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier path to target
      * @param body data node for put to config DS
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @POST
@@ -530,14 +552,14 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void postDataXML(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        server.dataPOST(newDataPOST(uriInfo, ar), identifier, new XmlDataPostBody(body));
+            @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.dataPOST(newDataPOST(uriInfo, sc, ar), identifier, new XmlDataPostBody(body));
     }
 
     @NonNullByDefault
     private <T extends DataPostResult> JaxRsServerRequest<T> newDataPOST(final UriInfo uriInfo,
-            final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
+            final SecurityContext sc, final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
             Response transform(final DataPostResult result) {
                 if (result instanceof CreateResourceResult createResource) {
@@ -564,6 +586,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param uriInfo request URI information
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
@@ -572,9 +595,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void dataJsonPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataJsonPUT(@Context final UriInfo uriInfo, final @Context SecurityContext sc, final InputStream body,
+            @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPUT(newDataPUT(uriInfo, ar), jsonBody);
+            server.dataPUT(newDataPUT(uriInfo, sc, ar), jsonBody);
         }
     }
 
@@ -584,6 +608,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier path to target
      * @param uriInfo request URI information
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
@@ -593,9 +618,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_JSON,
     })
     public void dataJsonPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
-            final InputStream body, @Suspended final AsyncResponse ar) {
+            final @Context SecurityContext sc, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPUT(newDataPUT(uriInfo, ar), identifier, jsonBody);
+            server.dataPUT(newDataPUT(uriInfo, sc, ar), identifier, jsonBody);
         }
     }
 
@@ -604,6 +629,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param uriInfo request URI information
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
@@ -613,9 +639,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataXmlPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataXmlPUT(@Context final UriInfo uriInfo, final @Context SecurityContext sc, final InputStream body,
+            @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPUT(newDataPUT(uriInfo, ar), xmlBody);
+            server.dataPUT(newDataPUT(uriInfo, sc, ar), xmlBody);
         }
     }
 
@@ -625,6 +652,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier path to target
      * @param uriInfo request URI information
      * @param body data node for put to config DS
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
@@ -635,15 +663,16 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataXmlPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
-            final InputStream body, @Suspended final AsyncResponse ar) {
+            final @Context SecurityContext sc, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPUT(newDataPUT(uriInfo, ar), identifier, xmlBody);
+            server.dataPUT(newDataPUT(uriInfo, sc, ar), identifier, xmlBody);
         }
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataPutResult> newDataPUT(final UriInfo uriInfo, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
+    private JaxRsServerRequest<DataPutResult> newDataPUT(final UriInfo uriInfo, final SecurityContext sc,
+            final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
             Response transform(final DataPutResult result) {
                 // Note: no Location header, as it matches the request path
@@ -657,6 +686,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     /**
      * List RPC and action operations.
      *
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -665,14 +695,15 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML,
         MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
     })
-    public void operationsGET(@Suspended final AsyncResponse ar) {
-        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, ar));
+    public void operationsGET(final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, sc, ar));
     }
 
     /**
      * Retrieve list of operations and actions supported by the server or device.
      *
      * @param operation path parameter to identify device and/or operation
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -681,8 +712,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML,
         MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
     })
-    public void operationsGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
-        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, ar), operation);
+    public void operationsGET(@PathParam("operation") final ApiPath operation, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
+        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, sc, ar), operation);
     }
 
     /**
@@ -691,6 +723,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier module name and rpc identifier string for the desired operation
      * @param body the body of the operation
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link FormattableBody} output
      */
     @POST
@@ -709,9 +742,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void operationsXmlPOST(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlOperationInputBody(body)) {
-            operationsPOST(identifier, uriInfo, ar, xmlBody);
+            operationsPOST(identifier, uriInfo, sc, ar, xmlBody);
         }
     }
 
@@ -721,6 +754,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier module name and rpc identifier string for the desired operation
      * @param body the body of the operation
      * @param uriInfo URI info
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link FormattableBody} output
      */
     @POST
@@ -738,16 +772,16 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void operationsJsonPOST(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonOperationInputBody(body)) {
-            operationsPOST(identifier, uriInfo, ar, jsonBody);
+            operationsPOST(identifier, uriInfo, sc, ar, jsonBody);
         }
     }
 
     @NonNullByDefault
-    private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
-            final OperationInputBody body) {
-        server.operationsPOST(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar, uriInfo) {
+    private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final SecurityContext sc,
+            final AsyncResponse ar, final OperationInputBody body) {
+        server.operationsPOST(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
             Response transform(final InvokeResult result) {
                 final var body = result.output();
@@ -760,6 +794,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     /**
      * Get revision of IETF YANG Library module.
      *
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -771,8 +806,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void yangLibraryVersionGET(@Suspended final AsyncResponse ar) {
-        server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, ar));
+    public void yangLibraryVersionGET(final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, sc, ar));
     }
 
     // FIXME: References to these resources are generated by our yang-library implementation. That means:
@@ -795,14 +830,16 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param fileName source file name
      * @param revision source revision
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
     @Path("/" + MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYangGET(@PathParam("fileName") final String fileName,
-            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
-        server.modulesYangGET(newModulesGET(ar), fileName, revision);
+            @QueryParam("revision") final String revision, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
+        server.modulesYangGET(newModulesGET(sc, ar), fileName, revision);
     }
 
     /**
@@ -811,6 +848,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param mountPath mount point path
      * @param fileName source file name
      * @param revision source revision
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -818,8 +856,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @Path("/" + MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
     public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
-            @Suspended final AsyncResponse ar) {
-        server.modulesYangGET(newModulesGET(ar), mountPath, fileName, revision);
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.modulesYangGET(newModulesGET(sc, ar), mountPath, fileName, revision);
     }
 
     /**
@@ -827,14 +865,16 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param fileName source file name
      * @param revision source revision
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
     @Path("/" + MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYinGET(@PathParam("fileName") final String fileName,
-            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
-        server.modulesYinGET(newModulesGET(ar), fileName, revision);
+            @QueryParam("revision") final String revision, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
+        server.modulesYinGET(newModulesGET(sc, ar), fileName, revision);
     }
 
     /**
@@ -843,6 +883,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param mountPath mount point path
      * @param fileName source file name
      * @param revision source revision
+     * @param sc {@link SecurityContext} of the request
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
@@ -850,13 +891,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @Path("/" + MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
     public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
-            @Suspended final AsyncResponse ar) {
-        server.modulesYinGET(newModulesGET(ar), mountPath, fileName, revision);
+            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.modulesYinGET(newModulesGET(sc, ar), mountPath, fileName, revision);
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<ModulesGetResult> newModulesGET(final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, ar) {
+    private JaxRsServerRequest<ModulesGetResult> newModulesGET(final SecurityContext sc, final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar) {
             @Override
             Response transform(final ModulesGetResult result) throws ServerException {
                 final Reader reader;

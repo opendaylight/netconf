@@ -9,11 +9,14 @@ package org.opendaylight.restconf.server.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
+import java.security.Principal;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
@@ -30,22 +33,24 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
  */
 @NonNullByDefault
 abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
+    private final SecurityContext sc;
     private final AsyncResponse ar;
 
     private JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
-            final AsyncResponse ar, final QueryParameters queryParameters) {
+            final SecurityContext sc, final AsyncResponse ar, final QueryParameters queryParameters) {
         super(queryParameters, defaultPrettyPrint, errorTagMapping);
+        this.sc = requireNonNull(sc);
         this.ar = requireNonNull(ar);
     }
 
     JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
-            final AsyncResponse ar) {
-        this(defaultPrettyPrint, errorTagMapping, ar, QueryParameters.of());
+            final SecurityContext sc, final AsyncResponse ar) {
+        this(defaultPrettyPrint, errorTagMapping, sc, ar, QueryParameters.of());
     }
 
     JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint,final ErrorTagMapping errorTagMapping,
-            final AsyncResponse ar, final UriInfo uriInfo) {
-        this(defaultPrettyPrint, errorTagMapping, ar, queryParamsOf(uriInfo));
+            final SecurityContext sc, final AsyncResponse ar, final UriInfo uriInfo) {
+        this(defaultPrettyPrint, errorTagMapping, sc, ar, queryParamsOf(uriInfo));
     }
 
     private static QueryParameters queryParamsOf(final UriInfo uriInfo) {
@@ -54,6 +59,11 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public final @Nullable Principal principal() {
+        return sc.getUserPrincipal();
     }
 
     @Override

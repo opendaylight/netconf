@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.SecurityContext;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -25,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * <p>The URL is expected to be requested by {@link org.opendaylight.netconf.yanglib.writer.YangLibraryWriter
  * YangLibraryWriter} when yang-library data is being constructed, only default module-set name ("ODL_modules")
  * is supported. The composed URL for resource download expected to be served by
- * {@link JaxRsRestconf#modulesYangGET(String, String, javax.ws.rs.container.AsyncResponse)} et al.
+ * {@link JaxRsRestconf#modulesYangGET(String, String, SecurityContext, AsyncResponse)} et al.
  */
 @Singleton
 @Component(immediate = true)

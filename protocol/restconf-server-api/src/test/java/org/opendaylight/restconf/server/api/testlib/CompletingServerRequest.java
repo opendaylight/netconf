@@ -9,11 +9,13 @@ package org.opendaylight.restconf.server.api.testlib;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import java.security.Principal;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -65,6 +67,11 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
             Throwables.throwIfUnchecked(cause);
             throw new UncheckedExecutionException(cause);
         }
+    }
+
+    @Override
+    public @Nullable Principal principal() {
+        return null;
     }
 
     @Override
