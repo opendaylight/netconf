@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.jaxrs;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -20,8 +21,8 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 @NonNullByDefault
 final class FormattableJaxRsServerRequest extends JaxRsServerRequest<FormattableBody> {
     FormattableJaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
-            final AsyncResponse ar) {
-        super(defaultPrettyPrint, errorTagMapping, ar);
+            final SecurityContext sc, final AsyncResponse ar) {
+        super(defaultPrettyPrint, errorTagMapping, sc, ar);
     }
 
     @Override
