@@ -88,7 +88,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         prepNNC(result);
         assertSame(result, assertOperationOutput(200, ar -> restconf.operationsXmlPOST(
             apiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
-                <input xmlns="invoke:rpc:module"/>"""), uriInfo, ar)));
+                <input xmlns="invoke:rpc:module"/>"""), uriInfo, sc, ar)));
     }
 
     @Test
@@ -102,7 +102,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                 {
                   "invoke-rpc-module:input" : {
                   }
-                }"""), uriInfo, ar)));
+                }"""), uriInfo, sc, ar)));
     }
 
     @Test
@@ -116,7 +116,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                   <cont>
                     <lf>test</lf>
                   </cont>
-                </input>"""), uriInfo, ar)));
+                </input>"""), uriInfo, sc, ar)));
     }
 
     @Test
@@ -133,7 +133,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "lf" : "test"
                     }
                   }
-                }"""), uriInfo, ar));
+                }"""), uriInfo, sc, ar));
         assertEquals(
             new ErrorMessage("No implementation of RPC (invoke:rpc:module?revision=2013-12-03)rpc-test available."),
             error.message());
@@ -166,7 +166,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                           "lf" : "test"
                         }
                       }
-                    }"""), uriInfo, ar)));
+                    }"""), uriInfo, sc, ar)));
     }
 
     @Test
@@ -188,7 +188,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                 {
                   "invoke-rpc-module:input" : {
                   }
-                }"""), uriInfo, ar));
+                }"""), uriInfo, sc, ar));
         assertEquals(new ErrorMessage("RPC not supported"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.tag());
@@ -208,7 +208,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "lf" : "test"
                     }
                   }
-                }"""), uriInfo, ar));
+                }"""), uriInfo, sc, ar));
         assertEquals(OUTPUT, body.data());
         assertFormat("""
             {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", body::formatToJSON, false);

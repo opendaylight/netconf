@@ -62,7 +62,7 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
 
     @Test
     void testOperations() {
-        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(sc, ar));
 
         assertFormat(EXPECTED_JSON, body::formatToJSON, true);
         assertFormat(EXPECTED_XML, body::formatToXML, true);
@@ -84,7 +84,7 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     void testMountPointOperations() {
         mockMountPoint();
 
-        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(DEVICE_ID, ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(DEVICE_ID, sc, ar));
         assertFormat(EXPECTED_JSON, body::formatToJSON, true);
         assertFormat(EXPECTED_XML, body::formatToXML, true);
     }
@@ -93,7 +93,7 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     void testMountPointSpecificOperationsJson() {
         mockMountPoint();
 
-        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(DEVICE_RPC1_MODULE1_ID, ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(DEVICE_RPC1_MODULE1_ID, sc, ar));
         assertFormat("""
             { "module1:dummy-rpc1-module1" : [null] }""", body::formatToJSON, false);
         assertFormat("""

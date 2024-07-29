@@ -72,7 +72,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                 {
                   "example-jukebox:jukebox" : {
                   }
-                }"""), uriInfo, ar)).getLocation());
+                }"""), uriInfo, sc, ar)).getLocation());
     }
 
     @Test
@@ -91,7 +91,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                     "name" : "name of band",
                     "description" : "band description"
                   }
-                }"""), uriInfo, ar)).getLocation());
+                }"""), uriInfo, sc, ar)).getLocation());
     }
 
     @Test
@@ -104,8 +104,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                 {
                   "example-jukebox:jukebox" : {
                   }
-                }"""),
-            uriInfo, ar));
+                }"""), uriInfo, sc, ar));
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.DATA_EXISTS, error.tag());
     }
@@ -125,7 +124,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                     "description" : "band description"
                   }
                 }"""),
-                uriInfo, ar));
+                uriInfo, sc, ar));
         assertEquals(YangInstanceIdentifier.builder(PLAYLIST_IID)
             .nodeWithKey(PLAYLIST_QNAME, QName.create(JUKEBOX_QNAME, "name"), "name of band")
             .build(), error.path().path());
@@ -155,7 +154,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                            "index": "3"
                         }
                       ]
-                    }"""), uriInfo, ar)).getLocation());
+                    }"""), uriInfo, sc, ar)).getLocation());
         verify(tx, times(1)).put(any(), any(), any());
     }
 
@@ -187,7 +186,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                            "index": "3"
                         }
                       ]
-                    }"""), uriInfo, ar)).getLocation());
+                    }"""), uriInfo, sc, ar)).getLocation());
         verify(tx, times(3)).put(any(), any(), any());
     }
 
@@ -219,7 +218,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                            "id" = "C"
                         }
                       ]
-                    }"""), uriInfo, ar)).getLocation());
+                    }"""), uriInfo, sc, ar)).getLocation());
 
         verify(tx, times(3)).put(any(), any(), any());
     }
@@ -251,7 +250,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                            "id" = "C"
                         }
                       ]
-                    }"""), uriInfo, ar)).getLocation());
+                    }"""), uriInfo, sc, ar)).getLocation());
 
         verify(tx, times(3)).put(any(), any(), any());
     }

@@ -21,6 +21,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
+import java.security.Principal;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
@@ -287,6 +288,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
                     // To be verified
                 }
+
+                @Override
+                public Principal principal() {
+                    return null;
+                }
         });
 
         final var spyStrategy = new MdsalServerStrategy(JUKEBOX_DATABIND, NotSupportedServerMountPointResolver.INSTANCE,
@@ -339,6 +345,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 @Override
                 protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
                     // To be verified
+                }
+
+                @Override
+                public Principal principal() {
+                    return null;
                 }
         });
 

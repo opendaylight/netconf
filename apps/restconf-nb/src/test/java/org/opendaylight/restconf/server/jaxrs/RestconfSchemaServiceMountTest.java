@@ -14,6 +14,7 @@ import static org.opendaylight.restconf.server.jaxrs.AbstractRestconfTest.assert
 
 import com.google.common.io.CharStreams;
 import java.io.Reader;
+import javax.ws.rs.core.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,6 +69,8 @@ class RestconfSchemaServiceMountTest {
     private YangTextSource yangSource;
     @Mock
     private Reader yangReader;
+    @Mock
+    private SecurityContext sc;
 
     // service under test
     private JaxRsRestconf restconf;
@@ -97,8 +100,8 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaMountPointTest() throws Exception {
-        final var reader = assertEntity(Reader.class, 200,
-            ar -> restconf.modulesYangGET(MOUNT_POINT, "module1-behind-mount-point", "2014-02-03", ar));
+        final var reader = assertEntity(Reader.class, 200, ar -> restconf.modulesYangGET(MOUNT_POINT,
+            "module1-behind-mount-point", "2014-02-03", sc, ar));
         assertEquals("""
             module module1-behind-mount-point {
               namespace module:1:behind:mount:point;
@@ -115,8 +118,8 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaForNotExistingModuleMountPointTest() {
-        final var error = assertError(409,
-            ar -> restconf.modulesYangGET(MOUNT_POINT, "not-existing", "2016-01-01", ar));
+        final var error = assertError(409, ar -> restconf.modulesYangGET(MOUNT_POINT, "not-existing", "2016-01-01", sc,
+            ar));
         assertEquals(new ErrorMessage("Source not-existing@2016-01-01 not found"), error.message());
         assertEquals(ErrorType.APPLICATION, error.type());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
@@ -130,8 +133,8 @@ class RestconfSchemaServiceMountTest {
     void getSchemaNullSchemaContextBehindMountPointTest() {
         // make test - call service on mount point with null schema context
         // NULL_MOUNT_POINT contains null schema context
-        final var error = assertError(503,
-            ar -> restconf.modulesYangGET(NULL_MOUNT_POINT, "module1-behind-mount-point", "2014-02-03", ar));
+        final var error = assertError(503, ar -> restconf.modulesYangGET(NULL_MOUNT_POINT, "module1-behind-mount-point",
+            "2014-02-03", sc, ar));
         assertEquals(new ErrorMessage("Mount point does not expose DOMSchemaService"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.tag());
@@ -147,7 +150,7 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaWithEmptyIdentifierMountPointTest() {
-        final var error = assertError(400, ar -> restconf.modulesYangGET(MOUNT_POINT, "", null, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET(MOUNT_POINT, "", null, sc, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -160,7 +163,8 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaWithNotParsableIdentifierMountPointTest() {
-        final var error = assertError(400, ar -> restconf.modulesYangGET(MOUNT_POINT, "01_module", "2016-01-01", ar));
+        final var error = assertError(400,
+            ar -> restconf.modulesYangGET(MOUNT_POINT, "01_module", "2016-01-01", sc, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -176,7 +180,7 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaWrongIdentifierMountPointTest() {
-        final var error = assertError(400, ar -> restconf.modulesYangGET(MOUNT_POINT, "2014-01-01", null, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET(MOUNT_POINT, "2014-01-01", null, sc, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -189,7 +193,7 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaWithoutRevisionMountPointTest() {
-        final var error = assertError(409, ar -> restconf.modulesYangGET(MOUNT_POINT, "module", null, ar));
+        final var error = assertError(409, ar -> restconf.modulesYangGET(MOUNT_POINT, "module", null, sc, ar));
         assertEquals(new ErrorMessage("Source module not found"), error.message());
         assertEquals(ErrorType.APPLICATION, error.type());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
@@ -201,8 +205,8 @@ class RestconfSchemaServiceMountTest {
      */
     @Test
     void getSchemaContextWithNotExistingMountPointTest() {
-        final var error = assertError(400,
-            ar -> restconf.modulesYangGET(NOT_EXISTING_MOUNT_POINT, "module1-behind-mount-point", "2014-02-03", ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET(NOT_EXISTING_MOUNT_POINT,
+            "module1-behind-mount-point", "2014-02-03", sc, ar));
         assertEquals(new ErrorMessage("Failed to lookup for module with name 'mount-point-3'."), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.tag());

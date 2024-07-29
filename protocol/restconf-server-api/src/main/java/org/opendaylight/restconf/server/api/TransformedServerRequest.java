@@ -9,8 +9,10 @@ package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
+import java.security.Principal;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -25,6 +27,11 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     TransformedServerRequest {
         requireNonNull(delegate);
         requireNonNull(function);
+    }
+
+    @Override
+    public @Nullable Principal principal() {
+        return delegate.principal();
     }
 
     @Override

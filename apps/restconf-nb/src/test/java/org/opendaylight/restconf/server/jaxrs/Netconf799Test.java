@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.Futures;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,6 +62,8 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
     private AsyncResponse asyncResponse;
     @Captor
     private ArgumentCaptor<Response> captor;
+    @Mock
+    private SecurityContext sc;
 
     @Test
     void testInvokeAction() throws Exception {
@@ -81,7 +84,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
               "instance-identifier-module:input": {
                 "delay": 600
               }
-            }"""), uriInfo, asyncResponse);
+            }"""), uriInfo, sc, asyncResponse);
         final var response = captor.getValue();
         assertEquals(204, response.getStatus());
         assertNull(response.getEntity());
@@ -109,7 +112,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
                       "instance-identifier-module:input": {
                         "delay": 600
                       }
-                    }"""), uriInfo, ar);
+                    }"""), uriInfo, sc, ar);
         });
 
         AbstractJukeboxTest.assertFormat("""

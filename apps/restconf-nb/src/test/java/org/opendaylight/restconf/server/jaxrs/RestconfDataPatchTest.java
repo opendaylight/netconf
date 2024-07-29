@@ -83,7 +83,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                       }
                     ]
                   }
-                }"""), uriInfo, ar));
+                }"""), uriInfo, sc, ar));
 
         assertFormat("""
             {
@@ -133,7 +133,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                       }
                     ]
                   }
-                }"""), uriInfo, ar));
+                }"""), uriInfo, sc, ar));
 
         assertFormat("""
             {
@@ -212,7 +212,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                     <operation>delete</operation>
                     <target>/example-jukebox:jukebox/player/gap</target>
                   </edit>
-                </yang-patch>"""), uriInfo, ar));
+                </yang-patch>"""), uriInfo, sc, ar));
 
         assertFormat("""
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">

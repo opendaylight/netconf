@@ -16,6 +16,7 @@ import static org.opendaylight.restconf.server.jaxrs.AbstractRestconfTest.assert
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.io.Reader;
+import javax.ws.rs.core.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,6 +64,8 @@ class RestconfSchemaServiceTest {
     private YangTextSource yangSource;
     @Mock
     private Reader yangReader;
+    @Mock
+    private SecurityContext sc;
 
     // service under test
     private JaxRsRestconf restconf;
@@ -86,7 +89,7 @@ class RestconfSchemaServiceTest {
         doReturn(yangReader).when(yangSource).openStream();
 
         assertSame(yangReader, assertEntity(Reader.class, 200,
-            ar -> restconf.modulesYangGET("module1", "2014-01-01", ar)));
+            ar -> restconf.modulesYangGET("module1", "2014-01-01", sc, ar)));
     }
 
     /**
@@ -95,7 +98,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaForNotExistingModuleTest() {
-        final var error = assertError(409, ar -> restconf.modulesYinGET("not-existing", "2016-01-01", ar));
+        final var error = assertError(409, ar -> restconf.modulesYinGET("not-existing", "2016-01-01", sc, ar));
         assertEquals(new ErrorMessage("Source not-existing@2016-01-01 not found"), error.message());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
         assertEquals(ErrorType.APPLICATION, error.type());
@@ -107,7 +110,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaWithEmptyIdentifierTest() {
-        final var error = assertError(400, ar -> restconf.modulesYangGET("", null, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET("", null, sc, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -119,7 +122,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaWithNotParsableIdentifierTest() {
-        final var error = assertError(400, ar -> restconf.modulesYangGET("01_module", "2016-01-01", ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET("01_module", "2016-01-01", sc, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -134,7 +137,7 @@ class RestconfSchemaServiceTest {
      */
     @Test
     void getSchemaWrongIdentifierTest() {
-        final var error = assertError(400, ar -> restconf.modulesYangGET("2014-01-01", null, ar));
+        final var error = assertError(400, ar -> restconf.modulesYangGET("2014-01-01", null, sc, ar));
         assertEquals(new ErrorMessage("Identifier must start with character from set 'a-zA-Z_"), error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
@@ -150,6 +153,6 @@ class RestconfSchemaServiceTest {
             .getYangTexttSource(new SourceIdentifier("module-without-revision", (Revision) null));
         doReturn(yangReader).when(yangSource).openStream();
         assertSame(yangReader, assertEntity(Reader.class, 200,
-            ar -> restconf.modulesYangGET("module-without-revision", null, ar)));
+            ar -> restconf.modulesYangGET("module-without-revision", null, sc, ar)));
     }
 }

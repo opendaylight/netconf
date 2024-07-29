@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -64,6 +65,8 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     DOMMountPointService mountPointService;
     @Mock
     DOMMountPoint mountPoint;
+    @Mock
+    SecurityContext sc;
 
     JaxRsRestconf restconf;
 
