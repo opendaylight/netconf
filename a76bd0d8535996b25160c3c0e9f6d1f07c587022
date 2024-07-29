@@ -54,6 +54,47 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "71490775_a820e773",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-29T19:47:35Z",
+      "side": 1,
+      "message": "yes. and it needs to be split up like:\n\n    return switch (msg) {\n      case HttpResponse response -\u003e channelRead(ctx, response);\n      // ...\n    };\n\n    private channelRead(ChannelHandlerContext ctx, HttpResponse response) {\n      // access state and do stuff\n    }\n    \nthat way it is easy to follow.",
+      "parentUuid": "b5b5751f_d95b4668",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00923466_d05920f0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-29T19:47:35Z",
+      "side": 1,
+      "message": "right, but shouldn\u0027t this be a hard error?\n\nessentially client and server view of what happened is diverging i.e. we cannot guarantee anything really, can we? might as well tear down the session...",
+      "range": {
+        "startLine": 115,
+        "startChar": 12,
+        "endLine": 115,
+        "endChar": 19
+      },
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "582cc044_02fd7e55",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseService.java",
         "patchSetId": 18
@@ -99,6 +140,70 @@
       "writtenOn": "2024-07-29T14:12:05Z",
       "side": 1,
       "message": "Please add some logging: https://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0238130d_693bdd2f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseService.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-29T19:47:35Z",
+      "side": 1,
+      "message": "yes, and this deserves a comment. why can this even happen?",
+      "parentUuid": "acb8f4f0_542322c5",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18f11371_34c1066b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2RequestDispatcher.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-29T19:47:35Z",
+      "side": 1,
+      "message": "the 2 here is something HTTP/2 stream aficionados will know, but not the causal peruser -- who will might catch the \u00272\u0027 instead of the usual \u00271\u0027 increment.\n\nthey will be left to wonder, and therefore this deserves about 3 line comment to the HTTP/2 spec of how streams work.",
+      "range": {
+        "startLine": 69,
+        "startChar": 41,
+        "endLine": 69,
+        "endChar": 42
+      },
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c8f4ee3_6355c662",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2RequestDispatcher.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-07-29T19:47:35Z",
+      "side": 1,
+      "message": "please use a qualified name, not a static import",
+      "range": {
+        "startLine": 74,
+        "startChar": 55,
+        "endLine": 74,
+        "endChar": 64
+      },
       "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
