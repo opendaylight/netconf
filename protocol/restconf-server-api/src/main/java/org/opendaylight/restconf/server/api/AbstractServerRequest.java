@@ -9,6 +9,8 @@ package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -86,4 +88,19 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
     protected abstract void onSuccess(T result);
 
     protected abstract void onFailure(YangErrorsBody errors);
+
+    @Override
+    public final String toString() {
+        return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
+    }
+
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        final var principal = principal();
+        if (principal != null) {
+            helper.add("principal", principal.getName());
+        }
+        return helper
+            .add("parameters", queryParameters)
+            .add("prettyPrint", prettyPrint);
+    }
 }

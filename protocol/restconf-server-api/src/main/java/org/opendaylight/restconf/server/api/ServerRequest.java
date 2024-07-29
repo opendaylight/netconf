@@ -7,26 +7,45 @@
  */
 package org.opendaylight.restconf.server.api;
 
+import java.security.Principal;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 /**
- * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing binding to
- * HTTP transport layer. This includes:
+ * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing the request
+ * on the transport (typically HTTP) layer. This includes:
  * <ul>
+ *   <li>requesting {@link #principal()}</li>
  *   <li>HTTP request {@link #queryParameters() query parameters},</li>
  * </ul>
  * It notably does <b>not</b> hold the HTTP request path, nor the request body. Those are passed as separate arguments
- * to server methods as implementations of those methods are expected to act on them.
+ * to server methods as implementations of those methods are expected to act on them on multiple layers, i.e. they are
+ * not a request invariant at the various processing layers.
+ *
+ * <p>
+ * Every request needs to be completed via one of {@link #completeWith(Object)}, {@link #completeWith(ServerException)}
+ * or other {@code completeWith} methods.
  *
  * @param <T> type of reported result
  */
 @NonNullByDefault
 public sealed interface ServerRequest<T> permits AbstractServerRequest, TransformedServerRequest {
+    /**
+     * Returns the Principal making this request.
+     *
+     * @return the Principal making this request, {@code null} if unauthenticated
+     */
+    @Nullable Principal principal();
 
+    /**
+     * Returns the request's {@link QueryParameters}
+     * .
+     * @return the request's {@link QueryParameters}
+     */
     QueryParameters queryParameters();
 
     void completeWith(T result);
