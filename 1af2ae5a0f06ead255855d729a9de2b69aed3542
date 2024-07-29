@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85a5e7b1_cdac1eb2",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-07-29T06:58:50Z",
+      "side": 1,
+      "message": "can be inlined",
+      "revId": "1af2ae5a0f06ead255855d729a9de2b69aed3542",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
