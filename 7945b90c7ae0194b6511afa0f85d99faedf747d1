@@ -16,6 +16,24 @@
       "message": "Why verify here?",
       "revId": "7945b90c7ae0194b6511afa0f85d99faedf747d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f31a0192_6d5a89f4",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-07-29T08:25:02Z",
+      "side": 1,
+      "message": "just followed the conventional usage of `rwTx` variable in this particular class",
+      "parentUuid": "fb94cb92_138a39c9",
+      "revId": "7945b90c7ae0194b6511afa0f85d99faedf747d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
