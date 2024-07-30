@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3d9d601_50228b77",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "In previous iterations using atomic objects was rejected by Robert. \nHandler expected to be thread safe enough:\n\u003e Netty will never call a ChannelHandler\u0027s methods concurrently, unless the ChannelHandler is annotated with @Sharable. \n\nsee https://github.com/netty/netty/wiki/New-and-noteworthy-in-4.0#well-defined-thread-model",
+      "parentUuid": "56673fd7_2f976a53",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5b5751f_d95b4668",
@@ -70,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f97962b4_3fac9ca1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71490775_a820e773",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00923466_d05920f0",
@@ -83,6 +119,30 @@
       "writtenOn": "2024-07-29T19:47:35Z",
       "side": 1,
       "message": "right, but shouldn\u0027t this be a hard error?\n\nessentially client and server view of what happened is diverging i.e. we cannot guarantee anything really, can we? might as well tear down the session...",
+      "range": {
+        "startLine": 115,
+        "startChar": 12,
+        "endLine": 115,
+        "endChar": 19
+      },
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40d27754_f0a3606b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "connection will be terminated on unexpected message arrival",
+      "parentUuid": "00923466_d05920f0",
       "range": {
         "startLine": 115,
         "startChar": 12,
@@ -110,6 +170,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff33393f_95693e68",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseService.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "582cc044_02fd7e55",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d65ee44b_613b8c3b",
@@ -123,6 +201,24 @@
       "writtenOn": "2024-07-29T14:12:05Z",
       "side": 1,
       "message": "Redundant line",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f5cb85a_84cf13e6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseService.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d65ee44b_613b8c3b",
       "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -162,6 +258,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8052cbe9_069ee931",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseService.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "there is just no guarantee the null wont be returned by `channel.pipeline().context(...)`, the exact case plays no role.\n\nadded log output and connection termination if no expected handler is found",
+      "parentUuid": "0238130d_693bdd2f",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18f11371_34c1066b",
@@ -175,6 +289,30 @@
       "writtenOn": "2024-07-29T19:47:35Z",
       "side": 1,
       "message": "the 2 here is something HTTP/2 stream aficionados will know, but not the causal peruser -- who will might catch the \u00272\u0027 instead of the usual \u00271\u0027 increment.\n\nthey will be left to wonder, and therefore this deserves about 3 line comment to the HTTP/2 spec of how streams work.",
+      "range": {
+        "startLine": 69,
+        "startChar": 41,
+        "endLine": 69,
+        "endChar": 42
+      },
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7152245e_873fac09",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2RequestDispatcher.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "the requirement of stream-id to be odd-numbered for clients\nwith spec reference can be found at line 38 (30 lines above).",
+      "parentUuid": "18f11371_34c1066b",
       "range": {
         "startLine": 69,
         "startChar": 41,
@@ -208,6 +346,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e65565ab_8e8c9a40",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2RequestDispatcher.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "qualified name is `HttpConversionUtil.ExtensionHeaderNames.STREAM_ID`.\nshorter version is preferable",
+      "parentUuid": "0c8f4ee3_6355c662",
+      "range": {
+        "startLine": 74,
+        "startChar": 55,
+        "endLine": 74,
+        "endChar": 64
+      },
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de59d7f8_913a73ea",
@@ -221,6 +383,24 @@
       "writtenOn": "2024-07-29T14:00:43Z",
       "side": 1,
       "message": "Move this to SseUtils",
+      "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67ad0fc9_713a3aac",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerChannelInitializer.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-30T14:39:11Z",
+      "side": 1,
+      "message": "Request dispatcher handler name does not belong to SSE overlay.\nSSE overlay depends on HTTP one, not vice-verse.\nSseUtils is a wrong artifact to place this constant into.",
+      "parentUuid": "de59d7f8_913a73ea",
       "revId": "a76bd0d8535996b25160c3c0e9f6d1f07c587022",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
