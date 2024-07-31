@@ -21,6 +21,7 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.slf4j.Logger;
@@ -71,6 +72,11 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
 
     @Override
     public @Nullable Principal principal() {
+        return null;
+    }
+
+    @Override
+    public @Nullable TransportSession session() {
         return null;
     }
 
