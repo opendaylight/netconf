@@ -43,13 +43,13 @@ public record InterceptingServerRpcOperations(Interceptor interceptor, ServerRpc
 
     @Override
     public void invokeRpc(final ServerRequest<InvokeResult> request, final URI restconfURI, final Rpc path,
-            final ContainerNode input) {
+            final ContainerNode input, final ServerDataOperations dataOperations) {
         final var impl = interceptor.interceptRpc(path);
         if (impl != null) {
             impl.invoke(request.transform(result -> invokeResultOf(path, result)), restconfURI,
-                new OperationInput(path, input));
+                new OperationInput(path, input), dataOperations);
         } else {
-            delegate.invokeRpc(request, restconfURI, path, input);
+            delegate.invokeRpc(request, restconfURI, path, input, dataOperations);
         }
     }
 

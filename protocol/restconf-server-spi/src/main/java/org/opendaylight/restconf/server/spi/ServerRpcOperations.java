@@ -32,5 +32,6 @@ public interface ServerRpcOperations {
      * @param input action {@code input}
      */
     @Beta
-    void invokeRpc(ServerRequest<InvokeResult> request, URI restconfURI, Rpc path, ContainerNode input);
+    void invokeRpc(ServerRequest<InvokeResult> request, URI restconfURI, Rpc path, ContainerNode input,
+        ServerDataOperations dataOperations);
 }

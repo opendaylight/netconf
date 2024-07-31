@@ -43,6 +43,7 @@ import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
@@ -77,6 +78,8 @@ class CreateNotificationStreamRpcTest {
     private DataTreeChangeExtension treeChange;
     @Mock
     private DOMDataTreeWriteTransaction tx;
+    @Mock
+    private ServerDataOperations dataOperations;
     @Captor
     private ArgumentCaptor<YangInstanceIdentifier> pathCaptor;
     @Captor
@@ -102,7 +105,7 @@ class CreateNotificationStreamRpcTest {
         doNothing().when(tx).put(eq(LogicalDatastoreType.OPERATIONAL), pathCaptor.capture(), dataCaptor.capture());
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        rpc.invoke(request, RESTCONF_URI, createInput("path", TOASTER));
+        rpc.invoke(request, RESTCONF_URI, createInput("path", TOASTER), dataOperations);
 
         final var output = request.getResult();
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
@@ -151,7 +154,7 @@ class CreateNotificationStreamRpcTest {
 
     @Test
     void createStreamWrongValueTest() {
-        rpc.invoke(request, RESTCONF_URI, createInput("path", "String value"));
+        rpc.invoke(request, RESTCONF_URI, createInput("path", "String value"), dataOperations);
 
         final var ex = assertThrows(ServerException.class, request::getResult);
         final var errors = ex.errors();
@@ -167,7 +170,7 @@ class CreateNotificationStreamRpcTest {
 
     @Test
     void createStreamWrongInputRpcTest() {
-        rpc.invoke(request, RESTCONF_URI, createInput(null, null));
+        rpc.invoke(request, RESTCONF_URI, createInput(null, null), dataOperations);
 
         final var ex = assertThrows(ServerException.class, request::getResult);
         final var errors = ex.errors();
