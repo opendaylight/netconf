@@ -23,6 +23,7 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
@@ -64,6 +65,12 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
     @Override
     public final @Nullable Principal principal() {
         return sc.getUserPrincipal();
+    }
+    
+    @Override
+    public final @Nullable TransportSession session() {
+        // JAX-RS does not give us control over TCP sessions
+        return null;
     }
 
     @Override

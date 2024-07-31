@@ -35,6 +35,11 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     }
 
     @Override
+    public @Nullable TransportSession session() {
+        return delegate.session();
+    }
+
+    @Override
     public QueryParameters queryParameters() {
         return delegate.queryParameters();
     }
