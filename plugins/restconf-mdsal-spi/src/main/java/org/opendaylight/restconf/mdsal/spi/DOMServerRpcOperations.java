@@ -23,6 +23,7 @@ import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.restconf.server.spi.ServerRpcOperations;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -42,7 +43,7 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
 
     @Override
     public void invokeRpc(final ServerRequest<InvokeResult> request, final URI restconfURI, final Rpc path,
-            final ContainerNode input) {
+            final ContainerNode input, final ServerDataOperations dataOperations) {
         // FIXME: NETCONF-773: why not DOMRpcResultCallback?
         Futures.addCallback(rpcService.invokeRpc(path.rpc().argument(), input), new FutureCallback<DOMRpcResult>() {
             @Override

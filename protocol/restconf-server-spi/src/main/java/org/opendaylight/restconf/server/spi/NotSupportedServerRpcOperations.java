@@ -18,8 +18,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**
- * A {@link ServerRpcOperations} implementation fails all {@link #invokeRpc(ServerRequest, URI, Rpc, ContainerNode)}
- * requests with {@link ErrorTag#OPERATION_NOT_SUPPORTED}.
+ * A {@link ServerRpcOperations} implementation fails all requests with {@link ErrorTag#OPERATION_NOT_SUPPORTED}.
  */
 @NonNullByDefault
 public final class NotSupportedServerRpcOperations implements ServerRpcOperations {
@@ -31,7 +30,7 @@ public final class NotSupportedServerRpcOperations implements ServerRpcOperation
 
     @Override
     public void invokeRpc(final ServerRequest<InvokeResult> request, final URI restconfURI, final Rpc path,
-            final ContainerNode input) {
+            final ContainerNode input, final ServerDataOperations dataOperations) {
         request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "RPC not supported"));
     }

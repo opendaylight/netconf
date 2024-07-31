@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev240218.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev240218.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev240218.SubscribeDeviceNotificationOutput;
@@ -59,7 +60,8 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
     }
 
     @Override
-    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input,
+            final ServerDataOperations dataOperations) {
         final var body = input.input();
         final var pathLeaf = body.childByArg(DEVICE_NOTIFICATION_PATH_NODEID);
         if (pathLeaf == null) {

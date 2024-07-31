@@ -46,8 +46,10 @@ public abstract class RpcImplementation {
      * @param request {@link ServerRequest} for this invocation.
      * @param restconfURI Request URI trimmed to the root RESTCONF endpoint, resolved {@code {+restconf}} resource name
      * @param input RPC input
+     * @param dataOperations {@link ServerDataOperations} for request-local datastore access
      */
-    public abstract void invoke(ServerRequest<ContainerNode> request, URI restconfURI, OperationInput input);
+    public abstract void invoke(ServerRequest<ContainerNode> request, URI restconfURI, OperationInput input,
+        ServerDataOperations dataOperations);
 
     @Override
     public final String toString() {
