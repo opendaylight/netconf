@@ -42,6 +42,14 @@ public sealed interface ServerRequest<T> permits AbstractServerRequest, Transfor
     @Nullable Principal principal();
 
     /**
+     * Returns the {@link TransportSession} on which this request is executing, or {@code null} if there is no control
+     * over transport sessions.
+     *
+     * @return the {@link TransportSession} on which this request is executing
+     */
+    @Nullable TransportSession session();
+
+    /**
      * Returns the request's {@link QueryParameters}
      * .
      * @return the request's {@link QueryParameters}
