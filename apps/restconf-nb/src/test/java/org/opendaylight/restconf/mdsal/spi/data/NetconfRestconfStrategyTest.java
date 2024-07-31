@@ -49,6 +49,7 @@ import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -293,6 +294,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 public Principal principal() {
                     return null;
                 }
+
+                @Override
+                public TransportSession session() {
+                    return null;
+                }
         });
 
         final var spyStrategy = new MdsalServerStrategy(JUKEBOX_DATABIND, NotSupportedServerMountPointResolver.INSTANCE,
@@ -349,6 +355,11 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
                 @Override
                 public Principal principal() {
+                    return null;
+                }
+
+                @Override
+                public TransportSession session() {
                     return null;
                 }
         });
