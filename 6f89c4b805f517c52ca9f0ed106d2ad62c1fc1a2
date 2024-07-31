@@ -39,6 +39,30 @@
       },
       "revId": "6f89c4b805f517c52ca9f0ed106d2ad62c1fc1a2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b85fc428_cc8c22df",
+        "filename": "apps/restconf-nb/pom.xml",
+        "patchSetId": 31
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-07-31T11:43:54Z",
+      "side": 1,
+      "message": "no, http transport configuration is built by OSGi service.\nit opens possibility to configure TLS layer for restconf server",
+      "parentUuid": "74b451a7_382a35c5",
+      "range": {
+        "startLine": 244,
+        "startChar": 12,
+        "endLine": 244,
+        "endChar": 51
+      },
+      "revId": "6f89c4b805f517c52ca9f0ed106d2ad62c1fc1a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
