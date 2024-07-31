@@ -317,7 +317,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             request.completeWith(e);
             return;
         }
-        rpc().invokeRpc(request, restconfURI, path, input);
+        rpc().invokeRpc(request, restconfURI, path, input, data());
     }
 
     @Override

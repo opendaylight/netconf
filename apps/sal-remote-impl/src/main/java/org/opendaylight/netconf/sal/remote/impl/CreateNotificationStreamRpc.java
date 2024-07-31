@@ -21,6 +21,7 @@ import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamInput;
@@ -66,7 +67,8 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
     }
 
     @Override
-    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input,
+            final ServerDataOperations dataOperations) {
         final var body = input.input();
         final var qnames = ((LeafSetNode<String>) body.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
