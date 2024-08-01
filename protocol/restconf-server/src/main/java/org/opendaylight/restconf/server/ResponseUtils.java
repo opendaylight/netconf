@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.DateFormatter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -39,18 +38,18 @@ final class ResponseUtils {
         // hidden on purpose
     }
 
-    static void handleException(final FullHttpRequest request, final ErrorTagMapping errorTagMapping,
-            final FutureCallback<FullHttpResponse> callback, final Exception thrown) {
-        // TODO dispatcher thrown exception to formatted response
-        LOG.error("exception on request dispatch", thrown);
-        callback.onFailure(thrown);
-    }
-
     static void handleException(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final Exception thrown) {
-        // TODO service thrown exception to formatted response
+            final ErrorTagMapping errorTagMapping, final RuntimeException thrown) {
+        final var error = new ServerError(ErrorType.PROTOCOL, ErrorTag.OPERATION_FAILED, thrown.getMessage());
+        final var statusCode = errorTagMapping.statusOf(error.tag()).code();
+        final var formattableBody = new YangErrorsBody(List.of(error));
+        final var responseType = responseTypeFromAccept(params);
+        final var response = responseBuilder(params, HttpResponseStatus.valueOf(statusCode))
+            .setBody(formattableBody)
+            .setHeader(HttpHeaderNames.CONTENT_TYPE, responseType)
+            .build();
+        callback.onSuccess(response);
         LOG.error("exception on request dispatch", thrown);
-        callback.onFailure(thrown);
     }
 
     static FullHttpResponse simpleErrorResponse(final RequestParameters params, final ErrorTag errorTag) {
