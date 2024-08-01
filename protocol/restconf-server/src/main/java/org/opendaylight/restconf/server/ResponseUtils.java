@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import java.io.IOException;
@@ -23,8 +24,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.HttpStatusCode;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -39,11 +43,27 @@ final class ResponseUtils {
         // hidden on purpose
     }
 
-    static void handleException(final FullHttpRequest request, final ErrorTagMapping errorTagMapping,
+    static void handleException(final FullHttpRequest request, final String basePath,
+            final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
+            final PrettyPrintParam defaultPrettyPrint, final PrincipalService principalService,
             final FutureCallback<FullHttpResponse> callback, final Exception thrown) {
-        // TODO dispatcher thrown exception to formatted response
-        LOG.error("exception on request dispatch", thrown);
-        callback.onFailure(thrown);
+        if (thrown instanceof ServerException exception) {
+            final var errorTag = exception.errors().getFirst().tag();
+            final var statusCode = errorTagMapping.statusOf(errorTag).code();
+            final var body = new YangErrorsBody(exception.errors());
+            final var parameters = new RequestParameters(basePath, request, principalService.acquirePrincipal(request),
+                errorTagMapping, defaultAcceptType, defaultPrettyPrint);
+            final var responseType = responseTypeFromAccept(parameters);
+            final var response = responseBuilder(parameters,
+                HttpResponseStatus.valueOf(statusCode))
+                .setBody(body)
+                .setHeader(HttpHeaderNames.CONTENT_TYPE, responseType)
+                .build();
+            callback.onSuccess(response);
+        } else {
+            LOG.error("Exception on request dispatch", thrown);
+            callback.onFailure(thrown);
+        }
     }
 
     static void handleException(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,

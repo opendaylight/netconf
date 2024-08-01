@@ -19,6 +19,7 @@ import io.netty.util.AsciiString;
 import org.opendaylight.netconf.transport.http.RequestDispatcher;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.slf4j.Logger;
@@ -78,8 +79,9 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
                     callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
                 default -> callback.onSuccess(ResponseUtils.simpleErrorResponse(params, ErrorTag.DATA_MISSING));
             }
-        } catch (RuntimeException e) {
-            handleException(request, errorTagMapping, callback, e);
+        } catch (Exception e) {
+            handleException(request, basePath, errorTagMapping, defaultAcceptType, defaultPrettyPrint,
+                principalService, callback, e);
         }
     }
 }
