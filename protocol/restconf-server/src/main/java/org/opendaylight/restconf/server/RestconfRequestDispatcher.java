@@ -62,8 +62,7 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
             switch (params.pathParameters().apiResource()) {
                 case PathParameters.DATA -> DataRequestProcessor.processDataRequest(params, restconfService, callback);
                 case PathParameters.OPERATIONS ->
-                    // TODO implement
-                    callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
+                    OperationsRequestProcessor.processOperationsRequest(params, restconfService, callback);
                 case PathParameters.YANG_LIBRARY_VERSION ->
                     // TODO implement
                     callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
