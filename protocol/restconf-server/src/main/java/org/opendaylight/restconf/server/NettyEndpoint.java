@@ -15,6 +15,7 @@ import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.http.HTTPServer;
+import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -72,12 +73,15 @@ public final class NettyEndpoint implements AutoCloseable {
     }
 
     private static TransportChannelListener buildSseOverlayListener(final RestconfStream.Registry streamRegistry,
-            final NettyEndpointConfiguration config) {
-        // TODO SSE Handler
+            final NettyEndpointConfiguration configuration) {
         return new TransportChannelListener() {
             @Override
             public void onTransportChannelEstablished(final TransportChannel channel) {
-                LOG.debug("Connection established with {}", channel.channel().remoteAddress());
+                SseUtils.enableServerSse(channel.channel(),
+                    new RestconfStreamService(streamRegistry, configuration.restconf(), configuration.errorTagMapping(),
+                        configuration.defaultAcceptType(), configuration.prettyPrint()),
+                    configuration.sseMaximumFragmentLength().intValue(),
+                    configuration.sseHeartbeatIntervalMillis().intValue());
             }
 
             @Override

@@ -79,6 +79,12 @@ record PathParameters(String apiResource, String childIdentifier) {
     static final String MODULES = "/modules";
 
     /**
+     * API resource equivalent for streams requests.
+     */
+
+    static final String STREAMS = "/streams";
+
+    /**
      * API resource equivalent for discovery XRD request.
      */
     static final String HOST_META = "/host-meta";
@@ -88,7 +94,7 @@ record PathParameters(String apiResource, String childIdentifier) {
      */
     static final String HOST_META_JSON = "/host-meta.json";
 
-    private static final Set<String> API_RESOURCES = Set.of(DATA, OPERATIONS, YANG_LIBRARY_VERSION, MODULES);
+    private static final Set<String> API_RESOURCES = Set.of(DATA, OPERATIONS, YANG_LIBRARY_VERSION, MODULES, STREAMS);
     private static final Set<String> DISCOVERY_API_RESOURCES = Set.of(HOST_META, HOST_META_JSON);
     private static final PathParameters EMPTY = new PathParameters("", "");
 
