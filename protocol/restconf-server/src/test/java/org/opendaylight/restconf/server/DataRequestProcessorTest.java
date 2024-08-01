@@ -55,12 +55,18 @@ import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata.EntityTag;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
+import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
+import org.opendaylight.restconf.server.api.JsonResourceBody;
+import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
+import org.opendaylight.restconf.server.api.XmlResourceBody;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 @ExtendWith(MockitoExtension.class)
 public class DataRequestProcessorTest {
@@ -96,6 +102,8 @@ public class DataRequestProcessorTest {
     ArgumentCaptor<ChildBody> childBodyCaptor;
     @Captor
     ArgumentCaptor<DataPostBody> dataPostBodyCaptor;
+    @Captor
+    ArgumentCaptor<ResourceBody> resourceBodyCaptor;
 
     private RequestDispatcher dispatcher;
 
@@ -110,6 +118,15 @@ public class DataRequestProcessorTest {
         return Stream.of(
             Arguments.of(TestEncoding.JSON, JSON_CONTENT),
             Arguments.of(TestEncoding.XML, XML_CONTENT)
+        );
+    }
+
+    private static Stream<Arguments> encodingsAndDataPresent() {
+        return Stream.of(
+            Arguments.of(TestEncoding.JSON, JSON_CONTENT, false),
+            Arguments.of(TestEncoding.JSON, JSON_CONTENT, false),
+            Arguments.of(TestEncoding.XML, XML_CONTENT, true),
+            Arguments.of(TestEncoding.XML, XML_CONTENT, false)
         );
     }
 
@@ -177,6 +194,86 @@ public class DataRequestProcessorTest {
 
         assertResponse(response, HttpResponseStatus.CREATED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.LOCATION, PATH_CREATED));
+    }
+
+    @ParameterizedTest
+    @MethodSource("encodingsAndDataPresent")
+    void putDataRoot(final TestEncoding encoding, final String content, final boolean dataPresent) throws Exception {
+        final var result = new DataPutResult(dataPresent, ETAG, LAST_MODIFIED);
+        doAnswer(answerCompleteWith(result)).when(service).dataPUT(any(), any(ResourceBody.class));
+
+        final var request = buildRequest(HttpMethod.PUT, DATA_PATH, encoding, content);
+        final var response = dispatch(request);
+        verify(service).dataPUT(any(), resourceBodyCaptor.capture());
+
+        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
+        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+
+        assertResponse(response, dataPresent ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT);
+        assertResponseHeaders(response, META_HEADERS);
+    }
+
+    @ParameterizedTest
+    @MethodSource("encodingsAndDataPresent")
+    void putDataWithId(final TestEncoding encoding, final String content, final boolean dataPresent) throws Exception {
+        final var result = new DataPutResult(dataPresent, null, null);
+        doAnswer(answerCompleteWith(result)).when(service)
+            .dataPUT(any(), any(ApiPath.class), any(ResourceBody.class));
+
+        final var request = buildRequest(HttpMethod.PUT, DATA_PATH_WITH_ID, encoding, content);
+        final var response = dispatch(request);
+        verify(service).dataPUT(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
+
+        assertEquals(API_PATH, apiPathCaptor.getValue());
+        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
+        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+
+        assertResponse(response, dataPresent ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT);
+    }
+
+    @ParameterizedTest
+    @MethodSource("encodings")
+    void patchDataRoot(final TestEncoding encoding, final String content) throws Exception {
+        final var result = new DataPatchResult(ETAG, LAST_MODIFIED);
+        doAnswer(answerCompleteWith(result)).when(service).dataPATCH(any(), any(ResourceBody.class));
+
+        final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, content);
+        final var response = dispatch(request);
+        verify(service).dataPATCH(any(), resourceBodyCaptor.capture());
+
+        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
+        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+        assertResponse(response, HttpResponseStatus.OK);
+        assertResponseHeaders(response, META_HEADERS);
+    }
+
+    @ParameterizedTest
+    @MethodSource("encodings")
+    void patchDataWithId(final TestEncoding encoding, final String content) throws Exception {
+        final var result = new DataPatchResult(null, null);
+        doAnswer(answerCompleteWith(result)).when(service)
+            .dataPATCH(any(), any(ApiPath.class), any(ResourceBody.class));
+
+        final var request = buildRequest(HttpMethod.PATCH, DATA_PATH_WITH_ID, encoding, content);
+        final var response = dispatch(request);
+        verify(service).dataPATCH(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
+
+        assertEquals(API_PATH, apiPathCaptor.getValue());
+        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
+        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+        assertResponse(response, HttpResponseStatus.OK);
+    }
+
+    @ParameterizedTest
+    @MethodSource("encodings")
+    void deleteData(final TestEncoding encoding, final String content) {
+        final var result = Empty.value();
+        doAnswer(answerCompleteWith(result)).when(service).dataDELETE(any(), any(ApiPath.class));
+
+        final var request = buildRequest(HttpMethod.DELETE, DATA_PATH, encoding, null);
+        final var response = dispatch(request);
+        verify(service).dataDELETE(any(), apiPathCaptor.capture());
+        assertResponse(response, HttpResponseStatus.NO_CONTENT);
     }
 
     private FullHttpResponse dispatch(final FullHttpRequest request) {
