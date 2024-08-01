@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.util.AsciiString;
 import org.opendaylight.netconf.transport.http.RequestDispatcher;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -62,12 +63,10 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
                 case PathParameters.OPERATIONS -> {
                     // TODO implement
                 }
-                case PathParameters.YANG_LIBRARY_VERSION -> {
-                    // TODO implement
-                }
-                case PathParameters.MODULES -> {
-                    // TODO implement
-                }
+                case PathParameters.YANG_LIBRARY_VERSION -> YangRequestProcessor.processYangLibraryVersion(params,
+                    restconfService, callback);
+                case PathParameters.MODULES -> YangRequestProcessor.processModules(params, restconfService, callback,
+                    request.headers().get(HttpHeaderNames.ACCEPT));
                 case PathParameters.HOST_META -> {
                     // TODO implement
                 }
