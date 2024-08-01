@@ -59,9 +59,8 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
                 errorTagMapping, defaultAcceptType, defaultPrettyPrint);
             switch (params.pathParameters().apiResource()) {
                 case PathParameters.DATA -> DataRequestProcessor.processDataRequest(params, restconfService, callback);
-                case PathParameters.OPERATIONS -> {
-                    // TODO implement
-                }
+                case PathParameters.OPERATIONS ->
+                    OperationsRequestProcessor.processOperationsRequest(params, restconfService, callback);
                 case PathParameters.YANG_LIBRARY_VERSION -> {
                     // TODO implement
                 }
