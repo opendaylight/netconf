@@ -53,10 +53,17 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
     public void dispatch(final FullHttpRequest request, final FutureCallback<FullHttpResponse> callback) {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
 
+        RequestParameters params;
         try {
             final var principal = principalService.acquirePrincipal(request);
-            final var params = new RequestParameters(basePath, request, principal,
-                errorTagMapping, defaultAcceptType, defaultPrettyPrint);
+            params = new RequestParameters(basePath, request, principal, errorTagMapping, defaultAcceptType,
+                defaultPrettyPrint);
+        } catch (RuntimeException e) {
+            LOG.error("Failed request parameters creation", e);
+            callback.onFailure(e);
+            return;
+        }
+        try {
             switch (params.pathParameters().apiResource()) {
                 case PathParameters.DATA -> DataRequestProcessor.processDataRequest(params, restconfService, callback);
                 case PathParameters.OPERATIONS -> {
@@ -78,7 +85,7 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
                 }
             }
         } catch (RuntimeException e) {
-            handleException(request, errorTagMapping, callback, e);
+            handleException(params, errorTagMapping, callback, e);
         }
     }
 }
