@@ -65,11 +65,9 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
                     // TODO implement
                     callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
                 case PathParameters.YANG_LIBRARY_VERSION ->
-                    // TODO implement
-                    callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
+                    YangRequestProcessor.processYangLibraryVersion(params, restconfService, callback);
                 case PathParameters.MODULES ->
-                    // TODO implement
-                    callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
+                    YangRequestProcessor.processModules(params, restconfService, callback);
                 case PathParameters.HOST_META ->
                     // TODO implement
                     callback.onSuccess(ResponseUtils.simpleResponse(params, HttpResponseStatus.NOT_IMPLEMENTED));
