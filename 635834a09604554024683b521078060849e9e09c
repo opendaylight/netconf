@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea657df6_002cc309",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-08-02T13:57:50Z",
+      "side": 1,
+      "message": "I think it should be volatile because it is touched from different threads. It would be good to have it covered by unit tests.",
+      "range": {
+        "startLine": 203,
+        "startChar": 8,
+        "endLine": 203,
+        "endChar": 32
+      },
+      "revId": "635834a09604554024683b521078060849e9e09c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0dd54ea_cd368920",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-08-02T13:57:50Z",
+      "side": 1,
+      "message": "That means a change in behavior. Old implementation doesn\u0027t send keepalive while other RPC is in progress.\n\nIs this behavior change desired?\n\nIn case a device can process only one RPC at the time, this could cause problems..",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "635834a09604554024683b521078060849e9e09c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
