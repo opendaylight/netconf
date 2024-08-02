@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01bfad1e_8a9bf38c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-02T14:27:50Z",
+      "side": 1,
+      "message": "We need to decide if continue with changes from patchset 36",
+      "revId": "56fa005bae8bbe6199a28da0de857a509eaa12d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
