@@ -114,6 +114,30 @@
       },
       "revId": "80d8adf8cf2042dd0006597a24e4f9351e76d05b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "357e1cd8_97cc2697",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseService.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-02T19:00:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "429da466_7c40362e",
+      "range": {
+        "startLine": 70,
+        "startChar": 8,
+        "endLine": 70,
+        "endChar": 16
+      },
+      "revId": "80d8adf8cf2042dd0006597a24e4f9351e76d05b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
