@@ -34,8 +34,8 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
@@ -268,8 +268,8 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     private void insertChunkFramingToPipeline() {
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER,
             new ChunkedFramingMechanismEncoder());
-        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR,
-            new NetconfChunkAggregator(maximumIncomingChunkSize));
+        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_DECODER,
+            new ChunkedFramingMechanismDecoder(maximumIncomingChunkSize));
     }
 
     private boolean shouldUseChunkFraming(final Document doc) {
