@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class NetconfMessageFactoryTest {
     @Test
     void testAuth() throws Exception {
-        NetconfXMLToHelloMessageDecoder parser = new NetconfXMLToHelloMessageDecoder();
+        HelloXMLMessageDecoder parser = new HelloXMLMessageDecoder();
         File authHelloFile = new File(getClass().getResource("/netconfMessages/client_hello_with_auth.xml").getFile());
 
         final List<Object> out = new ArrayList<>();
