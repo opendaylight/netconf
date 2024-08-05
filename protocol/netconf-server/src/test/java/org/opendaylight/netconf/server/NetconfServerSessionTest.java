@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,7 +27,8 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
@@ -174,29 +176,23 @@ class NetconfServerSessionTest {
 
     @Test
     void testAddExiHandlers() throws Exception {
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
-                new NetconfXMLToMessageDecoder());
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-                new NetconfMessageToXMLEncoder());
+        channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new NetconfXMLToMessageDecoder());
+        channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, new NetconfMessageToXMLEncoder());
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         session.addExiHandlers(NetconfEXIToMessageDecoder.create(codec), NetconfMessageToEXIEncoder.create(codec));
     }
 
     @Test
     void testStopExiCommunication() {
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
-            new ChannelInboundHandlerAdapter());
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-            new ChannelOutboundHandlerAdapter());
+        channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new ChannelInboundHandlerAdapter());
+        channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, new ChannelOutboundHandlerAdapter());
         session.stopExiCommunication();
         //handler is replaced only after next send message call
-        final var exiEncoder = channel.pipeline().get(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER);
+        final var exiEncoder = channel.pipeline().get(MessageEncoder.HANDLER_NAME);
         assertEquals(ChannelOutboundHandlerAdapter.class, exiEncoder.getClass());
         session.sendMessage(msg);
         channel.runPendingTasks();
-        final var decoder = channel.pipeline().get(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER);
-        assertEquals(NetconfXMLToMessageDecoder.class, decoder.getClass());
-        final var encoder = channel.pipeline().get(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER);
-        assertEquals(NetconfMessageToXMLEncoder.class, encoder.getClass());
+        assertInstanceOf(NetconfXMLToMessageDecoder.class, channel.pipeline().get(MessageDecoder.HANDLER_NAME));
+        assertInstanceOf(NetconfMessageToXMLEncoder.class, channel.pipeline().get(MessageEncoder.HANDLER_NAME));
     }
 }

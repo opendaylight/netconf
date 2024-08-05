@@ -39,6 +39,8 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -115,17 +117,14 @@ class AbstractNetconfSessionTest {
         final ChannelHandler mock = mock(ChannelHandler.class);
 
         testingNetconfSession.replaceMessageDecoder(mock);
-        verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
-                AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, mock);
+        verify(pipeline).replace(MessageDecoder.HANDLER_NAME, MessageDecoder.HANDLER_NAME, mock);
         testingNetconfSession.replaceMessageEncoder(mock);
-        verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-                AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, mock);
+        verify(pipeline).replace(MessageEncoder.HANDLER_NAME, MessageEncoder.HANDLER_NAME, mock);
         testingNetconfSession.replaceMessageEncoderAfterNextMessage(mock);
         verifyNoMoreInteractions(pipeline);
 
         testingNetconfSession.sendMessage(clientHello);
-        verify(pipeline, times(2)).replace(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-                AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, mock);
+        verify(pipeline, times(2)).replace(MessageEncoder.HANDLER_NAME, MessageEncoder.HANDLER_NAME, mock);
     }
 
     @Test
