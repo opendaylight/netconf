@@ -32,7 +32,7 @@ class NetconfXMLToHelloMessageDecoderTest {
                 "[tomas;10.0.0.0:10000;tcp;client;]",
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>").getBytes());
         final List<Object> out = new ArrayList<>();
-        new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
+        new HelloXMLMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
         final HelloMessage hello = assertInstanceOf(HelloMessage.class, out.get(0));
@@ -48,7 +48,7 @@ class NetconfXMLToHelloMessageDecoderTest {
         final ByteBuf src =
                 Unpooled.wrappedBuffer("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final List<Object> out = new ArrayList<>();
-        new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
+        new HelloXMLMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
         final HelloMessage hello = assertInstanceOf(HelloMessage.class, out.get(0));
@@ -64,7 +64,7 @@ class NetconfXMLToHelloMessageDecoderTest {
         final ByteBuf src =
                 Unpooled.wrappedBuffer("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final List<Object> out = new ArrayList<>();
-        final NetconfXMLToHelloMessageDecoder decoder = new NetconfXMLToHelloMessageDecoder();
+        final HelloXMLMessageDecoder decoder = new HelloXMLMessageDecoder();
         decoder.decode(null, src, out);
         decoder.decode(null, msg1, out);
         decoder.decode(null, msg2, out);
@@ -79,7 +79,7 @@ class NetconfXMLToHelloMessageDecoderTest {
         final ByteBuf msg1 =
                 Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final List<Object> out = new ArrayList<>();
-        NetconfXMLToHelloMessageDecoder decoder = new NetconfXMLToHelloMessageDecoder();
+        HelloXMLMessageDecoder decoder = new HelloXMLMessageDecoder();
         assertThrows(IllegalStateException.class, () -> decoder.decode(null, msg1, out));
     }
 }
