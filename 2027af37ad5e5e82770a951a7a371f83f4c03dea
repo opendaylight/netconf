@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0546573b_3161cfcf",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "please forget this class exists.\nThere is not such thing as LinkedList.\nThere is either:\n- ArrayList if a List is needed\n- ArrayDeque if a Deque is needed",
+      "range": {
+        "startLine": 23,
+        "startChar": 17,
+        "endLine": 23,
+        "endChar": 27
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4739b61b_8a97791e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "LinkedList is highly inefficient. In this case use an ArrayList",
+      "range": {
+        "startLine": 106,
+        "startChar": 35,
+        "endLine": 106,
+        "endChar": 45
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b818fcf_ec628939",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "Stream",
+      "range": {
+        "startLine": 147,
+        "startChar": 19,
+        "endLine": 147,
+        "endChar": 23
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70341172_8b629a86",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "again, LinkedList is inefficient, here it can easily be replaced with a map/filter operation",
+      "range": {
+        "startLine": 154,
+        "startChar": 31,
+        "endLine": 154,
+        "endChar": 41
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

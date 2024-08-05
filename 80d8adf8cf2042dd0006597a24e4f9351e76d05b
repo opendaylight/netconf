@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "874efe6b_6a4fb58c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2900a6af_b2b57b8d",
+      "range": {
+        "startLine": 54,
+        "startChar": 27,
+        "endLine": 54,
+        "endChar": 55
+      },
+      "revId": "80d8adf8cf2042dd0006597a24e4f9351e76d05b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00654d7a_43c91976",
@@ -61,6 +85,30 @@
       "writtenOn": "2024-08-02T18:38:40Z",
       "side": 1,
       "message": "sneaky. this should be AbstractRegistration to guarantee idempotence",
+      "range": {
+        "startLine": 96,
+        "startChar": 38,
+        "endLine": 96,
+        "endChar": 40
+      },
+      "revId": "80d8adf8cf2042dd0006597a24e4f9351e76d05b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bee4c14f_43f94e50",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00654d7a_43c91976",
       "range": {
         "startLine": 96,
         "startChar": 38,
@@ -94,6 +142,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85567d7d_c14395ea",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "We\u0027ll solidify this once all the code is in",
+      "parentUuid": "7e5a9af2_0c849c3b",
+      "range": {
+        "startLine": 142,
+        "startChar": 8,
+        "endLine": 142,
+        "endChar": 75
+      },
+      "revId": "80d8adf8cf2042dd0006597a24e4f9351e76d05b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b639e4e_e0d9efd2",
@@ -107,6 +179,30 @@
       "writtenOn": "2024-08-02T18:38:40Z",
       "side": 1,
       "message": "should be a dedicated exception",
+      "range": {
+        "startLine": 155,
+        "startChar": 38,
+        "endLine": 155,
+        "endChar": 85
+      },
+      "revId": "80d8adf8cf2042dd0006597a24e4f9351e76d05b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d62cbec8_34d3bdfc",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1SseHandler.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:05:53Z",
+      "side": 1,
+      "message": "We\u0027ll solidify this once all the code is in",
+      "parentUuid": "1b639e4e_e0d9efd2",
       "range": {
         "startLine": 155,
         "startChar": 38,
