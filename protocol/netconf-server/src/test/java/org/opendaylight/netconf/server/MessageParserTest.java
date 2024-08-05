@@ -24,8 +24,8 @@ import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
 import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.EOMFrameEncoder;
+import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.xmlunit.builder.DiffBuilder;
 
@@ -43,7 +43,7 @@ class MessageParserTest {
                 new ChunkedFrameEncoder(),
                 new NetconfMessageToXMLEncoder(),
                 new ChunkedFrameDecoder(ChunkedFrameEncoder.MAX_CHUNK_SIZE),
-                new NetconfXMLToMessageDecoder());
+                new XMLMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final var messages = testChunkChannel.outboundMessages();
@@ -93,7 +93,7 @@ class MessageParserTest {
     void testEOMFramingMechanismOnPipeline() {
         final var testChunkChannel = new EmbeddedChannel(
                 new EOMFrameEncoder(),
-                new NetconfMessageToXMLEncoder(), new EOMFrameDecoder(), new NetconfXMLToMessageDecoder());
+                new NetconfMessageToXMLEncoder(), new EOMFrameDecoder(), new XMLMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final ByteBuf recievedOutbound = testChunkChannel.readOutbound();

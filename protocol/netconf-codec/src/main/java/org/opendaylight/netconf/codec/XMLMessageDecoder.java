@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -16,14 +16,13 @@ import java.io.IOException;
 import java.util.List;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.codec.MessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public final class NetconfXMLToMessageDecoder extends MessageDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToMessageDecoder.class);
+public final class XMLMessageDecoder extends MessageDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(XMLMessageDecoder.class);
 
     @Override
     public void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
