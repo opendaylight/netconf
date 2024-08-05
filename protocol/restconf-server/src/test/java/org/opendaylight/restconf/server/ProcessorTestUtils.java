@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_JSON;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_XML;
+import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_XRD_XML;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_DATA_JSON;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_DATA_XML;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_PATCH_JSON;
@@ -140,7 +141,8 @@ final class ProcessorTestUtils {
         XML(APPLICATION_XML, APPLICATION_XML, APPLICATION_YANG_DATA_XML),
         JSON(APPLICATION_JSON, APPLICATION_JSON, APPLICATION_YANG_DATA_JSON),
         YANG_PATCH_XML(APPLICATION_YANG_PATCH_XML, APPLICATION_XML, APPLICATION_YANG_DATA_XML),
-        YANG_PATCH_JSON(APPLICATION_YANG_PATCH_JSON, APPLICATION_JSON, APPLICATION_YANG_DATA_JSON);
+        YANG_PATCH_JSON(APPLICATION_YANG_PATCH_JSON, APPLICATION_JSON, APPLICATION_YANG_DATA_JSON),
+        XRD(APPLICATION_XRD_XML, APPLICATION_XRD_XML, APPLICATION_XRD_XML);
 
         AsciiString contentType;
         AsciiString acceptType;

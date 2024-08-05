@@ -19,6 +19,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -102,6 +103,13 @@ final class ResponseUtils {
             return this;
         }
 
+        ResponseBuilder setStringBody(final String body, final AsciiString contentType) {
+            if (body != null) {
+                setStringContent(response, body, contentType);
+            }
+            return this;
+        }
+
         FullHttpResponse build() {
             return response;
         }
@@ -122,6 +130,14 @@ final class ResponseUtils {
         } catch (IOException e) {
             throw new IllegalStateException("Could not write content", e);
         }
+    }
+
+    private static void setStringContent(final FullHttpResponse response, final String body,
+            final AsciiString contentType) {
+        response.content().writeBytes(body.getBytes(StandardCharsets.UTF_8));
+        response.headers()
+            .set(HttpHeaderNames.CONTENT_TYPE, contentType)
+            .setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
     }
 
     private static AsciiString responseTypeFromAccept(final RequestParameters params) {
