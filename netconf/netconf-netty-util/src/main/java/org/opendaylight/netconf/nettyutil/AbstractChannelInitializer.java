@@ -16,8 +16,8 @@ import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
 public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public static final String NETCONF_SESSION_NEGOTIATOR = "negotiator";
@@ -40,7 +40,7 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     protected void initializeMessageDecoder(final Channel ch) {
         // Special decoding handler for hello message to parse additional header if available,
         // it is thrown away after successful negotiation
-        ch.pipeline().addLast(MessageDecoder.HANDLER_NAME, new NetconfXMLToHelloMessageDecoder());
+        ch.pipeline().addLast(MessageDecoder.HANDLER_NAME, new HelloXMLMessageDecoder());
     }
 
     /**
