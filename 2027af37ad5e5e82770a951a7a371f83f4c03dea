@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a353a301_4e91a7b6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:06:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0546573b_3161cfcf",
+      "range": {
+        "startLine": 23,
+        "startChar": 17,
+        "endLine": 23,
+        "endChar": 27
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4739b61b_8a97791e",
@@ -70,6 +94,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28d8a440_334deac3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:06:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b818fcf_ec628939",
+      "range": {
+        "startLine": 147,
+        "startChar": 19,
+        "endLine": 147,
+        "endChar": 23
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70341172_8b629a86",
@@ -83,6 +131,30 @@
       "writtenOn": "2024-08-05T11:05:53Z",
       "side": 1,
       "message": "again, LinkedList is inefficient, here it can easily be replaced with a map/filter operation",
+      "range": {
+        "startLine": 154,
+        "startChar": 31,
+        "endLine": 154,
+        "endChar": 41
+      },
+      "revId": "2027af37ad5e5e82770a951a7a371f83f4c03dea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68a7eb4c_9592c981",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T11:06:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70341172_8b629a86",
       "range": {
         "startLine": 154,
         "startChar": 31,
