@@ -9,7 +9,7 @@ package org.opendaylight.netconf.nettyutil;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
+import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_DECODER;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -27,9 +27,9 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
-import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
+import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.w3c.dom.Document;
@@ -52,7 +52,7 @@ class Netconf539Test {
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
             new NetconfXMLToHelloMessageDecoder());
         channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, new EOMFramingMechanismEncoder());
-        channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
+        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_DECODER, new EOMFramingMechanismDecoder());
         final HelloMessage serverHello = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1),
             Optional.empty());
         negotiator = new TestSessionNegotiator(serverHello, promise, channel, new DefaultNetconfTimer(), listener,
@@ -75,7 +75,7 @@ class Netconf539Test {
         final HelloMessage helloMessage = new HelloMessage(helloDocument);
         final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloMessage);
         assertNotNull(session);
-        assertInstanceOf(NetconfChunkAggregator.class, channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR),
+        assertInstanceOf(ChunkedFramingMechanismDecoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_DECODER),
             "NetconfChunkAggregator was not installed in the Netconf pipeline");
         assertInstanceOf(ChunkedFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER),
             "ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline");

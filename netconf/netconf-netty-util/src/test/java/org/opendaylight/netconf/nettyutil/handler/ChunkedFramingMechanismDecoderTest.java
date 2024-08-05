@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-class NetconfChunkAggregatorTest {
+class ChunkedFramingMechanismDecoderTest {
     private static final String CHUNKED_MESSAGE = "\n#4\n"
             + "<rpc"
             + "\n#18\n"
@@ -33,13 +33,13 @@ class NetconfChunkAggregatorTest {
 
     private static final String CHUNKED_MESSAGE_ONE = "\n#101\n" + EXPECTED_MESSAGE + "\n##\n";
 
-    private final NetconfChunkAggregator agr = new NetconfChunkAggregator(4096);
+    private final ChunkedFramingMechanismDecoder decoder = new ChunkedFramingMechanismDecoder(4096);
 
     @Test
     void testMultipleChunks() {
         final var output = new ArrayList<>();
         final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
-        agr.decode(null, input, output);
+        decoder.decode(null, input, output);
 
         assertEquals(1, output.size());
         final var chunk = (ByteBuf) output.get(0);
@@ -51,7 +51,7 @@ class NetconfChunkAggregatorTest {
     void testOneChunks() {
         final var output = new ArrayList<>();
         final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
-        agr.decode(null, input, output);
+        decoder.decode(null, input, output);
 
         assertEquals(1, output.size());
         final ByteBuf chunk = (ByteBuf) output.get(0);
