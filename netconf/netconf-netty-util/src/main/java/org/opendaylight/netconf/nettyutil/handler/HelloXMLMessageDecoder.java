@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
  * Netconf messages after hello should be processed once the negotiation succeeded.
  *
  */
-public final class NetconfXMLToHelloMessageDecoder extends MessageDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToHelloMessageDecoder.class);
+public final class HelloXMLMessageDecoder extends MessageDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(HelloXMLMessageDecoder.class);
 
     private static final List<byte[]> POSSIBLE_ENDS = List.of(
             new byte[] { ']', '\n' },
