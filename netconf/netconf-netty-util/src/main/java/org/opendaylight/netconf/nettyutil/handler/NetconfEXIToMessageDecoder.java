@@ -13,18 +13,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.slf4j.Logger;
@@ -33,19 +32,19 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
-
+public final class NetconfEXIToMessageDecoder extends MessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEXIToMessageDecoder.class);
+
     private static final SAXTransformerFactory FACTORY;
 
     static {
-        final TransformerFactory f = SAXTransformerFactory.newInstance();
+        final var f = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
         if (!f.getFeature(SAXTransformerFactory.FEATURE)) {
             throw new TransformerFactoryConfigurationError(
                     String.format("Factory %s is not a SAXTransformerFactory", f));
         }
 
-        FACTORY = (SAXTransformerFactory)f;
+        FACTORY = f;
     }
 
     /**
@@ -58,7 +57,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
     private NetconfEXIToMessageDecoder(final ThreadLocalSAXDecoder reader) {
         this.reader = requireNonNull(reader);
-        this.documentBuilder = UntrustedXML.newDocumentBuilder();
+        documentBuilder = UntrustedXML.newDocumentBuilder();
     }
 
     public static NetconfEXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIException {

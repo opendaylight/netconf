@@ -12,22 +12,22 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.IOException;
 import java.util.List;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
+public final class NetconfXMLToMessageDecoder extends MessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToMessageDecoder.class);
 
     @Override
-    public void decode(final ChannelHandlerContext ctx, final ByteBuf in,
-                       final List<Object> out) throws IOException, SAXException {
+    public void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
+            throws IOException, SAXException {
         if (in.isReadable()) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Received to decode: {}", ByteBufUtil.hexDump(in));

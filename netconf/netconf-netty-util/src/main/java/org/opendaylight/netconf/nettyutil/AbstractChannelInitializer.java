@@ -14,12 +14,12 @@ import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.FrameEncoder;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
 public abstract class AbstractChannelInitializer<S extends NetconfSession> {
-    public static final String NETCONF_MESSAGE_DECODER = "netconfMessageDecoder";
-    public static final String NETCONF_MESSAGE_ENCODER = "netconfMessageEncoder";
     public static final String NETCONF_SESSION_NEGOTIATOR = "negotiator";
 
     public void initialize(final Channel ch, final Promise<S> promise) {
@@ -34,18 +34,18 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     protected void initializeMessageEncoder(final Channel ch) {
         // Special encoding handler for hello message to include additional header if available,
         // it is thrown away after successful negotiation
-        ch.pipeline().addLast(NETCONF_MESSAGE_ENCODER, new NetconfHelloMessageToXMLEncoder());
+        ch.pipeline().addLast(MessageEncoder.HANDLER_NAME, new NetconfHelloMessageToXMLEncoder());
     }
 
     protected void initializeMessageDecoder(final Channel ch) {
         // Special decoding handler for hello message to parse additional header if available,
         // it is thrown away after successful negotiation
-        ch.pipeline().addLast(NETCONF_MESSAGE_DECODER, new NetconfXMLToHelloMessageDecoder());
+        ch.pipeline().addLast(MessageDecoder.HANDLER_NAME, new NetconfXMLToHelloMessageDecoder());
     }
 
     /**
      * Insert session negotiator into the pipeline. It must be inserted after message decoder
-     * identified by {@link AbstractChannelInitializer#NETCONF_MESSAGE_DECODER}, (or any other custom decoder processor)
+     * identified by {@link MessageDecoder#HANDLER_NAME}, (or any other custom decoder processor)
      */
     protected abstract void initializeSessionNegotiator(Channel ch, Promise<S> promise);
 }
