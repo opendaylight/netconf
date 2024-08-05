@@ -13,14 +13,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfChunkAggregator extends ByteToMessageDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfChunkAggregator.class);
+public final class ChunkedFramingMechanismDecoder extends FramingMechanismDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(ChunkedFramingMechanismDecoder.class);
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM = "Got byte {} while waiting for {}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM = "Got byte {} while waiting for {}-{}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
@@ -49,7 +48,7 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
      * @param maxChunkSize maximum chunk size
      * @throws IllegalArgumentException if {@code maxChunkSize} is negative
      */
-    public NetconfChunkAggregator(final @NonNegative int maxChunkSize) {
+    public ChunkedFramingMechanismDecoder(final @NonNegative int maxChunkSize) {
         this.maxChunkSize = maxChunkSize;
         checkArgument(maxChunkSize > 0, "Negative maximum chunk size %s", maxChunkSize);
     }

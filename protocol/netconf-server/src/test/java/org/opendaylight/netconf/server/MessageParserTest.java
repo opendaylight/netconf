@@ -20,10 +20,10 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
-import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
@@ -42,7 +42,7 @@ class MessageParserTest {
         final var testChunkChannel = new EmbeddedChannel(
                 new ChunkedFramingMechanismEncoder(),
                 new NetconfMessageToXMLEncoder(),
-                new NetconfChunkAggregator(ChunkedFramingMechanismEncoder.MAX_CHUNK_SIZE),
+                new ChunkedFramingMechanismDecoder(ChunkedFramingMechanismEncoder.MAX_CHUNK_SIZE),
                 new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
@@ -93,7 +93,7 @@ class MessageParserTest {
     void testEOMFramingMechanismOnPipeline() {
         final var testChunkChannel = new EmbeddedChannel(
                 new EOMFramingMechanismEncoder(),
-                new NetconfMessageToXMLEncoder(), new NetconfEOMAggregator(), new NetconfXMLToMessageDecoder());
+                new NetconfMessageToXMLEncoder(), new EOMFramingMechanismDecoder(), new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final ByteBuf recievedOutbound = testChunkChannel.readOutbound();
