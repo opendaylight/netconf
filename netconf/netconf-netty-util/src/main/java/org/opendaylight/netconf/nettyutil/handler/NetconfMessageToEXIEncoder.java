@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.xml.transform.Transformer;
@@ -20,12 +19,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfMessageToEXIEncoder extends MessageToByteEncoder<NetconfMessage> {
+public final class NetconfMessageToEXIEncoder extends MessageEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageToEXIEncoder.class);
     private final NetconfEXICodec codec;
 

@@ -28,8 +28,8 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -97,8 +97,7 @@ class NetconfClientSessionNegotiator
      * @param startExiMessage Exi message for initilization of exi communication.
      */
     void tryToInitiateExi(final NetconfClientSession session, final RpcMessage startExiMessage) {
-        channel.pipeline().addAfter(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
-                ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER,
+        channel.pipeline().addAfter(MessageDecoder.HANDLER_NAME, ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER,
                 new ExiConfirmationInboundHandler(session, startExiMessage));
 
         session.sendMessage(startExiMessage).addListener(channelFuture -> {

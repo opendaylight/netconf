@@ -13,6 +13,7 @@ import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
 public final class ClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
@@ -27,7 +28,7 @@ public final class ClientChannelInitializer extends AbstractChannelInitializer<N
 
     @Override
     protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfClientSession> promise) {
-        ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, NETCONF_SESSION_NEGOTIATOR,
+        ch.pipeline().addAfter(MessageDecoder.HANDLER_NAME, NETCONF_SESSION_NEGOTIATOR,
             negotiatorFactory.getSessionNegotiator(sessionListenerFactory, ch, promise));
         ch.config().setConnectTimeoutMillis((int) negotiatorFactory.getConnectionTimeoutMillis());
     }

@@ -29,6 +29,8 @@ import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.FrameEncoder;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
@@ -46,8 +48,8 @@ class Netconf539Test {
     @BeforeEach
     void setUp() {
         channel.pipeline()
-            .addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, new ChannelInboundHandlerAdapter())
-            .addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, new NetconfXMLToHelloMessageDecoder())
+            .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
+            .addLast(MessageDecoder.HANDLER_NAME, new NetconfXMLToHelloMessageDecoder())
             .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         negotiator = new TestSessionNegotiator(

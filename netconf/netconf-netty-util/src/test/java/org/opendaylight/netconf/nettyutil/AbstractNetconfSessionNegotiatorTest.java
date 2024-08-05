@@ -52,6 +52,8 @@ import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.FrameEncoder;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
@@ -67,23 +69,21 @@ class AbstractNetconfSessionNegotiatorTest {
     private NetconfTimer timer;
     @Mock
     private Timeout timeout;
-    private EmbeddedChannel channel;
     private TestSessionNegotiator negotiator;
-    private HelloMessage hello;
-    private HelloMessage helloBase11;
-    private NetconfXMLToHelloMessageDecoder xmlToHello;
+
+    private final HelloMessage hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
+    private final HelloMessage helloBase11 =
+        HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
+    private final NetconfXMLToHelloMessageDecoder xmlToHello  = new NetconfXMLToHelloMessageDecoder();
+    private final EmbeddedChannel channel = new EmbeddedChannel();
 
     @BeforeEach
     void setUp() {
-        channel = new EmbeddedChannel();
-        xmlToHello = new NetconfXMLToHelloMessageDecoder();
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-                new ChannelInboundHandlerAdapter());
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, xmlToHello);
-        channel.pipeline().addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder());
-        channel.pipeline().addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
-        hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
-        helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
+        channel.pipeline()
+            .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
+            .addLast(MessageDecoder.HANDLER_NAME, xmlToHello)
+            .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
+            .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
 
