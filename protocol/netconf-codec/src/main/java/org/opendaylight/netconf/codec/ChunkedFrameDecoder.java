@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -18,8 +18,8 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ChunkedFramingMechanismDecoder extends FramingMechanismDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(ChunkedFramingMechanismDecoder.class);
+public final class ChunkedFrameDecoder extends FrameDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(ChunkedFrameDecoder.class);
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM = "Got byte {} while waiting for {}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM = "Got byte {} while waiting for {}-{}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
@@ -48,7 +48,7 @@ public final class ChunkedFramingMechanismDecoder extends FramingMechanismDecode
      * @param maxChunkSize maximum chunk size
      * @throws IllegalArgumentException if {@code maxChunkSize} is negative
      */
-    public ChunkedFramingMechanismDecoder(final @NonNegative int maxChunkSize) {
+    public ChunkedFrameDecoder(final @NonNegative int maxChunkSize) {
         this.maxChunkSize = maxChunkSize;
         checkArgument(maxChunkSize > 0, "Negative maximum chunk size %s", maxChunkSize);
     }

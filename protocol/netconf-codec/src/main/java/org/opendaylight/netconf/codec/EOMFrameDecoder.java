@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
@@ -16,10 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link FramingMechanismDecoder} handling {@link FramingMechanism#EOM}.
+ * A {@link FrameDecoder} handling {@link FramingMechanism#EOM}.
  */
-public final class EOMFramingMechanismDecoder extends FramingMechanismDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(EOMFramingMechanismDecoder.class);
+public final class EOMFrameDecoder extends FrameDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(EOMFrameDecoder.class);
 
     // Cached for brevity and constantness
     private static final byte[] EOM = MessageParts.END_OF_MESSAGE;
