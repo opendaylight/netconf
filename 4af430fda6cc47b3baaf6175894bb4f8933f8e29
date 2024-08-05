@@ -160,6 +160,29 @@
       },
       "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f55e05f_46fc008b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyMediaTypes.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:08:58Z",
+      "side": 1,
+      "message": "@NonNullByDefault I assume?",
+      "range": {
+        "startLine": 15,
+        "startChar": 12,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
