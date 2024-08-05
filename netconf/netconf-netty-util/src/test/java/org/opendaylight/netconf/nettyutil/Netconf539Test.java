@@ -9,8 +9,6 @@ package org.opendaylight.netconf.nettyutil;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_DECODER;
-import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -30,9 +28,10 @@ import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
+import org.opendaylight.netconf.nettyutil.handler.FramingMechanismDecoder;
+import org.opendaylight.netconf.nettyutil.handler.FramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
-import org.w3c.dom.Document;
 
 @ExtendWith(MockitoExtension.class)
 class Netconf539Test {
@@ -41,22 +40,19 @@ class Netconf539Test {
     @Mock
     private Promise<TestingNetconfSession> promise;
 
-    private EmbeddedChannel channel;
+    private final EmbeddedChannel channel = new EmbeddedChannel();
     private TestSessionNegotiator negotiator;
 
     @BeforeEach
     void setUp() {
-        channel = new EmbeddedChannel();
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-            new ChannelInboundHandlerAdapter());
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
-            new NetconfXMLToHelloMessageDecoder());
-        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, new EOMFramingMechanismEncoder());
-        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_DECODER, new EOMFramingMechanismDecoder());
-        final HelloMessage serverHello = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1),
-            Optional.empty());
-        negotiator = new TestSessionNegotiator(serverHello, promise, channel, new DefaultNetconfTimer(), listener,
-            100L);
+        channel.pipeline()
+            .addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, new ChannelInboundHandlerAdapter())
+            .addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, new NetconfXMLToHelloMessageDecoder())
+            .addLast(FramingMechanismEncoder.HANDLER_NAME, new EOMFramingMechanismEncoder())
+            .addLast(FramingMechanismDecoder.HANDLER_NAME, new EOMFramingMechanismDecoder());
+        negotiator = new TestSessionNegotiator(
+            HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty()), promise, channel,
+            new DefaultNetconfTimer(), listener, 100L);
     }
 
     @Test
@@ -70,14 +66,15 @@ class Netconf539Test {
     }
 
     private void testGetSessionForHelloMessage(final String fileName) throws Exception {
-        final Document helloDocument = XmlFileLoader.xmlFileToDocument(fileName);
+        final var helloDocument = XmlFileLoader.xmlFileToDocument(fileName);
         negotiator.startNegotiation();
-        final HelloMessage helloMessage = new HelloMessage(helloDocument);
-        final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloMessage);
+        final var helloMessage = new HelloMessage(helloDocument);
+        final var session = negotiator.getSessionForHelloMessage(helloMessage);
         assertNotNull(session);
-        assertInstanceOf(ChunkedFramingMechanismDecoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_DECODER),
+        final var pipeline = channel.pipeline();
+        assertInstanceOf(ChunkedFramingMechanismDecoder.class, pipeline.get(FramingMechanismDecoder.HANDLER_NAME),
             "NetconfChunkAggregator was not installed in the Netconf pipeline");
-        assertInstanceOf(ChunkedFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER),
+        assertInstanceOf(ChunkedFramingMechanismEncoder.class, pipeline.get(FramingMechanismEncoder.HANDLER_NAME),
             "ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline");
     }
 }
