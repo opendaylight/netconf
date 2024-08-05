@@ -9,11 +9,15 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * An channel handler framing outbound messages into specified framing.
  */
 public abstract sealed class FramingMechanismEncoder extends MessageToByteEncoder<ByteBuf>
         permits ChunkedFramingMechanismEncoder, EOMFramingMechanismEncoder {
-    // Nothing else
+    /**
+     * The name of the handler providing frame encoding.
+     */
+    public static final @NonNull String HANDLER_NAME = "frameEncoder";
 }
