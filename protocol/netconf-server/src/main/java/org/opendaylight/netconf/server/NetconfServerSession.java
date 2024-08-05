@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
@@ -47,7 +47,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfServerSession extends AbstractNetconfSession<NetconfServerSession,
+public final class NetconfServerSession extends AbstractNetconfExiSession<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfManagementSession {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSession.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;

@@ -14,16 +14,17 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.Collection;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfClientSession extends AbstractNetconfSession<NetconfClientSession, NetconfClientSessionListener> {
-
+public class NetconfClientSession
+        extends AbstractNetconfExiSession<NetconfClientSession, NetconfClientSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSession.class);
+
     private final Collection<String> capabilities;
 
     /**
