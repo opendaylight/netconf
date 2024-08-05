@@ -325,6 +325,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4fc3958d_a3b11701",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:18:13Z",
+      "side": 1,
+      "message": "missing justification",
+      "range": {
+        "startLine": 52,
+        "startChar": 4,
+        "endLine": 52,
+        "endChar": 54
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "459b4780_2d78449e",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/package-info.java",
         "patchSetId": 41
