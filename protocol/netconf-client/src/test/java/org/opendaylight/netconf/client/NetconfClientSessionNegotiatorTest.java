@@ -40,8 +40,8 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
-import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
@@ -101,7 +101,7 @@ class NetconfClientSessionNegotiatorTest {
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         doReturn(null).when(pipeline).get(SslHandler.class);
         doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
-        doReturn(handler).when(pipeline).replace(anyString(), anyString(), any(ChunkedFramingMechanismEncoder.class));
+        doReturn(handler).when(pipeline).replace(anyString(), anyString(), any(ChunkedFrameEncoder.class));
 
         NetconfXMLToHelloMessageDecoder messageDecoder = new NetconfXMLToHelloMessageDecoder();
         doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(),

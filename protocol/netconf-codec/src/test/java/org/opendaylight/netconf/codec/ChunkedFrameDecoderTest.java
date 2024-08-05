@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,30 +15,33 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-class ChunkedFramingMechanismDecoderTest {
-    private static final String CHUNKED_MESSAGE = "\n#4\n"
-            + "<rpc"
-            + "\n#18\n"
-            + " message-id=\"102\"\n"
-            + "\n#79\n"
-            + "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "  <close-session/>\n"
-            + "</rpc>"
-            + "\n##\n";
-
-    private static final String EXPECTED_MESSAGE = "<rpc message-id=\"102\"\n"
-            + "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "  <close-session/>\n"
-            + "</rpc>";
+class ChunkedFrameDecoderTest {
+    private static final String EXPECTED_MESSAGE = """
+        <rpc message-id="102"
+             xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <close-session/>
+        </rpc>""";
 
     private static final String CHUNKED_MESSAGE_ONE = "\n#101\n" + EXPECTED_MESSAGE + "\n##\n";
 
-    private final ChunkedFramingMechanismDecoder decoder = new ChunkedFramingMechanismDecoder(4096);
+    private final ChunkedFrameDecoder decoder = new ChunkedFrameDecoder(4096);
 
     @Test
     void testMultipleChunks() {
         final var output = new ArrayList<>();
-        final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
+        final var input = Unpooled.copiedBuffer("""
+
+            #4
+            <rpc
+            #18
+             message-id="102"
+
+            #79
+                 xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <close-session/>
+            </rpc>
+            ##
+            """.getBytes(StandardCharsets.UTF_8));
         decoder.decode(null, input, output);
 
         assertEquals(1, output.size());
