@@ -47,12 +47,12 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismEncoder;
+import org.opendaylight.netconf.common.codec.ChunkedFramingMechanismDecoder;
+import org.opendaylight.netconf.common.codec.ChunkedFramingMechanismEncoder;
+import org.opendaylight.netconf.common.codec.EOMFramingMechanismDecoder;
+import org.opendaylight.netconf.common.codec.EOMFramingMechanismEncoder;
+import org.opendaylight.netconf.common.codec.FramingMechanismDecoder;
+import org.opendaylight.netconf.common.codec.FramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
 @ExtendWith(MockitoExtension.class)

@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.common.codec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,8 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ChunkedFramingMechanismEncoderTest {
-
     private static final int CHUNK_SIZE = 256;
+
     @Mock
     private ChannelHandlerContext ctx;
 

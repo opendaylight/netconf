@@ -10,10 +10,10 @@ package org.opendaylight.netconf.nettyutil;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
-import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismEncoder;
+import org.opendaylight.netconf.common.codec.EOMFramingMechanismDecoder;
+import org.opendaylight.netconf.common.codec.EOMFramingMechanismEncoder;
+import org.opendaylight.netconf.common.codec.FramingMechanismDecoder;
+import org.opendaylight.netconf.common.codec.FramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
