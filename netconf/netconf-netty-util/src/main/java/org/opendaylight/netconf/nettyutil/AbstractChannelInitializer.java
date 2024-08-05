@@ -10,20 +10,20 @@ package org.opendaylight.netconf.nettyutil;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
 public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public static final String NETCONF_MESSAGE_DECODER = "netconfMessageDecoder";
-    public static final String NETCONF_MESSAGE_AGGREGATOR = "aggregator";
     public static final String NETCONF_MESSAGE_ENCODER = "netconfMessageEncoder";
+    public static final String NETCONF_MESSAGE_FRAME_DECODER = "frameDecoder";
     public static final String NETCONF_MESSAGE_FRAME_ENCODER = "frameEncoder";
     public static final String NETCONF_SESSION_NEGOTIATOR = "negotiator";
 
     public void initialize(final Channel ch, final Promise<S> promise) {
-        ch.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
+        ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_DECODER, new EOMFramingMechanismDecoder());
         initializeMessageDecoder(ch);
         ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, new EOMFramingMechanismEncoder());
         initializeMessageEncoder(ch);

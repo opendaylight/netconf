@@ -10,13 +10,16 @@ package org.opendaylight.netconf.nettyutil.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfEOMAggregator extends ByteToMessageDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfEOMAggregator.class);
+/**
+ * A {@link FramingMechanismDecoder} handling {@link FramingMechanism#EOM}.
+ */
+public final class EOMFramingMechanismDecoder extends FramingMechanismDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(EOMFramingMechanismDecoder.class);
 
     // Cached for brevity and constantness
     private static final byte[] EOM = MessageParts.END_OF_MESSAGE;

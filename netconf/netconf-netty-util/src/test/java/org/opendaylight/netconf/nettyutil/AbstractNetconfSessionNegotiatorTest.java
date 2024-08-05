@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
+import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_DECODER;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
 import io.netty.buffer.ByteBuf;
@@ -50,10 +50,10 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
-import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,7 +82,7 @@ class AbstractNetconfSessionNegotiatorTest {
                 new ChannelInboundHandlerAdapter());
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, xmlToHello);
         channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, new EOMFramingMechanismEncoder());
-        channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
+        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_DECODER, new EOMFramingMechanismDecoder());
         hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
@@ -132,7 +132,7 @@ class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final TestingNetconfSession session = negotiator.getSessionForHelloMessage(hello);
         assertNotNull(session);
-        assertInstanceOf(NetconfEOMAggregator.class, channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR));
+        assertInstanceOf(EOMFramingMechanismDecoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_DECODER));
         assertInstanceOf(EOMFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER));
     }
 
@@ -142,7 +142,7 @@ class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloBase11);
         assertNotNull(session);
-        assertInstanceOf(NetconfChunkAggregator.class, channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR));
+        assertInstanceOf(ChunkedFramingMechanismDecoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_DECODER));
         assertInstanceOf(ChunkedFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER));
     }
 
