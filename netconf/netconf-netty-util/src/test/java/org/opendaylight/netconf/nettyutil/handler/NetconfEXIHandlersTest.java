@@ -28,7 +28,7 @@ class NetconfEXIHandlersTest {
     private final String msgAsString = "<netconf-message/>";
 
     private NetconfMessageToEXIEncoder netconfMessageToEXIEncoder;
-    private NetconfEXIToMessageDecoder netconfEXIToMessageDecoder;
+    private EXIToMessageDecoder netconfEXIToMessageDecoder;
     private NetconfMessage msg;
     private byte[] msgAsExi;
 
@@ -36,7 +36,7 @@ class NetconfEXIHandlersTest {
     void setUp() throws Exception {
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         netconfMessageToEXIEncoder = NetconfMessageToEXIEncoder.create(codec);
-        netconfEXIToMessageDecoder = NetconfEXIToMessageDecoder.create(codec);
+        netconfEXIToMessageDecoder = EXIToMessageDecoder.create(codec);
 
         msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));
         msgAsExi = msgToExi(msg, codec);
