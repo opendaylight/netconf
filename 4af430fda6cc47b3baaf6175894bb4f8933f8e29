@@ -183,6 +183,167 @@
       },
       "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7f6f13f_a38b20d5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "implied by @NonNullByDefault\n\ndo you have your IDE correctly configured?",
+      "range": {
+        "startLine": 28,
+        "startChar": 18,
+        "endLine": 28,
+        "endChar": 26
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db002174_28b6efd1",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestParameters.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "sealed or final?",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 5
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "929e1bd6_bb6793f8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "needs to be fixed -- we have ServerException readily agailable, so this class should just map to that",
+      "range": {
+        "startLine": 26,
+        "startChar": 15,
+        "endLine": 26,
+        "endChar": 20
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28d6ebbc_dab78b97",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "use shared Splitter.on(\u0027,\u0027) instead",
+      "range": {
+        "startLine": 133,
+        "startChar": 72,
+        "endLine": 133,
+        "endChar": 82
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ad1710a_8d5dd57f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "never rely on default Locale\nthis really is meant to be Locale.ROOT, right?",
+      "range": {
+        "startLine": 133,
+        "startChar": 51,
+        "endLine": 133,
+        "endChar": 70
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e33ee0bc_8b2cc641",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "can we split all the \u0027accept\u0027 -\u003e AsciiString into a dedicated method? it will make it clearer what is going on",
+      "range": {
+        "startLine": 134,
+        "startChar": 20,
+        "endLine": 134,
+        "endChar": 40
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "459b4780_2d78449e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/package-info.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:17:32Z",
+      "side": 1,
+      "message": "missing package documentation, but I will fill that in once everything else is done",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 40
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
