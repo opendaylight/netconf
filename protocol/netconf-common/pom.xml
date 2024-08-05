@@ -21,6 +21,10 @@
     <packaging>bundle</packaging>
     <description>Shared NETCONF protocol components</description>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -56,6 +60,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
