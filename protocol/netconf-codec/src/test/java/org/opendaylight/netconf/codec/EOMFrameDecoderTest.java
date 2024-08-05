@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class EOMFramingMechanismDecoderTest {
+class EOMFrameDecoderTest {
     private static final String COMM_1 = """
         <?xml version="1.0" encoding="UTF-8"?>
         <rpc-reply message-id="105"
@@ -154,7 +154,7 @@ class EOMFramingMechanismDecoderTest {
         </rpc-reply>
         """;
 
-    private final EOMFramingMechanismDecoder decoder = new EOMFramingMechanismDecoder();
+    private final EOMFrameDecoder decoder = new EOMFrameDecoder();
 
     @Test
     void testDecodeMessagesReadAtOnce() {
