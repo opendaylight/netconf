@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd786083_c1d05276",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/MappingServerRequest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:03:09Z",
+      "side": 1,
+      "message": "implied by @NonNullByDefault",
+      "range": {
+        "startLine": 60,
+        "startChar": 38,
+        "endLine": 60,
+        "endChar": 46
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b38af66_e2798140",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:03:09Z",
+      "side": 1,
+      "message": "missing justification",
+      "range": {
+        "startLine": 49,
+        "startChar": 24,
+        "endLine": 49,
+        "endChar": 49
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05818b59_03009433",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:03:09Z",
+      "side": 1,
+      "message": "should be split off into a separate method",
+      "range": {
+        "startLine": 57,
+        "startChar": 12,
+        "endLine": 62,
+        "endChar": 13
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc15346a_98854467",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:03:09Z",
+      "side": 1,
+      "message": "missing default error handling",
+      "range": {
+        "startLine": 83,
+        "startChar": 12,
+        "endLine": 83,
+        "endChar": 30
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f6bc5b6_7a5750a3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-05T17:03:09Z",
+      "side": 1,
+      "message": "this should be a switch expression",
+      "range": {
+        "startLine": 106,
+        "startChar": 12,
+        "endLine": 106,
+        "endChar": 68
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
