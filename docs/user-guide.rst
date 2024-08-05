@@ -1319,36 +1319,44 @@ particular mount point.
 Restconf northbound configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Restconf-nb configuration works through OSGi Configuration Admin interface, in the
-``org.opendaylight.restconf.nb.rfc8040`` configuration PID. There are six tuneables you can
-set:
+``org.opendaylight.restconf.nb.rfc8040`` configuration PID. There are seven tuneables you can set:
 
+* ``pretty-print``, which defaults to ``false``
+* ``data-missing-is-404``, which defaults to ``false``
 * ``maximum-fragment-length``, which defaults to ``0``
 * ``heartbeat-interval``, which defaults to ``10000``
+* ``restconf``, which defaults to ``rests``
 * ``ping-executor-name-prefix``, which defaults to ``ping-executor``
 * ``max-thread-count``, which defaults to ``1``
-* ``restconf``, which defaults to ``rests``
+
+*pretty-print* — Control the default value of the odl-pretty-print query parameter.
+
+*data-missing-is-404* — Control the HTTP status code reporting of conditions corresponding to "data-missing".
+When this is set to true, the server will violate RFC8040 and report "404" instead of "409".
 
 *maximum-fragment-length* — Maximum SSE fragment length in number of Unicode code units (characters)
 (exceeded message length leads to fragmentation of messages)
 
 *heartbeat-interval* — Interval in milliseconds between sending of ping control frames.
 
+*restconf* — The value of RFC8040 restconf URI template, pointing to the root resource. Must not end with '/'.
+
 *ping-executor-name-prefix* — Name of thread group Ping Executor will be run with.
 
 *max-thread-count* — Number of threads Ping Executor will be run with.
-
-*restconf* — The value of RFC8040 restconf URI template, pointing to the root resource. Must not end with '/'.
 
 In order to change these settings, you can either modify the corresponding configuration
 file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
 
 ::
 
+    pretty-print=false
+    data-missing-is-404=false
     maximum-fragment-length=0
     heartbeat-interval=10000
+    restconf=rests
     ping-executor-name-prefix=ping-executor
     max-thread-count=1
-    restconf=rests
 
 Or use Karaf CLI:
 
