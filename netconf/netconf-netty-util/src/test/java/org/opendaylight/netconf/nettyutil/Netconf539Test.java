@@ -32,7 +32,7 @@ import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
-import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +49,7 @@ class Netconf539Test {
     void setUp() {
         channel.pipeline()
             .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
-            .addLast(MessageDecoder.HANDLER_NAME, new NetconfXMLToHelloMessageDecoder())
+            .addLast(MessageDecoder.HANDLER_NAME, new HelloXMLMessageDecoder())
             .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         negotiator = new TestSessionNegotiator(
