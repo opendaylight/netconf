@@ -14,10 +14,9 @@ import io.netty.buffer.Unpooled;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class NetconfEOMAggregatorTest {
+class EOMFramingMechanismDecoderTest {
     private static final String COMM_1 = """
         <?xml version="1.0" encoding="UTF-8"?>
         <rpc-reply message-id="105"
@@ -155,19 +154,14 @@ class NetconfEOMAggregatorTest {
         </rpc-reply>
         """;
 
-    private static NetconfEOMAggregator aggregator;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        aggregator = new NetconfEOMAggregator();
-    }
+    private final EOMFramingMechanismDecoder decoder = new EOMFramingMechanismDecoder();
 
     @Test
     void testDecodeMessagesReadAtOnce() {
         final ByteBuf in = Unpooled.copiedBuffer(COMM_1.getBytes());
         final List<Object> out = new LinkedList<>();
 
-        aggregator.decode(null, in, out);
+        decoder.decode(null, in, out);
         assertEquals(2, out.size());
         assertEquals(COMM_1_M_1, byteBufToString((ByteBuf) out.get(0)));
         assertEquals(COMM_1_M_2, byteBufToString((ByteBuf) out.get(1)));
@@ -180,7 +174,7 @@ class NetconfEOMAggregatorTest {
 
         for (final byte b : COMM_1.getBytes()) {
             in.writeByte(b);
-            aggregator.decode(null, in, out);
+            decoder.decode(null, in, out);
         }
 
         assertEquals(2, out.size());
@@ -193,13 +187,13 @@ class NetconfEOMAggregatorTest {
         final ByteBuf in = Unpooled.copiedBuffer(COMM_1.getBytes());
         final List<Object> out = new LinkedList<>();
 
-        aggregator.decode(null, in, out);
+        decoder.decode(null, in, out);
         assertEquals(2, out.size());
         assertEquals(COMM_1_M_1, byteBufToString((ByteBuf) out.get(0)));
         assertEquals(COMM_1_M_2, byteBufToString((ByteBuf) out.get(1)));
 
         final ByteBuf in2 = Unpooled.copiedBuffer(COMM_2.getBytes());
-        aggregator.decode(null, in2, out);
+        decoder.decode(null, in2, out);
         assertEquals(3, out.size());
         assertEquals(COMM_2_M_1, byteBufToString((ByteBuf) out.get(2)));
     }
@@ -211,17 +205,17 @@ class NetconfEOMAggregatorTest {
 
         in.writeBytes((COMM_3_S_1 + COMM_3_S_2).getBytes());
 
-        aggregator.decode(null, in, out);
+        decoder.decode(null, in, out);
         assertEquals(1, out.size());
         assertEquals(COMM_3_M_1, byteBufToString((ByteBuf) out.get(0)));
 
-        aggregator.decode(null, in, out);
+        decoder.decode(null, in, out);
         assertEquals(1, out.size());
 
         in.clear();
         in.writeBytes((COMM_3_S_2 + COMM_3_S_3).getBytes());
 
-        aggregator.decode(null, in, out);
+        decoder.decode(null, in, out);
         assertEquals(2, out.size());
         assertEquals(COMM_3_M_2, byteBufToString((ByteBuf) out.get(1)));
     }
@@ -233,8 +227,8 @@ class NetconfEOMAggregatorTest {
 
         for (final byte b : MessageParts.END_OF_MESSAGE) {
             in.writeByte(b);
-            aggregator.decode(null, in, out);
-            assertEquals(0, aggregator.bodyLength());
+            decoder.decode(null, in, out);
+            assertEquals(0, decoder.bodyLength());
         }
 
         assertEquals(1, out.size());
