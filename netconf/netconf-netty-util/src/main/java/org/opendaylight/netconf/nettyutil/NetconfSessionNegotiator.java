@@ -41,8 +41,8 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -287,7 +287,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     protected final void replaceHelloMessageInboundHandler(final S session) {
         final var helloMessageHandler = replaceChannelHandler(channel, MessageDecoder.HANDLER_NAME,
             new XMLMessageDecoder());
-        if (!(helloMessageHandler instanceof NetconfXMLToHelloMessageDecoder helloDecorder)) {
+        if (!(helloMessageHandler instanceof HelloXMLMessageDecoder helloDecorder)) {
             throw new IllegalStateException(
                 "Pipeline handlers misplaced on session: " + session + ", pipeline: " + channel.pipeline());
         }

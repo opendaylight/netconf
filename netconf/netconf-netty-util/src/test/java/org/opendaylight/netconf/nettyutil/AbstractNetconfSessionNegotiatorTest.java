@@ -55,7 +55,7 @@ import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractNetconfSessionNegotiatorTest {
@@ -74,7 +74,7 @@ class AbstractNetconfSessionNegotiatorTest {
     private final HelloMessage hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
     private final HelloMessage helloBase11 =
         HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
-    private final NetconfXMLToHelloMessageDecoder xmlToHello  = new NetconfXMLToHelloMessageDecoder();
+    private final HelloXMLMessageDecoder xmlToHello  = new HelloXMLMessageDecoder();
     private final EmbeddedChannel channel = new EmbeddedChannel();
 
     @BeforeEach
