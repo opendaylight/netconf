@@ -67,11 +67,12 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
                 case PathParameters.MODULES -> {
                     // TODO implement
                 }
-                case PathParameters.HOST_META -> {
-                    // TODO implement
-                }
-                case PathParameters.HOST_META_JSON -> {
-                }
+                case PathParameters.HOST_META ->
+                    // no possibility to configure acceptType, always return XRD
+                    HostMetaRequestProcessor.processHostMetaRequest(params, callback);
+                case PathParameters.HOST_META_JSON ->
+                    // no possibility to configure acceptType, always return YANG_DATA_JSON
+                    HostMetaRequestProcessor.processHostMetaJsonRequest(params, callback);
                 default -> {
                     // TODO IMPLEMENT
                 }
