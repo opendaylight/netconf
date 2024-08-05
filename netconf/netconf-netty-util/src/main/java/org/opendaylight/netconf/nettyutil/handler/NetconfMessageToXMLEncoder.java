@@ -11,7 +11,6 @@ import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -22,21 +21,27 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 
-public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMessage> {
+public class NetconfMessageToXMLEncoder extends MessageEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageToXMLEncoder.class);
 
     private final @Nullable String clientId;
 
     public NetconfMessageToXMLEncoder() {
-        this(Optional.empty());
+        this((String) null);
     }
 
+    public NetconfMessageToXMLEncoder(final @Nullable String clientId) {
+        this.clientId = clientId;
+    }
+
+    @Deprecated(since = "8.0.0", forRemoval = true)
     public NetconfMessageToXMLEncoder(final Optional<String> clientId) {
-        this.clientId = clientId.orElse(null);
+        this(clientId.orElse(null));
     }
 
     @Override

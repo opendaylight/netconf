@@ -11,7 +11,6 @@ import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -23,6 +22,7 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.odlparent.logging.markers.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
  * Netconf messages after hello should be processed once the negotiation succeeded.
  *
  */
-public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder {
+public final class NetconfXMLToHelloMessageDecoder extends MessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToHelloMessageDecoder.class);
 
     private static final List<byte[]> POSSIBLE_ENDS = List.of(

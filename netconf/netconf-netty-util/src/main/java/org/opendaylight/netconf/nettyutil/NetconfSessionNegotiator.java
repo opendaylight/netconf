@@ -37,6 +37,8 @@ import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
 import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.FrameEncoder;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
@@ -178,8 +180,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
         channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
 
         // Remove special outbound handler for hello message. Insert regular netconf xml message (en|de)coders.
-        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-            new NetconfMessageToXMLEncoder());
+        replaceChannelHandler(channel, MessageEncoder.HANDLER_NAME, new NetconfMessageToXMLEncoder());
 
         synchronized (this) {
             lockedChangeState(State.OPEN_WAIT);
@@ -284,19 +285,18 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
      * It caches any non-hello messages while negotiation is still in progress
      */
     protected final void replaceHelloMessageInboundHandler(final S session) {
-        ChannelHandler helloMessageHandler = replaceChannelHandler(channel,
-                AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, new NetconfXMLToMessageDecoder());
-
-        checkState(helloMessageHandler instanceof NetconfXMLToHelloMessageDecoder,
-                "Pipeline handlers misplaced on session: %s, pipeline: %s", session, channel.pipeline());
-        Iterable<NetconfMessage> netconfMessagesFromNegotiation =
-                ((NetconfXMLToHelloMessageDecoder) helloMessageHandler).getPostHelloNetconfMessages();
+        final var helloMessageHandler = replaceChannelHandler(channel, MessageDecoder.HANDLER_NAME,
+            new NetconfXMLToMessageDecoder());
+        if (!(helloMessageHandler instanceof NetconfXMLToHelloMessageDecoder helloDecorder)) {
+            throw new IllegalStateException(
+                "Pipeline handlers misplaced on session: " + session + ", pipeline: " + channel.pipeline());
+        }
 
         // Process messages received during negotiation
         // The hello message handler does not have to be synchronized,
         // since it is always call from the same thread by netty.
         // It means, we are now using the thread now
-        for (NetconfMessage message : netconfMessagesFromNegotiation) {
+        for (NetconfMessage message : helloDecorder.getPostHelloNetconfMessages()) {
             session.handleMessage(message);
         }
     }

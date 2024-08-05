@@ -15,6 +15,8 @@ import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
@@ -70,11 +72,11 @@ public abstract class AbstractNetconfExiSession<
     protected abstract void addExiHandlers(ByteToMessageDecoder decoder, MessageToByteEncoder<NetconfMessage> encoder);
 
     protected final void replaceMessageDecoder(final ChannelHandler handler) {
-        replaceChannelHandler(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, handler);
+        replaceChannelHandler(MessageDecoder.HANDLER_NAME, handler);
     }
 
     protected final void replaceMessageEncoder(final ChannelHandler handler) {
-        replaceChannelHandler(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, handler);
+        replaceChannelHandler(MessageEncoder.HANDLER_NAME, handler);
     }
 
     protected final void replaceMessageEncoderAfterNextMessage(final ChannelHandler handler) {
