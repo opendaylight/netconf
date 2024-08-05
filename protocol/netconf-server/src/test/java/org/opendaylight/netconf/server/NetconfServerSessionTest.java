@@ -30,8 +30,8 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.EXIMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
-import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
@@ -179,7 +179,7 @@ class NetconfServerSessionTest {
         channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new XMLMessageDecoder());
         channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, new NetconfMessageToXMLEncoder());
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
-        session.addExiHandlers(NetconfEXIToMessageDecoder.create(codec), NetconfMessageToEXIEncoder.create(codec));
+        session.addExiHandlers(EXIMessageDecoder.create(codec), NetconfMessageToEXIEncoder.create(codec));
     }
 
     @Test
