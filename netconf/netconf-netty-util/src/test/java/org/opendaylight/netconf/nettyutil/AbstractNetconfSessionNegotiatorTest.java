@@ -46,13 +46,13 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
+import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
+import org.opendaylight.netconf.codec.EOMFrameDecoder;
+import org.opendaylight.netconf.codec.EOMFrameEncoder;
+import org.opendaylight.netconf.codec.FrameDecoder;
+import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismDecoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,8 +80,8 @@ class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
                 new ChannelInboundHandlerAdapter());
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, xmlToHello);
-        channel.pipeline().addLast(FramingMechanismEncoder.HANDLER_NAME, new EOMFramingMechanismEncoder());
-        channel.pipeline().addLast(FramingMechanismDecoder.HANDLER_NAME, new EOMFramingMechanismDecoder());
+        channel.pipeline().addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder());
+        channel.pipeline().addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
@@ -132,8 +132,8 @@ class AbstractNetconfSessionNegotiatorTest {
         final var session = negotiator.getSessionForHelloMessage(hello);
         assertNotNull(session);
         final var pipeline = channel.pipeline();
-        assertInstanceOf(EOMFramingMechanismDecoder.class, pipeline.get(FramingMechanismDecoder.HANDLER_NAME));
-        assertInstanceOf(EOMFramingMechanismEncoder.class, pipeline.get(FramingMechanismEncoder.HANDLER_NAME));
+        assertInstanceOf(EOMFrameDecoder.class, pipeline.get(FrameDecoder.HANDLER_NAME));
+        assertInstanceOf(EOMFrameEncoder.class, pipeline.get(FrameEncoder.HANDLER_NAME));
     }
 
     @Test
@@ -143,8 +143,8 @@ class AbstractNetconfSessionNegotiatorTest {
         final var session = negotiator.getSessionForHelloMessage(helloBase11);
         assertNotNull(session);
         final var pipeline = channel.pipeline();
-        assertInstanceOf(ChunkedFramingMechanismDecoder.class, pipeline.get(FramingMechanismDecoder.HANDLER_NAME));
-        assertInstanceOf(ChunkedFramingMechanismEncoder.class, pipeline.get(FramingMechanismEncoder.HANDLER_NAME));
+        assertInstanceOf(ChunkedFrameDecoder.class, pipeline.get(FrameDecoder.HANDLER_NAME));
+        assertInstanceOf(ChunkedFrameEncoder.class, pipeline.get(FrameEncoder.HANDLER_NAME));
     }
 
     @Test
