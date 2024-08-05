@@ -29,11 +29,11 @@ import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;
@@ -176,7 +176,7 @@ class NetconfServerSessionTest {
 
     @Test
     void testAddExiHandlers() throws Exception {
-        channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new NetconfXMLToMessageDecoder());
+        channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new XMLMessageDecoder());
         channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, new NetconfMessageToXMLEncoder());
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         session.addExiHandlers(NetconfEXIToMessageDecoder.create(codec), NetconfMessageToEXIEncoder.create(codec));
@@ -192,7 +192,7 @@ class NetconfServerSessionTest {
         assertEquals(ChannelOutboundHandlerAdapter.class, exiEncoder.getClass());
         session.sendMessage(msg);
         channel.runPendingTasks();
-        assertInstanceOf(NetconfXMLToMessageDecoder.class, channel.pipeline().get(MessageDecoder.HANDLER_NAME));
+        assertInstanceOf(XMLMessageDecoder.class, channel.pipeline().get(MessageDecoder.HANDLER_NAME));
         assertInstanceOf(NetconfMessageToXMLEncoder.class, channel.pipeline().get(MessageEncoder.HANDLER_NAME));
     }
 }
