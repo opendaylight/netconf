@@ -146,6 +146,11 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-codec</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-util</artifactId>
     </dependency>
     <dependency>

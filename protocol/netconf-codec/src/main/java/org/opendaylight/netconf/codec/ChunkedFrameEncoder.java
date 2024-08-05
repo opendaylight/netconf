@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,20 +13,20 @@ import java.nio.charset.StandardCharsets;
 import org.opendaylight.netconf.api.messages.FramingMechanism;
 
 /**
- * A {@link FramingMechanismEncoder} handling {@link FramingMechanism#CHUNK}.
+ * A {@link FrameEncoder} handling {@link FramingMechanism#CHUNK}.
  */
-public final class ChunkedFramingMechanismEncoder extends FramingMechanismEncoder {
+public final class ChunkedFrameEncoder extends FrameEncoder {
     public static final int DEFAULT_CHUNK_SIZE = 8192;
     public static final int MIN_CHUNK_SIZE = 128;
     public static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
 
     private final int chunkSize;
 
-    public ChunkedFramingMechanismEncoder() {
+    public ChunkedFrameEncoder() {
         this(DEFAULT_CHUNK_SIZE);
     }
 
-    public ChunkedFramingMechanismEncoder(final int chunkSize) {
+    public ChunkedFrameEncoder(final int chunkSize) {
         if (chunkSize < MIN_CHUNK_SIZE) {
             throw new IllegalArgumentException(chunkSize + " is lower than minimum supported " + MIN_CHUNK_SIZE);
         }
