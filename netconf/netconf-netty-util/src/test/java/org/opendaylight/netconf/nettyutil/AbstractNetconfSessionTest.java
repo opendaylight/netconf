@@ -25,8 +25,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.EOFException;
 import java.util.Optional;
 import java.util.Set;
@@ -133,7 +131,7 @@ class AbstractNetconfSessionTest {
         testingNetconfSession = spy(testingNetconfSession);
 
         testingNetconfSession.startExiCommunication(NetconfStartExiMessageProvider.create(EXIParameters.empty(), "4"));
-        verify(testingNetconfSession).addExiHandlers(any(ByteToMessageDecoder.class), any(MessageToByteEncoder.class));
+        verify(testingNetconfSession).addExiHandlers(any(MessageDecoder.class), any(MessageEncoder.class));
     }
 
     @Test

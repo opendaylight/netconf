@@ -10,10 +10,9 @@ package org.opendaylight.netconf.client;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.Collection;
-import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
 import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
@@ -53,8 +52,7 @@ public class NetconfClientSession
     }
 
     @Override
-    protected void addExiHandlers(final ByteToMessageDecoder decoder,
-                                  final MessageToByteEncoder<NetconfMessage> encoder) {
+    protected void addExiHandlers(final MessageDecoder decoder, final MessageEncoder encoder) {
         // TODO used only in negotiator, client supports only auto start-exi
         replaceMessageDecoder(decoder);
         replaceMessageEncoder(encoder);
