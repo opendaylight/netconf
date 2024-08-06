@@ -529,18 +529,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sal-rest-connector-config</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>sal-rest-connector-config</artifactId>
-                <version>${project.version}</version>
-                <type>cfg</type>
-                <classifier>restconf</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-openapi</artifactId>
                 <version>${project.version}</version>
             </dependency>
