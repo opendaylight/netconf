@@ -10,6 +10,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import io.netty.buffer.Unpooled;
 import java.io.ByteArrayOutputStream;
@@ -27,16 +28,16 @@ import org.xmlunit.builder.DiffBuilder;
 class NetconfEXIHandlersTest {
     private final String msgAsString = "<netconf-message/>";
 
-    private EXIMessageEncoder netconfMessageToEXIEncoder;
-    private EXIMessageDecoder netconfEXIMessageDecoder;
+    private EXIMessageEncoder exiEncoder;
+    private EXIMessageDecoder exiDecoder;
     private NetconfMessage msg;
     private byte[] msgAsExi;
 
     @BeforeEach
     void setUp() throws Exception {
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
-        netconfMessageToEXIEncoder = EXIMessageEncoder.create(codec);
-        netconfEXIMessageDecoder = EXIMessageDecoder.create(codec);
+        exiEncoder = assertInstanceOf(EXIMessageEncoder.class, codec.newMessageEncoder());
+        exiDecoder = assertInstanceOf(EXIMessageDecoder.class, codec.newMessageDecoder());
 
         msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));
         msgAsExi = msgToExi(msg, codec);
@@ -44,7 +45,7 @@ class NetconfEXIHandlersTest {
 
     private static byte[] msgToExi(final NetconfMessage msg, final NetconfEXICodec codec) throws Exception {
         final var bos = new ByteArrayOutputStream();
-        final var encoder = codec.getWriter();
+        final var encoder = codec.exiFactory().createEXIWriter();
         encoder.setOutputStream(bos);
         ThreadLocalTransformers.getDefaultTransformer().transform(new DOMSource(msg.getDocument()),
             new SAXResult(encoder));
@@ -54,7 +55,7 @@ class NetconfEXIHandlersTest {
     @Test
     void testEncodeDecode() throws Exception {
         final var buffer = Unpooled.buffer();
-        netconfMessageToEXIEncoder.encode(null, msg, buffer);
+        exiEncoder.encode(null, msg, buffer);
         final int exiLength = msgAsExi.length;
         // array from buffer is cca 256 n length, compare only subarray
         assertArrayEquals(msgAsExi, Arrays.copyOfRange(buffer.array(), 0, exiLength));
@@ -65,7 +66,7 @@ class NetconfEXIHandlersTest {
         }
 
         final var out = new ArrayList<>();
-        netconfEXIMessageDecoder.decode(null, buffer, out);
+        exiDecoder.decode(null, buffer, out);
 
         final var diff = DiffBuilder.compare(msg.getDocument())
             .withTest(((NetconfMessage) out.get(0)).getDocument())

@@ -13,8 +13,6 @@ import static com.google.common.base.Verify.verify;
 import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.time.Instant;
@@ -25,6 +23,8 @@ import java.util.regex.Pattern;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
 import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
@@ -159,8 +159,7 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
     }
 
     @Override
-    protected void addExiHandlers(final ByteToMessageDecoder decoder,
-                                  final MessageToByteEncoder<NetconfMessage> encoder) {
+    protected void addExiHandlers(final MessageDecoder decoder, final MessageEncoder encoder) {
         replaceMessageDecoder(decoder);
         replaceMessageEncoderAfterNextMessage(encoder);
     }
