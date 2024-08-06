@@ -90,13 +90,13 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     }
 
     private final @NonNull HelloMessage localHello;
-    protected final Channel channel;
+    protected final @NonNull Channel channel;
 
     private final @NonNegative int maximumIncomingChunkSize;
     private final long connectionTimeoutMillis;
-    private final Promise<S> promise;
-    private final L sessionListener;
-    private final NetconfTimer timer;
+    private final @NonNull Promise<S> promise;
+    private final @NonNull L sessionListener;
+    private final @NonNull NetconfTimer timer;
 
     @GuardedBy("this")
     private Timeout timeoutTask;
@@ -110,7 +110,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
         this.promise = requireNonNull(promise);
         this.channel = requireNonNull(channel);
         this.timer = requireNonNull(timer);
-        this.sessionListener = sessionListener;
+        this.sessionListener = requireNonNull(sessionListener);
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         checkArgument(maximumIncomingChunkSize > 0, "Invalid maximum incoming chunk size %s", maximumIncomingChunkSize);
