@@ -114,8 +114,9 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         runAfterNextMessage = requireNonNull(runnable);
     }
 
-    protected final void replaceChannelHandler(final String handlerName, final ChannelHandler handler) {
-        channel.pipeline().replace(handlerName, handlerName, handler);
+    protected final <T extends ChannelHandler>void replaceChannelHandler(final Class<T> type, final String name,
+            final T handler) {
+        channel.pipeline().replace(type, name, handler);
     }
 
     public final boolean isUp() {
