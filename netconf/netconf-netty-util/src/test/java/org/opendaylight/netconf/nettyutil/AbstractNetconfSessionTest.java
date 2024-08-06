@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
@@ -104,25 +103,26 @@ class AbstractNetconfSessionTest {
         doReturn(writeFuture).when(channel).newPromise();
         doReturn(writeFuture).when(channel).writeAndFlush(any(NetconfMessage.class), any(ChannelPromise.class));
         doReturn(pipeline).when(channel).pipeline();
-        doReturn(null).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
+        doReturn(null).when(pipeline).replace(any(Class.class), anyString(), any());
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
             invocation.<Runnable>getArgument(0).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
 
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
-        final ChannelHandler mock = mock(ChannelHandler.class);
+        final var testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
+        final var mockDecoder = mock(MessageDecoder.class);
+        testingNetconfSession.replaceMessageDecoder(mockDecoder);
+        verify(pipeline).replace(MessageDecoder.class, MessageDecoder.HANDLER_NAME, mockDecoder);
 
-        testingNetconfSession.replaceMessageDecoder(mock);
-        verify(pipeline).replace(MessageDecoder.HANDLER_NAME, MessageDecoder.HANDLER_NAME, mock);
-        testingNetconfSession.replaceMessageEncoder(mock);
-        verify(pipeline).replace(MessageEncoder.HANDLER_NAME, MessageEncoder.HANDLER_NAME, mock);
-        testingNetconfSession.replaceMessageEncoderAfterNextMessage(mock);
+        final var mockEncoder = mock(MessageEncoder.class);
+        testingNetconfSession.replaceMessageEncoder(mockEncoder);
+        verify(pipeline).replace(MessageEncoder.class, MessageEncoder.HANDLER_NAME, mockEncoder);
+        testingNetconfSession.replaceMessageEncoderAfterNextMessage(mockEncoder);
         verifyNoMoreInteractions(pipeline);
 
         testingNetconfSession.sendMessage(clientHello);
-        verify(pipeline, times(2)).replace(MessageEncoder.HANDLER_NAME, MessageEncoder.HANDLER_NAME, mock);
+        verify(pipeline, times(2)).replace(MessageEncoder.class, MessageEncoder.HANDLER_NAME, mockEncoder);
     }
 
     @Test
