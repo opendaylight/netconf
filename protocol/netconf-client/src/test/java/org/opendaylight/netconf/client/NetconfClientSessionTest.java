@@ -21,9 +21,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.EXIMessageDecoder;
-import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
+import org.opendaylight.netconf.nettyutil.handler.EXIMessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -50,7 +50,7 @@ class NetconfClientSessionTest {
         Mockito.doReturn(channelHandler).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
 
         final NetconfClientSession session = new NetconfClientSession(sessionListener, channel, sessId, caps);
-        final NetconfMessageToEXIEncoder exiEncoder = NetconfMessageToEXIEncoder.create(codec);
+        final EXIMessageEncoder exiEncoder = EXIMessageEncoder.create(codec);
         final EXIMessageDecoder exiDecoder = EXIMessageDecoder.create(codec);
         session.addExiHandlers(exiDecoder, exiEncoder);
         session.stopExiCommunication();

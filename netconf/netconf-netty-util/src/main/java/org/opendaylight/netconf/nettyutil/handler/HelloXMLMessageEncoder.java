@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.XMLMessageEncoder;
 
 /**
  * Customized NetconfMessageToXMLEncoder that serializes additional header with
@@ -42,7 +43,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
  * }
  * </pre>
  */
-public final class NetconfHelloMessageToXMLEncoder extends NetconfMessageToXMLEncoder {
+public final class HelloXMLMessageEncoder extends XMLMessageEncoder {
     @Override
     @VisibleForTesting
     public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
