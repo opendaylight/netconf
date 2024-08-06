@@ -9,6 +9,7 @@ package org.opendaylight.netconf.server;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
@@ -72,7 +73,7 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
                                 final SessionIdType sessionId, final NetconfHelloMessageAdditionalHeader header) {
         super(sessionListener, channel, sessionId);
         this.header = header;
-        this.sessionListener = sessionListener;
+        this.sessionListener = requireNonNull(sessionListener);
         LOG.debug("Session {} created", this);
     }
 
