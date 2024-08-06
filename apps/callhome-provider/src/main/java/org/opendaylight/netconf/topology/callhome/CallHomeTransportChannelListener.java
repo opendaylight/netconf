@@ -63,7 +63,7 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
                 LOG.info("Netconf session established for context: {}", context);
             }
         });
-        new ClientChannelInitializer(negotiationFactory, context::netconfSessionListener)
+        new ClientChannelInitializer(negotiationFactory, context.netconfSessionListener())
             .initialize(channel, promise);
 
         // this is required to trigger NETCONF negotiation on TLS
