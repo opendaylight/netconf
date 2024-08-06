@@ -9,7 +9,6 @@ package org.opendaylight.netconf.topology.callhome;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
@@ -48,7 +47,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
                 .withStatusRecorder(statusRecorder)
                 .withSessionContextManager(
                     mountService.createTlsSessionContextManager(authProvider, statusRecorder))
-                .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(),
+                .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer,
                     configuration.connection$_$timeout$_$millis(),
                     NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
                 .build();

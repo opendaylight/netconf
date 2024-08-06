@@ -22,7 +22,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
@@ -52,8 +51,6 @@ class NetconfClientConfigurationTest {
     private SshClientGrouping sshParams;
     @Mock
     private ClientFactoryManagerConfigurator sshConfigurator;
-    @Mock
-    private NetconfHelloMessageAdditionalHeader additionalHeader;
     @Mock
     private NetconfClientSessionListener sessionListener;
 
@@ -106,7 +103,6 @@ class NetconfClientConfigurationTest {
             .withProtocol(protocol)
             .withTcpParameters(tcpParams)
             .withName(NAME)
-            .withAdditionalHeader(additionalHeader)
             .withSessionListener(sessionListener)
             .withOdlHelloCapabilities(CAPABILITIES)
             .withConnectionTimeoutMillis(TIMEOUT_MILLIS)
@@ -117,7 +113,6 @@ class NetconfClientConfigurationTest {
         assertEquals(protocol, cfg.getProtocol());
         assertSame(tcpParams, cfg.getTcpParameters());
         assertEquals(NAME, cfg.getName());
-        assertSame(additionalHeader, cfg.getAdditionalHeader().orElseThrow());
         assertSame(sessionListener, cfg.getSessionListener());
         assertEquals(CAPABILITIES, cfg.getOdlHelloCapabilities());
         assertEquals(TIMEOUT_MILLIS, cfg.getConnectionTimeoutMillis());

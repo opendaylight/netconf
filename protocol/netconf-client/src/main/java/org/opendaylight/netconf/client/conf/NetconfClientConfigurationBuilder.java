@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
 import org.checkerframework.checker.index.qual.NonNegative;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
@@ -32,7 +31,6 @@ public final class NetconfClientConfigurationBuilder {
     private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
     private @NonNegative int maximumIncomingChunkSize =
         NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
-    private NetconfHelloMessageAdditionalHeader additionalHeader;
     private NetconfClientSessionListener sessionListener;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
     private List<Uri> odlHelloCapabilities;
@@ -73,19 +71,6 @@ public final class NetconfClientConfigurationBuilder {
     public NetconfClientConfigurationBuilder withProtocol(
             final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
         this.clientProtocol = clientProtocol;
-        return this;
-    }
-
-    /**
-     * Set additional header for Hello message.
-     *
-     * @param additionalHeader additional header
-     * @return current builder instance
-     */
-    @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withAdditionalHeader(
-            final NetconfHelloMessageAdditionalHeader additionalHeader) {
-        this.additionalHeader = additionalHeader;
         return this;
     }
 
@@ -209,6 +194,6 @@ public final class NetconfClientConfigurationBuilder {
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, tcpParameters, tlsParameters, sslHandlerFactory,
                 sshParameters, sshConfigurator, sessionListener, odlHelloCapabilities, connectionTimeoutMillis,
-                maximumIncomingChunkSize, additionalHeader, name);
+                maximumIncomingChunkSize, name);
     }
 }

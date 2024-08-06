@@ -85,12 +85,12 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
             final NetconfClientConfiguration configuration) {
         final var capabilities = configuration.getOdlHelloCapabilities();
         if (capabilities == null || capabilities.isEmpty()) {
-            return new NetconfClientSessionNegotiatorFactory(timer, configuration.getAdditionalHeader(),
-                configuration.getConnectionTimeoutMillis(), configuration.getMaximumIncomingChunkSize());
+            return new NetconfClientSessionNegotiatorFactory(timer, configuration.getConnectionTimeoutMillis(),
+                configuration.getMaximumIncomingChunkSize());
         }
         final var stringCapabilities = capabilities.stream().map(Uri::getValue)
             .collect(ImmutableSet.toImmutableSet());
-        return new NetconfClientSessionNegotiatorFactory(timer, configuration.getAdditionalHeader(),
-            configuration.getConnectionTimeoutMillis(), stringCapabilities);
+        return new NetconfClientSessionNegotiatorFactory(timer, configuration.getConnectionTimeoutMillis(),
+            stringCapabilities);
     }
 }
