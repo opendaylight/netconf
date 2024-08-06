@@ -27,7 +27,7 @@ import org.xmlunit.builder.DiffBuilder;
 class NetconfEXIHandlersTest {
     private final String msgAsString = "<netconf-message/>";
 
-    private NetconfMessageToEXIEncoder netconfMessageToEXIEncoder;
+    private EXIMessageEncoder netconfMessageToEXIEncoder;
     private EXIMessageDecoder netconfEXIMessageDecoder;
     private NetconfMessage msg;
     private byte[] msgAsExi;
@@ -35,7 +35,7 @@ class NetconfEXIHandlersTest {
     @BeforeEach
     void setUp() throws Exception {
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
-        netconfMessageToEXIEncoder = NetconfMessageToEXIEncoder.create(codec);
+        netconfMessageToEXIEncoder = EXIMessageEncoder.create(codec);
         netconfEXIMessageDecoder = EXIMessageDecoder.create(codec);
 
         msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));

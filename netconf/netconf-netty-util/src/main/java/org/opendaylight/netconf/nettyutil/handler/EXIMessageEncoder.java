@@ -25,16 +25,16 @@ import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfMessageToEXIEncoder extends MessageEncoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageToEXIEncoder.class);
+public final class EXIMessageEncoder extends MessageEncoder {
+    private static final Logger LOG = LoggerFactory.getLogger(EXIMessageEncoder.class);
     private final NetconfEXICodec codec;
 
-    private NetconfMessageToEXIEncoder(final NetconfEXICodec codec) {
+    private EXIMessageEncoder(final NetconfEXICodec codec) {
         this.codec = requireNonNull(codec);
     }
 
-    public static NetconfMessageToEXIEncoder create(final NetconfEXICodec codec) {
-        return new NetconfMessageToEXIEncoder(codec);
+    public static EXIMessageEncoder create(final NetconfEXICodec codec) {
+        return new EXIMessageEncoder(codec);
     }
 
     @Override
