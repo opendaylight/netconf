@@ -10,7 +10,9 @@ package org.opendaylight.netconf.client;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -28,12 +30,11 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfClientSessionTest {
+    @Mock
+    private ChannelHandler channelHandler;
 
     @Mock
-    ChannelHandler channelHandler;
-
-    @Mock
-    Channel channel;
+    private Channel channel;
 
     @Test
     void testNetconfClientSession() throws Exception {
@@ -44,8 +45,8 @@ class NetconfClientSessionTest {
         final NetconfEXICodec codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         final ChannelPipeline pipeline = mock(ChannelPipeline.class);
 
-        Mockito.doReturn(pipeline).when(channel).pipeline();
-        Mockito.doReturn(channelHandler).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
+        doReturn(pipeline).when(channel).pipeline();
+        doReturn(channelHandler).when(pipeline).replace(any(Class.class), anyString(), any(ChannelHandler.class));
 
         final NetconfClientSession session = new NetconfClientSession(sessionListener, channel, sessId, caps);
         session.addExiHandlers(codec.newMessageDecoder(), codec.newMessageEncoder());
@@ -54,6 +55,6 @@ class NetconfClientSessionTest {
         assertEquals(caps, session.getServerCapabilities());
         assertEquals(session, session.thisInstance());
 
-        Mockito.verify(pipeline, Mockito.times(4)).replace(anyString(), anyString(), Mockito.any(ChannelHandler.class));
+        verify(pipeline, Mockito.times(4)).replace(any(Class.class), anyString(), Mockito.any(ChannelHandler.class));
     }
 }

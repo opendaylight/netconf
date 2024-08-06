@@ -11,39 +11,46 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
+@ExtendWith(MockitoExtension.class)
 class DefaultStopExiTest {
+    @Mock
+    private Channel channel;
+    @Mock
+    private ChannelPipeline pipeline;
+    @Mock
+    private NetconfServerSessionListener sessionListener;
+    @Mock
+    private MessageDecoder decoder;
+
     @Test
     void testHandleWithNoSubsequentOperations() throws Exception {
         final DefaultStopExi exi = new DefaultStopExi(new SessionIdType(Uint32.ONE));
         final Document doc = XmlUtil.newDocument();
-        Channel channel = mock(Channel.class);
-        doReturn("mockChannel").when(channel).toString();
-        ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(channel).pipeline();
-        ChannelHandler channelHandler = mock(ChannelHandler.class);
-        doReturn(channelHandler).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
+        doReturn(decoder).when(pipeline).replace(any(Class.class), anyString(), any(MessageDecoder.class));
 
-        exi.setNetconfSession(new NetconfServerSession(mock(NetconfServerSessionListener.class), channel,
-            new SessionIdType(Uint32.TWO), null));
+        exi.setNetconfSession(new NetconfServerSession(sessionListener, channel, new SessionIdType(Uint32.TWO), null));
 
         assertNotNull(exi.handleWithNoSubsequentOperations(doc,
                 XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"))));
-        verify(pipeline, times(1)).replace(anyString(), anyString(), any(ChannelHandler.class));
+        verify(pipeline, times(1)).replace(any(Class.class), anyString(), any(MessageDecoder.class));
     }
 }
