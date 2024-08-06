@@ -9,19 +9,19 @@ package org.opendaylight.netconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -47,11 +47,16 @@ class NetconfServerSessionTest {
     private static final String SESSION_ID = "1";
     private static final String USER = "admin";
 
+    @Mock
+    private NetconfServerSessionListener listener;
+    @Spy
+    private MessageDecoder decoder;
+    @Spy
+    private MessageEncoder encoder;
+
     private NetconfServerSession session;
     private EmbeddedChannel channel;
     private NetconfMessage msg;
-    @Mock
-    private NetconfServerSessionListener listener;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -182,12 +187,11 @@ class NetconfServerSessionTest {
 
     @Test
     void testStopExiCommunication() {
-        channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new ChannelInboundHandlerAdapter());
-        channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, new ChannelOutboundHandlerAdapter());
+        channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, decoder);
+        channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, encoder);
         session.stopExiCommunication();
         //handler is replaced only after next send message call
-        final var exiEncoder = channel.pipeline().get(MessageEncoder.HANDLER_NAME);
-        assertEquals(ChannelOutboundHandlerAdapter.class, exiEncoder.getClass());
+        assertSame(encoder, channel.pipeline().get(MessageEncoder.HANDLER_NAME));
         session.sendMessage(msg);
         channel.runPendingTasks();
         assertInstanceOf(XMLMessageDecoder.class, channel.pipeline().get(MessageDecoder.HANDLER_NAME));

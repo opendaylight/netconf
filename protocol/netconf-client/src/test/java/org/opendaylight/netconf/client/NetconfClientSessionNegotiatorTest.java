@@ -118,7 +118,7 @@ class NetconfClientSessionNegotiatorTest {
             throw new AssertionError(e);
         }
 
-        doReturn(null).when(pipeline).replace(anyString(), anyString(), any(exiClass));
+        doReturn(null).when(pipeline).replace(any(Class.class), anyString(), any(exiClass));
         return pipeline;
     }
 
@@ -202,7 +202,8 @@ class NetconfClientSessionNegotiatorTest {
         verify(promise).setSuccess(any());
 
         // two calls for exiMessage, 2 for hello message
-        verify(pipeline, times(4)).replace(anyString(), anyString(), any(ChannelHandler.class));
+        verify(pipeline, times(2)).replace(anyString(), anyString(), any(ChannelHandler.class));
+        verify(pipeline, times(2)).replace(any(Class.class), anyString(), any(ChannelHandler.class));
     }
 
     @Test
