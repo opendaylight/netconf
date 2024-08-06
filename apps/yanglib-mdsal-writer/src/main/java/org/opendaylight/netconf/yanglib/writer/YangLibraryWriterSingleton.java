@@ -9,10 +9,8 @@ package org.opendaylight.netconf.yanglib.writer;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
@@ -53,11 +52,11 @@ public final class YangLibraryWriterSingleton implements ClusterSingletonService
     private static final Logger LOG = LoggerFactory.getLogger(YangLibraryWriterSingleton.class);
     private static final @NonNull ServiceGroupIdentifier SGI = new ServiceGroupIdentifier("yanglib-mdsal-writer");
 
-    private final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider;
     private final DOMSchemaService schemaService;
     private final DataBroker dataBroker;
     private final boolean writeLegacy;
 
+    private @NonNull YangLibrarySchemaSourceUrlProvider urlProvider;
     private YangLibraryWriter instance;
     private Registration reg;
 
@@ -87,12 +86,29 @@ public final class YangLibraryWriterSingleton implements ClusterSingletonService
     @Activate
     public YangLibraryWriterSingleton(@Reference final ClusterSingletonServiceProvider cssProvider,
             @Reference final DOMSchemaService schemaService, @Reference final DataBroker dataBroker,
-            @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
-                final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider,
             final Configuration configuration) {
-        this(cssProvider, schemaService, dataBroker, configuration.write$_$legacy(), urlProvider);
+        this(cssProvider, schemaService, dataBroker, configuration.write$_$legacy(), null);
     }
 
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY,
+               policy = ReferencePolicy.DYNAMIC, unbind = "unsetUrlProvider")
+    synchronized void setUrlProvider(final YangLibrarySchemaSourceUrlProvider urlProvider) {
+        LOG.info("Binding URL provider {}", urlProvider);
+        updateUrlProvider(requireNonNull(urlProvider));
+    }
+
+    synchronized void unsetUrlProvider(final YangLibrarySchemaSourceUrlProvider oldUrlProvider) {
+        LOG.info("Unbinding URL provider {}", oldUrlProvider);
+        updateUrlProvider(EmptyYangLibrarySchemaSourceUrlProvider.INSTANCE);
+    }
+
+    private void updateUrlProvider(final @NonNull YangLibrarySchemaSourceUrlProvider newUrlProvider) {
+        urlProvider = newUrlProvider;
+        final var local = instance;
+        if (local != null) {
+            local.setUrlProvider(newUrlProvider);
+        }
+    }
 
     @Deactivate
     @PreDestroy
@@ -110,12 +126,7 @@ public final class YangLibraryWriterSingleton implements ClusterSingletonService
 
     private static @NonNull YangLibrarySchemaSourceUrlProvider orEmptyProvider(
             final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
-        return urlProvider != null ? urlProvider : emptyProvider();
-    }
-
-    @VisibleForTesting
-    static @NonNull YangLibrarySchemaSourceUrlProvider emptyProvider() {
-        return (moduleSetName, moduleName, revision) -> Set.of();
+        return urlProvider != null ? urlProvider : EmptyYangLibrarySchemaSourceUrlProvider.INSTANCE;
     }
 
     @Override
