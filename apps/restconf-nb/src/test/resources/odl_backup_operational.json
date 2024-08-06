@@ -1,0 +1,46 @@
+{
+  "network-topology:network-topology": {
+    "topology": [
+      {
+        "topology-id": "topo-id",
+        "node": [
+          {
+            "node-id": "node-id-2",
+            "termination-point": [
+              {
+                "tp-id": "eth0"
+              }
+            ]
+          },
+          {
+            "node-id": "node-id-1"
+          }
+        ]
+      },
+      {
+        "topology-id": "topo-id-2",
+        "node": [
+          {
+            "node-id": "node-id-3",
+            "termination-point": [
+              {
+                "tp-id": "eth1"
+              }
+            ]
+          },
+          {
+            "node-id": "node-id-2",
+            "termination-point": [
+              {
+                "tp-id": "eth0"
+              }
+            ]
+          },
+          {
+            "node-id": "node-id-1"
+          }
+        ]
+      }
+    ]
+  }
+}
