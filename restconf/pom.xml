@@ -28,7 +28,6 @@
     </properties>
 
     <modules>
-        <module>sal-rest-connector-config</module>
         <module>restconf-openapi</module>
         <module>wadl-generator</module>
         <!--
