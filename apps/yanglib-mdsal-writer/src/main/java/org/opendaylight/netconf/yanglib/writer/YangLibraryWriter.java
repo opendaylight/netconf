@@ -44,16 +44,18 @@ final class YangLibraryWriter implements FutureCallback<Empty> {
 
     private final AtomicLong idCounter = new AtomicLong();
     private final AtomicBoolean closed = new AtomicBoolean();
-    private final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider;
+    private final DOMSchemaService schemaService;
     private final DataBroker dataBroker;
     private final boolean writeLegacy;
     private final Registration reg;
 
     // FIXME: this really should be a dynamically-populated shard (i.e. no write operations whatsoever)!
+    private @NonNull YangLibrarySchemaSourceUrlProvider urlProvider;
     private TransactionChain currentChain;
 
     YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
             final boolean writeLegacy, final YangLibrarySchemaSourceUrlProvider urlProvider) {
+        this.schemaService = requireNonNull(schemaService);
         this.dataBroker = requireNonNull(dataBroker);
         this.urlProvider = requireNonNull(urlProvider);
         this.writeLegacy = writeLegacy;
@@ -104,7 +106,17 @@ final class YangLibraryWriter implements FutureCallback<Empty> {
         return future;
     }
 
-    private void onModelContextUpdated(final EffectiveModelContext context) {
+    synchronized void setUrlProvider(final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
+        LOG.debug("Triggering update with {}", urlProvider);
+        this.urlProvider = requireNonNull(urlProvider);
+        updateModelContext(schemaService.getGlobalContext());
+    }
+
+    private synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+        updateModelContext(context);
+    }
+
+    private void updateModelContext(final EffectiveModelContext context) {
         if (context.findModule(YangLibrary.QNAME.getModule()).isPresent()) {
             updateYangLibrary(context);
         } else {
@@ -112,7 +124,7 @@ final class YangLibraryWriter implements FutureCallback<Empty> {
         }
     }
 
-    private synchronized void updateYangLibrary(final EffectiveModelContext context) {
+    private void updateYangLibrary(final EffectiveModelContext context) {
         if (closed.get()) {
             // Already shut down, do not do anything
             LOG.debug("ietf-yang-library writer closed, skipping update");
