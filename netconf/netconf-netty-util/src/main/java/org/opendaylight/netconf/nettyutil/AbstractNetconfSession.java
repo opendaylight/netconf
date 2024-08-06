@@ -31,15 +31,15 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
 
     private final @NonNull SessionIdType sessionId;
-    private final L sessionListener;
-    private final Channel channel;
+    private final @NonNull L sessionListener;
+    private final @NonNull Channel channel;
 
     private Runnable runAfterNextMessage;
     private boolean up;
 
     protected AbstractNetconfSession(final L sessionListener, final Channel channel, final SessionIdType sessionId) {
-        this.sessionListener = sessionListener;
-        this.channel = channel;
+        this.sessionListener = requireNonNull(sessionListener);
+        this.channel = requireNonNull(channel);
         this.sessionId = requireNonNull(sessionId);
         LOG.debug("Session {} created", sessionId);
     }

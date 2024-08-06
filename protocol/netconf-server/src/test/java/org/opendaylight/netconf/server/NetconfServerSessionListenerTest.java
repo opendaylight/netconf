@@ -47,6 +47,9 @@ class NetconfServerSessionListenerTest {
     private AutoCloseable closeable;
     @Mock
     private SessionListener monitoringListener;
+    @Mock
+    private NetconfServerSessionListener sessionListener;
+
     private NetconfServerSession session;
     private EmbeddedChannel channel;
     private NetconfServerSessionListener listener;
@@ -55,7 +58,7 @@ class NetconfServerSessionListenerTest {
     void setUp() {
         doReturn(monitoringListener).when(monitoring).getSessionListener();
         channel = new EmbeddedChannel();
-        session = new NetconfServerSession(null, channel, new SessionIdType(Uint32.ONE), null);
+        session = new NetconfServerSession(sessionListener, channel, new SessionIdType(Uint32.ONE), null);
         listener = new NetconfServerSessionListener(router, monitoring, closeable);
     }
 
