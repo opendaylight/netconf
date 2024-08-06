@@ -98,7 +98,7 @@ class YangLibraryWriterTest {
     void noUpdate() {
         writer = new YangLibraryWriter(new FixedDOMSchemaService(parseYangResources(YangLibraryWriterTest.class,
             "/test-module.yang", "/test-submodule.yang")), dataBroker, NO_LEGACY,
-            YangLibraryWriterSingleton.emptyProvider());
+            EmptyYangLibrarySchemaSourceUrlProvider.INSTANCE);
         verifyNoInteractions(dataBroker);
     }
 
@@ -113,7 +113,7 @@ class YangLibraryWriterTest {
         writer = new YangLibraryWriter(new FixedDOMSchemaService(parseYangResources(YangLibraryWriterTest.class,
             "/test-module.yang", "/test-submodule.yang", "/test-more.yang", "/ietf-yang-library@2019-01-04.yang",
             "/ietf-datastores@2018-02-14.yang", "/ietf-yang-types.yang", "/ietf-inet-types.yang")), dataBroker,
-            writeLegacy, withUrls ? URL_PROVIDER : YangLibraryWriterSingleton.emptyProvider());
+            writeLegacy, withUrls ? URL_PROVIDER : EmptyYangLibrarySchemaSourceUrlProvider.INSTANCE);
 
         verify(writeTransaction).put(eq(OPERATIONAL), eq(YANG_LIBRARY_PATH), yangLibraryCaptor.capture());
         assertEquals(expectedData, yangLibraryCaptor.getValue());
@@ -144,7 +144,7 @@ class YangLibraryWriterTest {
         doReturn(registration).when(schemaService).registerSchemaContextListener(any());
 
         assertNotNull(new YangLibraryWriter(schemaService, dataBroker, writeLegacy,
-            YangLibraryWriterSingleton.emptyProvider()).shutdown());
+            EmptyYangLibrarySchemaSourceUrlProvider.INSTANCE).shutdown());
         verify(writeTransaction).delete(OPERATIONAL, YANG_LIBRARY_PATH);
         verify(writeTransaction).delete(OPERATIONAL, MODULES_STATE_PATH);
         verify(writeTransaction).commit();
