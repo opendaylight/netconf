@@ -26,21 +26,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 
-public class NetconfMessageToXMLEncoder extends MessageEncoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageToXMLEncoder.class);
+public class XMLMessageEncoder extends MessageEncoder {
+    private static final Logger LOG = LoggerFactory.getLogger(XMLMessageEncoder.class);
 
     private final @Nullable String clientId;
 
-    public NetconfMessageToXMLEncoder() {
+    public XMLMessageEncoder() {
         this((String) null);
     }
 
-    public NetconfMessageToXMLEncoder(final @Nullable String clientId) {
+    public XMLMessageEncoder(final @Nullable String clientId) {
         this.clientId = clientId;
     }
 
     @Deprecated(since = "8.0.0", forRemoval = true)
-    public NetconfMessageToXMLEncoder(final Optional<String> clientId) {
+    public XMLMessageEncoder(final Optional<String> clientId) {
         this(clientId.orElse(null));
     }
 
