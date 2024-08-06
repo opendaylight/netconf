@@ -12,24 +12,23 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
 public final class ClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
-    private final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory;
+    private final NetconfClientSessionListener sessionListener;
 
     public ClientChannelInitializer(final @NonNull NetconfClientSessionNegotiatorFactory negotiatorFactory,
-            final @NonNull NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory) {
+            final @NonNull NetconfClientSessionListener sessionListener) {
         this.negotiatorFactory = requireNonNull(negotiatorFactory);
-        this.sessionListenerFactory = requireNonNull(sessionListenerFactory);
+        this.sessionListener = requireNonNull(sessionListener);
     }
 
     @Override
     protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfClientSession> promise) {
         ch.pipeline().addAfter(MessageDecoder.HANDLER_NAME, NETCONF_SESSION_NEGOTIATOR,
-            negotiatorFactory.getSessionNegotiator(sessionListenerFactory, ch, promise));
+            negotiatorFactory.getSessionNegotiator(sessionListener, ch, promise));
         ch.config().setConnectTimeoutMillis((int) negotiatorFactory.getConnectionTimeoutMillis());
     }
 }
