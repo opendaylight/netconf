@@ -67,6 +67,23 @@
       "message": "rerun-gha",
       "revId": "adc8b0185f2cf6a6ac0fee95bc1647224b49eefd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15d8320e_d70253ee",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-06T07:05:35Z",
+      "side": 1,
+      "message": "Please document (to ODL jira) the difference between merging empty subtree and ensuring parents by merge AND just merging(path, data).\n\nWhat is being invoked for controller before and now?\nWhat is being invoked for mount point before and now? (see NetconfDeviceComminucator).",
+      "revId": "adc8b0185f2cf6a6ac0fee95bc1647224b49eefd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
