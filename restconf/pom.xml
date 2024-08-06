@@ -30,10 +30,5 @@
     <modules>
         <module>restconf-openapi</module>
         <module>wadl-generator</module>
-        <!--
-        FIXME: Needs to be reimplemented to not use YANGTools restconf impl
-        <module>sal-restconf-broker</module>
-        -->
     </modules>
-
 </project>
