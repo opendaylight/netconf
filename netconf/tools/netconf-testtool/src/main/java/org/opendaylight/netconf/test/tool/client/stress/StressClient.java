@@ -20,7 +20,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
@@ -249,17 +248,6 @@ public final class StressClient {
                         .build())
                     .build())
                 .build());
-        }
-        if (params.tcpHeader != null) {
-            final String header = params.tcpHeader.replace("\"", "").trim() + "\n";
-            confBuilder.withAdditionalHeader(
-                new NetconfHelloMessageAdditionalHeader(null, null, null, null, null) {
-                    @Override
-                    public String toFormattedString() {
-                        LOG.debug("Sending TCP header {}", header);
-                        return header;
-                    }
-                });
         }
         return confBuilder.build();
     }

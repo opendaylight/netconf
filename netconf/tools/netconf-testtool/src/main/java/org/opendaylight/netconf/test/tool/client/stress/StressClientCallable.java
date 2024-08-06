@@ -75,7 +75,6 @@ public class StressClientCallable implements Callable<Boolean> {
             .withTcpParameters(base.getTcpParameters())
             .withSshParameters(base.getSshParameters())
             .withOdlHelloCapabilities(base.getOdlHelloCapabilities())
-            .withAdditionalHeader(base.getAdditionalHeader().orElse(null))
             .withConnectionTimeoutMillis(base.getConnectionTimeoutMillis())
             .withSessionListener(sessionListener).build();
     }

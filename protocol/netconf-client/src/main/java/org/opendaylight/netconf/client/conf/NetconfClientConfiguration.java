@@ -12,10 +12,8 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.util.List;
-import java.util.Optional;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tls.SslHandlerFactory;
@@ -31,7 +29,6 @@ public final class NetconfClientConfiguration {
 
     private final @NonNull NetconfClientProtocol clientProtocol;
     private final Long connectionTimeoutMillis;
-    private final NetconfHelloMessageAdditionalHeader additionalHeader;
     private final NetconfClientSessionListener sessionListener;
     private final List<Uri> odlHelloCapabilities;
     private final @NonNegative int maximumIncomingChunkSize;
@@ -53,7 +50,6 @@ public final class NetconfClientConfiguration {
             final List<Uri> odlHelloCapabilities,
             final Long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize,
-            final NetconfHelloMessageAdditionalHeader additionalHeader,
             final String name) {
         clientProtocol = requireNonNull(protocol);
         this.name = name;
@@ -66,7 +62,6 @@ public final class NetconfClientConfiguration {
         this.odlHelloCapabilities = odlHelloCapabilities;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
-        this.additionalHeader = additionalHeader;
         // validate
         if (NetconfClientProtocol.TLS.equals(protocol)) {
             Preconditions.checkArgument(tlsParameters != null || sslHandlerFactory != null,
@@ -82,10 +77,6 @@ public final class NetconfClientConfiguration {
 
     public Long getConnectionTimeoutMillis() {
         return connectionTimeoutMillis;
-    }
-
-    public Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
-        return Optional.ofNullable(additionalHeader);
     }
 
     public NetconfClientSessionListener getSessionListener() {
@@ -129,7 +120,6 @@ public final class NetconfClientConfiguration {
         return MoreObjects.toStringHelper(this)
             .add("clientProtocol", clientProtocol)
             .add("connectionTimeoutMillis", connectionTimeoutMillis)
-            .add("additionalHeader", additionalHeader)
             .add("sessionListener", sessionListener)
             .add("tcpParameters", tcpParameters)
             .add("tlsParameters", tlsParameters)

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 
@@ -25,7 +24,7 @@ class NetconfClientSessionNegotiatorFactoryTest {
         Channel channel = mock(Channel.class);
         Promise<NetconfClientSession> promise = mock(Promise.class);
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
-                Optional.empty(), 200L);
+                200L);
 
         NetconfClientSessionNegotiator sessionNegotiator = negotiatorFactory.getSessionNegotiator(sessionListener,
             channel, promise);

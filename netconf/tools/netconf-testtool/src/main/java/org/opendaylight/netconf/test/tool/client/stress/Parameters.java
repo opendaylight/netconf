@@ -62,9 +62,6 @@ public class Parameters {
     @Arg(dest = "msg-timeout")
     public long msgTimeout;
 
-    @Arg(dest = "tcp-header")
-    public String tcpHeader;
-
     @Arg(dest = "thread-amount")
     public int threadAmount;
 

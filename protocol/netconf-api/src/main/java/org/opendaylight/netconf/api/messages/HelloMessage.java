@@ -56,6 +56,11 @@ public final class HelloMessage extends NetconfMessage {
         }
     }
 
+    public static HelloMessage createClientHello(final Iterable<String> capabilities) {
+        return new HelloMessage(createHelloMessageDoc(capabilities));
+    }
+
+    @Deprecated(since = "8.0.0", forRemoval = true)
     public static HelloMessage createClientHello(final Iterable<String> capabilities,
             final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) {
         return new HelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orElse(null));
