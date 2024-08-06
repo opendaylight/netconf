@@ -84,6 +84,24 @@
       "message": "Please document (to ODL jira) the difference between merging empty subtree and ensuring parents by merge AND just merging(path, data).\n\nWhat is being invoked for controller before and now?\nWhat is being invoked for mount point before and now? (see NetconfDeviceComminucator).",
       "revId": "adc8b0185f2cf6a6ac0fee95bc1647224b49eefd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "786bbe5e_d03d37f5",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-06T15:18:51Z",
+      "side": 1,
+      "message": "https://www.javadoc.io/static/org.opendaylight.mdsal/mdsal-docs/14.0.1/org/opendaylight/mdsal/binding/api/WriteOperations.html#mergeParentStructurePut(org.opendaylight.mdsal.common.api.LogicalDatastoreType,org.opendaylight.yangtools.binding.DataObjectIdentifier,org.opendaylight.yangtools.binding.DataObject) might provide some background",
+      "parentUuid": "15d8320e_d70253ee",
+      "revId": "adc8b0185f2cf6a6ac0fee95bc1647224b49eefd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
