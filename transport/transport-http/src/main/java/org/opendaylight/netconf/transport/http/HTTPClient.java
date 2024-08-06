@@ -91,13 +91,13 @@ public final class HTTPClient extends HTTPTransportStack {
         switch (transport) {
             case Tcp tcpCase -> {
                 final var tcp = tcpCase.getTcp();
-                httpParams = tcp.getHttpClientParameters();
+                httpParams = tcp.nonnullHttpClientParameters();
                 tcpParams = tcp.nonnullTcpClientParameters();
                 tlsParams = null;
             }
             case Tls tlsCase -> {
                 final var tls = tlsCase.getTls();
-                httpParams = tls.getHttpClientParameters();
+                httpParams = tls.nonnullHttpClientParameters();
                 tcpParams = tls.nonnullTcpClientParameters();
                 tlsParams = tls.nonnullTlsClientParameters();
             }
