@@ -27,16 +27,16 @@ import org.xmlunit.builder.DiffBuilder;
 class NetconfEXIHandlersTest {
     private final String msgAsString = "<netconf-message/>";
 
-    private NetconfMessageToEXIEncoder netconfMessageToEXIEncoder;
-    private EXIToMessageDecoder netconfEXIToMessageDecoder;
+    private EXIMessageEncoder netconfMessageToEXIEncoder;
+    private EXIMessageDecoder netconfEXIToMessageDecoder;
     private NetconfMessage msg;
     private byte[] msgAsExi;
 
     @BeforeEach
     void setUp() throws Exception {
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
-        netconfMessageToEXIEncoder = NetconfMessageToEXIEncoder.create(codec);
-        netconfEXIToMessageDecoder = EXIToMessageDecoder.create(codec);
+        netconfMessageToEXIEncoder = EXIMessageEncoder.create(codec);
+        netconfEXIToMessageDecoder = EXIMessageDecoder.create(codec);
 
         msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));
         msgAsExi = msgToExi(msg, codec);

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
@@ -21,26 +21,25 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.codec.MessageEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 
-public class NetconfMessageToXMLEncoder extends MessageEncoder {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageToXMLEncoder.class);
+public class XMLMessageEncoder extends MessageEncoder {
+    private static final Logger LOG = LoggerFactory.getLogger(XMLMessageEncoder.class);
 
     private final @Nullable String clientId;
 
-    public NetconfMessageToXMLEncoder() {
+    public XMLMessageEncoder() {
         this((String) null);
     }
 
-    public NetconfMessageToXMLEncoder(final @Nullable String clientId) {
+    public XMLMessageEncoder(final @Nullable String clientId) {
         this.clientId = clientId;
     }
 
     @Deprecated(since = "8.0.0", forRemoval = true)
-    public NetconfMessageToXMLEncoder(final Optional<String> clientId) {
+    public XMLMessageEncoder(final Optional<String> clientId) {
         this(clientId.orElse(null));
     }
 
