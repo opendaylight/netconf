@@ -1,0 +1,27 @@
+[
+  {
+    "module": "ietf-inet-types",
+    "namespace": "urn:ietf:params:xml:ns:yang:ietf-inet-types",
+    "revision-date": "2013-07-15"
+  },
+  {
+    "module": "ietf-yang-types",
+    "namespace": "urn:ietf:params:xml:ns:yang:ietf-yang-types",
+    "revision-date": "2013-07-15"
+  },
+  {
+    "module": "data-export-import",
+    "namespace": "urn:opendaylight:daexim",
+    "revision-date": "2016-09-21"
+  },
+  {
+    "module": "data-export-import-internal",
+    "namespace": "urn:opendaylight:daexim-internal",
+    "revision-date": "2016-09-21"
+  },
+  {
+    "module": "network-topology",
+    "namespace": "urn:TBD:params:xml:ns:yang:network-topology",
+    "revision-date": "2013-10-21"
+  }
+]

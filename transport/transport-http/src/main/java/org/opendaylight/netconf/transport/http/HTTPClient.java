@@ -68,11 +68,11 @@ public final class HTTPClient extends HTTPTransportStack {
         final TlsClientGrouping tlsParams;
         final var transport = requireNonNull(connectParams).getTransport();
         if (transport instanceof Tcp tcp) {
-            httpParams = tcp.getTcp().getHttpClientParameters();
+            httpParams = tcp.getTcp().nonnullHttpClientParameters();
             tcpParams = tcp.getTcp().nonnullTcpClientParameters();
             tlsParams = null;
         } else if (transport instanceof Tls tls) {
-            httpParams = tls.getTls().getHttpClientParameters();
+            httpParams = tls.getTls().nonnullHttpClientParameters();
             tcpParams = tls.getTls().nonnullTcpClientParameters();
             tlsParams = tls.getTls().nonnullTlsClientParameters();
         } else {
