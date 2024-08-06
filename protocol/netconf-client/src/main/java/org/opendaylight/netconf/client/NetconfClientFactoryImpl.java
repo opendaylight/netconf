@@ -61,7 +61,7 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
             throws UnsupportedConfigurationException {
         final var sessionListener = configuration.getSessionListener();
         final var transportListener = new ClientTransportChannelListener(new ClientChannelInitializer(
-            createNegotiatorFactory(configuration), () -> sessionListener));
+            createNegotiatorFactory(configuration), sessionListener));
 
         final var stackFuture = switch (configuration.getProtocol()) {
             case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM, transportListener,
