@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71f6dafb_3e093da9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/MappingServerRequest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "dd786083_c1d05276",
+      "range": {
+        "startLine": 60,
+        "startChar": 38,
+        "endLine": 60,
+        "endChar": 46
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38faf5fd_e9067a69",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f85fbbb4_ddec4d22",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AAAShiroPrincipalService.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38faf5fd_e9067a69",
+      "range": {
+        "startLine": 41,
+        "startChar": 29,
+        "endLine": 41,
+        "endChar": 61
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7395a4d7_9b1dfc8f",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-08-05T17:20:11Z",
       "side": 1,
       "message": "this should only be guarding the UUIID.fromString() call",
+      "range": {
+        "startLine": 65,
+        "startChar": 12,
+        "endLine": 65,
+        "endChar": 50
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c84c0834_45b18f4e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AAAShiroPrincipalService.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7395a4d7_9b1dfc8f",
       "range": {
         "startLine": 65,
         "startChar": 12,
@@ -116,6 +188,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2b6d99c_23d097ee",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05818b59_03009433",
+      "range": {
+        "startLine": 57,
+        "startChar": 12,
+        "endLine": 62,
+        "endChar": 13
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc15346a_98854467",
@@ -162,6 +258,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcc2c1c0_88faaa6c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "does not work in this case",
+      "parentUuid": "4f6bc5b6_7a5750a3",
+      "range": {
+        "startLine": 106,
+        "startChar": 12,
+        "endLine": 106,
+        "endChar": 68
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27eefbcb_9d3a5ea1",
@@ -175,6 +295,30 @@
       "writtenOn": "2024-08-05T17:08:06Z",
       "side": 1,
       "message": "please don\u0027t -- this is OSGi-specific, the close() method should not be visible",
+      "range": {
+        "startLine": 29,
+        "startChar": 44,
+        "endLine": 29,
+        "endChar": 57
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "377d5b5a_7d52bc94",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "why it\u0027s ok for JaxRsEndpoint then?\nwhatever, updated to use deactivate() method instead",
+      "parentUuid": "27eefbcb_9d3a5ea1",
       "range": {
         "startLine": 29,
         "startChar": 44,
@@ -208,6 +352,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae10b81e_bb4e12a6",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700ca682_1410d395",
+      "range": {
+        "startLine": 38,
+        "startChar": 89,
+        "endLine": 38,
+        "endChar": 111
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f55e05f_46fc008b",
@@ -221,6 +389,30 @@
       "writtenOn": "2024-08-05T17:08:58Z",
       "side": 1,
       "message": "@NonNullByDefault I assume?",
+      "range": {
+        "startLine": 15,
+        "startChar": 12,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e33ab230_71ee0fe3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyMediaTypes.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "no reason \nit\u0027s a collection of constants",
+      "parentUuid": "3f55e05f_46fc008b",
       "range": {
         "startLine": 15,
         "startChar": 12,
@@ -254,6 +446,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdf94822_53d515d8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7f6f13f_a38b20d5",
+      "range": {
+        "startLine": 28,
+        "startChar": 18,
+        "endLine": 28,
+        "endChar": 26
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db002174_28b6efd1",
@@ -267,6 +483,30 @@
       "writtenOn": "2024-08-05T17:17:32Z",
       "side": 1,
       "message": "sealed or final?",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 5
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f89552_7d7070ef",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestParameters.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db002174_28b6efd1",
       "range": {
         "startLine": 32,
         "startChar": 0,
@@ -346,6 +586,54 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2347c00_7225500c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28d6ebbc_dab78b97",
+      "range": {
+        "startLine": 133,
+        "startChar": 72,
+        "endLine": 133,
+        "endChar": 82
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30f9662e_dd8f275b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ad1710a_8d5dd57f",
+      "range": {
+        "startLine": 133,
+        "startChar": 51,
+        "endLine": 133,
+        "endChar": 70
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e33ee0bc_8b2cc641",
@@ -359,6 +647,30 @@
       "writtenOn": "2024-08-05T17:17:32Z",
       "side": 1,
       "message": "can we split all the \u0027accept\u0027 -\u003e AsciiString into a dedicated method? it will make it clearer what is going on",
+      "range": {
+        "startLine": 134,
+        "startChar": 20,
+        "endLine": 134,
+        "endChar": 40
+      },
+      "revId": "4af430fda6cc47b3baaf6175894bb4f8933f8e29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c0a3846_b6888100",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-06T13:26:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e33ee0bc_8b2cc641",
       "range": {
         "startLine": 134,
         "startChar": 20,
