@@ -17,8 +17,6 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
-import org.opendaylight.netconf.nettyutil.handler.EXIMessageDecoder;
-import org.opendaylight.netconf.nettyutil.handler.EXIMessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
@@ -50,10 +48,10 @@ public abstract class AbstractNetconfExiSession<
         }
 
         final var exiCodec = NetconfEXICodec.forParameters(exiParams);
-        final var exiEncoder = EXIMessageEncoder.create(exiCodec);
-        final EXIMessageDecoder exiDecoder;
+        final var exiEncoder = exiCodec.newMessageEncoder();
+        final MessageDecoder exiDecoder;
         try {
-            exiDecoder = EXIMessageDecoder.create(exiCodec);
+            exiDecoder = exiCodec.newMessageDecoder();
         } catch (EXIException e) {
             LOG.warn("Failed to instantiate EXI decodeer for {} on session {}", exiCodec, this, e);
             throw new IllegalStateException("Cannot instantiate encoder for options", e);

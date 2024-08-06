@@ -13,28 +13,23 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
-import java.io.OutputStream;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
-import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXEncoder;
+import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class EXIMessageEncoder extends MessageEncoder {
+final class EXIMessageEncoder extends MessageEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(EXIMessageEncoder.class);
-    private final NetconfEXICodec codec;
 
-    private EXIMessageEncoder(final NetconfEXICodec codec) {
-        this.codec = requireNonNull(codec);
-    }
+    private final SAXFactory factory;
 
-    public static EXIMessageEncoder create(final NetconfEXICodec codec) {
-        return new EXIMessageEncoder(codec);
+    EXIMessageEncoder(final SAXFactory factory) {
+        this.factory = requireNonNull(factory);
     }
 
     @Override
@@ -42,10 +37,10 @@ public final class EXIMessageEncoder extends MessageEncoder {
             throws IOException, TransformerException, EXIException {
         LOG.trace("Sent to encode : {}", msg);
 
-        try (OutputStream os = new ByteBufOutputStream(out)) {
-            final SAXEncoder encoder = codec.getWriter();
+        try (var os = new ByteBufOutputStream(out)) {
+            final var encoder = factory.createEXIWriter();
             encoder.setOutputStream(os);
-            final Transformer transformer = ThreadLocalTransformers.getDefaultTransformer();
+            final var transformer = ThreadLocalTransformers.getDefaultTransformer();
             transformer.transform(new DOMSource(msg.getDocument()), new SAXResult(encoder));
         }
     }
