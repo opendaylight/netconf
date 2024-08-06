@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.nettyutil;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -69,15 +68,17 @@ public abstract class AbstractNetconfExiSession<
     @NonNullByDefault
     protected abstract void addExiHandlers(MessageDecoder decoder, MessageEncoder encoder);
 
-    protected final void replaceMessageDecoder(final ChannelHandler handler) {
-        replaceChannelHandler(MessageDecoder.HANDLER_NAME, handler);
+    @NonNullByDefault
+    protected final void replaceMessageDecoder(final MessageDecoder newDecoder) {
+        replaceChannelHandler(MessageDecoder.class, MessageDecoder.HANDLER_NAME, newDecoder);
     }
 
-    protected final void replaceMessageEncoder(final ChannelHandler handler) {
-        replaceChannelHandler(MessageEncoder.HANDLER_NAME, handler);
+    @NonNullByDefault
+    protected final void replaceMessageEncoder(final MessageEncoder handler) {
+        replaceChannelHandler(MessageEncoder.class, MessageEncoder.HANDLER_NAME, handler);
     }
 
-    protected final void replaceMessageEncoderAfterNextMessage(final ChannelHandler handler) {
+    protected final void replaceMessageEncoderAfterNextMessage(final MessageEncoder handler) {
         runAfterNextMessage(() -> replaceMessageEncoder(handler));
     }
 }
