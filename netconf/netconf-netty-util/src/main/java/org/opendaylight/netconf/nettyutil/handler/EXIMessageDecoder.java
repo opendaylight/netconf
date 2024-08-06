@@ -14,17 +14,14 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.TransformerHandler;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +29,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public final class EXIMessageDecoder extends MessageDecoder {
+final class EXIMessageDecoder extends MessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(EXIMessageDecoder.class);
 
     private static final SAXTransformerFactory FACTORY;
@@ -48,20 +45,15 @@ public final class EXIMessageDecoder extends MessageDecoder {
     }
 
     /**
-     * This class is not marked as shared, so it can be attached to only a single channel,
-     * which means that {@link #decode(ChannelHandlerContext, ByteBuf, List)}
-     * cannot be invoked concurrently. Hence we can reuse the reader.
+     * This class is not marked as shared, so it can be attached to only a single channel, which means that
+     * {@link #decode(ChannelHandlerContext, ByteBuf, List)} cannot be invoked concurrently. Hence we can reuse the
+     * reader.
      */
+    private final DocumentBuilder documentBuilder = UntrustedXML.newDocumentBuilder();
     private final ThreadLocalSAXDecoder reader;
-    private final DocumentBuilder documentBuilder;
 
-    private EXIMessageDecoder(final ThreadLocalSAXDecoder reader) {
+    EXIMessageDecoder(final ThreadLocalSAXDecoder reader) {
         this.reader = requireNonNull(reader);
-        documentBuilder = UntrustedXML.newDocumentBuilder();
-    }
-
-    public static EXIMessageDecoder create(final NetconfEXICodec codec) throws EXIException {
-        return new EXIMessageDecoder(codec.getReader());
     }
 
     @Override
@@ -84,13 +76,13 @@ public final class EXIMessageDecoder extends MessageDecoder {
             LOG.trace("Received to decode: {}", ByteBufUtil.hexDump(in));
         }
 
-        final TransformerHandler handler = FACTORY.newTransformerHandler();
+        final var handler = FACTORY.newTransformerHandler();
         reader.setContentHandler(handler);
 
-        final DOMResult domResult = new DOMResult(documentBuilder.newDocument());
+        final var domResult = new DOMResult(documentBuilder.newDocument());
         handler.setResult(domResult);
 
-        try (InputStream is = new ByteBufInputStream(in)) {
+        try (var is = new ByteBufInputStream(in)) {
             // Performs internal reset before doing anything
             reader.parse(new InputSource(is));
         }

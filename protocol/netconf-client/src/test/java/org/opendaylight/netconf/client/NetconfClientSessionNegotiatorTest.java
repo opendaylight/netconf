@@ -41,12 +41,14 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
+import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
-import org.opendaylight.netconf.nettyutil.handler.EXIMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
+import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -108,7 +110,15 @@ class NetconfClientSessionNegotiatorTest {
         doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(),
             any(NetconfClientSession.class));
         doReturn(null).when(pipeline).replace(anyString(), anyString(), any(MessageToByteEncoder.class));
-        doReturn(null).when(pipeline).replace(anyString(), anyString(), any(EXIMessageDecoder.class));
+
+        Class<? extends MessageDecoder> exiClass;
+        try {
+            exiClass = NetconfEXICodec.forParameters(EXIParameters.empty()).newMessageDecoder().getClass();
+        } catch (EXIException e) {
+            throw new AssertionError(e);
+        }
+
+        doReturn(null).when(pipeline).replace(anyString(), anyString(), any(exiClass));
         return pipeline;
     }
 
