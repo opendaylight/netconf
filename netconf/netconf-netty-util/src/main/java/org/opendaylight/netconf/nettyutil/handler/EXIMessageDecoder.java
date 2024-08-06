@@ -32,8 +32,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public final class EXIToMessageDecoder extends MessageDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(EXIToMessageDecoder.class);
+public final class EXIMessageDecoder extends MessageDecoder {
+    private static final Logger LOG = LoggerFactory.getLogger(EXIMessageDecoder.class);
 
     private static final SAXTransformerFactory FACTORY;
 
@@ -55,13 +55,13 @@ public final class EXIToMessageDecoder extends MessageDecoder {
     private final ThreadLocalSAXDecoder reader;
     private final DocumentBuilder documentBuilder;
 
-    private EXIToMessageDecoder(final ThreadLocalSAXDecoder reader) {
+    private EXIMessageDecoder(final ThreadLocalSAXDecoder reader) {
         this.reader = requireNonNull(reader);
         documentBuilder = UntrustedXML.newDocumentBuilder();
     }
 
-    public static EXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIException {
-        return new EXIToMessageDecoder(codec.getReader());
+    public static EXIMessageDecoder create(final NetconfEXICodec codec) throws EXIException {
+        return new EXIMessageDecoder(codec.getReader());
     }
 
     @Override
