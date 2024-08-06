@@ -42,7 +42,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
  * }
  * </pre>
  */
-public final class NetconfHelloMessageToXMLEncoder extends NetconfMessageToXMLEncoder {
+public final class HelloXMLMessageEncoder extends XMLMessageEncoder {
     @Override
     @VisibleForTesting
     public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
