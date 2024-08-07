@@ -30,7 +30,6 @@
 
   <modules>
     <module>netconf-netty-util</module>
-    <module>netconf-auth</module>
     <module>tools</module>
   </modules>
 </project>

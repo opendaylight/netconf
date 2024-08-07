@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-auth</artifactId>
+            <artifactId>transport-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

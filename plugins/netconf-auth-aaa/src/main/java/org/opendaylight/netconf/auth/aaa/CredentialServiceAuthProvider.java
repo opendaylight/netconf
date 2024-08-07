@@ -14,7 +14,7 @@ import javax.inject.Singleton;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
 import org.opendaylight.aaa.api.PasswordCredentialAuth;
-import org.opendaylight.netconf.auth.AuthProvider;
+import org.opendaylight.netconf.transport.api.PasswordUserAuthenticator;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
  * AuthProvider implementation delegating to a {@link PasswordCredentialAuth} instance.
  */
 @Singleton
-@Component(immediate = true, property = "type=netconf-auth-provider")
-public final class CredentialServiceAuthProvider implements AuthProvider {
+@Component
+public final class CredentialServiceAuthProvider implements PasswordUserAuthenticator {
     private static final Logger LOG = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
 
     private final PasswordCredentialAuth credService;
@@ -42,7 +42,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider {
      * and delegates the decision to it.
      */
     @Override
-    public boolean authenticated(final String username, final String password) {
+    public boolean authenticateUser(final String username, final String password) {
         final var credentials = new DefaultPasswordCredentials(username, password);
 
         final Claim claim;

@@ -1,16 +1,20 @@
 /*
  * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2024 PANTHEON.tech, s.r.o.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.auth;
+package org.opendaylight.netconf.transport.api;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Authentication Service definition for netconf.
+ * A {@link UserAuthenticator} based on plaintext passwords.
  */
-public interface AuthProvider {
+@NonNullByDefault
+public non-sealed interface PasswordUserAuthenticator extends UserAuthenticator {
     /**
      * Authenticate user by username/password.
      *
@@ -18,5 +22,5 @@ public interface AuthProvider {
      * @param password password
      * @return true if authentication is successful, false otherwise
      */
-    boolean authenticated(String username, String password);
+    boolean authenticateUser(String username, String password);
 }

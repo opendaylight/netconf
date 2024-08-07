@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.netconf.api.TransportConstants;
-import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+import org.opendaylight.netconf.transport.api.PasswordUserAuthenticator;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -53,8 +53,7 @@ public final class SshServerTransport implements AutoCloseable {
 
     @Activate
     public SshServerTransport(@Reference final TransportFactoryHolder factoryHolder,
-            @Reference final OSGiNetconfServer backend,
-            @Reference(target = "(type=netconf-auth-provider)") final AuthProvider authProvider,
+            @Reference final OSGiNetconfServer backend, @Reference final PasswordUserAuthenticator authProvider,
             final Configuration configuration) {
         this(factoryHolder, backend.serverTransportInitializer(), authProvider, new TcpServerParametersBuilder()
             .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
@@ -63,7 +62,7 @@ public final class SshServerTransport implements AutoCloseable {
     }
 
     public SshServerTransport(final TransportFactoryHolder factoryHolder, final ServerTransportInitializer initializer,
-            final AuthProvider authProvider, final TcpServerGrouping listenParams) {
+            final PasswordUserAuthenticator authProvider, final TcpServerGrouping listenParams) {
         final var localAddr = listenParams.requireLocalAddress().stringValue();
         final var localPort = listenParams.requireLocalPort().getValue();
 
@@ -72,7 +71,7 @@ public final class SshServerTransport implements AutoCloseable {
                 listenParams, null, factoryMgr -> {
                     factoryMgr.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     factoryMgr.setPasswordAuthenticator(
-                        (username, password, session) -> authProvider.authenticated(username, password));
+                        (username, password, session) -> authProvider.authenticateUser(username, password));
                     factoryMgr.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
                 })
                 .get();

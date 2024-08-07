@@ -43,13 +43,13 @@ class CredentialServiceAuthProviderTest {
         doReturn("domain").when(claim).domain();
         doReturn(claim).when(credAuth).authenticate(any(PasswordCredentials.class));
 
-        assertTrue(authProvider.authenticated("user", "pwd"));
+        assertTrue(authProvider.authenticateUser("user", "pwd"));
     }
 
     @Test
     void testAuthenticatedFalse() {
         doThrow(AuthenticationException.class).when(credAuth).authenticate(any(PasswordCredentials.class));
 
-        assertFalse(authProvider.authenticated("user", "pwd"));
+        assertFalse(authProvider.authenticateUser("user", "pwd"));
     }
 }
