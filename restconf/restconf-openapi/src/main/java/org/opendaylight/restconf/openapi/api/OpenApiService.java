@@ -72,6 +72,12 @@ public interface OpenApiService {
             @QueryParam("depth") Integer depth, @QueryParam("offset") Integer offset,
             @QueryParam("limit") Integer limit) throws IOException;
 
+    @GET
+    @Path("/single/meta")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getAllModulesMeta(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+            throws IOException;
+
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
@@ -166,4 +172,10 @@ public interface OpenApiService {
     Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
             @QueryParam("width") Integer width, @QueryParam("depth") Integer depth,
             @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) throws IOException;
+
+    @GET
+    @Path("/mounts/{instance}/meta")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountMeta(@PathParam("instance") String instanceNum, @QueryParam("offset") Integer offset,
+            @QueryParam("limit") Integer limit) throws IOException;
 }

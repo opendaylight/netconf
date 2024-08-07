@@ -67,9 +67,15 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth, offset,
-            limit);
+        final var stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth, offset, limit);
         return Response.ok(stream).build();
+    }
+
+    @Override
+    public Response getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
+            throws IOException {
+        final var metaStream = openApiGeneratorRFC8040.getControllerModulesMeta(offset, limit);
+        return Response.ok(metaStream).build();
     }
 
     /**
@@ -78,8 +84,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width,
-            depth);
+        final var stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width, depth);
         return Response.ok(stream).build();
     }
 
@@ -114,9 +119,16 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), width, depth, offset,
-                limit);
+        final var stream = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), width, depth,
+            offset, limit);
         return Response.ok(stream).build();
+    }
+
+    @Override
+    public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
+            final @Nullable Integer limit) throws IOException {
+        final var metaStream = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
+                offset, limit);
+        return Response.ok(metaStream).build();
     }
 }
