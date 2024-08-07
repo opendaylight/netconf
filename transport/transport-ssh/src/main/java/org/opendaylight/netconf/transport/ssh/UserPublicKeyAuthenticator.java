@@ -14,20 +14,17 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.opendaylight.netconf.shaded.sshd.server.auth.AsyncAuthException;
 import org.opendaylight.netconf.shaded.sshd.server.auth.hostbased.HostBasedAuthenticator;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 
 final class UserPublicKeyAuthenticator implements HostBasedAuthenticator, PublickeyAuthenticator {
-
     private final Map<String, List<PublicKey>> userHostPublicKeyMap;
 
-    UserPublicKeyAuthenticator(Map<String, List<PublicKey>> userHostPublicKeyMap) {
-        requireNonNull(userHostPublicKeyMap);
+    UserPublicKeyAuthenticator(final Map<String, List<PublicKey>> userHostPublicKeyMap) {
+        this.userHostPublicKeyMap = requireNonNull(userHostPublicKeyMap);
         checkArgument(!userHostPublicKeyMap.isEmpty(), "userHostPublicKeyMap should not be empty");
-        this.userHostPublicKeyMap = userHostPublicKeyMap;
     }
 
     @Override // HostBasedAuthenticator
@@ -46,7 +43,7 @@ final class UserPublicKeyAuthenticator implements HostBasedAuthenticator, Public
     }
 
     private boolean userHasMatchingKey(final String username, final PublicKey publicKey) {
-        return Optional.ofNullable(userHostPublicKeyMap.get(username))
-                .map(userKeys -> userKeys.contains(publicKey)).orElse(false);
+        final var keys = userHostPublicKeyMap.get(username);
+        return keys != null && keys.contains(publicKey);
     }
 }
