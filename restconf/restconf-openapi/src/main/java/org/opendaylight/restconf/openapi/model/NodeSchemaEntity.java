@@ -28,8 +28,8 @@ public final class NodeSchemaEntity extends SchemaEntity {
     public NodeSchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width,
-            final @NonNull Integer depth, final @NonNull Integer nodeDepth) {
+            final @NonNull DefinitionNames definitionNames, final int width,
+            final int depth, final int nodeDepth) {
         super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width, depth,
             nodeDepth);
     }

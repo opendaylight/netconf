@@ -9,7 +9,6 @@ package org.opendaylight.restconf.openapi.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNullElse;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 
 import java.io.IOException;
@@ -125,7 +124,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-            final String revision, final Integer width, final Integer depth) throws IOException  {
+            final String revision, final int width, final int depth) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext modelContext = getModelContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -142,8 +141,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             width, depth);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final Integer width,
-            final Integer depth, final Integer offset, final Integer limit) throws IOException {
+    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final int width,
+            final int depth, final int offset, final int limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
@@ -153,13 +152,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             return null;
         }
 
-        final var nonNullOffset = requireNonNullElse(offset, 0);
-        final var nonNullLimit = requireNonNullElse(limit, 0);
-
-        final boolean includeDataStore = nonNullLimit == 0 && nonNullOffset == 0;
+        final boolean includeDataStore = limit == 0 && offset == 0;
         final var modulesWithoutDuplications = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
         final var portionOfModules = BaseYangOpenApiGenerator.getModelsSublist(modulesWithoutDuplications,
-            nonNullOffset, nonNullLimit);
+            offset, limit);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
@@ -175,8 +171,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private OpenApiInputStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
-            final UriInfo uriInfo, final String urlPrefix, final String deviceName, final Integer width,
-            final Integer depth) throws IOException {
+            final UriInfo uriInfo, final String urlPrefix, final String deviceName, final int width,
+            final int depth) throws IOException {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var url = schema + "://" + host + "/";
