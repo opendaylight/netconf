@@ -74,6 +74,14 @@ public final class OpenApiServiceImpl implements OpenApiService {
         return Response.ok(stream).build();
     }
 
+    @Override
+    public Response getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
+            throws IOException {
+        final var metaStream = openApiGeneratorRFC8040.getControllerModulesMeta(requireNonNullElse(offset, 0),
+            requireNonNullElse(limit, 0));
+        return Response.ok(metaStream).build();
+    }
+
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
@@ -107,8 +115,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
             final String revision, final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
             throws IOException {
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, width,
-                depth);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision,
+                requireNonNullElse(width, 0), requireNonNullElse(depth, 0));
         return Response.ok(stream).build();
     }
 
@@ -117,8 +125,17 @@ public final class OpenApiServiceImpl implements OpenApiService {
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), width, depth, offset,
-                limit);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
+                requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset,0),
+                requireNonNullElse(limit, 0));
         return Response.ok(stream).build();
+    }
+
+    @Override
+    public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
+            final @Nullable Integer limit) throws IOException {
+        final var metaStream = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
+                requireNonNullElse(offset, 0), requireNonNullElse(limit, 0));
+        return Response.ok(metaStream).build();
     }
 }

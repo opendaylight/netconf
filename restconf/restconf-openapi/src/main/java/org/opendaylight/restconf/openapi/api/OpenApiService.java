@@ -73,6 +73,29 @@ public interface OpenApiService {
             @QueryParam("limit") Integer limit) throws IOException;
 
     /**
+     * Generate a metadata document for all or paginated modules of the controller schema context.
+     *
+     * <p>
+     * Generates a metadata document for modules of the controller schema context. The resulting metadata will contain
+     * information about all modules in the controller's model context if both {@code offset} and {@code limit}
+     * are set to 0.
+     *
+     * <p>
+     * Generate metadata document for modules of controller schema context with specified index and limit. The resulting
+     * metadata provides additional information about actual page and number of pages.
+     *
+     * @param offset First model to read. 0 means read from the first model.
+     * @param limit The number of models to read. 0 means read all models.
+     * @return Response containing the metadata document for ui implementation of pagination.
+     * @throws IOException When I/O error occurs.
+     */
+    @GET
+    @Path("/single/meta")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getAllModulesMeta(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+            throws IOException;
+
+    /**
      * Generates Swagger compliant document listing APIs for module.
      */
     @GET
@@ -166,4 +189,27 @@ public interface OpenApiService {
     Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
             @QueryParam("width") Integer width, @QueryParam("depth") Integer depth,
             @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) throws IOException;
+
+    /**
+     * Generate a metadata document for all or paginated modules of the mount point schema context.
+     *
+     * <p>
+     * Generates a metadata document for modules of the mount point schema context. The resulting metadata will contain
+     * information about all modules in the controller's model context if both {@code offset} and {@code limit}
+     * are set to 0.
+     *
+     * <p>
+     * Generate metadata document for modules of mount point schema context with specified index and limit. The
+     * resulting metadata provides additional information about the actual page and number of pages.
+     *
+     * @param offset First model to read. 0 means read from the first model.
+     * @param limit The number of models to read. 0 means read all models.
+     * @return Response containing the metadata document for ui implementation of pagination.
+     * @throws IOException When I/O error occurs.
+     */
+    @GET
+    @Path("/mounts/{instance}/meta")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountMeta(@PathParam("instance") String instanceNum, @QueryParam("offset") Integer offset,
+            @QueryParam("limit") Integer limit) throws IOException;
 }
