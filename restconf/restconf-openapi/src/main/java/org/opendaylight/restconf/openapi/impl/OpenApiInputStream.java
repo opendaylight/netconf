@@ -47,7 +47,7 @@ public final class OpenApiInputStream extends InputStream {
     public OpenApiInputStream(final EffectiveModelContext modelContext, final String title, final String url,
             final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
             final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
-            final String basePath, final Integer width, final Integer depth) throws IOException {
+            final String basePath, final int width, final int depth) throws IOException {
         final OpenApiBodyWriter writer = new OpenApiBodyWriter(generator, stream);
         stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
         stack.add(new InfoStream(new InfoEntity(title), writer));

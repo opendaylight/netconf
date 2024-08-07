@@ -54,8 +54,8 @@ public final class SchemasStream extends InputStream {
     private final boolean isForSingleModule;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
-    private final Integer width;
-    private final Integer depth;
+    private final int width;
+    private final int depth;
 
     private Reader reader;
     private ReadableByteChannel channel;
@@ -63,16 +63,16 @@ public final class SchemasStream extends InputStream {
 
     public SchemasStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
-            final Integer depth) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final int width,
+            final int depth) {
         this.iterator = iterator;
         this.modelContext = modelContext;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
         this.generator = generator;
-        this.width = requireNonNullElse(width, 0);
-        this.depth = requireNonNullElse(depth, 0);
+        this.width = width;
+        this.depth = depth;
     }
 
     @Override
