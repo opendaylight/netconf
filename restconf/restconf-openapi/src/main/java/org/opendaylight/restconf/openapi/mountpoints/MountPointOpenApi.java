@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
+import org.opendaylight.restconf.openapi.impl.MetadataStream;
 import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -163,6 +164,20 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var basePath = openApiGenerator.getBasePath();
         return new OpenApiInputStream(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
             portionOfModules, basePath, width, depth);
+    }
+
+    public MetadataStream getMountPointApiMeta(final Long id, final int offset, final int limit)
+            throws IOException {
+        final var iid = longIdToInstanceId.get(id);
+        final var context = getModelContext(iid);
+
+        if (context == null) {
+            return null;
+        }
+
+        final var modulesWithoutDuplications = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
+        return new MetadataStream(offset, limit, modulesWithoutDuplications.size(),
+            BaseYangOpenApiGenerator.configModulesList(modulesWithoutDuplications).size());
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
