@@ -65,7 +65,7 @@ public final class RestDocgenUtil {
         return node.getLocalName();
     }
 
-    public static Collection<? extends DataSchemaNode> widthList(final DataNodeContainer node, final Integer width) {
+    public static Collection<? extends DataSchemaNode> widthList(final DataNodeContainer node, final int width) {
         if (width > 0) {
             return node.getChildNodes().stream().limit(width).toList(); // limit children to width
         }
