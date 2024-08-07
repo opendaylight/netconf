@@ -41,8 +41,8 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final Integer width, final Integer depth,
-            final Integer offset, final Integer limit) throws IOException {
+    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final int width, final int depth,
+            final int offset, final int limit) throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
@@ -50,14 +50,13 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
-        final var portionOfModels = getModelsSublist(modulesWithoutDuplications, requireNonNullElse(offset, 0),
-            requireNonNullElse(limit, 0));
+        final var portionOfModels = getModelsSublist(modulesWithoutDuplications, offset, limit);
         return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
             portionOfModels, basePath, width, depth);
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
-            final Integer width, final Integer depth) throws IOException {
+            final int width, final int depth) throws IOException {
         final var modelContext = schemaService.getGlobalContext();
         Preconditions.checkState(modelContext != null);
         return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME, width, depth);
@@ -65,7 +64,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
-            final Integer width, final Integer depth) throws IOException {
+            final int width, final int depth) throws IOException {
         final Optional<Revision> rev;
 
         try {

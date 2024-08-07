@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
@@ -67,8 +68,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth, offset,
-            limit);
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
+            requireNonNullElse(width, 0),requireNonNullElse(depth, 0),
+            requireNonNullElse(offset, 0),requireNonNullElse(limit, 0));
         return Response.ok(stream).build();
     }
 
@@ -78,8 +80,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width,
-            depth);
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo,
+            requireNonNullElse(width, 0),requireNonNullElse(depth, 0));
         return Response.ok(stream).build();
     }
 
