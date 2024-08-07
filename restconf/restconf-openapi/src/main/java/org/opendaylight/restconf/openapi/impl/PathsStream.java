@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static java.util.Objects.requireNonNullElse;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
@@ -75,8 +74,8 @@ public final class PathsStream extends InputStream {
     private final boolean includeDataStore;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
-    private final Integer width;
-    private final Integer depth;
+    private final int width;
+    private final int depth;
 
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
@@ -87,8 +86,8 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
-            final Integer depth) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final int width,
+            final int depth) {
         this.iterator = iterator;
         this.writer = writer;
         this.modelContext = modelContext;
@@ -99,8 +98,8 @@ public final class PathsStream extends InputStream {
         this.basePath = basePath;
         this.stream = stream;
         this.generator = generator;
-        this.width = requireNonNullElse(width, 0);
-        this.depth = requireNonNullElse(depth, 0);
+        this.width = width;
+        this.depth = depth;
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
