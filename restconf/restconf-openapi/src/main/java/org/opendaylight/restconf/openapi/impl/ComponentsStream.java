@@ -35,8 +35,8 @@ public final class ComponentsStream extends InputStream {
     private final JsonGenerator generator;
     private final ByteArrayOutputStream stream;
     private final boolean isForSingleModule;
-    private final Integer width;
-    private final Integer depth;
+    private final int width;
+    private final int depth;
 
     private boolean schemasWritten;
     private boolean securityWritten;
@@ -45,8 +45,8 @@ public final class ComponentsStream extends InputStream {
 
     public ComponentsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
-            final Iterator<? extends Module> iterator, final boolean isForSingleModule, final Integer width,
-            final Integer depth) {
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule, final int width,
+            final int depth) {
         this.iterator = iterator;
         this.modelContext = modelContext;
         this.writer = writer;
