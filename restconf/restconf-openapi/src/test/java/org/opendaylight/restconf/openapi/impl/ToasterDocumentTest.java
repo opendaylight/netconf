@@ -49,7 +49,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
     @MethodSource
     void getDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(TOASTER, revision, 0, 0);
+        final var moduleDoc = getDocByModule(TOASTER, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
@@ -78,7 +78,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
     @MethodSource
     void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
-        final var moduleDoc = getMountDocByModule(TOASTER, revision, 0, 0);
+        final var moduleDoc = getMountDocByModule(TOASTER, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 

@@ -34,7 +34,7 @@ class BugsDocumentTest extends AbstractDocumentTest {
     void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("bugs-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(moduleName, revision, 0, 0);
+        final var moduleDoc = getDocByModule(moduleName, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
