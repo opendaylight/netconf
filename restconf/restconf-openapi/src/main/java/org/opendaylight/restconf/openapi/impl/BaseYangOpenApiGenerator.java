@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -52,6 +51,13 @@ public abstract class BaseYangOpenApiGenerator {
         final var portionOfModels = getModelsSublist(modulesWithoutDuplications, offset, limit);
         return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
             portionOfModels, basePath, width, depth);
+    }
+
+    public MetadataStream getControllerModulesMeta(final int offset, final int limit) throws IOException {
+        final var modelContext = requireNonNull(schemaService.getGlobalContext());
+        final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
+        return new MetadataStream(offset, limit, modulesWithoutDuplications.size(),
+            configModulesList(modulesWithoutDuplications).size());
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
@@ -117,7 +123,7 @@ public abstract class BaseYangOpenApiGenerator {
     public static Collection<? extends Module> getModelsSublist(final List<Module> modulesWithoutDuplications,
             final int offset, final int limit) {
         if (offset != 0 || limit != 0) {
-            final var modules = modulesList(modulesWithoutDuplications);
+            final var modules = configModulesList(modulesWithoutDuplications);
             if (offset > modules.size() || offset < 0 || limit < 0) {
                 return List.of();
             } else {
@@ -129,11 +135,11 @@ public abstract class BaseYangOpenApiGenerator {
         return modulesWithoutDuplications;
     }
 
-    private static List<Module> modulesList(final List<Module> modulesWithoutDuplications) {
+    public static List<Module> configModulesList(final List<Module> modulesWithoutDuplications) {
         return modulesWithoutDuplications
             .stream()
             .filter(BaseYangOpenApiGenerator::containsDataOrOperation)
-            .collect(Collectors.toCollection(ArrayList::new));
+            .toList();
     }
 
     private static boolean containsDataOrOperation(final Module module) {
