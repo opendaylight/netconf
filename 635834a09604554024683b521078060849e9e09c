@@ -69,6 +69,30 @@
       },
       "revId": "635834a09604554024683b521078060849e9e09c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c88791cb_9fb1078e",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2024-08-08T09:54:02Z",
+      "side": 1,
+      "message": "Such assumption could be a problem...Some devices can return RPC reply after 30min or more (getting entire config/state) but keepalive delay should be possible to set independently from that to detect broken connection when there is silence..",
+      "parentUuid": "0f8ddbc0_aaf8fb0b",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "635834a09604554024683b521078060849e9e09c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
