@@ -22,6 +22,30 @@
       },
       "revId": "72a5113cc3dfa1d002f379a8c3390de851c5a2c4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db636f07_6a712cfc",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultNetconfKeystoreService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-08T23:40:52Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "90b1b9a8_8d725269",
+      "range": {
+        "startLine": 222,
+        "startChar": 16,
+        "endLine": 222,
+        "endChar": 82
+      },
+      "revId": "72a5113cc3dfa1d002f379a8c3390de851c5a2c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
