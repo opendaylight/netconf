@@ -16,6 +16,24 @@
       "message": "i think it should be done for mountpoint too",
       "revId": "efb4d88f0acc29591868131d179bfb1e87c4059b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab42e3ad_ecb96263",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-08-08T08:51:49Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "77844896_94cfbbdb",
+      "revId": "efb4d88f0acc29591868131d179bfb1e87c4059b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
