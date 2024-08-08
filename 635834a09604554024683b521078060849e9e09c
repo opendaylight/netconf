@@ -45,6 +45,30 @@
       },
       "revId": "635834a09604554024683b521078060849e9e09c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f8ddbc0_aaf8fb0b",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-08-08T07:48:29Z",
+      "side": 1,
+      "message": "We are still reconsidering it, there may be proposal that keepalive should be set slightly higher than rpc timeout",
+      "parentUuid": "e0dd54ea_cd368920",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "635834a09604554024683b521078060849e9e09c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
