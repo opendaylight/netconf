@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "116807c6_1027e65f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-08T13:56:34Z",
+      "side": 1,
+      "message": "needs a manual rebase",
+      "revId": "6344f4b37eec913fe1a3bdaae615995b98bac40d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0dc03c75_6c34db03",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
         "patchSetId": 4
