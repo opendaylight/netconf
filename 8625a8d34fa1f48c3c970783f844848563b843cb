@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4249a7b5_e4fb05c6",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultAddTrustedCertificate.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-08T23:40:39Z",
+      "side": 1,
+      "message": "leaves the transaction hanging",
+      "range": {
+        "startLine": 57,
+        "startChar": 23,
+        "endLine": 57,
+        "endChar": 35
+      },
+      "revId": "8625a8d34fa1f48c3c970783f844848563b843cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
