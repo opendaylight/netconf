@@ -54,6 +54,13 @@ public abstract class BaseYangOpenApiGenerator {
             portionOfModels, basePath, width, depth);
     }
 
+    public MetadataStream getControllerModulesMeta(final int offset, final int limit) throws IOException {
+        final var modelContext = requireNonNull(schemaService.getGlobalContext());
+        final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
+        return new MetadataStream(offset, limit, modulesWithoutDuplications.size(),
+            configModulesList(modulesWithoutDuplications).size());
+    }
+
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
             final int width, final int depth) throws IOException {
         final var modelContext = schemaService.getGlobalContext();
@@ -117,7 +124,7 @@ public abstract class BaseYangOpenApiGenerator {
     public static Collection<? extends Module> getModelsSublist(final List<Module> modulesWithoutDuplications,
             final int offset, final int limit) {
         if (offset != 0 || limit != 0) {
-            final var modules = modulesList(modulesWithoutDuplications);
+            final var modules = configModulesList(modulesWithoutDuplications);
             if (offset > modules.size() || offset < 0 || limit < 0) {
                 return List.of();
             } else {
@@ -129,7 +136,7 @@ public abstract class BaseYangOpenApiGenerator {
         return modulesWithoutDuplications;
     }
 
-    private static List<Module> modulesList(final List<Module> modulesWithoutDuplications) {
+    public static List<Module> configModulesList(final List<Module> modulesWithoutDuplications) {
         return modulesWithoutDuplications
             .stream()
             .filter(BaseYangOpenApiGenerator::containsDataOrOperation)
