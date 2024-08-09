@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfd82815_991c30a8",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/AbstractRestconfApplication.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "use ImmutableSet.builder()",
+      "range": {
+        "startLine": 12,
+        "startChar": 7,
+        "endLine": 12,
+        "endChar": 24
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "740ea894_39a7e041",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "this needs to be split out into its separate components, so it can be quickly checked. perhaps this needs to be split out into a formatter, as it really is an immutable thing",
+      "range": {
+        "startLine": 36,
+        "startChar": 18,
+        "endLine": 36,
+        "endChar": 67
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b81356fb_4bcd30bf",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "atomic long, because ...",
+      "range": {
+        "startLine": 38,
+        "startChar": 12,
+        "endLine": 38,
+        "endChar": 58
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c25a620_ebeaf17f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "Instance.now() if possible",
+      "range": {
+        "startLine": 60,
+        "startChar": 54,
+        "endLine": 60,
+        "endChar": 81
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01213cc8_efeb4f29",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "... this has atrocious performance",
+      "range": {
+        "startLine": 110,
+        "startChar": 12,
+        "endLine": 110,
+        "endChar": 60
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab4e0301_4b43d229",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "appendBody, and everywhere else",
+      "range": {
+        "startLine": 209,
+        "startChar": 17,
+        "endLine": 209,
+        "endChar": 26
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c154ab0a_36121d89",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "\u0027sb\u0027 as first argument",
+      "range": {
+        "startLine": 220,
+        "startChar": 82,
+        "endLine": 220,
+        "endChar": 92
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2cf5f27_cf7854ca",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "return the StringBuilder for fluent operation",
+      "range": {
+        "startLine": 225,
+        "startChar": 19,
+        "endLine": 225,
+        "endChar": 23
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d06d4b02_cec742e3",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T01:14:27Z",
+      "side": 1,
+      "message": "needs to be merged into EndpointConfiguration",
+      "range": {
+        "startLine": 17,
+        "startChar": 19,
+        "endLine": 17,
+        "endChar": 47
+      },
+      "revId": "f8830632fedeaf4ca283939c6626a863c37cfffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
