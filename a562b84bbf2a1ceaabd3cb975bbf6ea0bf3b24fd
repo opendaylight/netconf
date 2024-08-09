@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e05b05a7_d1d8fc07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2024-08-09T08:02:00Z",
+      "side": 1,
+      "message": "Hello\n\nI am glad you merged this while I am still a little in the area.\nFor your possible interest, there is also a possibility to run gitlint via pre-commit git hooks too.\nhttps://git.opendaylight.org/gerrit/c/transportpce/+/103239\n\nhope this helps\n\nCheers\nGuillaume",
+      "revId": "a562b84bbf2a1ceaabd3cb975bbf6ea0bf3b24fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
