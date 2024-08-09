@@ -22,6 +22,30 @@
       },
       "revId": "4a852eef466b473e045039bce01a7e091026c1ed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86b5d159_a0a9c1a3",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-08-09T12:40:24Z",
+      "side": 1,
+      "message": "That was the main idea of the patch to delete device from topology when it removed from allowed device",
+      "parentUuid": "07995fac_dd54c266",
+      "range": {
+        "startLine": 346,
+        "startChar": 20,
+        "endLine": 346,
+        "endChar": 40
+      },
+      "revId": "4a852eef466b473e045039bce01a7e091026c1ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
