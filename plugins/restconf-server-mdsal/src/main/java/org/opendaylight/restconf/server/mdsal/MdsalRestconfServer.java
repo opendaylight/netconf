@@ -10,7 +10,10 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -18,10 +21,12 @@ import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -61,6 +66,7 @@ import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -71,6 +77,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -90,41 +98,80 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         }
     }
 
+    private final ArrayListMultimap<QName, @NonNull RpcImplementation> rpcImplementations = ArrayListMultimap.create();
     private final @NonNull MdsalMountPointResolver mountPointResolver;
     private final @NonNull MdsalDatabindProvider databindProvider;
-    private final @NonNull ServerActionOperations action;
-    private final @NonNull ServerRpcOperations rpc;
     private final @NonNull DOMDataBroker dataBroker;
+    private final DOMRpcService rpcService;
 
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile MdsalServerStrategy localStrategy;
 
+    private final @NonNull ServerActionOperations action;
+    private @NonNull ServerRpcOperations rpc;
+
     @Inject
-    @Activate
-    public MdsalRestconfServer(@Reference final MdsalDatabindProvider databindProvider,
-            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
-            @Reference final DOMActionService actionService,
-            @Reference final DOMMountPointService mountPointService,
-            @Reference(policyOption = ReferencePolicyOption.GREEDY) final List<RpcImplementation> localRpcs) {
+    public MdsalRestconfServer(final MdsalDatabindProvider databindProvider, final DOMDataBroker dataBroker,
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
+            final DOMMountPointService mountPointService, final List<RpcImplementation> localRpcs) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
+        this.rpcService = rpcService;
         mountPointResolver = new MdsalMountPointResolver(mountPointService);
 
-        final var rpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
-        final var rpcDelegate = rpcService != null ? new DOMServerRpcOperations(rpcService)
-            : NotSupportedServerRpcOperations.INSTANCE;
-        rpc = rpcs.isEmpty() ? rpcDelegate
-            : new InterceptingServerRpcOperations(path -> rpcs.get(path.rpc().argument()), rpcDelegate);
+        // FIXME: more dynamism
         action = actionService != null ? new DOMServerActionOperations(actionService)
             : NotSupportedServerActionOperations.INSTANCE;
 
-        localStrategy = createLocalStrategy(databindProvider.currentDatabind());
+        rpc = newRpcOperations(Maps.uniqueIndex(localRpcs, RpcImplementation::qname));
     }
 
     public MdsalRestconfServer(final MdsalDatabindProvider databindProvider, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
         this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+    }
+
+    @Activate
+    public MdsalRestconfServer(@Reference final MdsalDatabindProvider databindProvider,
+            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
+            @Reference final DOMActionService actionService, @Reference final DOMMountPointService mountPointService) {
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of());
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC,
+               policyOption = ReferencePolicyOption.GREEDY, unbind = "unbindLocalRpc")
+    public synchronized void bindLocalRpc(final RpcImplementation rpc) {
+        final var qname = rpc.qname();
+        final var duplicate = rpcImplementations.containsKey(qname);
+        rpcImplementations.put(qname, rpc);
+        if (!duplicate) {
+            updateLocalRpcs();
+        }
+    }
+
+    public synchronized void unbindLocalRpc(final RpcImplementation rpc) {
+        if (rpcImplementations.remove(rpc.qname(), rpc)) {
+            updateLocalRpcs();
+        }
+    }
+
+    private void updateLocalRpcs() {
+        updateLocalRpcs(Multimaps.asMap(rpcImplementations).values().stream()
+            .map(List::getFirst)
+            .collect(ImmutableMap.toImmutableMap(RpcImplementation::qname, Function.identity())));
+    }
+
+    private void updateLocalRpcs(final ImmutableMap<QName, RpcImplementation> rpcs) {
+        rpc = newRpcOperations(rpcs);
+        localStrategy = createLocalStrategy(databindProvider.currentDatabind());
+    }
+
+    private @NonNull ServerRpcOperations newRpcOperations(final ImmutableMap<QName, RpcImplementation> rpcs) {
+        final var rpcDelegate = rpcService != null ? new DOMServerRpcOperations(rpcService)
+            : NotSupportedServerRpcOperations.INSTANCE;
+        return rpcs.isEmpty() ? rpcDelegate
+            : new InterceptingServerRpcOperations(path -> rpcs.get(path.rpc().argument()), rpcDelegate);
     }
 
     private @NonNull MdsalServerStrategy createLocalStrategy(final @NonNull DatabindContext databind) {
