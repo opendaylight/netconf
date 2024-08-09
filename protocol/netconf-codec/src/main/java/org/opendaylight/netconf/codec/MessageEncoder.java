@@ -19,4 +19,8 @@ public abstract class MessageEncoder extends MessageToByteEncoder<NetconfMessage
      * The name of the handler providing message encoding.
      */
     public static final @NonNull String HANDLER_NAME = "netconfMessageEncoder";
+
+    protected MessageEncoder() {
+        super(NetconfMessage.class);
+    }
 }

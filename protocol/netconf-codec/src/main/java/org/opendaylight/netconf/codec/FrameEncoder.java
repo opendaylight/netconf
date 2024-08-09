@@ -20,4 +20,8 @@ public abstract sealed class FrameEncoder extends MessageToByteEncoder<ByteBuf>
      * The name of the handler providing frame encoding.
      */
     public static final @NonNull String HANDLER_NAME = "frameEncoder";
+
+    FrameEncoder() {
+        super(ByteBuf.class);
+    }
 }
