@@ -2172,7 +2172,13 @@
       "action-types_list": {
         "title": "action-types_list",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
         "xml": {
           "name": "list",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
@@ -2199,7 +2205,14 @@
       "choice-test_first-container": {
         "title": "choice-test_first-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "leaf-default": {
+            "description": "",
+            "type": "string",
+            "default": "default-value",
+            "example": "Some leaf-default"
+          }
+        },
         "xml": {
           "name": "first-container",
           "namespace": "urn:opendaylight:choice-test"
@@ -2208,7 +2221,14 @@
       "definition-test_binary-container": {
         "title": "definition-test_binary-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "binary-data": {
+            "description": "",
+            "type": "string",
+            "format": "byte",
+            "default": "SGVsbG8gdGVzdCE="
+          }
+        },
         "xml": {
           "name": "binary-container",
           "namespace": "urn:definition-test"
@@ -2227,6 +2247,15 @@
         "xml": {
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
         }
       },
       "duplication-test_test-rpc2_input": {
@@ -2259,10 +2288,31 @@
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
         }
       },
+      "duplication-test_first1": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {
+          "input-leaf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf1"
+          }
+        },
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
       "mandatory-test_root-container": {
         "title": "mandatory-test_root-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "optional-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-root-leaf"
+          }
+        },
         "xml": {
           "name": "root-container",
           "namespace": "http://example.com/test"
@@ -2271,7 +2321,13 @@
       "my-yang_data": {
         "title": "my-yang_data",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "my-data": {
+            "description": "",
+            "type": "string",
+            "example": "Some my-data"
+          }
+        },
         "xml": {
           "name": "data",
           "namespace": "urn:opendaylight:params:xml:ns:yang:my-yang"
@@ -2280,18 +2336,52 @@
       "path-params-test_cont": {
         "title": "path-params-test_cont",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "list1": {}
+        },
         "xml": {
           "name": "cont",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1": {
+        "title": "path-params-test_cont_list1",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list1",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         }
       },
       "recursive_container-root": {
         "title": "recursive_container-root",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "root-list": {}
+        },
         "xml": {
           "name": "container-root",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "recursive_container-root_root-list": {
+        "title": "recursive_container-root_root-list",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "root-list",
           "namespace": "urn:opendaylight:test:recursive"
         }
       },
@@ -2299,7 +2389,15 @@
         "title": "string-types_test",
         "type": "object",
         "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
-        "properties": {},
+        "properties": {
+          "display-string": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 0,
+            "maxLength": 255
+          }
+        },
         "xml": {
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:test:string:types"
@@ -2308,7 +2406,15 @@
       "strings-examples-length_test": {
         "title": "strings-examples-length_test",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "my-mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:",
+            "minLength": 12,
+            "maxLength": 18
+          }
+        },
         "xml": {
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:strings:examples"
@@ -2317,7 +2423,15 @@
       "strings-from-regex_test": {
         "title": "strings-from-regex_test",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:00:00",
+            "minLength": 0,
+            "maxLength": 2147483647
+          }
+        },
         "xml": {
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:strings:regex"
@@ -2326,9 +2440,22 @@
       "test-container-childs_root-container": {
         "title": "test-container-childs_root-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "nested-container": {
+            "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+          }
+        },
         "xml": {
           "name": "root-container",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "test-container-childs_root-container_nested-container": {
+        "title": "test-container-childs_root-container_nested-container",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "nested-container",
           "namespace": "http://example.com/test/container/child"
         }
       },
@@ -2395,9 +2522,26 @@
       "typed-params_typed": {
         "title": "typed-params_typed",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "string": {}
+        },
         "xml": {
           "name": "typed",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_string": {
+        "title": "typed-params_typed_string",
+        "type": "object",
+        "properties": {
+          "string-key": {
+            "description": "",
+            "type": "string",
+            "example": "Some string-key"
+          }
+        },
+        "xml": {
+          "name": "string",
           "namespace": "urn:typed-params"
         }
       }
