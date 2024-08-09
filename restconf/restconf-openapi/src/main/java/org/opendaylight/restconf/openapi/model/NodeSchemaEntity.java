@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -36,12 +37,17 @@ public final class NodeSchemaEntity extends SchemaEntity {
     @Override
     void generateProperties(final @NonNull JsonGenerator generator, final @NonNull List<String> required)
             throws IOException {
-        if (depth > 0 && nodeDepth + 1 > depth) {
+        if (depth > 0 && nodeDepth > depth) {
             return;
         }
         final var childNodes = new HashMap<String, DataSchemaNode>();
         final var dataSchemaNodes = widthList((DataNodeContainer) value(), width);
         for (final var childNode : dataSchemaNodes) {
+            if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
+                if (depth > 0 && nodeDepth + 1 > depth) {
+                    continue;
+                }
+            }
             childNodes.put(childNode.getQName().getLocalName(), childNode);
         }
         final boolean isValueConfig = ((DataSchemaNode) value()).isConfiguration();
