@@ -189,29 +189,5 @@ CONTROLLERS = ["ODL_SYSTEM_1_IP", "ODL_SYSTEM_2_IP", "ODL_SYSTEM_3_IP"]
 CONTROLLER_PASSWORD = ODL_SYSTEM_PASSWORD
 CONTROLLER_PROMPT = ODL_SYSTEM_PROMPT
 
-# Centinel Variables
-SET_CONFIGURATION_URI = "/rests/operations/configuration:set-centinel-configurations"
-GET_CONFIGURATION_URI = (
-    "/rests/data/configuration:configurationRecord?content=nonconfig"
-)
-STREAMRECORD_CONFIG = "/rests/data/stream:streamRecord"
-SET_STREAMRECORD = "/rests/operations/stream:set-stream"
-ALERTFIELDCONTENTRULERECORD = "/rests/data/alertrule:alertFieldContentRuleRecord"
-SET_ALERTFIELDCONTENTRULERECORD = (
-    "/rests/operations/alertrule:set-alert-field-content-rule"
-)
-ALERTFIELDVALUERULERECORD = "/rests/data/alertrule:alertFieldValueRuleRecord"
-
-SET_ALERTFIELDVALUERULERECORD = "/rests/operations/alertrule:set-alert-field-value-rule"
-ALERTMESSAGECOUNTRULERECORD = "/rests/data/alertrule:alertMessageCountRuleRecord"
-SET_ALERTMESSAGECOUNTRULERECORD = (
-    "/rests/operations/alertrule:set-alert-message-count-rule"
-)
-GET_DASHBOARDRECORD = "/rests/data/dashboardrule:dashboardRecord?content=nonconfig"
-SET_DASHBOARDRECORD = "/rests/operations/dashboardrule:set-dashboard"
-DELETE_DASHBOARDRECORD = "/rests/operations/dashboardrule:delete-dashboard"
-SET_SUBSCRIBEUSER = "/rests/operations/subscribe:subscribe-user"
-SUBSCRIPTION = "/rests/data/subscribe:subscription"
-
 # Elasticsearch Variables
 ELASTICPORT = 9200
