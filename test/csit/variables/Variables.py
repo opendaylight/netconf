@@ -118,13 +118,6 @@ CONFIG_API = "/rests/data"
 OPERATIONAL_API = "/rests/data"
 MODULES_API = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
 
-# NEMO Variables
-PREDEFINE_ROLE_URI = "/rests/data/nemo-user:user-roles"
-PREDEFINE_NODE_URI = "/rests/data/nemo-object:node-definitions"
-PREDEFINE_CONNECTION_URI = "/rests/data/nemo-object:connection-definitions"
-REGISTER_TENANT_URI = "/rests/operations/nemo-intent:register-user"
-STRUCTURE_INTENT_URI = "/rests/operations/nemo-intent:structure-style-nemo-update"
-
 # TOKEN
 AUTH_TOKEN_API = "/oauth2/token"
 REVOKE_TOKEN_API = "/oauth2/revoke"
