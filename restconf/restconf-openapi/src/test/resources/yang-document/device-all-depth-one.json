@@ -4594,7 +4594,13 @@
       "action-types_list": {
         "title": "action-types_list",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
         "xml": {
           "name": "list",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
@@ -4648,18 +4654,44 @@
       "action-types_multi-container": {
         "title": "action-types_multi-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "inner-container": {
+            "$ref": "#/components/schemas/action-types_multi-container_inner-container"
+          }
+        },
         "xml": {
           "name": "multi-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_multi-container_inner-container": {
+        "title": "action-types_multi-container_inner-container",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "inner-container",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         }
       },
       "action-types_first-container": {
         "title": "action-types_first-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "second-container": {
+            "$ref": "#/components/schemas/action-types_first-container_second-container"
+          }
+        },
         "xml": {
           "name": "first-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_first-container_second-container": {
+        "title": "action-types_first-container_second-container",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "second-container",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         }
       },
@@ -4720,7 +4752,14 @@
       "choice-test_first-container": {
         "title": "choice-test_first-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "leaf-default": {
+            "description": "",
+            "type": "string",
+            "default": "default-value",
+            "example": "Some leaf-default"
+          }
+        },
         "xml": {
           "name": "first-container",
           "namespace": "urn:opendaylight:choice-test"
@@ -4729,7 +4768,13 @@
       "choice-test_second-container": {
         "title": "choice-test_second-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "leaf-first-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-first-case"
+          }
+        },
         "xml": {
           "name": "second-container",
           "namespace": "urn:opendaylight:choice-test"
@@ -4738,7 +4783,14 @@
       "definition-test_binary-container": {
         "title": "definition-test_binary-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "binary-data": {
+            "description": "",
+            "type": "string",
+            "format": "byte",
+            "default": "SGVsbG8gdGVzdCE="
+          }
+        },
         "xml": {
           "name": "binary-container",
           "namespace": "urn:definition-test"
@@ -4747,7 +4799,34 @@
       "definition-test_union-container": {
         "title": "definition-test_union-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "testBoolean": {
+            "description": "",
+            "type": "boolean",
+            "default": true,
+            "example": true
+          },
+          "testUnion1": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "default": "5",
+            "example": -2147483648
+          },
+          "testUnion2": {
+            "description": "",
+            "type": "string",
+            "default": "false",
+            "example": "Some testUnion2"
+          },
+          "testUnion3": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "default": "false",
+            "example": -2147483648
+          }
+        },
         "xml": {
           "name": "union-container",
           "namespace": "urn:definition-test"
@@ -4756,7 +4835,47 @@
       "definition-test_number-container": {
         "title": "definition-test_number-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "testInteger": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "default": 42,
+            "example": -2147483648
+          },
+          "testUint64": {
+            "description": "",
+            "type": "integer",
+            "default": 42,
+            "example": 0
+          },
+          "testUnsignedInteger": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "default": 100,
+            "example": 0
+          },
+          "testDecimal": {
+            "description": "",
+            "type": "number",
+            "default": 3.14,
+            "example": -92233720368547760
+          },
+          "testInt64": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "default": 42,
+            "example": -9223372036854776000
+          },
+          "testDouble": {
+            "description": "",
+            "type": "number",
+            "default": 3.14159265359,
+            "example": -92233720.36854775
+          }
+        },
         "xml": {
           "name": "number-container",
           "namespace": "urn:definition-test"
@@ -4765,7 +4884,18 @@
       "definition-test_enum-container": {
         "title": "definition-test_enum-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "status": {
+            "description": "",
+            "type": "string",
+            "enum": [
+              "up",
+              "down"
+            ],
+            "default": "up",
+            "example": "up"
+          }
+        },
         "xml": {
           "name": "enum-container",
           "namespace": "urn:definition-test"
@@ -4774,7 +4904,14 @@
       "definition-test_network-container": {
         "title": "definition-test_network-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "network-ref": {
+            "description": "",
+            "type": "string",
+            "default": "/network/nodes[node-id='node1']",
+            "example": "/sample:binary-container"
+          }
+        },
         "xml": {
           "name": "network-container",
           "namespace": "urn:definition-test"
@@ -4793,6 +4930,15 @@
         "xml": {
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
         }
       },
       "duplication-test_test-rpc2_input": {
@@ -4825,19 +4971,173 @@
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
         }
       },
+      "duplication-test_first1": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {
+          "input-leaf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf1"
+          }
+        },
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
       "mandatory-test_root-container": {
         "title": "mandatory-test_root-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "optional-list": {},
+          "mandatory-container": {
+            "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+          },
+          "mandatory-list": {},
+          "optional-first-choice": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-first-choice"
+          },
+          "mandatory-first-choice": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-first-choice"
+          },
+          "mandatory-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-root-leaf"
+          },
+          "optional-presence-container": {
+            "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+          },
+          "optional-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-root-leaf"
+          }
+        },
+        "required": [
+          "mandatory-container",
+          "mandatory-list",
+          "mandatory-first-choice",
+          "mandatory-root-leaf"
+        ],
         "xml": {
           "name": "root-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_optional-presence-container": {
+        "title": "mandatory-test_root-container_optional-presence-container",
+        "type": "object",
+        "properties": {
+          "presence-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some presence-leaf"
+          }
+        },
+        "xml": {
+          "name": "optional-presence-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_mandatory-container": {
+        "title": "mandatory-test_root-container_mandatory-container",
+        "type": "object",
+        "properties": {
+          "leaf-list-with-min-elements": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "string",
+              "example": "Some leaf-list-with-min-elements"
+            },
+            "description": "",
+            "example": [
+              "Some leaf-list-with-min-elements",
+              "Some leaf-list-with-min-elements"
+            ]
+          },
+          "mandatory-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-leaf"
+          }
+        },
+        "required": [
+          "leaf-list-with-min-elements",
+          "mandatory-leaf"
+        ],
+        "xml": {
+          "name": "mandatory-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_optional-list": {
+        "title": "mandatory-test_root-container_optional-list",
+        "type": "object",
+        "properties": {
+          "optional-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "optional-list",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_mandatory-list": {
+        "title": "mandatory-test_root-container_mandatory-list",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          },
+          "mandatory-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-list-field"
+          }
+        },
+        "required": [
+          "mandatory-list-field"
+        ],
+        "xml": {
+          "name": "mandatory-list",
           "namespace": "http://example.com/test"
         }
       },
       "mandatory-test_root-optional-list": {
         "title": "mandatory-test_root-optional-list",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "root-optional-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some root-optional-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
         "xml": {
           "name": "root-optional-list",
           "namespace": "http://example.com/test"
@@ -4846,7 +5146,19 @@
       "mandatory-test_root-mandatory-list": {
         "title": "mandatory-test_root-mandatory-list",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "root-mandatory-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some root-mandatory-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
         "xml": {
           "name": "root-mandatory-list",
           "namespace": "http://example.com/test"
@@ -4855,7 +5167,13 @@
       "my-yang_data": {
         "title": "my-yang_data",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "my-data": {
+            "description": "",
+            "type": "string",
+            "example": "Some my-data"
+          }
+        },
         "xml": {
           "name": "data",
           "namespace": "urn:opendaylight:params:xml:ns:yang:my-yang"
@@ -4864,18 +5182,68 @@
       "path-params-test_cont": {
         "title": "path-params-test_cont",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "list1": {},
+          "list3": {}
+        },
         "xml": {
           "name": "cont",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1": {
+        "title": "path-params-test_cont_list1",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list1",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list3": {
+        "title": "path-params-test_cont_list3",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list3",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         }
       },
       "recursive_container-root": {
         "title": "recursive_container-root",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "root-list": {}
+        },
         "xml": {
           "name": "container-root",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "recursive_container-root_root-list": {
+        "title": "recursive_container-root_root-list",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "root-list",
           "namespace": "urn:opendaylight:test:recursive"
         }
       },
@@ -4883,7 +5251,64 @@
         "title": "string-types_test",
         "type": "object",
         "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
-        "properties": {},
+        "properties": {
+          "mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:00:00",
+            "minLength": 0,
+            "maxLength": 2147483647
+          },
+          "braille-patterns": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 10,
+            "maxLength": 10
+          },
+          "date-and-time": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 8,
+            "maxLength": 11
+          },
+          "phys-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:",
+            "minLength": 0,
+            "maxLength": 2147483647
+          },
+          "arrows": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 10,
+            "maxLength": 10
+          },
+          "thai": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 10,
+            "maxLength": 10
+          },
+          "display-string": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 0,
+            "maxLength": 255
+          },
+          "mathematical-operators": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 10,
+            "maxLength": 10
+          }
+        },
         "xml": {
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:test:string:types"
@@ -4892,7 +5317,29 @@
       "strings-examples-length_test": {
         "title": "strings-examples-length_test",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "my-phys-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00",
+            "minLength": 5,
+            "maxLength": 5
+          },
+          "my-mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:",
+            "minLength": 12,
+            "maxLength": 18
+          },
+          "my-string": {
+            "description": "",
+            "type": "string",
+            "example": "00000",
+            "minLength": 5,
+            "maxLength": 10
+          }
+        },
         "xml": {
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:strings:examples"
@@ -4901,7 +5348,29 @@
       "strings-from-regex_test": {
         "title": "strings-from-regex_test",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:00:00",
+            "minLength": 0,
+            "maxLength": 2147483647
+          },
+          "ipv4-address": {
+            "description": "",
+            "type": "string",
+            "example": "0.0.0.0",
+            "minLength": 0,
+            "maxLength": 2147483647
+          },
+          "login-date-time": {
+            "description": "",
+            "type": "string",
+            "example": "0000-00-00T00:00:00Z",
+            "minLength": 0,
+            "maxLength": 2147483647
+          }
+        },
         "xml": {
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:strings:regex"
@@ -4910,27 +5379,66 @@
       "test-container-childs_root-container": {
         "title": "test-container-childs_root-container",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "nested-container": {
+            "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+          }
+        },
         "xml": {
           "name": "root-container",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "test-container-childs_root-container_nested-container": {
+        "title": "test-container-childs_root-container_nested-container",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "nested-container",
           "namespace": "http://example.com/test/container/child"
         }
       },
       "test-container-childs_root-container-two-keys": {
         "title": "test-container-childs_root-container-two-keys",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "nested-container-two-keys": {
+            "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys"
+          }
+        },
         "xml": {
           "name": "root-container-two-keys",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "test-container-childs_root-container-two-keys_nested-container-two-keys": {
+        "title": "test-container-childs_root-container-two-keys_nested-container-two-keys",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "nested-container-two-keys",
           "namespace": "http://example.com/test/container/child"
         }
       },
       "test-container-childs_root-container-unique": {
         "title": "test-container-childs_root-container-unique",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "nested-container-unique": {
+            "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique"
+          }
+        },
         "xml": {
           "name": "root-container-unique",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "test-container-childs_root-container-unique_nested-container-unique": {
+        "title": "test-container-childs_root-container-unique_nested-container-unique",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "nested-container-unique",
           "namespace": "http://example.com/test/container/child"
         }
       },
@@ -4950,12 +5458,12 @@
             "type": "string",
             "enum": [
               "toast-type",
-              "white-bread",
-              "hash-brown",
               "wheat-bread",
-              "frozen-bagel",
+              "hash-brown",
+              "white-bread",
+              "wonder-bread",
               "frozen-waffle",
-              "wonder-bread"
+              "frozen-bagel"
             ],
             "default": "wheat-bread",
             "example": "toast-type"
@@ -4970,7 +5478,40 @@
         "title": "toaster_toaster",
         "type": "object",
         "description": "Top-level container for all toaster database objects.",
-        "properties": {},
+        "properties": {
+          "interval": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "default": 30,
+            "example": 0
+          },
+          "testUnion": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -2147483648
+          },
+          "allow-user": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Some allow-user"
+            },
+            "description": "A list of user name patterns to allow"
+          },
+          "testToasterBits": {
+            "description": "",
+            "type": "string",
+            "enum": [
+              "testbit1",
+              "testbit2"
+            ],
+            "minItems": 0,
+            "default": "testbit2",
+            "uniqueItems": true
+          }
+        },
         "xml": {
           "name": "toaster",
           "namespace": "http://netconfcentral.org/ns/toaster"
@@ -4992,12 +5533,12 @@
             "type": "string",
             "enum": [
               "toast-type",
-              "white-bread",
-              "wonder-bread",
               "frozen-bagel",
-              "frozen-waffle",
+              "white-bread",
               "wheat-bread",
-              "hash-brown"
+              "hash-brown",
+              "frozen-waffle",
+              "wonder-bread"
             ],
             "default": "wheat-bread",
             "example": "toast-type"
@@ -5028,27 +5569,494 @@
         "title": "toaster2_toaster",
         "type": "object",
         "description": "Top-level container for all toaster database objects.",
-        "properties": {},
+        "properties": {
+          "darknessFactor": {
+            "description": "The darkness factor. Basically, the number of ms to multiple the doneness value by.",
+            "type": "integer",
+            "format": "int64",
+            "default": 1000,
+            "example": 0
+          },
+          "toasterSlot": {}
+        },
         "xml": {
           "name": "toaster",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        }
+      },
+      "toaster2_toaster_toasterSlot": {
+        "title": "toaster2_toaster_toasterSlot",
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "description": "",
+            "type": "string",
+            "example": "Some slotId"
+          }
+        },
+        "xml": {
+          "name": "toasterSlot",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         }
       },
       "toaster2_lst": {
         "title": "toaster2_lst",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "lf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some lf1"
+          },
+          "lst1": {},
+          "cont1": {
+            "$ref": "#/components/schemas/toaster2_lst_cont1"
+          }
+        },
         "xml": {
           "name": "lst",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        }
+      },
+      "toaster2_lst_cont1": {
+        "title": "toaster2_lst_cont1",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "cont1",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        }
+      },
+      "toaster2_lst_lst1": {
+        "title": "toaster2_lst_lst1",
+        "type": "object",
+        "properties": {
+          "key1": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -2147483648
+          },
+          "key2": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -128
+          },
+          "lf11": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -32768
+          }
+        },
+        "xml": {
+          "name": "lst1",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         }
       },
       "typed-params_typed": {
         "title": "typed-params_typed",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "string": {},
+          "instance-identifier": {},
+          "bits": {},
+          "union": {},
+          "empty": {},
+          "int16": {},
+          "boolean": {},
+          "int32": {},
+          "int64": {},
+          "binary": {},
+          "int8": {},
+          "uint64": {},
+          "decimal64": {},
+          "uint32": {},
+          "enumeration": {},
+          "uint8": {},
+          "uint16": {},
+          "anydata": {}
+        },
         "xml": {
           "name": "typed",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_string": {
+        "title": "typed-params_typed_string",
+        "type": "object",
+        "properties": {
+          "string-key": {
+            "description": "",
+            "type": "string",
+            "example": "Some string-key"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "string",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_binary": {
+        "title": "typed-params_typed_binary",
+        "type": "object",
+        "properties": {
+          "binary-key": {
+            "description": "",
+            "type": "string",
+            "format": "byte"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "binary",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_bits": {
+        "title": "typed-params_typed_bits",
+        "type": "object",
+        "properties": {
+          "bits-key": {
+            "description": "",
+            "type": "string",
+            "enum": [
+              "UP"
+            ],
+            "minItems": 0,
+            "default": "UP UP",
+            "uniqueItems": true
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "bits",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_boolean": {
+        "title": "typed-params_typed_boolean",
+        "type": "object",
+        "properties": {
+          "boolean-key": {
+            "description": "",
+            "type": "boolean",
+            "example": true
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "boolean",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_empty": {
+        "title": "typed-params_typed_empty",
+        "type": "object",
+        "properties": {
+          "empty-key": {
+            "description": "",
+            "type": "object"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "empty",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_enumeration": {
+        "title": "typed-params_typed_enumeration",
+        "type": "object",
+        "properties": {
+          "enumeration-key": {
+            "description": "",
+            "type": "string",
+            "enum": [
+              "first",
+              "second",
+              "third"
+            ],
+            "example": "first"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "enumeration",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_instance-identifier": {
+        "title": "typed-params_typed_instance-identifier",
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "instance-identifier-key": {
+            "description": "",
+            "type": "string",
+            "example": "/tparams:typed"
+          }
+        },
+        "xml": {
+          "name": "instance-identifier",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_int8": {
+        "title": "typed-params_typed_int8",
+        "type": "object",
+        "properties": {
+          "int8-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -128
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "int8",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_int16": {
+        "title": "typed-params_typed_int16",
+        "type": "object",
+        "properties": {
+          "int16-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -32768
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "int16",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_int32": {
+        "title": "typed-params_typed_int32",
+        "type": "object",
+        "properties": {
+          "int32-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -2147483648
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "int32",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_int64": {
+        "title": "typed-params_typed_int64",
+        "type": "object",
+        "properties": {
+          "int64-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": -9223372036854776000
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "int64",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_uint8": {
+        "title": "typed-params_typed_uint8",
+        "type": "object",
+        "properties": {
+          "uint8-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": 0
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "uint8",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_uint16": {
+        "title": "typed-params_typed_uint16",
+        "type": "object",
+        "properties": {
+          "uint16-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": 0
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "uint16",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_uint32": {
+        "title": "typed-params_typed_uint32",
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "uint32-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "uint32",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_uint64": {
+        "title": "typed-params_typed_uint64",
+        "type": "object",
+        "properties": {
+          "uint64-key": {
+            "description": "",
+            "type": "integer",
+            "example": 0
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "uint64",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_decimal64": {
+        "title": "typed-params_typed_decimal64",
+        "type": "object",
+        "properties": {
+          "decimal64-key": {
+            "description": "",
+            "type": "number",
+            "example": -92233720368547760
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "decimal64",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_union": {
+        "title": "typed-params_typed_union",
+        "type": "object",
+        "properties": {
+          "union-key": {
+            "description": "",
+            "type": "integer",
+            "format": "int32",
+            "example": -2147483648
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "union",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_anydata": {
+        "title": "typed-params_typed_anydata",
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "Anydata value. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          },
+          "key": {
+            "description": "",
+            "type": "string",
+            "example": "Some key"
+          }
+        },
+        "xml": {
+          "name": "anydata",
           "namespace": "urn:typed-params"
         }
       }

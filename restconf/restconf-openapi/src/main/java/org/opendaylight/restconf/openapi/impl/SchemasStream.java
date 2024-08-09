@@ -200,7 +200,8 @@ public final class SchemasStream extends InputStream {
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig,
             final int width, final int depth, final int nodeDepth) {
-        if (depth > 0 && nodeDepth + 1 > depth) {
+        // Check if processed node isn't deeper than set cut off depth
+        if (depth > 0 && nodeDepth > depth) {
             return;
         }
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
@@ -211,7 +212,7 @@ public final class SchemasStream extends InputStream {
             }
             final var discriminator = definitionNames.pickDiscriminator(node, List.of(newTitle));
             final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
-                isParentConfig, definitionNames, width, depth, nodeDepth + 1);
+                isParentConfig, definitionNames, width, depth, nodeDepth);
             final var isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
