@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import java.security.Principal;
+import java.util.UUID;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -27,6 +28,11 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     TransformedServerRequest {
         requireNonNull(delegate);
         requireNonNull(function);
+    }
+
+    @Override
+    public UUID uuid() {
+        return delegate.uuid();
     }
 
     @Override
