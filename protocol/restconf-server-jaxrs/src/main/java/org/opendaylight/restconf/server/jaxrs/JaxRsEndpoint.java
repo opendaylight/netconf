@@ -75,7 +75,7 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
         final var sseSender = this;
 
         final var restconfBuilder = WebContext.builder()
-            .name("RFC8040 RESTCONF")
+            .name("RESTCONF")
             .contextPath("/" + restconf)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
@@ -105,7 +105,7 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
         restconfReg = webServer.registerWebContext(restconfBuilder.build());
 
         final var discoveryBuilder = WebContext.builder()
-            .name("RFC6415 Web Host Metadata")
+            .name("WellKnownURIs")
             .contextPath("/.well-known")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
