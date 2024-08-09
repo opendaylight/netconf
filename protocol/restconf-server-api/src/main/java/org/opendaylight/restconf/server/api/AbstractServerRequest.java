@@ -11,7 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.UUID;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -24,13 +28,25 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> type of reported result
  */
-@NonNullByDefault
 public abstract non-sealed class AbstractServerRequest<T> implements ServerRequest<T> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractServerRequest.class);
 
-    private final UUID uuid;
-    private final QueryParameters queryParameters;
-    private final PrettyPrintParam prettyPrint;
+    private static final VarHandle UUID_VH;
+
+    static {
+        try {
+            UUID_VH = MethodHandles.lookup().findVarHandle(AbstractServerRequest.class, "uuid", UUID.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
+    private final @NonNull QueryParameters queryParameters;
+    private final @NonNull PrettyPrintParam prettyPrint;
+
+    @SuppressFBWarnings(value = "UUF_UNUSED_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
+    @SuppressWarnings("unused")
+    private volatile UUID uuid;
 
     // TODO: this is where a binding to security principal and access control should be:
     //       - we would like to be able to have java.security.Principal#name() for logging purposes
@@ -45,6 +61,7 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
      * @param queryParameters user-supplied query parameters
      * @param defaultPrettyPrint default {@link PrettyPrintParam}
      */
+    @NonNullByDefault
     protected AbstractServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
         // We always recognize PrettyPrintParam and it is an output processing flag. We therefore filter it if present.
         final var tmp = queryParameters.lookup(PrettyPrintParam.uriName, PrettyPrintParam::forUriValue);
@@ -55,12 +72,18 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
             this.queryParameters = queryParameters;
             prettyPrint = requireNonNull(defaultPrettyPrint);
         }
-        uuid = UUID.randomUUID();
     }
 
     @Override
     public final UUID uuid() {
-        return uuid;
+        final var existing = (UUID) UUID_VH.getAcquire(this);
+        return existing != null ? existing : loadUuid();
+    }
+
+    private @NonNull UUID loadUuid() {
+        final var created = UUID.randomUUID();
+        final var witness = (UUID) UUID_VH.compareAndExchangeRelease(this, null, created);
+        return witness != null ? witness : created;
     }
 
     @Override
@@ -90,13 +113,13 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
      *
      * @return the effective {@link PrettyPrintParam}
      */
-    protected final PrettyPrintParam prettyPrint() {
+    protected final @NonNull PrettyPrintParam prettyPrint() {
         return prettyPrint;
     }
 
-    protected abstract void onSuccess(T result);
+    protected abstract void onSuccess(@NonNull T result);
 
-    protected abstract void onFailure(YangErrorsBody errors);
+    protected abstract void onFailure(@NonNull YangErrorsBody errors);
 
     @Override
     public final String toString() {
@@ -104,7 +127,7 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
     }
 
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        helper.add("uuid", uuid);
+        helper.add("uuid", uuid());
 
         final var principal = principal();
         if (principal != null) {
