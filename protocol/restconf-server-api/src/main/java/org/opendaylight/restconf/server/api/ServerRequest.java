@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import java.security.Principal;
+import java.util.UUID;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -34,6 +35,13 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
  */
 @NonNullByDefault
 public sealed interface ServerRequest<T> permits AbstractServerRequest, TransformedServerRequest {
+    /**
+     * Return the identifier of this request.
+     *
+     * @return an UUID
+     */
+    UUID uuid();
+
     /**
      * Returns the Principal making this request.
      *

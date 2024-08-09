@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.util.UUID;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -18,7 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for {@link ServerRequest} implementations.
+ * Abstract base class for {@link ServerRequest} implementations. Each instance is automatically assigned a
+ * <a href="https://www.rfc-editor.org/rfc/rfc4122#section-4.4">type 4 UUID</a>.
  *
  * @param <T> type of reported result
  */
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
 public abstract non-sealed class AbstractServerRequest<T> implements ServerRequest<T> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractServerRequest.class);
 
+    private final UUID uuid;
     private final QueryParameters queryParameters;
     private final PrettyPrintParam prettyPrint;
 
@@ -52,6 +55,12 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
             this.queryParameters = queryParameters;
             prettyPrint = requireNonNull(defaultPrettyPrint);
         }
+        uuid = UUID.randomUUID();
+    }
+
+    @Override
+    public final UUID uuid() {
+        return uuid;
     }
 
     @Override
@@ -95,6 +104,8 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
     }
 
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        helper.add("uuid", uuid);
+
         final var principal = principal();
         if (principal != null) {
             helper.add("principal", principal.getName());
