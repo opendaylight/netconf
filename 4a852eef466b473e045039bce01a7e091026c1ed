@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07995fac_dd54c266",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-09T00:31:19Z",
+      "side": 1,
+      "message": "this routes to topology. can CallHomeTopology deal with this?",
+      "range": {
+        "startLine": 346,
+        "startChar": 20,
+        "endLine": 346,
+        "endChar": 40
+      },
+      "revId": "4a852eef466b473e045039bce01a7e091026c1ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
