@@ -12,9 +12,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import java.io.ByteArrayOutputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -29,35 +28,34 @@ class HelloXMLMessageEncoderTest {
     @Mock
     private ChannelHandlerContext ctx;
 
+    private final HelloXMLMessageEncoder encoder = new HelloXMLMessageEncoder();
+    private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
     @Test
     void testEncode() throws Exception {
-        final NetconfMessage msg = new HelloMessage(XmlUtil.readXmlToDocument(
+        encoder.encodeTo(new HelloMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"),
-                NetconfHelloMessageAdditionalHeader.fromString("[tomas;10.0.0.0:10000;tcp;client;]"));
-        final ByteBuf destination = Unpooled.buffer();
-        new HelloXMLMessageEncoder().encode(ctx, msg, destination);
+                NetconfHelloMessageAdditionalHeader.fromString("[tomas;10.0.0.0:10000;tcp;client;]")), baos);
 
-        final String encoded = new String(destination.array());
+        final var encoded = new String(baos.toByteArray());
         assertThat(encoded, containsString("[tomas;10.0.0.0:10000;tcp;client;]"));
         assertThat(encoded, containsString("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
     }
 
     @Test
     void testEncodeNoHeader() throws Exception {
-        final NetconfMessage msg = new HelloMessage(XmlUtil.readXmlToDocument(
-                "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
-        final ByteBuf destination = Unpooled.buffer();
-        new HelloXMLMessageEncoder().encode(ctx, msg, destination);
+        encoder.encodeTo(new HelloMessage(XmlUtil.readXmlToDocument(
+                "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>")), baos);
 
-        final String encoded = new String(destination.array());
+        final var encoded = new String(baos.toByteArray());
         assertThat(encoded, not(containsString("[tomas;10.0.0.0:10000;tcp;client;]")));
         assertThat(encoded, containsString("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
     }
 
     @Test
     void testEncodeNotHello() throws Exception {
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final var msg = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
-        assertThrows(IllegalStateException.class, () -> new HelloXMLMessageEncoder().encode(ctx, msg, null));
+        assertThrows(IllegalStateException.class, () -> encoder.encodeTo(msg, baos));
     }
 }

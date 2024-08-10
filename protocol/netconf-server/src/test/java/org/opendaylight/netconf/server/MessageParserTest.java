@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,10 +49,11 @@ class MessageParserTest {
         final var messages = testChunkChannel.outboundMessages();
         assertEquals(1, messages.size());
 
-        final var enc = new XMLMessageEncoder();
-        final var out = Unpooled.buffer();
-        enc.encode(null, msg, out);
-        final int msgLength = out.readableBytes();
+        final var baos = new ByteArrayOutputStream();
+        new XMLMessageEncoder().encodeTo(msg, baos);
+
+        final int msgLength = baos.toByteArray().length;
+        assertEquals(346, msgLength);
 
         int chunkCount = msgLength / ChunkedFrameEncoder.DEFAULT_CHUNK_SIZE;
         if (msgLength % ChunkedFrameEncoder.DEFAULT_CHUNK_SIZE != 0) {

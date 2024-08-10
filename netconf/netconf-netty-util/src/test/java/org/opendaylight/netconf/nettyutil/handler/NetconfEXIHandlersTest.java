@@ -44,29 +44,31 @@ class NetconfEXIHandlersTest {
     }
 
     private static byte[] msgToExi(final NetconfMessage msg, final NetconfEXICodec codec) throws Exception {
-        final var bos = new ByteArrayOutputStream();
+        final var baos = new ByteArrayOutputStream();
         final var encoder = codec.exiFactory().createEXIWriter();
-        encoder.setOutputStream(bos);
+        encoder.setOutputStream(baos);
         ThreadLocalTransformers.getDefaultTransformer().transform(new DOMSource(msg.getDocument()),
             new SAXResult(encoder));
-        return bos.toByteArray();
+        return baos.toByteArray();
     }
 
     @Test
     void testEncodeDecode() throws Exception {
-        final var buffer = Unpooled.buffer();
-        exiEncoder.encode(null, msg, buffer);
+        final var baos = new ByteArrayOutputStream();
+        exiEncoder.encodeTo(msg, baos);
         final int exiLength = msgAsExi.length;
+
+        final var array = baos.toByteArray();
         // array from buffer is cca 256 n length, compare only subarray
-        assertArrayEquals(msgAsExi, Arrays.copyOfRange(buffer.array(), 0, exiLength));
+        assertArrayEquals(msgAsExi, Arrays.copyOfRange(array, 0, exiLength));
 
         // assert all other bytes in buffer be 0
-        for (int i = exiLength; i < buffer.array().length; i++) {
-            assertEquals((byte)0, buffer.array()[i]);
+        for (int i = exiLength; i < array.length; i++) {
+            assertEquals((byte)0, array[i]);
         }
 
         final var out = new ArrayList<>();
-        exiDecoder.decode(null, buffer, out);
+        exiDecoder.decode(null, Unpooled.wrappedBuffer(array), out);
 
         final var diff = DiffBuilder.compare(msg.getDocument())
             .withTest(((NetconfMessage) out.get(0)).getDocument())
