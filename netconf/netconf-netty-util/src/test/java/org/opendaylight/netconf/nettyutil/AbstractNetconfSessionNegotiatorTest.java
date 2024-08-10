@@ -22,7 +22,6 @@ import static org.mockito.Mockito.verify;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -53,7 +52,6 @@ import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 
@@ -80,7 +78,7 @@ class AbstractNetconfSessionNegotiatorTest {
     @BeforeEach
     void setUp() {
         channel.pipeline()
-            .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
+//            .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
             .addLast(MessageDecoder.HANDLER_NAME, xmlToHello)
             .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());

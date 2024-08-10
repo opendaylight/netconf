@@ -7,18 +7,17 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 
 /**
- * Customized NetconfMessageToXMLEncoder that serializes additional header with
- * session metadata along with
- * {@link HelloMessage}
- * . Used by netconf clients to send information about the user, ip address,
- * protocol etc.
+ * Customized XMLMessageWriter that serializes additional header with session metadata along with {@link HelloMessage}.
+ * Used by netconf clients to send information about the user, ip address, protocol etc.
  *
  * <p>
  * Hello message with header example:
@@ -36,13 +35,21 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
  * }
  * </pre>
  */
-public final class HelloXMLMessageEncoder extends XMLMessageEncoder {
+public final class HelloXMLMessageWriter extends XMLMessageWriter {
+    public HelloXMLMessageWriter() {
+        // Nothing else
+    }
+
+    public HelloXMLMessageWriter(final boolean pretty) {
+        super(pretty);
+    }
+
     @Override
-    @VisibleForTesting
-    public void encodeTo(final NetconfMessage msg, final OutputStream out) throws Exception {
-        if (!(msg instanceof HelloMessage hello)) {
+    protected void writeMessage(final NetconfMessage message, final Transformer transformer, final OutputStream out)
+            throws IOException, TransformerException {
+        if (!(message instanceof HelloMessage hello)) {
             throw new IllegalStateException("Netconf message of type %s expected, was %s".formatted(
-                HelloMessage.class, msg.getClass()));
+                HelloMessage.class, message.getClass()));
         }
 
         // If additional header present, serialize it along with netconf hello message
@@ -51,6 +58,6 @@ public final class HelloXMLMessageEncoder extends XMLMessageEncoder {
             out.write(header.orElseThrow().toFormattedString().getBytes(StandardCharsets.UTF_8));
         }
 
-        super.encodeTo(msg, out);
+        super.writeMessage(message, transformer, out);
     }
 }

@@ -42,7 +42,7 @@ import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -180,7 +180,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
         channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
 
         // Remove special outbound handler for hello message. Insert regular netconf xml message (en|de)coders.
-        replaceChannelHandler(channel, MessageEncoder.HANDLER_NAME, new XMLMessageEncoder());
+        channel.pipeline().get(MessageEncoder.class).setWriter(new XMLMessageWriter());
 
         synchronized (this) {
             lockedChangeState(State.OPEN_WAIT);
