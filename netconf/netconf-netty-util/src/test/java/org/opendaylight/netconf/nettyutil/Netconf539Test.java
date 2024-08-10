@@ -10,7 +10,6 @@ package org.opendaylight.netconf.nettyutil;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
@@ -33,6 +32,7 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +48,7 @@ class Netconf539Test {
     @BeforeEach
     void setUp() {
         channel.pipeline()
-            .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
+            .addLast("mockEncoder", new MessageEncoder(new XMLMessageWriter()))
             .addLast(MessageDecoder.HANDLER_NAME, new HelloXMLMessageDecoder())
             .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());

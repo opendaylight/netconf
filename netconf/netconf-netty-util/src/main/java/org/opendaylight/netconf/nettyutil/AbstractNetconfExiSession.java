@@ -8,13 +8,14 @@
 package org.opendaylight.netconf.nettyutil;
 
 import io.netty.channel.Channel;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
@@ -46,7 +47,7 @@ public abstract class AbstractNetconfExiSession<
         }
 
         final var exiCodec = NetconfEXICodec.forParameters(exiParams);
-        final var exiEncoder = exiCodec.newMessageEncoder();
+        final var exiWriter = exiCodec.newMessageWriter();
         final MessageDecoder exiDecoder;
         try {
             exiDecoder = exiCodec.newMessageDecoder();
@@ -55,7 +56,7 @@ public abstract class AbstractNetconfExiSession<
             throw new IllegalStateException("Cannot instantiate encoder for options", e);
         }
 
-        addExiHandlers(exiDecoder, exiEncoder);
+        addExiHandlers(exiDecoder, exiWriter);
         LOG.debug("Session {} EXI handlers added to pipeline", this);
     }
 
@@ -63,10 +64,10 @@ public abstract class AbstractNetconfExiSession<
      * Add a set encoder/decoder tuple into the channel pipeline as appropriate.
      *
      * @param decoder EXI decoder
-     * @param encoder EXI encoder
+     * @param encoder EXI {@link MessageWriter}
      */
     @NonNullByDefault
-    protected abstract void addExiHandlers(MessageDecoder decoder, MessageEncoder encoder);
+    protected abstract void addExiHandlers(MessageDecoder decoder, MessageWriter encoder);
 
     @NonNullByDefault
     protected final void replaceMessageDecoder(final MessageDecoder newDecoder) {
@@ -74,11 +75,11 @@ public abstract class AbstractNetconfExiSession<
     }
 
     @NonNullByDefault
-    protected final void replaceMessageEncoder(final MessageEncoder handler) {
-        replaceChannelHandler(MessageEncoder.class, MessageEncoder.HANDLER_NAME, handler);
+    protected final void setMessageWriter(final MessageWriter newWriter) {
+        messageEncoder().setWriter(newWriter);
     }
 
-    protected final void replaceMessageEncoderAfterNextMessage(final MessageEncoder handler) {
-        runAfterNextMessage(() -> replaceMessageEncoder(handler));
+    protected final void setMessageWriterAfterNextMessage(final @NonNull MessageWriter newWriter) {
+        runAfterNextMessage(() -> setMessageWriter(newWriter));
     }
 }
