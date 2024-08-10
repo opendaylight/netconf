@@ -22,7 +22,7 @@ public final class EOMFrameDecoder extends FrameDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(EOMFrameDecoder.class);
 
     // Cached for brevity and constantness
-    private static final byte[] EOM = MessageParts.END_OF_MESSAGE;
+    private static final byte[] EOM = FramingParts.END_OF_MESSAGE;
     private static final int EOM_LENGTH = EOM.length;
 
     // Number of input ByteBuf bytes known to not include the delimiter.

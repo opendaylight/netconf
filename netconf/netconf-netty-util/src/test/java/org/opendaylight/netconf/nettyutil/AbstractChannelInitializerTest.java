@@ -11,7 +11,6 @@ package org.opendaylight.netconf.nettyutil;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
@@ -24,6 +23,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.NetconfSession;
+import org.opendaylight.netconf.codec.FrameDecoder;
+import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractChannelInitializerTest {
@@ -45,7 +47,9 @@ class AbstractChannelInitializerTest {
     void testInit() {
         final TestingInitializer testingInitializer = new TestingInitializer();
         testingInitializer.initialize(channel, sessionPromise);
-        verify(pipeline, times(4)).addLast(anyString(), any(ChannelHandler.class));
+        verify(pipeline).addLast(anyString(), any(FrameDecoder.class));
+        verify(pipeline).addLast(anyString(), any(MessageDecoder.class));
+        verify(pipeline).addLast(anyString(), any(MessageEncoder.class));
     }
 
     private static final class TestingInitializer extends AbstractChannelInitializer<NetconfSession> {

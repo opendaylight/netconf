@@ -11,9 +11,7 @@ import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
-import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
-import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.HelloMessageWriter;
@@ -25,7 +23,6 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public void initialize(final Channel ch, final Promise<S> promise) {
         ch.pipeline().addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         initializeMessageDecoder(ch);
-        ch.pipeline().addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder());
         // Special encoding handler for hello message to include additional header if available, it is thrown away after
         // successful negotiation
         ch.pipeline().addLast("netconfMessageEncoder", new MessageEncoder(HelloMessageWriter.pretty()));

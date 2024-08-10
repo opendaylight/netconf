@@ -19,7 +19,7 @@ import org.opendaylight.netconf.api.messages.FramingMechanism;
  *
  * @author Thomas Pantelis
  */
-final class MessageParts {
+final class FramingParts {
     static final byte[] END_OF_MESSAGE;
     static final byte[] START_OF_CHUNK;
     static final byte[] END_OF_CHUNK;
@@ -38,7 +38,7 @@ final class MessageParts {
         }
     }
 
-    private MessageParts() {
+    private FramingParts() {
         // Hidden on purpose
     }
 
