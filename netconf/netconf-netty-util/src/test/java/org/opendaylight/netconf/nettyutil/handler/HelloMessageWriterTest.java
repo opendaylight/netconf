@@ -24,16 +24,16 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
 @ExtendWith(MockitoExtension.class)
-class HelloXMLMessageEncoderTest {
+class HelloMessageWriterTest {
     @Mock
     private ChannelHandlerContext ctx;
 
-    private final HelloXMLMessageEncoder encoder = new HelloXMLMessageEncoder();
+    private final HelloMessageWriter encoder = HelloMessageWriter.of();
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     @Test
     void testEncode() throws Exception {
-        encoder.encodeTo(new HelloMessage(XmlUtil.readXmlToDocument(
+        encoder.writeMessage(new HelloMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"),
                 NetconfHelloMessageAdditionalHeader.fromString("[tomas;10.0.0.0:10000;tcp;client;]")), baos);
 
@@ -44,7 +44,7 @@ class HelloXMLMessageEncoderTest {
 
     @Test
     void testEncodeNoHeader() throws Exception {
-        encoder.encodeTo(new HelloMessage(XmlUtil.readXmlToDocument(
+        encoder.writeMessage(new HelloMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>")), baos);
 
         final var encoded = new String(baos.toByteArray());
@@ -56,6 +56,6 @@ class HelloXMLMessageEncoderTest {
     void testEncodeNotHello() throws Exception {
         final var msg = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
-        assertThrows(IllegalStateException.class, () -> encoder.encodeTo(msg, baos));
+        assertThrows(IllegalStateException.class, () -> encoder.writeMessage(msg, baos));
     }
 }
