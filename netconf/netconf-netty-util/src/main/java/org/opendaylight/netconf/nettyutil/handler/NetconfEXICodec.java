@@ -15,7 +15,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.shaded.exificient.core.EXIFactory;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
@@ -57,8 +57,8 @@ public final class NetconfEXICodec {
         return new EXIMessageDecoder(reader);
     }
 
-    public @NonNull MessageEncoder newMessageEncoder() {
-        return new EXIMessageEncoder(exiFactory);
+    public @NonNull MessageWriter newMessageWriter() {
+        return new EXIMessageWriter(exiFactory);
     }
 
     @VisibleForTesting

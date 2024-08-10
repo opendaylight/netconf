@@ -25,10 +25,10 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -160,14 +160,14 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
     }
 
     @Override
-    protected void addExiHandlers(final MessageDecoder decoder, final MessageEncoder encoder) {
+    protected void addExiHandlers(final MessageDecoder decoder, final MessageWriter encoder) {
         replaceMessageDecoder(decoder);
-        replaceMessageEncoderAfterNextMessage(encoder);
+        setMessageWriterAfterNextMessage(encoder);
     }
 
     @Override
     public void stopExiCommunication() {
         replaceMessageDecoder(new XMLMessageDecoder());
-        replaceMessageEncoderAfterNextMessage(new XMLMessageEncoder());
+        setMessageWriterAfterNextMessage(XMLMessageWriter.pretty());
     }
 }
