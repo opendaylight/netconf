@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -21,13 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
-import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
-import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
-import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
@@ -50,7 +49,6 @@ class Netconf539Test {
         channel.pipeline()
             .addLast("mockEncoder", new MessageEncoder(XMLMessageWriter.of()))
             .addLast(MessageDecoder.HANDLER_NAME, new HelloXMLMessageDecoder())
-            .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         negotiator = new TestSessionNegotiator(
             HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty()), promise, channel,
@@ -76,7 +74,7 @@ class Netconf539Test {
         final var pipeline = channel.pipeline();
         assertInstanceOf(ChunkedFrameDecoder.class, pipeline.get(FrameDecoder.HANDLER_NAME),
             "NetconfChunkAggregator was not installed in the Netconf pipeline");
-        assertInstanceOf(ChunkedFrameEncoder.class, pipeline.get(FrameEncoder.HANDLER_NAME),
+        assertEquals(FramingMechanism.CHUNK, pipeline.get(MessageEncoder.class).framing().mechanism(),
             "ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline");
     }
 }
