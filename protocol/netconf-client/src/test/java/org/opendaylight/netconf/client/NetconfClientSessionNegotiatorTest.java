@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableSet;
@@ -42,6 +41,8 @@ import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
@@ -110,6 +111,9 @@ class NetconfClientSessionNegotiatorTest {
         doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(),
             any(NetconfClientSession.class));
         doReturn(null).when(pipeline).replace(anyString(), anyString(), any(MessageToByteEncoder.class));
+
+        final var encoder = new MessageEncoder(mock(MessageWriter.class));
+        doReturn(encoder).when(pipeline).get(MessageEncoder.class);
 
         Class<? extends MessageDecoder> exiClass;
         try {
@@ -201,9 +205,10 @@ class NetconfClientSessionNegotiatorTest {
 
         verify(promise).setSuccess(any());
 
-        // two calls for exiMessage, 2 for hello message
-        verify(pipeline, times(2)).replace(anyString(), anyString(), any(ChannelHandler.class));
-        verify(pipeline, times(2)).replace(any(Class.class), anyString(), any(ChannelHandler.class));
+        // for hello message
+        verify(pipeline).replace(anyString(), anyString(), any(MessageDecoder.class));
+        // for exiMessage
+        verify(pipeline).replace(any(Class.class), anyString(), any(MessageDecoder.class));
     }
 
     @Test

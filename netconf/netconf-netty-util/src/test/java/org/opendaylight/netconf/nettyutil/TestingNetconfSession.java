@@ -10,7 +10,7 @@ package org.opendaylight.netconf.nettyutil;
 import io.netty.channel.Channel;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
 class TestingNetconfSession
@@ -26,7 +26,7 @@ class TestingNetconfSession
     }
 
     @Override
-    protected void addExiHandlers(final MessageDecoder decoder, final MessageEncoder encoder) {
+    protected void addExiHandlers(final MessageDecoder decoder, final MessageWriter encoder) {
         // No-op
     }
 
