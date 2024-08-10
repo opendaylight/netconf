@@ -34,9 +34,8 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
-import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
-import org.opendaylight.netconf.codec.FrameEncoder;
+import org.opendaylight.netconf.codec.FramingSupport;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
@@ -269,7 +268,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
      * Insert chunk framing handlers into the pipeline.
      */
     private void insertChunkFramingToPipeline() {
-        replaceChannelHandler(channel, FrameEncoder.HANDLER_NAME, new ChunkedFrameEncoder());
+        channel.pipeline().get(MessageEncoder.class).setFraming(FramingSupport.chunk());
         replaceChannelHandler(channel, FrameDecoder.HANDLER_NAME, new ChunkedFrameDecoder(maximumIncomingChunkSize));
     }
 

@@ -225,7 +225,7 @@ class EOMFrameDecoderTest {
         final ByteBuf in = Unpooled.buffer();
         final List<Object> out = new LinkedList<>();
 
-        for (final byte b : MessageParts.END_OF_MESSAGE) {
+        for (final byte b : FramingParts.END_OF_MESSAGE) {
             in.writeByte(b);
             decoder.decode(null, in, out);
             assertEquals(0, decoder.bodyLength());

@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * NETCONF netty-codec integration. Exposes {@link FrameDecoder} and {@link FrameEncoder} to deal with NETCONF message
+ * NETCONF netty-codec integration. Exposes {@link FrameDecoder} and {@link FramingSupport} to deal with NETCONF message
  * framing on top of a byte-oriented channel.
  */
 @org.osgi.annotation.bundle.Export

@@ -45,14 +45,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
-import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
-import org.opendaylight.netconf.codec.EOMFrameEncoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
-import org.opendaylight.netconf.codec.FrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
@@ -84,7 +82,6 @@ class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline()
             .addLast("mockEncoder", new MessageEncoder(XMLMessageWriter.pretty()))
             .addLast(MessageDecoder.HANDLER_NAME, xmlToHello)
-            .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
@@ -102,7 +99,7 @@ class AbstractNetconfSessionNegotiatorTest {
                     <capability>urn:ietf:params:netconf:base:1.1</capability>
                 </capabilities>
             </hello>
-            """, new String(ByteBufUtil.getBytes(buf), StandardCharsets.UTF_8));
+            ]]>]]>""", new String(ByteBufUtil.getBytes(buf), StandardCharsets.UTF_8));
     }
 
     @Test
@@ -144,7 +141,7 @@ class AbstractNetconfSessionNegotiatorTest {
         assertNotNull(session);
         final var pipeline = channel.pipeline();
         assertInstanceOf(EOMFrameDecoder.class, pipeline.get(FrameDecoder.HANDLER_NAME));
-        assertInstanceOf(EOMFrameEncoder.class, pipeline.get(FrameEncoder.HANDLER_NAME));
+        assertEquals(FramingMechanism.EOM, pipeline.get(MessageEncoder.class).framing().mechanism());
     }
 
     @Test
@@ -155,7 +152,7 @@ class AbstractNetconfSessionNegotiatorTest {
         assertNotNull(session);
         final var pipeline = channel.pipeline();
         assertInstanceOf(ChunkedFrameDecoder.class, pipeline.get(FrameDecoder.HANDLER_NAME));
-        assertInstanceOf(ChunkedFrameEncoder.class, pipeline.get(FrameEncoder.HANDLER_NAME));
+        assertEquals(FramingMechanism.CHUNK, pipeline.get(MessageEncoder.class).framing().mechanism());
     }
 
     @Test

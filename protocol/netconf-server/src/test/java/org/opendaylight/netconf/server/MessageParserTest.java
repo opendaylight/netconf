@@ -21,9 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
-import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
-import org.opendaylight.netconf.codec.EOMFrameEncoder;
+import org.opendaylight.netconf.codec.FramingSupport;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
@@ -40,9 +39,11 @@ class MessageParserTest {
 
     @Test
     void testChunkedFramingMechanismOnPipeline() throws Exception {
-        final var testChunkChannel = new EmbeddedChannel(
-                new ChunkedFrameEncoder(), new MessageEncoder(XMLMessageWriter.pretty()),
-                new ChunkedFrameDecoder(ChunkedFrameEncoder.MAX_CHUNK_SIZE), new XMLMessageDecoder());
+        final var encoder = new MessageEncoder(XMLMessageWriter.pretty());
+        encoder.setFraming(FramingSupport.chunk());
+
+        final var testChunkChannel = new EmbeddedChannel(encoder,
+                new ChunkedFrameDecoder(FramingSupport.MAX_CHUNK_SIZE), new XMLMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final var messages = testChunkChannel.outboundMessages();
@@ -54,17 +55,17 @@ class MessageParserTest {
         final int msgLength = baos.toByteArray().length;
         assertEquals(346, msgLength);
 
-        int chunkCount = msgLength / ChunkedFrameEncoder.DEFAULT_CHUNK_SIZE;
-        if (msgLength % ChunkedFrameEncoder.DEFAULT_CHUNK_SIZE != 0) {
+        int chunkCount = msgLength / FramingSupport.DEFAULT_CHUNK_SIZE;
+        if (msgLength % FramingSupport.DEFAULT_CHUNK_SIZE != 0) {
             chunkCount++;
         }
 
         final var endOfChunkBytes = "\n##\n".getBytes(StandardCharsets.US_ASCII);
         for (int i = 1; i <= chunkCount; i++) {
             final var recievedOutbound = (ByteBuf) messages.poll();
-            int exptHeaderLength = ChunkedFrameEncoder.DEFAULT_CHUNK_SIZE;
+            int exptHeaderLength = FramingSupport.DEFAULT_CHUNK_SIZE;
             if (i == chunkCount) {
-                exptHeaderLength = msgLength - ChunkedFrameEncoder.DEFAULT_CHUNK_SIZE * (i - 1);
+                exptHeaderLength = msgLength - FramingSupport.DEFAULT_CHUNK_SIZE * (i - 1);
                 byte[] eom = new byte[endOfChunkBytes.length];
                 recievedOutbound.getBytes(recievedOutbound.readableBytes() - endOfChunkBytes.length, eom);
                 assertArrayEquals(endOfChunkBytes, eom);
@@ -91,8 +92,7 @@ class MessageParserTest {
 
     @Test
     void testEOMFramingMechanismOnPipeline() {
-        final var testChunkChannel = new EmbeddedChannel(
-                new EOMFrameEncoder(), new MessageEncoder(XMLMessageWriter.of()),
+        final var testChunkChannel = new EmbeddedChannel(new MessageEncoder(XMLMessageWriter.of()),
                 new EOMFrameDecoder(), new XMLMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
