@@ -12,10 +12,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import java.util.Collection;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,16 +52,16 @@ public class NetconfClientSession
     }
 
     @Override
-    protected void addExiHandlers(final MessageDecoder decoder, final MessageEncoder encoder) {
+    protected void addExiHandlers(final MessageDecoder decoder, final MessageWriter encoder) {
         // TODO used only in negotiator, client supports only auto start-exi
         replaceMessageDecoder(decoder);
-        replaceMessageEncoder(encoder);
+        setMessageWriter(encoder);
     }
 
     @Override
     public void stopExiCommunication() {
         // TODO never used, Netconf client does not support stop-exi
         replaceMessageDecoder(new XMLMessageDecoder());
-        replaceMessageEncoder(new XMLMessageEncoder());
+        setMessageWriter(XMLMessageWriter.pretty());
     }
 }

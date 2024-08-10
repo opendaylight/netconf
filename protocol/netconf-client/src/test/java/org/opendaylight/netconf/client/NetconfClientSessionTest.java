@@ -49,7 +49,7 @@ class NetconfClientSessionTest {
         doReturn(channelHandler).when(pipeline).replace(any(Class.class), anyString(), any(ChannelHandler.class));
 
         final NetconfClientSession session = new NetconfClientSession(sessionListener, channel, sessId, caps);
-        session.addExiHandlers(codec.newMessageDecoder(), codec.newMessageEncoder());
+        session.addExiHandlers(codec.newMessageDecoder(), codec.newMessageWriter());
         session.stopExiCommunication();
 
         assertEquals(caps, session.getServerCapabilities());
