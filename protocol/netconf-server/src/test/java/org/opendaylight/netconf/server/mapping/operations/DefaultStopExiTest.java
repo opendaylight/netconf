@@ -23,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.MessageDecoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -39,13 +41,17 @@ class DefaultStopExiTest {
     private NetconfServerSessionListener sessionListener;
     @Mock
     private MessageDecoder decoder;
+    @Mock
+    private MessageWriter messageWriter;
 
     @Test
     void testHandleWithNoSubsequentOperations() throws Exception {
         final DefaultStopExi exi = new DefaultStopExi(new SessionIdType(Uint32.ONE));
         final Document doc = XmlUtil.newDocument();
+        final var encoder = new MessageEncoder(messageWriter);
         doReturn(pipeline).when(channel).pipeline();
         doReturn(decoder).when(pipeline).replace(any(Class.class), anyString(), any(MessageDecoder.class));
+        doReturn(encoder).when(pipeline).get(MessageEncoder.class);
 
         exi.setNetconfSession(new NetconfServerSession(sessionListener, channel, new SessionIdType(Uint32.TWO), null));
 

@@ -90,11 +90,12 @@ public abstract sealed class FramingSupport {
         @Override
         void writeMessage(final ByteBufAllocator alloc, final NetconfMessage message, final MessageWriter writer,
                 final ByteBuf out) throws IOException, TransformerException {
-            final int offset = out.writerIndex();
+            final boolean needEom;
             try (var os = new ByteBufOutputStream(out)) {
                 writer.writeMessage(message, os);
+                needEom = os.writtenBytes() != 0;
             }
-            if (offset != out.writerIndex()) {
+            if (needEom) {
                 out.writeBytes(FramingParts.END_OF_MESSAGE);
             }
         }
