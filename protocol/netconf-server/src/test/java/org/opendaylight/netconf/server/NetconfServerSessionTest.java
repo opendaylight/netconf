@@ -29,9 +29,10 @@ import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;
@@ -51,8 +52,8 @@ class NetconfServerSessionTest {
     private NetconfServerSessionListener listener;
     @Spy
     private MessageDecoder decoder;
-    @Spy
-    private MessageEncoder encoder;
+    @Mock
+    private MessageWriter messageWriter;
 
     private NetconfServerSession session;
     private EmbeddedChannel channel;
@@ -180,21 +181,24 @@ class NetconfServerSessionTest {
     @Test
     void testAddExiHandlers() throws Exception {
         channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, new XMLMessageDecoder());
-        channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, new XMLMessageEncoder());
+        channel.pipeline().addLast("spyEncoder", new MessageEncoder(XMLMessageWriter.of()));
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
-        session.addExiHandlers(codec.newMessageDecoder(), codec.newMessageEncoder());
+        session.addExiHandlers(codec.newMessageDecoder(), codec.newMessageWriter());
     }
 
     @Test
     void testStopExiCommunication() {
         channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, decoder);
-        channel.pipeline().addLast(MessageEncoder.HANDLER_NAME, encoder);
+        final var encoder = new MessageEncoder(messageWriter);
+        channel.pipeline().addLast("spyEncoder", encoder);
+
+        // handler is replaced only after next send message call
         session.stopExiCommunication();
-        //handler is replaced only after next send message call
-        assertSame(encoder, channel.pipeline().get(MessageEncoder.HANDLER_NAME));
+        assertSame(messageWriter, encoder.writer());
+
         session.sendMessage(msg);
         channel.runPendingTasks();
         assertInstanceOf(XMLMessageDecoder.class, channel.pipeline().get(MessageDecoder.HANDLER_NAME));
-        assertInstanceOf(XMLMessageEncoder.class, channel.pipeline().get(MessageEncoder.HANDLER_NAME));
+        assertInstanceOf(XMLMessageWriter.class, encoder.writer());
     }
 }

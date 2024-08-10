@@ -16,6 +16,7 @@ import io.netty.buffer.Unpooled;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,7 @@ import org.xmlunit.builder.DiffBuilder;
 class NetconfEXIHandlersTest {
     private final String msgAsString = "<netconf-message/>";
 
-    private EXIMessageEncoder exiEncoder;
+    private EXIMessageWriter exiEncoder;
     private EXIMessageDecoder exiDecoder;
     private NetconfMessage msg;
     private byte[] msgAsExi;
@@ -36,7 +37,7 @@ class NetconfEXIHandlersTest {
     @BeforeEach
     void setUp() throws Exception {
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
-        exiEncoder = assertInstanceOf(EXIMessageEncoder.class, codec.newMessageEncoder());
+        exiEncoder = assertInstanceOf(EXIMessageWriter.class, codec.newMessageWriter());
         exiDecoder = assertInstanceOf(EXIMessageDecoder.class, codec.newMessageDecoder());
 
         msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));
@@ -47,7 +48,7 @@ class NetconfEXIHandlersTest {
         final var baos = new ByteArrayOutputStream();
         final var encoder = codec.exiFactory().createEXIWriter();
         encoder.setOutputStream(baos);
-        ThreadLocalTransformers.getDefaultTransformer().transform(new DOMSource(msg.getDocument()),
+        TransformerFactory.newInstance().newTransformer().transform(new DOMSource(msg.getDocument()),
             new SAXResult(encoder));
         return baos.toByteArray();
     }
@@ -55,7 +56,7 @@ class NetconfEXIHandlersTest {
     @Test
     void testEncodeDecode() throws Exception {
         final var baos = new ByteArrayOutputStream();
-        exiEncoder.encodeTo(msg, baos);
+        exiEncoder.writeMessage(msg, baos);
         final int exiLength = msgAsExi.length;
 
         final var array = baos.toByteArray();

@@ -20,9 +20,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -31,6 +31,7 @@ import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +57,7 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractNetconfSessionNegotiatorTest {
@@ -80,7 +82,7 @@ class AbstractNetconfSessionNegotiatorTest {
     @BeforeEach
     void setUp() {
         channel.pipeline()
-            .addLast(MessageEncoder.HANDLER_NAME, new ChannelInboundHandlerAdapter())
+            .addLast("mockEncoder", new MessageEncoder(XMLMessageWriter.pretty()))
             .addLast(MessageDecoder.HANDLER_NAME, xmlToHello)
             .addLast(FrameEncoder.HANDLER_NAME, new EOMFrameEncoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
@@ -91,7 +93,16 @@ class AbstractNetconfSessionNegotiatorTest {
     void testStartNegotiation() {
         enableTimerTask();
         negotiator.startNegotiation();
-        assertEquals(helloBase11, channel.readOutbound());
+
+        final var buf = assertInstanceOf(ByteBuf.class, channel.readOutbound());
+        assertEquals("""
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <capabilities>
+                    <capability>urn:ietf:params:netconf:base:1.1</capability>
+                </capabilities>
+            </hello>
+            """, new String(ByteBufUtil.getBytes(buf), StandardCharsets.UTF_8));
     }
 
     @Test
