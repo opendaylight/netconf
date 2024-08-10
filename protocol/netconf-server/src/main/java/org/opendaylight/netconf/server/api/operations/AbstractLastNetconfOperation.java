@@ -24,12 +24,11 @@ public abstract class AbstractLastNetconfOperation extends AbstractNetconfOperat
     @Override
     protected Element handle(final Document document, final XmlElement operationElement,
                              final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
-        if (!subsequentOperation.isExecutionTermination()) {
-            throw new DocumentedException(String.format(
-                    "No netconf operation expected to be subsequent to %s, but is %s", this, subsequentOperation),
-                    ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
+        if (subsequentOperation != null) {
+            throw new DocumentedException(
+                "No netconf operation expected to be subsequent to %s, but is %s".formatted(this, subsequentOperation),
+                ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
-
         return handleWithNoSubsequentOperations(document, operationElement);
     }
 

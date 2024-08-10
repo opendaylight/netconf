@@ -10,6 +10,7 @@ package org.opendaylight.netconf.server.api.operations;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.messages.RpcMessage;
@@ -84,8 +85,8 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     protected abstract String getOperationName();
 
     @Override
-    public Document handle(final Document requestMessage,
-            final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+    public Document handle(final Document requestMessage, final NetconfOperationChainedExecution subsequentOperation)
+            throws DocumentedException {
         final var requestElement = getRequestElementWithCheck(requestMessage);
         final var document = XmlUtil.newDocument();
         final var operationElement = requestElement.getOnlyChildElement();
@@ -113,8 +114,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     }
 
     protected abstract Element handle(Document document, XmlElement message,
-                                      NetconfOperationChainedExecution subsequentOperation)
-            throws DocumentedException;
+        @Nullable NetconfOperationChainedExecution subsequentOperation) throws DocumentedException;
 
     @Override
     public String toString() {

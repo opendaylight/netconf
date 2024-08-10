@@ -36,17 +36,13 @@ public interface NetconfOperation {
     @Nullable HandlingPriority canHandle(Document message) throws DocumentedException;
 
     /**
-     * Execute current netconf operation and trigger execution of subsequent
-     * operations. subsequentOperation parameter will provide information, if
-     * current operation is the termination point in execution. In case of
-     * last/singleton operation, subsequentOperation must indicate termination
-     * point.
+     * Execute current netconf operation and trigger execution of subsequent operations, if applicable.
      *
      * @param requestMessage request message
-     * @param subsequentOperation execution of subsequent netconf operation
+     * @param subsequentOperation execution of subsequent NETCONF operation, or {@code null}
      * @return {@code document}
      * @throws DocumentedException if operation fails
      */
-    Document handle(Document requestMessage, NetconfOperationChainedExecution subsequentOperation)
+    Document handle(Document requestMessage, @Nullable NetconfOperationChainedExecution subsequentOperation)
             throws DocumentedException;
 }

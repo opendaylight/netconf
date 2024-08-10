@@ -46,7 +46,6 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.operations.HandlingPriority;
-import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -189,7 +188,7 @@ class RuntimeRpcTest {
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
         assertNotNull(priority);
 
-        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, null);
 
         verifyResponse(response, RPC_REPLY_OK);
     }
@@ -203,7 +202,7 @@ class RuntimeRpcTest {
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
         assertNotNull(priority);
 
-        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, null);
         verifyResponse(response, XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid-control.xml"));
     }
 
@@ -216,7 +215,7 @@ class RuntimeRpcTest {
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
         assertNotNull(priority);
 
-        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, null);
         verifyResponse(response, XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container-control.xml"));
     }
 
@@ -229,8 +228,7 @@ class RuntimeRpcTest {
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
         assertNotNull(priority);
 
-        final DocumentedException e = assertThrows(DocumentedException.class,
-                () -> rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT));
+        final DocumentedException e = assertThrows(DocumentedException.class, () -> rpc.handle(rpcDocument, null));
 
         assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
         assertEquals(e.getErrorTag(), ErrorTag.OPERATION_FAILED);
@@ -245,7 +243,7 @@ class RuntimeRpcTest {
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
         assertNotNull(priority);
 
-        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, null);
 
         verifyResponse(response, RPC_REPLY_OK);
     }
@@ -255,8 +253,7 @@ class RuntimeRpcTest {
         final RuntimeRpc rpc = new RuntimeRpc(SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_VOID_INVOKER);
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-bad-namespace.xml");
 
-        final DocumentedException e = assertThrows(DocumentedException.class,
-                () -> rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT));
+        final DocumentedException e = assertThrows(DocumentedException.class, () -> rpc.handle(rpcDocument, null));
 
         assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
         assertEquals(e.getErrorTag(), ErrorTag.BAD_ELEMENT);

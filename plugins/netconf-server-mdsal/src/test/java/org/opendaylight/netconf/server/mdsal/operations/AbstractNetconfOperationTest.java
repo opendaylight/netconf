@@ -42,7 +42,6 @@ import org.opendaylight.mdsal.dom.spi.store.DOMStore;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
-import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
 import org.opendaylight.netconf.test.util.NetconfXmlUnitRecursiveQualifier;
@@ -210,7 +209,7 @@ abstract class AbstractNetconfOperationTest {
     }
 
     protected static Document executeOperation(final NetconfOperation op, final Document request) throws Exception {
-        final Document response = op.handle(request, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = op.handle(request, null);
         LOG.debug("Got response {}", response);
         return response;
     }
