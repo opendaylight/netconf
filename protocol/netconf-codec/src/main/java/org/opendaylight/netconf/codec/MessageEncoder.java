@@ -10,10 +10,12 @@ package org.opendaylight.netconf.codec;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.VerifyException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,8 @@ public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
     private @NonNull FramingSupport framing = FramingSupport.eom();
     private @NonNull MessageWriter writer;
 
+    private @Nullable MessageWriter nextWriter;
+
     public MessageEncoder(final MessageWriter writer) {
         super(NetconfMessage.class);
         this.writer = requireNonNull(writer);
@@ -34,10 +38,25 @@ public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
 
     public void setFraming(final FramingSupport newFraming) {
         framing = requireNonNull(newFraming);
+        LOG.debug("Switched framing to {}", framing);
     }
 
     public void setWriter(final MessageWriter newWriter) {
-        writer = requireNonNull(newWriter);
+        doSetWriter(requireNonNull(newWriter));
+    }
+
+    private void doSetWriter(final @NonNull MessageWriter newWriter) {
+        writer = newWriter;
+        LOG.debug("Switched writer to {}", writer);
+    }
+
+    public void setNextWriter(final MessageWriter newNextWriter) {
+        final var local = nextWriter;
+        if (local != null) {
+            throw new VerifyException("Next writer already set to " + local);
+        }
+        nextWriter = requireNonNull(newNextWriter);
+        LOG.debug("Switching to {} after next message", nextWriter);
     }
 
     @VisibleForTesting
@@ -50,10 +69,28 @@ public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
         return writer;
     }
 
+    @VisibleForTesting
+    public @Nullable MessageWriter nextWriter() {
+        return nextWriter;
+    }
+
     @Override
     protected void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
             throws Exception {
         LOG.trace("Sent to encode : {}", msg);
         framing.writeMessage(ctx.alloc(), msg, writer, out);
+
+        // TODO: This is nicer than it used to be, but it is still not pretty.
+        //       Next writer should be carried with the message being written, i.e. have a 'MessageWriterNetconfMessage'
+        //       class, which has a MessageWriter. When we encounter it, just pick the writer from there -- making state
+        //       bound to the event causing them.
+        //       Unfortunately this is called from DefaultStartExi, which does not send the message directly, hence
+        //       addressing this improvement requires a netconf-server RPC execution refactor.
+
+        final var local = nextWriter;
+        if (local != null) {
+            nextWriter = null;
+            doSetWriter(local);
+        }
     }
 }

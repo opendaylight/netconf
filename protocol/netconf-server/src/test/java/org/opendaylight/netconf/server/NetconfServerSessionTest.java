@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.server;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -187,7 +188,7 @@ class NetconfServerSessionTest {
     }
 
     @Test
-    void testStopExiCommunication() {
+    void testStopExiCommunication() throws Exception {
         channel.pipeline().addLast(MessageDecoder.HANDLER_NAME, decoder);
         final var encoder = new MessageEncoder(messageWriter);
         channel.pipeline().addLast("spyEncoder", encoder);
@@ -195,10 +196,17 @@ class NetconfServerSessionTest {
         // handler is replaced only after next send message call
         session.stopExiCommunication();
         assertSame(messageWriter, encoder.writer());
+        assertInstanceOf(XMLMessageWriter.class, encoder.nextWriter());
 
+        doNothing().when(messageWriter).writeMessage(any(), any());
         session.sendMessage(msg);
         channel.runPendingTasks();
-        assertInstanceOf(XMLMessageDecoder.class, channel.pipeline().get(MessageDecoder.HANDLER_NAME));
+
+        final var outbound = channel.outboundMessages();
+        assertEquals(1, outbound.size());
+
+        assertInstanceOf(XMLMessageDecoder.class, channel.pipeline().get(MessageDecoder.class));
         assertInstanceOf(XMLMessageWriter.class, encoder.writer());
+        assertNull(encoder.nextWriter());
     }
 }
