@@ -8,15 +8,9 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 
 /**
@@ -45,17 +39,18 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 public final class HelloXMLMessageEncoder extends XMLMessageEncoder {
     @Override
     @VisibleForTesting
-    public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
-            throws IOException, TransformerException {
-        Preconditions.checkState(msg instanceof HelloMessage, "Netconf message of type %s expected, was %s",
-                HelloMessage.class, msg.getClass());
-        Optional<NetconfHelloMessageAdditionalHeader> headerOptional = ((HelloMessage) msg).getAdditionalHeader();
-
-        // If additional header present, serialize it along with netconf hello message
-        if (headerOptional.isPresent()) {
-            out.writeBytes(headerOptional.orElseThrow().toFormattedString().getBytes(StandardCharsets.UTF_8));
+    public void encodeTo(final NetconfMessage msg, final OutputStream out) throws Exception {
+        if (!(msg instanceof HelloMessage hello)) {
+            throw new IllegalStateException("Netconf message of type %s expected, was %s".formatted(
+                HelloMessage.class, msg.getClass()));
         }
 
-        super.encode(ctx, msg, out);
+        // If additional header present, serialize it along with netconf hello message
+        final var header = hello.getAdditionalHeader();
+        if (header.isPresent()) {
+            out.write(header.orElseThrow().toFormattedString().getBytes(StandardCharsets.UTF_8));
+        }
+
+        super.encodeTo(msg, out);
     }
 }
