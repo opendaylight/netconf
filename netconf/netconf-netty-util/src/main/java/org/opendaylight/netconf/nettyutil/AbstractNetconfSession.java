@@ -36,7 +36,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     private final @NonNull L sessionListener;
     private final @NonNull Channel channel;
 
-    private Runnable runAfterNextMessage;
     private boolean up;
 
     protected AbstractNetconfSession(final L sessionListener, final Channel channel, final SessionIdType sessionId) {
@@ -77,15 +76,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         // we need to execute all messages from an EventLoop thread.
 
         final var promise = channel.newPromise();
-        channel.eventLoop().execute(() -> {
-            channel.writeAndFlush(netconfMessage, promise);
-
-            final var local = runAfterNextMessage;
-            if (local != null) {
-                runAfterNextMessage = null;
-                local.run();
-            }
-        });
+        channel.eventLoop().execute(() -> channel.writeAndFlush(netconfMessage, promise));
 
         return promise;
     }
@@ -110,10 +101,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("sessionId", sessionId.getValue()).add("channel", channel);
-    }
-
-    protected final void runAfterNextMessage(final Runnable runnable) {
-        runAfterNextMessage = requireNonNull(runnable);
     }
 
     protected final <T extends ChannelHandler> void replaceChannelHandler(final Class<T> type, final String name,
