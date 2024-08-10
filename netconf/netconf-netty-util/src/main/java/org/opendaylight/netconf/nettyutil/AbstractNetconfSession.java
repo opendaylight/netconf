@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
@@ -22,6 +23,7 @@ import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +119,10 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     protected final <T extends ChannelHandler> void replaceChannelHandler(final Class<T> type, final String name,
             final T handler) {
         channel.pipeline().replace(type, name, handler);
+    }
+
+    protected final @NonNull MessageEncoder messageEncoder() {
+        return verifyNotNull(channel.pipeline().get(MessageEncoder.class), "No MessageEncoder present");
     }
 
     public final boolean isUp() {
