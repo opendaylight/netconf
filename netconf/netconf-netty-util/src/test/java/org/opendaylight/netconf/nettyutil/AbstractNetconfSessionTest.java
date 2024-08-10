@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.nettyutil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,8 +20,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
@@ -58,6 +61,8 @@ class AbstractNetconfSessionTest {
     private EventLoop eventLoop;
     @Mock
     private ChannelPromise writeFuture;
+    @Mock
+    private ChannelHandlerContext handlerContext;
 
     private HelloMessage clientHello;
 
@@ -100,14 +105,13 @@ class AbstractNetconfSessionTest {
     }
 
     @Test
-    void testReplaceHandlers() {
+    void testReplaceHandlers() throws Exception {
         doReturn(writeFuture).when(channel).newPromise();
-        doReturn(writeFuture).when(channel).writeAndFlush(any(NetconfMessage.class), any(ChannelPromise.class));
         doReturn(pipeline).when(channel).pipeline();
         doReturn(null).when(pipeline).replace(any(Class.class), anyString(), any());
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.<Runnable>getArgument(0).run();
+            invocation.getArgument(0, Runnable.class).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
 
@@ -123,15 +127,29 @@ class AbstractNetconfSessionTest {
         final var first = mock(MessageWriter.class);
         testingNetconfSession.setMessageWriter(first);
         assertSame(first, encoder.writer());
+        assertNull(encoder.nextWriter());
         verifyNoMoreInteractions(pipeline);
 
         final var second = mock(MessageWriter.class);
         testingNetconfSession.setMessageWriterAfterNextMessage(second);
         assertSame(first, encoder.writer());
+        assertSame(second, encoder.nextWriter());
         verifyNoMoreInteractions(pipeline);
+
+        doReturn(ByteBufAllocator.DEFAULT).when(handlerContext).alloc();
+        doNothing().when(first).writeMessage(any(), any());
+        doReturn(writeFuture).when(handlerContext).write(any(), any());
+
+        doAnswer(invocation -> {
+            final NetconfMessage message = invocation.getArgument(0);
+            final ChannelPromise promise = invocation.getArgument(1);
+            encoder.write(handlerContext, message, promise);
+            return writeFuture;
+        }).when(channel).writeAndFlush(any(NetconfMessage.class), any(ChannelPromise.class));
 
         testingNetconfSession.sendMessage(clientHello);
         assertSame(second, encoder.writer());
+        assertNull(encoder.nextWriter());
     }
 
     @Test

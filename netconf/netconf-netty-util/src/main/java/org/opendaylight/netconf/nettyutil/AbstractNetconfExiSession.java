@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.nettyutil;
 
 import io.netty.channel.Channel;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -79,7 +78,8 @@ public abstract class AbstractNetconfExiSession<
         messageEncoder().setWriter(newWriter);
     }
 
-    protected final void setMessageWriterAfterNextMessage(final @NonNull MessageWriter newWriter) {
-        runAfterNextMessage(() -> setMessageWriter(newWriter));
+    @NonNullByDefault
+    protected final void setMessageWriterAfterNextMessage(final MessageWriter newWriter) {
+        messageEncoder().setNextWriter(newWriter);
     }
 }
