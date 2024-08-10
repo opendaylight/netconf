@@ -22,7 +22,7 @@ import org.opendaylight.netconf.api.messages.FramingMechanism;
 final class FramingParts {
     static final byte[] END_OF_MESSAGE;
     static final byte[] START_OF_CHUNK;
-    static final byte[] END_OF_CHUNK;
+    static final byte[] END_OF_CHUNKS;
 
     static {
         final var encoder = StandardCharsets.US_ASCII.newEncoder()
@@ -32,7 +32,7 @@ final class FramingParts {
         try {
             END_OF_MESSAGE = getBytes(encoder, FramingMechanism.EOM_STR);
             START_OF_CHUNK = getBytes(encoder, FramingMechanism.CHUNK_START_STR);
-            END_OF_CHUNK = getBytes(encoder, FramingMechanism.CHUNK_END_STR);
+            END_OF_CHUNKS = getBytes(encoder, FramingMechanism.CHUNK_END_STR);
         } catch (CharacterCodingException e) {
             throw new ExceptionInInitializerError(e);
         }
