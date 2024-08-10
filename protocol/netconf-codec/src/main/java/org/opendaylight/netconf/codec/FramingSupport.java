@@ -8,24 +8,32 @@
  */
 package org.opendaylight.netconf.codec;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import javax.xml.transform.TransformerException;
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Support for {@link FramingMechanism}s.
+ * Support for {@link FramingMechanism}s. Instances are available via {@link #eom()} and {@link #chunk()} static factory
+ * methods.
  */
-@NonNullByDefault
 public abstract sealed class FramingSupport {
     private static final class Chunk extends FramingSupport {
-        private static final FramingSupport DEFAULT = new Chunk(DEFAULT_CHUNK_SIZE);
+        static final @NonNull Chunk DEFAULT = new Chunk(DEFAULT_CHUNK_SIZE);
 
         private final int chunkSize;
 
@@ -47,36 +55,119 @@ public abstract sealed class FramingSupport {
         @Override
         void writeMessage(final ByteBufAllocator alloc, final NetconfMessage message, final MessageWriter writer,
                 final ByteBuf out) throws IOException, TransformerException {
-            final var buffer = alloc.ioBuffer();
+            final var allocated = alloc.ioBuffer();
             try {
-                // TODO: This implementation is not entirely efficient: we buffer the entire message and we frame it
-                //       into individual chunks -- leading to sub-optimal memory usage.
-                //       Improve this by providing an OuputStream implementation backed by 'buffer', which does not
-                //       allow more buffering than chunkSize: i.e. as soon as MessageWriter invokes OutputStream.write()
-                //       which would exceed chunkSize, emit the frame into 'out', clear 'buffer' and continue writing
-                //       into it.
+                final var maxCapacity = allocated.maxCapacity();
+                final ByteBuf buffer;
+                final int size;
 
-                try (var os = new ByteBufOutputStream(buffer)) {
-                    writer.writeMessage(message, os);
+                // Safety checks so we do not run into trouble with chunk size exceeding buffer maximum size
+                if (maxCapacity < chunkSize) {
+                    LOG.debug("Allocated buffer cannot support chunk size {}", chunkSize);
+                    if (maxCapacity >= MIN_CHUNK_SIZE) {
+                        LOG.debug("Using chunk size {}", maxCapacity);
+                        buffer = allocated;
+                        size = maxCapacity;
+                    } else {
+                        LOG.debug("Using chunk size {} with unpooled on-heap buffer", MIN_CHUNK_SIZE);
+                        buffer = Unpooled.buffer(MIN_CHUNK_SIZE);
+                        size = MIN_CHUNK_SIZE;
+                    }
+                } else {
+                    buffer = allocated;
+                    size = chunkSize;
                 }
 
-                do {
-                    final int xfer = Math.min(chunkSize, buffer.readableBytes());
-
-                    out.writeBytes(FramingParts.START_OF_CHUNK)
-                        .writeBytes(String.valueOf(xfer).getBytes(StandardCharsets.US_ASCII)).writeByte('\n')
-                        .writeBytes(buffer, xfer);
-                } while (buffer.isReadable());
+                try (var os = new ChunkOutputStream(out, buffer, size)) {
+                    // let the writer do its thing first ...
+                    writer.writeMessage(message, os);
+                    // ... and nothing bad happens, also make sure to send anything that remains in the buffer
+                    os.flushChunk();
+                }
             } finally {
-                buffer.release();
+                allocated.release();
             }
 
-            out.writeBytes(FramingParts.END_OF_CHUNK);
+            out.writeBytes(FramingParts.END_OF_CHUNKS);
+        }
+
+        @Override
+        ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+            return super.addToStringAttributes(helper).add("chunkSize", chunkSize);
+        }
+    }
+
+    private static final class ChunkOutputStream extends OutputStream {
+        private final ByteBuf buffer;
+        private final ByteBuf out;
+        private final int chunkSize;
+
+        ChunkOutputStream(final ByteBuf out, final ByteBuf buffer, final int chunkSize) {
+            this.out = requireNonNull(out);
+            this.buffer = requireNonNull(buffer);
+            this.chunkSize = chunkSize;
+        }
+
+        @Override
+        public void write(final int value) throws IOException {
+            final var size = size();
+            if (size == chunkSize) {
+                sendChunk(size);
+            }
+            buffer.writeByte(value);
+        }
+
+        @Override
+        public void write(final byte[] bytes, final int off, final int len) throws IOException {
+            Objects.checkFromIndexSize(off, len, bytes.length);
+            if (len == 0) {
+                return;
+            }
+
+            int from = off;
+            int remaining = len;
+            int available = chunkSize - size();
+            do {
+                if (available == 0) {
+                    sendChunk(chunkSize);
+                    available = chunkSize;
+                }
+
+                final int xfer = Math.min(remaining, available);
+                buffer.writeBytes(bytes, from, xfer);
+                from += xfer;
+                remaining -= xfer;
+                available -= xfer;
+            } while (remaining != 0);
+        }
+
+        void flushChunk() {
+            final var size = size();
+            if (size != 0) {
+                sendChunk(size);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this).add("chunkSize", chunkSize).add("pending", size()).toString();
+        }
+
+        private void sendChunk(final int size) {
+            out.writeBytes(FramingParts.START_OF_CHUNK)
+                .writeBytes(Integer.toString(size).getBytes(StandardCharsets.US_ASCII)).writeByte('\n')
+                .writeBytes(buffer);
+            buffer.clear();
+        }
+
+        private int size() {
+            // buffer.readableBytes(), but we know readerIndex() is 0, so this is faster
+            return buffer.writerIndex();
         }
     }
 
     private static final class EOM extends FramingSupport {
-        static final FramingSupport INSTANCE = new EOM();
+        static final @NonNull EOM INSTANCE = new EOM();
 
         private EOM() {
             // Hidden on purpose
@@ -97,6 +188,8 @@ public abstract sealed class FramingSupport {
         }
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(FramingSupport.class);
+
     public static final int DEFAULT_CHUNK_SIZE = 8192;
     public static final int MIN_CHUNK_SIZE = 128;
     public static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
@@ -110,25 +203,47 @@ public abstract sealed class FramingSupport {
      *
      * @return A {@link FramingSupport}
      */
-    public static FramingSupport eom() {
+    public static @NonNull FramingSupport eom() {
         return EOM.INSTANCE;
     }
 
-    public static FramingSupport chunk() {
+    /**
+     * Return {@link FramingSupport} for {@link FramingMechanism#CHUNK} producing {@value #DEFAULT_CHUNK_SIZE}-byte
+     * chunks.
+     *
+     * @return A {@link FramingSupport}
+     */
+    public static @NonNull FramingSupport chunk() {
         return Chunk.DEFAULT;
     }
 
-    public static FramingSupport chunk(final int chunkSize) {
+    /**
+     * Return {@link FramingSupport} for {@link FramingMechanism#CHUNK} producing chunks of specified size.
+     *
+     * @return A {@link FramingSupport}
+     * @throws IllegalArgumentException if {@code chunkSize} is not valid
+     */
+    public static @NonNull FramingSupport chunk(final int chunkSize) {
         return chunkSize == DEFAULT_CHUNK_SIZE ? Chunk.DEFAULT : new Chunk(chunkSize);
     }
 
-    public abstract FramingMechanism mechanism();
+    /**
+     * Return the {@link FramingMechanism} of this object supports.
+     *
+     * @return A {@link FramingMechanism}
+     */
+    public abstract @NonNull FramingMechanism mechanism();
 
     @Override
     public final String toString() {
-        return MoreObjects.toStringHelper(FramingSupport.class).add("mechanism", mechanism()).toString();
+        return addToStringAttributes(MoreObjects.toStringHelper(FramingSupport.class)).toString();
+    }
+
+    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return helper.add("mechanism", mechanism());
     }
 
     abstract void writeMessage(ByteBufAllocator alloc, NetconfMessage message, MessageWriter writer, ByteBuf out)
         throws IOException, TransformerException;
+
 }
