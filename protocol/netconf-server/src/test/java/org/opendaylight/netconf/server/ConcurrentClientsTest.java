@@ -85,6 +85,7 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 @ExtendWith(MockitoExtension.class)
 class ConcurrentClientsTest {
@@ -238,7 +239,6 @@ class ConcurrentClientsTest {
                 ? null : HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
         }
 
-        @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         public Document handle(final Document requestMessage,
                 final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
@@ -246,7 +246,7 @@ class ConcurrentClientsTest {
             counter.getAndIncrement();
             try {
                 return XmlUtil.readXmlToDocument("<test/>");
-            } catch (Exception e) {
+            } catch (IOException | SAXException e) {
                 throw new RuntimeException(e);
             }
         }

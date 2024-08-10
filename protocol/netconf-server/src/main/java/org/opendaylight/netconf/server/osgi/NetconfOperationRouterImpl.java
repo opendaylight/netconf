@@ -180,11 +180,6 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoC
         }
 
         @Override
-        public boolean isExecutionTermination() {
-            return false;
-        }
-
-        @Override
         public Document execute(final Document message) throws DocumentedException {
             return netconfOperation.handle(message, subsequentExecution);
         }
@@ -195,15 +190,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoC
             final NetconfOperation netconfOperation = sortedByPriority.get(handlingPriority);
             final HandlingPriority subsequentHandlingPriority = sortedByPriority.lowerKey(handlingPriority);
 
-            NetconfOperationChainedExecution subsequentExecution = null;
-
-            if (subsequentHandlingPriority != null) {
-                subsequentExecution = createExecutionChain(sortedByPriority, subsequentHandlingPriority);
-            } else {
-                subsequentExecution = EXECUTION_TERMINATION_POINT;
-            }
-
-            return new NetconfOperationExecution(netconfOperation, subsequentExecution);
+            return new NetconfOperationExecution(netconfOperation, subsequentHandlingPriority == null ? null
+                : createExecutionChain(sortedByPriority, subsequentHandlingPriority));
         }
     }
 

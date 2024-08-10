@@ -37,8 +37,8 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
     }
 
     @Override
-    public Document handle(final Document message,
-                           final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+    public Document handle(final Document message, final NetconfOperationChainedExecution subsequentOperation)
+            throws DocumentedException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Received start-exi message {} ", XmlUtil.toString(message));
         }
@@ -54,8 +54,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document,
-                                                       final XmlElement operationElement) {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
         final Element getSchemaResult = document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
         LOG.trace("{} operation successful", START_EXI);
         return getSchemaResult;

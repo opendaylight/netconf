@@ -60,10 +60,9 @@ class AbstractLastNetconfOperationTest {
 
     @Test
     void testHandle() {
-        NetconfOperationChainedExecution operation = mock(NetconfOperationChainedExecution.class);
+        final var operation = mock(NetconfOperationChainedExecution.class);
         doReturn("").when(operation).toString();
 
-        doReturn(false).when(operation).isExecutionTermination();
         assertThrows(DocumentedException.class, () -> netconfOperation.handle(null, null, operation));
     }
 }

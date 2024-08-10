@@ -8,10 +8,10 @@
 package org.opendaylight.netconf.server.osgi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -77,37 +77,33 @@ class NetconfOperationRouterImplTest {
     void testOnNetconfMessage() throws Exception {
         doReturn(HandlingPriority.HANDLE_WITH_MAX_PRIORITY).when(maxPrioMock).canHandle(any(Document.class));
         doReturn(XmlUtil.readXmlToDocument(MAX_PRIORITY_REPLY)).when(maxPrioMock).handle(any(Document.class),
-            any(NetconfOperationChainedExecution.class));
+            any());
 
         doReturn(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY).when(defaultPrioMock).canHandle(any(Document.class));
         doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class),
-            any(NetconfOperationChainedExecution.class));
-        final ArgumentCaptor<NetconfOperationChainedExecution> highPriorityChainEx =
-                ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
-        final ArgumentCaptor<NetconfOperationChainedExecution> defaultPriorityChainEx =
-                ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
+            isNull());
+        final var highPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
 
-        final Document document = operationRouter.onNetconfMessage(TEST_RPC_DOC, null);
+        final var document = operationRouter.onNetconfMessage(TEST_RPC_DOC, null);
 
         //max priority message is first in chain
         verify(maxPrioMock).handle(any(Document.class), highPriorityChainEx.capture());
-        final NetconfOperationChainedExecution chainedExecution = highPriorityChainEx.getValue();
-        assertFalse(chainedExecution.isExecutionTermination());
+        final var chainedExecution = highPriorityChainEx.getValue();
+        assertNotNull(chainedExecution);
 
         //execute next in chain
-        final Document execute = chainedExecution.execute(XmlUtil.newDocument());
+        final var execute = chainedExecution.execute(XmlUtil.newDocument());
         assertEquals(DEFAULT_PRIORITY_REPLY, XmlUtil.toString(execute).trim());
 
         //default priority message is second and last
-        verify(defaultPrioMock).handle(any(Document.class), defaultPriorityChainEx.capture());
-        assertTrue(defaultPriorityChainEx.getValue().isExecutionTermination());
+        verify(defaultPrioMock).handle(any(Document.class), isNull());
 
         assertEquals(MAX_PRIORITY_REPLY, XmlUtil.toString(document).trim());
     }
 
     @Test
     void testOnNetconfMessageFail() {
-        final DocumentedException ex =  assertThrows(DocumentedException.class,
+        final var ex = assertThrows(DocumentedException.class,
             () -> emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null));
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
     }

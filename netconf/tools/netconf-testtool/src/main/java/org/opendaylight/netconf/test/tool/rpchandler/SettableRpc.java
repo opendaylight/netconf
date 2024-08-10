@@ -49,11 +49,11 @@ class SettableRpc implements NetconfOperation {
             checkForError(document);
             document.getDocumentElement().setAttribute(XmlNetconfConstants.MESSAGE_ID, msgId);
             return document;
-        } else if (subsequentOperation.isExecutionTermination()) {
-            throw new DocumentedException("Mapping not found " + XmlUtil.toString(requestMessage),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
-        } else {
+        } else if (subsequentOperation != null) {
             return subsequentOperation.execute(requestMessage);
+        } else {
+            throw new DocumentedException("Mapping not found " + XmlUtil.toString(requestMessage),
+                ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
     }
 
