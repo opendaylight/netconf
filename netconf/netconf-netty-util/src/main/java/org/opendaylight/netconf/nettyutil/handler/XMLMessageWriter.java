@@ -7,25 +7,35 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 
-public class XMLMessageEncoder extends MessageEncoder {
+public sealed class XMLMessageWriter extends MessageWriter permits HelloXMLMessageWriter {
+    public XMLMessageWriter() {
+        this(true);
+    }
+
+    public XMLMessageWriter(final boolean pretty) {
+        super(pretty);
+    }
+
     @Override
-    @VisibleForTesting
-    public void encodeTo(final NetconfMessage msg, final OutputStream out) throws Exception {
+    protected void writeMessage(final NetconfMessage message, final Transformer transformer, final OutputStream out)
+            throws IOException, TransformerException {
         // Wrap OutputStreamWriter with BufferedWriter as suggested in javadoc for OutputStreamWriter
 
         // Using custom BufferedWriter that does not provide newLine method as performance improvement
         // see javadoc for BufferedWriter
         final var result = new StreamResult(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
-        final var source = new DOMSource(msg.getDocument());
-        ThreadLocalTransformers.getPrettyTransformer().transform(source, result);
+        final var source = new DOMSource(message.getDocument());
+        transformer.transform(source, result);
     }
 }

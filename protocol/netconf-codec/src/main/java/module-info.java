@@ -14,9 +14,9 @@ module org.opendaylight.netconf.codec {
     requires transitive io.netty.buffer;
     requires transitive io.netty.codec;
     requires transitive io.netty.transport;
+    requires transitive org.opendaylight.netconf.api;
     requires com.google.common;
     requires io.netty.common;
-    requires org.opendaylight.netconf.api;
     requires org.slf4j;
 
     // Annotation-only dependencies

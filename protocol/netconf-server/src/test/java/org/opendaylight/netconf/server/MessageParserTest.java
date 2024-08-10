@@ -24,8 +24,9 @@ import org.opendaylight.netconf.codec.ChunkedFrameDecoder;
 import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.EOMFrameEncoder;
+import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageEncoder;
+import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.xmlunit.builder.DiffBuilder;
 
@@ -40,17 +41,15 @@ class MessageParserTest {
     @Test
     void testChunkedFramingMechanismOnPipeline() throws Exception {
         final var testChunkChannel = new EmbeddedChannel(
-                new ChunkedFrameEncoder(),
-                new XMLMessageEncoder(),
-                new ChunkedFrameDecoder(ChunkedFrameEncoder.MAX_CHUNK_SIZE),
-                new XMLMessageDecoder());
+                new ChunkedFrameEncoder(), new MessageEncoder(new XMLMessageWriter()),
+                new ChunkedFrameDecoder(ChunkedFrameEncoder.MAX_CHUNK_SIZE), new XMLMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final var messages = testChunkChannel.outboundMessages();
         assertEquals(1, messages.size());
 
         final var baos = new ByteArrayOutputStream();
-        new XMLMessageEncoder().encodeTo(msg, baos);
+        new XMLMessageWriter().writeMessage(msg, baos);
 
         final int msgLength = baos.toByteArray().length;
         assertEquals(346, msgLength);
@@ -93,8 +92,8 @@ class MessageParserTest {
     @Test
     void testEOMFramingMechanismOnPipeline() {
         final var testChunkChannel = new EmbeddedChannel(
-                new EOMFrameEncoder(),
-                new XMLMessageEncoder(), new EOMFrameDecoder(), new XMLMessageDecoder());
+                new EOMFrameEncoder(), new MessageEncoder(new XMLMessageWriter()),
+                new EOMFrameDecoder(), new XMLMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final ByteBuf recievedOutbound = testChunkChannel.readOutbound();

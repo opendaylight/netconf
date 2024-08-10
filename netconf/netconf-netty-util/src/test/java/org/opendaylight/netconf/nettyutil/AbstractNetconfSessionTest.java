@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.nettyutil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -15,7 +16,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -37,7 +37,7 @@ import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -111,18 +111,25 @@ class AbstractNetconfSessionTest {
         }).when(eventLoop).execute(any(Runnable.class));
 
         final var testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
+
         final var mockDecoder = mock(MessageDecoder.class);
         testingNetconfSession.replaceMessageDecoder(mockDecoder);
         verify(pipeline).replace(MessageDecoder.class, MessageDecoder.HANDLER_NAME, mockDecoder);
 
-        final var mockEncoder = mock(MessageEncoder.class);
-        testingNetconfSession.replaceMessageEncoder(mockEncoder);
-        verify(pipeline).replace(MessageEncoder.class, MessageEncoder.HANDLER_NAME, mockEncoder);
-        testingNetconfSession.replaceMessageEncoderAfterNextMessage(mockEncoder);
+        final var encoder = testingNetconfSession.messageEncoder();
+
+        final var first = mock(MessageWriter.class);
+        testingNetconfSession.setMessageWriter(first);
+        assertSame(first, encoder.writer());
+        verifyNoMoreInteractions(pipeline);
+
+        final var second = mock(MessageWriter.class);
+        testingNetconfSession.setMessageWriterAfterNextMessage(second);
+        assertSame(first, encoder.writer());
         verifyNoMoreInteractions(pipeline);
 
         testingNetconfSession.sendMessage(clientHello);
-        verify(pipeline, times(2)).replace(MessageEncoder.class, MessageEncoder.HANDLER_NAME, mockEncoder);
+        assertSame(second, encoder.writer());
     }
 
     @Test
@@ -131,7 +138,7 @@ class AbstractNetconfSessionTest {
         testingNetconfSession = spy(testingNetconfSession);
 
         testingNetconfSession.startExiCommunication(NetconfStartExiMessageProvider.create(EXIParameters.empty(), "4"));
-        verify(testingNetconfSession).addExiHandlers(any(MessageDecoder.class), any(MessageEncoder.class));
+        verify(testingNetconfSession).addExiHandlers(any(MessageDecoder.class), any(MessageWriter.class));
     }
 
     @Test
