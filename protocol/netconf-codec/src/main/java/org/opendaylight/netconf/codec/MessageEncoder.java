@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.eclipse.jdt.annotation.NonNull;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
     private static final Logger LOG = LoggerFactory.getLogger(MessageEncoder.class);
 
+    private @NonNull FramingSupport framing = FramingSupport.eom();
     private @NonNull MessageWriter writer;
 
     public MessageEncoder(final MessageWriter writer) {
@@ -32,8 +32,17 @@ public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
         this.writer = requireNonNull(writer);
     }
 
+    public void setFraming(final FramingSupport newFraming) {
+        framing = requireNonNull(newFraming);
+    }
+
     public void setWriter(final MessageWriter newWriter) {
         writer = requireNonNull(newWriter);
+    }
+
+    @VisibleForTesting
+    public @NonNull FramingSupport framing() {
+        return framing;
     }
 
     @VisibleForTesting
@@ -45,8 +54,6 @@ public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
     protected void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
             throws Exception {
         LOG.trace("Sent to encode : {}", msg);
-        try (var os = new ByteBufOutputStream(out)) {
-            writer.writeMessage(msg, os);
-        }
+        framing.writeMessage(ctx.alloc(), msg, writer, out);
     }
 }

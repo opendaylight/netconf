@@ -11,45 +11,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ChunkedFrameEncoderTest {
+class ChunkedFramingSupportTest extends FramingSupportTest {
     private static final int CHUNK_SIZE = 256;
-
-    @Mock
-    private ChannelHandlerContext ctx;
 
     @Test
     void testIllegalSize() {
-        assertThrows(IllegalArgumentException.class, () -> new ChunkedFrameEncoder(10));
+        assertThrows(IllegalArgumentException.class, () -> FramingSupport.chunk(10));
     }
 
     @Test
     void testIllegalSizeMax() {
-        assertThrows(IllegalArgumentException.class, () -> new ChunkedFrameEncoder(Integer.MAX_VALUE));
+        assertThrows(IllegalArgumentException.class, () -> FramingSupport.chunk(Integer.MAX_VALUE));
     }
 
     @Test
     void testEncode() {
-        final var encoder = new ChunkedFrameEncoder(CHUNK_SIZE);
         final int lastChunkSize = 20;
-        final var src = Unpooled.wrappedBuffer(getByteArray(CHUNK_SIZE * 4 + lastChunkSize));
-        final var destination = Unpooled.buffer();
-        encoder.encode(ctx, src, destination);
+        final var out = Unpooled.buffer();
 
-        assertEquals(1077, destination.readableBytes());
+        writeBytes(FramingSupport.chunk(CHUNK_SIZE), getByteArray(CHUNK_SIZE * 4 + lastChunkSize), out);
 
-        byte[] buf = new byte[destination.readableBytes()];
-        destination.readBytes(buf);
-        String string = StandardCharsets.US_ASCII.decode(ByteBuffer.wrap(buf)).toString();
+        final var bytes = ByteBufUtil.getBytes(out);
+        assertEquals(1077, bytes.length);
+
+        String string = StandardCharsets.US_ASCII.decode(ByteBuffer.wrap(bytes)).toString();
 
         assertTrue(string.startsWith("\n#256\na"));
         assertTrue(string.endsWith("\n#20\naaaaaaaaaaaaaaaaaaaa\n##\n"));

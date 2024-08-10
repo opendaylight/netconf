@@ -39,7 +39,6 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.codec.ChunkedFrameEncoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.MessageWriter;
@@ -100,11 +99,9 @@ class NetconfClientSessionNegotiatorTest {
 
     private static ChannelPipeline mockChannelPipeline() {
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
-        ChannelHandler handler = mock(ChannelHandler.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         doReturn(null).when(pipeline).get(SslHandler.class);
         doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
-        doReturn(handler).when(pipeline).replace(anyString(), anyString(), any(ChunkedFrameEncoder.class));
 
         HelloXMLMessageDecoder messageDecoder = new HelloXMLMessageDecoder();
         doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(), any(XMLMessageDecoder.class));

@@ -12,13 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Test;
 
-class EOMFrameEncoderTest {
+class EOMFramingSupportTest extends FramingSupportTest {
     @Test
-    void testEncode() {
-        final var source = Unpooled.wrappedBuffer(new byte[50]);
-        final var destination = Unpooled.buffer();
-        new EOMFrameEncoder().encode(null, source, destination);
+    void testEncode() throws Exception {
+        final var bytes = new byte[50];
+        final var out = Unpooled.buffer();
 
-        assertEquals(Unpooled.wrappedBuffer(source.array(), MessageParts.END_OF_MESSAGE), destination);
+        writeBytes(FramingSupport.eom(), bytes, out);
+
+        assertEquals(Unpooled.wrappedBuffer(bytes, FramingParts.END_OF_MESSAGE), out);
     }
 }
