@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -41,7 +40,7 @@ public final class XMLMessageWriter extends MessageWriter {
     }
 
     @Override
-    protected void writeMessage(final NetconfMessage message, final Transformer transformer, final OutputStream out)
+    protected void writeTo(final NetconfMessage message, final OutputStream out)
             throws IOException, TransformerException {
         // Wrap OutputStreamWriter with BufferedWriter as suggested in javadoc for OutputStreamWriter
 
@@ -49,6 +48,6 @@ public final class XMLMessageWriter extends MessageWriter {
         // see javadoc for BufferedWriter
         final var result = new StreamResult(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
         final var source = new DOMSource(message.getDocument());
-        transformer.transform(source, result);
+        threadLocalTransformer().transform(source, result);
     }
 }
