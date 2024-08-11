@@ -9,8 +9,10 @@ package org.opendaylight.netconf.codec;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -21,19 +23,38 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
  */
 @NonNullByDefault
 public abstract class MessageWriter {
-    private final boolean pretty;
+    /**
+     * A transformer with default configuration.
+     */
+    @VisibleForTesting
+    static final ThreadLocalTransformer DEFAULT_TRANSFORMER = new ThreadLocalTransformer(transformer -> {
+        // No-op
+    });
+
+    /**
+     * A transformer with default configuration, but with automatic indentation and the XML declaration removed.
+     */
+    @VisibleForTesting
+    static final ThreadLocalTransformer PRETTY_TRANSFORMER = new ThreadLocalTransformer(transformer -> {
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+    });
+
+    private final ThreadLocalTransformer threadLocal;
 
     protected MessageWriter(final boolean pretty) {
-        this.pretty = pretty;
+        threadLocal = pretty ? PRETTY_TRANSFORMER : DEFAULT_TRANSFORMER;
     }
 
+    protected final Transformer threadLocalTransformer() {
+        return threadLocal.get();
+    }
+
+    @VisibleForTesting
     public final void writeMessage(final NetconfMessage message, final OutputStream out)
             throws IOException, TransformerException {
-        writeMessage(requireNonNull(message),
-            pretty ? ThreadLocalTransformers.getPrettyTransformer() : ThreadLocalTransformers.getDefaultTransformer(),
-            requireNonNull(out));
+        writeTo(requireNonNull(message), requireNonNull(out));
     }
 
-    protected abstract void writeMessage(NetconfMessage message, Transformer transformer, OutputStream out)
-        throws IOException, TransformerException;
+    protected abstract void writeTo(NetconfMessage message, OutputStream out) throws IOException, TransformerException;
 }

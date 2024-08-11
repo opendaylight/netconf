@@ -11,7 +11,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -27,8 +26,7 @@ class FramingSupportTest {
         try {
             framing.writeMessage(ByteBufAllocator.DEFAULT, message, new MessageWriter(false) {
                 @Override
-                protected void writeMessage(final NetconfMessage ignored, final Transformer transformer,
-                        final OutputStream out) throws IOException {
+                protected void writeTo(final NetconfMessage ignored, final OutputStream out) throws IOException {
                     out.write(bytes);
                 }
             }, out);
