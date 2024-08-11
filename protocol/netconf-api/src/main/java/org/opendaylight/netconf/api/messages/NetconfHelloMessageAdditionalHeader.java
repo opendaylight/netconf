@@ -28,7 +28,28 @@ import java.util.regex.Pattern;
  * Session-identifier is optional, others mandatory.
  * </pre>
  * This header is inserted in front of a netconf hello message followed by a newline.
+ *
+ * @deprecated This class is a leftover from initial implementation where SSH was done by http://www.jcraft.com/jsch/
+ *             and piped channels to get around the sync nature of JSch. We are now using a directly-connected Netty
+ *             channel via transport-ssh.
  */
+// FIXME: session-identifier is unused
+// FIXME: hostAddress, and port is readily available from Channel
+// FIXME: transport should be visible in the form of TransportChannel in NetconfServerSession, the actual String here
+//        is a leak towards netconf-server-'s ietf-netconf-monitoring operational state. That piece of code should use
+//        a switch expression to go from 'transportChannel instanceof SSHTransportChannel' to 'NetconfSsh.VALUE' without
+//        the intermediate random string -- which does not support TLS anyway!
+// FIXME: userName is coming from:
+//        - authentication in case of SSH/TLS
+//        - from wire in case of TCP
+//        We should propagate these via transport-api:
+//        -  sealed interface TransportUser permits AuthenticatedUser, UnauthenticatedUser
+//        -  non-sealed interface AuthenticatedUser
+//        -  final class UnauthenticatedUser
+//        A TransportUser and TransportChannel via a netconf.codec.NetconfChannel exposed to
+//        ServerSessionNegotiator. On ClientSessionNegotiator side we want to have TransportServer exposing server's
+//        credentials, like the result of server key authentication.
+@Deprecated(since = "8.0.0", forRemoval = true)
 public class NetconfHelloMessageAdditionalHeader {
 
     private static final String SC = ";";
