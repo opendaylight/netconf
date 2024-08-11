@@ -10,7 +10,6 @@ package org.opendaylight.netconf.codec;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -62,7 +61,7 @@ public final class HelloMessageWriter extends MessageWriter {
     }
 
     @Override
-    protected void writeMessage(final NetconfMessage message, final Transformer transformer, final OutputStream out)
+    protected void writeTo(final NetconfMessage message, final OutputStream out)
             throws IOException, TransformerException {
         if (!(message instanceof HelloMessage hello)) {
             throw new IllegalStateException("Netconf message of type %s expected, was %s".formatted(
@@ -75,6 +74,6 @@ public final class HelloMessageWriter extends MessageWriter {
             out.write(header.orElseThrow().toFormattedString().getBytes(StandardCharsets.UTF_8));
         }
 
-        delegate.writeMessage(message, transformer, out);
+        delegate.writeTo(message, out);
     }
 }
