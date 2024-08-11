@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +14,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.codec.MessageWriter;
 
 /**
  * Customized XMLMessageWriter that serializes additional header with session metadata along with {@link HelloMessage}.
@@ -35,7 +34,10 @@ import org.opendaylight.netconf.codec.MessageWriter;
  * < /hello>
  * }
  * </pre>
+ *
+ * @deprecated This class should not be used, as it constitutes data that is unexpected on a normal NETCONF session.
  */
+@Deprecated(since = "8.0.1", forRemoval = true)
 public final class HelloMessageWriter extends MessageWriter {
     private static final HelloMessageWriter DEFAULT = new HelloMessageWriter(false);
     private static final HelloMessageWriter PRETTY = new HelloMessageWriter(true);
