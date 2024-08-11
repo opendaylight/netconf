@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
@@ -27,7 +28,9 @@ import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
 import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
+import org.opendaylight.netconf.server.api.monitoring.JavaCommonCounters;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
+import org.opendaylight.netconf.server.spi.MutableCommonCounters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -36,10 +39,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter32;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.Session1Builder;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +57,11 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
         DATE_TIME_PATTERN = Pattern.compile(DateAndTime.PATTERN_CONSTANTS.get(0));
     }
 
+    private final @NonNull MutableCommonCounters commonCounters = MutableCommonCounters.of();
     private final NetconfHelloMessageAdditionalHeader header;
     private final NetconfServerSessionListener sessionListener;
 
     private ZonedDateTime loginTime;
-    private long inRpcSuccess;
-    private long inRpcFail;
-    private long outRpcError;
-    private long outNotification;
     private volatile boolean delayedClose;
 
     public NetconfServerSession(final NetconfServerSessionListener sessionListener, final Channel channel,
@@ -72,6 +70,10 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
         this.header = header;
         this.sessionListener = requireNonNull(sessionListener);
         LOG.debug("Session {} created", this);
+    }
+
+    public @NonNull JavaCommonCounters commonCounters() {
+        return commonCounters;
     }
 
     @Override
@@ -93,7 +95,7 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
         final ChannelFuture channelFuture = super.sendMessage(netconfMessage);
         if (netconfMessage instanceof NotificationMessage notification) {
-            outNotification++;
+            commonCounters.incOutNotifications();
             sessionListener.onNotification(this, notification);
         }
         // delayed close was set, close after the message was sent
@@ -103,36 +105,14 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
         return channelFuture;
     }
 
-    // FIXME: the YANG definition for monitoring says:
-    //
-    //            uses common-counters {
-    //              description
-    //                "Per-session counters.  Zero based with following reset behaviour:
-    //                 - at start of a session
-    //                 - when max value is reached";
-    //            }
-    //
-    //        the overflow should checked after increment: if it becomes Uint32#MAX_VALUE + 1, it needs to
-    //        be reset to 1.
-    //
-    //        We want to isolate the three into a separate class, so that we can share code between here and whoever
-    //        is populating the Statistics container. That class should implement CommonCounters to make it super easy
-    //        to fill via {Session,Statistics}Builder.fieldsFrom(Grouping).
-    public void onIncommingRpcSuccess() {
-        inRpcSuccess++;
-    }
-
-    public void onIncommingRpcFail() {
-        inRpcFail++;
-    }
-
-    public void onOutgoingRpcError() {
-        outRpcError++;
+    // internal use only, do not expose!
+    @NonNull MutableCommonCounters counters() {
+        return commonCounters;
     }
 
     @Override
     public Session toManagementSession() {
-        final var builder = new SessionBuilder()
+        final var builder = new SessionBuilder(commonCounters)
             .setSessionId(sessionId().getValue());
 
         final var remoteAddress = channel.remoteAddress();
@@ -164,14 +144,10 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
 
         return builder
                 .setLoginTime(new DateAndTime(formattedDateTime))
-                .setInBadRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcFail)))
-                .setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcSuccess)))
-                .setOutRpcErrors(new ZeroBasedCounter32(Uint32.valueOf(outRpcError)))
                 // FIXME: a TransportUser from somewhere around TransportChannel
                 .setUsername(header.getUserName())
                 // FIXME: derive from TransportChannel instead
                 .setTransport(getTransportForString(header.getTransport()))
-                .setOutNotifications(new ZeroBasedCounter32(Uint32.valueOf(outNotification)))
                 // FIXME: obsolete this leaf and do not produce it here
                 .addAugmentation(new Session1Builder().setSessionIdentifier(header.getSessionIdentifier()).build())
                 .build();
