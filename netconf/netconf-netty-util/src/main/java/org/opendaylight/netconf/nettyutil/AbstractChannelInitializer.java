@@ -12,9 +12,9 @@ import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
+import org.opendaylight.netconf.codec.HelloMessageWriter;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
-import org.opendaylight.netconf.nettyutil.handler.HelloMessageWriter;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 
 // FIXME: This is not related Netty's'ChannelInitializer' and is pretty much unused.
