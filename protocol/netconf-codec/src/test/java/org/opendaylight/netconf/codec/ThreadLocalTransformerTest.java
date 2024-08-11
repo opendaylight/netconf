@@ -9,6 +9,8 @@ package org.opendaylight.netconf.codec;
 
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opendaylight.netconf.codec.MessageWriter.DEFAULT_TRANSFORMER;
+import static org.opendaylight.netconf.codec.MessageWriter.PRETTY_TRANSFORMER;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,7 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ThreadLocalTransformersTest {
+class ThreadLocalTransformerTest {
     private ExecutorService executorService;
 
     @BeforeEach
@@ -31,24 +33,19 @@ class ThreadLocalTransformersTest {
 
     @Test
     void testGetDefaultTransformer() throws Exception {
-        final var t1 = ThreadLocalTransformers.getDefaultTransformer();
-        final var t2 = ThreadLocalTransformers.getDefaultTransformer();
+        final var t1 = DEFAULT_TRANSFORMER.get();
+        final var t2 = DEFAULT_TRANSFORMER.get();
         assertSame(t1, t2);
-        final var future = executorService.submit(ThreadLocalTransformers::getDefaultTransformer);
+        final var future = executorService.submit(DEFAULT_TRANSFORMER::get);
         assertNotSame(t1, future.get());
     }
 
     @Test
     void testGetPrettyTransformer() throws Exception {
-        final var t1 = ThreadLocalTransformers.getPrettyTransformer();
-        final var t2 = ThreadLocalTransformers.getPrettyTransformer();
+        final var t1 = PRETTY_TRANSFORMER.get();
+        final var t2 = PRETTY_TRANSFORMER.get();
         assertSame(t1, t2);
-        final var future = executorService.submit(ThreadLocalTransformers::getPrettyTransformer);
+        final var future = executorService.submit(PRETTY_TRANSFORMER::get);
         assertNotSame(t1, future.get());
-    }
-
-    @AfterEach
-    void tearDown() {
-        executorService.shutdown();
     }
 }
