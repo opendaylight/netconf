@@ -23,6 +23,10 @@ import org.slf4j.LoggerFactory;
 /**
  * An encoder of {@link NetconfMessage} to a series of bytes.
  */
+// TODO: MessageToByteEncoder is forcing us to encode the entire NetconfMessage into a single buffer before it can be
+//       passed downstream. We should switch to a plain ChannelOutboundHandlerAdapter and send multiple ByteBufs down
+//       the pipeline, completing the Promise with the result of Future returned by the last write(ByteBuf) -- which
+//       we expect underlying Channel to handle as required by https://www.rfc-editor.org/rfc/rfc6241#section-2.1
 public final class MessageEncoder extends MessageToByteEncoder<NetconfMessage> {
     private static final Logger LOG = LoggerFactory.getLogger(MessageEncoder.class);
 

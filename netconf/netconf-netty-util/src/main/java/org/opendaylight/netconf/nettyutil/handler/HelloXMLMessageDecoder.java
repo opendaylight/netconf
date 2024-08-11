@@ -38,6 +38,15 @@ import org.xml.sax.SAXException;
  * Netconf messages after hello should be processed once the negotiation succeeded.
  *
  */
+// FIXME: This handler conflates two things:
+//        - extracting session metadata
+//        - holding onto non-HelloMessages
+//
+//        The former is a leftover from initial implementation we had SSH provided with http://www.jcraft.com/jsch/ --
+//        where we had piping proxies rather than a live Channel connected to the user, due to JSch being synchronous.
+//        See comments about that in NetconfHelloMessageAdditionalHeader.
+//
+//        The need for the latter should disappear once we split out
 public final class HelloXMLMessageDecoder extends MessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(HelloXMLMessageDecoder.class);
 
