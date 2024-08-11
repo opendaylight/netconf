@@ -11,11 +11,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import java.net.Inet4Address;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -32,14 +30,11 @@ import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6Address;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Transport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter32;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
@@ -137,17 +132,31 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
 
     @Override
     public Session toManagementSession() {
-        final SessionBuilder builder = new SessionBuilder().withKey(new SessionKey(sessionId().getValue()));
+        final var builder = new SessionBuilder()
+            .setSessionId(sessionId().getValue());
 
-        // FIXME: use channel to get this information
-        final InetAddress address1 = InetAddresses.forString(header.getAddress());
-        final IpAddress address;
-        if (address1 instanceof Inet4Address) {
-            address = new IpAddress(new Ipv4Address(header.getAddress()));
-        } else {
-            address = new IpAddress(new Ipv6Address(header.getAddress()));
+        final var remoteAddress = channel.remoteAddress();
+        switch (remoteAddress) {
+            case InetSocketAddress inet -> {
+                // Note: In case this session was created via a connect-server, depending on how the connect address was
+                //       specified, remoteAddress.getHostName() will be readily available and it might be more user
+                //       friendly to report those.
+                //
+                //       On the other hand:
+                //       - YANG model for domain-name is something of a best-effort, and is capped at 253 characters.
+                //       - String storage is more wasteful
+                //       - in a mixed listen/connect server, that would lead to different sessions being reported
+                //         differently
+                //       - getting to that information is quite fraught -- the best tool for this particular job is:
+                //         IetfInetUtil.hostFor(inet.getHostString()), but that can fail as well.
+                //
+                //       So here we are consistently reporting using the InetAddress, side-stepping any possible bugs.
+                builder.setSourceHost(new Host(IetfInetUtil.ipAddressFor(inet.getAddress())));
+            }
+            default -> {
+                LOG.debug("Skipping unrecognized source host {}", remoteAddress);
+            }
         }
-        builder.setSourceHost(new Host(address));
 
         final String formattedDateTime = DATE_FORMATTER.format(loginTime);
         checkState(DATE_TIME_PATTERN.matcher(formattedDateTime).matches(),
