@@ -17,9 +17,18 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 
+// FIXME: This is not related Netty's'ChannelInitializer' and is pretty much unused.
+//        Perhaps a NetconfConnectionFactory? It would:
+//        - take a TransportChannel
+//        - initialize the pipeline with MessageEncoder
+//        - produce a NetconfConnection, which has:
+//          -  TransportChannel transport()
+//          -  MessageEncoder messageEncoder()
 public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public static final String NETCONF_SESSION_NEGOTIATOR = "negotiator";
 
+    // FIXME: this should be taking only a TransportChannel and should be factory method producing NetconfConnections,
+    //        without the 'attach a negotiator with some promise' part
     public void initialize(final Channel ch, final Promise<S> promise) {
         ch.pipeline().addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         initializeMessageDecoder(ch);
@@ -40,5 +49,7 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
      * Insert session negotiator into the pipeline. It must be inserted after message decoder
      * identified by {@link MessageDecoder#HANDLER_NAME}, (or any other custom decoder processor)
      */
+    // FIXME: This should be somewhere else. It should take an already-initialized NetconfConnection and perform
+    //        the listener magic of eventually giving out the negotiated NetconfSession.
     protected abstract void initializeSessionNegotiator(Channel ch, Promise<S> promise);
 }
