@@ -15,9 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.net.InetAddresses;
+import io.netty.channel.Channel;
 import io.netty.channel.embedded.EmbeddedChannel;
+import java.net.InetSocketAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +59,8 @@ class NetconfServerSessionTest {
     private MessageDecoder decoder;
     @Mock
     private MessageWriter messageWriter;
+    @Mock
+    private Channel mockChannel;
 
     private NetconfServerSession session;
     private EmbeddedChannel channel;
@@ -140,8 +146,8 @@ class NetconfServerSessionTest {
     void testToManagementSession() {
         doNothing().when(listener).onSessionUp(any());
         final var header = new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, TCP_TRANSPORT, SESSION_ID);
-        final var ch = new EmbeddedChannel();
-        final var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
+        doReturn(new InetSocketAddress(InetAddresses.forString(HOST), 17830)).when(mockChannel).remoteAddress();
+        final var tcpSession = new NetconfServerSession(listener, mockChannel, new SessionIdType(Uint32.ONE), header);
         tcpSession.sessionUp();
         final var managementSession = tcpSession.toManagementSession();
         assertEquals(HOST, managementSession.getSourceHost().getIpAddress().getIpv4Address().getValue());
@@ -164,8 +170,8 @@ class NetconfServerSessionTest {
     void testToManagementSessionIpv6() {
         doNothing().when(listener).onSessionUp(any());
         final var header = new NetconfHelloMessageAdditionalHeader(USER, "::1", PORT, SSH_TRANSPORT, SESSION_ID);
-        final var ch = new EmbeddedChannel();
-        var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
+        doReturn(new InetSocketAddress(InetAddresses.forString("::1"), 17830)).when(mockChannel).remoteAddress();
+        var tcpSession = new NetconfServerSession(listener, mockChannel, new SessionIdType(Uint32.ONE), header);
         tcpSession.sessionUp();
         final var managementSession = tcpSession.toManagementSession();
         assertEquals("::1", managementSession.getSourceHost().getIpAddress().getIpv6Address().getValue());
