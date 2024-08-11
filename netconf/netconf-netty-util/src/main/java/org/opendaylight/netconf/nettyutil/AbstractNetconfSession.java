@@ -37,10 +37,11 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         extends SimpleChannelInboundHandler<Object> implements NetconfSession {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
 
+    // FIXME: we should have a TransportChannel available
+    protected final @NonNull Channel channel;
+
     private final @NonNull SessionIdType sessionId;
     private final @NonNull L sessionListener;
-    // FIXME: we should have a TransportChannel available
-    private final @NonNull Channel channel;
 
     private boolean up;
 
