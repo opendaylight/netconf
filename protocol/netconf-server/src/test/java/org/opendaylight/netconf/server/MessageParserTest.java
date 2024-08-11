@@ -25,7 +25,7 @@ import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.FramingSupport;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
+import org.opendaylight.netconf.codec.XMLMessageWriter;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.xmlunit.builder.DiffBuilder;
 

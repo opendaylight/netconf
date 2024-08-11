@@ -29,9 +29,9 @@ import org.opendaylight.netconf.codec.EOMFrameDecoder;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.codec.XMLMessageWriter;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
-import org.opendaylight.netconf.nettyutil.handler.XMLMessageWriter;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
 @ExtendWith(MockitoExtension.class)
