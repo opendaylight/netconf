@@ -29,11 +29,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractNetconfSession<S extends NetconfSession, L extends NetconfSessionListener<S>>
+        // FIXME: This is fugly: we receive either NetconfNotification or Exception, routing it to listener.
+        //        It would be much better if we communicated Exception via something else than channelRead(), for
+        //        example via userEventTriggered(). The contract of what can actually be seen is dictated by
+        //        MessageDecoder in general.
         extends SimpleChannelInboundHandler<Object> implements NetconfSession {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
 
     private final @NonNull SessionIdType sessionId;
     private final @NonNull L sessionListener;
+    // FIXME: we should have a TransportChannel available
     private final @NonNull Channel channel;
 
     private boolean up;
@@ -43,6 +48,11 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         this.channel = requireNonNull(channel);
         this.sessionId = requireNonNull(sessionId);
         LOG.debug("Session {} created", sessionId);
+    }
+
+    @Override
+    public final SessionIdType sessionId() {
+        return sessionId;
     }
 
     protected abstract S thisInstance();
@@ -114,10 +124,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     public final boolean isUp() {
         return up;
-    }
-
-    public final @NonNull SessionIdType sessionId() {
-        return sessionId;
     }
 
     @Override

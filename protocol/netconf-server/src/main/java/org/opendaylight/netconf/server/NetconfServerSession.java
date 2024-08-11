@@ -48,6 +48,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: separate out API and implementation, because at it currently stands we are leaking all of
+//        ChannelInboundHandlerAdapter, potentially leading to surprises.
 public final class NetconfServerSession extends AbstractNetconfExiSession<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfManagementSession {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSession.class);
@@ -121,6 +123,8 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
     @Override
     public Session toManagementSession() {
         final SessionBuilder builder = new SessionBuilder().withKey(new SessionKey(sessionId().getValue()));
+
+        // FIXME: use channel to get this information
         final InetAddress address1 = InetAddresses.forString(header.getAddress());
         final IpAddress address;
         if (address1 instanceof Inet4Address) {
