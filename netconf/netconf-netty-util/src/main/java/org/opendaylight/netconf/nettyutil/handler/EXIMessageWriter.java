@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
@@ -30,7 +29,7 @@ final class EXIMessageWriter extends MessageWriter {
     }
 
     @Override
-    protected void writeMessage(final NetconfMessage message, final Transformer transformer, final OutputStream out)
+    protected void writeTo(final NetconfMessage message, final OutputStream out)
             throws IOException, TransformerException {
         final SAXEncoder encoder;
         try {
@@ -39,6 +38,6 @@ final class EXIMessageWriter extends MessageWriter {
         } catch (EXIException e) {
             throw new IOException(e);
         }
-        transformer.transform(new DOMSource(message.getDocument()), new SAXResult(encoder));
+        threadLocalTransformer().transform(new DOMSource(message.getDocument()), new SAXResult(encoder));
     }
 }
