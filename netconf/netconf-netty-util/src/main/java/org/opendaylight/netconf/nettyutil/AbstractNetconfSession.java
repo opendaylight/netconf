@@ -28,12 +28,18 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: move this class to netconf.common
 public abstract class AbstractNetconfSession<S extends NetconfSession, L extends NetconfSessionListener<S>>
+        // FIXME: This is fugly: we receive either NetconfNotification or Exception, routing it to listener.
+        //        It would be much better if we communicated Exception via something else than channelRead(), for
+        //        example via userEventTriggered(). The contract of what can actually be seen is dictated by
+        //        MessageDecoder in general.
         extends SimpleChannelInboundHandler<Object> implements NetconfSession {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
 
     private final @NonNull SessionIdType sessionId;
     private final @NonNull L sessionListener;
+    // FIXME: we should have a TransportChannel available
     private final @NonNull Channel channel;
 
     private boolean up;
@@ -43,6 +49,11 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         this.channel = requireNonNull(channel);
         this.sessionId = requireNonNull(sessionId);
         LOG.debug("Session {} created", sessionId);
+    }
+
+    @Override
+    public final SessionIdType sessionId() {
+        return sessionId;
     }
 
     protected abstract S thisInstance();
@@ -65,6 +76,25 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     }
 
     @Override
+    // FIXME: The below comment provides a bit more reasoning why this method should be kept of out end-user APIs.
+    //        This method can be invoked from two different contexts:
+    //        - a user either publishing a NotificationMessage, a RpcMessage, or similar: we know for sure that the
+    //          entrypoint lies outside of the EventLoop's executor
+    //        - the server responding with a RpcReplyMessage or similar: we may or may not be executing on the event
+    //          loop.
+    //
+    //        Examples:
+    //
+    //        DeserializerExceptionHandler.exceptionCaught() is calling SendErrorExceptionUtil.sendErrorMessage().
+    //        Is that okay?
+    //
+    //        NetconfServerSessionListener.onMessage() is catching DocumentedException and calling
+    //        SendErrorExceptionUtil.sendErrorMessage(). Is that okay?
+    //
+    //        In any case we need to ensure requests complete in the order they arrived, I think, otherwise problems may
+    //        occur. Callers of both need to be audited and we should be checking EventLoop.inEventLoop(). Note that we
+    //        could be acquiring a ChannelHandlerContext, so we can find something helpful there?
+    //
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
         // From: https://github.com/netty/netty/issues/3887
         // Netty can provide "ordering" in the following situations:
@@ -114,10 +144,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     public final boolean isUp() {
         return up;
-    }
-
-    public final @NonNull SessionIdType sessionId() {
-        return sessionId;
     }
 
     @Override
