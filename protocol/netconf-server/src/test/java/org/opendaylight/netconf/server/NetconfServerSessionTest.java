@@ -107,7 +107,7 @@ class NetconfServerSessionTest {
         doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         final var managementSession = session.toManagementSession();
-        session.onIncommingRpcSuccess();
+        session.counters().incInRpcs();
         final var afterRpcSuccess = session.toManagementSession();
         assertEquals(managementSession.getInRpcs().getValue().toJava() + 1,
                 afterRpcSuccess.getInRpcs().getValue().longValue());
@@ -118,7 +118,7 @@ class NetconfServerSessionTest {
         doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         final var managementSession = session.toManagementSession();
-        session.onIncommingRpcFail();
+        session.counters().incInBadRpcs();
         final var afterRpcSuccess = session.toManagementSession();
         assertEquals(managementSession.getInBadRpcs().getValue().toJava() + 1,
                 afterRpcSuccess.getInBadRpcs().getValue().longValue());
@@ -129,7 +129,7 @@ class NetconfServerSessionTest {
         doNothing().when(listener).onSessionUp(any());
         session.sessionUp();
         final var managementSession = session.toManagementSession();
-        session.onOutgoingRpcError();
+        session.counters().incOutRpcErrors();
         final var afterRpcSuccess = session.toManagementSession();
         assertEquals(managementSession.getOutRpcErrors().getValue().toJava() + 1,
                 afterRpcSuccess.getOutRpcErrors().getValue().longValue());

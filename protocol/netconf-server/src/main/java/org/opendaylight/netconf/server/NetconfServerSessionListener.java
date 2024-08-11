@@ -98,7 +98,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Failed to send response {}", getMessageId(message), cause);
                     }
-                    session.onOutgoingRpcError();
+                    session.counters().incOutRpcErrors();
                     monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
                 } else if (LOG.isDebugEnabled()) {
                     LOG.debug("Finished sending response {}", getMessageId(message));
@@ -108,13 +108,14 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         } catch (final RuntimeException e) {
             // TODO: should send generic error or close session?
             LOG.error("Unexpected exception", e);
-            session.onIncommingRpcFail();
+            session.counters().incInBadRpcs();
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
             throw new IllegalStateException("Unable to process incoming message " + netconfMessage, e);
         } catch (final DocumentedException e) {
             LOG.trace("Error occurred while processing message", e);
-            session.onOutgoingRpcError();
-            session.onIncommingRpcFail();
+            // FIXME: hmm.. this does not look right. does it count as one or the other?
+            session.counters().incOutRpcErrors();
+            session.counters().incInBadRpcs();
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
             monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
             SendErrorExceptionUtil.sendErrorMessage(session, e, netconfMessage);
@@ -127,7 +128,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
     @Override
     public void onError(final NetconfServerSession session, final Exception failure) {
-        session.onIncommingRpcFail();
+        session.counters().incInBadRpcs();
         monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
         throw new IllegalStateException("Unable to process incoming message", failure);
     }
@@ -150,7 +151,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
             rpcReply = SubtreeFilter.applyRpcSubtreeFilter(incomingDocument, rpcReply);
 
-            session.onIncommingRpcSuccess();
+            session.counters().incInRpcs();
 
             responseDocument.appendChild(responseDocument.importNode(rpcReply.getDocumentElement(), true));
             return new NetconfMessage(responseDocument);
