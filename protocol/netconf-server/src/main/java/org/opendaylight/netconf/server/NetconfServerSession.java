@@ -48,6 +48,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: separate out API and implementation, because at it currently stands we are leaking all of
+//        ChannelInboundHandlerAdapter, potentially leading to surprises.
 public final class NetconfServerSession extends AbstractNetconfExiSession<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfManagementSession {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSession.class);
@@ -106,6 +108,21 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
         return channelFuture;
     }
 
+    // FIXME: the YANG definition for monitoring says:
+    //
+    //            uses common-counters {
+    //              description
+    //                "Per-session counters.  Zero based with following reset behaviour:
+    //                 - at start of a session
+    //                 - when max value is reached";
+    //            }
+    //
+    //        the overflow should checked after increment: if it becomes Uint32#MAX_VALUE + 1, it needs to
+    //        be reset to 1.
+    //
+    //        We want to isolate the three into a separate class, so that we can share code between here and whoever
+    //        is populating the Statistics container. That class should implement CommonCounters to make it super easy
+    //        to fill via {Session,Statistics}Builder.fieldsFrom(Grouping).
     public void onIncommingRpcSuccess() {
         inRpcSuccess++;
     }
@@ -121,6 +138,8 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
     @Override
     public Session toManagementSession() {
         final SessionBuilder builder = new SessionBuilder().withKey(new SessionKey(sessionId().getValue()));
+
+        // FIXME: use channel to get this information
         final InetAddress address1 = InetAddresses.forString(header.getAddress());
         final IpAddress address;
         if (address1 instanceof Inet4Address) {
@@ -139,9 +158,12 @@ public final class NetconfServerSession extends AbstractNetconfExiSession<Netcon
                 .setInBadRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcFail)))
                 .setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcSuccess)))
                 .setOutRpcErrors(new ZeroBasedCounter32(Uint32.valueOf(outRpcError)))
+                // FIXME: a TransportUser from somewhere around TransportChannel
                 .setUsername(header.getUserName())
+                // FIXME: derive from TransportChannel instead
                 .setTransport(getTransportForString(header.getTransport()))
                 .setOutNotifications(new ZeroBasedCounter32(Uint32.valueOf(outNotification)))
+                // FIXME: obsolete this leaf and do not produce it here
                 .addAugmentation(new Session1Builder().setSessionIdentifier(header.getSessionIdentifier()).build())
                 .build();
     }
