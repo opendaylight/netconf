@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil.handler;
+package org.opendaylight.netconf.codec;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,7 +18,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.codec.MessageWriter;
 
 @NonNullByDefault
 public final class XMLMessageWriter extends MessageWriter {
