@@ -14,6 +14,15 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 /**
  * A decoder from a series of bytes to a {@link NetconfMessage}.
  */
+// FIXME: 'NetconfMesssage' is not quite accurate: we can also produce Exceptions and the handling of those needs to be
+//        specific to the negotiator or attached client/server session. This class should probably be producting:
+//        -  sealed interface MessageEvent permits MessageException, MessageDocument
+//        -  record DecoderError(Exception cause), or similar
+//        -  record DecoderMessage(Document document), to be converted to NetconfMessage
+//        There should be another abstract class for the above:
+//        -  abstract sealed class MessageHandler extends ChannelInboundHandlerAdapter
+//               permits AbstractNetconfSesssion, AbstractSessionNegotiator
+//        -  with it having a codified channelRead() method which does not tolerate unknown messages
 public abstract class MessageDecoder extends ByteToMessageDecoder {
     /**
      * The name of the handler providing message decoding.
