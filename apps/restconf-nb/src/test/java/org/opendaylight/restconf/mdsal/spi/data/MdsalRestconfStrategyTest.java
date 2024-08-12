@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -179,6 +180,26 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
         strategy.putData(dataPutRequest, GAP_PATH, GAP_LEAF);
         verify(tx).merge(eq(GAP_IID.getAncestor(1)), any());
+        assertNotNull(dataPutRequest.getResult());
+    }
+
+    @Test
+    void noEnsureParentsByMergeForTopLevelElements() throws Exception {
+        final var topLevelContainer = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build();
+
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, topLevelContainer);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        final var strategy = spy(jukeboxDataOperations());
+        final var tx = spy(jukeboxDataOperations().prepareWriteExecution());
+        doReturn(tx).when(strategy).prepareWriteExecution();
+
+        strategy.putData(dataPutRequest, JUKEBOX_PATH, topLevelContainer);
+        // no parent node merge for top level elements
+        verify(tx, never()).merge(any(), any());
         assertNotNull(dataPutRequest.getResult());
     }
 
