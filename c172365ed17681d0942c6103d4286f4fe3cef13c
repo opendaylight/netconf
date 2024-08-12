@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d057b81_8dcce44a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "one more tab",
+      "range": {
+        "startLine": 200,
+        "startChar": 4,
+        "endLine": 200,
+        "endChar": 8
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f28d3b3_01f8895a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 120,
+        "startChar": 17,
+        "endLine": 120,
+        "endChar": 21
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "555b471d_f3b2a201",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 123,
+        "startChar": 13,
+        "endLine": 123,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f6a9cae_16b1769e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfStreamService.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 131,
+        "startChar": 13,
+        "endLine": 131,
+        "endChar": 16
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68924111_d9114ee8",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 126,
+        "startChar": 13,
+        "endLine": 126,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00d9530f_dac79697",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 147,
+        "startChar": 13,
+        "endLine": 147,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "231d2e51_12c7d53f",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-12T13:52:18Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 175,
+        "startChar": 13,
+        "endLine": 175,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
