@@ -102,6 +102,24 @@
       "parentUuid": "15d8320e_d70253ee",
       "revId": "adc8b0185f2cf6a6ac0fee95bc1647224b49eefd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c59dd635_f5cffd8b",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-08-12T13:24:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "786bbe5e_d03d37f5",
+      "revId": "adc8b0185f2cf6a6ac0fee95bc1647224b49eefd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
