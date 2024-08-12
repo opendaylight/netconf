@@ -144,7 +144,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var parent = path.getParent();
-        if (parent != null) {
+        if (parent != null && !parent.isEmpty()) {
             final var rootNormalizedPath = path.getAncestor(1);
             merge(rootNormalizedPath, fromInstanceId(databind.modelContext(), parent));
         }
