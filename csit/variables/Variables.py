@@ -60,25 +60,10 @@ ODL_NETCONF_NAMESPACE = "urn:ietf:params:xml:ns:netconf:base:1.0"
 ODL_OF_PORT = "6633"
 ODL_OF_PLUGIN = "lithium"
 
-# VTN Coordinator Variables
-VTNC = "127.0.0.1"
-VTNCPORT = "8083"
-VTNC_PREFIX = "http://" + VTNC + ":" + VTNCPORT
-VTNC_HEADERS = {
-    "Content-Type": "application/json",
-    "username": "admin",
-    "password": "adminpass",
-}
-
-VTNWEBAPI = "/vtn-webapi"
 # controllers URL
 CTRLS_CREATE = "controllers.json"
 CTRLS = "controllers"
 SW = "switches"
-
-# vtn URL
-VTNS_CREATE = "vtns.json"
-VTNS = "vtns"
 
 # vbridge URL
 VBRS_CREATE = "vbridges.json"
@@ -121,10 +106,6 @@ MODULES_API = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
 # TOKEN
 AUTH_TOKEN_API = "/oauth2/token"
 REVOKE_TOKEN_API = "/oauth2/revoke"
-
-# Vlan Custom Topology Path and File
-CREATE_VLAN_TOPOLOGY_FILE = "vlan_vtn_test.py"
-CREATE_VLAN_TOPOLOGY_FILE_PATH = "MininetTopo/" + CREATE_VLAN_TOPOLOGY_FILE
 
 # Mininet Custom Topology Path and File for Path Policy
 CREATE_PATHPOLICY_TOPOLOGY_FILE = "topo-3sw-2host_multipath.py"
