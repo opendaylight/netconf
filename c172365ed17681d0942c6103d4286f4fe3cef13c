@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e855eea_0b2c491f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d057b81_8dcce44a",
+      "range": {
+        "startLine": 200,
+        "startChar": 4,
+        "endLine": 200,
+        "endChar": 8
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f28d3b3_01f8895a",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-08-12T13:52:18Z",
       "side": 1,
       "message": "final?",
+      "range": {
+        "startLine": 120,
+        "startChar": 17,
+        "endLine": 120,
+        "endChar": 21
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78d681a6_a19adf56",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "the var is _effectively final_ - the compiler makes no difference.\nwe are not using `final` for loop circle var and try/catch vars\nsame for other similar comments",
+      "parentUuid": "4f28d3b3_01f8895a",
       "range": {
         "startLine": 120,
         "startChar": 17,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "296af913_ff7e4c71",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ResponseUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "555b471d_f3b2a201",
+      "range": {
+        "startLine": 123,
+        "startChar": 13,
+        "endLine": 123,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f6a9cae_16b1769e",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-08-12T13:52:18Z",
       "side": 1,
       "message": "final?",
+      "range": {
+        "startLine": 131,
+        "startChar": 13,
+        "endLine": 131,
+        "endChar": 16
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b4c0d59_d122479e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfStreamService.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2f6a9cae_16b1769e",
       "range": {
         "startLine": 131,
         "startChar": 13,
@@ -116,6 +212,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb736c1a_ab1266b8",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "68924111_d9114ee8",
+      "range": {
+        "startLine": 126,
+        "startChar": 13,
+        "endLine": 126,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00d9530f_dac79697",
@@ -139,6 +259,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "110b0344_299cfbf5",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "00d9530f_dac79697",
+      "range": {
+        "startLine": 147,
+        "startChar": 13,
+        "endLine": 147,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "231d2e51_12c7d53f",
@@ -152,6 +296,30 @@
       "writtenOn": "2024-08-12T13:52:18Z",
       "side": 1,
       "message": "final?",
+      "range": {
+        "startLine": 175,
+        "startChar": 13,
+        "endLine": 175,
+        "endChar": 17
+      },
+      "revId": "c172365ed17681d0942c6103d4286f4fe3cef13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2408714b_b99150ce",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-14T07:37:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "231d2e51_12c7d53f",
       "range": {
         "startLine": 175,
         "startChar": 13,
