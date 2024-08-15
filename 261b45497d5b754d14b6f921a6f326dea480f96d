@@ -16,6 +16,40 @@
       "message": "Please try to improve code layout by introducing packages, interfaces, sealed hierarchies, etc.",
       "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "397277f3_22c14e6e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-15T12:35:18Z",
+      "side": 1,
+      "message": "Where are `streams`?",
+      "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68da57da_cfd480c5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-15T12:35:18Z",
+      "side": 1,
+      "message": "Why catching `RuntimeException`?",
+      "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
