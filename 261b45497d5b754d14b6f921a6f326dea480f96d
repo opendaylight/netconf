@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77bf6426_beefeef6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 54
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-15T07:56:49Z",
+      "side": 1,
+      "message": "Please try to improve code layout by introducing packages, interfaces, sealed hierarchies, etc.",
+      "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
