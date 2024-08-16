@@ -54,21 +54,29 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "properties" : {
+                    "ietf-restconf:operations" : {
+                      "type" : "object"
+                    }
                   }
                 }
               },
-              "application/xml": {
-                "schema": {
+              "application/xml" : {
+                "schema" : {
+                  "type" : "object",
+                  "xml" : {
+                    "name" : "operations",
+                    "namespace" : "urn:ietf:params:xml:ns:yang:ietf-restconf"
+                  }
                 }
               }
             }
           }
         },
-        "description": "Queries the available operations (RPC calls) on the mounted hosted.",
+        "description": "The example demonstrates only top-level container \"ietf-restconf:operations\".\nThe request returns a list of all available operations on the mounted\nhost, showcasing the structure of RPCs that can be executed.",
         "summary": "GET - 123 - datastore - operations"
       }
     },

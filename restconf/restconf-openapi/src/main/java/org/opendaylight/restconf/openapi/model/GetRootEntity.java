@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.jdt.annotation.NonNull;
 
 public final class GetRootEntity extends GetEntity {
+    private static final String OPERATIONS = "operations";
     private static final String DATA = "data";
     private static final String CONTROLLER = "Controller";
     private static final String NETCONF_STATE = "#/components/schemas/ietf-netconf-monitoring_netconf-state";
@@ -44,8 +45,10 @@ public final class GetRootEntity extends GetEntity {
                     supported by the server, some session-specific data and statistical data.""");
             }
         } else {
-            generator.writeStringField(DESCRIPTION,
-                "Queries the available operations (RPC calls) on the mounted hosted.");
+            generator.writeStringField(DESCRIPTION, """
+                The example demonstrates only top-level container "ietf-restconf:operations".
+                The request returns a list of all available operations on the mounted
+                host, showcasing the structure of RPCs that can be executed.""");
         }
         generator.writeObjectFieldStart(RESPONSES);
         generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
@@ -66,6 +69,11 @@ public final class GetRootEntity extends GetEntity {
             }
             generator.writeEndObject(); // end of state
         }
+        if (type.equals(OPERATIONS)) {
+            generator.writeObjectFieldStart("ietf-restconf:operations");
+            generator.writeStringField(TYPE, OBJECT);
+            generator.writeEndObject(); // end of ietf-restconf:operations
+        }
         generator.writeEndObject(); // end of properties
         generator.writeEndObject(); // end of json schema
         generator.writeEndObject(); //end of json
@@ -78,6 +86,14 @@ public final class GetRootEntity extends GetEntity {
                 generator.writeStringField(REF, NETCONF_STATE);
             }
         }
+        if (type.equals(OPERATIONS)) {
+            generator.writeStringField(TYPE, OBJECT);
+            // Define the root XML element and namespace
+            generator.writeObjectFieldStart("xml");
+            generator.writeStringField(NAME, OPERATIONS);
+            generator.writeStringField("namespace", "urn:ietf:params:xml:ns:yang:ietf-restconf");
+            generator.writeEndObject(); // end of xml for root
+        }
         generator.writeEndObject(); // end of xml schema
         generator.writeEndObject(); // end of xml
         generator.writeEndObject(); //end of content
@@ -88,7 +104,7 @@ public final class GetRootEntity extends GetEntity {
         generator.writeArrayFieldStart("tags");
         generator.writeString(deviceName() + " root");
         generator.writeEndArray(); //end of tags
-        if (!type.equals("operations")) {
+        if (!type.equals(OPERATIONS)) {
             generateParams(generator);
         }
         generator.writeEndObject(); //end of get
