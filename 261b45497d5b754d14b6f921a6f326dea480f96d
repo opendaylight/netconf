@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5af88769_6822562e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 54
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-16T07:31:37Z",
+      "side": 1,
+      "message": "endpoint is dynamically instantiated/restarted (if configuration changes)\nby org.opendaylight.restconf.nb.rfc8040.OSGiNorthbound service\n\noriginally developed by Robert as part of hist restconf refactoring.\n\nhe explicitly requested the netty endpoint should be maintained same \nway by same artifact",
+      "parentUuid": "6ee191b2_440713b9",
+      "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "77bf6426_beefeef6",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 54
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e98a5c6b_b07ff91b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-16T07:31:37Z",
+      "side": 1,
+      "message": "due to SSE stream sends response header and content chunks separately it cannot be served by dispatcher which operates full messages. stream requests are intercepted by sse handler on a transport layer then directed to RestconfStreamService, the request URI used as input",
+      "parentUuid": "397277f3_22c14e6e",
+      "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68da57da_cfd480c5",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-08-15T12:35:18Z",
       "side": 1,
       "message": "Why catching `RuntimeException`?",
+      "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5a42b02_2dacafb3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-16T07:31:37Z",
+      "side": 1,
+      "message": "to format outgoing error message according to restconf spec - https://datatracker.ietf.org/doc/html/rfc8040#section-7.1\n\nif runtime exception is not caught by request dispatcher then it will caught by server handler on transport layer and error message will be returned as plain text",
+      "parentUuid": "68da57da_cfd480c5",
       "revId": "261b45497d5b754d14b6f921a6f326dea480f96d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
