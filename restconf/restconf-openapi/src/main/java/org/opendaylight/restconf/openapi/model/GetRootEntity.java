@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.jdt.annotation.NonNull;
 
 public final class GetRootEntity extends GetEntity {
+    private static final String OPERATIONS = "operations";
     private final String type;
 
     public GetRootEntity(final @NonNull String deviceName, final @NonNull String type) {
@@ -38,13 +39,24 @@ public final class GetRootEntity extends GetEntity {
         generator.writeObjectFieldStart(MediaType.APPLICATION_JSON);
         generator.writeObjectFieldStart(SCHEMA);
         generator.writeObjectFieldStart(PROPERTIES);
+        if (type.equals(OPERATIONS)) {
+            generator.writeObjectFieldStart("ietf-restconf:operations");
+            generator.writeStringField(TYPE, OBJECT);
+            generator.writeEndObject(); // end of ietf-restconf:operations
+        }
         generator.writeEndObject(); // end of properties
         generator.writeEndObject(); // end of json schema
         generator.writeEndObject(); //end of json
         generator.writeObjectFieldStart(MediaType.APPLICATION_XML);
         generator.writeObjectFieldStart(SCHEMA);
-        generator.writeObjectFieldStart(PROPERTIES);
-        generator.writeEndObject(); // end of properties
+        if (type.equals(OPERATIONS)) {
+            generator.writeStringField(TYPE, OBJECT);
+            // Define the root XML element and namespace
+            generator.writeObjectFieldStart("xml");
+            generator.writeStringField(NAME, OPERATIONS);
+            generator.writeStringField("namespace", "urn:ietf:params:xml:ns:yang:ietf-restconf");
+            generator.writeEndObject(); // end of xml for root
+        }
         generator.writeEndObject(); // end of xml schema
         generator.writeEndObject(); // end of xml
         generator.writeEndObject(); //end of content
@@ -55,7 +67,7 @@ public final class GetRootEntity extends GetEntity {
         generator.writeArrayFieldStart("tags");
         generator.writeString(deviceName() + " root");
         generator.writeEndArray(); //end of tags
-        if (!type.equals("operations")) {
+        if (!type.equals(OPERATIONS)) {
             generateParams(generator);
         }
         generator.writeEndObject(); //end of get
