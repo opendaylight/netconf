@@ -62,8 +62,6 @@
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
                 }
               }
             }
@@ -96,15 +94,23 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {}
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "properties" : {
+                    "ietf-restconf:operations" : {
+                      "type" : "object"
+                    }
+                  }
                 }
               },
-              "application/xml": {
-                "schema": {
-                  "properties": {}
+              "application/xml" : {
+                "schema" : {
+                  "type" : "object",
+                  "xml" : {
+                    "name" : "operations",
+                    "namespace" : "urn:ietf:params:xml:ns:yang:ietf-restconf"
+                  }
                 }
               }
             }
