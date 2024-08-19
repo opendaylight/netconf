@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "3857a319b707332d2d7002d2a50c794a2bd70239",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f3d9e9f_4bfffb7c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 57
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-19T11:59:07Z",
+      "side": 1,
+      "message": "Netty",
+      "revId": "3857a319b707332d2d7002d2a50c794a2bd70239",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
