@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fba0137_269fd426",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53bd0a2b_036cbdc3",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "430e8361_e8dba066",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "final file",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffa8a439_9e425edd",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "430e8361_e8dba066",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b35a059_cb5a26ce",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfe0c898_10bb6b73",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20432688_6357645d",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "We could say at WARN level that we continuing with... IDK",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "239dd32d_7faef4ed",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20432688_6357645d",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5382dd38_d0a1d43f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c4a1db3_421828c1",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8b082e1_033ec271",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "Plain RFC 8040 patch and YANG PATCH (other rfc/draft).",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e6c78c3_cb42b890",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8b082e1_033ec271",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52e8ac0d_ad8e57e0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "we pass object _builders_ for both json and xml cases\nthe actual builder is chosen based on _content-type_ header value",
+      "parentUuid": "c6b5031a_37a2035f",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd9ba1d6_b335f8d2",
@@ -133,6 +259,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "IMO we do not need UNSUPPORTED, what do you think?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b80d103e_69483617",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Method.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "it serves @NonNullByDefault \na fallback option in a mapping method below",
+      "parentUuid": "dd9ba1d6_b335f8d2",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a9332c3_e13c8380",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "We should not. We either _throw_ exception (using current as cause) or _log \u0026 handle_.\n\nif exception is logged then thrown then subsequently same exception will be logged again in a place which handles it. In current case the exception handling and logging is performed by karaf\u0027s OSGi framework.",
+      "parentUuid": "47dd040b_61dfe398",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e077da4d_66777b41",
@@ -167,6 +329,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "LOG.error",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "409d64e8_f4ec3024",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "same as above",
+      "parentUuid": "e077da4d_66777b41",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -188,6 +368,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8269a7e_28d3038d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "we don\u0027t need to. \nit\u0027s just a case of client not able to connect to server for some reason. \nso we log the stack-trace to clarify the cause",
+      "parentUuid": "a5ffd18f_155dc75b",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d498967f_51dc9cf0",
@@ -201,6 +399,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "Its NonNullByDefault",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cad070a2_a74b91b6",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d498967f_51dc9cf0",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -222,6 +438,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edf4c4f5_ccd1de30",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestParameters.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a96577b_d04af529",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a12f2603_b6a9dcff",
@@ -235,6 +469,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "@NonNullByDefault?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62e2c2cf_04876086",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestParameters.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a12f2603_b6a9dcff",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -256,6 +508,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04e2cc5e_8259d505",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "no need to log if exception is thrown\nthe stack-trace will be logged at place the exception is handled\n-- see ResconfRequestDispatcher -\u003e catch(RuntimeException)\nextra log will cause same exception logged twice",
+      "parentUuid": "9c19a86b_281b5125",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8aeff0b0_04c97921",
@@ -273,6 +543,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29b01154_cda032ae",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8aeff0b0_04c97921",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a57f8505_7d87eb6b",
@@ -286,6 +574,24 @@
       "writtenOn": "2024-08-20T08:05:35Z",
       "side": 1,
       "message": "LOG?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef6ffd40_f37920c7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfStreamService.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-08-20T13:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a57f8505_7d87eb6b",
       "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
