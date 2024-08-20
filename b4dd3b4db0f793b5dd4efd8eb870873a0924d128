@@ -1,0 +1,293 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53bd0a2b_036cbdc3",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "indentation",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "430e8361_e8dba066",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "final file",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfe0c898_10bb6b73",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "file ... file - too many time you say its a file 😊",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20432688_6357645d",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/TlsUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "We could say at WARN level that we continuing with... IDK",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c4a1db3_421828c1",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "I was thinking about some explanation for humans that this class is serving /data, YANG PATCH requests, etc.",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8b082e1_033ec271",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "Plain RFC 8040 patch and YANG PATCH (other rfc/draft).",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6b5031a_37a2035f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataRequestProcessor.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "We have both XML and JSON for every request? Regardless user content setting?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd9ba1d6_b335f8d2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Method.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "IMO we do not need UNSUPPORTED, what do you think?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47dd040b_61dfe398",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "LOG.error..",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e077da4d_66777b41",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "LOG.error",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5ffd18f_155dc75b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "How are we going to continue?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d498967f_51dc9cf0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "Its NonNullByDefault",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a96577b_d04af529",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestParameters.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "Unsure - but we need requireNonNull anyway?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a12f2603_b6a9dcff",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestParameters.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "@NonNullByDefault?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c19a86b_281b5125",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestUtils.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "LOG something?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8aeff0b0_04c97921",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfRequestDispatcher.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "unnecessary line",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a57f8505_7d87eb6b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfStreamService.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-20T08:05:35Z",
+      "side": 1,
+      "message": "LOG?",
+      "revId": "b4dd3b4db0f793b5dd4efd8eb870873a0924d128",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
