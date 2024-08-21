@@ -49,7 +49,7 @@
         "parameters": []
       },
       "get": {
-        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "description": "Result of this GET contains data from the monitoring data model, i.e., several lists that have\ninformation about capabilities supported by the server, configuration datastores, data model schemas\nsupported by the server, some session-specific data and statistical data.",
         "responses": {
           "200": {
             "description": "OK",
@@ -57,13 +57,16 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "ietf-netconf-monitoring:netconf-state": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ietf-netconf-monitoring_netconf-state"
+                    }
                   }
                 }
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
+                  "$ref": "#/components/schemas/ietf-netconf-monitoring_netconf-state"
                 }
               }
             }
@@ -105,8 +108,6 @@
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
                 }
               }
             }

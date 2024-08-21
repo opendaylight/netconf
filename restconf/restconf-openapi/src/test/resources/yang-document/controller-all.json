@@ -49,7 +49,7 @@
         "parameters": []
       },
       "get": {
-        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "description": "Result of this GET contains YANG module monitoring information.",
         "responses": {
           "200": {
             "description": "OK",
@@ -57,13 +57,16 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "ietf-yang-library:modules-state": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ietf-yang-library_modules-state"
+                    }
                   }
                 }
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
+                  "$ref": "#/components/schemas/ietf-yang-library_modules-state"
                 }
               }
             }
@@ -104,7 +107,6 @@
               },
               "application/xml": {
                 "schema": {
-                  "properties": {}
                 }
               }
             }
