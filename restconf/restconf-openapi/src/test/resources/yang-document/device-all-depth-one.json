@@ -57,12 +57,18 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "ietf-netconf-monitoring:netconf-state": {
+                      "type": "object"
+                    }
                   }
                 }
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
+                  "type": "object",
+                  "xml": {
+                    "name": "netconf-state",
+                    "namespace": "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"
                   }
                 }
               }
@@ -105,8 +111,6 @@
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
                 }
               }
             }
@@ -4993,12 +4997,12 @@
             "type": "string",
             "enum": [
               "toast-type",
-              "white-bread",
-              "hash-brown",
               "wheat-bread",
-              "frozen-bagel",
+              "wonder-bread",
+              "hash-brown",
               "frozen-waffle",
-              "wonder-bread"
+              "frozen-bagel",
+              "white-bread"
             ],
             "default": "wheat-bread",
             "example": "toast-type"
@@ -5035,11 +5039,11 @@
             "type": "string",
             "enum": [
               "toast-type",
-              "white-bread",
-              "wonder-bread",
               "frozen-bagel",
-              "frozen-waffle",
               "wheat-bread",
+              "frozen-waffle",
+              "wonder-bread",
+              "white-bread",
               "hash-brown"
             ],
             "default": "wheat-bread",
