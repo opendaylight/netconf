@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "76dba50463ffefae26f491fc001e4acd065f61f7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7f1b395_c1b8dda1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/GetRootEntity.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-08-21T11:20:18Z",
+      "side": 1,
+      "message": "add one empty line between private static final and private final variables",
+      "revId": "76dba50463ffefae26f491fc001e4acd065f61f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
