@@ -57,13 +57,16 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "ietf-yang-library:modules-state": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ietf-yang-library_modules-state"
+                    }
                   }
                 }
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
+                  "$ref": "#/components/schemas/ietf-yang-library_modules-state"
                 }
               }
             }
@@ -105,8 +108,6 @@
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
-                  }
                 }
               }
             }
