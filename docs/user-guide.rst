@@ -1410,6 +1410,21 @@ Restconf-nb configuration works through OSGi Configuration Admin interface, in t
 * ``ping-executor-name-prefix``, which defaults to ``ping-executor``
 * ``max-thread-count``, which defaults to ``1``
 
+Netty endpoint related settings are also configurable:
+
+* ``host-name``, which defaults to ``localhost``
+* ``bind-address``, which defaults to ``0.0.0.0``
+* ``bind-port``, which defaults to ``8182``
+* ``group-name``, which defaults to ``restconf-server``
+* ``group-threads``, which defaults to ``0``
+* ``default-encoding``, which defaults to ``json``
+
+Netty Tls transport configuration. Both certificate and private key are required in order to enable.
+
+* ``tls-certificate``
+* ``tls-private-key``
+
+
 *pretty-print* — Control the default value of the odl-pretty-print query parameter.
 
 *data-missing-is-404* — Control the HTTP status code reporting of conditions corresponding to "data-missing".
@@ -1426,6 +1441,22 @@ When this is set to true, the server will violate RFC8040 and report "404" inste
 
 *max-thread-count* — Number of threads Ping Executor will be run with.
 
+*host-name* — The hostname to be used for URLs constructed on server side.
+
+*bind-address* — The address to bind to.
+
+*bind-port* — The port to bind to.
+
+*group-name* — Thread name prefix to be used by Netty's thread executor.
+
+*group-threads* — Netty's thread limit. 0 means no limits.
+
+*default-encoding* — Default encoding for outgoing messages. Expected values are 'xml' or 'json' (without quotes).
+
+*tls-certificate* — Path to the X509 certificate file in PEM format.
+
+*tls-private-key* — Path to the private key file in PEM format.
+
 In order to change these settings, you can either modify the corresponding configuration
 file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
 
@@ -1438,6 +1469,14 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     restconf=rests
     ping-executor-name-prefix=ping-executor
     max-thread-count=1
+    host-name=localhost
+    bind-address=0.0.0.0
+    bind-port=8182
+    group-name=restconf-server
+    group-threads=0
+    default-encoding=json
+    tls-certificate=etc/tls/cert.pem
+    tls-private-key=etc/tls/key.pem
 
 Or use Karaf CLI:
 
@@ -1449,6 +1488,14 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
     opendaylight-user@root>config:property-set max-thread-count 1
     opendaylight-user@root>config:property-set restconf "rests"
+    opendaylight-user@root>config:property-set host-name "localhost"
+    opendaylight-user@root>config:property-set bind-address "0.0.0.0"
+    opendaylight-user@root>config:property-set bind-port 8182
+    opendaylight-user@root>config:property-set group-name "restconf-server"
+    opendaylight-user@root>config:property-set group-threads 0
+    opendaylight-user@root>config:property-set default-encoding "json"
+    opendaylight-user@root>config:property-set tls-certificate "etc/tls/cert.pem"
+    opendaylight-user@root>config:property-set tls-private-key "etc/tls/key.pem"
     opendaylight-user@root>config:update
 
 NETCONF Call Home
