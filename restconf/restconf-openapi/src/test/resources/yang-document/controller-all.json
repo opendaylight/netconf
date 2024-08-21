@@ -57,12 +57,18 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "ietf-netconf-monitoring:netconf-state": {
+                      "type": "object"
+                    }
                   }
                 }
               },
               "application/xml": {
                 "schema": {
-                  "properties": {
+                  "type": "object",
+                  "xml": {
+                    "name": "netconf-state",
+                    "namespace": "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"
                   }
                 }
               }
@@ -104,7 +110,6 @@
               },
               "application/xml": {
                 "schema": {
-                  "properties": {}
                 }
               }
             }
