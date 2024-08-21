@@ -49,10 +49,31 @@
         "parameters": []
       },
       "get": {
-        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "description": "Result of this GET contains YANG module monitoring information.",
         "responses": {
           "200": {
+<<<<<<< HEAD   (c56391 OpenApi: Avoid leaf names duplication)
             "description": "OK"
+=======
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ietf-yang-library:modules-state": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ietf-yang-library_modules-state"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ietf-yang-library_modules-state"
+                }
+              }
+            }
+>>>>>>> CHANGE (5da08c Add response body example for ROOT data GET)
           }
         },
         "summary": "GET - Controller - datastore - data",
@@ -66,7 +87,22 @@
         "description": "Queries the available operations (RPC calls) on the mounted hosted.",
         "responses": {
           "200": {
+<<<<<<< HEAD   (c56391 OpenApi: Avoid leaf names duplication)
             "description": "OK"
+=======
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {}
+                }
+              },
+              "application/xml": {
+                "schema": {
+                }
+              }
+            }
+>>>>>>> CHANGE (5da08c Add response body example for ROOT data GET)
           }
         },
         "summary": "GET - Controller - datastore - operations",

@@ -53,7 +53,23 @@
         ],
         "responses": {
           "200": {
+<<<<<<< HEAD   (c56391 OpenApi: Avoid leaf names duplication)
             "description": "OK"
+=======
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                }
+              }
+            }
+>>>>>>> CHANGE (5da08c Add response body example for ROOT data GET)
           }
         },
         "description": "Queries the available operations (RPC calls) on the mounted hosted.",
@@ -233,10 +249,50 @@
         ],
         "responses": {
           "200": {
+<<<<<<< HEAD   (c56391 OpenApi: Avoid leaf names duplication)
             "description": "OK"
+=======
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ietf-netconf-monitoring:netconf-state": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ietf-netconf-monitoring_netconf-state"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ietf-netconf-monitoring_netconf-state"
+                }
+              }
+            }
+>>>>>>> CHANGE (5da08c Add response body example for ROOT data GET)
           }
         },
+<<<<<<< HEAD   (c56391 OpenApi: Avoid leaf names duplication)
         "description": "Queries the config (startup) datastore on the mounted hosted.",
+=======
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Result of this GET contains data from the monitoring data model, i.e., several lists that have\ninformation about capabilities supported by the server, configuration datastores, data model schemas\nsupported by the server, some session-specific data and statistical data.",
+>>>>>>> CHANGE (5da08c Add response body example for ROOT data GET)
         "summary": "GET - 123 - datastore - data"
       },
       "post": {
