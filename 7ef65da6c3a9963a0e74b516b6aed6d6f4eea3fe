@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79e835ee_0db1c57e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T08:11:09Z",
+      "side": 1,
+      "message": "Create a new JIRA ticket for this (bug in 8.0.0)",
+      "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
