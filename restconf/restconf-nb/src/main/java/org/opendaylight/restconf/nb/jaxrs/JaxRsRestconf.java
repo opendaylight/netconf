@@ -351,7 +351,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), jsonBody), ar);
+            final var request = requestOf(uriInfo);
+            completeDataYangPATCH(server.dataPATCH(request, jsonBody), request.prettyPrint(), ar);
         }
     }
 
@@ -374,7 +375,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), identifier, jsonBody), ar);
+            final var request = requestOf(uriInfo);
+            completeDataYangPATCH(server.dataPATCH(request, identifier, jsonBody), request.prettyPrint(), ar);
         }
     }
 
@@ -396,7 +398,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), xmlBody), ar);
+            final var request = requestOf(uriInfo);
+            completeDataYangPATCH(server.dataPATCH(request, xmlBody), request.prettyPrint(), ar);
         }
     }
 
@@ -419,19 +422,20 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), identifier, xmlBody), ar);
+            final var request = requestOf(uriInfo);
+            completeDataYangPATCH(server.dataPATCH(request, identifier, xmlBody), request.prettyPrint(), ar);
         }
     }
 
     private void completeDataYangPATCH(final RestconfFuture<DataYangPatchResult> future,
-            final AsyncResponse ar) {
+            final PrettyPrintParam reqPrettyPrint, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final DataYangPatchResult result) {
                 final var patchStatus = result.status();
                 final var statusCode = statusOf(patchStatus);
                 final var builder = Response.status(statusCode.code(), statusCode.phrase())
-                    .entity(new YangPatchStatusBody(patchStatus));
+                    .entity(new JaxRsFormattableBody(new YangPatchStatusBody(patchStatus), reqPrettyPrint));
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
