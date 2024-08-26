@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "f947ea7d4705c34f1569998181a6d18ead9f2e5e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d9c8739_dd920251",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T13:29:21Z",
+      "side": 1,
+      "message": "tox is failing because of wrong jira redirects..",
+      "revId": "f947ea7d4705c34f1569998181a6d18ead9f2e5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
