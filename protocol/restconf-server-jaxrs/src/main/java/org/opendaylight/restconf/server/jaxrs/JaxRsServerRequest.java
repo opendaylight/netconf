@@ -15,6 +15,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -30,30 +31,33 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
 /**
  * A {@link ServerRequest} originating in {@link JaxRsRestconf}.
  *
- * @param T type of reported result
+ * @param <T> type of reported result
  */
-@NonNullByDefault
 abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
-    private final SecurityContext sc;
-    private final AsyncResponse ar;
+    private final @Nullable Principal principal;
+    private final @NonNull AsyncResponse ar;
 
+    @NonNullByDefault
     private JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
             final SecurityContext sc, final AsyncResponse ar, final QueryParameters queryParameters) {
         super(queryParameters, defaultPrettyPrint, errorTagMapping);
-        this.sc = requireNonNull(sc);
         this.ar = requireNonNull(ar);
+        principal = sc.getUserPrincipal();
     }
 
+    @NonNullByDefault
     JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
             final SecurityContext sc, final AsyncResponse ar) {
         this(defaultPrettyPrint, errorTagMapping, sc, ar, QueryParameters.of());
     }
 
+    @NonNullByDefault
     JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint,final ErrorTagMapping errorTagMapping,
             final SecurityContext sc, final AsyncResponse ar, final UriInfo uriInfo) {
         this(defaultPrettyPrint, errorTagMapping, sc, ar, queryParamsOf(uriInfo));
     }
 
+    @NonNullByDefault
     private static QueryParameters queryParamsOf(final UriInfo uriInfo) {
         try {
             return QueryParameters.ofMultiValue(uriInfo.getQueryParameters());
@@ -63,12 +67,12 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
     }
 
     @Override
-    public final @Nullable Principal principal() {
-        return sc.getUserPrincipal();
+    public final Principal principal() {
+        return principal;
     }
 
     @Override
-    public final @Nullable TransportSession session() {
+    public final TransportSession session() {
         // JAX-RS does not give us control over TCP sessions
         return null;
     }
@@ -90,5 +94,6 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
         ar.resume(Response.status(status.code(), status.phrase()).entity(body).build());
     }
 
+    @NonNullByDefault
     abstract Response transform(T result) throws ServerException;
 }
