@@ -33,6 +33,29 @@
       "message": "In the future please follow: https://cbea.ms/git-commit/",
       "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a88c6dea_517349b2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerSseHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-26T10:06:29Z",
+      "side": 1,
+      "message": "this is not mentioned at all, why does it need to be volatile?",
+      "range": {
+        "startLine": 61,
+        "startChar": 12,
+        "endLine": 61,
+        "endChar": 20
+      },
+      "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
