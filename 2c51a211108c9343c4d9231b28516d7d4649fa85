@@ -16,6 +16,23 @@
       "message": "test-netconf-core",
       "revId": "2c51a211108c9343c4d9231b28516d7d4649fa85",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9deb6ae1_1a9b32df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 60
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T08:09:34Z",
+      "side": 1,
+      "message": "Test run: https://jenkins.opendaylight.org/releng/view/netconf/job/netconf-csit-1node-gate-userfeatures-netty-all-scandium/",
+      "revId": "2c51a211108c9343c4d9231b28516d7d4649fa85",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
