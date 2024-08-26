@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "b7e70a759ef451bdf4bb49f570a93b66fc3d974a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3edc502_4757849f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T12:36:52Z",
+      "side": 1,
+      "message": "verified +1:\n13:57:41 (      user-guide: line 1213) broken    https://jira.opendaylight.org/browse/ODLPARENT-112 - 404 Client Error: Not Found for url: https://lf-opendaylight.atlassian.net/jira/browse/ODLPARENT-112",
+      "revId": "b7e70a759ef451bdf4bb49f570a93b66fc3d974a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
