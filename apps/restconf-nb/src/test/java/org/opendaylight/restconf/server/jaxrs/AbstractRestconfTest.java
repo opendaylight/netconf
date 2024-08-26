@@ -124,7 +124,8 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     }
 
     static final List<ServerError> assertErrors(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
-        return assertEntity(YangErrorsBody.class, expectedStatus, invocation).errors();
+        return assertInstanceOf(YangErrorsBody.class,
+            assertEntity(JaxRsFormattableBody.class, expectedStatus, invocation).body()).errors();
     }
 
     static final Response assertResponse(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
