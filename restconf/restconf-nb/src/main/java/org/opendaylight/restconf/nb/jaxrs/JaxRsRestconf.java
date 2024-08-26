@@ -431,7 +431,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 final var patchStatus = result.status();
                 final var statusCode = statusOf(patchStatus);
                 final var builder = Response.status(statusCode.code(), statusCode.phrase())
-                    .entity(new YangPatchStatusBody(patchStatus));
+                    .entity(new JaxRsFormattableBody(new YangPatchStatusBody(patchStatus), prettyPrint()));
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
