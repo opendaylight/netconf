@@ -91,7 +91,9 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
 
     @Override
     protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
-        ar.resume(Response.status(status.code(), status.phrase()).entity(body).build());
+        ar.resume(Response.status(status.code(), status.phrase())
+            .entity(new JaxRsFormattableBody(body, prettyPrint()))
+            .build());
     }
 
     @NonNullByDefault
