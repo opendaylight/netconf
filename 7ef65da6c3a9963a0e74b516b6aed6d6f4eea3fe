@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "81e71727_f827a034",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T11:10:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79e835ee_0db1c57e",
+      "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7c5c281e_7ce824f9",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -48,6 +66,30 @@
       "writtenOn": "2024-08-26T10:06:29Z",
       "side": 1,
       "message": "this is not mentioned at all, why does it need to be volatile?",
+      "range": {
+        "startLine": 61,
+        "startChar": 12,
+        "endLine": 61,
+        "endChar": 20
+      },
+      "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f9554c3_9c99a18f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerSseHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T11:10:21Z",
+      "side": 1,
+      "message": "Doesn\u0027t need to be.",
+      "parentUuid": "a88c6dea_517349b2",
       "range": {
         "startLine": 61,
         "startChar": 12,
