@@ -16,6 +16,23 @@
       "message": "Create a new JIRA ticket for this (bug in 8.0.0)",
       "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c5c281e_7ce824f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-26T08:25:23Z",
+      "side": 1,
+      "message": "In the future please follow: https://cbea.ms/git-commit/",
+      "revId": "7ef65da6c3a9963a0e74b516b6aed6d6f4eea3fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
