@@ -1,0 +1,8 @@
+Verified+1: Robert Varga <nite@hq.sk>
+Code-Review+2: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Verified+1: ODL Required.GHA <releng+odl.required.gha@linuxfoundation.org>
+Submitted-by: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Submitted-at: Tue, 27 Aug 2024 12:51:16 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/113261
+Project: netconf
+Branch: refs/heads/master
