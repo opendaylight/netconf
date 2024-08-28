@@ -34,6 +34,24 @@
       "parentUuid": "637ed700_2308a32e",
       "revId": "36050a653f52fe96abd9d922566bd8967e77e7ea",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29e94d73_88110d07",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-08-28T13:23:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4495abfb_9308e745",
+      "revId": "36050a653f52fe96abd9d922566bd8967e77e7ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
