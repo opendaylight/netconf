@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75488cd5_046cc406",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiatorTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-28T17:48:48Z",
+      "side": 1,
+      "message": "this actually shows that setUp()\u0027s placement of EOMFrameEncoder was wrong",
+      "range": {
+        "startLine": 102,
+        "startChar": 12,
+        "endLine": 102,
+        "endChar": 21
+      },
+      "revId": "857571a4fee6bec55911da5c1412545178a7d5a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
