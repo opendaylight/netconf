@@ -39,6 +39,30 @@
       },
       "revId": "5c1012721c09787440ddf0d9e7886784591d3c44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc14e38_ca4d4bcd",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ThreadLocalTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-28T18:02:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a2e7034_137cdf0f",
+      "range": {
+        "startLine": 43,
+        "startChar": 25,
+        "endLine": 43,
+        "endChar": 34
+      },
+      "revId": "5c1012721c09787440ddf0d9e7886784591d3c44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
