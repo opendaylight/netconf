@@ -49,7 +49,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final DatabindProvider databindProvider, @Reference final RestconfServer server,
             @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
         final var restconfBuilder = WebContext.builder()
-            .name("RFC8040 RESTCONF")
+            .name("RESTCONF")
             .contextPath("/" + servletFactory.restconf())
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
@@ -87,7 +87,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
         restconfReg = webServer.registerWebContext(restconfBuilder.build());
 
         final var discoveryBuilder = WebContext.builder()
-            .name("RFC6415 Web Host Metadata")
+            .name("WellKnownURIs")
             .contextPath("/.well-known")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
