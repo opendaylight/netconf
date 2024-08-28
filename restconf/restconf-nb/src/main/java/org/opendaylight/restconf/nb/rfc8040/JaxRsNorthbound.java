@@ -101,7 +101,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             new NamingThreadPoolFactory(pingNamePrefix));
 
         final var restconfBuilder = WebContext.builder()
-            .name("RFC8040 RESTCONF")
+            .name("RESTCONF")
             .contextPath("/" + streamsConfiguration.basePath())
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
@@ -137,7 +137,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
         restconfReg = webServer.registerWebContext(restconfBuilder.build());
 
         final var discoveryBuilder = WebContext.builder()
-            .name("RFC6415 Web Host Metadata")
+            .name("WellKnownURIs")
             .contextPath("/.well-known")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
