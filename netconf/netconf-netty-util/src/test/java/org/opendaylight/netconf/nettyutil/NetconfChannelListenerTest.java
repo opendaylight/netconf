@@ -5,58 +5,56 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.util.concurrent.Promise;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 
 @ExtendWith(MockitoExtension.class)
-class AbstractChannelInitializerTest {
-
+class NetconfChannelListenerTest {
     @Mock
     private Channel channel;
     @Mock
     private ChannelPipeline pipeline;
-    @Mock
-    private Promise<NetconfSession> sessionPromise;
-
-    @BeforeEach
-    void setUp() {
-        doReturn(pipeline).when(channel).pipeline();
-        doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
-    }
+    @Spy
+    private TransportChannel transportChannel;
+    @Spy
+    private NetconfChannelListener channelListener;
+    @Captor
+    private ArgumentCaptor<NetconfChannel> channelCaptor;
 
     @Test
     void testInit() {
-        final TestingInitializer testingInitializer = new TestingInitializer();
-        testingInitializer.initialize(channel, sessionPromise);
+        doReturn(pipeline).when(channel).pipeline();
+        doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
+        doReturn(channel).when(transportChannel).channel();
+        doNothing().when(channelListener).onNetconfChannelEstablished(any());
+
+        channelListener.onTransportChannelEstablished(transportChannel);
+
         verify(pipeline).addLast(anyString(), any(FrameDecoder.class));
         verify(pipeline).addLast(anyString(), any(MessageDecoder.class));
         verify(pipeline).addLast(anyString(), any(MessageEncoder.class));
+        verify(channelListener).onNetconfChannelEstablished(channelCaptor.capture());
+        assertSame(transportChannel, channelCaptor.getValue().transport());
     }
-
-    private static final class TestingInitializer extends AbstractChannelInitializer<NetconfSession> {
-
-        @Override
-        protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfSession> promise) {
-        }
-    }
-
 }
