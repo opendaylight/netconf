@@ -15,21 +15,24 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.transport.api.TransportChannel;
-import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.nettyutil.NetconfChannel;
+import org.opendaylight.netconf.nettyutil.NetconfChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class ClientTransportChannelListener implements TransportChannelListener, FutureListener<NetconfClientSession>,
-        FutureCallback<TransportStack> {
-    private static final Logger LOG = LoggerFactory.getLogger(ClientTransportChannelListener.class);
+final class ClientNetconfChannelListener extends NetconfChannelListener
+        implements FutureListener<NetconfClientSession>, FutureCallback<TransportStack> {
+    private static final Logger LOG = LoggerFactory.getLogger(ClientNetconfChannelListener.class);
 
     private final @NonNull SettableFuture<NetconfClientSession> sessionFuture = SettableFuture.create();
-    private final ClientChannelInitializer initializer;
+    private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
+    private final NetconfClientSessionListener sessionListener;
 
-    ClientTransportChannelListener(final ClientChannelInitializer initializer) {
-        this.initializer = requireNonNull(initializer);
+    ClientNetconfChannelListener(final NetconfClientSessionNegotiatorFactory negotiatorFactory,
+            final NetconfClientSessionListener sessionListener) {
+        this.negotiatorFactory = requireNonNull(negotiatorFactory);
+        this.sessionListener = requireNonNull(sessionListener);
     }
 
     @NonNull ListenableFuture<NetconfClientSession> sessionFuture() {
@@ -37,11 +40,15 @@ final class ClientTransportChannelListener implements TransportChannelListener, 
     }
 
     @Override
-    public void onTransportChannelEstablished(final TransportChannel channel) {
+    protected void onNetconfChannelEstablished(final NetconfChannel channel) {
         LOG.debug("Initializing established transport {}", channel);
-        final var nettyChannel = channel.channel();
+        final var nettyChannel = channel.transport().channel();
         final var promise = nettyChannel.eventLoop().<NetconfClientSession>newPromise();
-        initializer.initialize(nettyChannel, promise);
+
+        nettyChannel.pipeline().addLast(NETCONF_SESSION_NEGOTIATOR,
+            negotiatorFactory.getSessionNegotiator(sessionListener, nettyChannel, promise));
+        nettyChannel.config().setConnectTimeoutMillis((int) negotiatorFactory.getConnectionTimeoutMillis());
+
         promise.addListener(this);
     }
 
