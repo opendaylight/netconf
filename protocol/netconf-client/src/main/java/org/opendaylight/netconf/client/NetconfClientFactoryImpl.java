@@ -59,9 +59,8 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     @Override
     public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration configuration)
             throws UnsupportedConfigurationException {
-        final var sessionListener = configuration.getSessionListener();
-        final var transportListener = new ClientTransportChannelListener(new ClientChannelInitializer(
-            createNegotiatorFactory(configuration), sessionListener));
+        final var transportListener = new ClientNetconfChannelListener(createNegotiatorFactory(configuration),
+            configuration.getSessionListener());
 
         final var stackFuture = switch (configuration.getProtocol()) {
             case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM, transportListener,

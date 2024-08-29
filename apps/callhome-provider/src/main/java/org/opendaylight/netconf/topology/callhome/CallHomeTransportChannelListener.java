@@ -11,15 +11,14 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.ssl.SslHandler;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.client.ClientChannelInitializer;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.transport.api.TransportChannel;
-import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.nettyutil.NetconfChannel;
+import org.opendaylight.netconf.nettyutil.NetconfChannelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CallHomeTransportChannelListener implements TransportChannelListener {
+public class CallHomeTransportChannelListener extends NetconfChannelListener {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeTransportChannelListener.class);
 
     private final @NonNull NetconfClientSessionNegotiatorFactory negotiationFactory;
@@ -34,22 +33,22 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
     }
 
     @Override
-    public void onTransportChannelEstablished(final TransportChannel transportChannel) {
-        final var channel = transportChannel.channel();
+    protected void onNetconfChannelEstablished(final NetconfChannel channel) {
+        final var nettyChannel = channel.transport().channel();
 
         // identify or create session context associated with current connection
-        final var context = contextManager.findByChannel(channel);
+        final var context = contextManager.findByChannel(nettyChannel);
         if (context == null) {
             LOG.error("No valid context found for incoming connection from {}. Connection rejected.",
-                channel.remoteAddress());
-            channel.close();
+                nettyChannel.remoteAddress());
+            nettyChannel.close();
             return;
         }
 
         LOG.info("Starting netconf negotiation for context: {}", context);
 
         // init NETCONF negotiation
-        final var promise = channel.eventLoop().<NetconfClientSession>newPromise();
+        final var promise = nettyChannel.eventLoop().<NetconfClientSession>newPromise();
         promise.addListener(ignored -> {
             final var cause = promise.cause();
             if (cause != null) {
@@ -63,12 +62,15 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
                 LOG.info("Netconf session established for context: {}", context);
             }
         });
-        new ClientChannelInitializer(negotiationFactory, context.netconfSessionListener())
-            .initialize(channel, promise);
+
+        final var pipeline = nettyChannel.pipeline()
+            .addLast(NETCONF_SESSION_NEGOTIATOR,
+                negotiationFactory.getSessionNegotiator(context.netconfSessionListener(), nettyChannel, promise));
+        nettyChannel.config().setConnectTimeoutMillis((int) negotiationFactory.getConnectionTimeoutMillis());
 
         // this is required to trigger NETCONF negotiation on TLS
-        if (channel.pipeline().get(SslHandler.class) != null) {
-            channel.pipeline().fireChannelActive();
+        if (pipeline.get(SslHandler.class) != null) {
+            pipeline.fireChannelActive();
         }
     }
 

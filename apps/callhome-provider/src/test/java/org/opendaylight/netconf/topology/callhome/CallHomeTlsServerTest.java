@@ -20,7 +20,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.util.concurrent.Promise;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -57,15 +56,14 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
+import org.opendaylight.netconf.nettyutil.NetconfChannel;
+import org.opendaylight.netconf.nettyutil.NetconfChannelListener;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
-import org.opendaylight.netconf.transport.api.TransportChannel;
-import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.netconf.transport.tls.TLSServer;
@@ -274,21 +272,21 @@ class CallHomeTlsServerTest {
     }
 
     // Same as org.opendaylight.netconf.server.ServerTransportInitializer but with explicit fireChannelActive()
-    private record TestNetconfServerInitializer(NetconfServerSessionNegotiatorFactory negotiatorFactory)
-        implements TransportChannelListener {
+    private static final class TestNetconfServerInitializer extends NetconfChannelListener {
+        private final NetconfServerSessionNegotiatorFactory negotiatorFactory;
+
+        TestNetconfServerInitializer(final NetconfServerSessionNegotiatorFactory negotiatorFactory) {
+            this.negotiatorFactory = negotiatorFactory;
+        }
 
         @Override
-        public void onTransportChannelEstablished(final TransportChannel channel) {
+        public void onNetconfChannelEstablished(final NetconfChannel channel) {
             LOG.debug("Call-Home client's transport channel {} established", channel);
-            final var nettyChannel = channel.channel();
-            new AbstractChannelInitializer<NetconfServerSession>() {
-                @Override
-                protected void initializeSessionNegotiator(final Channel ch,
-                    final Promise<NetconfServerSession> promise) {
-                    ch.pipeline()
-                        .addLast(NETCONF_SESSION_NEGOTIATOR, negotiatorFactory.getSessionNegotiator(ch, promise));
-                }
-            }.initialize(nettyChannel, nettyChannel.eventLoop().newPromise());
+            final var nettyChannel = channel.transport().channel();
+            final var promise = nettyChannel.eventLoop().<NetconfServerSession>newPromise();
+            nettyChannel.pipeline()
+                .addLast(NETCONF_SESSION_NEGOTIATOR, negotiatorFactory.getSessionNegotiator(nettyChannel, promise));
+
             // below line is required
             nettyChannel.pipeline().fireChannelActive();
         }
