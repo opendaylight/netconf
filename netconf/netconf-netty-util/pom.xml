@@ -77,6 +77,10 @@
       <artifactId>shaded-exificient</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.odlparent</groupId>
       <artifactId>logging-markers</artifactId>
     </dependency>
