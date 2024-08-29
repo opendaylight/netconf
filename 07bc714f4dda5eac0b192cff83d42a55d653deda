@@ -22,6 +22,30 @@
       },
       "revId": "07bc714f4dda5eac0b192cff83d42a55d653deda",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "391c21bc_a8f936ea",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/monitoring/JavaCommonCounters.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-08-29T03:45:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88f983bc_c850f652",
+      "range": {
+        "startLine": 15,
+        "startChar": 78,
+        "endLine": 15,
+        "endChar": 80
+      },
+      "revId": "07bc714f4dda5eac0b192cff83d42a55d653deda",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
