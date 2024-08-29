@@ -50,8 +50,9 @@ import org.slf4j.LoggerFactory;
 final class ServerSseHandler extends ChannelInboundHandlerAdapter implements EventStreamListener {
     private static final Logger LOG = LoggerFactory.getLogger(ServerSseHandler.class);
     private static final ByteBuf PING_MESSAGE =
-        Unpooled.wrappedBuffer(":ping\r\n\r\n".getBytes(StandardCharsets.UTF_8));
-    private static final ByteBuf EMPTY_LINE = Unpooled.wrappedBuffer("\r\n".getBytes(StandardCharsets.UTF_8));
+        Unpooled.wrappedBuffer(new byte[] { ':', 'p', 'i', 'n', 'g', '\r', '\n', '\r', '\n' }).asReadOnly();
+    private static final ByteBuf EMPTY_LINE = Unpooled.wrappedBuffer(new byte[] { '\r', '\n' }).asReadOnly();
+
     private final int maxFieldValueLength;
     private final int heartbeatIntervalMillis;
     private final EventStreamService service;
@@ -154,7 +155,7 @@ final class ServerSseHandler extends ChannelInboundHandlerAdapter implements Eve
         if (isChannelWritable()) {
             chunksOf(fieldName, fieldValue, maxFieldValueLength, context.alloc())
                 .forEach(chunk -> context.writeAndFlush(new DefaultHttpContent(chunk)));
-            context.writeAndFlush(new DefaultHttpContent(EMPTY_LINE.copy()));
+            context.writeAndFlush(new DefaultHttpContent(EMPTY_LINE.retainedSlice()));
         }
     }
 
@@ -182,7 +183,7 @@ final class ServerSseHandler extends ChannelInboundHandlerAdapter implements Eve
 
     private void sendPing() {
         if (isChannelWritable() && streaming) {
-            context.writeAndFlush(new DefaultHttpContent(PING_MESSAGE.copy()));
+            context.writeAndFlush(new DefaultHttpContent(PING_MESSAGE.retainedSlice()));
             schedulePing();
         }
     }
