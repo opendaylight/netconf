@@ -11,7 +11,7 @@
  * {@code transport-api} constructs.
  *
  * <p>
- * Given a particular transport stack, the main entrypoint is {@link ServerTransportInitializer}, which is suitable
+ * Given a particular transport stack, the main entrypoint is {@link ServerNetconfChannelListener}, which is suitable
  * for passing down to the various TransportStack implementations and deals with negotiating the details of a NETCONF
  * session.
  */

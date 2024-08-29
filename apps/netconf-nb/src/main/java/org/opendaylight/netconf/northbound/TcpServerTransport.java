@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.northbound;
 
 import java.util.concurrent.ExecutionException;
-import org.opendaylight.netconf.server.ServerTransportInitializer;
+import org.opendaylight.netconf.server.ServerNetconfChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -49,19 +49,19 @@ public final class TcpServerTransport implements AutoCloseable {
     public TcpServerTransport(@Reference final TransportFactoryHolder factoryHolder,
             @Reference final OSGiNetconfServer backend, final Configuration configuration) {
         // FIXME: create an instantiation and do not use TLS
-        this(factoryHolder, backend.serverTransportInitializer(), new TcpServerParametersBuilder()
+        this(factoryHolder, backend.netconfChannelListener(), new TcpServerParametersBuilder()
             .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
             .setLocalPort(new PortNumber(Uint16.valueOf(configuration.portNumber())))
             .build());
     }
 
-    public TcpServerTransport(final TransportFactoryHolder factoryHolder, final ServerTransportInitializer initializer,
+    public TcpServerTransport(final TransportFactoryHolder factoryHolder, final ServerNetconfChannelListener listener,
             final TcpServerGrouping listenParams) {
         final var localAddr = listenParams.requireLocalAddress().stringValue();
         final var localPort = listenParams.requireLocalPort().getValue();
 
         try {
-            tcpServer = TCPServer.listen(initializer, factoryHolder.factory().newServerBootstrap(), listenParams).get();
+            tcpServer = TCPServer.listen(listener, factoryHolder.factory().newServerBootstrap(), listenParams).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             LOG.warn("Could not start TCP NETCONF server at {}:{}", localAddr, localPort, e);
             throw new IllegalStateException("Could not start TCP NETCONF server", e);

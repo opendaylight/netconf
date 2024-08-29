@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.netconf.server.ServerTransportInitializer;
+import org.opendaylight.netconf.server.ServerNetconfChannelListener;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
@@ -41,7 +41,7 @@ public final class OSGiNetconfServer {
 
     private final AggregatedNetconfOperationServiceFactory mappers = new AggregatedNetconfOperationServiceFactory();
     private final ComponentInstance<DefaultNetconfMonitoringService> monitoring;
-    private final ServerTransportInitializer serverTransportInitializer;
+    private final ServerNetconfChannelListener netconfChannelListener;
 
     @Activate
     public OSGiNetconfServer(
@@ -54,7 +54,7 @@ public final class OSGiNetconfServer {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
             mapperAggregatorRegistry, configuration.monitoring$_$update$_$interval())));
-        serverTransportInitializer = new ServerTransportInitializer(NetconfServerSessionNegotiatorFactory.builder()
+        netconfChannelListener = new ServerNetconfChannelListener(NetconfServerSessionNegotiatorFactory.builder()
             .setTimer(timer)
             .setAggregatedOpService(mappers)
             .setIdProvider(sessionIdProvider)
@@ -69,8 +69,8 @@ public final class OSGiNetconfServer {
         mappers.close();
     }
 
-    ServerTransportInitializer serverTransportInitializer() {
-        return serverTransportInitializer;
+    ServerNetconfChannelListener netconfChannelListener() {
+        return netconfChannelListener;
     }
 
     static <T> T extractProp(final Map<String, ?> properties, final String key, final Class<T> valueType) {

@@ -39,7 +39,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.netconf.server.ServerTransportInitializer;
+import org.opendaylight.netconf.server.ServerNetconfChannelListener;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
@@ -123,7 +123,7 @@ class CallHomeSshServerTest {
             .setConnectionTimeoutMillis(TIMEOUT)
             .setMonitoringService(monitoringService)
             .build();
-        final var netconfTransportListener = new ServerTransportInitializer(negotiatorFactory);
+        final var netconfTransportListener = new ServerNetconfChannelListener(negotiatorFactory);
 
         // tcp layer for clients
         final var sshTransportFactory = new SSHTransportStackFactory("call-home-test-client", 0);
