@@ -13,14 +13,14 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>bnd-parent</artifactId>
         <version>8.0.1-SNAPSHOT</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../../bnd-parent</relativePath>
     </parent>
 
     <artifactId>restconf-server</artifactId>
     <name>${project.artifactId}</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>
         RESTCONF protocol endpoint based on Netty. Configuration is provided
         via ietf-restconf-server.yang. The endpoint is bound to a backed
