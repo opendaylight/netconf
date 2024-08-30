@@ -1213,7 +1213,7 @@ OpenDaylight provides 2 types of NETCONF servers:
     Since Nitrogen release, there has been performance regression in NETCONF
     servers accepting SSH connections. While opening a connection takes
     less than 10 seconds on Carbon, on Nitrogen time can increase up to
-    60 seconds. Please see https://lf-opendaylight.atlassian.net/browse/ODLPARENT-112
+    60 seconds. Please see https://jira.opendaylight.org/browse/ODLPARENT-112
 
 NETCONF server for config-subsystem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
