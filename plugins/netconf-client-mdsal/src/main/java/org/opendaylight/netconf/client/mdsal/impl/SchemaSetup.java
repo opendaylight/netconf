@@ -81,10 +81,8 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         this.sessionPreferences = requireNonNull(sessionPreferences);
 
         // If device supports notifications and does not contain necessary modules, add them automatically
-        // also check if device supports interleave
         deviceRequiredSources = new HashSet<>(deviceSchemas.requiredSources());
-        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)
-                && sessionPreferences.containsNonModuleCapability(CapabilityURN.INTERLEAVE)) {
+        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
             deviceRequiredSources.add(
                 org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                     .YangModuleInfoImpl.getInstance().getName());

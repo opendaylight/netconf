@@ -82,7 +82,7 @@ public class NetconfDeviceSalFacadeTest {
             netconfSessionPreferences, deviceServices);
 
         verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
-            any(DOMDataBroker.class), any(NetconfDataTreeService.class), any(NetconfSessionPreferences.class));
+            any(DOMDataBroker.class), any(NetconfDataTreeService.class));
     }
 
     @Test
