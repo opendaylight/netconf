@@ -71,7 +71,7 @@ final class ModulesRequestProcessor {
     }
 
     private static void getYangLibraryVersion(final RequestParameters params, final RestconfServer service,
-        final FutureCallback<FullHttpResponse> callback) {
+            final FutureCallback<FullHttpResponse> callback) {
         final var request = new NettyServerRequest<FormattableBody>(params, callback,
             result -> responseBuilder(params, HttpResponseStatus.OK).setBody(result).build());
         service.yangLibraryVersionGET(request);
@@ -83,6 +83,7 @@ final class ModulesRequestProcessor {
         final var revision = params.queryParameters().lookup(REVISION);
         if (file.name().isEmpty()) {
             callback.onSuccess(simpleErrorResponse(params, ErrorTag.MISSING_ELEMENT, MISSING_FILENAME_ERROR));
+            return;
         }
         final var acceptYang = params.requestHeaders()
             .contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YANG, true);
