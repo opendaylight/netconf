@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "68b1f8fd_5f42e677",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-03T08:20:08Z",
+      "side": 1,
+      "message": "because otherwise FramingSupport.chunk() would warn about nullability (unannotated constant, annotated return)",
+      "parentUuid": "a34d58f8_86f31c34",
+      "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70e1cc89_ac55dfb2",
         "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
         "patchSetId": 15
