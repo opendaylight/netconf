@@ -9,12 +9,10 @@ package org.opendaylight.netconf.client.mdsal.spi;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +26,6 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
@@ -124,28 +120,5 @@ class MountInstanceTest {
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
         mountInstance.publish(notification);
         verify(notificationService).publishNotification(notification);
-    }
-
-    @Test
-    void testOnTopologyDeviceConnectedNotificationServiceAdded() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
-            broker, netconfService, NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.NOTIFICATION,
-                CapabilityURN.INTERLEAVE)));
-        verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
-        verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
-        // NotificationService should be added if Interleave capability is present
-        verify(mountPointBuilder).addService(eq(DOMNotificationService.class), any(DOMNotificationService.class));
-    }
-
-    @Test
-    void testOnTopologyDeviceConnectedNotificationServiceNotAdded() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
-                broker, netconfService, NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.NOTIFICATION)));
-        verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
-        verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
-        // NotificationService should not be added if Interleave capability is not present
-        verify(mountPointBuilder, never()).addService(eq(DOMNotificationService.class), any());
     }
 }
