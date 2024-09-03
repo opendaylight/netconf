@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.QueryParameters;
@@ -121,7 +120,7 @@ final class RequestParameters {
      *
      * @return request headers
      */
-    public @NonNull HttpHeaders requestHeaders() {
+    public HttpHeaders requestHeaders() {
         return request.headers();
     }
 
@@ -130,7 +129,7 @@ final class RequestParameters {
      *
      * @return HTTP protocol version
      */
-    public @NonNull HttpVersion protocolVersion() {
+    public HttpVersion protocolVersion() {
         return request.protocolVersion();
     }
 
@@ -139,7 +138,7 @@ final class RequestParameters {
      *
      * @return request body as {@link InputStream}
      */
-    public @NonNull InputStream requestBody() {
+    public InputStream requestBody() {
         return new ByteBufInputStream(request.content());
     }
 

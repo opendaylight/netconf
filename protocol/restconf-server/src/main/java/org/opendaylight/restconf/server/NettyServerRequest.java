@@ -27,12 +27,13 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
 final class NettyServerRequest<T> extends MappingServerRequest<T> {
     private final RequestParameters requestParameters;
     private final FutureCallback<FullHttpResponse> callback;
-    private final @NonNull Function<T, FullHttpResponse> transformer;
+    private final Function<T, FullHttpResponse> transformer;
 
-    NettyServerRequest(final RequestParameters params,
+    NettyServerRequest(final RequestParameters requestParameters,
             final FutureCallback<FullHttpResponse> callback, final Function<T, FullHttpResponse> transformer) {
-        super(params.queryParameters(), params.defaultPrettyPrint(), params.errorTagMapping());
-        this.requestParameters = requireNonNull(params);
+        super(requestParameters.queryParameters(), requestParameters.defaultPrettyPrint(),
+            requestParameters.errorTagMapping());
+        this.requestParameters = requireNonNull(requestParameters);
         this.callback = requireNonNull(callback);
         this.transformer = requireNonNull(transformer);
     }
