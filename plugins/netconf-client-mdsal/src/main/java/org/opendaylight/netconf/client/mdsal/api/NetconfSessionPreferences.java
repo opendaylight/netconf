@@ -167,10 +167,6 @@ public record NetconfSessionPreferences(
             || containsModuleCapability(YangModuleInfoImpl.getInstance().getName());
     }
 
-    public boolean isInterleaveSupported() {
-        return containsPartialNonModuleCapability(CapabilityURN.INTERLEAVE);
-    }
-
     public boolean isMonitoringSupported() {
         return containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING)
             || containsPartialNonModuleCapability(

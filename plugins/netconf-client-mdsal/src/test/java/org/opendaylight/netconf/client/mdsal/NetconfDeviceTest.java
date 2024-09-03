@@ -303,8 +303,8 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
-        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION,
-                CapabilityURN.INTERLEAVE), listener);
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION),
+            listener);
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
@@ -316,33 +316,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
                 .build(),
             new AvailableCapabilityBuilder()
                 .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
-                .build()), argument.getValue().capabilities().resolvedCapabilities());
-    }
-
-    @Test
-    void testNetconfDeviceNotificationsModelNotPresentWithoutInterleaveCapability() {
-        final var netconfSpy = spy(new NetconfDeviceBuilder()
-            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
-            .setProcessingExecutor(MoreExecutors.directExecutor())
-            .setId(getId())
-            .setSalFacade(facade)
-            .setBaseSchemaProvider(BASE_SCHEMAS)
-            .build());
-
-        final var sessionCaps = getSessionCaps(false,
-            TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION, CapabilityURN.NOTIFICATION);
-
-        netconfSpy.onRemoteSessionUp(sessionCaps, listener);
-
-        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
-        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
-            any(RemoteDeviceServices.class));
-
-        // Notification schema was not added when there is no Interleave capability
-        assertEquals(Set.of(
-            new AvailableCapabilityBuilder()
-                .setCapability("(test:namespace?revision=2013-07-22)test-module")
-                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
                 .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
