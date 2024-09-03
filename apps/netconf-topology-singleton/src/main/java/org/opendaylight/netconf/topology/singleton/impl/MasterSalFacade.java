@@ -155,7 +155,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
         mount.onDeviceConnected(mountContext.getEffectiveModelContext(), deviceServices,
-            proxyDataBroker, proxyNetconfService, preferences);
+            proxyDataBroker, proxyNetconfService);
     }
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,

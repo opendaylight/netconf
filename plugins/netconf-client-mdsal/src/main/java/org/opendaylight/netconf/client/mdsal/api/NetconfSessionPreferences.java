@@ -166,10 +166,6 @@ public record NetconfSessionPreferences(
             || containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS);
     }
 
-    public boolean isInterleaveSupported() {
-        return containsPartialNonModuleCapability(CapabilityURN.INTERLEAVE);
-    }
-
     public boolean isMonitoringSupported() {
         return containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING)
             || containsPartialNonModuleCapability(
