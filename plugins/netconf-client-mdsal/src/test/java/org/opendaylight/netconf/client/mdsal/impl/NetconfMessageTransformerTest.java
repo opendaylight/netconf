@@ -208,7 +208,7 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     void testCreateSubscriberNotificationSchemaNotPresent() {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(
-                Set.of(CapabilityURN.NOTIFICATION, CapabilityURN.INTERLEAVE))));
+                Set.of(CapabilityURN.NOTIFICATION))));
         var netconfMessage = transformer.toRpcRequest(CreateSubscription.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CreateSubscriptionInput.QNAME))
             .build());
