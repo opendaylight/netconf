@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a34d58f8_86f31c34",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-03T07:08:52Z",
+      "side": 1,
+      "message": "this \"constant\" can never be assigned null, why annotated?",
+      "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70e1cc89_ac55dfb2",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-03T07:08:52Z",
+      "side": 1,
+      "message": "NonNull or NonNull by default?",
+      "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ec29045_f655fcf3",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-03T07:08:52Z",
+      "side": 1,
+      "message": "while (remaining \u003e 0); we are not decrementing by 1, how are we sure we get exactly 0 at the end?",
+      "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
