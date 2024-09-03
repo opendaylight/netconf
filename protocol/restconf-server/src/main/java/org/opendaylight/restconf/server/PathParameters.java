@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Set;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
@@ -105,7 +104,7 @@ record PathParameters(String apiResource, String childIdentifier) {
         requireNonNull(childIdentifier);
     }
 
-    static PathParameters from(final @NonNull String fullPath, @NonNull final String basePath) {
+    static PathParameters from(final String fullPath, final String basePath) {
         if (!fullPath.startsWith(basePath) && !fullPath.startsWith(DISCOVERY_BASE)) {
             return EMPTY;
         }
