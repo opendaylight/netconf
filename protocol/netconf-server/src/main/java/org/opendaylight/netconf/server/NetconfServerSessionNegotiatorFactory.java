@@ -36,6 +36,7 @@ public class NetconfServerSessionNegotiatorFactory {
         CapabilityURN.BASE,
         CapabilityURN.BASE_1_1,
         CapabilityURN.EXI,
+        CapabilityURN.INTERLEAVE,
         CapabilityURN.NOTIFICATION);
 
     private final @NonNegative int maximumIncomingChunkSize;
