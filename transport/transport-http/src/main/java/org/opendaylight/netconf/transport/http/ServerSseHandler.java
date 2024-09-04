@@ -54,7 +54,7 @@ final class ServerSseHandler extends ChannelInboundHandlerAdapter implements Eve
     private static final ByteBuf EMPTY_LINE = Unpooled.wrappedBuffer(new byte[] { '\r', '\n' }).asReadOnly();
 
     private final int maxFieldValueLength;
-    private final int heartbeatIntervalMillis;
+    private final long heartbeatIntervalMillis;
     private final EventStreamService service;
 
     private ChannelHandlerContext context;
@@ -62,7 +62,7 @@ final class ServerSseHandler extends ChannelInboundHandlerAdapter implements Eve
     private boolean streaming;
 
     ServerSseHandler(final EventStreamService service, final int maxFieldValueLength,
-            final int heartbeatIntervalMillis) {
+            final long heartbeatIntervalMillis) {
         this.service = requireNonNull(service);
         this.maxFieldValueLength = maxFieldValueLength;
         this.heartbeatIntervalMillis = heartbeatIntervalMillis;
