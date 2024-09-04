@@ -18,6 +18,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -29,8 +30,11 @@ import static org.opendaylight.netconf.transport.http.TestUtils.freePort;
 import static org.opendaylight.netconf.transport.http.TestUtils.generateX509CertData;
 import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +50,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
@@ -69,7 +74,6 @@ class HttpClientServerTest {
         };
 
     private static ScheduledExecutorService scheduledExecutor;
-    private static RequestDispatcher requestDispatcher;
     private static BootstrapFactory bootstrapFactory;
     private static String localAddress;
 
@@ -87,23 +91,6 @@ class HttpClientServerTest {
         bootstrapFactory = new BootstrapFactory("IntegrationTest", 0);
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
         scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-
-        requestDispatcher = (request, callback) -> {
-            // emulate asynchronous server request processing - run in separate thread with 100 millis delay
-            scheduledExecutor.schedule(() -> {
-                // return 200 response with a content built from request parameters
-                final var method = request.method().name();
-                final var uri = request.uri();
-                final var payload = request.content().readableBytes() > 0
-                    ? request.content().toString(StandardCharsets.UTF_8) : "";
-                final var responseMessage = RESPONSE_TEMPLATE.formatted(method, uri, payload);
-                final var response = new DefaultFullHttpResponse(request.protocolVersion(), OK,
-                    wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8)));
-                response.headers().set(CONTENT_TYPE, TEXT_PLAIN)
-                    .setInt(CONTENT_LENGTH, response.content().readableBytes());
-                callback.onSuccess(response);
-            }, 100, TimeUnit.MILLISECONDS);
-        };
     }
 
     @AfterAll
@@ -182,21 +169,47 @@ class HttpClientServerTest {
     }
 
     private void integrationTest(final boolean http2, final AuthHandlerFactory authHandlerFactory) throws Exception {
+        doAnswer(inv -> {
+            inv.<TransportChannel>getArgument(0).channel().pipeline()
+                .addLast(new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
+                    @Override
+                    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+                        // return 200 response with a content built from request parameters
+                        final var method = msg.method().name();
+                        final var uri = msg.uri();
+                        final var payload = msg.content().readableBytes() > 0
+                            ? msg.content().toString(StandardCharsets.UTF_8) : "";
+                        final var responseMessage = RESPONSE_TEMPLATE.formatted(method, uri, payload);
+                        final var response = new DefaultFullHttpResponse(msg.protocolVersion(), OK,
+                            wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8)));
+                        response.headers()
+                            .set(CONTENT_TYPE, TEXT_PLAIN)
+                            .setInt(CONTENT_LENGTH, response.content().readableBytes());
+                        Http2Utils.copyStreamId(msg, response);
+
+                        // emulate asynchronous server request processing - run in separate thread with 100 millis delay
+                        scheduledExecutor.schedule(() -> ctx.writeAndFlush(response), 100, TimeUnit.MILLISECONDS);
+                    }
+                });
+            return null;
+        }).when(serverTransportListener).onTransportChannelEstablished(any());
+
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
-            serverConfig, requestDispatcher, authHandlerFactory).get(2, TimeUnit.SECONDS);
+            serverConfig, authHandlerFactory).get(2, TimeUnit.SECONDS);
         try {
             final var client = HTTPClient.connect(clientTransportListener, bootstrapFactory.newBootstrap(),
                     clientConfig, http2).get(2, TimeUnit.SECONDS);
             try {
-                verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
                 verify(clientTransportListener, timeout(2000)).onTransportChannelEstablished(any());
+                verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
 
                 for (var method : METHODS) {
                     final var uri = nextValue("URI");
                     final var payload = nextValue("PAYLOAD");
                     final var request = new DefaultFullHttpRequest(HTTP_1_1, HttpMethod.valueOf(method),
                         uri, wrappedBuffer(payload.getBytes(StandardCharsets.UTF_8)));
-                    request.headers().set(CONTENT_TYPE, TEXT_PLAIN)
+                    request.headers()
+                        .set(CONTENT_TYPE, TEXT_PLAIN)
                         .setInt(CONTENT_LENGTH, request.content().readableBytes())
                         // allow multiple requests on same connections
                         .set(CONNECTION, KEEP_ALIVE);
