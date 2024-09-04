@@ -37,14 +37,12 @@ public final class NettyEndpoint {
 
     public NettyEndpoint(final RestconfServer server, final PrincipalService principalService,
             final RestconfStream.Registry streamRegistry, final NettyEndpointConfiguration configuration) {
-        final var restconf = new NettyRestconf(streamRegistry, configuration);
-        final var dispatcher = new RestconfRequestDispatcher(server, principalService, configuration.baseUri(),
-            configuration.errorTagMapping(), configuration.defaultAcceptType(), configuration.prettyPrint());
+        final var restconf = new NettyRestconf(server, streamRegistry, principalService, configuration);
 
         final var bootstrapFactory = new BootstrapFactory(configuration.groupName(), configuration.groupThreads());
         try {
             httpServer = HTTPServer.listen(restconf, bootstrapFactory.newServerBootstrap(),
-                configuration.transportConfiguration(), dispatcher, principalService).get();
+                configuration.transportConfiguration(), principalService).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             throw new IllegalStateException("Could not start RESTCONF server", e);
         }
