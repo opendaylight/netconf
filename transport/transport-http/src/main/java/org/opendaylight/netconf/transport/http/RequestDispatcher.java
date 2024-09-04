@@ -14,9 +14,14 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Functional interface for HTTP request dispatcher.
+ *
+ * @deprecated This interface is an Operations layer concern (i.e. request/response semantics). As such it is a clear
+ *             layering violation as {@code org.opendaylight.netconf.transport} deals only with the Secure Transport
+ *             layer.
  */
 @NonNullByDefault
 @FunctionalInterface
+@Deprecated(forRemoval = true, since = "8.0.2")
 public interface RequestDispatcher {
     /**
      * Performs {@link FullHttpRequest} processing. Any error occurred is expected either to be returned within
