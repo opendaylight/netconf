@@ -56,6 +56,7 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
 
     @Override
     public @Nullable TransportSession session() {
+        // FIXME: return the correct NettyTransportSession
         return null;
     }
 }
