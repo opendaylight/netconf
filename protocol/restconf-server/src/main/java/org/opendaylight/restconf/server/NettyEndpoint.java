@@ -33,6 +33,7 @@ public final class NettyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(NettyEndpoint.class);
     private static final String PROP_CONFIGURATION = ".configuration";
 
+    private final BootstrapFactory bootstrapFactory;
     private final HTTPServer httpServer;
 
     @Activate
@@ -45,7 +46,7 @@ public final class NettyEndpoint {
 
     public NettyEndpoint(final RestconfServer restconfService, final PrincipalService principalService,
             final RestconfStream.Registry streamRegistry, final NettyEndpointConfiguration config) {
-        final var bootstrapFactory = new BootstrapFactory(config.groupName(), config.groupThreads());
+        bootstrapFactory = new BootstrapFactory(config.groupName(), config.groupThreads());
         final var dispatcher = new RestconfRequestDispatcher(restconfService, principalService,
             config.baseUri(), config.errorTagMapping(), config.defaultAcceptType(), config.prettyPrint());
         final var overlayListener = buildSseOverlayListener(streamRegistry, config);
@@ -54,6 +55,7 @@ public final class NettyEndpoint {
             httpServer = HTTPServer.listen(overlayListener, bootstrapFactory.newServerBootstrap(),
                 config.transportConfiguration(), dispatcher, principalService).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
+            bootstrapFactory.close();
             throw new IllegalStateException("Could not start RESTCONF server", e);
         }
     }
@@ -64,6 +66,8 @@ public final class NettyEndpoint {
             httpServer.shutdown().get(1, TimeUnit.MINUTES);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new IllegalStateException("RESTCONF server shutdown failed", e);
+        } finally {
+            bootstrapFactory.close();
         }
     }
 
