@@ -125,7 +125,7 @@ public class PropertyEntity {
             processChoiceNodeRecursively(isConfig, stack, choice, nodeDepth);
             stack.exit();
         } else {
-            generator.writeObjectFieldStart(node.getQName().getLocalName());
+            generator.writeObjectFieldStart(getNamespace(stack, node) + node.getQName().getLocalName());
             processChildNode(node, stack, isParentConfig, nodeDepth);
             generator.writeEndObject();
         }
@@ -148,13 +148,33 @@ public class PropertyEntity {
                     processChoiceNodeRecursively(isChildConfig, stack, childChoice, nodeDepth + 1);
                     stack.exit();
                 } else if (!isConfig || childNode.isConfiguration()) {
-                    generator.writeObjectFieldStart(childNode.getQName().getLocalName());
+                    generator.writeObjectFieldStart(getNamespace(stack, childNode) + childNode.getQName()
+                        .getLocalName());
                     processChildNode(childNode, stack, isConfig, nodeDepth + 1);
                     generator.writeEndObject();
                 }
             }
             stack.exit();
         }
+    }
+
+    /**
+     * This method used to solve duplicity issues when node, and it's augmentation have same name by adding name of the
+     * module before name of the node to specify that this exact node if coming from augmentation.
+     *
+     * @param stack currently processed stack
+     * @param childNode child node to be checked
+     * @return name of the augmentation module with ':' or empty line if parent and child came from the same model
+     */
+    private String getNamespace(SchemaInferenceStack stack, DataSchemaNode childNode) {
+        final var parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
+        var namespace = "";
+        if (!childNode.getQName().getNamespace().equals(parentNamespace)) {
+            // Getting module name from augmentation
+            namespace = stack.modelContext().getModuleStatement(childNode.getQName().getModule()).getDeclared()
+                .argument().getLocalName() + ":";
+        }
+        return namespace;
     }
 
     private void processChildNode(final DataSchemaNode schemaNode, final SchemaInferenceStack stack,
