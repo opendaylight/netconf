@@ -30,18 +30,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class PlaintextLocalFileStorageTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PlaintextLocalFileStorageTest.class);
     private static final StorageEntry ENTRY_1 = storageEntry("key-1", "value-1");
     private static final StorageEntry ENTRY_1_MODIFIED = storageEntry("key-1", "value-1-modified");
     private static final StorageEntry ENTRY_2 = storageEntry("key-2", "value-2");
@@ -51,35 +53,37 @@ public class PlaintextLocalFileStorageTest {
     private static final StorageEntry ENTRY_4 = storageEntry("key-4", "value-4");
     private static final Collection<StorageEntry> INITIAL_DATA = List.of(ENTRY_1, ENTRY_2, ENTRY_3);
     private static final Collection<StorageEntry> DEFAULT_DATA = List.of(storageEntry("admin", "admin"));
-
-    @TempDir
-    private static File tempDir;
+    private static final Path TEST_FOLDER = new File("target/test-classes").toPath();
 
     @Mock
     private PlaintextLocalFileStorage.Configuration config;
 
-    private static File storageFile;
-    private static File keyFile;
-    private static File importFile;
-
     private byte[] secret;
-
-    @BeforeAll
-    static void beforeAll() {
-        // init file paths after temp dir is initialized
-        storageFile = new File(tempDir, "data-file");
-        keyFile = new File(tempDir, "key-file");
-        importFile = new File(tempDir, "import-file");
-    }
+    private File tmpFolder;
+    private File storageFile;
+    private File keyFile;
+    private File importFile;
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws IOException {
         secret = CipherUtils.generateSecret();
-        // clear dir content before test
-        for (var file : tempDir.listFiles()) {
-            if (file.isFile()) {
-                file.delete();
+        tmpFolder = Files.createTempDirectory(TEST_FOLDER, "plaintext-local-file-storage-test").toFile();
+        storageFile = new File(tmpFolder, "data-file");
+        keyFile = new File(tmpFolder, "key-file");
+        importFile = new File(tmpFolder, "import-file");
+    }
+
+    @AfterEach
+    void afterEach() {
+        // Clear plaintext-local-file-storage-test dir content after test.
+        if (tmpFolder != null) {
+            for (var file : tmpFolder.listFiles()) {
+                if (!file.delete()) {
+                    LOG.warn("Test file: {} was not successfully deleted", file);
+                }
             }
+            // Remove testing folder. If some file was not deleted, this will fail.
+            assertTrue(tmpFolder.delete());
         }
     }
 
@@ -227,7 +231,7 @@ public class PlaintextLocalFileStorageTest {
 
     private static File symLink(File file) throws IOException {
         final var link = Path.of(file.getAbsolutePath() + ".lnk");
-        Files.createSymbolicLink(link, file.toPath());
+        Files.createSymbolicLink(link, Path.of(file.getAbsolutePath()));
         return link.toFile();
     }
 }
