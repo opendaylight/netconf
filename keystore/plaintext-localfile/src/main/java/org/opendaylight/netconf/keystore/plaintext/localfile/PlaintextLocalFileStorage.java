@@ -186,8 +186,8 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
         // randomize order before persistence
         final var list = new ArrayList<>(data);
         Collections.shuffle(list, new Random());
-        // write data to temp file
-        final var tmpFile = File.createTempFile("localfile-", ".temp");
+        // create temp file with new data-file value
+        final var tmpFile = File.createTempFile(file.getName(), ".temp", file.getParentFile());
         try (var fos = new FileOutputStream(tmpFile)) {
             CipherUtils.toBase64Stream(list, secret, fos);
         }
