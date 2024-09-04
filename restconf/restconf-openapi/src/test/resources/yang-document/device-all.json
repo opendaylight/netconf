@@ -13988,7 +13988,7 @@
             "type": "string",
             "example": "Some slotId"
           },
-          "slotInfo": {
+          "toaster-augmented:slotInfo": {
             "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo"
           }
         },
