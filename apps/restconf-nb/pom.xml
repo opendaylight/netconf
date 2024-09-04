@@ -169,6 +169,10 @@
 
         <!-- Testing Dependencies -->
         <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
             <scope>test</scope>
@@ -242,6 +246,16 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-topology</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
