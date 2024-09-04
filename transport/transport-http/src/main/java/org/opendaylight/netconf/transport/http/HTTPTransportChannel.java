@@ -10,8 +10,8 @@ package org.opendaylight.netconf.transport.http;
 import org.opendaylight.netconf.transport.api.AbstractOverlayTransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 
-public class HTTPTransportChannel extends AbstractOverlayTransportChannel {
-    public HTTPTransportChannel(final TransportChannel transportChannel) {
-        super(transportChannel);
+public final class HTTPTransportChannel extends AbstractOverlayTransportChannel {
+    HTTPTransportChannel(final TransportChannel underlay) {
+        super(underlay);
     }
 }
