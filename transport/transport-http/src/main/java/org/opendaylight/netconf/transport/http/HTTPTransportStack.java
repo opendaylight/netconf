@@ -7,25 +7,26 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 
 public abstract sealed class HTTPTransportStack extends AbstractOverlayTransportStack<HTTPTransportChannel>
         permits HTTPClient, HTTPServer {
-    final HttpChannelInitializer channelInitializer;
+    private final HttpChannelInitializer channelInitializer;
 
-    public HTTPTransportStack(final TransportChannelListener listener, final HttpChannelInitializer handler) {
+    HTTPTransportStack(final TransportChannelListener listener, final HttpChannelInitializer channelInitializer) {
         super(listener);
-        this.channelInitializer = handler;
+        this.channelInitializer = requireNonNull(channelInitializer);
     }
 
     @Override
-    protected void onUnderlayChannelEstablished(final @NonNull TransportChannel underlayChannel) {
+    protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         underlayChannel.channel().pipeline().addLast(channelInitializer);
         Futures.addCallback(channelInitializer.completeFuture(), new FutureCallback<>() {
             @Override
@@ -34,7 +35,7 @@ public abstract sealed class HTTPTransportStack extends AbstractOverlayTransport
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 notifyTransportChannelFailed(cause);
             }
         }, MoreExecutors.directExecutor());
