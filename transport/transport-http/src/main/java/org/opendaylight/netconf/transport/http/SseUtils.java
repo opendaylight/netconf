@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.transport.http.ServerChannelInitializer.REQUEST_DISPATCHER_HANDLER_NAME;
 
 import com.google.common.base.CharMatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,7 +59,7 @@ public final class SseUtils {
                 // so the HTTP1 vs HTTP2 state expected to be established already,
                 // it means the request passed upgrade codecs already and final codecs plus
                 // optional auth handler and request dispatcher are in expected positions within pipeline
-                ctx.pipeline().addBefore(REQUEST_DISPATCHER_HANDLER_NAME, SSE_HANDLER_NAME, sseHandler);
+                ctx.pipeline().addBefore(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME, SSE_HANDLER_NAME, sseHandler);
                 // pass message to next handler
                 ctx.fireChannelRead(msg);
                 // remove this handler as no longer required
