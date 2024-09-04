@@ -1,0 +1,32 @@
+module device-sim {
+    yang-version 1.1;
+    namespace "test:device:simulator";
+    prefix "dsim";
+
+    description "Test model for device simulator";
+
+    revision "2024-09-17";
+
+    container data-root {
+
+        leaf name {
+            type string;
+        }
+
+        list properties {
+            key "id";
+
+            leaf id {
+                type string;
+            }
+
+            leaf name {
+                type string;
+            }
+
+            leaf value {
+                type string;
+            }
+        }
+    }
+}
