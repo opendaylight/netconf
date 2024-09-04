@@ -139,7 +139,7 @@ public final class HTTPClient extends HTTPTransportStack {
 
     private void configureEndOfPipeline(final TransportChannel underlayChannel, final ChannelPipeline pipeline) {
         if (http2) {
-            pipeline.addLast(Http2Utils.clientSettingsHandler());
+            pipeline.addLast(Http2SettingsFilter.INSTANCE);
         }
         if (authProvider != null) {
             pipeline.addLast(authProvider);

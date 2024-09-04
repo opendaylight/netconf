@@ -9,15 +9,11 @@ package org.opendaylight.netconf.transport.http;
 
 import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.STREAM_ID;
 
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
 import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import io.netty.handler.codec.http2.Http2FrameLogger;
-import io.netty.handler.codec.http2.Http2Settings;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
 import io.netty.handler.logging.LogLevel;
@@ -58,21 +54,6 @@ final class Http2Utils {
             .frameLogger(server ? SERVER_FRAME_LOGGER : CLIENT_FRAME_LOGGER)
             .gracefulShutdownTimeoutMillis(0L)
             .build();
-    }
-
-    /**
-     * Build a handler consuming Http2Settings message.
-     *
-     * @return handler instance
-     */
-    static ChannelHandler clientSettingsHandler() {
-        return new SimpleChannelInboundHandler<Http2Settings>() {
-            @Override
-            protected void channelRead0(final ChannelHandlerContext ctx, final Http2Settings msg) throws Exception {
-                // the HTTP 2 Settings message is expected once, just consume it then remove itself
-                ctx.pipeline().remove(this);
-            }
-        };
     }
 
     /**
