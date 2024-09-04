@@ -67,17 +67,22 @@ public final class HTTPClient extends HTTPTransportStack {
         final TcpClientGrouping tcpParams;
         final TlsClientGrouping tlsParams;
         final var transport = requireNonNull(connectParams).getTransport();
-        if (transport instanceof Tcp tcp) {
-            httpParams = tcp.getTcp().getHttpClientParameters();
-            tcpParams = tcp.getTcp().nonnullTcpClientParameters();
-            tlsParams = null;
-        } else if (transport instanceof Tls tls) {
-            httpParams = tls.getTls().getHttpClientParameters();
-            tcpParams = tls.getTls().nonnullTcpClientParameters();
-            tlsParams = tls.getTls().nonnullTlsClientParameters();
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
+        switch (transport) {
+            case Tcp tcpCase -> {
+                final var tcp = tcpCase.getTcp();
+                httpParams = tcp.getHttpClientParameters();
+                tcpParams = tcp.nonnullTcpClientParameters();
+                tlsParams = null;
+            }
+            case Tls tlsCase -> {
+                final var tls = tlsCase.getTls();
+                httpParams = tls.getHttpClientParameters();
+                tcpParams = tls.nonnullTcpClientParameters();
+                tlsParams = tls.nonnullTlsClientParameters();
+            }
+            default -> throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         }
+
         final var dispatcher = http2 ? new ClientHttp2RequestDispatcher() : new ClientHttp1RequestDispatcher();
         final var client = new HTTPClient(listener, new ClientChannelInitializer(httpParams, dispatcher, http2),
             dispatcher);

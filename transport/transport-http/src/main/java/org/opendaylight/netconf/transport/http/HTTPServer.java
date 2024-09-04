@@ -71,17 +71,22 @@ public final class HTTPServer extends HTTPTransportStack {
         final TcpServerGrouping tcpParams;
         final TlsServerGrouping tlsParams;
         final var transport = requireNonNull(listenParams).getTransport();
-        if (transport instanceof Tcp tcp) {
-            httpParams = tcp.getTcp().getHttpServerParameters();
-            tcpParams = tcp.getTcp().nonnullTcpServerParameters();
-            tlsParams = null;
-        } else if (transport instanceof Tls tls) {
-            httpParams = tls.getTls().getHttpServerParameters();
-            tcpParams = tls.getTls().nonnullTcpServerParameters();
-            tlsParams = tls.getTls().nonnullTlsServerParameters();
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
+        switch (transport) {
+            case Tcp tcpCase -> {
+                final var tcp = tcpCase.getTcp();
+                httpParams = tcp.getHttpServerParameters();
+                tcpParams = tcp.nonnullTcpServerParameters();
+                tlsParams = null;
+            }
+            case Tls tlsCase -> {
+                final var tls = tlsCase.getTls();
+                httpParams = tls.getHttpServerParameters();
+                tcpParams = tls.nonnullTcpServerParameters();
+                tlsParams = tls.nonnullTlsServerParameters();
+            }
+            default -> throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         }
+
         final var channelInitializer = authHandlerFactory == null
             ? new ServerChannelInitializer(httpParams, requireNonNull(dispatcher))
             : new ServerChannelInitializer(authHandlerFactory, requireNonNull(dispatcher));
