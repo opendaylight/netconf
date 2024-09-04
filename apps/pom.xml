@@ -39,5 +39,6 @@
         <module>odl-device-notification</module>
         <module>sal-remote-impl</module>
         <module>yanglib-mdsal-writer</module>
+        <module>restconf-it</module>
     </modules>
 </project>
