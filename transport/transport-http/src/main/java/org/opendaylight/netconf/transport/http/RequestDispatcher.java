@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 @FunctionalInterface
+@Deprecated(forRemoval = true, since = "8.0.2")
 public interface RequestDispatcher {
     /**
      * Performs {@link FullHttpRequest} processing. Any error occurred is expected either to be returned within
