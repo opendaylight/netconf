@@ -113,27 +113,27 @@ public final class OSGiNorthbound {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
     private final ComponentFactory<JaxRsEndpoint> jaxrsFactory;
-    private final ComponentFactory<NettyEndpoint> nettyEndpointFactory;
+    private final ComponentFactory<NettyEndpoint> nettyFactory;
 
     private ComponentInstance<JaxRsEndpoint> jaxrs;
-    private ComponentInstance<NettyEndpoint> nettyEndpoint;
+    private ComponentInstance<NettyEndpoint> netty;
     private Map<String, ?> jaxrsProps;
-    private Map<String, ?> nettyEndpointProps;
+    private Map<String, ?> nettyProps;
 
     @Activate
     public OSGiNorthbound(
             @Reference(target = "(component.factory=" + JaxRsEndpoint.FACTORY_NAME + ")")
             final ComponentFactory<JaxRsEndpoint> jaxrsFactory,
             @Reference(target = "(component.factory=" + NettyEndpoint.FACTORY_NAME + ")")
-            final ComponentFactory<NettyEndpoint> nettyEndpointFactory,
+            final ComponentFactory<NettyEndpoint> nettyFactory,
             final Configuration configuration) {
         this.jaxrsFactory = requireNonNull(jaxrsFactory);
         jaxrsProps = newJaxrsProps(configuration);
         jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
 
-        this.nettyEndpointFactory = requireNonNull(nettyEndpointFactory);
-        nettyEndpointProps = newNettyEndpointProps(configuration);
-        nettyEndpoint = nettyEndpointFactory.newInstance(FrameworkUtil.asDictionary(nettyEndpointProps));
+        this.nettyFactory = requireNonNull(nettyFactory);
+        nettyProps = newNettyEndpointProps(configuration);
+        netty = nettyFactory.newInstance(FrameworkUtil.asDictionary(nettyProps));
 
         LOG.info("Global RESTCONF northbound pools started");
     }
@@ -148,11 +148,11 @@ public final class OSGiNorthbound {
             LOG.debug("JAX-RS northbound restarted with {}", jaxrsProps);
         }
         final var newNettyEndpointProps = newNettyEndpointProps(configuration);
-        if (!newNettyEndpointProps.equals(nettyEndpointProps)) {
-            nettyEndpoint.dispose();
-            nettyEndpointProps = newNettyEndpointProps;
-            nettyEndpoint = nettyEndpointFactory.newInstance(FrameworkUtil.asDictionary(nettyEndpointProps));
-            LOG.debug("Netty northbound restarted with {}", nettyEndpointProps);
+        if (!newNettyEndpointProps.equals(nettyProps)) {
+            netty.dispose();
+            nettyProps = newNettyEndpointProps;
+            netty = nettyFactory.newInstance(FrameworkUtil.asDictionary(nettyProps));
+            LOG.debug("Netty northbound restarted with {}", nettyProps);
         }
         LOG.debug("Applied {}", configuration);
     }
@@ -161,8 +161,8 @@ public final class OSGiNorthbound {
     void deactivate() {
         jaxrs.dispose();
         jaxrs = null;
-        nettyEndpoint.dispose();
-        nettyEndpoint = null;
+        netty.dispose();
+        netty = null;
         LOG.info("Global RESTCONF northbound pools stopped");
     }
 

@@ -32,6 +32,7 @@ public final class NettyEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(NettyEndpoint.class);
     private static final String PROP_CONFIGURATION = ".configuration";
+    private static final String PROP_BOOTSTRAP_FACTORY = ".bootstrapFactory";
 
     private final HTTPServer httpServer;
 
@@ -40,12 +41,13 @@ public final class NettyEndpoint {
             @Reference final PrincipalService principalService,
             @Reference final RestconfStream.Registry streamRegistry, final Map<String, ?> props) {
         this(restconfService, principalService, streamRegistry,
+            (BootstrapFactory) props.get(PROP_BOOTSTRAP_FACTORY),
             (NettyEndpointConfiguration) props.get(PROP_CONFIGURATION));
     }
 
     public NettyEndpoint(final RestconfServer restconfService, final PrincipalService principalService,
-            final RestconfStream.Registry streamRegistry, final NettyEndpointConfiguration config) {
-        final var bootstrapFactory = new BootstrapFactory(config.groupName(), config.groupThreads());
+            final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
+            final NettyEndpointConfiguration config) {
         final var dispatcher = new RestconfRequestDispatcher(restconfService, principalService,
             config.baseUri(), config.errorTagMapping(), config.defaultAcceptType(), config.prettyPrint());
         final var overlayListener = buildSseOverlayListener(streamRegistry, config);
@@ -67,8 +69,9 @@ public final class NettyEndpoint {
         }
     }
 
-    public static Map<String, ?> props(final NettyEndpointConfiguration configuration) {
-        return Map.of(PROP_CONFIGURATION, configuration);
+    public static Map<String, ?> props(final BootstrapFactory bootstrapFactory,
+            final NettyEndpointConfiguration configuration) {
+        return Map.of(PROP_BOOTSTRAP_FACTORY, bootstrapFactory, PROP_CONFIGURATION, configuration);
     }
 
     private static TransportChannelListener buildSseOverlayListener(final RestconfStream.Registry streamRegistry,
