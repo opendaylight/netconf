@@ -30,11 +30,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
@@ -51,9 +51,7 @@ class PlaintextLocalFileStorageTest {
     private static final StorageEntry ENTRY_4 = storageEntry("key-4", "value-4");
     private static final Collection<StorageEntry> INITIAL_DATA = List.of(ENTRY_1, ENTRY_2, ENTRY_3);
     private static final Collection<StorageEntry> DEFAULT_DATA = List.of(storageEntry("admin", "admin"));
-
-    @TempDir
-    private static File tempDir;
+    private static final File TEST_FOLDER = new File("target/test-classes/plaintext-local-file-storage-test");
 
     @Mock
     private PlaintextLocalFileStorage.Configuration config;
@@ -66,17 +64,22 @@ class PlaintextLocalFileStorageTest {
 
     @BeforeAll
     static void beforeAll() {
-        // init file paths after temp dir is initialized
-        storageFile = new File(tempDir, "data-file");
-        keyFile = new File(tempDir, "key-file");
-        importFile = new File(tempDir, "import-file");
+        // init file paths after plaintext-local-file-storage-test dir is initialized
+        assertTrue(TEST_FOLDER.mkdir());
+        storageFile = new File(TEST_FOLDER, "data-file");
+        keyFile = new File(TEST_FOLDER, "key-file");
+        importFile = new File(TEST_FOLDER, "import-file");
     }
 
     @BeforeEach
     void beforeEach() {
         secret = CipherUtils.generateSecret();
-        // clear dir content before test
-        for (var file : tempDir.listFiles()) {
+    }
+
+    @AfterEach
+    void afterEach() {
+        // clear plaintext-local-file-storage-test dir content after test
+        for (var file : TEST_FOLDER.listFiles()) {
             if (file.isFile()) {
                 file.delete();
             }
@@ -227,7 +230,7 @@ class PlaintextLocalFileStorageTest {
 
     private static File symLink(File file) throws IOException {
         final var link = Path.of(file.getAbsolutePath() + ".lnk");
-        Files.createSymbolicLink(link, file.toPath());
+        Files.createSymbolicLink(link, Path.of(file.getAbsolutePath()));
         return link.toFile();
     }
 }
