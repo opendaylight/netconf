@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,14 +23,21 @@ import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.util.encoders.DecoderException;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: inline this class into its sole user
 final class TlsUtils {
     private static final Logger LOG = LoggerFactory.getLogger(TlsUtils.class);
 
+    @NonNullByDefault
     record CertificateKey(X509Certificate certificate, PrivateKey privateKey) {
+        CertificateKey {
+            requireNonNull(certificate);
+            requireNonNull(privateKey);
+        }
     }
 
     private TlsUtils() {
@@ -61,6 +70,7 @@ final class TlsUtils {
             if (obj instanceof X509CertificateHolder cert) {
                 return new JcaX509CertificateConverter().getCertificate(cert);
             } else {
+                // FIXME: NPE if obj == null, which is a valid return
                 LOG.warn("Configured certificate file {} contains unexpected object {}. Content ignored as invalid.",
                     file.getAbsolutePath(), obj.getClass());
             }
@@ -82,6 +92,7 @@ final class TlsUtils {
             } else if (obj instanceof PrivateKeyInfo pkInfo) {
                 return new JcaPEMKeyConverter().getPrivateKey(pkInfo);
             } else {
+                // FIXME: NPE if obj == null, which is a valid return
                 LOG.warn("Configured private key file {} contains unexpected object {}. Content ignored as invalid.",
                     file.getAbsolutePath(), obj.getClass());
             }
