@@ -19,9 +19,7 @@ import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.transport.Tls;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.framework.FrameworkUtil;
@@ -176,8 +174,23 @@ public final class OSGiNorthbound {
     }
 
     private static Map<String, ?> newNettyEndpointProps(final Configuration configuration) {
-        final var transportConfiguration = newTransportConfiguration(configuration);
-        final var scheme = transportConfiguration.getTransport() instanceof Tls ? "https" : "http";
+        // FIXME: do not start the endpoint if we fail to read the files (i.e. secure-on-failure)!
+        // TODO: why are we even using separate files here?
+        final var tlsCertKey = TlsUtils.readCertificateKey(configuration.tls$_$certificate(),
+            configuration.tls$_$private$_$key());
+
+        final Transport transport;
+        final String scheme;
+        if (tlsCertKey != null) {
+            scheme = "https";
+            transport = ConfigUtils.serverTransportTls(configuration.bind$_$address(), configuration.bind$_$port(),
+                tlsCertKey.certificate(), tlsCertKey.privateKey());
+        } else {
+            scheme = "http";
+            transport = ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
+        }
+
+        // FIXME: use seven-argument URI constructor instead, which correctly handles IPv6 addresses
         final var baseUri = URI.create("%s://%s:%d/%s".formatted(scheme, configuration.host$_$name(),
             configuration.bind$_$port(), configuration.restconf()));
         return NettyEndpoint.props(
@@ -190,27 +203,7 @@ public final class OSGiNorthbound {
                 configuration.group$_$name(),
                 configuration.group$_$threads(),
                 NettyEndpointConfiguration.Encoding.from(configuration.default$_$encoding()),
-                transportConfiguration)
+                new HttpServerStackConfiguration(transport))
         );
-    }
-
-    private static HttpServerStackGrouping newTransportConfiguration(final Configuration configuration) {
-        final var tlsCertKey = TlsUtils.readCertificateKey(configuration.tls$_$certificate(),
-            configuration.tls$_$private$_$key());
-        final var transport = tlsCertKey == null
-            ? ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port())
-            : ConfigUtils.serverTransportTls(configuration.bind$_$address(), configuration.bind$_$port(),
-                tlsCertKey.certificate(), tlsCertKey.privateKey());
-        return new HttpServerStackGrouping() {
-            @Override
-            public Class<? extends HttpServerStackGrouping> implementedInterface() {
-                return HttpServerStackGrouping.class;
-            }
-
-            @Override
-            public Transport getTransport() {
-                return transport;
-            }
-        };
     }
 }
