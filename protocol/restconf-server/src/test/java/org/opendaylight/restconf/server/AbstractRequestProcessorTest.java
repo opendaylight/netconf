@@ -25,7 +25,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.transport.http.RequestDispatcher;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
@@ -57,7 +56,7 @@ public class AbstractRequestProcessorTest {
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
 
-    private RequestDispatcher dispatcher;
+    private RestconfRequestDispatcher dispatcher;
 
     @BeforeEach
     void beforeEach() {
