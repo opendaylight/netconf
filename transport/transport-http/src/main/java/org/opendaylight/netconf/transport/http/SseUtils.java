@@ -48,7 +48,7 @@ public final class SseUtils {
      *      no ping message will be sent by server
      */
     public static void enableServerSse(final Channel channel, final EventStreamService service,
-            final int maxFieldValueLength, final int heartbeatIntervalMillis) {
+            final int maxFieldValueLength, final long heartbeatIntervalMillis) {
         final var sseHandler =
             new ServerSseHandler(requireNonNull(service), maxFieldValueLength, heartbeatIntervalMillis);
         requireNonNull(channel).pipeline().addLast(new ChannelInboundHandlerAdapter() {

@@ -79,8 +79,8 @@ public final class NettyEndpoint {
                 SseUtils.enableServerSse(channel.channel(),
                     new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
                         configuration.defaultAcceptType(), configuration.prettyPrint()),
-                    configuration.sseMaximumFragmentLength().intValue(),
-                    configuration.sseHeartbeatIntervalMillis().intValue());
+                    configuration.sseMaximumFragmentLength().toJava(),
+                    configuration.sseHeartbeatIntervalMillis().toJava());
             }
 
             @Override
