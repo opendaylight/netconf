@@ -122,8 +122,13 @@ public class PropertyEntity {
             processChoiceNodeRecursively(isConfig, stack, choice);
             stack.exit();
         } else {
+<<<<<<< HEAD   (806ef7 Limit the number of candidates for string example)
             generator.writeObjectFieldStart(node.getQName().getLocalName());
             processChildNode(node, stack, isParentConfig);
+=======
+            generator.writeObjectFieldStart(resolveNamespace(stack, node) + node.getQName().getLocalName());
+            processChildNode(node, stack, isParentConfig, nodeDepth);
+>>>>>>> CHANGE (6de864 OpenApi: Avoid leaf names duplication)
             generator.writeEndObject();
         }
     }
@@ -141,13 +146,40 @@ public class PropertyEntity {
                     processChoiceNodeRecursively(isChildConfig, stack, childChoice);
                     stack.exit();
                 } else if (!isConfig || childNode.isConfiguration()) {
+<<<<<<< HEAD   (806ef7 Limit the number of candidates for string example)
                     generator.writeObjectFieldStart(childNode.getQName().getLocalName());
                     processChildNode(childNode, stack, isConfig);
+=======
+                    generator.writeObjectFieldStart(resolveNamespace(stack, childNode) + childNode.getQName()
+                        .getLocalName());
+                    processChildNode(childNode, stack, isConfig, nodeDepth + 1);
+>>>>>>> CHANGE (6de864 OpenApi: Avoid leaf names duplication)
                     generator.writeEndObject();
                 }
             }
             stack.exit();
         }
+    }
+
+    /**
+     * Resolve parent namespace
+     *
+     * <p>
+     * This method used to solve duplicity issues when node, and it's augmentation have the same name by adding name
+     * of the module before name of the node to specify that this exact node if coming from augmentation.
+     *
+     * @param stack currently processed stack
+     * @param childNode child node to be checked
+     * @return name of the augmentation module with ':' or empty line if parent and child came from the same model
+     */
+    private static String resolveNamespace(final SchemaInferenceStack stack, final DataSchemaNode childNode) {
+        final var parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
+        if (!childNode.getQName().getNamespace().equals(parentNamespace)) {
+            // Getting module name from augmentation
+            return stack.modelContext().getModuleStatement(childNode.getQName().getModule()).getDeclared()
+                .argument().getLocalName() + ":";
+        }
+        return "";
     }
 
     private void processChildNode(final DataSchemaNode schemaNode, final SchemaInferenceStack stack,
