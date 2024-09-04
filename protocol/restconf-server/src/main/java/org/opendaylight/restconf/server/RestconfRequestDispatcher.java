@@ -17,7 +17,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.util.AsciiString;
 import java.net.URI;
-import org.opendaylight.netconf.transport.http.RequestDispatcher;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -25,7 +24,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class RestconfRequestDispatcher implements RequestDispatcher {
+final class RestconfRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
 
     private final URI baseURI;
@@ -35,24 +34,23 @@ public final class RestconfRequestDispatcher implements RequestDispatcher {
     private final AsciiString defaultAcceptType;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    public RestconfRequestDispatcher(final RestconfServer restconfService, final PrincipalService principalService,
+    RestconfRequestDispatcher(final RestconfServer restconfService, final PrincipalService principalService,
             final URI baseUri, final ErrorTagMapping errorTagMapping,
             final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
         this.restconfService = requireNonNull(restconfService);
         this.principalService = requireNonNull(principalService);
-        this.baseURI = requireNonNull(baseUri);
+        baseURI = requireNonNull(baseUri);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.defaultAcceptType = requireNonNull(defaultAcceptType);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), restconfService.getClass());
         LOG.info("Base path: {}, default accept: {}, default pretty print: {}",
-            this.baseURI, defaultAcceptType, defaultPrettyPrint.value());
+            baseURI, defaultAcceptType, defaultPrettyPrint.value());
     }
 
-    @Override
     @SuppressWarnings("IllegalCatch")
-    public void dispatch(final FullHttpRequest request, final FutureCallback<FullHttpResponse> callback) {
+    void dispatch(final FullHttpRequest request, final FutureCallback<FullHttpResponse> callback) {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
 
         final var principal = principalService.acquirePrincipal(request);
