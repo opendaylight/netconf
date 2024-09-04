@@ -32,8 +32,11 @@ import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -72,7 +75,6 @@ class SseClientServerTest {
     private static final List<String> DATA_VALUES = IntStream.rangeClosed(1, 10)
         .mapToObj(num -> "value " + num).toList();
 
-    private static RequestDispatcher requestDispatcher;
     private static BootstrapFactory bootstrapFactory;
     private static String localAddress;
 
@@ -96,13 +98,6 @@ class SseClientServerTest {
     static void beforeAll() {
         bootstrapFactory = new BootstrapFactory("IntegrationTest", 0);
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
-        requestDispatcher = (request, callback) -> {
-            final var response = DATA_URI.equals(request.uri())
-                ? new DefaultFullHttpResponse(request.protocolVersion(), OK, OK_CONTENT.copy())
-                : new DefaultFullHttpResponse(request.protocolVersion(), NOT_FOUND, Unpooled.EMPTY_BUFFER);
-            response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
-            callback.onSuccess(response);
-        };
     }
 
     @AfterAll
@@ -115,10 +110,23 @@ class SseClientServerTest {
         clientEventStreamService = null;
         serverEventStreamService = new TestStreamService();
         // init SSE layer on top of HTTP layer using Transport channel listeners
-        serverTransportListener = new TestTransportListener(channel ->
-            SseUtils.enableServerSse(channel, serverEventStreamService, 0, 0));
+        serverTransportListener = new TestTransportListener(channel -> {
+            channel.pipeline().addLast(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME,
+                new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
+                    @Override
+                    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+                        final var response = DATA_URI.equals(msg.uri())
+                            ? new DefaultFullHttpResponse(msg.protocolVersion(), OK, OK_CONTENT.copy())
+                            : new DefaultFullHttpResponse(msg.protocolVersion(), NOT_FOUND, Unpooled.EMPTY_BUFFER);
+                        response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
+                        Http2Utils.copyStreamId(msg, response);
+                        ctx.writeAndFlush(response);
+                    }
+            });
+            SseUtils.enableServerSse(channel, serverEventStreamService, 0, 0);
+        });
         clientTransportListener = new TestTransportListener(channel ->
-            SseClientServerTest.this.clientEventStreamService = SseUtils.enableClientSse(channel));
+            clientEventStreamService = SseUtils.enableClientSse(channel));
     }
 
     @ParameterizedTest(name = "TCP with no authorization, HTTP/2: {0}")
@@ -166,7 +174,7 @@ class SseClientServerTest {
 
     private void integrationTest(final boolean http2) throws Exception {
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
-            serverConfig, requestDispatcher).get(2, TimeUnit.SECONDS);
+            serverConfig).get(2, TimeUnit.SECONDS);
         try {
             final var client = HTTPClient.connect(clientTransportListener, bootstrapFactory.newBootstrap(),
                 clientConfig, http2).get(2, TimeUnit.SECONDS);
