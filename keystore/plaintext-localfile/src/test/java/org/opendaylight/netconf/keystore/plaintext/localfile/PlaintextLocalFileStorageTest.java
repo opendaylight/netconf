@@ -30,11 +30,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
@@ -51,9 +51,7 @@ class PlaintextLocalFileStorageTest {
     private static final StorageEntry ENTRY_4 = storageEntry("key-4", "value-4");
     private static final Collection<StorageEntry> INITIAL_DATA = List.of(ENTRY_1, ENTRY_2, ENTRY_3);
     private static final Collection<StorageEntry> DEFAULT_DATA = List.of(storageEntry("admin", "admin"));
-
-    @TempDir
-    private static File tempDir;
+    private static final File TEST_FOLDER = new File("target/test-classes");
 
     @Mock
     private PlaintextLocalFileStorage.Configuration config;
@@ -67,17 +65,25 @@ class PlaintextLocalFileStorageTest {
     @BeforeAll
     static void beforeAll() {
         // init file paths after temp dir is initialized
-        storageFile = new File(tempDir, "data-file");
-        keyFile = new File(tempDir, "key-file");
-        importFile = new File(tempDir, "import-file");
+        assertNotNull(TEST_FOLDER);
+        storageFile = new File(TEST_FOLDER, "data-file");
+        keyFile = new File(TEST_FOLDER, "key-file");
+        importFile = new File(TEST_FOLDER, "import-file");
     }
 
     @BeforeEach
     void beforeEach() {
         secret = CipherUtils.generateSecret();
+    }
+
+    @AfterEach
+    void afterEach() {
         // clear dir content before test
-        for (var file : tempDir.listFiles()) {
-            if (file.isFile()) {
+        final var testFileNames = List.of(storageFile.getName(), storageFile.getName() + ".lnk",
+            keyFile.getName(), keyFile.getName() + ".lnk",
+            importFile.getName(), importFile.getName() + ".lnk");
+        for (var file : TEST_FOLDER.listFiles()) {
+            if (testFileNames.contains(file.getName())) {
                 file.delete();
             }
         }
@@ -227,7 +233,7 @@ class PlaintextLocalFileStorageTest {
 
     private static File symLink(File file) throws IOException {
         final var link = Path.of(file.getAbsolutePath() + ".lnk");
-        Files.createSymbolicLink(link, file.toPath());
+        Files.createSymbolicLink(link, Path.of(file.getAbsolutePath()));
         return link.toFile();
     }
 }
