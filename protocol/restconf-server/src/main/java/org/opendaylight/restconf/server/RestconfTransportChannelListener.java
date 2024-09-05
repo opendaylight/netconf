@@ -11,8 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
-import org.opendaylight.netconf.transport.http.HTTPServer;
-import org.opendaylight.netconf.transport.http.SseUtils;
+import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
@@ -38,14 +37,12 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final TransportChannel channel) {
-        final var nettyChannel = channel.channel();
-
-        nettyChannel.pipeline().addLast(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME, new RestconfSession(dispatcher));
-
-        SseUtils.enableServerSse(nettyChannel,
-            new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
-                configuration.defaultAcceptType(), configuration.prettyPrint()),
-            configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava());
+        channel.channel().pipeline().addLast(
+            new ServerSseHandler(
+                new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
+                    configuration.defaultAcceptType(), configuration.prettyPrint()),
+                configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
+            new RestconfSession(dispatcher));
     }
 
     @Override
