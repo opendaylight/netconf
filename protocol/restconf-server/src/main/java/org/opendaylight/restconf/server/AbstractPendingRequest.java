@@ -22,7 +22,6 @@ import java.util.Date;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.PendingRequest;
 import org.opendaylight.netconf.transport.http.PendingRequestListener;
 import org.opendaylight.netconf.transport.http.Response;
@@ -51,7 +50,6 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
 // Note: not @NonNullByDefault because SpotBugs throws a tantrum on @Nullable field
 abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
         permits PendingRequestWithBody, PendingRequestWithoutBody {
-    static final @NonNull EmptyRequestResponse NO_CONTENT = new EmptyRequestResponse(HttpResponseStatus.NO_CONTENT);
     static final @NonNull DefaultHttpHeadersFactory HEADERS_FACTORY = DefaultHttpHeadersFactory.headersFactory();
 
     final @NonNull EndpointInvariants invariants;

@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -107,7 +108,7 @@ final class EndpointRoot {
         }
 
         final var resource = resources.get(segment);
-        return resource == null ? AbstractResource.NOT_FOUND
+        return resource == null ? EmptyRequestResponse.NOT_FOUND
             : resource.prepare(method, targetUri, headers, peeler, wellKnown);
     }
 }

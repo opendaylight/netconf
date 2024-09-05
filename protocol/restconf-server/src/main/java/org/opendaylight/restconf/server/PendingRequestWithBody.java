@@ -80,6 +80,7 @@ abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> ex
     static final Response transformInvoke(final NettyServerRequest<?> request, final InvokeResult result,
             final MessageEncoding acceptEncoding) {
         final var output = result.output();
-        return output == null ? NO_CONTENT : new FormattableDataResponse(output, acceptEncoding, request.prettyPrint());
+        return output == null ? EmptyRequestResponse.NO_CONTENT
+            : new FormattableDataResponse(output, acceptEncoding, request.prettyPrint());
     }
 }
