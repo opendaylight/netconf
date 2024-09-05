@@ -10,7 +10,6 @@ package org.opendaylight.netconf.transport.http;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.CharMatcher;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
@@ -111,14 +110,8 @@ public final class SseUtils {
         return List.of(chunkOf(fieldName, valueStr, allocator));
     }
 
-    @SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE",
-        justification = "CRLF ending is intentional and should not be platform dependent")
     private static ByteBuf chunkOf(final String fieldName, final String fieldValue, final ByteBufAllocator allocator) {
-        final var bytes = "%s: %s\r\n".formatted(requireNonNull(fieldName), requireNonNull(fieldValue))
-            .getBytes(StandardCharsets.UTF_8);
-        final var buf = allocator.buffer(bytes.length);
-        buf.writeBytes(bytes);
-        return buf;
+        return ByteBufUtil.writeUtf8(allocator, requireNonNull(fieldName) + ": " + requireNonNull(fieldValue) + "\r\n");
     }
 
     /**
