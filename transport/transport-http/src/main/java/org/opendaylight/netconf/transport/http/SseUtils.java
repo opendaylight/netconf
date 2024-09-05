@@ -35,23 +35,6 @@ public final class SseUtils {
     }
 
     /**
-     * Enable SSE functionality on top of server's HTTP transport layer channel.
-     *
-     * @param channel netty channel with server side HTTP layer initialized
-     * @param service the event stream service instance
-     * @param maxFieldValueLength max length of event message in chars, if parameter value is greater than zero and
-     *      message length exceeds the limit then message will split to sequence of shorter messages;
-     *      if parameter value is zero or less, then message length won't be checked
-     * @param heartbeatIntervalMillis the keep-alive ping message interval in milliseconds, if set to zero or less
-     *      no ping message will be sent by server
-     */
-    public static void enableServerSse(final Channel channel, final EventStreamService service,
-            final int maxFieldValueLength, final long heartbeatIntervalMillis) {
-        channel.pipeline().addBefore(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME, SSE_HANDLER_NAME,
-            new ServerSseHandler(service, maxFieldValueLength, heartbeatIntervalMillis));
-    }
-
-    /**
      * Enable SSE functionality on top of client's HTTP transport layer channel.
      *
      * @param channel netty channel with client-side HTTP layer initialized
