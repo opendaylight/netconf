@@ -28,8 +28,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
  * A {@link HTTPTransportStack} acting as a server.
  */
 public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
-    public static final String REQUEST_DISPATCHER_HANDLER_NAME = "request-dispatcher";
-
     private final AuthHandlerFactory authHandlerFactory;
 
     HTTPServer(final TransportChannelListener listener, final AuthHandlerFactory authHandlerFactory) {
