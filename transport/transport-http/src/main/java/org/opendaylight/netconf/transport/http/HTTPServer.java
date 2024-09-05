@@ -120,17 +120,14 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
     @Override
     protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         // External HTTP 2 to internal HTTP 1.1 adapter handler
-        initializePipeline(underlayChannel.channel().pipeline(),
-            Http2Utils.connectionHandler(true, MAX_HTTP_CONTENT_LENGTH));
-        addTransportChannel(new HTTPTransportChannel(underlayChannel));
-    }
+        final var pipeline = underlayChannel.channel().pipeline();
 
-    abstract void initializePipeline(ChannelPipeline pipeline, Http2ConnectionHandler connectionHandler);
+        initializePipeline(pipeline, Http2Utils.connectionHandler(true, MAX_HTTP_CONTENT_LENGTH));
 
-    final void configureEndOfPipeline(final ChannelPipeline pipeline) {
         if (authHandlerFactory != null) {
             pipeline.addLast(authHandlerFactory.create());
         }
+
         pipeline.addLast(REQUEST_DISPATCHER_HANDLER_NAME, new SimpleChannelInboundHandler<FullHttpRequest>() {
             @Override
             protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) {
@@ -157,5 +154,9 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
                 });
             }
         });
+
+        addTransportChannel(new HTTPTransportChannel(underlayChannel));
     }
+
+    abstract void initializePipeline(ChannelPipeline pipeline, Http2ConnectionHandler connectionHandler);
 }
