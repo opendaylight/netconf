@@ -32,22 +32,15 @@ final class TlsHTTPServer extends HTTPServer {
         pipeline.addLast(new ApplicationProtocolNegotiationHandler(ApplicationProtocolNames.HTTP_1_1) {
             @Override
             protected void configurePipeline(final ChannelHandlerContext ctx, final String protocol) {
-                final var pipeline = ctx.pipeline();
-
                 switch (protocol) {
                     case null -> throw new NullPointerException();
-                    case ApplicationProtocolNames.HTTP_1_1 -> {
-                        pipeline.addLast(new HttpServerCodec(),
-                            new HttpServerKeepAliveHandler(),
-                            new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
-                    }
-                    case ApplicationProtocolNames.HTTP_2 -> {
-                        pipeline.addLast(connectionHandler);
-                    }
+                    case ApplicationProtocolNames.HTTP_1_1 -> ctx.pipeline()
+                        .addAfter(ctx.name(), null, new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH))
+                        .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
+                        .replace(this, null, new HttpServerCodec());
+                    case ApplicationProtocolNames.HTTP_2 -> ctx.pipeline().replace(this, null, connectionHandler);
                     default -> throw new IllegalStateException("unknown protocol: " + protocol);
                 }
-
-                configureEndOfPipeline(pipeline);
             }
         });
     }
