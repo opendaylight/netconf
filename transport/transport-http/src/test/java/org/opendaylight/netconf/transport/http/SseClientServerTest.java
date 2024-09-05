@@ -111,7 +111,8 @@ class SseClientServerTest {
         serverEventStreamService = new TestStreamService();
         // init SSE layer on top of HTTP layer using Transport channel listeners
         serverTransportListener = new TestTransportListener(channel -> {
-            channel.pipeline().addLast(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME,
+            channel.pipeline().addLast(
+                new ServerSseHandler(serverEventStreamService, 0, 0),
                 new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
                     @Override
                     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
@@ -123,7 +124,6 @@ class SseClientServerTest {
                         ctx.writeAndFlush(response);
                     }
                 });
-            SseUtils.enableServerSse(channel, serverEventStreamService, 0, 0);
         });
         clientTransportListener = new TestTransportListener(channel ->
             clientEventStreamService = SseUtils.enableClientSse(channel));
