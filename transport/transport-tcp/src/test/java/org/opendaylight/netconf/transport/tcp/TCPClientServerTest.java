@@ -52,17 +52,17 @@ class TCPClientServerTest {
     @Mock
     private TransportChannelListener serverListener;
 
-    private static EventLoopGroup group;
+    private static EventLoopGroup GROUP;
 
     @BeforeAll
     static void beforeAll() {
-        group = NettyTransportSupport.newEventLoopGroup("IntegrationTest");
+        GROUP = NettyTransportSupport.newEventLoopGroup("IntegrationTest");
     }
 
     @AfterAll
     static void afterAll() {
-        group.shutdownGracefully();
-        group = null;
+        GROUP.shutdownGracefully();
+        GROUP = null;
     }
 
     @Test
@@ -71,6 +71,7 @@ class TCPClientServerTest {
         final var loopbackAddr = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
 
         // Server-side config
+        doReturn(null).when(serverGrouping).getKeepalives();
         doReturn(loopbackAddr).when(serverGrouping).getLocalAddress();
         doCallRealMethod().when(serverGrouping).requireLocalAddress();
         // note: this lets the server pick any port, we do not care
@@ -79,9 +80,10 @@ class TCPClientServerTest {
 
         // Spin up the server and acquire its port
         final var server =
-            TCPServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group), serverGrouping)
+            TCPServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(GROUP), serverGrouping)
             .get(2, TimeUnit.SECONDS);
         try {
+            doReturn("serverListener").when(serverListener).toString();
             assertEquals("TCPServer{listener=serverListener}", server.toString());
 
             final var serverChannel = server.listenChannel();
@@ -90,6 +92,9 @@ class TCPClientServerTest {
                 Uint16.valueOf(((ServerSocketChannel) serverChannel).localAddress().getPort()));
 
             // Client-side config
+            doReturn(null).when(clientGrouping).getKeepalives();
+            doReturn(null).when(clientGrouping).getLocalAddress();
+            doReturn(null).when(clientGrouping).getLocalPort();
             doReturn(new Host(loopbackAddr)).when(clientGrouping).getRemoteAddress();
             doCallRealMethod().when(clientGrouping).requireRemoteAddress();
             doReturn(serverPort).when(clientGrouping).getRemotePort();
@@ -102,7 +107,7 @@ class TCPClientServerTest {
             doNothing().when(clientListener).onTransportChannelEstablished(clientCaptor.capture());
 
             final var client =
-                TCPClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group), clientGrouping)
+                TCPClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(GROUP), clientGrouping)
                 .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(500)).onTransportChannelEstablished(any());
@@ -118,6 +123,8 @@ class TCPClientServerTest {
                 assertThat(clientTransports.get(0).toString(), allOf(
                     startsWith("TCPTransportChannel{channel=[id: "),
                     endsWith(":" + serverPort.getValue() + "]}")));
+
+                doReturn("clientListener").when(clientListener).toString();
 
                 assertThat(client.toString(), allOf(
                     startsWith("TCPClient{listener=clientListener, state=TCPTransportChannel{channel=[id: 0x"),
