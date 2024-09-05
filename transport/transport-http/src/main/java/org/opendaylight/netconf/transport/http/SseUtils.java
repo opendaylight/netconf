@@ -15,8 +15,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -50,22 +48,8 @@ public final class SseUtils {
      */
     public static void enableServerSse(final Channel channel, final EventStreamService service,
             final int maxFieldValueLength, final long heartbeatIntervalMillis) {
-        final var sseHandler =
-            new ServerSseHandler(requireNonNull(service), maxFieldValueLength, heartbeatIntervalMillis);
-        requireNonNull(channel).pipeline().addLast(new ChannelInboundHandlerAdapter() {
-            @Override
-            public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-                // setting SSE handler on first message arrival, not on initializer handler placement,
-                // so the HTTP1 vs HTTP2 state expected to be established already,
-                // it means the request passed upgrade codecs already and final codecs plus
-                // optional auth handler and request dispatcher are in expected positions within pipeline
-                ctx.pipeline().addBefore(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME, SSE_HANDLER_NAME, sseHandler);
-                // pass message to next handler
-                ctx.fireChannelRead(msg);
-                // remove this handler as no longer required
-                ctx.pipeline().remove(this);
-            }
-        });
+        channel.pipeline().addBefore(HTTPServer.REQUEST_DISPATCHER_HANDLER_NAME, SSE_HANDLER_NAME,
+            new ServerSseHandler(service, maxFieldValueLength, heartbeatIntervalMillis));
     }
 
     /**

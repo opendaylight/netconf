@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -37,38 +36,33 @@ final class PlainHTTPServer extends HTTPServer {
     void initializePipeline(final ChannelPipeline pipeline, final Http2ConnectionHandler connectionHandler) {
         // Cleartext upgrade flow
         final var sourceCodec = new HttpServerCodec();
-        pipeline.addLast(new CleartextHttp2ServerUpgradeHandler(sourceCodec,
-            new HttpServerUpgradeHandler(sourceCodec,
-                protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                    ? new Http2ServerUpgradeCodec(connectionHandler) : null), connectionHandler),
-            upgradeResultHandler());
-    }
-
-    private ChannelHandler upgradeResultHandler() {
-        // the handler processes cleartext upgrade result
-        return new SimpleChannelInboundHandler<HttpMessage>() {
-            @Override
-            protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
-                // if there was no upgrade to HTTP/2 the incoming message is accepted via channel read;
-                // configure HTTP 1.1 flow, pass the message further the pipeline, remove self as no longer required
-                final var pipeline = ctx.pipeline();
-                pipeline.addLast(new HttpServerKeepAliveHandler(), new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
-                configureEndOfPipeline(pipeline);
-                ctx.fireChannelRead(ReferenceCountUtil.retain(request));
-                pipeline.remove(this);
-            }
-
-            @Override
-            public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) {
-                // if there was upgrade to HTTP/2 the upgrade event is fired further the pipeline;
-                // on event occurrence it's only required to complete the configuration for future requests,
-                // then remove self as no longer required
-                if (event instanceof HttpServerUpgradeHandler.UpgradeEvent) {
-                    final var pipeline = ctx.pipeline();
-                    configureEndOfPipeline(pipeline);
-                    pipeline.remove(this);
+        pipeline
+            .addLast(new CleartextHttp2ServerUpgradeHandler(
+                sourceCodec,
+                new HttpServerUpgradeHandler(sourceCodec,
+                    protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
+                        ? new Http2ServerUpgradeCodec(connectionHandler) : null), connectionHandler))
+            .addLast(new SimpleChannelInboundHandler<HttpMessage>() {
+                @Override
+                protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
+                    // if there was no upgrade to HTTP/2 the incoming message is accepted via channel read;
+                    // configure HTTP 1.1 flow, pass the message further the pipeline, remove self as no longer required
+                    ctx.pipeline()
+                        .addAfter(ctx.name(), null, new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH))
+                        .replace(this, null, new HttpServerKeepAliveHandler());
+                    ctx.fireChannelRead(ReferenceCountUtil.retain(request));
                 }
-            }
-        };
+
+                @Override
+                public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
+                    // if there was upgrade to HTTP/2 the upgrade event is fired further the pipeline;
+                    // on event occurrence it's only required to complete the configuration for future requests,
+                    // then remove self as no longer required
+                    if (event instanceof HttpServerUpgradeHandler.UpgradeEvent) {
+                        ctx.pipeline().remove(this);
+                    }
+                    super.userEventTriggered(ctx, event);
+                }
+            });
     }
 }
