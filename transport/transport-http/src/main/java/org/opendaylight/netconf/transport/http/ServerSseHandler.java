@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * If decline exception is an instance of {@link ErrorResponseException} then explicitly defined
  * {@code content-type} value and response status code will be used in error response header.
  */
-final class ServerSseHandler extends ChannelInboundHandlerAdapter implements EventStreamListener {
+public final class ServerSseHandler extends ChannelInboundHandlerAdapter implements EventStreamListener {
     private static final Logger LOG = LoggerFactory.getLogger(ServerSseHandler.class);
     private static final ByteBuf PING_MESSAGE =
         Unpooled.wrappedBuffer(new byte[] { ':', 'p', 'i', 'n', 'g', '\r', '\n', '\r', '\n' }).asReadOnly();
@@ -61,7 +61,17 @@ final class ServerSseHandler extends ChannelInboundHandlerAdapter implements Eve
     private StreamControl eventStream;
     private boolean streaming;
 
-    ServerSseHandler(final EventStreamService service, final int maxFieldValueLength,
+    /**
+     * Default constructor.
+     *
+     * @param service the event stream service instance
+     * @param maxFieldValueLength max length of event message in chars, if parameter value is greater than zero and
+     *        message length exceeds the limit then message will split to sequence of shorter messages;
+     *        if parameter value is zero or less, then message length won't be checked
+     * @param heartbeatIntervalMillis the keep-alive ping message interval in milliseconds, if set to zero or less
+     *        no ping message will be sent by server
+     */
+    public ServerSseHandler(final EventStreamService service, final int maxFieldValueLength,
             final long heartbeatIntervalMillis) {
         this.service = requireNonNull(service);
         this.maxFieldValueLength = maxFieldValueLength;
