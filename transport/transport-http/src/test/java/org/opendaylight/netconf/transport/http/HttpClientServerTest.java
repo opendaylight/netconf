@@ -32,7 +32,13 @@ import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
+import java.net.Authenticator;
 import java.net.InetAddress;
+import java.net.PasswordAuthentication;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -41,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -209,6 +216,54 @@ class HttpClientServerTest {
                 }
             } finally {
                 client.shutdown().get(2, TimeUnit.SECONDS);
+            }
+        } finally {
+            server.shutdown().get(2, TimeUnit.SECONDS);
+        }
+    }
+
+    @ParameterizedTest(name = "Java HttpClient compatibility check, Basic Auth: {0}")
+    @ValueSource(booleans = {false, true})
+    @Timeout(20)
+    @SuppressWarnings("RegexpSinglelineJava")
+    void cleartextUpgradeFlowCompatibility(final boolean withAuth) throws Exception {
+
+        // FIXME https://lf-opendaylight.atlassian.net/browse/NETCONF-1378
+
+        // validate server cleartext protocol upgrade flow being compatible with java.net.HttpClient
+        final var localPort = freePort();
+        final var transport = withAuth
+            ? serverTransportTcp(localAddress, localPort, USER_HASHES_MAP)
+            : serverTransportTcp(localAddress, localPort);
+        doReturn(transport).when(serverConfig).getTransport();
+
+        final var uri = nextValue("URI");
+        final var payload = nextValue("PAYLOAD");
+        final var url = URI.create("http://%s:%d/%s".formatted(localAddress, localPort, uri));
+
+        final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
+            serverConfig, requestDispatcher).get(2, TimeUnit.SECONDS);
+        try {
+            try (var client = HttpClient.newBuilder()
+                // authenticator is only used if only 401 returned
+                .authenticator(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(USERNAME, PASSWORD.toCharArray());
+                    }
+                })
+                .build()) {
+
+                final var request = HttpRequest.newBuilder(url)
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(payload, StandardCharsets.UTF_8))
+                    .header("Content-Type", "text-plain")
+                    .header("Accept", "text-plain")
+                    .build();
+                final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                assertNotNull(response);
+                assertEquals(200, response.statusCode());
+                final var expected = RESPONSE_TEMPLATE.formatted("GET", uri, payload);
+                assertEquals(expected, response.body());
             }
         } finally {
             server.shutdown().get(2, TimeUnit.SECONDS);
