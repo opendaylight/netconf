@@ -24,6 +24,7 @@ import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
+import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
@@ -54,14 +55,16 @@ public enum HTTPScheme {
             pipeline
                 .addLast(new CleartextHttp2ServerUpgradeHandler(
                     sourceCodec,
-                    new HttpServerUpgradeHandler(sourceCodec,
+                    new HttpServerUpgradeHandler(
+                        sourceCodec,
                         protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                            ? new Http2ServerUpgradeCodec(twoToOne) : null),
+                            ? new Http2ServerUpgradeCodec(twoToOne) : null,
+                        HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     twoToOne))
                 .addLast(new SimpleChannelInboundHandler<HttpMessage>() {
                     @Override
                     protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
-                        // if there was no upgrade to HTTP/2 the incoming message is accepted via channel read;
+                        // if there was no upgrade to HTTP/2, the incoming message is accepted via channelRead();
                         // configure HTTP 1.1 flow, pass the message further the pipeline, remove self as no longer
                         // required
                         ctx.pipeline()
@@ -73,13 +76,18 @@ public enum HTTPScheme {
                     @Override
                     public void userEventTriggered(final ChannelHandlerContext ctx, final Object event)
                             throws Exception {
-                        // if there was upgrade to HTTP/2 the upgrade event is fired further the pipeline;
-                        // on event occurrence it's only required to complete the configuration for future requests,
-                        // then remove self as no longer required
-                        if (event instanceof HttpServerUpgradeHandler.UpgradeEvent) {
+                        // if there was an upgrade to HTTP/2, the incoming message is propagated as an UpgradeEvent;
+                        // just pass the request down on the dedicated HTTP/2 stream. Since we are restoring that magic,
+                        // there is no need for downstream handlers to see this event.
+                        if (event instanceof HttpServerUpgradeHandler.UpgradeEvent upgrade) {
                             ctx.pipeline().remove(this);
+                            final var request = upgrade.upgradeRequest();
+                            request.headers().setInt(ExtensionHeaderNames.STREAM_ID.text(),
+                                Http2CodecUtil.HTTP_UPGRADE_STREAM_ID);
+                            ctx.fireChannelRead(request.retain());
+                        } else {
+                            super.userEventTriggered(ctx, event);
                         }
-                        super.userEventTriggered(ctx, event);
                     }
                 });
         }
