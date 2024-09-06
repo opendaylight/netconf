@@ -32,14 +32,14 @@ final class HostMetaRequestProcessor {
     static final String ALLOW_METHODS = allowHeaderValue(OPTIONS, HEAD, GET);
 
     @VisibleForTesting
-    static String XRD_TEMPLATE = """
+    static final String XRD_TEMPLATE = """
         <?xml version='1.0' encoding='UTF-8'?>
         <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
             <Link rel="restconf" href="%s"/>
         </XRD>""";
     @VisibleForTesting
 
-    static String JRD_TEMPLATE = """
+    static final String JRD_TEMPLATE = """
         {
             "links" : {
                 "rel" : "restconf",
