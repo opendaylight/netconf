@@ -8,12 +8,34 @@
 package org.opendaylight.restconf.server.netty;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_SVG_XML;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpMethod;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 class OperationsE2ETest extends AbstractE2ETest {
+
+    @Before
+    public void before() throws Exception {
+        // ensure topology branch exists
+        var pretest = invokeRequest(
+                buildRequest(HttpMethod.PUT, "/rests/data/network-topology:network-topology", APPLICATION_JSON,
+                        """
+                            {
+                                "network-topology:network-topology": {
+                                    "topology": [
+                                        {
+                                            "topology-id": "topology-netconf"
+                                        }
+                                    ]
+                                }
+                            }"""));
+        final var statusCode = pretest.status().code();
+        assertTrue(statusCode == 200 || statusCode == 201);
+    }
 
     @Test
     void readAllOperationsTest() throws Exception {
@@ -49,8 +71,141 @@ class OperationsE2ETest extends AbstractE2ETest {
     }
 
     @Test
+    void invokeCreateDeviceTest() throws Exception {
+        final var result = invokeRequest(buildRequest(HttpMethod.POST,
+            "rests/operations/netconf-node-topology:create-device",
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": 0,
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }"""));
+        assertEquals(204, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceDataMissingTest() throws Exception {
+        final var result = invokeRequest(buildRequest(HttpMethod.POST,
+            "rests/operations/netconf-node-topology:create-device-data-missing",
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": 0,
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }"""));
+        assertEquals(409, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceNotFoundTest() throws Exception {
+        final var result = invokeRequest(buildRequest(HttpMethod.POST,
+            "rests/operations/netconf-node-topology:create-device",
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password-not-found": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": 0,
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }"""));
+        assertEquals(500, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceMalformedMessageTest() throws Exception {
+        final var result = invokeRequest(buildRequest(HttpMethod.POST,
+            "rests/operations/netconf-node-topology:create-device",
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": "abc",
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }"""));
+        assertEquals(500, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceWrongAcceptTypeTest() throws Exception {
+        final var result = invokeRequest(buildRequest(HttpMethod.POST,
+                "rests/operations/netconf-node-topology:create-device",
+                APPLICATION_SVG_XML,
+                """
+                    {
+                       "input": {
+                         "login-password": {
+                           "password": "Some password",
+                           "username": "Some username"
+                         },
+                         "host": "0.0.0.0",
+                         "port": "abc",
+                         "tcp-only": true,
+                         "protocol": {
+                           "name": "SSH"
+                         },
+                         "schemaless": true,
+                         "reconnect-on-changed-schema": true,
+                         "node-id": "Some node-id"
+                       }
+                    }"""));
+        assertEquals(406, result.status().code());
+    }
+
+    @Test
     void errorHandlingTest() {
-        // TODO
+        // TODO wrong accept type
+        // not authorized?
+        // not implemented
+        // data-missing?
     }
 
     @Test
