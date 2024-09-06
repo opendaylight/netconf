@@ -20,6 +20,8 @@ class OperationsE2ETest extends AbstractE2ETest {
     private static final String OPERATIONS_URI = "/rests/operations";
     private static final String SUBSCRIBE_DEVICE_NOTIFICATIONS_URI =
         OPERATIONS_URI + "/odl-device-notification:subscribe-device-notification";
+    private static final String WRONG_TYPE = "application/svg+xml";
+    private static final String CREATE_DEVICE = "rests/operations/netconf-node-topology:create-device";
 
     @Test
     void readOperationsJson() throws Exception {
@@ -88,8 +90,133 @@ class OperationsE2ETest extends AbstractE2ETest {
     }
 
     @Test
-    void errorHandlingTest() {
-        // TODO
+    void invokeCreateDeviceTest() throws Exception {
+        final var result = invokeRequest(HttpMethod.POST,
+            CREATE_DEVICE,
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": 0,
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }""");
+        assertEquals(204, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceDataMissingTest() throws Exception {
+        final var result = invokeRequest(HttpMethod.POST,
+            CREATE_DEVICE + "data-missing",
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": 0,
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }""");
+        assertEquals(409, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceNotFoundTest() throws Exception {
+        final var result = invokeRequest(HttpMethod.POST,
+            CREATE_DEVICE,
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password-not-found": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": 0,
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }""");
+        assertEquals(500, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceMalformedMessageTest() throws Exception {
+        final var result = invokeRequest(HttpMethod.POST,
+            CREATE_DEVICE,
+            APPLICATION_JSON,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": "abc",
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }""");
+        assertEquals(500, result.status().code());
+    }
+
+    @Test
+    void invokeCreateDeviceWrongAcceptTypeTest() throws Exception {
+        final var result = invokeRequest(HttpMethod.POST,
+            CREATE_DEVICE,
+            WRONG_TYPE,
+            """
+                {
+                   "input": {
+                     "login-password": {
+                       "password": "Some password",
+                       "username": "Some username"
+                     },
+                     "host": "0.0.0.0",
+                     "port": "abc",
+                     "tcp-only": true,
+                     "protocol": {
+                       "name": "SSH"
+                     },
+                     "schemaless": true,
+                     "reconnect-on-changed-schema": true,
+                     "node-id": "Some node-id"
+                   }
+                }""");
+        assertEquals(406, result.status().code());
     }
 
     @Test
