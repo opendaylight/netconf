@@ -49,6 +49,9 @@ final class Execution implements Callable<Void> {
                                 params.controllerAuthPassword.toCharArray());
                     }
                 })
+                // disable http/2 upgrade (set by default)
+                // bc netty based server is not supporting it if first request is not GET
+                .version(HttpClient.Version.HTTP_1_1)
                 .build();
         destination = String.format(Locale.ROOT, NETCONF_TOPOLOGY_DESTINATION,
                 params.controllerIp, params.controllerPort);

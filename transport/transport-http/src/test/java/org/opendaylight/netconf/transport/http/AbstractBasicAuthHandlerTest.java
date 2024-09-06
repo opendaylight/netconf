@@ -10,10 +10,12 @@ package org.opendaylight.netconf.transport.http;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opendaylight.netconf.transport.http.AbstractBasicAuthHandler.WWW_AUTHENTICATE_BASIC;
 import static org.opendaylight.netconf.transport.http.TestUtils.basicAuthHeader;
 import static org.opendaylight.netconf.transport.http.TestUtils.httpRequest;
 
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -55,6 +57,7 @@ class AbstractBasicAuthHandlerTest {
         channel.writeInbound(GRANTED_URI, httpRequest(authHeader.isEmpty() ? null : authHeader));
         final var response = assertInstanceOf(HttpResponse.class, channel.readOutbound());
         assertEquals(HttpResponseStatus.UNAUTHORIZED, response.status());
+        assertEquals(WWW_AUTHENTICATE_BASIC, response.headers().get(HttpHeaderNames.WWW_AUTHENTICATE));
     }
 
     static List<String> unauthorized() {
