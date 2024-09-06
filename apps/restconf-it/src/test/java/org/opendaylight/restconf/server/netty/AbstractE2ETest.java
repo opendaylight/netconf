@@ -58,6 +58,7 @@ import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -291,6 +292,19 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static void assertContentJson(final FullHttpResponse response, final String expectedContent) {
         final var content = response.content().toString(StandardCharsets.UTF_8);
         JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
+    }
+
+    protected void assertContentXml(final String getRequestUri, final String expectedContent) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, getRequestUri, APPLICATION_XML);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        assertContentXml(response, expectedContent);
+    }
+
+    protected static void assertContentXml(final FullHttpResponse response, final String expectedContent)
+            throws Exception {
+        final var content = response.content().toString(StandardCharsets.UTF_8);
+        assertEquals(XmlUtil.readXmlToDocument(expectedContent).getTextContent(),
+            XmlUtil.readXmlToDocument(content).getTextContent());
     }
 
     protected static void assertErrorResponseJson(final FullHttpResponse response, final ErrorType errorType,
