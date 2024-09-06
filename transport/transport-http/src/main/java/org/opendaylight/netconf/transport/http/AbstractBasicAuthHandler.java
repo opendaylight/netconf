@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -36,12 +37,16 @@ public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHa
     private static final Logger LOG = LoggerFactory.getLogger(AbstractBasicAuthHandler.class);
 
     static final String BASIC_AUTH_PREFIX = "Basic ";
+    @VisibleForTesting
+    static final String WWW_AUTHENTICATE_BASIC = "BASIC realm=\"application\"";
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request) throws Exception {
         final var authn = authenticate(request);
         if (authn == null) {
-            ctx.writeAndFlush(errorResponse(request, HttpResponseStatus.UNAUTHORIZED));
+            final var response = errorResponse(request, HttpResponseStatus.UNAUTHORIZED);
+            response.headers().set(HttpHeaderNames.WWW_AUTHENTICATE, WWW_AUTHENTICATE_BASIC);
+            ctx.writeAndFlush(response);
         } else if (!isAuthorized(request, authn)) {
             ctx.writeAndFlush(errorResponse(request, HttpResponseStatus.FORBIDDEN));
         } else {
