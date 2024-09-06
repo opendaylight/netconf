@@ -41,7 +41,8 @@ final class PlainHTTPServer extends HTTPServer {
                 sourceCodec,
                 new HttpServerUpgradeHandler(sourceCodec,
                     protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                        ? new Http2ServerUpgradeCodec(connectionHandler) : null), connectionHandler))
+                        ? new Http2ServerUpgradeCodec(connectionHandler) : null, MAX_HTTP_CONTENT_LENGTH),
+                connectionHandler))
             .addLast(new SimpleChannelInboundHandler<HttpMessage>() {
                 @Override
                 protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
