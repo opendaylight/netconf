@@ -46,7 +46,6 @@ final class Http2Utils {
                 .build()
             : Http2ToHttpAdapter.builder(connection)
                 .maxContentLength(maxContentLength)
-                .propagateSettings(true)
                 .build();
         return new HttpToHttp2ConnectionHandlerBuilder()
             .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
