@@ -22,6 +22,30 @@
       },
       "revId": "409bb66ffc411c5a5d32f3eab4ec086ae5eefb8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df0966a2_dcf9ed6d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyTransportSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-06T07:52:35Z",
+      "side": 1,
+      "message": "so what is your naming suggestion?\n\nhow exactly do you propose to solve the need to have a TransportSession implementation?",
+      "parentUuid": "232e04d7_e96a4c40",
+      "range": {
+        "startLine": 31,
+        "startChar": 12,
+        "endLine": 31,
+        "endChar": 33
+      },
+      "revId": "409bb66ffc411c5a5d32f3eab4ec086ae5eefb8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
