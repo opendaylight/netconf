@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6adda940_e1e370d2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-06T07:14:52Z",
+      "side": 1,
+      "message": "confusing and misleading artifact name\ni\u0027ll never guess the functionality by name\ni have to open it to find out what it does \nand what the purpose of this artifact\nwhatever",
+      "range": {
+        "startLine": 23,
+        "startChar": 12,
+        "endLine": 23,
+        "endChar": 25
+      },
+      "revId": "7ad81235d388d21149cade2cd7a55039f7148019",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
