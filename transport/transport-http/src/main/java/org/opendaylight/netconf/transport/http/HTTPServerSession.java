@@ -13,7 +13,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -57,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * snapshot -- which is the typical use case.
  */
 @Beta
-public abstract class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest> {
+public abstract class HTTPServerSession extends AbstractServerHandler {
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
     private static final Map<HttpMethod, ImplementedMethod> ALL_METHODS = Arrays.stream(ImplementedMethod.values())
@@ -87,7 +86,6 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     private ServerRequestExecutor executor;
 
     protected HTTPServerSession(final HTTPScheme scheme) {
-        super(FullHttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
     }
 

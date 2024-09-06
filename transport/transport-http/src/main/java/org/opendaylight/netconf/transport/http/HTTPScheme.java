@@ -56,7 +56,7 @@ public enum HTTPScheme {
                     sourceCodec,
                     new HttpServerUpgradeHandler(sourceCodec,
                         protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                            ? new Http2ServerUpgradeCodec(twoToOne) : null),
+                            ? new Http2ServerUpgradeCodec(twoToOne) : null, HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     twoToOne))
                 .addLast(new SimpleChannelInboundHandler<HttpMessage>() {
                     @Override
