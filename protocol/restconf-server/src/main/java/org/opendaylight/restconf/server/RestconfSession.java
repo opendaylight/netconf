@@ -36,12 +36,13 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     private final RestconfRequestDispatcher dispatcher;
 
     RestconfSession(final RestconfRequestDispatcher dispatcher) {
+        super(FullHttpRequest.class, false);
         this.dispatcher = requireNonNull(dispatcher);
     }
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-        dispatcher.dispatch(msg.retain(), new FutureCallback<>() {
+        dispatcher.dispatch(msg, new FutureCallback<>() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
                 final var streamId = msg.headers().getInt(STREAM_ID);
