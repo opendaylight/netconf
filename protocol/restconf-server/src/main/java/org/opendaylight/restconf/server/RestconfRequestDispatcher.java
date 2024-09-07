@@ -65,9 +65,6 @@ final class RestconfRequestDispatcher {
                     ModulesRequestProcessor.processYangLibraryVersion(params, restconfService, callback);
                 case PathParameters.MODULES ->
                     ModulesRequestProcessor.processModules(params, restconfService, callback);
-                case PathParameters.HOST_META -> HostMetaRequestProcessor.processHostMetaRequest(params, callback);
-                case PathParameters.HOST_META_JSON ->
-                    HostMetaRequestProcessor.processHostMetaJsonRequest(params, callback);
                 default -> callback.onSuccess(
                     params.method() == Method.OPTIONS
                         ? optionsResponse(params, Method.OPTIONS.name())

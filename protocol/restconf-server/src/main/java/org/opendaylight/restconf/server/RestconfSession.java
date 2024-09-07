@@ -33,37 +33,58 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
 
     private final RestconfRequestDispatcher dispatcher;
+    private final WellKnownResources wellKnown;
 
-    RestconfSession(final RestconfRequestDispatcher dispatcher) {
+    RestconfSession(final WellKnownResources wellKnown, final RestconfRequestDispatcher dispatcher) {
         super(FullHttpRequest.class, false);
+        this.wellKnown = requireNonNull(wellKnown);
         this.dispatcher = requireNonNull(dispatcher);
     }
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        // non-null indicates HTTP/2 request, which we need to propagate to any response
+        final var streamId = msg.headers().getInt(STREAM_ID);
+        final var version = msg.protocolVersion();
+        final var uri = msg.uri();
+
+        // Well-known resources are immediate
+        if (uri.startsWith("/.well-known/")) {
+            respond(ctx, streamId, wellKnown.request(version, Method.of(msg.method()), uri.substring(13)));
+            msg.release();
+            return;
+        }
+
+        // Defer to dispatcher
         dispatcher.dispatch(msg, new FutureCallback<>() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
-                final var streamId = msg.headers().getInt(STREAM_ID);
-                if (streamId != null) {
-                    response.headers().setInt(STREAM_ID, streamId);
-                }
                 msg.release();
-                ctx.writeAndFlush(response);
+                respond(ctx, streamId, response);
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
+                msg.release();
+
                 final var message = throwable.getMessage();
                 final var content = message == null ? Unpooled.EMPTY_BUFFER
                     : ByteBufUtil.writeUtf8(ctx.alloc(), message);
-                final var response = new DefaultFullHttpResponse(msg.protocolVersion(),
-                    HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
+                final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                    content);
                 response.headers()
                     .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
                     .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-                onSuccess(response);
+                respond(ctx, streamId, response);
             }
         });
+    }
+
+    private static void respond(final ChannelHandlerContext ctx, final Integer streamId,
+            final FullHttpResponse response) {
+        if (streamId != null) {
+            response.headers().setInt(STREAM_ID, streamId);
+        }
+        ctx.writeAndFlush(response);
     }
 }
