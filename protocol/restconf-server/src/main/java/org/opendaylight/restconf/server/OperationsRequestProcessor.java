@@ -7,20 +7,14 @@
  */
 package org.opendaylight.restconf.server;
 
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.HEAD;
-import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
-import static io.netty.handler.codec.http.HttpMethod.POST;
 import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
 import static org.opendaylight.restconf.server.RequestUtils.requestBody;
-import static org.opendaylight.restconf.server.ResponseUtils.allowHeaderValue;
 import static org.opendaylight.restconf.server.ResponseUtils.optionsResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.simpleResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErrorResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTypeErrorResponse;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -38,9 +32,6 @@ import org.opendaylight.restconf.server.api.XmlOperationInputBody;
  * Section 3.3.2. {+restconf}/operations</a>
  */
 final class OperationsRequestProcessor {
-    @VisibleForTesting
-    static final String ALLOW_METHODS = allowHeaderValue(OPTIONS, HEAD, GET, POST);
-
     private OperationsRequestProcessor() {
         // hidden on purpose
     }
@@ -49,7 +40,7 @@ final class OperationsRequestProcessor {
             final FutureCallback<FullHttpResponse> callback) {
         final var apiPath = extractApiPath(params);
         switch (params.method().name()) {
-            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
+            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS, POST"));
             case "HEAD", "GET" -> getOperations(params, service, callback, apiPath);
             case "POST" -> {
                 if (NettyMediaTypes.RESTCONF_TYPES.contains(params.contentType())) {

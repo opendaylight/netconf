@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
@@ -53,10 +52,6 @@ final class ResponseUtils {
 
     private ResponseUtils() {
         // hidden on purpose
-    }
-
-    static String allowHeaderValue(final HttpMethod ... methods) {
-        return String.join(", ", Stream.of(methods).map(HttpMethod::name).sorted().toList());
     }
 
     static FullHttpResponse optionsResponse(final RequestParameters params, final String allowHeaderValue) {

@@ -52,7 +52,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @ValueSource(strings = {OPERATIONS_PATH, OPERATIONS_PATH_WITH_ID})
     void options(final String uri) {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri);
-        assertOptionsResponse(dispatch(request), OperationsRequestProcessor.ALLOW_METHODS);
+        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS, POST");
     }
 
 

@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.opendaylight.restconf.server.ModulesRequestProcessor.ALLOW_METHODS;
 import static org.opendaylight.restconf.server.ModulesRequestProcessor.MISSING_FILENAME_ERROR;
 import static org.opendaylight.restconf.server.ModulesRequestProcessor.REVISION;
 import static org.opendaylight.restconf.server.ModulesRequestProcessor.SOURCE_READ_FAILURE_ERROR;
@@ -64,8 +63,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ValueSource(strings = {YANG_LIBRARY_VERSION_URI, MODULES_PATH, MODULE_URI, MODULE_URI_WITH_MOUNT})
     void options(final String uri) {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri);
-        assertOptionsResponse(dispatch(request), ALLOW_METHODS);
-
+        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
     }
 
     @ParameterizedTest
