@@ -53,7 +53,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
         root = new EndpointRoot(principalService, new WellKnownResources(restconf), firstSegment,
             new APIResource(server, otherSegments, sb.append('/').toString(), configuration.errorTagMapping(),
-                configuration.defaultEncoding(), configuration.prettyPrint()));
+                configuration.defaultEncoding(), configuration.prettyPrint()), streamRegistry);
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
