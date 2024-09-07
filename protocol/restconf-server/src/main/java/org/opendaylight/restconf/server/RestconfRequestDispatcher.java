@@ -15,6 +15,7 @@ import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErro
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import java.net.URI;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -50,11 +51,12 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final FullHttpRequest request, final FutureCallback<FullHttpResponse> callback) {
+    void dispatch(final QueryStringDecoder decoder, final FullHttpRequest request,
+            final FutureCallback<FullHttpResponse> callback) {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
 
         final var principal = principalService.acquirePrincipal(request);
-        final var params = new RequestParameters(baseUri, request, principal,
+        final var params = new RequestParameters(baseUri, decoder, request, principal,
             errorTagMapping, defaultAcceptType, defaultPrettyPrint);
         try {
             switch (params.pathParameters().apiResource()) {
@@ -65,9 +67,6 @@ final class RestconfRequestDispatcher {
                     ModulesRequestProcessor.processYangLibraryVersion(params, restconfService, callback);
                 case PathParameters.MODULES ->
                     ModulesRequestProcessor.processModules(params, restconfService, callback);
-                case PathParameters.HOST_META -> HostMetaRequestProcessor.processHostMetaRequest(params, callback);
-                case PathParameters.HOST_META_JSON ->
-                    HostMetaRequestProcessor.processHostMetaJsonRequest(params, callback);
                 default -> callback.onSuccess(
                     params.method() == Method.OPTIONS
                         ? optionsResponse(params, Method.OPTIONS.name())
