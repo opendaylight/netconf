@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * <ol>
  *   <li>request method binding, performed on the Netty thread via {@link #implementationOf(HttpMethod)}</li>
  *   <li>request path and header binding, performed on the Netty thread via
- *       {@link #prepareRequest(ImplementedMethod, URI, HttpHeaders)}</li>
+ *       {@link #prepareRequest(ChannelHandler, ImplementedMethod, URI, HttpHeaders)}</li>
  *   <li>request execution, performed in a dedicated thread, via
  *       {@link PendingRequest#execute(PendingRequestListener, java.io.InputStream)}</li>
  *   <li>response execution, performed in another dedicated thread</li>
@@ -204,7 +205,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        switch (prepareRequest(method, targetUri, msg.headers())) {
+        switch (prepareRequest(this, method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
                 LOG.debug("Immediate response to {} {}", method, targetUri);
@@ -251,7 +252,8 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      * @param headers request {@link HttpHeaders}
      */
     @NonNullByDefault
-    protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpHeaders headers);
+    protected abstract PreparedRequest prepareRequest(ChannelHandler channelHandler, ImplementedMethod method,
+            URI targetUri, HttpHeaders headers);
 
     @NonNullByDefault
     static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
