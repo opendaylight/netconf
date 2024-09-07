@@ -18,7 +18,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -41,9 +40,9 @@ final class RequestParameters {
     private final @Nullable Principal principal;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    RequestParameters(final URI baseUri, final FullHttpRequest request, final @Nullable Principal principal,
-            final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
-            final PrettyPrintParam defaultPrettyPrint) {
+    RequestParameters(final URI baseUri, final QueryStringDecoder decoder, final FullHttpRequest request,
+            final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
+            final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
         this.baseUri = requireNonNull(baseUri);
         this.request = requireNonNull(request);
         this.principal = principal;
@@ -52,7 +51,6 @@ final class RequestParameters {
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
         contentType = extractContentType(request, defaultAcceptType);
-        final var decoder = new QueryStringDecoder(request.uri(), StandardCharsets.UTF_8);
         pathParameters = PathParameters.from(decoder.path(), baseUri.getPath());
         queryParameters = QueryParameters.ofMultiValue(decoder.parameters());
     }
