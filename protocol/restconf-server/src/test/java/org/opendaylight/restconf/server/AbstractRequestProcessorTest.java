@@ -16,6 +16,7 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URI;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +67,7 @@ public class AbstractRequestProcessorTest {
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {
-        dispatcher.dispatch(request, callback);
+        dispatcher.dispatch(new QueryStringDecoder(request.uri()), request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }
