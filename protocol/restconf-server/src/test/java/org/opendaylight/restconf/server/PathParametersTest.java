@@ -10,9 +10,6 @@ package org.opendaylight.restconf.server;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opendaylight.restconf.server.PathParameters.DATA;
-import static org.opendaylight.restconf.server.PathParameters.DISCOVERY_BASE;
-import static org.opendaylight.restconf.server.PathParameters.HOST_META;
-import static org.opendaylight.restconf.server.PathParameters.HOST_META_JSON;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.OPERATIONS;
 import static org.opendaylight.restconf.server.PathParameters.YANG_LIBRARY_VERSION;
@@ -51,9 +48,6 @@ class PathParametersTest {
             Arguments.of(BASE + YANG_LIBRARY_VERSION, YANG_LIBRARY_VERSION, ""),
             Arguments.of(BASE + MODULES, MODULES, ""),
             Arguments.of(BASE + MODULES + CHILD_PATH, MODULES, CHILD_ID),
-            Arguments.of(DISCOVERY_BASE, "", ""),
-            Arguments.of(DISCOVERY_BASE + HOST_META, HOST_META, ""),
-            Arguments.of(DISCOVERY_BASE + HOST_META_JSON, HOST_META_JSON, ""),
 
             // unsupported
             Arguments.of(UNSUPPORTED_BASE, "", ""),
