@@ -15,6 +15,7 @@ import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErro
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -68,8 +69,8 @@ final class RestconfRequestDispatcher {
                 case PathParameters.MODULES ->
                     ModulesRequestProcessor.processModules(params, restconfService, callback);
                 default -> callback.onSuccess(
-                    params.method() == Method.OPTIONS
-                        ? optionsResponse(params, Method.OPTIONS.name())
+                    HttpMethod.OPTIONS.equals(params.method())
+                        ? optionsResponse(params, HttpMethod.OPTIONS.name())
                         : unmappedRequestErrorResponse(params));
             }
         } catch (RuntimeException e) {

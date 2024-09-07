@@ -18,6 +18,7 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import java.io.IOException;
@@ -54,8 +55,8 @@ final class ResponseUtils {
         // hidden on purpose
     }
 
-    static String allowHeaderValue(final Method ... methods) {
-        return String.join(", ", Stream.of(methods).map(Method::name).sorted().toList());
+    static String allowHeaderValue(final HttpMethod ... methods) {
+        return String.join(", ", Stream.of(methods).map(HttpMethod::name).sorted().toList());
     }
 
     static FullHttpResponse optionsResponse(final RequestParameters params, final String allowHeaderValue) {
@@ -128,7 +129,7 @@ final class ResponseUtils {
         }
 
         ResponseBuilder setBody(final byte[] bytes) {
-            if (params.method() != Method.HEAD) {
+            if (!HttpMethod.HEAD.equals(params.method())) {
                 // don't write content if head only requested
                 response.content().writeBytes(bytes);
             }
@@ -150,7 +151,7 @@ final class ResponseUtils {
             final FormattableBody body) {
         final var contentType = responseTypeFromAccept(params);
         try (var out = new CountingOutputStream(
-            params.method() == Method.HEAD
+            HttpMethod.HEAD.equals(params.method())
                 // don't write content if head only requested
                 ? OutputStream.nullOutputStream()
                 : new ByteBufOutputStream(response.content()))) {
