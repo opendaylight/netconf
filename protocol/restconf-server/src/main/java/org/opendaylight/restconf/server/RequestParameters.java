@@ -13,6 +13,7 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
@@ -56,12 +57,12 @@ final class RequestParameters {
     }
 
     /**
-     * Returns enum representation of HTTP request method.
+     * Returns HTTP request method.
      *
      * @return request method
      */
-    public Method method() {
-        return org.opendaylight.restconf.server.Method.of(request.method());
+    public HttpMethod method() {
+        return request.method();
     }
 
     /**

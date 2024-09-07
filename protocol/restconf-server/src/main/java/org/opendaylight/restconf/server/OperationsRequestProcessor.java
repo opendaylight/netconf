@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.server;
 
-import static org.opendaylight.restconf.server.Method.GET;
-import static org.opendaylight.restconf.server.Method.HEAD;
-import static org.opendaylight.restconf.server.Method.OPTIONS;
-import static org.opendaylight.restconf.server.Method.POST;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.HEAD;
+import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
 import static org.opendaylight.restconf.server.RequestUtils.requestBody;
 import static org.opendaylight.restconf.server.ResponseUtils.allowHeaderValue;
@@ -48,10 +48,10 @@ final class OperationsRequestProcessor {
     static void processOperationsRequest(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
         final var apiPath = extractApiPath(params);
-        switch (params.method()) {
-            case OPTIONS -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
-            case HEAD, GET -> getOperations(params, service, callback, apiPath);
-            case POST -> {
+        switch (params.method().name()) {
+            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
+            case "HEAD", "GET" -> getOperations(params, service, callback, apiPath);
+            case "POST" -> {
                 if (NettyMediaTypes.RESTCONF_TYPES.contains(params.contentType())) {
                     // invoke rpc -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.4.2
                     postOperations(params, service, callback, apiPath);

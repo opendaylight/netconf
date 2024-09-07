@@ -7,9 +7,9 @@
  */
 package org.opendaylight.restconf.server;
 
-import static org.opendaylight.restconf.server.Method.GET;
-import static org.opendaylight.restconf.server.Method.HEAD;
-import static org.opendaylight.restconf.server.Method.OPTIONS;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.HEAD;
+import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
 import static org.opendaylight.restconf.server.ResponseUtils.allowHeaderValue;
 import static org.opendaylight.restconf.server.ResponseUtils.optionsResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
@@ -54,18 +54,18 @@ final class ModulesRequestProcessor {
 
     static void processYangLibraryVersion(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
-        switch (params.method()) {
-            case OPTIONS -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
-            case HEAD, GET -> getYangLibraryVersion(params, service, callback);
+        switch (params.method().name()) {
+            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
+            case "HEAD", "GET" -> getYangLibraryVersion(params, service, callback);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
 
     static void processModules(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
-        switch (params.method()) {
-            case OPTIONS -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
-            case HEAD, GET ->  getModule(params, service, callback);
+        switch (params.method().name()) {
+            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
+            case "HEAD", "GET" ->  getModule(params, service, callback);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
