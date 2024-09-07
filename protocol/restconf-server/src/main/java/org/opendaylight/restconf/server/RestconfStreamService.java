@@ -58,7 +58,7 @@ public final class RestconfStreamService implements EventStreamService {
     public RestconfStreamService(final RestconfStream.Registry registry, final URI baseUri,
             final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
             final PrettyPrintParam defaultPrettyPrint) {
-        this.streamRegistry = requireNonNull(registry);
+        streamRegistry = requireNonNull(registry);
         basePath = requireNonNull(baseUri).getPath();
         defaultEncoding = NettyMediaTypes.JSON_TYPES.contains(defaultAcceptType) ? RFC8040_JSON : RFC8040_XML;
         this.errorTagMapping = errorTagMapping;
@@ -95,7 +95,7 @@ public final class RestconfStreamService implements EventStreamService {
         // Try starting stream via registry stream subscriber
         final var sender = new RestconfStream.Sender() {
             @Override
-            public void sendDataMessage(String data) {
+            public void sendDataMessage(final String data) {
                 listener.onEventField("data", data);
             }
 

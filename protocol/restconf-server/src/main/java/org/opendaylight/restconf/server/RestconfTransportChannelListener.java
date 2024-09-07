@@ -45,7 +45,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                 new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
                     configuration.defaultAcceptType(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            new RestconfSession(wellKnown, dispatcher));
+            new RestconfSession(wellKnown, streamRegistry, dispatcher));
     }
 
     @Override
