@@ -7,10 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.HEAD;
-import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
-import static org.opendaylight.restconf.server.ResponseUtils.allowHeaderValue;
 import static org.opendaylight.restconf.server.ResponseUtils.optionsResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.simpleErrorResponse;
@@ -45,8 +41,6 @@ final class ModulesRequestProcessor {
     static final String MISSING_FILENAME_ERROR = "Module name is missing";
     @VisibleForTesting
     static final String SOURCE_READ_FAILURE_ERROR = "Failure reading module source: ";
-    @VisibleForTesting
-    static final String ALLOW_METHODS = allowHeaderValue(OPTIONS, HEAD, GET);
 
     private ModulesRequestProcessor() {
         // hidden on purpose
@@ -55,7 +49,7 @@ final class ModulesRequestProcessor {
     static void processYangLibraryVersion(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
         switch (params.method().name()) {
-            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
+            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
             case "HEAD", "GET" -> getYangLibraryVersion(params, service, callback);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
@@ -64,7 +58,7 @@ final class ModulesRequestProcessor {
     static void processModules(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
         switch (params.method().name()) {
-            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, ALLOW_METHODS));
+            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
             case "HEAD", "GET" ->  getModule(params, service, callback);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
