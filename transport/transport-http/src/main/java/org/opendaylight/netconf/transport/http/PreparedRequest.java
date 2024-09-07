@@ -11,7 +11,8 @@ import com.google.common.annotations.Beta;
 
 /**
  * The result of
- * {@link HTTPServerSession#prepareRequest(ImplementedMethod, java.net.URI, io.netty.handler.codec.http.HttpHeaders)}.
+ * {@link HTTPServerSession#prepareRequest(io.netty.channel.ChannelHandler, ImplementedMethod, java.net.URI,
+ * io.netty.handler.codec.http.HttpHeaders)}.
  * This can either be a {@link CompletedRequest} or a {@link PendingRequest}.
  */
 @Beta
