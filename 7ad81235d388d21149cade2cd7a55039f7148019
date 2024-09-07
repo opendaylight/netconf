@@ -46,6 +46,30 @@
       },
       "revId": "7ad81235d388d21149cade2cd7a55039f7148019",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd24d686_e6d1152c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-07T09:18:31Z",
+      "side": 1,
+      "message": "Renamed to RestconfTransportChannelListener",
+      "parentUuid": "76075e46_01a65927",
+      "range": {
+        "startLine": 23,
+        "startChar": 12,
+        "endLine": 23,
+        "endChar": 25
+      },
+      "revId": "7ad81235d388d21149cade2cd7a55039f7148019",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
