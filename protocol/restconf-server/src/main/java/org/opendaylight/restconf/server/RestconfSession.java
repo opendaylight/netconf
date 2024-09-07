@@ -19,12 +19,17 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>. It acts
@@ -32,14 +37,18 @@ import org.opendaylight.restconf.server.api.TransportSession;
  * connections.
  */
 final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest> implements TransportSession {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
 
+    private final RestconfStream.Registry streamRegistry;
     private final RestconfRequestDispatcher dispatcher;
     private final WellKnownResources wellKnown;
 
-    RestconfSession(final WellKnownResources wellKnown, final RestconfRequestDispatcher dispatcher) {
+    RestconfSession(final WellKnownResources wellKnown, final RestconfStream.Registry streamRegistry,
+            final RestconfRequestDispatcher dispatcher) {
         super(FullHttpRequest.class, false);
         this.wellKnown = requireNonNull(wellKnown);
+        this.streamRegistry = requireNonNull(streamRegistry);
         this.dispatcher = requireNonNull(dispatcher);
     }
 
@@ -55,10 +64,66 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             // Well-known resources are immediately available and are trivial to service
             respond(ctx, streamId, wellKnown.request(version, msg.method(), path.substring(13)));
             msg.release();
+        } else if (path.startsWith("/streams/")) {
+            // Event streams are immediately available, but involve tricky state management
+            streamsRequest(ctx, version, streamId, decoder, msg, path.substring(9));
+            msg.release();
         } else {
             // Defer to dispatcher
             dispatchRequest(ctx, version, streamId, decoder, msg);
         }
+    }
+
+    private void streamsRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
+            final QueryStringDecoder decoder, final FullHttpRequest request, final String suffix) {
+        // uri is expected to be in the format <encodingName>/<streamName>
+        final int slash = suffix.indexOf('/');
+        if (slash != -1) {
+            LOG.debug("Malformed stream URI '{}'", suffix);
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
+            return;
+        }
+
+        final String encodingName = suffix.substring(0, slash);
+        final EncodingName encoding;
+        try {
+            encoding = new EncodingName(encodingName);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Stream encoding name '{}' is invalid", encodingName, e);
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
+            return;
+        }
+
+        final var streamName = suffix.substring(slash + 1);
+        final var stream = streamRegistry.lookupStream(streamName);
+        if (stream == null) {
+            LOG.debug("Stream '{}' not found", streamName);
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
+            return;
+        }
+
+        // We only support GET method
+        if (!HttpMethod.GET.equals(request.method())) {
+            final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED);
+            response.headers().set(HttpHeaderNames.ALLOW, HttpMethod.GET);
+            respond(ctx, streamId, response);
+            return;
+        }
+
+        // We only support text/event-stream
+        if (!request.headers().contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_ACCEPTABLE));
+            return;
+        }
+
+        streamRequest(ctx, version, streamId, decoder, request, stream, encoding);
+    }
+
+    private void streamRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
+            final QueryStringDecoder decoder, final FullHttpRequest request, final RestconfStream<?> stream,
+            final EncodingName encoding) {
+        // TODO Auto-generated method stub
+
     }
 
     private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
