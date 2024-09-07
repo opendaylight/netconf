@@ -7,13 +7,13 @@
  */
 package org.opendaylight.restconf.server;
 
-import static org.opendaylight.restconf.server.Method.DELETE;
-import static org.opendaylight.restconf.server.Method.GET;
-import static org.opendaylight.restconf.server.Method.HEAD;
-import static org.opendaylight.restconf.server.Method.OPTIONS;
-import static org.opendaylight.restconf.server.Method.PATCH;
-import static org.opendaylight.restconf.server.Method.POST;
-import static org.opendaylight.restconf.server.Method.PUT;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.HEAD;
+import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static org.opendaylight.restconf.server.NettyMediaTypes.ACCEPT_PATCH_HEADER_VALUE;
 import static org.opendaylight.restconf.server.NettyMediaTypes.RESTCONF_TYPES;
 import static org.opendaylight.restconf.server.NettyMediaTypes.YANG_PATCH_TYPES;
@@ -83,13 +83,13 @@ final class DataRequestProcessor {
             final FutureCallback<FullHttpResponse> callback) {
         final var contentType = params.contentType();
         final var apiPath = extractApiPath(params);
-        switch (params.method()) {
+        switch (params.method().name()) {
             // resource options -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.1
-            case OPTIONS -> options(params, callback, apiPath);
+            case "OPTIONS" -> options(params, callback, apiPath);
             // retrieve data and metadata for a resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.3
             // HEAD is same as GET but without content -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.2
-            case HEAD, GET -> getData(params, service, callback, apiPath);
-            case POST -> {
+            case "HEAD", "GET" -> getData(params, service, callback, apiPath);
+            case "POST" -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.4.1
                     // or invoke an action -> https://datatracker.ietf.org/doc/html/rfc8040#section-3.6
@@ -98,7 +98,7 @@ final class DataRequestProcessor {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
             }
-            case PUT -> {
+            case "PUT" -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create or replace target resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.5
                     putData(params, service, callback, apiPath);
@@ -106,7 +106,7 @@ final class DataRequestProcessor {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
             }
-            case PATCH -> {
+            case "PATCH" -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // Plain RESTCONF patch = merge target resource content ->
                     // https://datatracker.ietf.org/doc/html/rfc8040#section-4.6.1
@@ -120,13 +120,13 @@ final class DataRequestProcessor {
                 }
             }
             // delete target resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.7
-            case DELETE -> deleteData(params, service, callback, apiPath);
+            case "DELETE" -> deleteData(params, service, callback, apiPath);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
 
     private static void options(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            ApiPath apiPath) {
+            final ApiPath apiPath) {
         callback.onSuccess(
             responseBuilder(params, HttpResponseStatus.OK)
                 .setHeader(HttpHeaderNames.ALLOW, apiPath.isEmpty() ? ALLOW_METHODS_ROOT : ALLOW_METHODS)
