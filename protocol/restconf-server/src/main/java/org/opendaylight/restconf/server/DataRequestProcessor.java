@@ -7,19 +7,11 @@
  */
 package org.opendaylight.restconf.server;
 
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.HEAD;
-import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static org.opendaylight.restconf.server.NettyMediaTypes.ACCEPT_PATCH_HEADER_VALUE;
 import static org.opendaylight.restconf.server.NettyMediaTypes.RESTCONF_TYPES;
 import static org.opendaylight.restconf.server.NettyMediaTypes.YANG_PATCH_TYPES;
 import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
 import static org.opendaylight.restconf.server.RequestUtils.requestBody;
-import static org.opendaylight.restconf.server.ResponseUtils.allowHeaderValue;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.responseStatus;
 import static org.opendaylight.restconf.server.ResponseUtils.simpleErrorResponse;
@@ -27,7 +19,6 @@ import static org.opendaylight.restconf.server.ResponseUtils.simpleResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErrorResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTypeErrorResponse;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -69,11 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 final class DataRequestProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(DataRequestProcessor.class);
-
-    @VisibleForTesting
-    static final String ALLOW_METHODS_ROOT = allowHeaderValue(OPTIONS, HEAD, GET, POST, PUT, PATCH);
-    @VisibleForTesting
-    static final String ALLOW_METHODS = allowHeaderValue(OPTIONS, HEAD, GET, POST, PUT, PATCH, DELETE);
 
     private DataRequestProcessor() {
         // hidden on purpose
@@ -127,10 +113,11 @@ final class DataRequestProcessor {
 
     private static void options(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
             final ApiPath apiPath) {
-        callback.onSuccess(
-            responseBuilder(params, HttpResponseStatus.OK)
-                .setHeader(HttpHeaderNames.ALLOW, apiPath.isEmpty() ? ALLOW_METHODS_ROOT : ALLOW_METHODS)
-                .setHeader(HttpHeaderNames.ACCEPT_PATCH, ACCEPT_PATCH_HEADER_VALUE).build());
+        callback.onSuccess(responseBuilder(params, HttpResponseStatus.OK)
+            .setHeader(HttpHeaderNames.ALLOW, apiPath.isEmpty()
+                ? "GET, HEAD, OPTIONS, PATCH, POST, PUT" : "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT")
+            .setHeader(HttpHeaderNames.ACCEPT_PATCH, ACCEPT_PATCH_HEADER_VALUE)
+            .build());
     }
 
     private static void getData(final RequestParameters params, final RestconfServer service,
