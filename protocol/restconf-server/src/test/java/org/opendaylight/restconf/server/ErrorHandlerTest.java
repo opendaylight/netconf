@@ -10,9 +10,6 @@ package org.opendaylight.restconf.server;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.opendaylight.restconf.server.PathParameters.DISCOVERY_BASE;
-import static org.opendaylight.restconf.server.PathParameters.HOST_META;
-import static org.opendaylight.restconf.server.PathParameters.HOST_META_JSON;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.OPERATIONS;
 import static org.opendaylight.restconf.server.PathParameters.YANG_LIBRARY_VERSION;
@@ -68,8 +65,8 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
             Arguments.of(TestEncoding.XML, HttpMethod.PUT, OPERATIONS_PATH),
             Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + YANG_LIBRARY_VERSION),
             Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + MODULES),
-            Arguments.of(TestEncoding.XML, HttpMethod.POST, DISCOVERY_BASE + HOST_META),
-            Arguments.of(TestEncoding.XML, HttpMethod.POST, DISCOVERY_BASE + HOST_META_JSON)
+            Arguments.of(TestEncoding.XML, HttpMethod.POST, "/.well-known/host-meta"),
+            Arguments.of(TestEncoding.XML, HttpMethod.POST, "/.well-known/host-meta.json")
         );
     }
 
