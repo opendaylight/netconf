@@ -10,8 +10,10 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http2.Http2Exception;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
@@ -78,6 +80,16 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     }
 
     @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (cause instanceof Http2Exception.StreamException se) {
+            if (root.exceptionCaught(se)){
+                return;
+            }
+        }
+        super.exceptionCaught(ctx, cause);
+    }
+
+    @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         try {
             super.channelInactive(ctx);
@@ -105,9 +117,9 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     }
 
     @Override
-    protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers) {
-        return root.prepare(this, method, targetUri, headers);
+    protected PreparedRequest prepareRequest(final ChannelHandler channelHandler, final ImplementedMethod method,
+            final URI targetUri, final HttpHeaders headers) {
+        return root.prepare(channelHandler,this, method, targetUri, headers);
     }
 
     @Override
