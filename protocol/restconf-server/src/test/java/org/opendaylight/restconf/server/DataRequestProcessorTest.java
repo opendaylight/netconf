@@ -112,8 +112,8 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
     public static Stream<Arguments> options() {
         return Stream.of(
-          Arguments.of(DATA_PATH, DataRequestProcessor.ALLOW_METHODS_ROOT),
-          Arguments.of(DATA_PATH_WITH_ID, DataRequestProcessor.ALLOW_METHODS)
+          Arguments.of(DATA_PATH, "GET, HEAD, OPTIONS, PATCH, POST, PUT"),
+          Arguments.of(DATA_PATH_WITH_ID, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT")
         );
     }
 
