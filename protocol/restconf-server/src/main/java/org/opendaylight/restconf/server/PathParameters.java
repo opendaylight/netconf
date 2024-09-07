@@ -53,12 +53,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 record PathParameters(String apiResource, String childIdentifier) {
-
-    /**
-     * URI path prefix for discovery requests.
-     */
-    static final String DISCOVERY_BASE = "/.well-known";
-
     /**
      * API resource for datastore.
      */
@@ -85,18 +79,7 @@ record PathParameters(String apiResource, String childIdentifier) {
 
     static final String STREAMS = "/streams";
 
-    /**
-     * API resource equivalent for discovery XRD request.
-     */
-    static final String HOST_META = "/host-meta";
-
-    /**
-     * API resource equivalent for discovery JRD request.
-     */
-    static final String HOST_META_JSON = "/host-meta.json";
-
     private static final Set<String> API_RESOURCES = Set.of(DATA, OPERATIONS, YANG_LIBRARY_VERSION, MODULES, STREAMS);
-    private static final Set<String> DISCOVERY_API_RESOURCES = Set.of(HOST_META, HOST_META_JSON);
     private static final PathParameters EMPTY = new PathParameters("", "");
 
     PathParameters {
@@ -105,7 +88,7 @@ record PathParameters(String apiResource, String childIdentifier) {
     }
 
     static PathParameters from(final String fullPath, final String basePath) {
-        if (!fullPath.startsWith(basePath) && !fullPath.startsWith(DISCOVERY_BASE)) {
+        if (!fullPath.startsWith(basePath)) {
             return EMPTY;
         }
         final var maxIndex = fullPath.length() - 1;
@@ -117,7 +100,6 @@ record PathParameters(String apiResource, String childIdentifier) {
         final var child = cut(fullPath, childStartIndex, -1, maxIndex);
 
         return basePath.equals(base) && API_RESOURCES.contains(resource)
-            || DISCOVERY_BASE.equals(base) && DISCOVERY_API_RESOURCES.contains(resource)
             ? new PathParameters(resource, child) : EMPTY;
     }
 
