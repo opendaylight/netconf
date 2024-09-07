@@ -20,6 +20,8 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -33,37 +35,63 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
 
     private final RestconfRequestDispatcher dispatcher;
+    private final WellKnownResources wellKnown;
 
-    RestconfSession(final RestconfRequestDispatcher dispatcher) {
+    RestconfSession(final WellKnownResources wellKnown, final RestconfRequestDispatcher dispatcher) {
         super(FullHttpRequest.class, false);
+        this.wellKnown = requireNonNull(wellKnown);
         this.dispatcher = requireNonNull(dispatcher);
     }
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-        dispatcher.dispatch(msg, new FutureCallback<>() {
+        // non-null indicates HTTP/2 request, which we need to propagate to any response
+        final var streamId = msg.headers().getInt(STREAM_ID);
+        final var version = msg.protocolVersion();
+        final var decoder = new QueryStringDecoder(msg.uri());
+        final var path = decoder.path();
+
+        if (path.startsWith("/.well-known/")) {
+            // Well-known resources are immediately available and are trivial to service
+            respond(ctx, streamId, wellKnown.request(version, msg.method(), path.substring(13)));
+            msg.release();
+        } else {
+            // Defer to dispatcher
+            dispatchRequest(ctx, version, streamId, decoder, msg);
+        }
+    }
+
+    private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
+            final QueryStringDecoder decoder, final FullHttpRequest msg) {
+        dispatcher.dispatch(decoder, msg, new FutureCallback<>() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
-                final var streamId = msg.headers().getInt(STREAM_ID);
-                if (streamId != null) {
-                    response.headers().setInt(STREAM_ID, streamId);
-                }
                 msg.release();
-                ctx.writeAndFlush(response);
+                respond(ctx, streamId, response);
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
+                msg.release();
+
                 final var message = throwable.getMessage();
                 final var content = message == null ? Unpooled.EMPTY_BUFFER
                     : ByteBufUtil.writeUtf8(ctx.alloc(), message);
-                final var response = new DefaultFullHttpResponse(msg.protocolVersion(),
-                    HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
+                final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                    content);
                 response.headers()
                     .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
                     .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-                onSuccess(response);
+                respond(ctx, streamId, response);
             }
         });
+    }
+
+    private static void respond(final ChannelHandlerContext ctx, final Integer streamId,
+            final FullHttpResponse response) {
+        if (streamId != null) {
+            response.headers().setInt(STREAM_ID, streamId);
+        }
+        ctx.writeAndFlush(response);
     }
 }
