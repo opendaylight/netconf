@@ -46,6 +46,30 @@
       },
       "revId": "409bb66ffc411c5a5d32f3eab4ec086ae5eefb8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01acff20_9dcae19c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyTransportSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-08T19:29:02Z",
+      "side": 1,
+      "message": "Renamed to RestconfSession and added javadoc to explain reasoning.\n\nI am not sure what \u0027everywhere we use\u0027 places you are referring to, so I cannot possibly comment of the \"same\" part of your statement.\n\nNone of transport-{tcp,tls,ssh} need anything remotely similar to RequestDisparcher, yet they work just fine.\n\nRequestDispatcher is *absolutely* *definitely* the wrong API for RESTCONF server.\n\nEventhough we do not yet know how restconf-client-api will look like, it is most likely also wrong for that use case.\n \nI will not enumerate and explain the reasons beyond stating they step from the difference between Http{Request,Response} and FullHttp{Request,Response}. The rest is left as an exercise for the reader.",
+      "parentUuid": "df0966a2_dcf9ed6d",
+      "range": {
+        "startLine": 31,
+        "startChar": 12,
+        "endLine": 31,
+        "endChar": 33
+      },
+      "revId": "409bb66ffc411c5a5d32f3eab4ec086ae5eefb8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
