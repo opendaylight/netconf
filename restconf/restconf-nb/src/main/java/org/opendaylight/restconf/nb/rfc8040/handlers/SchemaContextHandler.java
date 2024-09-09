@@ -169,6 +169,8 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
                 .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
                 .withChild(Builders.<String>orderedLeafSetBuilder()
                     .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
+                    // Closest match to DOMDataBroker's semantics
+                    .withChildValue(CapabilityURN.DEFAULTS + "?basic-mode=explicit")
                     .withChildValue(CapabilityURN.DEPTH)
                     .withChildValue(CapabilityURN.FIELDS)
                     .withChildValue(CapabilityURN.FILTER)
