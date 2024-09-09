@@ -68,6 +68,7 @@ public abstract sealed class AbstractReplayParam<T extends AbstractReplayParam<T
         return MoreObjects.toStringHelper(this).add("value", paramValue()).toString();
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static final @NonNull URI capabilityUri() {
         return CAPABILITY;
     }

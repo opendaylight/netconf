@@ -93,6 +93,7 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
         return value;
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static @NonNull URI capabilityUri() {
         return CAPABILITY;
     }

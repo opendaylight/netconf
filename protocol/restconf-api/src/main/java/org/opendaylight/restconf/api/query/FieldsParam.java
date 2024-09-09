@@ -130,6 +130,7 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
         return uriName;
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static URI capabilityUri() {
         return CAPABILITY;
     }

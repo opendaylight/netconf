@@ -63,6 +63,7 @@ public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintPar
         return value;
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static @NonNull URI capabilityUri() {
         return CAPABILITY;
     }
