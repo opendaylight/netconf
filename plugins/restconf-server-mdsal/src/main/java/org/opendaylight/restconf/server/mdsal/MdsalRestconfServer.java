@@ -44,6 +44,7 @@ import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -183,6 +184,30 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return;
         }
         stratAndTail.strategy().dataGET(request, stratAndTail.path());
+    }
+
+    @Override
+    public void dataOPTIONS(final ServerRequest<OptionsResult> request) {
+        localStrategy().dataOPTIONS(request);
+    }
+
+    @Override
+    public void dataOPTIONS(final ServerRequest<OptionsResult> request, final ApiPath identifier) {
+        final StrategyAndPath stratAndTail;
+        try {
+            stratAndTail = localStrategy().resolveStrategy(identifier);
+        } catch (ServerException e) {
+            request.completeWith(e);
+            return;
+        }
+
+        final var strategy = stratAndTail.strategy();
+        final var tail = stratAndTail.path();
+        if (tail.isEmpty()) {
+            strategy.dataOPTIONS(request);
+        } else {
+            strategy.dataOPTIONS(request, tail);
+        }
     }
 
     @Override
@@ -362,6 +387,24 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             strategy.operationsGET(request);
         } else {
             strategy.operationsGET(request, tail);
+        }
+    }
+
+    @Override
+    public void operationsOPTIONS(final ServerRequest<OptionsResult> request, final ApiPath operation) {
+        final StrategyAndPath strategyAndPath;
+        try {
+            strategyAndPath = localStrategy().resolveStrategy(operation);
+        } catch (ServerException e) {
+            request.completeWith(e);
+            return;
+        }
+
+        final var tail = strategyAndPath.path();
+        if (tail.isEmpty()) {
+            request.completeWith(OptionsResult.READ_ONLY);
+        } else {
+            strategyAndPath.strategy().operationsOPTIONS(request, tail);
         }
     }
 

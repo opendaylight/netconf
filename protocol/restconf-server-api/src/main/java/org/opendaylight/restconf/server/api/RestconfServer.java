@@ -45,6 +45,23 @@ public interface RestconfServer {
     void dataGET(ServerRequest<DataGetResult> request, ApiPath identifier);
 
     /**
+     * Return the HTTP methods supported by the datastore.
+     *
+     * @param request {@link ServerRequest} for this request
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    void dataOPTIONS(ServerRequest<OptionsResult> request);
+
+    /**
+     * Return the HTTP methods supported by the target data resource.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param identifier resource identifier
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    void dataOPTIONS(ServerRequest<OptionsResult> request, ApiPath identifier);
+
+    /**
      * Partially modify the target data resource, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
@@ -133,6 +150,15 @@ public interface RestconfServer {
      * @param operation An operation
      */
     void operationsGET(ServerRequest<FormattableBody> request, ApiPath operation);
+
+    /**
+     * Return the HTTP methods supported by the target data resource.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param operation An operation
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    void operationsOPTIONS(ServerRequest<OptionsResult> request, ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in
