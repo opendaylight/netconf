@@ -47,7 +47,8 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -210,7 +211,8 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     // TODO change to a specific documented Exception when changed in ClusterSingletonServiceProvider
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void startNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
-        final NetconfNode netconfNode = requireNonNull(node.augmentation(NetconfNode.class));
+        final var netconfNodeAugment = requireNonNull(node.augmentation(NetconfNodeAugment.class));
+        final NetconfNode netconfNode = requireNonNull(netconfNodeAugment.getNetconfNode());
 
         final Timeout actorResponseWaitTime = Timeout.create(
                 Duration.ofSeconds(netconfNode.getActorResponseWaitTime().toJava()));
@@ -312,7 +314,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     }
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
-        final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+        final NetconfNode netconfNode = node.augmentation(NetconfNodeAugment.class).getNetconfNode();
         final RemoteDeviceId deviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), netconfNode);
 
         return NetconfTopologySetup.builder()
