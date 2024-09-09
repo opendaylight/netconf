@@ -51,6 +51,7 @@ public final class FilterParam implements RestconfQueryParam<FilterParam> {
         return new FilterParam(uriValue);
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static @NonNull URI capabilityUri() {
         return CAPABILITY;
     }

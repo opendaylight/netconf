@@ -87,6 +87,7 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
         return mode;
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static @NonNull URI capabilityUri() {
         return CAPABILITY;
     }

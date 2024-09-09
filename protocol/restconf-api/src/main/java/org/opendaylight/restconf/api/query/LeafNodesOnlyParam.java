@@ -61,6 +61,7 @@ public final class LeafNodesOnlyParam implements RestconfQueryParam<LeafNodesOnl
         return value;
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static @NonNull URI capabilityUri() {
         return CAPABILITY;
     }

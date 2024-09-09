@@ -61,6 +61,7 @@ public final class ChangedLeafNodesOnlyParam implements RestconfQueryParam<Chang
         return value;
     }
 
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static @NonNull URI capabilityUri() {
         return CAPABILITY;
     }
