@@ -48,6 +48,25 @@ public interface RestconfServer {
     RestconfFuture<DataGetResult> dataGET(ServerRequest request, ApiPath identifier);
 
     /**
+     * Return the HTTP methods supported by the datastore.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @return A {@link RestconfFuture} of the {@link OptionsResult} content
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    RestconfFuture<OptionsResult> dataOPTIONS(ServerRequest request);
+
+    /**
+     * Return the HTTP methods supported by the target data resource.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param identifier resource identifier
+     * @return A {@link RestconfFuture} of the {@link OptionsResult} content
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    RestconfFuture<OptionsResult> dataOPTIONS(ServerRequest request, ApiPath identifier);
+
+    /**
      * Partially modify the target data resource, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
@@ -144,6 +163,16 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
     RestconfFuture<FormattableBody> operationsGET(ServerRequest request, ApiPath operation);
+
+    /**
+     * Return the HTTP methods supported by the target data resource.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param operation An operation
+     * @return A {@link RestconfFuture} of the {@link OptionsResult} content
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    RestconfFuture<OptionsResult> operationsOPTIONS(ServerRequest request, ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in

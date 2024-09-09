@@ -80,6 +80,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
@@ -889,6 +890,40 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     /**
+     * Classify a data reference.
+     *
+     * @param request {@link ServerRequest} for this request
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public final RestconfFuture<OptionsResult> dataOPTIONS(final ServerRequest request) {
+        return RestconfFuture.of(isNonConfigContent(request) ? OptionsResult.READ_ONLY : OptionsResult.DATASTORE);
+    }
+
+    /**
+     * Classify a data resource reference.
+     *
+     * @param request {@link ServerRequest} for this request
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public final RestconfFuture<OptionsResult> dataOPTIONS(final ServerRequest request, final ApiPath apiPath) {
+        final InstanceReference path;
+        try {
+            path = pathNormalizer.normalizeDataOrActionPath(apiPath);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
+
+        if (path instanceof Action) {
+            return RestconfFuture.of(OptionsResult.OPERATION);
+        }
+        return RestconfFuture.of(isNonConfigContent(request) ? OptionsResult.READ_ONLY : OptionsResult.RESOURCE);
+    }
+
+    private static boolean isNonConfigContent(final ServerRequest request) {
+        return ContentParam.NONCONFIG.paramValue().equals(request.queryParameters().lookup(ContentParam.uriName));
+    }
+
+    /**
      * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter.
      *
@@ -1286,6 +1321,34 @@ public abstract class RestconfStrategy implements DatabindAware {
     @NonNullByDefault
     public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request, final ApiPath apiPath) {
         return operations.httpGET(request, apiPath);
+    }
+
+    /**
+     * Classify an operations reference.
+     *
+     * @param request {@link ServerRequest} for this request
+     * @param operation An operation
+     */
+    @NonNullByDefault
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public final RestconfFuture<OptionsResult> operationsOPTIONS(final ServerRequest request, final ApiPath operation) {
+        try {
+            pathNormalizer.normalizeRpcPath(operation);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
+        // RFC8040 is not consistent on this point:
+        // - section 3.3.2 states:
+        //        The access point for each RPC operation is represented as an empty
+        //        leaf.  If an operation resource is retrieved, the empty leaf
+        //        representation is returned by the server.
+        // - section 4.3 states:
+        //        The RESTCONF server MUST support the GET method.  The GET method is
+        //        sent by the client to retrieve data and metadata for a resource.  It
+        //        is supported for all resource types, except operation resources.
+        // We implement the former, as it seems to be more in-line with the original intent, whereas we take the latter
+        // to apply to /data only.
+        return RestconfFuture.of(OptionsResult.READ_ONLY);
     }
 
     public @NonNull RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,

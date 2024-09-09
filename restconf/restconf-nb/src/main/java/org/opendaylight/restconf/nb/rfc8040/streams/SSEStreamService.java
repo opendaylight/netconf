@@ -13,11 +13,14 @@ import java.io.UnsupportedEncodingException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
@@ -87,5 +90,12 @@ public final class SSEStreamService {
         } catch (IllegalArgumentException | XPathExpressionException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
+    }
+
+    @OPTIONS
+    @Path("/{encodingName:[a-zA-Z]+}/{streamName:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public Response streamsOPTIONS(@PathParam("encodingName") final EncodingName encodingName) {
+        return Response.ok().header(HttpHeaders.ALLOW, "GET, HEAD, OPTIONS").build();
     }
 }

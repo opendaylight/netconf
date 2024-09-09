@@ -47,6 +47,7 @@ import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -168,6 +169,24 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return RestconfFuture.failed(e.toLegacy());
         }
         return stratAndTail.strategy().dataGET(request, stratAndTail.tail());
+    }
+
+    @Override
+    public RestconfFuture<OptionsResult> dataOPTIONS(final ServerRequest request) {
+        return localStrategy().dataOPTIONS(request);
+    }
+
+    @Override
+    public RestconfFuture<OptionsResult> dataOPTIONS(final ServerRequest request, final ApiPath identifier) {
+        final StrategyAndTail stratAndTail;
+        try {
+            stratAndTail = localStrategy().resolveStrategy(identifier);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
+        final var strategy = stratAndTail.strategy();
+        final var tail = stratAndTail.tail();
+        return tail.isEmpty() ? strategy.dataOPTIONS(request) : strategy.dataOPTIONS(request, tail);
     }
 
     @Override
@@ -335,6 +354,19 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final var strategy = strategyAndTail.strategy();
         final var tail = strategyAndTail.tail();
         return tail.isEmpty() ? strategy.operationsGET(request) : strategy.operationsGET(request, tail);
+    }
+
+    @Override
+    public RestconfFuture<OptionsResult> operationsOPTIONS(final ServerRequest request, final ApiPath operation) {
+        final StrategyAndTail strategyAndPath;
+        try {
+            strategyAndPath = localStrategy().resolveStrategy(operation);
+        } catch (ServerException e) {
+            return RestconfFuture.failed(e.toLegacy());
+        }
+        final var tail = strategyAndPath.tail();
+        return tail.isEmpty() ? RestconfFuture.of(OptionsResult.READ_ONLY)
+            : strategyAndPath.strategy().operationsOPTIONS(request, tail);
     }
 
     @Override
