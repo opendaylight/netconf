@@ -46,8 +46,9 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
         NodeIdentifier.create(CreateNotificationStreamOutput.QNAME);
     private static final NodeIdentifier NOTIFICATIONS =
         NodeIdentifier.create(QName.create(CreateNotificationStreamInput.QNAME, "notifications").intern());
-    private static final NodeIdentifier STREAM_NAME_NODEID =
-        NodeIdentifier.create(QName.create(CreateNotificationStreamOutput.QNAME, "stream-name").intern());
+    private static final NodeIdentifier NOTIFICATION_STREAM_IDENTIFIER_NODEID =
+        NodeIdentifier.create(QName.create(CreateNotificationStreamOutput.QNAME, "notification-stream-identifier")
+            .intern());
 
     private final DatabindProvider databindProvider;
     private final DOMNotificationService notificationService;
@@ -107,7 +108,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
             new NotificationSource(databindProvider, notificationService, qnames), description.toString())
             .transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-                .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
+                .withChild(ImmutableNodes.leafNode(NOTIFICATION_STREAM_IDENTIFIER_NODEID, stream.name()))
                 .build());
     }
 }
