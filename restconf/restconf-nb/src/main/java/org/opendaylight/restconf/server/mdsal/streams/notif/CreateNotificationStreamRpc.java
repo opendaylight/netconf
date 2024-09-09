@@ -20,9 +20,9 @@ import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -43,11 +43,11 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = RpcImplementation.class)
 public final class CreateNotificationStreamRpc extends RpcImplementation {
     private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
-        NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
+        NodeIdentifier.create(CreateNotificationStreamOutput.QNAME);
     private static final NodeIdentifier NOTIFICATIONS =
         NodeIdentifier.create(QName.create(CreateNotificationStreamInput.QNAME, "notifications").intern());
     private static final NodeIdentifier STREAM_NAME_NODEID =
-        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
+        NodeIdentifier.create(QName.create(CreateNotificationStreamOutput.QNAME, "stream-name").intern());
 
     private final DatabindProvider databindProvider;
     private final DOMNotificationService notificationService;
