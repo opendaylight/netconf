@@ -27,6 +27,7 @@ class CapabilitiesWriterTest {
             "urn:ietf:params:restconf:capability:filter:1.0",
             "urn:ietf:params:restconf:capability:replay:1.0",
             "urn:ietf:params:restconf:capability:with-defaults:1.0",
+            "urn:ietf:params:restconf:capability:yang-patch:1.0",
             "urn:opendaylight:params:restconf:capability:pretty-print:1.0",
             "urn:opendaylight:params:restconf:capability:leaf-nodes-only:1.0",
             "urn:opendaylight:params:restconf:capability:changed-leaf-nodes-only:1.0",
