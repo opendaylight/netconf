@@ -16,6 +16,7 @@ import java.net.URI;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.CapabilityURN;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
@@ -90,7 +91,7 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "fields";
-    private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:fields:1.0");
+    private static final URI CAPABILITY = URI.create(CapabilityURN.FIELDS);
 
     private final ImmutableList<NodeSelector> nodeSelectors;
 
