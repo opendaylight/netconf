@@ -9,6 +9,7 @@ package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * OpenDaylight extension parameter. When used as {@code odl-leaf-nodes-only=true}, it will instruct the listener
@@ -19,8 +20,7 @@ public final class LeafNodesOnlyParam implements RestconfQueryParam<LeafNodesOnl
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "odl-leaf-nodes-only";
 
-    private static final @NonNull URI CAPABILITY =
-        URI.create("urn:opendaylight:params:restconf:capability:leaf-nodes-only:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.ODL_LEAF_NODES_ONLY);
     private static final @NonNull LeafNodesOnlyParam FALSE = new LeafNodesOnlyParam(false);
     private static final @NonNull LeafNodesOnlyParam TRUE = new LeafNodesOnlyParam(true);
 

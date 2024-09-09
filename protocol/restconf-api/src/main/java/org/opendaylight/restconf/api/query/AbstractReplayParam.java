@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
@@ -19,7 +20,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
  */
 public abstract sealed class AbstractReplayParam<T extends AbstractReplayParam<T>> implements RestconfQueryParam<T>
         permits StartTimeParam, StopTimeParam {
-    private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:replay:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.REPLAY);
 
     private final @NonNull DateAndTime value;
 

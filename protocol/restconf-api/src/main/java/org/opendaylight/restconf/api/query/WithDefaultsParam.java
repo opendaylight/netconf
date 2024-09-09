@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * Enumeration of possible {@code with-defaults} parameter values as defined by
@@ -38,7 +39,7 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     @SuppressWarnings("checkstyle:ConstantName")
     public static final @NonNull String uriName = "with-defaults";
 
-    private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:with-defaults:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.WITH_DEFAULTS);
 
     private final @NonNull String uriValue;
 

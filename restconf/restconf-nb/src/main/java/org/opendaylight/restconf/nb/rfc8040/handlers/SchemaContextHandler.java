@@ -26,16 +26,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.api.query.AbstractReplayParam;
-import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
-import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
-import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.api.query.FilterParam;
-import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
-import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.api.CapabilityURN;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
@@ -178,16 +169,16 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
                 .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
                 .withChild(Builders.<String>orderedLeafSetBuilder()
                     .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
-                    .withChildValue(DepthParam.capabilityUri().toString())
-                    .withChildValue(FieldsParam.capabilityUri().toString())
-                    .withChildValue(FilterParam.capabilityUri().toString())
-                    .withChildValue(AbstractReplayParam.capabilityUri().toString())
-                    .withChildValue(WithDefaultsParam.capabilityUri().toString())
-                    .withChildValue(PrettyPrintParam.capabilityUri().toString())
-                    .withChildValue(LeafNodesOnlyParam.capabilityUri().toString())
-                    .withChildValue(SkipNotificationDataParam.capabilityUri().toString())
-                    .withChildValue(ChangedLeafNodesOnlyParam.capabilityUri().toString())
-                    .withChildValue(ChildNodesOnlyParam.capabilityUri().toString())
+                    .withChildValue(CapabilityURN.DEPTH)
+                    .withChildValue(CapabilityURN.FIELDS)
+                    .withChildValue(CapabilityURN.FILTER)
+                    .withChildValue(CapabilityURN.REPLAY)
+                    .withChildValue(CapabilityURN.WITH_DEFAULTS)
+                    .withChildValue(CapabilityURN.ODL_PRETTY_PRINT)
+                    .withChildValue(CapabilityURN.ODL_LEAF_NODES_ONLY)
+                    .withChildValue(CapabilityURN.ODL_CHANGED_LEAF_NODES_ONLY)
+                    .withChildValue(CapabilityURN.ODL_SKIP_NOTIFICATION_DATA)
+                    .withChildValue(CapabilityURN.ODL_CHILD_NODES_ONLY)
                     .build())
                 .build())
             .build();

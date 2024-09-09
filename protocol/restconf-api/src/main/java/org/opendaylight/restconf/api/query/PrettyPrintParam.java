@@ -9,6 +9,7 @@ package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * OpenDaylight extension parameter. When used as {@code odl-pretty-print=true}, it will instruct outbound XML/JSON
@@ -19,8 +20,7 @@ public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintPar
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "odl-pretty-print";
 
-    private static final @NonNull URI CAPABILITY =
-        URI.create("urn:opendaylight:params:restconf:capability:pretty-print:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.ODL_PRETTY_PRINT);
     private static final @NonNull PrettyPrintParam FALSE = new PrettyPrintParam(false);
     private static final @NonNull PrettyPrintParam TRUE = new PrettyPrintParam(true);
 

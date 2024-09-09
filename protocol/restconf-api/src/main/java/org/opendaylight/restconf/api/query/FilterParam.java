@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * This class represents a {@code filter} parameter as defined in
@@ -22,7 +23,7 @@ public final class FilterParam implements RestconfQueryParam<FilterParam> {
     @SuppressWarnings("checkstyle:ConstantName")
     public static final @NonNull String uriName = "filter";
 
-    private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:filter:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.FILTER);
 
     // FIXME: can we have a parsed, but not bound version of an XPath, please?
     private final @NonNull String value;
