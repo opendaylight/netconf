@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
@@ -34,6 +35,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.ResourceBody;
@@ -120,6 +122,30 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             return;
         }
         data().getData(request, path, params);
+    }
+
+    @Override
+    public final void dataOPTIONS(final ServerRequest<OptionsResult> request) {
+        request.completeWith(isNonConfigContent(request) ? OptionsResult.READ_ONLY : OptionsResult.DATASTORE);
+    }
+
+    @Override
+    public final void dataOPTIONS(final ServerRequest<OptionsResult> request, final ApiPath apiPath) {
+        final InstanceReference path;
+        try {
+            path = pathNormalizer.normalizeDataOrActionPath(apiPath);
+        } catch (ServerException e) {
+            request.completeWith(e);
+            return;
+        }
+        request.completeWith(switch (path) {
+            case Action action -> OptionsResult.OPERATION;
+            case Data data -> isNonConfigContent(request) ? OptionsResult.READ_ONLY : OptionsResult.RESOURCE;
+        });
+    }
+
+    private static boolean isNonConfigContent(final ServerRequest<?> request) {
+        return ContentParam.NONCONFIG.paramValue().equals(request.queryParameters().lookup(ContentParam.uriName));
     }
 
     @Override
@@ -295,8 +321,19 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
     }
 
     @Override
-    public final void operationsGET(final ServerRequest<FormattableBody> request, final ApiPath apiPath) {
-        operations.httpGET(request, apiPath);
+    public final void operationsGET(final ServerRequest<FormattableBody> request, final ApiPath operation) {
+        operations.httpGET(request, operation);
+    }
+
+    @Override
+    public final void operationsOPTIONS(final ServerRequest<OptionsResult> request, final ApiPath operation) {
+        try {
+            pathNormalizer.normalizeRpcPath(operation);
+        } catch (ServerException e) {
+            request.completeWith(e);
+            return;
+        }
+        request.completeWith(OptionsResult.OPERATION);
     }
 
     @Override
