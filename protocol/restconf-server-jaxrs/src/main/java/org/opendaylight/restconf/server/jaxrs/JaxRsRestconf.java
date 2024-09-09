@@ -24,6 +24,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,6 +37,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -70,6 +72,7 @@ import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerError;
@@ -222,7 +225,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
-            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+            @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
         server.dataGET(newDataGet(uriInfo, sc, ar), identifier);
     }
 
@@ -250,6 +253,46 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         if (lastModified != null) {
             builder.lastModified(Date.from(lastModified));
         }
+    }
+
+    @OPTIONS
+    @Path("/data")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataOPTIONS(@Context final UriInfo uriInfo, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
+        server.dataOPTIONS(newOptions(uriInfo, sc, ar), ApiPath.empty());
+    }
+
+    @OPTIONS
+    @Path("/data/{identifier:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataOPTIONS(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
+            @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.dataOPTIONS(newOptions(uriInfo, sc, ar), identifier);
+    }
+
+    @NonNullByDefault
+    private JaxRsServerRequest<OptionsResult> newOptions(final UriInfo uriInfo, final SecurityContext sc,
+            final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
+            @Override
+            Response transform(final OptionsResult result) {
+                return switch (result) {
+                    case IMMUTABLE_DATASTORE, IMMMUTABLE_RESOURCE -> simple("GET, HEAD, OPTIONS");
+                    case MUTABLE_DATASTORE -> withPatch("GET, HEAD, OPTIONS, PATCH, POST, PUT");
+                    case MUTABLE_RESOURCE -> withPatch("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
+                    case OPERATION -> simple("OPTIONS, POST");
+                };
+            }
+
+            private static Response simple(final String allow) {
+                return Response.ok().header(HttpHeaders.ALLOW, allow).build();
+            }
+
+            private static Response withPatch(final String allow) {
+                return Response.ok().header(HttpHeaders.ALLOW, allow).build();
+            }
+        };
     }
 
     /**
@@ -728,6 +771,14 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void operationsGET(@PathParam("operation") final ApiPath operation, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, sc, ar), operation);
+    }
+
+    @OPTIONS
+    @Path("/operations/{identifier:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void operationsOPTIONS(@Encoded @PathParam("identifier") final ApiPath identifier,
+            @Context final UriInfo uriInfo, @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.operationsOPTIONS(newOptions(uriInfo, sc, ar), identifier);
     }
 
     /**
