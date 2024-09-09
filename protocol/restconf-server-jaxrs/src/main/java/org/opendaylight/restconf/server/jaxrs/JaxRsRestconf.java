@@ -24,6 +24,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,6 +37,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -70,6 +72,7 @@ import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerError;
@@ -222,7 +225,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
-            final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
+            @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
         server.dataGET(newDataGet(uriInfo, sc, ar), identifier);
     }
 
@@ -250,6 +253,53 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         if (lastModified != null) {
             builder.lastModified(Date.from(lastModified));
         }
+    }
+
+    @OPTIONS
+    @Path("/data")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataOPTIONS(@Context final UriInfo uriInfo, final @Context SecurityContext sc,
+            @Suspended final AsyncResponse ar) {
+        server.dataOPTIONS(newOptions(uriInfo, sc, ar));
+    }
+
+    @OPTIONS
+    @Path("/data/{identifier:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataOPTIONS(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
+            @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.dataOPTIONS(newOptions(uriInfo, sc, ar), identifier);
+    }
+
+    @NonNullByDefault
+    private JaxRsServerRequest<OptionsResult> newOptions(final UriInfo uriInfo, final SecurityContext sc,
+            final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
+            private static final String ACCEPT_PATCH = String.join(", ",
+                // RESTCONF-defined
+                MediaTypes.APPLICATION_YANG_DATA_JSON,
+                MediaTypes.APPLICATION_YANG_DATA_XML,
+                MediaTypes.APPLICATION_YANG_PATCH_JSON,
+                MediaTypes.APPLICATION_YANG_PATCH_XML,
+                // compatibility
+                MediaType.APPLICATION_JSON,
+                MediaType.APPLICATION_XML,
+                MediaType.TEXT_XML);
+
+            @Override
+            Response transform(final OptionsResult result) {
+                return switch (result) {
+                    case DATASTORE -> allowMethods("GET, HEAD, OPTIONS, PATCH, POST, PUT");
+                    case RESOURCE -> allowMethods("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
+                    case READ_ONLY -> allowGetHeadOptions();
+                    case OPERATION -> Response.ok().header(HttpHeaders.ALLOW, "OPTIONS, POST").build();
+                };
+            }
+
+            private static Response allowMethods(final String allow) {
+                return Response.ok().header(HttpHeaders.ALLOW, allow).header("Accept-Patch", ACCEPT_PATCH).build();
+            }
+        };
     }
 
     /**
@@ -730,6 +780,21 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, sc, ar), operation);
     }
 
+    @OPTIONS
+    @Path("/operations")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public Response operationsOPTIONS() {
+        return allowGetHeadOptions();
+    }
+
+    @OPTIONS
+    @Path("/operations/{operation:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void operationsOPTIONS(@Encoded @PathParam("operation") final ApiPath operation,
+            @Context final UriInfo uriInfo, @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
+        server.operationsOPTIONS(newOptions(uriInfo, sc, ar), operation);
+    }
+
     /**
      * Invoke RPC operation.
      *
@@ -823,6 +888,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, sc, ar));
     }
 
+    @OPTIONS
+    @Path("/yang-library-version")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public Response yangLibraryVersionOPTIONS() {
+        return allowGetHeadOptions();
+    }
+
     // FIXME: References to these resources are generated by our yang-library implementation. That means:
     //        - We really need to formalize the parameter structure so we get some help from JAX-RS during matching
     //          of three things:
@@ -908,6 +980,18 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         server.modulesYinGET(newModulesGET(sc, ar), mountPath, fileName, revision);
     }
 
+    @OPTIONS
+    @Path("/" + MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    public Response modulesOPTIONS(@Encoded @PathParam("mountPath") final ApiPath mountPath) {
+        return allowGetHeadOptions();
+    }
+
+    @OPTIONS
+    @Path("/" + MODULES_SUBPATH + "/{fileName : [^/]+}")
+    public Response modulesOPTIONS() {
+        return allowGetHeadOptions();
+    }
+
     @NonNullByDefault
     private JaxRsServerRequest<ModulesGetResult> newModulesGET(final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar) {
@@ -932,7 +1016,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
-    public void getSSE(@PathParam("encodingName") final EncodingName encodingName,
+    public void streamsGET(@PathParam("encodingName") final EncodingName encodingName,
             @PathParam("streamName") final String streamName, @Context final UriInfo uriInfo,
             @Context final SseEventSink sink, @Context final Sse sse) {
         final var stream = streamRegistry.lookupStream(streamName);
@@ -950,5 +1034,16 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         senderFactory.newSSESender(sink, sse, stream, encodingName, getParams);
+    }
+
+    @OPTIONS
+    @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public Response streamsOPTIONS(@PathParam("encodingName") final EncodingName encodingName) {
+        return allowGetHeadOptions();
+    }
+
+    private static @NonNull Response allowGetHeadOptions() {
+        return Response.ok().header(HttpHeaders.ALLOW, "GET, HEAD, OPTIONS").build();
     }
 }
