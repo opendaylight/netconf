@@ -146,6 +146,7 @@ public class SchemaContextHandlerTest {
         assertThat(
             capability.body().stream().map(entry -> ((LeafSetEntryNode<?>) entry).body()).collect(Collectors.toList()),
             containsInAnyOrder(
+                equalTo("urn:ietf:params:restconf:capability:defaults:1.0?basic-mode=explicit"),
                 equalTo("urn:ietf:params:restconf:capability:depth:1.0"),
                 equalTo("urn:ietf:params:restconf:capability:fields:1.0"),
                 equalTo("urn:ietf:params:restconf:capability:filter:1.0"),
