@@ -32,8 +32,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
@@ -85,11 +87,13 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         final var nodePath = nodePath();
         tx.put(LogicalDatastoreType.OPERATIONAL, nodePath, new NodeBuilder()
             .withKey(nodePath.getKey())
-            .addAugmentation(new NetconfNodeBuilder()
-                .setConnectionStatus(ConnectionStatus.Connecting)
-                .setHost(id.host())
-                .setCredentials(credentials)
-                .setPort(new PortNumber(Uint16.valueOf(id.address().getPort()))).build())
+            .addAugmentation(new NetconfNodeAugmentBuilder()
+                .setNetconfNode(new NetconfNodeBuilder()
+                    .setConnectionStatus(ConnectionStatus.Connecting)
+                    .setHost(id.host())
+                    .setCredentials(credentials)
+                    .setPort(new PortNumber(Uint16.valueOf(id.address().getPort()))).build())
+                .build())
             .build());
         LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, tx.getIdentifier());
         commitTransaction(tx, "init");
@@ -156,7 +160,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     }
 
     private @NonNull InstanceIdentifier<NetconfNode> netconfNodePath() {
-        return nodePath().augmentation(NetconfNode.class);
+        return nodePath().augmentation(NetconfNodeAugment.class).child(NetconfNode.class);
     }
 
     private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities,

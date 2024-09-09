@@ -44,7 +44,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240208.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.ProtocolBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -257,25 +258,27 @@ public final class CallHomeMountService implements AutoCloseable {
         // construct synthetic Node object with minimal required parameters
         return new NodeBuilder()
             .setNodeId(new NodeId(id))
-            .addAugmentation(new NetconfNodeBuilder()
-                .setHost(new Host(IetfInetUtil.ipAddressFor(nodeAddress.getAddress())))
-                .setPort(new PortNumber(Uint16.valueOf(nodeAddress.getPort())))
-                .setTcpOnly(false)
-                .setProtocol(protocol)
-                // below parameters are required for NetconfNodeHandler
-                .setSchemaless(config.schemaless())
-                .setReconnectOnChangedSchema(config.reconnect$_$on$_$changed$_$schema())
-                .setConnectionTimeoutMillis(Uint32.valueOf(config.connection$_$timeout$_$millis()))
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(config.request$_$timeout$_$millis()))
-                .setMaxConnectionAttempts(Uint32.valueOf(config.max$_$connection$_$attempts()))
-                .setMinBackoffMillis(Uint16.valueOf(config.min$_$backoff$_$millis()))
-                .setMaxBackoffMillis(Uint32.valueOf(config.max$_$backoff$_$millis()))
-                .setBackoffMultiplier(Decimal64.valueOf(config.backoff$_$multiplier(), RoundingMode.HALF_DOWN))
-                .setBackoffJitter(Decimal64.valueOf(config.backoff$_$jitter(), RoundingMode.HALF_DOWN))
-                .setKeepaliveDelay(Uint32.valueOf(config.keep$_$alive$_$delay()))
-                .setConcurrentRpcLimit(Uint16.valueOf(config.concurrent$_$rpc$_$limit()))
-                .setActorResponseWaitTime(Uint16.valueOf(config.actor$_$response$_$wait$_$time()))
-                .setLockDatastore(config.lock$_$datastore())
+            .addAugmentation(new NetconfNodeAugmentBuilder()
+                .setNetconfNode(new NetconfNodeBuilder()
+                    .setHost(new Host(IetfInetUtil.ipAddressFor(nodeAddress.getAddress())))
+                    .setPort(new PortNumber(Uint16.valueOf(nodeAddress.getPort())))
+                    .setTcpOnly(false)
+                    .setProtocol(protocol)
+                    // below parameters are required for NetconfNodeHandler
+                    .setSchemaless(config.schemaless())
+                    .setReconnectOnChangedSchema(config.reconnect$_$on$_$changed$_$schema())
+                    .setConnectionTimeoutMillis(Uint32.valueOf(config.connection$_$timeout$_$millis()))
+                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(config.request$_$timeout$_$millis()))
+                    .setMaxConnectionAttempts(Uint32.valueOf(config.max$_$connection$_$attempts()))
+                    .setMinBackoffMillis(Uint16.valueOf(config.min$_$backoff$_$millis()))
+                    .setMaxBackoffMillis(Uint32.valueOf(config.max$_$backoff$_$millis()))
+                    .setBackoffMultiplier(Decimal64.valueOf(config.backoff$_$multiplier(), RoundingMode.HALF_DOWN))
+                    .setBackoffJitter(Decimal64.valueOf(config.backoff$_$jitter(), RoundingMode.HALF_DOWN))
+                    .setKeepaliveDelay(Uint32.valueOf(config.keep$_$alive$_$delay()))
+                    .setConcurrentRpcLimit(Uint16.valueOf(config.concurrent$_$rpc$_$limit()))
+                    .setActorResponseWaitTime(Uint16.valueOf(config.actor$_$response$_$wait$_$time()))
+                    .setLockDatastore(config.lock$_$datastore())
+                    .build())
                 .build())
             .build();
     }
