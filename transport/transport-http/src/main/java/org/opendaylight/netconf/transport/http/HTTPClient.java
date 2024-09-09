@@ -7,9 +7,6 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -24,7 +21,9 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpClientUpgradeHandler;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.Http2ClientUpgradeCodec;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import io.netty.handler.ssl.ApplicationProtocolNames;
@@ -173,9 +172,10 @@ public final class HTTPClient extends HTTPTransportStack {
         return new ChannelInboundHandlerAdapter() {
             @Override
             public void channelActive(final ChannelHandlerContext ctx) throws Exception {
-                // trigger upgrade by simple GET request;
+                // Trigger upgrade with an OPTIONS request targetting the server itself, as per
+                // https://www.rfc-editor.org/rfc/rfc7231#section-4.3.7
                 // required headers and flow will be handled by HttpClientUpgradeHandler
-                ctx.writeAndFlush(new DefaultFullHttpRequest(HTTP_1_1, GET, "/", EMPTY_BUFFER));
+                ctx.writeAndFlush(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "*"));
                 ctx.fireChannelActive();
             }
 
