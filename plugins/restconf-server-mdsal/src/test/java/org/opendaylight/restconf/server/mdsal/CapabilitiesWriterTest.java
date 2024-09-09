@@ -22,6 +22,7 @@ class CapabilitiesWriterTest {
         final var entries = capability.body().stream().map(LeafSetEntryNode::body).toList();
         final var unique = Set.copyOf(entries);
         assertEquals(Set.of(
+            "urn:ietf:params:restconf:capability:defaults:1.0?basic-mode=explicit",
             "urn:ietf:params:restconf:capability:depth:1.0",
             "urn:ietf:params:restconf:capability:fields:1.0",
             "urn:ietf:params:restconf:capability:filter:1.0",
