@@ -28,7 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.protocol.specification.tls._case.TlsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @Service

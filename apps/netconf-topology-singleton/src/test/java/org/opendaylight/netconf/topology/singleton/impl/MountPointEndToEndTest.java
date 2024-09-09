@@ -111,8 +111,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.Co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.GetTopInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.GetTopOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.PutTopInputBuilder;
@@ -504,7 +506,8 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
                 assertTrue(node.isPresent());
-                final NetconfNode netconfNode = node.orElseThrow().augmentation(NetconfNode.class);
+                final NetconfNode netconfNode = node.orElseThrow().augmentation(NetconfNodeAugment.class)
+                    .getNetconfNode();
                 return netconfNode.getConnectionStatus() != ConnectionStatus.Connected;
             }
         });
@@ -628,7 +631,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static void writeNetconfNode(final String cacheDir, final DataBroker dataBroker) throws Exception {
         putData(dataBroker, NODE_INSTANCE_ID, new NodeBuilder()
             .withKey(NODE_INSTANCE_ID.getKey())
-            .addAugmentation(new NetconfNodeBuilder()
+            .addAugmentation(new NetconfNodeAugmentBuilder().setNetconfNode(new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(1234)))
                 .setActorResponseWaitTime(Uint16.valueOf(10))
@@ -645,7 +648,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                         .build())
                     .build())
                 .setSchemaCacheDirectory(cacheDir)
-                .build())
+                .build()).build())
             .build());
     }
 

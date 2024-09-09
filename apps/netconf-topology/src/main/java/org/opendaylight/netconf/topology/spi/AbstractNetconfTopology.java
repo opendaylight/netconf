@@ -25,7 +25,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -98,7 +98,8 @@ public abstract class AbstractNetconfTopology {
             LOG.info("RemoteDevice{{}} was already configured, disconnecting", nodeId);
             prev.close();
         }
-        final var netconfNode = node.augmentation(NetconfNode.class);
+        final var netconfNodeAugment = node.augmentation(NetconfNodeAugment.class);
+        final var netconfNode = netconfNodeAugment != null ? netconfNodeAugment.getNetconfNode() : null;
         if (netconfNode == null) {
             LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not connecting it", nodeId);
             return;
@@ -165,9 +166,10 @@ public abstract class AbstractNetconfTopology {
     @VisibleForTesting
     static final String hideCredentials(final Node nodeConfiguration) {
         final var nodeConfigurationString = nodeConfiguration.toString();
-        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
-        if (netconfNodeAugmentation != null && netconfNodeAugmentation.getCredentials() != null) {
-            final var nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
+        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNodeAugment.class);
+        final var netconfNode = netconfNodeAugmentation != null ? netconfNodeAugmentation.getNetconfNode() : null;
+        if (netconfNode != null && netconfNode.getCredentials() != null) {
+            final var nodeCredentials = netconfNode.getCredentials().toString();
             return nodeConfigurationString.replace(nodeCredentials, "***");
         }
         return nodeConfigurationString;

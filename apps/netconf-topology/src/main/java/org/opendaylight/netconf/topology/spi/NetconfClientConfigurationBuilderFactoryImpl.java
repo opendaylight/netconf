@@ -36,7 +36,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.KeyAuth;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;

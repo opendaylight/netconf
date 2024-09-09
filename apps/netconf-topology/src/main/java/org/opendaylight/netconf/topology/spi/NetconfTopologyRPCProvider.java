@@ -39,8 +39,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev24
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.DeleteDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.DeleteDeviceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.DeleteDeviceOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.RpcCredentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.rpc.credentials.KeyAuth;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.rpc.credentials.LoginPw;
@@ -134,11 +135,11 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     @VisibleForTesting
-    NetconfNode encryptPassword(final CreateDeviceInput input) {
+    NetconfNodeAugment encryptPassword(final CreateDeviceInput input) {
         final NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
-        return builder.setCredentials(translate(input.getRpcCredentials()))
-            .build();
+        builder.setCredentials(translate(input.getRpcCredentials()));
+        return new NetconfNodeAugmentBuilder().setNetconfNode(builder.build()).build();
     }
 
     private Credentials translate(final RpcCredentials credentialsRpc) {

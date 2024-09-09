@@ -104,11 +104,16 @@ module netconf-node-topology {
 
     augment "/nt:network-topology/nt:topology/nt:node" {
         when "../../nt:topology-types/topology-netconf";
-        ext:augment-identifier "netconf-node";
+        ext:augment-identifier "netconf-node-augment";
 
-        uses ond:credentials;
-        uses netconf-node-fields;
-        uses ond:connection-oper;
-        ext:mount;
+        container netconf-node {
+            presence "The presence of the container node indicates a NETCONF
+                      device";
+
+            uses ond:credentials;
+            uses netconf-node-fields;
+            uses ond:connection-oper;
+            ext:mount;
+        }
     }
 }

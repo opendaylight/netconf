@@ -44,7 +44,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240208.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.ProtocolBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -257,7 +258,7 @@ public final class CallHomeMountService implements AutoCloseable {
         // construct synthetic Node object with minimal required parameters
         return new NodeBuilder()
             .setNodeId(new NodeId(id))
-            .addAugmentation(new NetconfNodeBuilder()
+            .addAugmentation(new NetconfNodeAugmentBuilder().setNetconfNode(new NetconfNodeBuilder()
                 .setHost(new Host(IetfInetUtil.ipAddressFor(nodeAddress.getAddress())))
                 .setPort(new PortNumber(Uint16.valueOf(nodeAddress.getPort())))
                 .setTcpOnly(false)
@@ -276,7 +277,7 @@ public final class CallHomeMountService implements AutoCloseable {
                 .setConcurrentRpcLimit(Uint16.valueOf(config.concurrent$_$rpc$_$limit()))
                 .setActorResponseWaitTime(Uint16.valueOf(config.actor$_$response$_$wait$_$time()))
                 .setLockDatastore(config.lock$_$datastore())
-                .build())
+                .build()).build())
             .build();
     }
 

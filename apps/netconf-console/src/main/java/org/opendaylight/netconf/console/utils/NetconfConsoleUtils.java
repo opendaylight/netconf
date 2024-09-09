@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.console.utils;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +17,8 @@ import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.binding.DataObject;
@@ -51,7 +54,8 @@ public final class NetconfConsoleUtils {
                                                    final DataBroker db) {
         final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
         for (Node node : netconfNodes(topology)) {
-            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+            final NetconfNode netconfNode = requireNonNull(node.augmentation(NetconfNodeAugment.class))
+                .getNetconfNode();
             if (netconfNode != null && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)
                     && devicePort.equals(netconfNode.getPort().getValue().toString())) {
                 return node;

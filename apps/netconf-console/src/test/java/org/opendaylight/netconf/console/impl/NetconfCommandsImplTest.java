@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
@@ -33,8 +34,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -132,7 +134,8 @@ class NetconfCommandsImplTest {
 
             assertTrue(storedNode.isPresent());
 
-            final var storedNetconfNode = storedNode.orElseThrow().augmentation(NetconfNode.class);
+            final var storedNetconfNode = Objects.requireNonNull(storedNode.orElseThrow()
+                .augmentation(NetconfNodeAugment.class)).getNetconfNode();
             assertEquals(7777, storedNetconfNode.getPort().getValue().longValue());
             assertEquals("10.10.1.1", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
             return true;
@@ -179,7 +182,8 @@ class NetconfCommandsImplTest {
                 .findFirst();
             assertTrue(storedNode.isPresent());
 
-            final var storedNetconfNode = storedNode.orElseThrow().augmentation(NetconfNode.class);
+            final var storedNetconfNode = Objects.requireNonNull(storedNode.orElseThrow()
+                .augmentation(NetconfNodeAugment.class)).getNetconfNode();
             assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
             return true;
         });
@@ -202,7 +206,7 @@ class NetconfCommandsImplTest {
             final ConnectionStatus cs, final String notificationCapabilityPrefix) {
         return new NodeBuilder()
             .setNodeId(new NodeId(nodeIdent))
-            .addAugmentation(new NetconfNodeBuilder()
+            .addAugmentation(new NetconfNodeAugmentBuilder().setNetconfNode(new NetconfNodeBuilder()
                 .setConnectionStatus(cs)
                 .setHost(new Host(new IpAddress(new Ipv4Address(ip))))
                 .setPort(new PortNumber(Uint16.valueOf(portNumber)))
@@ -212,7 +216,7 @@ class NetconfCommandsImplTest {
                         .setCapability(notificationCapabilityPrefix + "_availableCapabilityString1")
                         .build()))
                     .build())
-                .build())
+                .build()).build())
             .build();
     }
 

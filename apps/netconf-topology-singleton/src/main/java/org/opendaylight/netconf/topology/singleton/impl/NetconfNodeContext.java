@@ -26,7 +26,7 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterAc
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +132,7 @@ final class NetconfNodeContext implements AutoCloseable {
     private void connectNode() {
         final var configNode = setup.getNode();
 
-        final var netconfNode = configNode.augmentation(NetconfNode.class);
+        final var netconfNode = requireNonNull(configNode.augmentation(NetconfNodeAugment.class)).getNetconfNode();
         final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
         requireNonNull(netconfNode.getHost());
@@ -156,7 +156,8 @@ final class NetconfNodeContext implements AutoCloseable {
 
     @VisibleForTesting
     MasterSalFacade createSalFacade(final boolean lockDatastore) {
-        return new MasterSalFacade(remoteDeviceId, requireNonNull(setup.getNode()).augmentation(NetconfNode.class)
+        return new MasterSalFacade(remoteDeviceId, requireNonNull(requireNonNull(setup.getNode())
+            .augmentation(NetconfNodeAugment.class)).getNetconfNode()
             .getCredentials(), setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
             mountPointService, setup.getDataBroker(), lockDatastore);
     }

@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.CreateDeviceInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.RpcCredentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.rpc.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.rpc.credentials.rpc.credentials.LoginPwUnencryptedBuilder;
@@ -67,7 +67,7 @@ class NetconfTopologyRPCProviderTest {
     @Test
     void testEncryptPassword() throws Exception {
         doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
-        final var encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
+        final var encryptedPwNode = rpcProvider.encryptPassword(getInput(true)).getNetconfNode();
         final var loginPw = assertInstanceOf(LoginPw.class, encryptedPwNode.getCredentials());
 
         assertArrayEquals(ENC_PWD.getBytes(), loginPw.getLoginPassword().getPassword());
@@ -75,7 +75,7 @@ class NetconfTopologyRPCProviderTest {
 
     @Test
     void testNoEncryption() {
-        final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(false));
+        final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(false)).getNetconfNode();
         final var loginPw = assertInstanceOf(LoginPwUnencrypted.class, encryptedPwNode.getCredentials());
 
         assertEquals(TEST_PWD, loginPw.getLoginPasswordUnencrypted().getPassword());

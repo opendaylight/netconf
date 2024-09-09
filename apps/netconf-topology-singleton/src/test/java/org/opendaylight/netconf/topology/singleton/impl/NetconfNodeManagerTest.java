@@ -74,8 +74,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.ConnectionOper.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.oper.ClusteredConnectionStatusBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -219,7 +220,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         // Invoke onDataTreeChanged with a NetconfNode WRITE to simulate the master writing the operational state to
         // Connected. Expect the slave mount point created and registered.
 
-        final NetconfNode netconfNode = newNetconfNode();
+        final NetconfNodeAugment netconfNode = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
@@ -282,9 +283,10 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         doNothing().when(mockMountPointReg).close();
 
         final Node updatedNode = new NodeBuilder().setNodeId(nodeId)
-                .addAugmentation(new NetconfNodeBuilder(netconfNode)
-                    .setConnectionStatus(ConnectionStatus.UnableToConnect)
-                    .build())
+                .addAugmentation(new NetconfNodeAugmentBuilder()
+                    .setNetconfNode(new NetconfNodeBuilder(netconfNode.getNetconfNode())
+                        .setConnectionStatus(ConnectionStatus.UnableToConnect)
+                        .build()).build())
                 .build();
 
         doReturn(SUBTREE_MODIFIED).when(mockDataObjModification).modificationType();
@@ -310,7 +312,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final InstanceIdentifier<Node> nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(
                 nodeKey, topologyId);
 
-        final NetconfNode netconfNode = newNetconfNode();
+        final NetconfNodeAugment netconfNode = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
@@ -365,14 +367,14 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         verify(mockMountPointReg, timeout(5000)).close();
     }
 
-    private NetconfNode newNetconfNode() {
-        return new NetconfNodeBuilder()
+    private NetconfNodeAugment newNetconfNode() {
+        return new NetconfNodeAugmentBuilder().setNetconfNode(new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setConnectionStatus(ConnectionStatus.Connected)
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
                         .setNetconfMasterNode(masterAddress).build())
-                .build();
+                .build()).build();
     }
 
     private void setupMountPointMocks() {

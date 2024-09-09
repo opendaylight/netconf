@@ -28,7 +28,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.ConnectionOper.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -98,9 +99,9 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> dataBroker.newReadWriteTransaction()
             .read(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID
                 .child(Node.class, new NodeKey(new NodeId(ID.name())))
-                .augmentation(NetconfNode.class))
+                .augmentation(NetconfNodeAugment.class))
             .get(5, TimeUnit.SECONDS)
-            .filter(conn -> conn.getConnectionStatus() == ConnectionStatus.UnableToConnect)
+            .filter(conn -> conn.getNetconfNode().getConnectionStatus() == ConnectionStatus.UnableToConnect)
             .isPresent());
     }
 
