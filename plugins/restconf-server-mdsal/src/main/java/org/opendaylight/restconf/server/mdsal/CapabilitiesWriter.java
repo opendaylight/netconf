@@ -184,6 +184,8 @@ public final class CapabilitiesWriter implements AutoCloseable, FutureCallback<E
     static @NonNull LeafSetNode<String> mapCapabilities() {
         return ImmutableNodes.<String>newSystemLeafSetBuilder()
             .withNodeIdentifier(CAPABILITY)
+            // Closest match to DOMDataBroker's semantics
+            .withChildValue(CapabilityURN.DEFAULTS + "?basic-mode=explicit")
             .withChildValue(CapabilityURN.DEPTH)
             .withChildValue(CapabilityURN.FIELDS)
             .withChildValue(CapabilityURN.FILTER)
