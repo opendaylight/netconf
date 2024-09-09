@@ -16,7 +16,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.cr
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev240611.YangModuleInfoImpl;
+import org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev240911.YangModuleInfoImpl;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -45,6 +45,8 @@ final class PayloadCreator {
     private static final QName TOPOLOGY_ID_QNAME = QName.create(Topology.QNAME, "topology-id").intern();
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
 
+    private static final NodeIdentifier NETCONF_NODE_IDENTIFIER =
+        NodeIdentifier.create(YangModuleInfoImpl.qnameOf("netconf-node"));
     private static final NodeIdentifier PORT_NODE_IDENTIFIER =
         NodeIdentifier.create(YangModuleInfoImpl.qnameOf("port"));
     private static final NodeIdentifier HOST_NODE_IDENTIFIER =
@@ -103,19 +105,22 @@ final class PayloadCreator {
         for (final Integer device : devices) {
             nodeBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, device + "-sim-device"))
-                .withChild(ImmutableNodes.leafNode(PORT_NODE_IDENTIFIER, Uint16.valueOf(device)))
-                .withChild(ImmutableNodes.leafNode(HOST_NODE_IDENTIFIER, parameters.generateConfigsAddress))
-                .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(CREDENTIALS_NODE_IDENTIFIER)
-                    .withChild(ImmutableNodes.newContainerBuilder()
-                        .withNodeIdentifier(LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER)
-                        .withChild(ImmutableNodes.leafNode(USERNAME_NODE_IDENTIFIER, DEFAULT_NODE_USERNAME))
-                        .withChild(ImmutableNodes.leafNode(PASSWORD_NODE_IDENTIFIER, DEFAULT_NODE_PASSWORD))
+                .withChild(ImmutableNodes.newContainerBuilder()
+                    .withNodeIdentifier((NETCONF_NODE_IDENTIFIER))
+                    .withChild(ImmutableNodes.leafNode(PORT_NODE_IDENTIFIER, Uint16.valueOf(device)))
+                    .withChild(ImmutableNodes.leafNode(HOST_NODE_IDENTIFIER, parameters.generateConfigsAddress))
+                    .withChild(ImmutableNodes.newChoiceBuilder()
+                        .withNodeIdentifier(CREDENTIALS_NODE_IDENTIFIER)
+                        .withChild(ImmutableNodes.newContainerBuilder()
+                            .withNodeIdentifier(LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER)
+                            .withChild(ImmutableNodes.leafNode(USERNAME_NODE_IDENTIFIER, DEFAULT_NODE_USERNAME))
+                            .withChild(ImmutableNodes.leafNode(PASSWORD_NODE_IDENTIFIER, DEFAULT_NODE_PASSWORD))
+                            .build())
                         .build())
+                    .withChild(ImmutableNodes.leafNode(TCP_ONLY_NODE_IDENTIFIER, !parameters.ssh))
+                    .withChild(ImmutableNodes.leafNode(KEEPALIVE_DELAY_NODE_IDENTIFIER, DEFAULT_NODE_KEEPALIVE_DELAY))
+                    .withChild(ImmutableNodes.leafNode(SCHEMALESS_NODE_IDENTIFIER, DEFAULT_NODE_SCHEMALESS))
                     .build())
-                .withChild(ImmutableNodes.leafNode(TCP_ONLY_NODE_IDENTIFIER, !parameters.ssh))
-                .withChild(ImmutableNodes.leafNode(KEEPALIVE_DELAY_NODE_IDENTIFIER, DEFAULT_NODE_KEEPALIVE_DELAY))
-                .withChild(ImmutableNodes.leafNode(SCHEMALESS_NODE_IDENTIFIER, DEFAULT_NODE_SCHEMALESS))
                 .build());
         }
 
