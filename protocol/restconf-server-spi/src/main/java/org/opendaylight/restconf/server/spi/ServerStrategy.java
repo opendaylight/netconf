@@ -25,6 +25,7 @@ import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -67,6 +68,12 @@ public interface ServerStrategy {
      * @param path resource identifier
      */
     void dataGET(ServerRequest<DataGetResult> request, ApiPath path);
+
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    void dataOPTIONS(final ServerRequest<OptionsResult> request);
+
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    void dataOPTIONS(final ServerRequest<OptionsResult> request, ApiPath path);
 
     /**
      * Merge data into the configuration datastore, as outlined in
@@ -168,6 +175,10 @@ public interface ServerStrategy {
      */
     @NonNullByDefault
     void operationsGET(ServerRequest<FormattableBody> request, ApiPath operation);
+
+    @NonNullByDefault
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    void operationsOPTIONS(final ServerRequest<OptionsResult> request, ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in
