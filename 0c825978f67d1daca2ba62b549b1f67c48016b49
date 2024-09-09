@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ea9fd30_53270fa7",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-09T09:23:49Z",
+      "side": 1,
+      "message": "this is part of setup, not test\nmove it where it to beforeEach()",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 78
+      },
+      "revId": "0c825978f67d1daca2ba62b549b1f67c48016b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
