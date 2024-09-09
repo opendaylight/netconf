@@ -174,6 +174,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
                     .withChildValue(CapabilityURN.FILTER)
                     .withChildValue(CapabilityURN.REPLAY)
                     .withChildValue(CapabilityURN.WITH_DEFAULTS)
+                    .withChildValue(CapabilityURN.YANG_PATCH)
                     .withChildValue(CapabilityURN.ODL_PRETTY_PRINT)
                     .withChildValue(CapabilityURN.ODL_LEAF_NODES_ONLY)
                     .withChildValue(CapabilityURN.ODL_CHANGED_LEAF_NODES_ONLY)
