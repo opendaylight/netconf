@@ -64,8 +64,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -191,12 +192,14 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final InstanceIdentifier<Node> nodeInstanceId2 = NetconfTopologyUtils.createTopologyNodeListPath(
                 new NodeKey(nodeId2), TOPOLOGY_ID);
 
-        final NetconfNode netconfNode1 = new NetconfNodeBuilder()
+        final NetconfNodeAugment netconfNodeAugment1 = new NetconfNodeAugmentBuilder()
+            .setNetconfNode(new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(1111)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
-                .build();
-        final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(netconfNode1).build();
+                .build())
+            .build();
+        final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(netconfNodeAugment1).build();
 
         final DataObjectModification<Node> dataObjectModification1 = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification1).modificationType();
@@ -204,12 +207,14 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1)))
                 .when(dataObjectModification1).step();
 
-        final NetconfNode netconfNode2 = new NetconfNodeBuilder()
+        final NetconfNodeAugment netconfNodeAugment2 = new NetconfNodeAugmentBuilder()
+            .setNetconfNode(new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(2222)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
-                .build();
-        final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(netconfNode2).build();
+                .build())
+            .build();
+        final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(netconfNodeAugment2).build();
 
         final DataObjectModification<Node> dataObjectModification2 = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification2).modificationType();
@@ -250,8 +255,10 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         // Notify of Node 1 replaced and Node 2 subtree modified.
         mockContextMap.clear();
 
-        final NetconfNode updatedNetconfNode1 = new NetconfNodeBuilder(netconfNode1)
-                .setPort(new PortNumber(Uint16.valueOf(33333))).build();
+        final NetconfNodeAugment updatedNetconfNode1 = new NetconfNodeAugmentBuilder()
+            .setNetconfNode(new NetconfNodeBuilder(netconfNodeAugment1.getNetconfNode())
+                .setPort(new PortNumber(Uint16.valueOf(33333))).build())
+            .build();
         final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(updatedNetconfNode1).build();
 
         doReturn(WRITE).when(dataObjectModification1).modificationType();
@@ -336,10 +343,12 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         final Node node = new NodeBuilder()
                 .setNodeId(nodeId)
-                .addAugmentation(new NetconfNodeBuilder()
-                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                    .setPort(new PortNumber(Uint16.valueOf(10)))
-                    .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
+                .addAugmentation(new NetconfNodeAugmentBuilder()
+                    .setNetconfNode(new NetconfNodeBuilder()
+                        .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                        .setPort(new PortNumber(Uint16.valueOf(10)))
+                        .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
+                        .build())
                     .build())
                 .build();
 
