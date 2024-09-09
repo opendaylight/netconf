@@ -22,7 +22,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             final ServiceGroupIdentifier serviceGroupIdent, final NetconfTopologySetup setup) {
         this.serviceGroupIdent = requireNonNull(serviceGroupIdent);
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),
-                setup.getNode().augmentation(NetconfNode.class));
+                requireNonNull(setup.getNode().augmentation(NetconfNodeAugment.class)).getNetconfNode());
 
         topologySingleton = new NetconfNodeContext(setup, schemaManager, mountPointService, builderFactory,
             deviceActionFactory, remoteDeviceId, actorResponseWaitTime);
@@ -82,7 +82,8 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     void refresh(final @NonNull NetconfTopologySetup setup) {
         final var node = requireNonNull(setup).getNode();
-        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(),
+            requireNonNull(node.augmentation(NetconfNodeAugment.class)).getNetconfNode());
 
         final var singleton = getTopologySingleton();
         if (isMaster) {
