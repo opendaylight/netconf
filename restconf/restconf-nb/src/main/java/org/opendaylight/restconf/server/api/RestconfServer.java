@@ -136,7 +136,7 @@ public interface RestconfServer {
     /*
      * Return the details about a particular operation supported by
      * {@link #operationsPOST(URI, String, OperationInputBody)}, as expressed in the
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84">ietf-restconfig.yang</a>
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84">ietf-restconf.yang</a>
      * {@code container operations} statement.
      *
      * @param request {@link ServerRequest} for this request
