@@ -9,6 +9,7 @@ package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * OpenDaylight extension parameter. When used as {@code odl-child-nodes-only=true}, it will instruct the listener
@@ -19,8 +20,7 @@ public final class ChildNodesOnlyParam implements RestconfQueryParam<ChildNodesO
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "odl-child-nodes-only";
 
-    private static final @NonNull URI CAPABILITY =
-        URI.create("urn:opendaylight:params:restconf:capability:child-nodes-only:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.ODL_CHILD_NODES_ONLY);
     private static final @NonNull ChildNodesOnlyParam FALSE = new ChildNodesOnlyParam(false);
     private static final @NonNull ChildNodesOnlyParam TRUE = new ChildNodesOnlyParam(true);
 
