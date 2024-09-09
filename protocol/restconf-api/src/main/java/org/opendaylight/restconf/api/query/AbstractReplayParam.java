@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.CapabilityURN;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
@@ -24,7 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
  */
 public abstract sealed class AbstractReplayParam<T extends AbstractReplayParam<T>> implements RestconfQueryParam<T>
         permits StartTimeParam, StopTimeParam {
-    private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:replay:1.0");
+    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.REPLAY);
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
         .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
         .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
