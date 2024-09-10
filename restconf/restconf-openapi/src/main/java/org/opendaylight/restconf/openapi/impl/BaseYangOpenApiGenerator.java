@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
@@ -40,11 +40,11 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final int width, final int depth,
+    public OpenApiInputStream getControllerModulesDoc(final URI uri, final int width, final int depth,
             final int offset, final int limit) throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
-        final var schema = createSchemaFromUriInfo(uriInfo);
-        final var host = createHostFromUriInfo(uriInfo);
+        final var schema = createSchemaFromUri(uri);
+        final var host = createHostFromUri(uri);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
@@ -61,14 +61,14 @@ public abstract class BaseYangOpenApiGenerator {
             configModulesList(modulesWithoutDuplications).size());
     }
 
-    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
+    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final URI uri,
             final int width, final int depth) throws IOException {
         final var modelContext = schemaService.getGlobalContext();
         Preconditions.checkState(modelContext != null);
-        return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME, width, depth);
+        return getApiDeclaration(module, revision, uri, modelContext, "", CONTROLLER_RESOURCE_NAME, width, depth);
     }
 
-    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final URI uri,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
             final int width, final int depth) throws IOException {
         final Optional<Revision> rev;
@@ -83,8 +83,8 @@ public abstract class BaseYangOpenApiGenerator {
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        final var schema = createSchemaFromUriInfo(uriInfo);
-        final var host = createHostFromUriInfo(uriInfo);
+        final var schema = createSchemaFromUri(uri);
+        final var host = createHostFromUri(uri);
         final var title = module.getName();
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
@@ -93,17 +93,17 @@ public abstract class BaseYangOpenApiGenerator {
             modules, basePath, width, depth);
     }
 
-    public String createHostFromUriInfo(final UriInfo uriInfo) {
+    public String createHostFromUri(final URI uri) {
         String portPart = "";
-        final int port = uriInfo.getBaseUri().getPort();
+        final int port = uri.getPort();
         if (port != -1) {
             portPart = ":" + port;
         }
-        return uriInfo.getBaseUri().getHost() + portPart;
+        return uri.getHost() + portPart;
     }
 
-    public String createSchemaFromUriInfo(final UriInfo uriInfo) {
-        return uriInfo.getBaseUri().getScheme();
+    public String createSchemaFromUri(final URI uri) {
+        return uri.getScheme();
     }
 
     public abstract String getBasePath();
