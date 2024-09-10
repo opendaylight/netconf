@@ -50,7 +50,8 @@ public final class WebInitializer implements AutoCloseable {
                 .servlet(servletSupport.createHttpServletBuilder(new Application() {
                     @Override
                     public Set<Object> getSingletons() {
-                        return Set.of(openApiService, new OpenApiBodyWriter(new JsonFactoryBuilder().build()));
+                        return Set.of(new JaxRsOpenApiEndpoint(openApiService),
+                            new OpenApiBodyWriter(new JsonFactoryBuilder().build()));
                     }
                 }).build())
                 .addUrlPattern("/api/v3/*")
