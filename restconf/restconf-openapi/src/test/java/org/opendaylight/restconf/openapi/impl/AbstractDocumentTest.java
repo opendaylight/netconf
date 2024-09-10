@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,10 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
-import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -68,12 +63,10 @@ abstract class AbstractDocumentTest {
 
     protected static String getAllModulesDoc(final int width, final int depth, final int offset,
             final int limit) throws Exception {
-        final var getAllController = createMockUriInfo(URI + "single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, width, depth, offset, limit)
-            .getEntity();
+        final var controllerDocAll = openApiService.getAllModulesDoc(new URI(URI + "single"), width, depth, offset,
+            limit);
 
-        return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(controllerDocAll.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {
@@ -81,44 +74,23 @@ abstract class AbstractDocumentTest {
         if (revision != null) {
             uri = uri + "(" + revision + ")";
         }
-        final var getModuleController = createMockUriInfo(uri);
-        final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, getModuleController, 0, 0);
+        final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0);
 
-        return new String(((OpenApiInputStream) controllerDocModule.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(controllerDocModule.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static String getMountDoc(final int width, final int depth, final int offset,
             final int limit) throws Exception {
-        final var getAllDevice = createMockUriInfo(URI + "mounts/1");
-        when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, width, depth, offset, limit);
+        final var deviceDocAll = openApiService.getMountDoc("1", new URI(URI + "mounts/1"), width, depth, offset,
+            limit);
 
-        return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(deviceDocAll.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
-        final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
-        final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice, 0, 0);
+        final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision,
+            new URI(URI + "mounts/1/" + moduleName), 0, 0);
 
-        return new String(((OpenApiInputStream) deviceDoc.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
-    }
-
-    protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
-        final var uri = new URI(urlPrefix);
-        final var mockBuilder = mock(UriBuilder.class);
-
-        final var subStringCapture = ArgumentCaptor.forClass(String.class);
-        when(mockBuilder.path(subStringCapture.capture())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).then(invocation -> java.net.URI.create(uri + "/" + subStringCapture.getValue()));
-
-        final var info = mock(UriInfo.class);
-        when(info.getRequestUriBuilder()).thenReturn(mockBuilder);
-        when(mockBuilder.replaceQuery(any())).thenReturn(mockBuilder);
-        when(info.getBaseUri()).thenReturn(uri);
-
-        return info;
+        return new String(deviceDoc.readAllBytes(), StandardCharsets.UTF_8);
     }
 }
