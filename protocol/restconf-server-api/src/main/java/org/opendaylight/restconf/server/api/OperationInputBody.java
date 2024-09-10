@@ -18,6 +18,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.MandatoryLeafEnforcer;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 
 /**
  * Access to an {code rpc}'s or an {@code action}'s input.
@@ -36,6 +38,19 @@ public abstract sealed class OperationInputBody extends RequestBody
      * @throws ServerException when an I/O error occurs
      */
     public final @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws ServerException {
+        final var container = toContainerNodeImpl(path);
+        final var enforcer = MandatoryLeafEnforcer.forContainer((DataNodeContainer) path.inputStatement(), true);
+        if (enforcer != null) {
+            try {
+                enforcer.enforceOnData(container);
+            } catch (IllegalArgumentException e) {
+                throw new ServerException(e);
+            }
+        }
+        return container;
+    }
+
+    private @NonNull ContainerNode toContainerNodeImpl(final @NonNull OperationPath path) throws ServerException {
         try (var is = new PushbackInputStream(consume())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
