@@ -11,16 +11,18 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
+import java.net.URI;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.openapi.model.DocumentEntity;
+import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
@@ -34,8 +36,8 @@ import org.osgi.service.component.annotations.Reference;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
-@Component
 @Singleton
+@Component(service = OpenApiService.class)
 public final class OpenApiServiceImpl implements OpenApiService {
     private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
@@ -62,72 +64,54 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
-            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
-            throws IOException {
-        final var entity = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, unboxOrZero(width),
-            unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
-        return Response.ok(entity).build();
+    public DocumentEntity getAllModulesDoc(final URI uri, final @Nullable Integer width, final @Nullable Integer depth,
+            final @Nullable Integer offset, final @Nullable Integer limit) throws IOException {
+        return openApiGeneratorRFC8040.getControllerModulesDoc(uri, unboxOrZero(width), unboxOrZero(depth),
+            unboxOrZero(offset), unboxOrZero(limit));
     }
 
     @Override
-    public Response getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
+    public MetadataEntity getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final var metaStream = openApiGeneratorRFC8040.getControllerModulesMeta(unboxOrZero(offset), unboxOrZero(limit));
-        return Response.ok(metaStream).build();
+        return openApiGeneratorRFC8040.getControllerModulesMeta(unboxOrZero(offset), unboxOrZero(limit));
     }
 
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
     @Override
-    public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
+    public DocumentEntity getDocByModule(final String module, final String revision, final URI uri,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final var entity = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, unboxOrZero(width),
-            unboxOrZero(depth));
-        return Response.ok(entity).build();
-    }
-
-    /**
-     * Redirects to embedded swagger ui.
-     */
-    @Override
-    public Response getApiExplorer(final UriInfo uriInfo) {
-        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../../explorer/index.html").build()).build();
+        return openApiGeneratorRFC8040.getApiDeclaration(module, revision, uri, unboxOrZero(width), unboxOrZero(depth));
     }
 
     @Override
-    public Response getListOfMounts(final UriInfo uriInfo) {
-        final var entity = mountPointOpenApiRFC8040
-            .getInstanceIdentifiers().entrySet().stream()
+    public List<MountPointInstance> getListOfMounts() {
+        return mountPointOpenApiRFC8040.getInstanceIdentifiers().entrySet().stream()
             .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
             .collect(Collectors.toList());
-        return Response.ok(entity).build();
     }
 
     @Override
-    public Response getMountDocByModule(final String instanceNum, final String module, final String revision,
-            final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
-            revision, unboxOrZero(width), unboxOrZero(depth));
-        return Response.ok(entity).build();
+    public DocumentEntity getMountDocByModule(final String instanceNum, final String module, final String revision,
+            final URI uri, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
+        return mountPointOpenApiRFC8040.getMountPointApi(uri, Long.parseLong(instanceNum), module, revision,
+            unboxOrZero(width), unboxOrZero(depth));
     }
 
     @Override
-    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
+    public DocumentEntity getMountDoc(final String instanceNum, final URI uri, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-            unboxOrZero(width), unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
-        return Response.ok(entity).build();
+        return mountPointOpenApiRFC8040.getMountPointApi(uri, Long.parseLong(instanceNum), unboxOrZero(width),
+            unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
     }
 
     @Override
-    public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
+    public MetadataEntity getMountMeta(final String instanceNum, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
-        final var entity = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
-            unboxOrZero(offset), unboxOrZero(limit));
-        return Response.ok(entity).build();
+        return mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum), unboxOrZero(offset),
+            unboxOrZero(limit));
     }
 
     private static int unboxOrZero(final @Nullable Integer value) {
