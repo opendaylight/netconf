@@ -12,12 +12,12 @@ import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -65,44 +65,41 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
+    public OpenApiInputStream getAllModulesDoc(final URI uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
+        return openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
             requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
             requireNonNullElse(limit, 0));
-        return Response.ok(stream).build();
     }
 
     @Override
-    public Response getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
+    public MetadataStream getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final var metaStream = openApiGeneratorRFC8040.getControllerModulesMeta(requireNonNullElse(offset, 0),
+        return openApiGeneratorRFC8040.getControllerModulesMeta(requireNonNullElse(offset, 0),
             requireNonNullElse(limit, 0));
-        return Response.ok(metaStream).build();
     }
 
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
     @Override
-    public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
+    public OpenApiInputStream getDocByModule(final String module, final String revision, final URI uriInfo,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo,
+        return openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo,
             requireNonNullElse(width, 0), requireNonNullElse(depth, 0));
-        return Response.ok(stream).build();
     }
 
     /**
      * Redirects to embedded swagger ui.
      */
     @Override
-    public Response getApiExplorer(final UriInfo uriInfo) {
-        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../../explorer/index.html").build()).build();
+    public URI getApiExplorer(final URI uriInfo) throws URISyntaxException {
+        return new URI("../../explorer/index.html");
     }
 
     @Override
-    public Response getListOfMounts(final UriInfo uriInfo) {
+    public Response getListOfMounts(final URI uriInfo) {
         final List<MountPointInstance> entity = mountPointOpenApiRFC8040
                 .getInstanceIdentifiers().entrySet().stream()
                 .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
@@ -111,31 +108,26 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getMountDocByModule(final String instanceNum, final String module,
-            final String revision, final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
+    public OpenApiInputStream getMountDocByModule(final String instanceNum, final String module,
+            final String revision, final URI uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision,
-                requireNonNullElse(width, 0),requireNonNullElse(depth, 0));
-        return Response.ok(stream).build();
+        return mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision,
+            requireNonNullElse(width, 0),requireNonNullElse(depth, 0));
     }
 
     @Override
-    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
+    public OpenApiInputStream getMountDoc(final String instanceNum, final URI uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-                requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
-                requireNonNullElse(limit, 0));
-        return Response.ok(stream).build();
+        return mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
+            requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
+            requireNonNullElse(limit, 0));
     }
 
     @Override
-    public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
+    public MetadataStream getMountMeta(final String instanceNum, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
-        final var metaStream = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
+        return mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
                 requireNonNullElse(offset, 0), requireNonNullElse(limit, 0));
-        return Response.ok(metaStream).build();
     }
 }

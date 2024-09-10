@@ -5,14 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.openapi.api;
+package org.opendaylight.restconf.openapi.jaxrs;
 
 import com.google.common.collect.ImmutableCollection;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import org.opendaylight.restconf.openapi.impl.MetadataStream;
-import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -21,7 +26,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
-public interface OpenApiService {
+@Path("/")
+public interface JaxRsOpenApiService {
 
     /**
      * Generate OpenAPI specification document.
@@ -45,7 +51,7 @@ public interface OpenApiService {
      * or negative value, the response will contain empty OpenAPI document. Same if user uses negative value for
      * {@code limit}.
      *
-     * @param uriInfo Requests {@link URI}.
+     * @param uriInfo Requests {@link UriInfo}.
      * @param width Width is the number of child nodes processed for each module/node. This means that for example with
      *      width=3 we will process schema only for first 3 nodes in each module and each node that we process after.
      *      Value set to 0 or lesser means ignore width and to process all child nodes of a YANG module.
@@ -59,9 +65,12 @@ public interface OpenApiService {
      *      {@code limit}, with number child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
-
-    OpenApiInputStream getAllModulesDoc(URI uriInfo,Integer width, Integer depth, Integer offset, Integer limit)
-        throws IOException;
+    @GET
+    @Path("/single")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getAllModulesDoc(@Context UriInfo uriInfo, @QueryParam("width") Integer width,
+            @QueryParam("depth") Integer depth, @QueryParam("offset") Integer offset,
+            @QueryParam("limit") Integer limit) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the controller schema context.
@@ -80,30 +89,44 @@ public interface OpenApiService {
      * @return Response containing the metadata document for ui implementation of pagination.
      * @throws IOException When I/O error occurs.
      */
-    MetadataStream getAllModulesMeta(Integer offset, Integer limit) throws IOException;
+    @GET
+    @Path("/single/meta")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getAllModulesMeta(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+            throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
-    OpenApiInputStream getDocByModule(String module, String revision, URI uriInfo, Integer width, Integer depth)
-        throws IOException;
+    @GET
+    @Path("/{module}")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getDocByModule(@PathParam("module") String module, @QueryParam("revision") String revision,
+                            @Context UriInfo uriInfo, @QueryParam("width") Integer width,
+                            @QueryParam("depth") Integer depth) throws IOException;
 
     /**
      * Redirects to embedded swagger ui.
      */
-    URI getApiExplorer(URI uriInfo) throws URISyntaxException;
+    @GET
+    @Path("/ui")
+    @Produces(MediaType.TEXT_HTML)
+    Response getApiExplorer(@Context UriInfo uriInfo);
 
     /**
      * Generates index document for Swagger UI. This document lists out all
      * modules with link to get APIs for each module. The API for each module is
      * served by <code> getDocByModule()</code> method.
      */
-    Response getListOfMounts( URI uriInfo);
+    @GET
+    @Path("/mounts")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getListOfMounts(@Context UriInfo uriInfo);
 
     /**
      * Generate OpenAPI specification document listing APIs for module.
      *
-     * @param uriInfo Requests {@link URI}.
+     * @param uriInfo Requests {@link UriInfo}.
      * @param width Width is the number of child nodes processed for each module/node. This means that for example with
      *      width=3 we will process schema only for first 3 nodes in each module and each node that we process after.
      *      Value set to 0 or lesser means ignore width and to process all child nodes of a YANG module.
@@ -115,8 +138,13 @@ public interface OpenApiService {
      *      {@code width}.
      * @throws IOException When I/O error occurs.
      */
-    OpenApiInputStream getMountDocByModule(String instanceNum,
-        String module, String revision, URI uriInfo, Integer width, Integer depth) throws IOException;
+    @GET
+    @Path("/mounts/{instance}/{module}")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountDocByModule(@PathParam("instance") String instanceNum,
+                                 @PathParam("module") String module, @QueryParam("revision") String revision,
+                                 @Context UriInfo uriInfo, @QueryParam("width") Integer width,
+                                 @QueryParam("depth") Integer depth) throws IOException;
 
     /**
      * Generate OpenAPI specification document listing APIs for all modules of mount point.
@@ -141,7 +169,7 @@ public interface OpenApiService {
      * {@code limit}.
      *
      * @param instanceNum Instance number of the mount point.
-     * @param uriInfo Requests {@link URI}.
+     * @param uriInfo Requests {@link UriInfo}.
      * @param width Width is the number of child nodes processed for each module/node. This means that for example with
      *      width=3 we will process schema only for first 3 nodes in each module and each node that we process after.
      *      Value set to 0 or lesser means ignore width and to process all child nodes of a YANG module.
@@ -155,8 +183,12 @@ public interface OpenApiService {
      *      and {@code limit} with number child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
-    OpenApiInputStream getMountDoc(String instanceNum, URI uriInfo, Integer width, Integer depth, Integer offset,
-        Integer limit) throws IOException;
+    @GET
+    @Path("/mounts/{instance}")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
+            @QueryParam("width") Integer width, @QueryParam("depth") Integer depth,
+            @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the mount point schema context.
@@ -175,5 +207,9 @@ public interface OpenApiService {
      * @return Response containing the metadata document for ui implementation of pagination.
      * @throws IOException When I/O error occurs.
      */
-    MetadataStream getMountMeta(String instanceNum, Integer offset, Integer limit) throws IOException;
+    @GET
+    @Path("/mounts/{instance}/meta")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountMeta(@PathParam("instance") String instanceNum, @QueryParam("offset") Integer offset,
+            @QueryParam("limit") Integer limit) throws IOException;
 }

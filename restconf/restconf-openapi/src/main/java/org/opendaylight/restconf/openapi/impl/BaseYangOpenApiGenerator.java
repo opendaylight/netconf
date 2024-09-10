@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -39,7 +39,7 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final int width, final int depth,
+    public OpenApiInputStream getControllerModulesDoc(final URI uriInfo, final int width, final int depth,
             final int offset, final int limit) throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
@@ -60,14 +60,14 @@ public abstract class BaseYangOpenApiGenerator {
             configModulesList(modulesWithoutDuplications).size());
     }
 
-    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
+    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final URI uriInfo,
             final int width, final int depth) throws IOException {
         final var modelContext = schemaService.getGlobalContext();
         Preconditions.checkState(modelContext != null);
         return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME, width, depth);
     }
 
-    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final URI uriInfo,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
             final int width, final int depth) throws IOException {
         final Optional<Revision> rev;
@@ -92,17 +92,17 @@ public abstract class BaseYangOpenApiGenerator {
             modules, basePath, width, depth);
     }
 
-    public String createHostFromUriInfo(final UriInfo uriInfo) {
+    public String createHostFromUriInfo(final URI uriInfo) {
         String portPart = "";
-        final int port = uriInfo.getBaseUri().getPort();
+        final int port = uriInfo.getPort();
         if (port != -1) {
             portPart = ":" + port;
         }
-        return uriInfo.getBaseUri().getHost() + portPart;
+        return uriInfo.getHost() + portPart;
     }
 
-    public String createSchemaFromUriInfo(final UriInfo uriInfo) {
-        return uriInfo.getBaseUri().getScheme();
+    public String createSchemaFromUriInfo(final URI uriInfo) {
+        return uriInfo.getScheme();
     }
 
     public abstract String getBasePath();
