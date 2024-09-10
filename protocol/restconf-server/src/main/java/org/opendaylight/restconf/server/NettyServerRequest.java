@@ -14,8 +14,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.security.Principal;
-import java.util.function.Function;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -24,39 +22,38 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
 @NonNullByDefault
-final class NettyServerRequest<T> extends MappingServerRequest<T> {
+abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
     private final RequestParameters requestParameters;
     private final FutureCallback<FullHttpResponse> callback;
-    private final Function<T, FullHttpResponse> transformer;
 
-    NettyServerRequest(final RequestParameters requestParameters,
-            final FutureCallback<FullHttpResponse> callback, final Function<T, FullHttpResponse> transformer) {
+    NettyServerRequest(final RequestParameters requestParameters, final FutureCallback<FullHttpResponse> callback) {
         super(requestParameters.queryParameters(), requestParameters.defaultPrettyPrint(),
             requestParameters.errorTagMapping());
         this.requestParameters = requireNonNull(requestParameters);
         this.callback = requireNonNull(callback);
-        this.transformer = requireNonNull(transformer);
     }
 
     @Override
-    public @Nullable Principal principal() {
+    public final @Nullable Principal principal() {
         return requestParameters.principal();
     }
 
     @Override
-    protected void onSuccess(final @NonNull T result) {
-        callback.onSuccess(transformer.apply(result));
+    protected final void onSuccess(final T result) {
+        callback.onSuccess(transform(result));
     }
 
     @Override
-    protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
+    protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
         callback.onSuccess(responseBuilder(requestParameters, HttpResponseStatus.valueOf(status.code()))
             .setBody(body).build());
     }
 
     @Override
-    public @Nullable TransportSession session() {
+    public final @Nullable TransportSession session() {
         // FIXME: return the correct NettyTransportSession
         return null;
     }
+
+    abstract FullHttpResponse transform(T result);
 }
