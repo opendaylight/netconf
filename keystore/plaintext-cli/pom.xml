@@ -39,8 +39,14 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.karaf.tooling</groupId>
-                <artifactId>karaf-services-maven-plugin</artifactId>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Karaf-Commands>org.opendaylight.netconf.keystore.plaintext.cli</Karaf-Commands>
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
     </build>
