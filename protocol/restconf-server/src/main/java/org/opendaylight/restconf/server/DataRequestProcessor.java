@@ -14,7 +14,6 @@ import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
 import static org.opendaylight.restconf.server.RequestUtils.requestBody;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.responseStatus;
-import static org.opendaylight.restconf.server.ResponseUtils.simpleErrorResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.simpleResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErrorResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTypeErrorResponse;
@@ -48,9 +47,6 @@ import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Static request processor serving RESTCONF and Yang-Patch requests for data resource.
@@ -59,8 +55,6 @@ import org.slf4j.LoggerFactory;
  * Section 3.3.1. {+restconf}/data</a>
  */
 final class DataRequestProcessor {
-    private static final Logger LOG = LoggerFactory.getLogger(DataRequestProcessor.class);
-
     private DataRequestProcessor() {
         // hidden on purpose
     }
@@ -146,22 +140,18 @@ final class DataRequestProcessor {
 
     private static <T extends DataPostResult> ServerRequest<T> postRequest(final RequestParameters params,
             final FutureCallback<FullHttpResponse> callback) {
-        return new NettyServerRequest<>(params, callback, result -> {
-            if (result instanceof CreateResourceResult createResult) {
+        return new NettyServerRequest<>(params, callback, result -> switch (result) {
+            case CreateResourceResult createResult -> {
                 final var location = params.baseUri() + PathParameters.DATA + "/" + createResult.createdPath();
-                return responseBuilder(params, HttpResponseStatus.CREATED)
+                yield responseBuilder(params, HttpResponseStatus.CREATED)
                     .setHeader(HttpHeaderNames.LOCATION, location)
                     .setMetadataHeaders(createResult).build();
             }
-            if (result instanceof InvokeResult invokeResult) {
+            case InvokeResult invokeResult -> {
                 final var output = invokeResult.output();
-                return output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
+                yield output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
                     : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
             }
-            // below is not expected
-            LOG.error("Unexpected response {}", result);
-            return simpleErrorResponse(params, ErrorTag.OPERATION_FAILED,
-                "Internal error. See server logs for details");
         });
     }
 

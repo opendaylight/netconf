@@ -575,21 +575,21 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
             Response transform(final DataPostResult result) {
-                if (result instanceof CreateResourceResult createResource) {
-                    final var builder = Response.created(uriInfo.getBaseUriBuilder()
-                        .path("data")
-                        .path(createResource.createdPath().toString())
-                        .build());
-                    fillConfigurationMetadata(builder, createResource);
-                    return builder.build();
-                }
-                if (result instanceof InvokeResult invokeOperation) {
-                    final var output = invokeOperation.output();
-                    return output == null ? Response.noContent().build()
-                        : Response.ok().entity(new JaxRsFormattableBody(output, prettyPrint())).build();
-                }
-                LOG.error("Unhandled result {}", result);
-                return Response.serverError().build();
+                return switch (result) {
+                    case CreateResourceResult createResource -> {
+                        final var builder = Response.created(uriInfo.getBaseUriBuilder()
+                            .path("data")
+                            .path(createResource.createdPath().toString())
+                            .build());
+                        fillConfigurationMetadata(builder, createResource);
+                        yield builder.build();
+                    }
+                    case InvokeResult invokeOperation -> {
+                        final var output = invokeOperation.output();
+                        yield output == null ? Response.noContent().build()
+                            : Response.ok().entity(new JaxRsFormattableBody(output, prettyPrint())).build();
+                    }
+                };
             }
         };
     }
