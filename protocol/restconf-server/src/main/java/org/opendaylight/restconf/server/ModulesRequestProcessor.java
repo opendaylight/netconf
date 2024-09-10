@@ -66,9 +66,12 @@ final class ModulesRequestProcessor {
 
     private static void getYangLibraryVersion(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
-        final var request = new NettyServerRequest<FormattableBody>(params, callback,
-            result -> responseBuilder(params, HttpResponseStatus.OK).setBody(result).build());
-        service.yangLibraryVersionGET(request);
+        service.yangLibraryVersionGET(new NettyServerRequest<>(params, callback) {
+            @Override
+            FullHttpResponse transform(final FormattableBody result) {
+                return responseBuilder(params, HttpResponseStatus.OK).setBody(result).build();
+            }
+        });
     }
 
     private static void getModule(final RequestParameters params, final RestconfServer service,
@@ -104,17 +107,19 @@ final class ModulesRequestProcessor {
 
     private static ServerRequest<ModulesGetResult> getModuleRequest(final RequestParameters params,
             final FutureCallback<FullHttpResponse> callback, final AsciiString mediaType) {
-        return new NettyServerRequest<>(params, callback,
-            result -> {
+        return new NettyServerRequest<>(params, callback) {
+            @Override
+            FullHttpResponse transform(final ModulesGetResult result) {
                 final byte[] bytes;
                 try {
                     bytes = result.source().asByteSource(StandardCharsets.UTF_8).read();
                 } catch (IOException e) {
                     throw new ServerErrorException(ErrorTag.OPERATION_FAILED,
-                       SOURCE_READ_FAILURE_ERROR + e.getMessage(), e);
+                        SOURCE_READ_FAILURE_ERROR + e.getMessage(), e);
                 }
                 return simpleResponse(params, HttpResponseStatus.OK, mediaType, bytes);
-            });
+            }
+        };
     }
 
     private static ModuleFile extractModuleFile(final String path) {

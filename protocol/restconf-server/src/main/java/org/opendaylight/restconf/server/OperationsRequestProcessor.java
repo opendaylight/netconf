@@ -56,8 +56,12 @@ final class OperationsRequestProcessor {
 
     private static void getOperations(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<FormattableBody>(params, callback,
-            result -> responseBuilder(params, HttpResponseStatus.OK).setBody(result).build());
+        final var request = new NettyServerRequest<FormattableBody>(params, callback) {
+            @Override
+            FullHttpResponse transform(final FormattableBody result) {
+                return responseBuilder(params, HttpResponseStatus.OK).setBody(result).build();
+            }
+        };
         if (apiPath.isEmpty()) {
             service.operationsGET(request);
         } else {
@@ -67,13 +71,13 @@ final class OperationsRequestProcessor {
 
     private static void postOperations(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<InvokeResult>(params, callback,
-            result -> {
+        service.operationsPOST(new NettyServerRequest<>(params, callback) {
+            @Override
+            FullHttpResponse transform(final InvokeResult result) {
                 final var output = result.output();
                 return output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
                     : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
-            });
-        final var operationInputBody = requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new);
-        service.operationsPOST(request, params.baseUri(), apiPath, operationInputBody);
+            }
+        }, params.baseUri(), apiPath, requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new));
     }
 }

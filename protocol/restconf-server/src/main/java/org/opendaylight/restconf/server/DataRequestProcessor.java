@@ -24,11 +24,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
-import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
@@ -116,10 +114,15 @@ final class DataRequestProcessor {
 
     private static void getData(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataGetResult>(params, callback,
-            result -> responseBuilder(params, HttpResponseStatus.OK)
-                .setHeader(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE)
-                .setMetadataHeaders(result).setBody(result.body()).build());
+        final var request = new NettyServerRequest<DataGetResult>(params, callback) {
+            @Override
+            FullHttpResponse transform(final DataGetResult result) {
+                return responseBuilder(params, HttpResponseStatus.OK)
+                    .setHeader(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE)
+                    .setMetadataHeaders(result).setBody(result.body()).build();
+            }
+        };
+
         if (apiPath.isEmpty()) {
             service.dataGET(request);
         } else {
@@ -130,38 +133,45 @@ final class DataRequestProcessor {
     private static void postData(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
         if (apiPath.isEmpty()) {
-            final ChildBody childBody = requestBody(params, JsonChildBody::new, XmlChildBody::new);
-            service.dataPOST(postRequest(params, callback), childBody);
+            service.dataPOST(postRequest(params, callback), requestBody(params, JsonChildBody::new, XmlChildBody::new));
         } else {
-            final DataPostBody dataPostBody = requestBody(params, JsonDataPostBody::new, XmlDataPostBody::new);
-            service.dataPOST(postRequest(params, callback), apiPath, dataPostBody);
+            service.dataPOST(postRequest(params, callback), apiPath,
+                requestBody(params, JsonDataPostBody::new, XmlDataPostBody::new));
         }
     }
 
     private static <T extends DataPostResult> ServerRequest<T> postRequest(final RequestParameters params,
             final FutureCallback<FullHttpResponse> callback) {
-        return new NettyServerRequest<>(params, callback, result -> switch (result) {
-            case CreateResourceResult createResult -> {
-                final var location = params.baseUri() + PathParameters.DATA + "/" + createResult.createdPath();
-                yield responseBuilder(params, HttpResponseStatus.CREATED)
-                    .setHeader(HttpHeaderNames.LOCATION, location)
-                    .setMetadataHeaders(createResult).build();
+        return new NettyServerRequest<>(params, callback) {
+            @Override
+            FullHttpResponse transform(final DataPostResult result) {
+                return switch (result) {
+                    case CreateResourceResult createResult -> {
+                        yield responseBuilder(params, HttpResponseStatus.CREATED)
+                            .setHeader(HttpHeaderNames.LOCATION,
+                                params.baseUri() + PathParameters.DATA + "/" + createResult.createdPath())
+                            .setMetadataHeaders(createResult)
+                            .build();
+                    }
+                    case InvokeResult invokeResult -> {
+                        final var output = invokeResult.output();
+                        yield output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
+                            : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
+                    }
+                };
             }
-            case InvokeResult invokeResult -> {
-                final var output = invokeResult.output();
-                yield output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
-                    : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
-            }
-        });
+        };
     }
 
     private static void putData(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataPutResult>(params, callback,
-            result -> {
+        final var request = new NettyServerRequest<DataPutResult>(params, callback) {
+            @Override
+            FullHttpResponse transform(final DataPutResult result) {
                 final var status = result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT;
                 return responseBuilder(params, status).setMetadataHeaders(result).build();
-            });
+            }
+        };
         final var dataResourceBody = requestBody(params, JsonResourceBody::new, XmlResourceBody::new);
         if (apiPath.isEmpty()) {
             service.dataPUT(request, dataResourceBody);
@@ -172,8 +182,12 @@ final class DataRequestProcessor {
 
     private static void patchData(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataPatchResult>(params, callback, result ->
-            responseBuilder(params, HttpResponseStatus.OK).setMetadataHeaders(result).build());
+        final var request = new NettyServerRequest<DataPatchResult>(params, callback) {
+            @Override
+            FullHttpResponse transform(final DataPatchResult result) {
+                return responseBuilder(params, HttpResponseStatus.OK).setMetadataHeaders(result).build();
+            }
+        };
         final var dataResourceBody = requestBody(params, JsonResourceBody::new, XmlResourceBody::new);
         if (apiPath.isEmpty()) {
             service.dataPATCH(request, dataResourceBody);
@@ -184,14 +198,16 @@ final class DataRequestProcessor {
 
     private static void yangPatchData(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataYangPatchResult>(params, callback,
-            result -> {
+        final var request = new NettyServerRequest<DataYangPatchResult>(params, callback) {
+            @Override
+            FullHttpResponse transform(final DataYangPatchResult result) {
                 final var patchStatus = result.status();
-                final var status = patchResponseStatus(patchStatus, params.errorTagMapping());
-                return responseBuilder(params, status)
+                return responseBuilder(params, patchResponseStatus(patchStatus, params.errorTagMapping()))
                     .setBody(new YangPatchStatusBody(patchStatus))
-                    .setMetadataHeaders(result).build();
-            });
+                    .setMetadataHeaders(result)
+                    .build();
+            }
+        };
         final var yangPatchBody = requestBody(params, JsonPatchBody::new, XmlPatchBody::new);
         if (apiPath.isEmpty()) {
             service.dataPATCH(request, yangPatchBody);
@@ -222,8 +238,11 @@ final class DataRequestProcessor {
 
     private static void deleteData(final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<Empty>(params, callback,
-            result -> simpleResponse(params, HttpResponseStatus.NO_CONTENT));
-        service.dataDELETE(request, apiPath);
+        service.dataDELETE(new NettyServerRequest<>(params, callback) {
+            @Override
+            FullHttpResponse transform(final Empty result) {
+                return simpleResponse(params, HttpResponseStatus.NO_CONTENT);
+            }
+        }, apiPath);
     }
 }
