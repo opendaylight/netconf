@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,11 +17,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Optional;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
-import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -74,10 +67,10 @@ abstract class AbstractDocumentTest {
             AbstractDocumentTest.class.getClassLoader().getResourceAsStream(jsonPath)));
     }
 
-    protected static String getAllModulesDoc(final int width, final int depth, final int offset,
-            final int limit) throws Exception {
-        final var getAllController = createMockUriInfo(URI + "single");
-        return assertOpenApiEntity(openApiService.getAllModulesDoc(getAllController, width, depth, offset, limit));
+    protected static String getAllModulesDoc(final int width, final int depth, final int offset, final int limit)
+            throws Exception {
+        return assertOpenApiEntity(openApiService.getAllModulesDoc(new URI(URI + "single"), width, depth, offset,
+            limit));
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {
@@ -85,40 +78,21 @@ abstract class AbstractDocumentTest {
         if (revision != null) {
             uri = uri + "(" + revision + ")";
         }
-        final var getModuleController = createMockUriInfo(uri);
-        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, getModuleController, 0, 0));
+        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0));
     }
 
-    protected static String getMountDoc(final int width, final int depth, final int offset,
-            final int limit) throws Exception {
-        final var getAllDevice = createMockUriInfo(URI + "mounts/1");
-        when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        return assertOpenApiEntity(openApiService.getMountDoc(1, getAllDevice, width, depth, offset, limit));
+    protected static String getMountDoc(final int width, final int depth, final int offset, final int limit)
+            throws Exception {
+        return assertOpenApiEntity(openApiService.getMountDoc(1, new URI(URI + "mounts/1"), width, depth, offset,
+            limit));
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
-        final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
-        return assertOpenApiEntity(openApiService.getMountDocByModule(1, moduleName, revision, getDevice, 0, 0));
+        return assertOpenApiEntity(openApiService.getMountDocByModule(1, moduleName, revision,
+            new URI(URI + "mounts/1/" + moduleName), 0, 0));
     }
 
-    protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
-        final var uri = new URI(urlPrefix);
-        final var mockBuilder = mock(UriBuilder.class);
-
-        final var subStringCapture = ArgumentCaptor.forClass(String.class);
-        when(mockBuilder.path(subStringCapture.capture())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).then(invocation -> java.net.URI.create(uri + "/" + subStringCapture.getValue()));
-
-        final var info = mock(UriInfo.class);
-        when(info.getRequestUriBuilder()).thenReturn(mockBuilder);
-        when(mockBuilder.replaceQuery(any())).thenReturn(mockBuilder);
-        when(info.getBaseUri()).thenReturn(uri);
-
-        return info;
-    }
-
-    private static String assertOpenApiEntity(final Response response) {
-        final var entity = assertInstanceOf(DocumentEntity.class, response.getEntity());
+    private static String assertOpenApiEntity(final DocumentEntity entity) {
         final var sw = new StringWriter();
         try (var generator = JSON_FACTORY.createGenerator(sw)) {
             entity.generate(generator);
