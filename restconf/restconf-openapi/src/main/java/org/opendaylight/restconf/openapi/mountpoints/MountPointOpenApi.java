@@ -12,13 +12,13 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -125,8 +125,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-            final String revision, final int width, final int depth) throws IOException  {
+    public DocumentEntity getMountPointApi(final URI uri, final Long id, final String module, final String revision,
+            final int width, final int depth) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext modelContext = getModelContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -137,13 +137,13 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreOpenApi(modelContext, uriInfo, urlPrefix, deviceName, width, depth);
+            return generateDataStoreOpenApi(modelContext, uri, urlPrefix, deviceName, width, depth);
         }
-        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, modelContext, urlPrefix, deviceName,
+        return openApiGenerator.getApiDeclaration(module, revision, uri, modelContext, urlPrefix, deviceName,
             width, depth);
     }
 
-    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final Long id, final int width, final int depth,
+    public DocumentEntity getMountPointApi(final URI uri, final Long id, final int width, final int depth,
             final int offset, final int limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
@@ -158,8 +158,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var modulesWithoutDuplications = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
         final var portionOfModules = BaseYangOpenApiGenerator.getModelsSublist(modulesWithoutDuplications,
             offset, limit);
-        final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
-        final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
+        final var schema = openApiGenerator.createSchemaFromUri(uri);
+        final var host = openApiGenerator.createHostFromUri(uri);
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
@@ -186,11 +186,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private DocumentEntity generateDataStoreOpenApi(final EffectiveModelContext modelContext,
-            final UriInfo uriInfo, final String urlPrefix, final String deviceName, final int width,
-            final int depth) throws IOException {
-        final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
-        final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
+    private DocumentEntity generateDataStoreOpenApi(final EffectiveModelContext modelContext, final URI uri,
+            final String urlPrefix, final String deviceName, final int width, final int depth) throws IOException {
+        final var schema = openApiGenerator.createSchemaFromUri(uri);
+        final var host = openApiGenerator.createHostFromUri(uri);
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
         final var modules = BaseYangOpenApiGenerator.getModulesWithoutDuplications(modelContext);
