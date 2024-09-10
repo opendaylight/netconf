@@ -12,13 +12,13 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -124,7 +124,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+    public OpenApiInputStream getMountPointApi(final URI uriInfo, final Long id, final String module,
             final String revision, final int width, final int depth) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext modelContext = getModelContext(iid);
@@ -142,7 +142,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             width, depth);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final int width,
+    public OpenApiInputStream getMountPointApi(final URI uriInfo, final Long id, final int width,
             final int depth, final int offset, final int limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
@@ -186,7 +186,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private OpenApiInputStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
-            final UriInfo uriInfo, final String urlPrefix, final String deviceName, final int width,
+            final URI uriInfo, final String urlPrefix, final String deviceName, final int width,
             final int depth) throws IOException {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
