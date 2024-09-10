@@ -28,6 +28,10 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc6991-ietf-yang-types</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc8341</artifactId>
         </dependency>
         <dependency>
