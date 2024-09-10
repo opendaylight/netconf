@@ -20,7 +20,6 @@ import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -40,7 +39,7 @@ public final class WebInitializer implements AutoCloseable {
     @Inject
     @Activate
     public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
-            @Reference final ServletSupport servletSupport, @Reference final OpenApiService openApiService)
+            @Reference final ServletSupport servletSupport, @Reference final JaxRsOpenApiService openApiService)
                 throws ServletException {
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")

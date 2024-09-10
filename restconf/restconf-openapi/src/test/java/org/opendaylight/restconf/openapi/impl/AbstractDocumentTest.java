@@ -69,11 +69,10 @@ abstract class AbstractDocumentTest {
     protected static String getAllModulesDoc(final int width, final int depth, final int offset,
             final int limit) throws Exception {
         final var getAllController = createMockUriInfo(URI + "single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, width, depth, offset, limit)
-            .getEntity();
+        final var controllerDocAll = openApiService.getAllModulesDoc(new URI(URI + "single"), width, depth, offset,
+            limit);
 
-        return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(controllerDocAll.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {
@@ -82,28 +81,27 @@ abstract class AbstractDocumentTest {
             uri = uri + "(" + revision + ")";
         }
         final var getModuleController = createMockUriInfo(uri);
-        final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, getModuleController, 0, 0);
+        final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0);
 
-        return new String(((OpenApiInputStream) controllerDocModule.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(controllerDocModule.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static String getMountDoc(final int width, final int depth, final int offset,
             final int limit) throws Exception {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, width, depth, offset, limit);
+        final var deviceDocAll = openApiService.getMountDoc("1", new URI(URI + "mounts/1"), width, depth, offset,
+            limit);
 
-        return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(deviceDocAll.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
         final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
-        final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice, 0, 0);
+        final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision,
+            new URI(URI + "mounts/1/" + moduleName), 0, 0);
 
-        return new String(((OpenApiInputStream) deviceDoc.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return new String(deviceDoc.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
