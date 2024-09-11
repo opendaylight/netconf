@@ -1,0 +1,8 @@
+module mount-point-2 {
+    namespace "mount:point:2";
+    prefix "point2";
+    revision "2016-01-01";
+
+    container cont {
+    }
+}
