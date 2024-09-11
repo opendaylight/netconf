@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc5a58f3_2eab79f7",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-11T08:21:41Z",
+      "side": 0,
+      "message": "Maybe we can assume that previous revision has been \"published\" so this should be new revision, for example 2024-09-11?",
+      "revId": "df59413f635c5202f49c9382d2b23a945708e927",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
