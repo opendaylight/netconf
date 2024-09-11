@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3fe323e_58b5d9ac",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/RestconfOperationsOptionsTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-11T16:03:18Z",
+      "side": 1,
+      "message": "currently GET and HEAD are supported for operations with apiPath example\n`$ curl -v -u admin:admin -X GET http://localhost:8181/rests/operations/sal-remote:create-notification-stream`",
+      "revId": "c80729e343168c534d520b299bfe44e252f7f157",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
