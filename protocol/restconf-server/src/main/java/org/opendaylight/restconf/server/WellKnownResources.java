@@ -94,7 +94,7 @@ final class WellKnownResources {
 
     private static FullHttpResponse getResponse(final HttpVersion version, final AsciiString contentType,
             final ByteBuf content) {
-        return setContentHeaders(new DefaultFullHttpResponse(version, HttpResponseStatus.OK, content),
+        return setContentHeaders(new DefaultFullHttpResponse(version, HttpResponseStatus.OK, content.slice()),
             contentType, content);
     }
 
