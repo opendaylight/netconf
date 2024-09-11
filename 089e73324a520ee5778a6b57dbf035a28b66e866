@@ -16,6 +16,23 @@
       "message": "We are working onhttps://git.opendaylight.org/gerrit/c/netconf/+/113482",
       "revId": "089e73324a520ee5778a6b57dbf035a28b66e866",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "434a8e04_21dc0289",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-11T08:19:54Z",
+      "side": 1,
+      "message": "This means that we prefer to complete another solution before just reverting this.",
+      "revId": "089e73324a520ee5778a6b57dbf035a28b66e866",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
