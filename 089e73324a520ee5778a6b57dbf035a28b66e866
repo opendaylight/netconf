@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53644d2d_aa3ace14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-09-11T07:49:57Z",
+      "side": 1,
+      "message": "We are working onhttps://git.opendaylight.org/gerrit/c/netconf/+/113482",
+      "revId": "089e73324a520ee5778a6b57dbf035a28b66e866",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
