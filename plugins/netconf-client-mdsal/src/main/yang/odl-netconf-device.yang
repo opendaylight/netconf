@@ -1,7 +1,6 @@
 module odl-netconf-device {
   namespace "urn:opendaylight:netconf:device";
   prefix "ond";
-  yang-version 1.1;
 
   description
     "Common groupings for describing configuration and operational status
@@ -9,11 +8,6 @@ module odl-netconf-device {
 
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
-
-  revision 2024-06-11 {
-    description "Update the YANG model to version 1.1 and modify the credentials
-      choice within the credentials grouping to be mandatory";
-  }
 
   revision 2024-03-19 {
     description "Added key-id to TLS connection-parameters.";
@@ -84,7 +78,6 @@ module odl-netconf-device {
 
   grouping credentials {
     choice credentials {
-      mandatory true;
       config true;
       case login-pw {
         description "login-password credentials, encrypted.";

@@ -36,9 +36,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.LoginPwUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
@@ -78,12 +76,7 @@ class NetconfDeviceTopologyAdapterTest {
 
         doReturn(mockChain).when(mockBroker).createMergingTransactionChain();
         doNothing().when(mockChain).addCallback(listeners.capture());
-        adapter = new NetconfDeviceTopologyAdapter(mockBroker, TEST_TOPOLOGY_ID, id, new LoginPwUnencryptedBuilder()
-            .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
-                .setUsername("testuser")
-                .setPassword("testpassword")
-                .build())
-            .build());
+        adapter = new NetconfDeviceTopologyAdapter(mockBroker, TEST_TOPOLOGY_ID, id);
     }
 
     @Test

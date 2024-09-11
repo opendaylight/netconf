@@ -23,9 +23,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -117,8 +116,7 @@ public abstract class AbstractNetconfTopology {
 
         // Instantiate the handler ...
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
-        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
-            netconfNode.requireLockDatastore());
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
 
         final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
             schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
@@ -151,9 +149,8 @@ public abstract class AbstractNetconfTopology {
         activeConnectors.clear();
     }
 
-    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final Credentials credentials,
-            final boolean lockDatastore) {
-        return new NetconfTopologyDeviceSalFacade(deviceId, credentials,  mountPointService, lockDatastore, dataBroker);
+    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
+        return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
     /**

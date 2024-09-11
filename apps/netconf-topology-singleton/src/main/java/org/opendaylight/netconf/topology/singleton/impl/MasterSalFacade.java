@@ -34,7 +34,6 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.Credentials;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
@@ -65,7 +64,6 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
      * the master actor to update device data and manage session preferences.
      *
      * @param id                    the unique identifier for the remote device
-     * @param credentials           the credentials used to authenticate the remote device
      * @param actorSystem           the Actor system for managing actors
      * @param masterActorRef        the reference to the master actor responsible for this device
      * @param actorResponseWaitTime the timeout duration to wait for responses from the actor
@@ -74,7 +72,6 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
      * @param lockDatastore         a flag indicating whether the datastore should be locked
      */
     MasterSalFacade(final RemoteDeviceId id,
-                    final Credentials credentials,
                     final ActorSystem actorSystem,
                     final ActorRef masterActorRef,
                     final Timeout actorResponseWaitTime,
@@ -88,8 +85,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.lockDatastore = lockDatastore;
 
-        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id,
-            credentials);
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id);
     }
 
     @Override
