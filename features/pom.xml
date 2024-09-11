@@ -34,7 +34,6 @@
         <module>odl-netconf-model-rfc5277</module>
 
         <module>odl-aaa-netconf-plugin</module>
-        <module>odl-restconf-openapi</module>
         <module>odl-netconf-all</module>
         <module>odl-netconf-api</module>
         <module>odl-netconf-callhome-ssh</module>
@@ -55,10 +54,13 @@
         <module>odl-netconf-transport-api</module>
         <module>odl-netconf-truststore</module>
         <module>odl-netconf-util</module>
-        <module>odl-restconf-all</module>
-        <module>odl-restconf-common</module>
         <module>odl-restconf</module>
+        <module>odl-restconf-all</module>
+        <module>odl-restconf-api</module>
+        <module>odl-restconf-common</module>
         <module>odl-restconf-nb</module>
+        <module>odl-restconf-openapi</module>
+        <module>odl-restconf-server-api</module>
         <module>odl-yanglib-mdsal-writer</module>
     </modules>
 </project>
