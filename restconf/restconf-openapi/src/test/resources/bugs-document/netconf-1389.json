@@ -1,0 +1,406 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "version" : "1.0.0",
+    "title" : "netconf-1389",
+    "description" : "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8181/"
+  } ],
+  "paths" : {
+    "/rests/data" : {
+      "post" : {
+        "description" : "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary" : "POST - Controller - netconf-1389 - netconf-1389",
+        "requestBody" : {
+          "description" : "cntr",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "properties" : {
+                  "cntr" : {
+                    "$ref" : "#/components/schemas/netconf-1389_cntr",
+                    "type" : "object"
+                  }
+                }
+              }
+            },
+            "application/xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/netconf-1389_cntr"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ ]
+      }
+    },
+    "/rests/data/netconf-1389:cntr" : {
+      "post" : {
+        "description" : "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary" : "POST - Controller - netconf-1389 - cntr",
+        "requestBody" : {
+          "description" : "lst",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "properties" : {
+                  "lst" : {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/components/schemas/netconf-1389_cntr_lst",
+                      "type" : "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/netconf-1389_cntr_lst"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ ]
+      },
+      "put" : {
+        "description" : "",
+        "summary" : "PUT - netconf-1389 - Controller - cntr",
+        "requestBody" : {
+          "description" : "cntr",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "properties" : {
+                  "netconf-1389:cntr" : {
+                    "$ref" : "#/components/schemas/netconf-1389_cntr",
+                    "type" : "object"
+                  }
+                }
+              }
+            },
+            "application/xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/netconf-1389_cntr"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "204" : {
+            "description" : "Updated"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ ]
+      },
+      "patch" : {
+        "description" : "",
+        "summary" : "PATCH - netconf-1389 - Controller - cntr",
+        "requestBody" : {
+          "description" : "cntr",
+          "content" : {
+            "application/yang-data+json" : {
+              "schema" : {
+                "properties" : {
+                  "netconf-1389:cntr" : {
+                    "$ref" : "#/components/schemas/netconf-1389_cntr",
+                    "type" : "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/netconf-1389_cntr"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "204" : {
+            "description" : "Updated"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ ]
+      },
+      "delete" : {
+        "description" : "",
+        "summary" : "DELETE - Controller - netconf-1389 - cntr",
+        "responses" : {
+          "204" : {
+            "description" : "Deleted"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ ]
+      },
+      "get" : {
+        "description" : "",
+        "summary" : "GET - Controller - netconf-1389 - cntr",
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/xml" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/netconf-1389_cntr"
+                }
+              },
+              "application/json" : {
+                "schema" : {
+                  "properties" : {
+                    "cntr" : {
+                      "$ref" : "#/components/schemas/netconf-1389_cntr",
+                      "type" : "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ {
+          "name" : "content",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "config", "nonconfig", "all" ],
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/rests/data/netconf-1389:cntr/lst={lf2}" : {
+      "put" : {
+        "description" : "",
+        "summary" : "PUT - netconf-1389 - Controller - lst",
+        "requestBody" : {
+          "description" : "lst",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "properties" : {
+                  "netconf-1389:lst" : {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/components/schemas/netconf-1389_cntr_lst",
+                      "type" : "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/netconf-1389_cntr_lst"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "204" : {
+            "description" : "Updated"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ {
+          "name" : "lf2",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      },
+      "patch" : {
+        "description" : "",
+        "summary" : "PATCH - netconf-1389 - Controller - lst",
+        "requestBody" : {
+          "description" : "lst",
+          "content" : {
+            "application/yang-data+json" : {
+              "schema" : {
+                "properties" : {
+                  "netconf-1389:lst" : {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/components/schemas/netconf-1389_cntr_lst",
+                      "type" : "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/netconf-1389_cntr_lst"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "204" : {
+            "description" : "Updated"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ {
+          "name" : "lf2",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      },
+      "delete" : {
+        "description" : "",
+        "summary" : "DELETE - Controller - netconf-1389 - lst",
+        "responses" : {
+          "204" : {
+            "description" : "Deleted"
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ {
+          "name" : "lf2",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      },
+      "get" : {
+        "description" : "",
+        "summary" : "GET - Controller - netconf-1389 - lst",
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/xml" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/netconf-1389_cntr_lst"
+                }
+              },
+              "application/json" : {
+                "schema" : {
+                  "properties" : {
+                    "lst" : {
+                      "type" : "array",
+                      "items" : {
+                        "$ref" : "#/components/schemas/netconf-1389_cntr_lst",
+                        "type" : "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags" : [ "Controller netconf-1389" ],
+        "parameters" : [ {
+          "name" : "lf2",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "content",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "config", "nonconfig", "all" ],
+            "type" : "string"
+          }
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "netconf-1389_cntr" : {
+        "title" : "netconf-1389_cntr",
+        "type" : "object",
+        "properties" : {
+          "lf1" : {
+            "description" : "",
+            "type" : "string",
+            "example" : "Some lf1"
+          },
+          "lst" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/netconf-1389_cntr_lst"
+            },
+            "description" : "",
+            "example" : [ {
+              "lf2" : "Some lf2"
+            } ],
+            "minItems" : 1
+          }
+        },
+        "required" : [ "lst" ],
+        "xml" : {
+          "name" : "cntr",
+          "namespace" : "urn:leafref-test"
+        }
+      },
+      "netconf-1389_cntr_lst" : {
+        "title" : "netconf-1389_cntr_lst",
+        "type" : "object",
+        "properties" : {
+          "lf2" : {
+            "description" : "",
+            "type" : "string",
+            "example" : "Some lf2"
+          }
+        },
+        "xml" : {
+          "name" : "lst",
+          "namespace" : "urn:leafref-test"
+        }
+      }
+    },
+    "securitySchemes" : {
+      "basicAuth" : {
+        "scheme" : "basic",
+        "type" : "http"
+      }
+    }
+  },
+  "security" : [ {
+    "basicAuth" : [ ]
+  } ]
+}
