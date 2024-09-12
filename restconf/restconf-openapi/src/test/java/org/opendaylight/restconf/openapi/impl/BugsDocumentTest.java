@@ -20,6 +20,11 @@ class BugsDocumentTest extends AbstractDocumentTest {
      */
     private static final String NETCONF_1309 = "netconf-1309";
     private static final String NETCONF_1309_REVISION = "2024-05-13";
+    /**
+     * Test for <a href="https://lf-opendaylight.atlassian.net/browse/NETCONF-1389">NETCONF-1389</a>.
+     */
+    private static final String NETCONF_1389 = "netconf-1389";
+    private static final String NETCONF_1389_REVISION = "2024-09-11";
 
     @BeforeAll
     static void beforeAll() {
@@ -27,21 +32,21 @@ class BugsDocumentTest extends AbstractDocumentTest {
     }
 
     /**
-     * Tests the swagger document that is result of the call to the '/moduleName' endpoint.
+     * Tests the swagger document that is result of the call to the '/bugName' endpoint.
      */
     @ParameterizedTest
     @MethodSource
-    void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
-            throws Exception {
-        final var expectedJson = getExpectedDoc("bugs-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(moduleName, revision);
+    void getDocByModuleTest(final String bugName, final String revision) throws Exception {
+        final var expectedJson = getExpectedDoc("bugs-document/" + bugName + ".json");
+        final var moduleDoc = getDocByModule(bugName, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
     private static Stream<Arguments> getDocByModuleTest() {
-        // moduleName, revision, jsonPath
+        // bugName, revision
         return Stream.of(
-            Arguments.of(NETCONF_1309, NETCONF_1309_REVISION, "controller-netconf-1309.json")
+            Arguments.of(NETCONF_1309, NETCONF_1309_REVISION),
+            Arguments.of(NETCONF_1389, NETCONF_1389_REVISION)
         );
     }
 }
