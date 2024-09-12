@@ -279,7 +279,9 @@ public class PropertyEntity {
         for (final var childNode : childNodes) {
             if (childNode instanceof TypedDataSchemaNode leafSchemaNode) {
                 final var def = new TypeDef();
+                stack.enterDataTree(childNode.getQName());
                 processTypeDef(leafSchemaNode.getType(), leafSchemaNode, stack, def);
+                stack.exit();
                 if (def.hasExample()) {
                     firstExampleMap.put(leafSchemaNode.getQName().getLocalName(), def.getExample());
                 }
