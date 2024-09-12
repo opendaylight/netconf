@@ -22,14 +22,32 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-common</artifactId>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>odl-aaa-shiro</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc7317-iana-crypt-hash</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc7407-ietf-x509-cert-to-name</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8341</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-api</artifactId>
+            <artifactId>odl-netconf-transport</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -53,6 +71,18 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server-jaxrs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server-mdsal</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
