@@ -1,0 +1,22 @@
+module leafref-test {
+    namespace "urn:leafref-test";
+    prefix "lt";
+    revision 2024-09-11 {
+        description "Initial revision.";
+    }
+
+    container cntr {
+        leaf lf1 {
+            type string;
+        }
+        list lst {
+            key lf2;
+            min-elements 1;
+            leaf lf2 {
+                type leafref {
+                    path "../../lf1";
+                }
+            }
+        }
+    }
+}
