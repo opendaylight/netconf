@@ -16,6 +16,24 @@
       "message": "Can we use Uri.getPath?\n\nSee: https://git.opendaylight.org/gerrit/c/netconf/+/111272",
       "revId": "6721a83ef59609c54831f8231cabd3e697f49ce0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56860c81_f6295d30",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/OperationsRequestProcessor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-13T11:35:42Z",
+      "side": 1,
+      "message": "No magic here\n\n`URI.create(\"http://localhost:8181/rests\").getPath()` -\u003e `/rests`\n`URI.create(\"http://localhost:8181/rests/\").getPath()` -\u003e `/rests/`\nit depends on how the initial uri was constructed\njaxrs always provide URI with trailing slashes\nin netty we need to pass same uri to receive same result",
+      "parentUuid": "c318b792_9304a58e",
+      "revId": "6721a83ef59609c54831f8231cabd3e697f49ce0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
