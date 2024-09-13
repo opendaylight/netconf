@@ -18,6 +18,7 @@ import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTyp
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.net.URI;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.InvokeResult;
@@ -78,6 +79,12 @@ final class OperationsRequestProcessor {
                 return output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
                     : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
             }
-        }, params.baseUri(), apiPath, requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new));
+        }, restconfUri(params.baseUri()), apiPath,
+            requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new));
+    }
+
+    private static URI restconfUri(final URI uri) {
+        final var uriString = uri.toString();
+        return !uriString.endsWith("/") ? URI.create(uriString.concat("/")) : uri;
     }
 }
