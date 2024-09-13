@@ -1,0 +1,213 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "version": "1.0.0",
+        "title": "regex3",
+        "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8181/"
+        }
+    ],
+    "paths": {
+        "/rests/data": {
+            "post": {
+                "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+                "summary": "POST - Controller - regex3 - regex3",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cntr": {
+                                        "$ref": "#/components/schemas/regex3_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex3_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "tags": [
+                    "Controller regex3"
+                ],
+                "parameters": []
+            }
+        },
+        "/rests/data/regex3:cntr": {
+            "put": {
+                "description": "",
+                "summary": "PUT - regex3 - Controller - cntr",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "regex3:cntr": {
+                                        "$ref": "#/components/schemas/regex3_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex3_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "204": {
+                        "description": "Updated"
+                    }
+                },
+                "tags": [
+                    "Controller regex3"
+                ],
+                "parameters": []
+            },
+            "patch": {
+                "description": "",
+                "summary": "PATCH - regex3 - Controller - cntr",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/yang-data+json": {
+                            "schema": {
+                                "properties": {
+                                    "regex3:cntr": {
+                                        "$ref": "#/components/schemas/regex3_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/yang-data+xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex3_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "Updated"
+                    }
+                },
+                "tags": [
+                    "Controller regex3"
+                ],
+                "parameters": []
+            },
+            "delete": {
+                "description": "",
+                "summary": "DELETE - Controller - regex3 - cntr",
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    }
+                },
+                "tags": [
+                    "Controller regex3"
+                ],
+                "parameters": []
+            },
+            "get": {
+                "description": "",
+                "summary": "GET - Controller - regex3 - cntr",
+                "responses": {
+                    "200": {
+                        "description": "200",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/regex3_cntr"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cntr": {
+                                            "$ref": "#/components/schemas/regex3_cntr",
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Controller regex3"
+                ],
+                "parameters": [
+                    {
+                        "name": "content",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "enum": [
+                                "config",
+                                "nonconfig",
+                                "all"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "regex3_cntr": {
+                "title": "regex3_cntr",
+                "type": "object",
+                "properties": {
+                    "lf": {
+                        "description": "",
+                        "type": "string",
+                        "example": "A-0",
+                        "minLength": 3,
+                        "maxLength": 250
+                    }
+                },
+                "xml": {
+                    "name": "cntr",
+                    "namespace": "urn:regex3"
+                }
+            }
+        },
+        "securitySchemes": {
+            "basicAuth": {
+                "scheme": "basic",
+                "type": "http"
+            }
+        }
+    },
+    "security": [
+        {
+            "basicAuth": []
+        }
+    ]
+}

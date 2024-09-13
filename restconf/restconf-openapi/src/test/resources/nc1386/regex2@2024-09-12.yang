@@ -1,0 +1,16 @@
+module regex2 {
+    namespace "urn:regex2";
+    prefix "re2";
+    revision 2024-09-12 {
+        description "Initial revision.";
+    }
+
+    container cntr {
+        leaf lf {
+            type string {
+                length "1..100";
+                pattern "[0-9]*[A-Z]";
+            }
+        }
+    }
+}
