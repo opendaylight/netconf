@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c318b792_9304a58e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/OperationsRequestProcessor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-13T10:45:32Z",
+      "side": 1,
+      "message": "Can we use Uri.getPath?\n\nSee: https://git.opendaylight.org/gerrit/c/netconf/+/111272",
+      "revId": "6721a83ef59609c54831f8231cabd3e697f49ce0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
