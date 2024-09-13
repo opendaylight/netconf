@@ -16,6 +16,24 @@
       "message": "Please follow https://git.opendaylight.org/gerrit/c/netconf/+/113508 way to create bug tests.",
       "revId": "9e67d11cee1e724418105f1d319094ada68ebc72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47935526_f32cef18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-09-13T15:34:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cc4ffea_ff9c4cc3",
+      "revId": "9e67d11cee1e724418105f1d319094ada68ebc72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
