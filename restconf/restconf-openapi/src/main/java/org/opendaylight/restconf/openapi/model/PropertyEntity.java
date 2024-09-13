@@ -596,7 +596,8 @@ public class PropertyEntity {
             try {
                 final var automaton = new RegExp(regex).toAutomaton();
                 if (minLength > 0) {
-                    defaultValue = prepareExample(defaultValue, automaton.getInitialState(), minLength, maxLength);
+                    defaultValue = prepareExample(List.of(new ExampleCandidate(
+                        defaultValue, automaton.getInitialState())), minLength, maxLength);
                 } else {
                     defaultValue = automaton.getShortestExample(true);
                 }
@@ -693,28 +694,32 @@ public class PropertyEntity {
         return STRING_TYPE;
     }
 
-    private static String prepareExample(final String strMatch, final State state, final int minLength,
+    private static String prepareExample(final List<ExampleCandidate> candidates, final int minLength,
             final int maxLength) {
-        final var transitions = state.getSortedTransitions(false);
+        final var nextCandidates = new ArrayList<ExampleCandidate>();
+        for (var candidate : candidates) {
+            final var string = candidate.string();
+            final var state = candidate.state();
 
-        if (state.isAccept() && strMatch.length() >= minLength) {
-            return strMatch;
+            if (string.length() >= minLength && state.isAccept()) {
+                return candidate.string();
+            }
+
+            if (string.length() < maxLength) {
+                final var transitions = state.getSortedTransitions(false);
+                transitions.forEach(t -> nextCandidates.add(
+                    new ExampleCandidate(string + t.getMin(), t.getDest())));
+            }
         }
 
-        if (transitions.isEmpty()) {
-            return strMatch;
+        if (nextCandidates.isEmpty()) {
+            // If no string satisfies the length & regex constraints, return the first
+            return candidates.getFirst().string();
         }
 
-        // Always choose the first transition and the minimum character
-        final var firstTransition = transitions.get(0);
-        final var firstChar = firstTransition.getMin();
-        final var result = prepareExample(strMatch + firstChar, firstTransition.getDest(), minLength, maxLength);
+        return prepareExample(nextCandidates, minLength, maxLength);
+    }
 
-        if (minLength <= result.length() && result.length() <= maxLength) {
-            return result;
-        }
-
-        // If the resulting string does not satisfy the length constraints, return the current string
-        return strMatch;
+    private record ExampleCandidate(String string, State state) {
     }
 }

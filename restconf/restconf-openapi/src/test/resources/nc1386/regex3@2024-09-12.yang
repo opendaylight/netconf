@@ -1,0 +1,16 @@
+module regex3 {
+    namespace "urn:regex3";
+    prefix "re3";
+    revision 2024-09-12 {
+        description "Initial revision.";
+    }
+
+    container cntr {
+        leaf lf {
+            type string {
+                length "3..250";
+                pattern "([a-zA-Z]([a-zA-Z0-9_.-]*)([a-zA-Z0-9]))";
+            }
+        }
+    }
+}

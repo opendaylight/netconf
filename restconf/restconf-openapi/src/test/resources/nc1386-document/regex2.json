@@ -1,0 +1,213 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "version": "1.0.0",
+        "title": "regex2",
+        "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8181/"
+        }
+    ],
+    "paths": {
+        "/rests/data": {
+            "post": {
+                "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+                "summary": "POST - Controller - regex2 - regex2",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cntr": {
+                                        "$ref": "#/components/schemas/regex2_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex2_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "tags": [
+                    "Controller regex2"
+                ],
+                "parameters": []
+            }
+        },
+        "/rests/data/regex2:cntr": {
+            "put": {
+                "description": "",
+                "summary": "PUT - regex2 - Controller - cntr",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "regex2:cntr": {
+                                        "$ref": "#/components/schemas/regex2_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex2_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "204": {
+                        "description": "Updated"
+                    }
+                },
+                "tags": [
+                    "Controller regex2"
+                ],
+                "parameters": []
+            },
+            "patch": {
+                "description": "",
+                "summary": "PATCH - regex2 - Controller - cntr",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/yang-data+json": {
+                            "schema": {
+                                "properties": {
+                                    "regex2:cntr": {
+                                        "$ref": "#/components/schemas/regex2_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/yang-data+xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex2_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "Updated"
+                    }
+                },
+                "tags": [
+                    "Controller regex2"
+                ],
+                "parameters": []
+            },
+            "delete": {
+                "description": "",
+                "summary": "DELETE - Controller - regex2 - cntr",
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    }
+                },
+                "tags": [
+                    "Controller regex2"
+                ],
+                "parameters": []
+            },
+            "get": {
+                "description": "",
+                "summary": "GET - Controller - regex2 - cntr",
+                "responses": {
+                    "200": {
+                        "description": "200",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/regex2_cntr"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cntr": {
+                                            "$ref": "#/components/schemas/regex2_cntr",
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Controller regex2"
+                ],
+                "parameters": [
+                    {
+                        "name": "content",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "enum": [
+                                "config",
+                                "nonconfig",
+                                "all"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "regex2_cntr": {
+                "title": "regex2_cntr",
+                "type": "object",
+                "properties": {
+                    "lf": {
+                        "description": "",
+                        "type": "string",
+                        "example": "A",
+                        "minLength": 1,
+                        "maxLength": 100
+                    }
+                },
+                "xml": {
+                    "name": "cntr",
+                    "namespace": "urn:regex2"
+                }
+            }
+        },
+        "securitySchemes": {
+            "basicAuth": {
+                "scheme": "basic",
+                "type": "http"
+            }
+        }
+    },
+    "security": [
+        {
+            "basicAuth": []
+        }
+    ]
+}
