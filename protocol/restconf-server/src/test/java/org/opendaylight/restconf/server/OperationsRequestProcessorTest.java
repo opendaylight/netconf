@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import java.net.URI;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +43,7 @@ import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     private static final String OPERATIONS_PATH = BASE_PATH + OPERATIONS;
     private static final String OPERATIONS_PATH_WITH_ID = OPERATIONS_PATH + "/" + ID_PATH;
+    private static final URI RESTCONF_URI = URI.create(BASE_URI.toString().concat("/"));
 
     @Captor
     ArgumentCaptor<ApiPath> apiPathCaptor;
@@ -90,7 +92,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
 
         final var request = buildRequest(HttpMethod.POST, OPERATIONS_PATH_WITH_ID, encoding, input);
         final var response = dispatch(request);
-        verify(service).operationsPOST(any(), eq(BASE_URI), apiPathCaptor.capture(), inputCaptor.capture());
+        verify(service).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         final var expectedClass = encoding.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class;
@@ -122,7 +124,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
         // can be used to invoke rpc with no input defined
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, OPERATIONS_PATH_WITH_ID);
         final var response = dispatch(request);
-        verify(service).operationsPOST(any(), eq(BASE_URI), apiPathCaptor.capture(), inputCaptor.capture());
+        verify(service).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
         assertEquals(API_PATH, apiPathCaptor.getValue());
 
         // empty body expected to be passed using a wrapper object of server default encoding
