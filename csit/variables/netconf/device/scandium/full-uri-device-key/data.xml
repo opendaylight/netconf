@@ -1,0 +1,13 @@
+<node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+  <node-id>$DEVICE_NAME</node-id>
+  <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+    <host>$DEVICE_IP</host>
+    <port>$DEVICE_PORT</port>
+    <key-based>
+      <username>$DEVICE_USER</username>
+      <key-id>device-key</key-id>
+    </key-based>
+    <tcp-only>false</tcp-only>
+    <keepalive-delay>0</keepalive-delay>
+  </netconf-node>
+</node>

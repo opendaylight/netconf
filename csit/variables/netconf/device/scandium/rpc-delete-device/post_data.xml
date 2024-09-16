@@ -1,0 +1,3 @@
+<input xmlns="urn:opendaylight:netconf-node-topology">
+   <node-id>$DEVICE_NAME</node-id>
+ </input>
