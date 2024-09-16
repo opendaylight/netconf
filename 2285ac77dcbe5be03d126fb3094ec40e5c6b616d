@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bee71ffc_9b44d289",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/OperationsRequestProcessor.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-16T08:17:52Z",
+      "side": 1,
+      "message": "if (restconf.endsWith(\"/\")) {\n            throw new IllegalArgumentException(\"restconf cannot end with \u0027/\u0027\");\n        }",
+      "revId": "2285ac77dcbe5be03d126fb3094ec40e5c6b616d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
