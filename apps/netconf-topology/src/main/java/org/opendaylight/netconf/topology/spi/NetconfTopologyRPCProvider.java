@@ -145,41 +145,44 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     private Credentials translate(final RpcCredentials credentialsRpc) {
-        if (credentialsRpc instanceof LoginPw loginPw) {
-            final var loginPassword = loginPw.getLoginPassword();
-            final byte[] cipherBytes;
-
-            try {
-                cipherBytes = encryptionService.encrypt(loginPassword.getPassword().getBytes(StandardCharsets.UTF_8));
-            } catch (GeneralSecurityException e) {
-                throw new IllegalArgumentException("Failed to encrypt password", e);
+        return switch (credentialsRpc) {
+            case KeyAuth keyAuth -> {
+                final var loginPassword = keyAuth.getKeyBased();
+                yield new KeyAuthBuilder()
+                    .setKeyBased(new KeyBasedBuilder()
+                        .setUsername(loginPassword.getUsername())
+                        .setKeyId(loginPassword.getKeyId())
+                        .build())
+                    .build();
             }
+            case LoginPw loginPw -> {
+                final var loginPassword = loginPw.getLoginPassword();
+                final byte[] cipherBytes;
+                try {
+                    cipherBytes = encryptionService.encrypt(
+                        loginPassword.getPassword().getBytes(StandardCharsets.UTF_8));
+                } catch (GeneralSecurityException e) {
+                    throw new IllegalArgumentException("Failed to encrypt password", e);
+                }
 
-            return new LoginPwBuilder()
-                .setLoginPassword(new LoginPasswordBuilder()
-                    .setUsername(loginPassword.getUsername())
-                    .setPassword(cipherBytes)
-                    .build())
-                .build();
-        } else if (credentialsRpc instanceof LoginPwUnencrypted loginPwUnencrypted) {
-            final var loginPassword = loginPwUnencrypted.getLoginPasswordUnencrypted();
-            return new LoginPwUnencryptedBuilder()
-                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
-                    .setUsername(loginPassword.getUsername())
-                    .setPassword(loginPassword.getPassword())
-                    .build())
-                .build();
-        } else if (credentialsRpc instanceof KeyAuth keyAuth) {
-            final var loginPassword = keyAuth.getKeyBased();
-            return new KeyAuthBuilder()
-                .setKeyBased(new KeyBasedBuilder()
-                    .setUsername(loginPassword.getUsername())
-                    .setKeyId(loginPassword.getKeyId())
-                    .build())
-                .build();
-        } else {
-            throw new IllegalArgumentException("Unsupported credential type: " + credentialsRpc.getClass());
-        }
+                yield new LoginPwBuilder()
+                    .setLoginPassword(new LoginPasswordBuilder()
+                        .setUsername(loginPassword.getUsername())
+                        .setPassword(cipherBytes)
+                        .build())
+                    .build();
+            }
+            case LoginPwUnencrypted loginPwUnencrypted -> {
+                final var loginPassword = loginPwUnencrypted.getLoginPasswordUnencrypted();
+                yield new LoginPwUnencryptedBuilder()
+                    .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                        .setUsername(loginPassword.getUsername())
+                        .setPassword(loginPassword.getPassword())
+                        .build())
+                    .build();
+            }
+            default -> throw new IllegalArgumentException("Unsupported credential type: " + credentialsRpc.getClass());
+        };
     }
 
     private void writeToConfigDS(final Node node, final NodeId nodeId,
