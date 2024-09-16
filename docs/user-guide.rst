@@ -141,22 +141,24 @@ Payload for password authentication:
 
          <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
            <node-id>new-netconf-device</node-id>
-           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
-           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
-           <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
-             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
-             <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
-           </login-password-unencrypted>
-           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
-           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
-           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
-           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
-           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
-           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
-           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
-           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
-           <!-- keepalive-delay set to 0 turns off keepalives-->
-           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+             <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+             <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+             <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+             <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
+               <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+               <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
+             </login-password-unencrypted>
+             <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+             <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+             <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+             <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+             <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+             <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+             <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+             <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+             <!-- keepalive-delay set to 0 turns off keepalives-->
+             <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+           </netconf-node>
          </node>
 
    .. tab:: JSON
@@ -173,20 +175,22 @@ Payload for password authentication:
              "node": [
                  {
                      "node-id": "new-netconf-device",
-                     "netconf-node-topology:port": 17830,
-                     "netconf-node-topology:reconnect-on-changed-schema": false,
-                     "netconf-node-topology:connection-timeout-millis": 20000,
-                     "netconf-node-topology:tcp-only": false,
-                     "netconf-node-topology:max-connection-attempts": 0,
-                     "netconf-node-topology:login-password-unencrypted": {
-                        "netconf-node-topology:username": "admin",
-                        "netconf-node-topology:password": "admin"
-                     },
-                     "netconf-node-topology:host": "127.0.0.1",
-                     "netconf-node-topology:min-backoff-millis": 2000,
-                     "netconf-node-topology:max-backoff-millis": 1800000,
-                     "netconf-node-topology:backoff-multiplier": 1.5,
-                     "netconf-node-topology:keepalive-delay": 120
+                     "netconf-node":{
+                         "netconf-node-topology:port": 17830,
+                         "netconf-node-topology:reconnect-on-changed-schema": false,
+                         "netconf-node-topology:connection-timeout-millis": 20000,
+                         "netconf-node-topology:tcp-only": false,
+                         "netconf-node-topology:max-connection-attempts": 0,
+                         "netconf-node-topology:login-password-unencrypted": {
+                            "netconf-node-topology:username": "admin",
+                            "netconf-node-topology:password": "admin"
+                         },
+                         "netconf-node-topology:host": "127.0.0.1",
+                         "netconf-node-topology:min-backoff-millis": 2000,
+                         "netconf-node-topology:max-backoff-millis": 1800000,
+                         "netconf-node-topology:backoff-multiplier": 1.5,
+                         "netconf-node-topology:keepalive-delay": 120
+                     }
                  }
              ]
          }
@@ -228,22 +232,24 @@ Payload for key-based authentication via SSH:
 
          <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
            <node-id>new-netconf-device</node-id>
-           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
-           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
-           <key-based xmlns="urn:opendaylight:netconf-node-topology">
-             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
-             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
-           </key-based>
-           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
-           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
-           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
-           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
-           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
-           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
-           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
-           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
-           <!-- keepalive-delay set to 0 turns off keepalives-->
-           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+           <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+             <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+             <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+             <key-based xmlns="urn:opendaylight:netconf-node-topology">
+               <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+               <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+             </key-based>
+             <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+             <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+             <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+             <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+             <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+             <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+             <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+             <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+             <!-- keepalive-delay set to 0 turns off keepalives-->
+             <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+           </netconf-node>
          </node>
 
    .. tab:: JSON
@@ -260,20 +266,22 @@ Payload for key-based authentication via SSH:
              "node": [
                  {
                      "node-id": "new-netconf-device",
-                     "netconf-node-topology:port": 17830,
-                     "netconf-node-topology:reconnect-on-changed-schema": false,
-                     "netconf-node-topology:connection-timeout-millis": 20000,
-                     "netconf-node-topology:tcp-only": false,
-                     "netconf-node-topology:max-connection-attempts": 0,
-                     "netconf-node-topology:key-based": {
-                        "netconf-node-topology:username": "admin",
-                        "netconf-node-topology:key-id": "key-id"
-                     },
-                     "netconf-node-topology:host": "127.0.0.1",
-                     "netconf-node-topology:min-backoff-millis": 2000,
-                     "netconf-node-topology:max-backoff-millis": 1800000,
-                     "netconf-node-topology:backoff-multiplier": 1.5,
-                     "netconf-node-topology:keepalive-delay": 120
+                     "netconf-node":{
+                         "netconf-node-topology:port": 17830,
+                         "netconf-node-topology:reconnect-on-changed-schema": false,
+                         "netconf-node-topology:connection-timeout-millis": 20000,
+                         "netconf-node-topology:tcp-only": false,
+                         "netconf-node-topology:max-connection-attempts": 0,
+                         "netconf-node-topology:key-based": {
+                            "netconf-node-topology:username": "admin",
+                            "netconf-node-topology:key-id": "key-id"
+                         },
+                         "netconf-node-topology:host": "127.0.0.1",
+                         "netconf-node-topology:min-backoff-millis": 2000,
+                         "netconf-node-topology:max-backoff-millis": 1800000,
+                         "netconf-node-topology:backoff-multiplier": 1.5,
+                         "netconf-node-topology:keepalive-delay": 120
+                     }
                  }
              ]
          }
@@ -301,27 +309,29 @@ Payload for key-based authentication via TLS:
 
          <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
            <node-id>new-netconf-device</node-id>
-           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
-           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
-           <key-based xmlns="urn:opendaylight:netconf-node-topology">
-             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
-             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</key-id>
-           </key-based>
-           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
-           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
-           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
-           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
-           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
-           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
-           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
-           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
-           <!-- keepalive-delay set to 0 turns off keepalives-->
-           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
-           <protocol xmlns="urn:opendaylight:netconf-node-topology">
-             <name xmlns="urn:opendaylight:netconf-node-topology">TLS</name>
-             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id1</key-id>
-             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id2</key-id>
-           </protocol>
+           <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+             <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+             <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+             <key-based xmlns="urn:opendaylight:netconf-node-topology">
+               <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+               <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</key-id>
+             </key-based>
+             <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+             <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+             <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+             <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+             <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+             <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+             <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+             <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+             <!-- keepalive-delay set to 0 turns off keepalives-->
+             <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+             <protocol xmlns="urn:opendaylight:netconf-node-topology">
+               <name xmlns="urn:opendaylight:netconf-node-topology">TLS</name>
+               <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id1</key-id>
+               <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id2</key-id>
+             </protocol>
+           </netconf-node>
          </node>
 
    .. tab:: JSON
@@ -338,23 +348,25 @@ Payload for key-based authentication via TLS:
              "node": [
                  {
                      "node-id": "new-netconf-device",
-                     "netconf-node-topology:port": 17830,
-                     "netconf-node-topology:reconnect-on-changed-schema": false,
-                     "netconf-node-topology:connection-timeout-millis": 20000,
-                     "netconf-node-topology:tcp-only": false,
-                     "netconf-node-topology:max-connection-attempts": 0,
-                     "netconf-node-topology:key-based": {
-                        "netconf-node-topology:username": "admin",
-                        "netconf-node-topology:key-id": "key-id"
-                     },
-                     "netconf-node-topology:host": "127.0.0.1",
-                     "netconf-node-topology:min-backoff-millis": 2000,
-                     "netconf-node-topology:max-backoff-millis": 1800000,
-                     "netconf-node-topology:backoff-multiplier": 1.5,
-                     "netconf-node-topology:keepalive-delay": 120,
-                     "protocol": {
-                        "name": "TLS",
-                        "key-id": ["key-id1", "key-id2"]
+                     "netconf-node":{
+                         "netconf-node-topology:port": 17830,
+                         "netconf-node-topology:reconnect-on-changed-schema": false,
+                         "netconf-node-topology:connection-timeout-millis": 20000,
+                         "netconf-node-topology:tcp-only": false,
+                         "netconf-node-topology:max-connection-attempts": 0,
+                         "netconf-node-topology:key-based": {
+                            "netconf-node-topology:username": "admin",
+                            "netconf-node-topology:key-id": "key-id"
+                         },
+                         "netconf-node-topology:host": "127.0.0.1",
+                         "netconf-node-topology:min-backoff-millis": 2000,
+                         "netconf-node-topology:max-backoff-millis": 1800000,
+                         "netconf-node-topology:backoff-multiplier": 1.5,
+                         "netconf-node-topology:keepalive-delay": 120,
+                         "protocol": {
+                            "name": "TLS",
+                            "key-id": ["key-id1", "key-id2"]
+                         }
                      }
                  }
              ]
@@ -405,7 +417,9 @@ Example JSON payload to modify the password entry:
              "node": [
                 {
                  "node-id": "new-netconf-device",
-                 "netconf-node-topology:password" : "newpassword"
+                 "netconf-node":{
+                    "netconf-node-topology:password" : "newpassword"
+                 }
                 }
              ]
             }
@@ -495,20 +509,22 @@ configuration of netconf-connector like in the example below:
 
          <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
            <node-id>r5</node-id>
-           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
-           <port xmlns="urn:opendaylight:netconf-node-topology">8305</port>
-           <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
-             <username xmlns="urn:opendaylight:netconf-node-topology">root</username>
-             <password xmlns="urn:opendaylight:netconf-node-topology">root</password>
-           </login-password-unencrypted>
-           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
-           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">30</keepalive-delay>
-           <yang-module-capabilities xmlns="urn:opendaylight:netconf-node-topology">
-             <override>true</override>
-             <capability xmlns="urn:opendaylight:netconf-node-topology">
-               urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15
-             </capability>
-           </yang-module-capabilities>
+           <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+             <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+             <port xmlns="urn:opendaylight:netconf-node-topology">8305</port>
+             <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
+               <username xmlns="urn:opendaylight:netconf-node-topology">root</username>
+               <password xmlns="urn:opendaylight:netconf-node-topology">root</password>
+             </login-password-unencrypted>
+             <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+             <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">30</keepalive-delay>
+             <yang-module-capabilities xmlns="urn:opendaylight:netconf-node-topology">
+               <override>true</override>
+               <capability xmlns="urn:opendaylight:netconf-node-topology">
+                 urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15
+               </capability>
+             </yang-module-capabilities>
+           </netconf-node>
          </node>
 
    .. tab:: JSON
@@ -525,20 +541,22 @@ configuration of netconf-connector like in the example below:
              "node": [
                  {
                      "node-id": "device",
-                     "netconf-node-topology:host": "127.0.0.1",
-                     "netconf-node-topology:login-password-unencrypted": {
-                        "netconf-node-topology:password": "root",
-                        "netconf-node-topology:username": "root"
-                     },
-                     "netconf-node-topology:yang-module-capabilities": {
-                         "override": true,
-                         "capability": [
-                             "urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&revision=2013-07-15"
-                         ]
-                     },
-                     "netconf-node-topology:port": 8305,
-                     "netconf-node-topology:tcp-only": false,
-                     "netconf-node-topology:keepalive-delay": 30
+                     "netconf-node":{
+                         "netconf-node-topology:host": "127.0.0.1",
+                         "netconf-node-topology:login-password-unencrypted": {
+                            "netconf-node-topology:password": "root",
+                            "netconf-node-topology:username": "root"
+                         },
+                         "netconf-node-topology:yang-module-capabilities": {
+                             "override": true,
+                             "capability": [
+                                 "urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&revision=2013-07-15"
+                             ]
+                         },
+                         "netconf-node-topology:port": 8305,
+                         "netconf-node-topology:tcp-only": false,
+                         "netconf-node-topology:keepalive-delay": 30
+                     }
                  }
              ]
          }
@@ -1921,14 +1939,16 @@ Mounting NETCONF device that runs on NETCONF testtool:
       "node": [
           {
               "node-id": "testtool",
-              "netconf-node-topology:host": "127.0.0.1",
-              "netconf-node-topology:port": 17830,
-              "netconf-node-topology:keepalive-delay": 100,
-              "netconf-node-topology:tcp-only": false,
-              "netconf-node-topology:login-password-unencrypted": {
-                  "netconf-node-topology:username": "admin",
-                  "netconf-node-topology:password": "admin"
-              },
+              "netconf-node":{
+                  "netconf-node-topology:host": "127.0.0.1",
+                  "netconf-node-topology:port": 17830,
+                  "netconf-node-topology:keepalive-delay": 100,
+                  "netconf-node-topology:tcp-only": false,
+                  "netconf-node-topology:login-password-unencrypted": {
+                      "netconf-node-topology:username": "admin",
+                      "netconf-node-topology:password": "admin"
+                  }
+              }
           }
       ]
   }'
