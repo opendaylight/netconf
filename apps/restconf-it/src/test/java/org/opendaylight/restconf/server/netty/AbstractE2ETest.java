@@ -53,6 +53,7 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
@@ -63,6 +64,7 @@ import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.HTTPClient;
+import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
@@ -105,21 +107,25 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
+    protected static String localAddress;
     protected static BootstrapFactory bootstrapFactory;
+    protected static SSHTransportStackFactory sshTransportStackFactory;
     protected HttpClientStackGrouping clientStackGrouping;
+    protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
 
     private NettyEndpoint endpoint;
 
     @BeforeAll
     static void beforeAll() {
+        localAddress = InetAddress.getLoopbackAddress().getHostAddress();
         bootstrapFactory = new BootstrapFactory("restconf-netty-e2e", 8);
+        sshTransportStackFactory = new SSHTransportStackFactory("netconf-netty-e2e", 8);
     }
 
     @BeforeEach
     void beforeEach() throws Exception {
         // transport configuration
-        final var localAddress = InetAddress.getLoopbackAddress().getHostAddress();
         final var port = freePort();
         final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
         final var serverStackGrouping = new HttpServerStackGrouping() {
@@ -170,18 +176,17 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
         final var domRpcRouter = new DOMRpcRouter(schemaService);
         final var domRpcService = new RouterDOMRpcService(domRpcRouter);
+        final var domActionService = new RouterDOMActionService(new DOMRpcRouter(schemaService));
+        domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
-        rpcProviderService =
-            new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var actionService = new RouterDOMActionService(new DOMRpcRouter(schemaService));
-        final var mountPointService = new DOMMountPointServiceImpl();
+        rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
         final var streamRegistry = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker)
         );
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, actionService,
-            mountPointService, rpcImplementations);
+        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
+            domMountPointService, rpcImplementations);
 
         // Netty endpoint
         final var serverBaseUri = URI.create("http://" + localAddress + ":" + port + "/rests");
@@ -192,7 +197,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         endpoint = new NettyEndpoint(server, principalService, streamRegistry, configuration);
     }
 
-    private static int freePort() {
+    protected static int freePort() {
         // find free port
         try {
             final var socket = new ServerSocket(0);
@@ -212,6 +217,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @AfterAll
     static void afterAll() {
         bootstrapFactory.close();
+        sshTransportStackFactory.close();
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
