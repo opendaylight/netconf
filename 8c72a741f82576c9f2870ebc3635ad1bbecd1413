@@ -16,6 +16,24 @@
       "message": "JaxRsOpenApiEndpoint",
       "revId": "8c72a741f82576c9f2870ebc3635ad1bbecd1413",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9912908c_ef345566",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/jaxrs/JaxRsOpenApiService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-09-17T09:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "166b80c0_285dc84b",
+      "revId": "8c72a741f82576c9f2870ebc3635ad1bbecd1413",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
