@@ -54,6 +54,7 @@ import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
@@ -99,22 +100,62 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void options(final String uri, final String expectedAllowHeader) {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri);
+    @Test
+    void optionsDataStore() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH);
+        doAnswer(answerCompleteWith(OptionsResult.DATASTORE)).when(service).dataOPTIONS(any());
+
         final var response = dispatch(request);
         assertResponse(response, HttpResponseStatus.OK);
         assertResponseHeaders(response, Map.of(
-            HttpHeaderNames.ALLOW, expectedAllowHeader,
-            HttpHeaderNames.ACCEPT_PATCH, NettyMediaTypes.ACCEPT_PATCH_HEADER_VALUE));
+            HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS, PATCH, POST, PUT",
+            HttpHeaderNames.ACCEPT_PATCH, """
+                application/json, application/xml, application/yang-data+json, application/yang-data+xml, \
+                application/yang-patch+json, application/yang-patch+xml, text/xml"""));
     }
 
-    public static Stream<Arguments> options() {
-        return Stream.of(
-          Arguments.of(DATA_PATH, "GET, HEAD, OPTIONS, PATCH, POST, PUT"),
-          Arguments.of(DATA_PATH_WITH_ID, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT")
-        );
+    @Test
+    void optionsDataStoreReadOnly() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH);
+        doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(service).dataOPTIONS(any());
+
+        final var response = dispatch(request);
+        assertResponse(response, HttpResponseStatus.OK);
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
+    }
+
+    @Test
+    void optionsOperation() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
+        doAnswer(answerCompleteWith(OptionsResult.ACTION)).when(service).dataOPTIONS(any(), any());
+
+        final var response = dispatch(request);
+        assertResponse(response, HttpResponseStatus.OK);
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "OPTIONS, POST"));
+    }
+
+    @Test
+    void optionsResource() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
+        doAnswer(answerCompleteWith(OptionsResult.RESOURCE)).when(service).dataOPTIONS(any(), any());
+
+        final var response = dispatch(request);
+        assertResponse(response, HttpResponseStatus.OK);
+        assertResponseHeaders(response, Map.of(
+            HttpHeaderNames.ALLOW, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+            HttpHeaderNames.ACCEPT_PATCH, """
+                application/json, application/xml, application/yang-data+json, application/yang-data+xml, \
+                application/yang-patch+json, application/yang-patch+xml, text/xml"""));
+    }
+
+    @Test
+    void optionsReadOnly() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
+        doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(service).dataOPTIONS(any(), any());
+
+        final var response = dispatch(request);
+        assertResponse(response, HttpResponseStatus.OK);
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }
 
     @ParameterizedTest

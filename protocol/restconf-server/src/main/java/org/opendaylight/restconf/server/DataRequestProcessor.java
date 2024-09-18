@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import static org.opendaylight.restconf.server.NettyMediaTypes.ACCEPT_PATCH_HEADER_VALUE;
 import static org.opendaylight.restconf.server.NettyMediaTypes.RESTCONF_TYPES;
 import static org.opendaylight.restconf.server.NettyMediaTypes.YANG_PATCH_TYPES;
 import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
@@ -63,7 +62,14 @@ final class DataRequestProcessor {
         final var apiPath = extractApiPath(params);
         switch (params.method().name()) {
             // resource options -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.1
-            case "OPTIONS" -> options(params, callback, apiPath);
+            case "OPTIONS" -> {
+                final var request = new OptionsServerRequest(params, callback);
+                if (apiPath.isEmpty()) {
+                    service.dataOPTIONS(request);
+                } else {
+                    service.dataOPTIONS(request, apiPath);
+                }
+            }
             // retrieve data and metadata for a resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.3
             // HEAD is same as GET but without content -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.2
             case "HEAD", "GET" -> getData(params, service, callback, apiPath);
@@ -101,15 +107,6 @@ final class DataRequestProcessor {
             case "DELETE" -> deleteData(params, service, callback, apiPath);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
-    }
-
-    private static void options(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
-        callback.onSuccess(responseBuilder(params, HttpResponseStatus.OK)
-            .setHeader(HttpHeaderNames.ALLOW, apiPath.isEmpty()
-                ? "GET, HEAD, OPTIONS, PATCH, POST, PUT" : "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT")
-            .setHeader(HttpHeaderNames.ACCEPT_PATCH, ACCEPT_PATCH_HEADER_VALUE)
-            .build());
     }
 
     private static void getData(final RequestParameters params, final RestconfServer service,

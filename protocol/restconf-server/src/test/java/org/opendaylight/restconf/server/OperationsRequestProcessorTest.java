@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.opendaylight.restconf.api.ApiPath;
@@ -38,6 +37,7 @@ import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 
 class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
@@ -50,13 +50,20 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @Captor
     ArgumentCaptor<OperationInputBody> inputCaptor;
 
-    @ParameterizedTest
-    @ValueSource(strings = {OPERATIONS_PATH, OPERATIONS_PATH_WITH_ID})
-    void options(final String uri) {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri);
-        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS, POST");
+    @Test
+    void optionsRoot() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, OPERATIONS_PATH);
+        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
     }
 
+    @Test
+    void optionsOperations() {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS,
+            OPERATIONS_PATH_WITH_ID);
+        doAnswer(answerCompleteWith(OptionsResult.RPC)).when(service).operationsOPTIONS(any(), any());
+
+        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS, POST");
+    }
 
     @ParameterizedTest
     @MethodSource("encodings")
