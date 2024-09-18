@@ -23,7 +23,7 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
 @NonNullByDefault
 abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
-    private final RequestParameters requestParameters;
+    protected final RequestParameters requestParameters;
     private final FutureCallback<FullHttpResponse> callback;
 
     NettyServerRequest(final RequestParameters requestParameters, final FutureCallback<FullHttpResponse> callback) {

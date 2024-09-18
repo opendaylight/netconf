@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
 import static org.opendaylight.restconf.server.RequestUtils.requestBody;
-import static org.opendaylight.restconf.server.ResponseUtils.optionsResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.simpleResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErrorResponse;
@@ -41,7 +40,14 @@ final class OperationsRequestProcessor {
             final FutureCallback<FullHttpResponse> callback) {
         final var apiPath = extractApiPath(params);
         switch (params.method().name()) {
-            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS, POST"));
+            case "OPTIONS" -> {
+                if (apiPath.isEmpty()) {
+                    callback.onSuccess(OptionsServerRequest.withoutPatch(params.protocolVersion(),
+                        "GET, HEAD, OPTIONS"));
+                } else {
+                    service.operationsOPTIONS(new OptionsServerRequest(params, callback), apiPath);
+                }
+            }
             case "HEAD", "GET" -> getOperations(params, service, callback, apiPath);
             case "POST" -> {
                 if (NettyMediaTypes.RESTCONF_TYPES.contains(params.contentType())) {
