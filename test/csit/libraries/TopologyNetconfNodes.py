@@ -16,6 +16,7 @@ def configure_device_range(
     device_ipaddress,
     device_port,
     device_count,
+    use_node_encapsulation,
     first_device_id=1,
 ):
     """Generate device_count names in format "$device_name_prefix-$i" and configure them into NETCONF topology at specified RESTCONF URL.
@@ -70,29 +71,10 @@ def configure_device_range(
     for i in range(first_device_id, first_device_id + device_count):
         name = "{}-{}".format(device_name_prefix, i)
         device_names.append(name)
-        edits.append(
-            """
-            {
-              "edit-id" : "node-%s",
-              "operation" : "replace",
-              "target" : "/network-topology:node[network-topology:node-id='%s']",
-              "value" : {
-                "node" : [
-                  {
-                    "node-id" : "%s",
-                    "netconf-node-topology:host" : "%s",
-                    "netconf-node-topology:port" : %s,
-                    "netconf-node-topology:username" : "admin",
-                    "netconf-node-topology:password" : "topsecret",
-                    "netconf-node-topology:tcp-only" : false,
-                    "netconf-node-topology:keepalive-delay" : 0
-                  }
-                ]
-              }
-            }
-        """
-            % (name, name, name, device_ipaddress, device_port)
-        )
+        if use_node_encapsulation:
+            edits.append(get_encapsulated_payload(name, device_ipaddress, device_port))
+        else:
+            edits.append(get_legacy_payload(name, device_ipaddress, device_port))
 
     data = """
     {
@@ -171,6 +153,70 @@ def configure_device_range(
     return device_names
 
 
+def get_legacy_payload(name, device_ipaddress, device_port):
+    return """
+        {
+          "edit-id" : "node-%s",
+          "operation" : "replace",
+          "target": "/node=%s",
+          "value" : {
+            "node" : [
+              {
+                "node-id" : "%s",
+                "netconf-node-topology:host" : "%s",
+                "netconf-node-topology:port" : %s,
+                "netconf-node-topology:login-password-unencrypted": {
+                    "username": "admin",
+                    "password": "topsecret"
+                },
+                "netconf-node-topology:tcp-only" : false,
+                "netconf-node-topology:keepalive-delay" : 0
+              }
+            ]
+          }
+        }
+    """ % (
+        name,
+        name,
+        name,
+        device_ipaddress,
+        device_port,
+    )
+
+
+def get_encapsulated_payload(name, device_ipaddress, device_port):
+    return """
+        {
+          "edit-id" : "node-%s",
+          "operation" : "replace",
+          "target": "/node=%s",
+          "value" : {
+            "node" : [
+              {
+                "node-id" : "%s",
+                "netconf-node-topology:netconf-node":{
+                    "host" : "%s",
+                    "port" : %s,
+                    "login-password-unencrypted": {
+                        "username": "admin",
+                        "password": "topsecret"
+                    },
+                    "tcp-only" : false,
+                    "keepalive-delay" : 0
+                  }
+              }
+            ]
+          }
+        }
+    """ % (
+        name,
+        name,
+        name,
+        device_ipaddress,
+        device_port,
+    )
+
+
 def await_devices_connected(restconf_url, device_names, deadline_seconds):
     """Await all specified devices to become connected in NETCONF topology at specified RESTCONF URL."""
 
@@ -228,6 +274,7 @@ def main(args):
             device_ipaddress="127.0.0.1",
             device_port=17830,
             device_count=int(args[1]),
+            use_node_encapsulation=True,
         )
         print(names)
     elif args[0] == "await":
