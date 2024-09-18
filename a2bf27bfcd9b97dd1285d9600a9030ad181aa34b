@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7ccc876_be7bc6bb",
+        "filename": "apps/restconf-it/pom.xml",
+        "patchSetId": 39
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-18T14:36:41Z",
+      "side": 1,
+      "message": "remove this",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 46
+      },
+      "revId": "a2bf27bfcd9b97dd1285d9600a9030ad181aa34b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
