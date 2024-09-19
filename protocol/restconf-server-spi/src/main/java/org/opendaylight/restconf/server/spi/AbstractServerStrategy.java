@@ -139,7 +139,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
             return;
         }
         request.completeWith(switch (path) {
-            case Action action -> OptionsResult.OPERATION;
+            case Action action -> OptionsResult.ACTION;
             case Data data -> isNonConfigContent(request) ? OptionsResult.READ_ONLY : OptionsResult.RESOURCE;
         });
     }
@@ -344,7 +344,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         //        is supported for all resource types, except operation resources.
         // We implement the former, as it seems to be more in-line with the original intent, whereas we take the latter
         // to apply to /data only.
-        request.completeWith(OptionsResult.READ_ONLY);
+        request.completeWith(OptionsResult.RPC);
     }
 
     @Override

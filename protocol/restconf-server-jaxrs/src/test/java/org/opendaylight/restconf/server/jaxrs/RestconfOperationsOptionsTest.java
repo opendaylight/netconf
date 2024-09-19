@@ -29,6 +29,6 @@ class RestconfOperationsOptionsTest extends AbstractRestconfTest {
         doReturn(queryParams).when(uriInfo).getQueryParameters();
         final var response = assertResponse(200, ar -> restconf.operationsOPTIONS(apiPath("example-jukebox:play"),
             uriInfo, sc, ar));
-        assertEquals("GET, HEAD, OPTIONS", response.getHeaderString(HttpHeaders.ALLOW));
+        assertEquals("GET, HEAD, OPTIONS, POST", response.getHeaderString(HttpHeaders.ALLOW));
     }
 }
