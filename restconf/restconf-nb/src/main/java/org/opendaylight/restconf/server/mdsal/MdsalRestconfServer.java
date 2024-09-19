@@ -365,7 +365,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return RestconfFuture.failed(e.toLegacy());
         }
         final var tail = strategyAndPath.tail();
-        return tail.isEmpty() ? RestconfFuture.of(OptionsResult.READ_ONLY)
+        return tail.isEmpty() ? RestconfFuture.of(OptionsResult.RPC)
             : strategyAndPath.strategy().operationsOPTIONS(request, tail);
     }
 

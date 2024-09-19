@@ -14,6 +14,10 @@ package org.opendaylight.restconf.server.api;
  */
 public enum OptionsResult {
     /**
+     * An {@code action} which can be invoked via {@link RestconfServer} data endpoint.
+     */
+    ACTION,
+    /**
      * An entire data store, which can be modified via {@link RestconfServer}.
      */
     DATASTORE,
@@ -26,7 +30,7 @@ public enum OptionsResult {
      */
     READ_ONLY,
     /**
-     * An operation which can be invoked via {@link RestconfServer}.
+     * An {@code rpc} which can be invoked via {@link RestconfServer} operations endpoint.
      */
-    OPERATION,
+    RPC,
 }

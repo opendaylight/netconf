@@ -274,10 +274,11 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             @Override
             Response transform(final OptionsResult result) {
                 return switch (result) {
+                    case ACTION -> Response.ok().header(HttpHeaders.ALLOW, "OPTIONS, POST").build();
                     case DATASTORE -> allowMethods("GET, HEAD, OPTIONS, PATCH, POST, PUT");
                     case RESOURCE -> allowMethods("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
                     case READ_ONLY -> allowGetHeadOptions();
-                    case OPERATION -> Response.ok().header(HttpHeaders.ALLOW, "OPTIONS, POST").build();
+                    case RPC -> Response.ok().header(HttpHeaders.ALLOW, "GET, HEAD, OPTIONS, POST").build();
                 };
             }
 

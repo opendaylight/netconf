@@ -914,7 +914,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         }
 
         if (path instanceof Action) {
-            return RestconfFuture.of(OptionsResult.OPERATION);
+            return RestconfFuture.of(OptionsResult.ACTION);
         }
         return RestconfFuture.of(isNonConfigContent(request) ? OptionsResult.READ_ONLY : OptionsResult.RESOURCE);
     }
@@ -1348,7 +1348,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         //        is supported for all resource types, except operation resources.
         // We implement the former, as it seems to be more in-line with the original intent, whereas we take the latter
         // to apply to /data only.
-        return RestconfFuture.of(OptionsResult.READ_ONLY);
+        return RestconfFuture.of(OptionsResult.RPC);
     }
 
     public @NonNull RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
