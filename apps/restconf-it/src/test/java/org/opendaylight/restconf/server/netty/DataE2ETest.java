@@ -10,19 +10,32 @@ package org.opendaylight.restconf.server.netty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.mdsal.binding.api.ActionSpec;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.Root;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleAction;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionInput;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutput;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutputBuilder;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
 class DataE2ETest extends AbstractE2ETest {
     private static final String DATA_URI = "/rests/data";
     private static final String PARENT_URI = DATA_URI + "/example-jukebox:jukebox/library";
+    private static final String ACTIONS_URI = DATA_URI + "/example-action:root";
     private static final String ITEM_URI = PARENT_URI + "/artist=artist";
     private static final String INITIAL_NODE_JSON = """
         {
@@ -37,12 +50,20 @@ class DataE2ETest extends AbstractE2ETest {
                 }
             ]
         }""";
+    private static final String ACTIONS_NODE_JSON = """
+        {
+            "input": {
+                "data": "Some data"
+            }
+        }""";
 
     @BeforeEach
     @Override
     void beforeEach() throws Exception {
         super.beforeEach();
         resetDataNode();
+        actionProviderService.registerImplementation(ActionSpec.builder(Root.class).build(ExampleAction.class),
+            new ExampleActionImpl());
     }
 
     @Test
@@ -136,7 +157,36 @@ class DataE2ETest extends AbstractE2ETest {
 
     @Test
     void invokeActionTest() throws Exception {
-        // TODO
+        // invoke action
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", APPLICATION_JSON,
+            ACTIONS_NODE_JSON);
+        assertContentJson(response, """
+            {
+                "example-action:output": {
+                    "response":"Action was invoked"
+                }
+            }""");
+    }
+
+    @Test
+    void invokeNotImplementedActionTest() throws Exception {
+        // invoke not implemented action
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/not-implemented", APPLICATION_JSON,
+            ACTIONS_NODE_JSON);
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
+    }
+
+    @Test
+    void invokeBadDataActionTest() throws Exception {
+        // invoke action
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", APPLICATION_JSON,
+            """
+            {
+                "input": {
+                    "wrong-data": "Some wrong data"
+                }
+            }""");
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
     }
 
     @Test
@@ -178,5 +228,14 @@ class DataE2ETest extends AbstractE2ETest {
                 }""");
         final var status = response.status().code();
         assertTrue(status == HttpResponseStatus.OK.code() || status ==  HttpResponseStatus.CREATED.code());
+    }
+
+    static final class ExampleActionImpl implements ExampleAction {
+        @Override
+        public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(DataObjectIdentifier<Root> path,
+                ExampleActionInput input) {
+            return Futures.immediateFuture(RpcResultBuilder.success(
+                new ExampleActionOutputBuilder().setResponse("Action was invoked").build()).build());
+        }
     }
 }
