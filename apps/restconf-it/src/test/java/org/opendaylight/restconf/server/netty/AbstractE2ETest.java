@@ -48,7 +48,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.opendaylight.mdsal.binding.api.ActionProviderService;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.binding.dom.adapter.BindingAdapterFactory;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
@@ -108,6 +110,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected HttpClientStackGrouping clientStackGrouping;
     protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
+    protected ActionProviderService actionProviderService;
 
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
@@ -174,9 +177,11 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
         final var domRpcRouter = new DOMRpcRouter(schemaService);
         final var domRpcService = new RouterDOMRpcService(domRpcRouter);
-        final var domActionService = new RouterDOMActionService(new DOMRpcRouter(schemaService));
+        final var domActionService = new RouterDOMActionService(domRpcRouter);
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
+        final var adapterFactory = new BindingAdapterFactory(adapterContext);
+        actionProviderService = adapterFactory.createActionProviderService(domRpcRouter.actionProviderService());
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
         final var streamRegistry = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
         final var rpcImplementations = List.<RpcImplementation>of(
