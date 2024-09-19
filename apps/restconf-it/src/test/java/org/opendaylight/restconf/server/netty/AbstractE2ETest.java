@@ -23,6 +23,8 @@ import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
 import com.google.common.base.Splitter;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -47,7 +49,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.opendaylight.mdsal.binding.api.ActionProviderService;
+import org.opendaylight.mdsal.binding.api.ActionSpec;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.binding.dom.adapter.BindingAdapterFactory;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
@@ -78,12 +83,20 @@ import org.opendaylight.restconf.server.netty.TestUtils.TestRequestCallback;
 import org.opendaylight.restconf.server.netty.TestUtils.TestTransportListener;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.Root;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleAction;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionInput;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutput;
+import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -108,6 +121,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected HttpClientStackGrouping invalidClientStackGrouping;
     protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
+    protected ActionProviderService actionProviderService;
 
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
@@ -168,6 +182,10 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var domActionService = new RouterDOMActionService(domRpcRouter);
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
+        final var adapterFactory = new BindingAdapterFactory(adapterContext);
+        actionProviderService = adapterFactory.createActionProviderService(domRpcRouter.actionProviderService());
+        actionProviderService.registerImplementation(ActionSpec.builder(Root.class).build(ExampleAction.class),
+                new DataE2ETest.ExampleActionImpl());
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
         final var streamRegistry = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
         final var rpcImplementations = List.<RpcImplementation>of(
@@ -385,5 +403,14 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         await().atMost(Duration.ofSeconds(2)).until(eventListener::started);
         assertNotNull(streamControl);
         return eventListener;
+    }
+
+    static final class ExampleActionImpl implements ExampleAction {
+        @Override
+        public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(DataObjectIdentifier<Root> path,
+                                                                       ExampleActionInput input) {
+            return Futures.immediateFuture(RpcResultBuilder.success(
+                    new ExampleActionOutputBuilder().setResponse("Action was invoked").build()).build());
+        }
     }
 }

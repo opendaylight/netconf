@@ -23,6 +23,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 class DataE2ETest extends AbstractE2ETest {
     private static final String DATA_URI = "/rests/data";
     private static final String PARENT_URI = DATA_URI + "/example-jukebox:jukebox/library";
+    private static final String ACTIONS_URI = DATA_URI + "/example-action:root";
     private static final String ITEM_URI = PARENT_URI + "/artist=artist";
     private static final String INITIAL_NODE_JSON = """
         {
@@ -36,6 +37,12 @@ class DataE2ETest extends AbstractE2ETest {
                     }]
                 }
             ]
+        }""";
+    private static final String ACTIONS_NODE_JSON = """
+        {
+            "input": {
+                "data": "Some data"
+            }
         }""";
 
     @BeforeEach
@@ -136,7 +143,36 @@ class DataE2ETest extends AbstractE2ETest {
 
     @Test
     void invokeActionTest() throws Exception {
-        // TODO
+        // invoke action
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", APPLICATION_JSON,
+            ACTIONS_NODE_JSON);
+        assertContentJson(response, """
+            {
+                "example-action:output": {
+                    "response":"Action was invoked"
+                }
+            }""");
+    }
+
+    @Test
+    void invokeNotImplementedActionTest() throws Exception {
+        // invoke not implemented action
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/not-implemented", APPLICATION_JSON,
+            ACTIONS_NODE_JSON);
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
+    }
+
+    @Test
+    void invokeBadDataActionTest() throws Exception {
+        // invoke action
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", APPLICATION_JSON,
+            """
+            {
+                "input": {
+                    "wrong-data": "Some wrong data"
+                }
+            }""");
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
     }
 
     @Test
