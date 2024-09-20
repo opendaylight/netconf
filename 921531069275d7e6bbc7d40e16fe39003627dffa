@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6095d59_9df5a242",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-09-20T10:39:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11ddb80d_d528d3fb",
+      "range": {
+        "startLine": 40,
+        "startChar": 21,
+        "endLine": 40,
+        "endChar": 39
+      },
+      "revId": "921531069275d7e6bbc7d40e16fe39003627dffa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3add26a5_68f22f96",
@@ -54,6 +78,30 @@
       "writtenOn": "2024-09-20T10:02:54Z",
       "side": 1,
       "message": "@Reference should use interface, not implementation\nsame for internal property type",
+      "range": {
+        "startLine": 35,
+        "startChar": 43,
+        "endLine": 35,
+        "endChar": 61
+      },
+      "revId": "921531069275d7e6bbc7d40e16fe39003627dffa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b018bb96_2f2dfb3c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/jaxrs/JaxRsOpenApiEndpoint.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-09-20T10:39:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3add26a5_68f22f96",
       "range": {
         "startLine": 35,
         "startChar": 43,
