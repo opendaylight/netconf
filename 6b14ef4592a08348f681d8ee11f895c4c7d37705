@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3e1c46e_ff7163c5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-09-20T13:42:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c3ec978_777cda20",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 51
+      },
+      "revId": "6b14ef4592a08348f681d8ee11f895c4c7d37705",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ab90739_23445e72",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-09-20T12:34:32Z",
       "side": 1,
       "message": "URL construction  logic heavily relies on invocation context having 2 extra path elements\nin jaxRs server has `/openapi/api/v3/` permanent context path configured\nso resulting URI will be `/openapi/explorer/index.html`\nnetty implementation has the only base path `/openapi`\nit makes provided URI useless for netty case because of `../../` \n\nremove the method from both interface and implementation\nmove the URI construction to JaxRsOpenApiEndpoint, \nit\u0027s JaxRs onl, no need to share",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 5
+      },
+      "revId": "6b14ef4592a08348f681d8ee11f895c4c7d37705",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "652d4dbb_4279494a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-09-20T13:42:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ab90739_23445e72",
       "range": {
         "startLine": 92,
         "startChar": 0,
