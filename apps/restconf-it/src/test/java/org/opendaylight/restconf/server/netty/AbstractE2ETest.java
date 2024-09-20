@@ -99,8 +99,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
              ]
            }
          }""";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "pa$$w0Rd";
+    protected static final String USERNAME = "username";
+    protected static final String PASSWORD = "pa$$w0Rd";
 
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
@@ -215,17 +215,22 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
-        return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null));
+        return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType)
             throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, null));
+        return invokeRequest(buildRequest(method, uri, mediaType, null, null));
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
             final String content) throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, content));
+        return invokeRequest(buildRequest(method, uri, mediaType, content, null));
+    }
+
+    protected FullHttpResponse invokeRequest(final String uri, final String authHeader)
+            throws Exception {
+        return invokeRequest(buildRequest(HttpMethod.GET, uri, APPLICATION_JSON, null, authHeader));
     }
 
     private FullHttpResponse invokeRequest(final FullHttpRequest request) throws Exception {
@@ -244,7 +249,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     private static FullHttpRequest buildRequest(final HttpMethod method, final String uri, final String mediaType,
-            final String content) {
+            final String content, final String authHeader) {
         final var contentBuf = content == null ? Unpooled.EMPTY_BUFFER
             : Unpooled.wrappedBuffer(content.getBytes(StandardCharsets.UTF_8));
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri, contentBuf);
@@ -252,6 +257,9 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
         if (method != HttpMethod.GET) {
             request.headers().set(HttpHeaderNames.CONTENT_TYPE, mediaType);
+        }
+        if (authHeader != null) {
+            request.headers().add(HttpHeaderNames.AUTHORIZATION, authHeader);
         }
         return request;
     }
