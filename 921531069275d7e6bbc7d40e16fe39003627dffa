@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "606be2da_620f717c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-20T10:02:54Z",
+      "side": 1,
+      "message": "also rebase is needed",
+      "revId": "921531069275d7e6bbc7d40e16fe39003627dffa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11ddb80d_d528d3fb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-20T10:02:54Z",
+      "side": 1,
+      "message": "Interface here, not implementation",
+      "range": {
+        "startLine": 40,
+        "startChar": 21,
+        "endLine": 40,
+        "endChar": 39
+      },
+      "revId": "921531069275d7e6bbc7d40e16fe39003627dffa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3add26a5_68f22f96",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/jaxrs/JaxRsOpenApiEndpoint.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-20T10:02:54Z",
+      "side": 1,
+      "message": "@Reference should use interface, not implementation\nsame for internal property type",
+      "range": {
+        "startLine": 35,
+        "startChar": 43,
+        "endLine": 35,
+        "endChar": 61
+      },
+      "revId": "921531069275d7e6bbc7d40e16fe39003627dffa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
