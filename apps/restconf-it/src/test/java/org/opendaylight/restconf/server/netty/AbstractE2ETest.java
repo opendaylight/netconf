@@ -158,7 +158,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
                 throws AuthenticationException {
                 final var principal = ((String) token.getPrincipal());
                 final var credentials = new String(((char[]) token.getCredentials()));
-                if (USERNAME.equals(principal) && PASSWORD.equals(credentials)) {
+                if (USERNAME.equals(principal) && getPassword().equals(credentials)) {
                     return new SimpleAuthenticationInfo(principal, credentials, "user");
                 }
                 return null;
@@ -194,6 +194,10 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             serverBaseUri, "restconf-netty-e2e", 8,
             NettyEndpointConfiguration.Encoding.JSON, serverStackGrouping);
         endpoint = new NettyEndpoint(server, principalService, streamRegistry, configuration);
+    }
+
+    String getPassword() {
+        return PASSWORD;
     }
 
     @AfterEach
