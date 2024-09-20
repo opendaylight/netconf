@@ -158,7 +158,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
                 throws AuthenticationException {
                 final var principal = ((String) token.getPrincipal());
                 final var credentials = new String(((char[]) token.getCredentials()));
-                if (USERNAME.equals(principal) && PASSWORD.equals(credentials)) {
+                if (USERNAME.equals(principal) && getPassword().equals(credentials)) {
                     return new SimpleAuthenticationInfo(principal, credentials, "user");
                 }
                 return null;
@@ -207,6 +207,10 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     static void afterAll() {
         bootstrapFactory.close();
         sshTransportStackFactory.close();
+    }
+
+    String getPassword() {
+        return PASSWORD;
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
