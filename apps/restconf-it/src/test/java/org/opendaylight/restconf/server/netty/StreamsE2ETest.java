@@ -198,7 +198,7 @@ class StreamsE2ETest extends AbstractE2ETest {
         }
     }
 
-    private static String extractStreamNameJson(final String content) {
+    static String extractStreamNameJson(final String content) {
         // {
         //      "sal-remote:output": {
         //          "stream-name":"urn:uuid:6413c077-5dfe-464c-b17f-20c5bbb456f4"
