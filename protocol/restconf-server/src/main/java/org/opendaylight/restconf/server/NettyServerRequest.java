@@ -51,7 +51,7 @@ abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
 
     @Override
     public final @Nullable TransportSession session() {
-        // FIXME: return the correct NettyTransportSession
+        // FIXME: NETCONF-714: return the correct NettyTransportSession, RestconfSession in our case
         return null;
     }
 
