@@ -113,8 +113,8 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final @NonNull ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
-            final FullHttpRequest request, final RestconfRequest callback) {
+    void dispatch(final RestconfSession session, final @NonNull ImplementedMethod method, final URI targetUri,
+            final SegmentPeeler peeler, final FullHttpRequest request, final RestconfRequest callback) {
         LOG.debug("Dispatching {} {}", method, targetUri);
 
         // FIXME: this is here just because of test structure
@@ -145,10 +145,10 @@ final class RestconfRequestDispatcher {
 
         try {
             switch (segment) {
-                case "data" -> processDataRequest(params, callback);
-                case "operations" -> processOperationsRequest(params, callback);
-                case "yang-library-version" -> processYangLibraryVersion(params, callback);
-                case "modules" -> processModules(params, callback);
+                case "data" -> processDataRequest(session, params, callback);
+                case "operations" -> processOperationsRequest(session, params, callback);
+                case "yang-library-version" -> processYangLibraryVersion(session, params, callback);
+                case "modules" -> processModules(session, params, callback);
                 default -> callback.onSuccess(method == ImplementedMethod.OPTIONS
                     ? optionsResponse(params, ImplementedMethod.OPTIONS.toString()) : notFound(request));
             }
@@ -168,13 +168,14 @@ final class RestconfRequestDispatcher {
      * Process a request to <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.1">RFC 8040 {+restconf}/data</a>
      * resource.
      */
-    private void processDataRequest(final RequestParameters params, final RestconfRequest callback) {
+    private void processDataRequest(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback) {
         final var contentType = params.contentType();
         final var apiPath = extractApiPath(params);
         switch (params.method()) {
             // resource options -> https://www.rfc-editor.org/rfc/rfc8040#section-4.1
             case OPTIONS -> {
-                final var request = new OptionsServerRequest(params, callback);
+                final var request = new OptionsServerRequest(session, params, callback);
                 if (apiPath.isEmpty()) {
                     server.dataOPTIONS(request);
                 } else {
@@ -183,12 +184,12 @@ final class RestconfRequestDispatcher {
             }
             // retrieve data and metadata for a resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.3
             // HEAD is same as GET but without content -> https://www.rfc-editor.org/rfc/rfc8040#section-4.2
-            case HEAD, GET -> getData(params, callback, apiPath);
+            case HEAD, GET -> getData(session, params, callback, apiPath);
             case POST -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
                     // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
-                    postData(params, callback, apiPath);
+                    postData(session, params, callback, apiPath);
                 } else {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
@@ -196,7 +197,7 @@ final class RestconfRequestDispatcher {
             case PUT -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create or replace target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.5
-                    putData(params, callback, apiPath);
+                    putData(session, params, callback, apiPath);
                 } else {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
@@ -205,23 +206,24 @@ final class RestconfRequestDispatcher {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // Plain RESTCONF patch = merge target resource content ->
                     // https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1
-                    patchData(params, callback, apiPath);
+                    patchData(session, params, callback, apiPath);
                 } else if (YANG_PATCH_TYPES.contains(contentType)) {
                     // YANG Patch = ordered list of edits that are applied to the target datastore ->
                     // https://www.rfc-editor.org/rfc/rfc8072#section-2
-                    yangPatchData(params, callback, apiPath);
+                    yangPatchData(session, params, callback, apiPath);
                 } else {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
             }
             // delete target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.7
-            case DELETE -> deleteData(params, callback, apiPath);
+            case DELETE -> deleteData(session, params, callback, apiPath);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
 
-    private void getData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataGetResult>(params, callback) {
+    private void getData(final RestconfSession session, final RequestParameters params, final RestconfRequest callback,
+            final ApiPath apiPath) {
+        final var request = new NettyServerRequest<DataGetResult>(session, params, callback) {
             @Override
             FullHttpResponse transform(final DataGetResult result) {
                 return responseBuilder(requestParams, HttpResponseStatus.OK)
@@ -239,19 +241,20 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void postData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
+    private void postData(final RestconfSession session, final RequestParameters params, final RestconfRequest callback,
+            final ApiPath apiPath) {
         if (apiPath.isEmpty()) {
-            server.dataPOST(postRequest(params, callback),
+            server.dataPOST(postRequest(session, params, callback),
                 requestBody(params, JsonChildBody::new, XmlChildBody::new));
         } else {
-            server.dataPOST(postRequest(params, callback), apiPath,
+            server.dataPOST(postRequest(session, params, callback), apiPath,
                 requestBody(params, JsonDataPostBody::new, XmlDataPostBody::new));
         }
     }
 
-    private static <T extends DataPostResult> ServerRequest<T> postRequest(final RequestParameters params,
-            final RestconfRequest callback) {
-        return new NettyServerRequest<>(params, callback) {
+    private static <T extends DataPostResult> ServerRequest<T> postRequest(final RestconfSession session,
+            final RequestParameters params, final RestconfRequest callback) {
+        return new NettyServerRequest<>(session, params, callback) {
             @Override
             FullHttpResponse transform(final DataPostResult result) {
                 return switch (result) {
@@ -272,8 +275,9 @@ final class RestconfRequestDispatcher {
         };
     }
 
-    private void putData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataPutResult>(params, callback) {
+    private void putData(final RestconfSession session, final RequestParameters params, final RestconfRequest callback,
+            final ApiPath apiPath) {
+        final var request = new NettyServerRequest<DataPutResult>(session, params, callback) {
             @Override
             FullHttpResponse transform(final DataPutResult result) {
                 final var status = result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT;
@@ -288,8 +292,9 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void patchData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataPatchResult>(params, callback) {
+    private void patchData(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback, final ApiPath apiPath) {
+        final var request = new NettyServerRequest<DataPatchResult>(session, params, callback) {
             @Override
             FullHttpResponse transform(final DataPatchResult result) {
                 return responseBuilder(requestParams, HttpResponseStatus.OK).setMetadataHeaders(result).build();
@@ -303,8 +308,9 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void yangPatchData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataYangPatchResult>(params, callback) {
+    private void yangPatchData(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback, final ApiPath apiPath) {
+        final var request = new NettyServerRequest<DataYangPatchResult>(session, params, callback) {
             @Override
             FullHttpResponse transform(final DataYangPatchResult result) {
                 final var patchStatus = result.status();
@@ -342,8 +348,9 @@ final class RestconfRequestDispatcher {
         return HttpResponseStatus.INTERNAL_SERVER_ERROR;
     }
 
-    private void deleteData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        server.dataDELETE(new NettyServerRequest<>(params, callback) {
+    private void deleteData(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback, final ApiPath apiPath) {
+        server.dataDELETE(new NettyServerRequest<>(session, params, callback) {
             @Override
             FullHttpResponse transform(final Empty result) {
                 return simpleResponse(requestParams, HttpResponseStatus.NO_CONTENT);
@@ -355,7 +362,8 @@ final class RestconfRequestDispatcher {
      * Process a request to
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC 8040 {+restconf}/operations</a> resource.
      */
-    private void processOperationsRequest(final RequestParameters params, final RestconfRequest callback) {
+    private void processOperationsRequest(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback) {
         final var apiPath = extractApiPath(params);
         switch (params.method()) {
             case OPTIONS -> {
@@ -363,14 +371,14 @@ final class RestconfRequestDispatcher {
                     callback.onSuccess(OptionsServerRequest.withoutPatch(params.protocolVersion(),
                         "GET, HEAD, OPTIONS"));
                 } else {
-                    server.operationsOPTIONS(new OptionsServerRequest(params, callback), apiPath);
+                    server.operationsOPTIONS(new OptionsServerRequest(session, params, callback), apiPath);
                 }
             }
-            case HEAD, GET -> getOperations(params, callback, apiPath);
+            case HEAD, GET -> getOperations(session, params, callback, apiPath);
             case POST -> {
                 if (NettyMediaTypes.RESTCONF_TYPES.contains(params.contentType())) {
                     // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2
-                    postOperations(params, callback, apiPath);
+                    postOperations(session, params, callback, apiPath);
                 } else {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
@@ -379,8 +387,9 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void getOperations(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        final var request = new FormattableServerRequest(params, callback);
+    private void getOperations(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback, final ApiPath apiPath) {
+        final var request = new FormattableServerRequest(session, params, callback);
         if (apiPath.isEmpty()) {
             server.operationsGET(request);
         } else {
@@ -388,9 +397,9 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void postOperations(final RequestParameters params, final RestconfRequest callback,
-            final ApiPath apiPath) {
-        server.operationsPOST(new NettyServerRequest<>(params, callback) {
+    private void postOperations(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback, final ApiPath apiPath) {
+        server.operationsPOST(new NettyServerRequest<>(session, params, callback) {
             @Override
             FullHttpResponse transform(final InvokeResult result) {
                 final var output = result.output();
@@ -405,10 +414,11 @@ final class RestconfRequestDispatcher {
      * Process a request to
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">{+restconf}/yang-library-version</a> resource.
      */
-    private void processYangLibraryVersion(final RequestParameters params, final RestconfRequest callback) {
+    private void processYangLibraryVersion(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback) {
         switch (params.method()) {
             case OPTIONS -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
-            case HEAD, GET -> server.yangLibraryVersionGET(new FormattableServerRequest(params, callback));
+            case HEAD, GET -> server.yangLibraryVersionGET(new FormattableServerRequest(session, params, callback));
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
@@ -416,15 +426,17 @@ final class RestconfRequestDispatcher {
     /**
      * Access to YANG modules.
      */
-    private void processModules(final RequestParameters params, final RestconfRequest callback) {
+    private void processModules(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback) {
         switch (params.method()) {
             case OPTIONS -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
-            case HEAD, GET -> getModule(params, callback);
+            case HEAD, GET -> getModule(session, params, callback);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
 
-    private void getModule(final RequestParameters params, final RestconfRequest callback) {
+    private void getModule(final RestconfSession session, final RequestParameters params,
+            final RestconfRequest callback) {
         final var rawPath = params.remainingRawPath();
         if (rawPath.isEmpty()) {
             callback.onSuccess(simpleErrorResponse(params, ErrorTag.MISSING_ELEMENT, MISSING_FILENAME_ERROR));
@@ -443,7 +455,7 @@ final class RestconfRequestDispatcher {
             .contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YIN_XML, true);
         if (acceptYin && !acceptYang) {
             // YIN if explicitly requested
-            final var request = getModuleRequest(params, callback, NettyMediaTypes.APPLICATION_YIN_XML);
+            final var request = getModuleRequest(session, params, callback, NettyMediaTypes.APPLICATION_YIN_XML);
             if (file.mountPath.isEmpty()) {
                 server.modulesYinGET(request, file.name(), revision);
             } else {
@@ -451,7 +463,7 @@ final class RestconfRequestDispatcher {
             }
         } else {
             // YANG by default, incl accept any
-            final var request = getModuleRequest(params, callback, NettyMediaTypes.APPLICATION_YANG);
+            final var request = getModuleRequest(session, params, callback, NettyMediaTypes.APPLICATION_YANG);
             if (file.mountPath.isEmpty()) {
                 server.modulesYangGET(request, file.name(), revision);
             } else {
@@ -460,9 +472,9 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private static ServerRequest<ModulesGetResult> getModuleRequest(final RequestParameters params,
-            final RestconfRequest callback, final AsciiString mediaType) {
-        return new NettyServerRequest<>(params, callback) {
+    private static ServerRequest<ModulesGetResult> getModuleRequest(final RestconfSession session,
+            final RequestParameters params, final RestconfRequest callback, final AsciiString mediaType) {
+        return new NettyServerRequest<>(session, params, callback) {
             @Override
             FullHttpResponse transform(final ModulesGetResult result) {
                 final byte[] bytes;

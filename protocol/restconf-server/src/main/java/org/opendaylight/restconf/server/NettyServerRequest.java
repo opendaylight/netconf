@@ -23,13 +23,16 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
 @NonNullByDefault
 abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
     final RequestParameters requestParams;
+    private final RestconfSession session;
 
     private final RestconfRequest callback;
 
-    NettyServerRequest(final RequestParameters requestParams, final RestconfRequest callback) {
+    NettyServerRequest(final RestconfSession session, final RequestParameters requestParams,
+            final RestconfRequest callback) {
         super(requestParams.queryParameters(), requestParams.defaultPrettyPrint(), requestParams.errorTagMapping());
         this.requestParams = requireNonNull(requestParams);
         this.callback = requireNonNull(callback);
+        this.session = session;
     }
 
     @Override
@@ -52,7 +55,7 @@ abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
     @Override
     public final @Nullable TransportSession session() {
         // FIXME: NETCONF-714: return the correct NettyTransportSession, RestconfSession in our case
-        return null;
+        return session;
     }
 
     abstract FullHttpResponse transform(T result);

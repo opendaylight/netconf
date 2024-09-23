@@ -17,8 +17,9 @@ import org.opendaylight.restconf.server.api.OptionsResult;
 
 @NonNullByDefault
 final class OptionsServerRequest extends NettyServerRequest<OptionsResult> {
-    OptionsServerRequest(final RequestParameters requestParameters, final RestconfRequest callback) {
-        super(requestParameters, callback);
+    OptionsServerRequest(final RestconfSession session, final RequestParameters requestParameters,
+            final RestconfRequest callback) {
+        super(session, requestParameters, callback);
     }
 
     @Override

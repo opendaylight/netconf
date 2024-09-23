@@ -162,7 +162,7 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             msg.release();
             respond(ctx, streamId, wellKnown.request(version, method, peeler));
         } else if (segment.equals(dispatcher.firstSegment())) {
-            dispatcher.dispatch(method, targetUri, peeler, msg, new RestconfRequest() {
+            dispatcher.dispatch(this, method, targetUri, peeler, msg, new RestconfRequest() {
                 @Override
                 public void onSuccess(final FullHttpResponse response) {
                     msg.release();

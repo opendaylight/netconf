@@ -15,6 +15,7 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpScheme;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
@@ -82,15 +83,16 @@ public class AbstractRequestProcessorTest {
         final var peeler = new SegmentPeeler(targetUri);
         assertEquals("rests", peeler.next());
         final var nettyMethod = request.method();
-        dispatcher.dispatch(switch (nettyMethod.name()) {
-            case "DELETE" -> ImplementedMethod.DELETE;
-            case "GET" -> ImplementedMethod.GET;
-            case "OPTIONS" -> ImplementedMethod.OPTIONS;
-            case "PATCH" -> ImplementedMethod.PATCH;
-            case "POST" -> ImplementedMethod.POST;
-            case "PUT" -> ImplementedMethod.PUT;
-            default -> throw new AssertionError("Unhandled method " + nettyMethod);
-        }, targetUri, peeler, request, callback);
+        dispatcher.dispatch(new RestconfSession(new WellKnownResources(""), dispatcher, HttpScheme.HTTP),
+            switch (nettyMethod.name()) {
+                case "DELETE" -> ImplementedMethod.DELETE;
+                case "GET" -> ImplementedMethod.GET;
+                case "OPTIONS" -> ImplementedMethod.OPTIONS;
+                case "PATCH" -> ImplementedMethod.PATCH;
+                case "POST" -> ImplementedMethod.POST;
+                case "PUT" -> ImplementedMethod.PUT;
+                default -> throw new AssertionError("Unhandled method " + nettyMethod);
+            }, targetUri, peeler, request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }
