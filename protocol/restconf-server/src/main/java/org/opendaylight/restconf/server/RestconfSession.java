@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import java.io.IOException;
 import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
@@ -93,5 +94,10 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             response.headers().setInt(STREAM_ID, streamId);
         }
         ctx.writeAndFlush(response);
+    }
+
+    @Override
+    public void close() throws IOException {
+        // FIXME is this what we want?
     }
 }

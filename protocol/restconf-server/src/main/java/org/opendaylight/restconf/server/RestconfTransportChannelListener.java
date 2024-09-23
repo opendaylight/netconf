@@ -52,4 +52,9 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     public void onTransportChannelFailed(final Throwable cause) {
         LOG.warn("Connection failed", cause);
     }
+
+    @Override
+    public void onTransportChannelClosed(final TransportChannel channel) {
+        channel.channel().pipeline().remove(RestconfSession.class).close();
+    }
 }

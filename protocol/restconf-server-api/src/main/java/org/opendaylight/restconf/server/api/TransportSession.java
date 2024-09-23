@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import com.google.common.annotations.Beta;
+import java.io.Closeable;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
@@ -16,6 +17,5 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @Beta
 @NonNullByDefault
-public interface TransportSession {
-    // FIXME: NETCONF-714: add the option to register resources for cleanup
+public interface TransportSession extends Closeable {
 }
