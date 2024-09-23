@@ -19,8 +19,9 @@ import org.opendaylight.restconf.api.FormattableBody;
  */
 @NonNullByDefault
 final class FormattableServerRequest extends NettyServerRequest<FormattableBody> {
-    FormattableServerRequest(final RequestParameters requestParameters, final RestconfRequest callback) {
-        super(requestParameters, callback);
+    FormattableServerRequest(final RestconfSession session, final RequestParameters requestParameters,
+            final RestconfRequest callback) {
+        super(session, requestParameters, callback);
     }
 
     @Override
