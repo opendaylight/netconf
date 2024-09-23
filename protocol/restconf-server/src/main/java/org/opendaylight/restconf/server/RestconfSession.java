@@ -63,7 +63,7 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
 
     private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
             final QueryStringDecoder decoder, final FullHttpRequest msg) {
-        dispatcher.dispatch(decoder, msg, new FutureCallback<>() {
+        dispatcher.dispatch(this, decoder, msg, new FutureCallback<>() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
                 msg.release();

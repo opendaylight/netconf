@@ -67,7 +67,8 @@ public class AbstractRequestProcessorTest {
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {
-        dispatcher.dispatch(new QueryStringDecoder(request.uri()), request, callback);
+        dispatcher.dispatch(new RestconfSession(new WellKnownResources(""), dispatcher),
+            new QueryStringDecoder(request.uri()), request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }

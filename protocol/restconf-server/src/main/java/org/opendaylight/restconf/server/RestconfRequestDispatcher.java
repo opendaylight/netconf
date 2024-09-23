@@ -52,7 +52,7 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final QueryStringDecoder decoder, final FullHttpRequest request,
+    void dispatch(final RestconfSession session, final QueryStringDecoder decoder, final FullHttpRequest request,
             final FutureCallback<FullHttpResponse> callback) {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
 
@@ -61,7 +61,7 @@ final class RestconfRequestDispatcher {
             errorTagMapping, defaultAcceptType, defaultPrettyPrint);
         try {
             switch (params.pathParameters().apiResource()) {
-                case PathParameters.DATA -> DataRequestProcessor.processDataRequest(params, restconfService, callback);
+                case PathParameters.DATA -> DataRequestProcessor.processDataRequest(session, params, restconfService, callback);
                 case PathParameters.OPERATIONS ->
                     OperationsRequestProcessor.processOperationsRequest(params, restconfService, callback);
                 case PathParameters.YANG_LIBRARY_VERSION ->

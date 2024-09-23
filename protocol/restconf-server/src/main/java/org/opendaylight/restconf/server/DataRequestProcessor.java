@@ -56,7 +56,7 @@ final class DataRequestProcessor {
         // hidden on purpose
     }
 
-    static void processDataRequest(final RequestParameters params, final RestconfServer service,
+    static void processDataRequest(final RestconfSession session, final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback) {
         final var contentType = params.contentType();
         final var apiPath = extractApiPath(params);
@@ -72,7 +72,7 @@ final class DataRequestProcessor {
             }
             // retrieve data and metadata for a resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.3
             // HEAD is same as GET but without content -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.2
-            case "HEAD", "GET" -> getData(params, service, callback, apiPath);
+            case "HEAD", "GET" -> getData(session, params, service, callback, apiPath);
             case "POST" -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create resource -> https://datatracker.ietf.org/doc/html/rfc8040#section-4.4.1
@@ -109,9 +109,9 @@ final class DataRequestProcessor {
         }
     }
 
-    private static void getData(final RequestParameters params, final RestconfServer service,
+    private static void getData(final RestconfSession session, final RequestParameters params, final RestconfServer service,
             final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<DataGetResult>(params, callback) {
+        final var request = new NettyServerRequest<DataGetResult>(session, callback) {
             @Override
             FullHttpResponse transform(final DataGetResult result) {
                 return responseBuilder(params, HttpResponseStatus.OK)
