@@ -31,6 +31,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import java.net.URI;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -41,6 +42,7 @@ import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
+import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -48,6 +50,7 @@ import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
+import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -93,8 +96,7 @@ final class RestconfRequestDispatcher {
         try {
             switch (params.pathParameters().apiResource()) {
                 case PathParameters.DATA -> processDataRequest(params, restconfService, callback);
-                case PathParameters.OPERATIONS ->
-                    OperationsRequestProcessor.processOperationsRequest(params, restconfService, callback);
+                case PathParameters.OPERATIONS -> processOperationsRequest(params, restconfService, callback);
                 case PathParameters.YANG_LIBRARY_VERSION ->
                     ModulesRequestProcessor.processYangLibraryVersion(params, restconfService, callback);
                 case PathParameters.MODULES ->
@@ -302,4 +304,65 @@ final class RestconfRequestDispatcher {
         }, apiPath);
     }
 
+    /**
+     * Process a request to
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC 8040 {+restconf}/operations</a> resource.
+     */
+    private static void processOperationsRequest(final RequestParameters params, final RestconfServer service,
+            final FutureCallback<FullHttpResponse> callback) {
+        final var apiPath = extractApiPath(params);
+        switch (params.method().name()) {
+            case "OPTIONS" -> {
+                if (apiPath.isEmpty()) {
+                    callback.onSuccess(OptionsServerRequest.withoutPatch(params.protocolVersion(),
+                        "GET, HEAD, OPTIONS"));
+                } else {
+                    service.operationsOPTIONS(new OptionsServerRequest(params, callback), apiPath);
+                }
+            }
+            case "HEAD", "GET" -> getOperations(params, service, callback, apiPath);
+            case "POST" -> {
+                if (NettyMediaTypes.RESTCONF_TYPES.contains(params.contentType())) {
+                    // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2
+                    postOperations(params, service, callback, apiPath);
+                } else {
+                    callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
+                }
+            }
+            default -> callback.onSuccess(unmappedRequestErrorResponse(params));
+        }
+    }
+
+    private static void getOperations(final RequestParameters params, final RestconfServer service,
+            final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
+        final var request = new NettyServerRequest<FormattableBody>(params, callback) {
+            @Override
+            FullHttpResponse transform(final FormattableBody result) {
+                return responseBuilder(params, HttpResponseStatus.OK).setBody(result).build();
+            }
+        };
+        if (apiPath.isEmpty()) {
+            service.operationsGET(request);
+        } else {
+            service.operationsGET(request, apiPath);
+        }
+    }
+
+    private static void postOperations(final RequestParameters params, final RestconfServer service,
+            final FutureCallback<FullHttpResponse> callback, final ApiPath apiPath) {
+        service.operationsPOST(new NettyServerRequest<>(params, callback) {
+            @Override
+            FullHttpResponse transform(final InvokeResult result) {
+                final var output = result.output();
+                return output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
+                    : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
+            }
+        }, restconfUri(params.baseUri()), apiPath,
+            requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new));
+    }
+
+    private static URI restconfUri(final URI uri) {
+        // we need to add `/` at the end of RESTCONF base path to create correct streams URLs
+        return URI.create(uri.toString().concat("/"));
+    }
 }
