@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -190,9 +191,14 @@ public final class OSGiNorthbound {
             transport = ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
         }
 
-        // FIXME: use seven-argument URI constructor instead, which correctly handles IPv6 addresses
-        final var baseUri = URI.create("%s://%s:%d/%s".formatted(scheme, configuration.host$_$name(),
-            configuration.bind$_$port(), configuration.restconf()));
+        final URI baseUri;
+        try {
+            baseUri = new URI(scheme, null, configuration.host$_$name(), configuration.bind$_$port(),
+                configuration.restconf(), null, null);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+
         return NettyEndpoint.props(
             new NettyEndpointConfiguration(
                 configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
