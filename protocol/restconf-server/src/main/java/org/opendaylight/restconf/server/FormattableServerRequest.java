@@ -25,6 +25,6 @@ final class FormattableServerRequest extends NettyServerRequest<FormattableBody>
 
     @Override
     FullHttpResponse transform(final FormattableBody result) {
-        return responseBuilder(requestParameters, HttpResponseStatus.OK).setBody(result).build();
+        return responseBuilder(requestParams, HttpResponseStatus.OK).setBody(result).build();
     }
 }
