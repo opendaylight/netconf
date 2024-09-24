@@ -35,7 +35,6 @@ import java.text.ParseException;
 import java.util.function.Function;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
-import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -336,12 +335,7 @@ final class RestconfRequestDispatcher {
     }
 
     private void getOperations(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
-        final var request = new NettyServerRequest<FormattableBody>(params, callback) {
-            @Override
-            FullHttpResponse transform(final FormattableBody result) {
-                return responseBuilder(params, HttpResponseStatus.OK).setBody(result).build();
-            }
-        };
+        final var request = new FormattableServerRequest(params, callback);
         if (apiPath.isEmpty()) {
             server.operationsGET(request);
         } else {
@@ -374,12 +368,7 @@ final class RestconfRequestDispatcher {
     private void processYangLibraryVersion(final RequestParameters params, final RestconfRequest callback) {
         switch (params.method().name()) {
             case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
-            case "HEAD", "GET" -> server.yangLibraryVersionGET(new NettyServerRequest<>(params, callback) {
-                @Override
-                FullHttpResponse transform(final FormattableBody result) {
-                    return responseBuilder(params, HttpResponseStatus.OK).setBody(result).build();
-                }
-            });
+            case "HEAD", "GET" -> server.yangLibraryVersionGET(new FormattableServerRequest(params, callback));
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
