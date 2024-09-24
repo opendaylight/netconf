@@ -181,7 +181,7 @@ final class RestconfRequestDispatcher {
         final var request = new NettyServerRequest<DataGetResult>(params, callback) {
             @Override
             FullHttpResponse transform(final DataGetResult result) {
-                return responseBuilder(params, HttpResponseStatus.OK)
+                return responseBuilder(requestParams, HttpResponseStatus.OK)
                     .setHeader(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE)
                     .setMetadataHeaders(result).setBody(result.body()).build();
             }
@@ -211,16 +211,16 @@ final class RestconfRequestDispatcher {
             FullHttpResponse transform(final DataPostResult result) {
                 return switch (result) {
                     case CreateResourceResult createResult -> {
-                        yield responseBuilder(params, HttpResponseStatus.CREATED)
-                        .setHeader(HttpHeaderNames.LOCATION,
-                            params.baseUri() + PathParameters.DATA + "/" + createResult.createdPath())
-                        .setMetadataHeaders(createResult)
-                        .build();
+                        yield responseBuilder(requestParams, HttpResponseStatus.CREATED)
+                            .setHeader(HttpHeaderNames.LOCATION,
+                                requestParams.baseUri() + PathParameters.DATA + "/" + createResult.createdPath())
+                            .setMetadataHeaders(createResult)
+                            .build();
                     }
                     case InvokeResult invokeResult -> {
                         final var output = invokeResult.output();
-                        yield output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
-                            : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
+                        yield output == null ? simpleResponse(requestParams, HttpResponseStatus.NO_CONTENT)
+                            : responseBuilder(requestParams, HttpResponseStatus.OK).setBody(output).build();
                     }
                 };
             }
@@ -232,7 +232,7 @@ final class RestconfRequestDispatcher {
             @Override
             FullHttpResponse transform(final DataPutResult result) {
                 final var status = result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT;
-                return responseBuilder(params, status).setMetadataHeaders(result).build();
+                return responseBuilder(requestParams, status).setMetadataHeaders(result).build();
             }
         };
         final var dataResourceBody = requestBody(params, JsonResourceBody::new, XmlResourceBody::new);
@@ -247,7 +247,7 @@ final class RestconfRequestDispatcher {
         final var request = new NettyServerRequest<DataPatchResult>(params, callback) {
             @Override
             FullHttpResponse transform(final DataPatchResult result) {
-                return responseBuilder(params, HttpResponseStatus.OK).setMetadataHeaders(result).build();
+                return responseBuilder(requestParams, HttpResponseStatus.OK).setMetadataHeaders(result).build();
             }
         };
         final var dataResourceBody = requestBody(params, JsonResourceBody::new, XmlResourceBody::new);
@@ -263,7 +263,7 @@ final class RestconfRequestDispatcher {
             @Override
             FullHttpResponse transform(final DataYangPatchResult result) {
                 final var patchStatus = result.status();
-                return responseBuilder(params, patchResponseStatus(patchStatus, params.errorTagMapping()))
+                return responseBuilder(requestParams, patchResponseStatus(patchStatus, requestParams.errorTagMapping()))
                     .setBody(new YangPatchStatusBody(patchStatus))
                     .setMetadataHeaders(result)
                     .build();
@@ -301,7 +301,7 @@ final class RestconfRequestDispatcher {
         server.dataDELETE(new NettyServerRequest<>(params, callback) {
             @Override
             FullHttpResponse transform(final Empty result) {
-                return simpleResponse(params, HttpResponseStatus.NO_CONTENT);
+                return simpleResponse(requestParams, HttpResponseStatus.NO_CONTENT);
             }
         }, apiPath);
     }
@@ -349,8 +349,8 @@ final class RestconfRequestDispatcher {
             @Override
             FullHttpResponse transform(final InvokeResult result) {
                 final var output = result.output();
-                return output == null ? simpleResponse(params, HttpResponseStatus.NO_CONTENT)
-                    : responseBuilder(params, HttpResponseStatus.OK).setBody(output).build();
+                return output == null ? simpleResponse(requestParams, HttpResponseStatus.NO_CONTENT)
+                    : responseBuilder(requestParams, HttpResponseStatus.OK).setBody(output).build();
             }
         }, restconfUri(params.baseUri()), apiPath,
             requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new));
@@ -426,7 +426,7 @@ final class RestconfRequestDispatcher {
                     throw new ServerErrorException(ErrorTag.OPERATION_FAILED,
                         SOURCE_READ_FAILURE_ERROR + e.getMessage(), e);
                 }
-                return simpleResponse(params, HttpResponseStatus.OK, mediaType, bytes);
+                return simpleResponse(requestParams, HttpResponseStatus.OK, mediaType, bytes);
             }
         };
     }

@@ -22,19 +22,19 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
 @NonNullByDefault
 abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
-    protected final RequestParameters requestParameters;
+    final RequestParameters requestParams;
+
     private final RestconfRequest callback;
 
-    NettyServerRequest(final RequestParameters requestParameters, final RestconfRequest callback) {
-        super(requestParameters.queryParameters(), requestParameters.defaultPrettyPrint(),
-            requestParameters.errorTagMapping());
-        this.requestParameters = requireNonNull(requestParameters);
+    NettyServerRequest(final RequestParameters requestParams, final RestconfRequest callback) {
+        super(requestParams.queryParameters(), requestParams.defaultPrettyPrint(), requestParams.errorTagMapping());
+        this.requestParams = requireNonNull(requestParams);
         this.callback = requireNonNull(callback);
     }
 
     @Override
     public final @Nullable Principal principal() {
-        return requestParameters.principal();
+        return requestParams.principal();
     }
 
     @Override
@@ -44,8 +44,9 @@ abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
 
     @Override
     protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
-        callback.onSuccess(responseBuilder(requestParameters, HttpResponseStatus.valueOf(status.code()))
-            .setBody(body).build());
+        callback.onSuccess(responseBuilder(requestParams, HttpResponseStatus.valueOf(status.code()))
+            .setBody(body)
+            .build());
     }
 
     @Override
