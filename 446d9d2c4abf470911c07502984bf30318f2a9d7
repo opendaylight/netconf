@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9c65ac6c_86a7b564",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-24T13:27:05Z",
+      "side": 1,
+      "message": "This is configured by NettyEndpoint configuration. IMO let\u0027s reuse it.",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57ab26f8_d461a234",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-24T13:27:05Z",
+      "side": 1,
+      "message": "This is configured by NettyEndpoint configuration. IMO let\u0027s reuse it.",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "db95da30_ef321245",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
         "patchSetId": 5
