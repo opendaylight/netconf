@@ -60,7 +60,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     void optionsOperations() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS,
             OPERATIONS_PATH_WITH_ID);
-        doAnswer(answerCompleteWith(OptionsResult.RPC)).when(service).operationsOPTIONS(any(), any());
+        doAnswer(answerCompleteWith(OptionsResult.RPC)).when(server).operationsOPTIONS(any(), any());
 
         assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS, POST");
     }
@@ -69,7 +69,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void getOperationsRoot(final TestEncoding encoding, final String content) {
         final var result = formattableBody(encoding, content);
-        doAnswer(answerCompleteWith(result)).when(service).operationsGET(any());
+        doAnswer(answerCompleteWith(result)).when(server).operationsGET(any());
 
         final var request = buildRequest(HttpMethod.GET, OPERATIONS_PATH, encoding, null);
         final var response = dispatch(request);
@@ -80,11 +80,11 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void getOperationsWithId(final TestEncoding encoding, final String content) {
         final var result = formattableBody(encoding, content);
-        doAnswer(answerCompleteWith(result)).when(service).operationsGET(any(), any(ApiPath.class));
+        doAnswer(answerCompleteWith(result)).when(server).operationsGET(any(), any(ApiPath.class));
 
         final var request = buildRequest(HttpMethod.GET, OPERATIONS_PATH_WITH_ID, encoding, null);
         final var response = dispatch(request);
-        verify(service).operationsGET(any(), apiPathCaptor.capture());
+        verify(server).operationsGET(any(), apiPathCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
@@ -94,12 +94,12 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource
     void postOperations(final TestEncoding encoding, final String input, final String output) throws Exception {
         final var result = new InvokeResult(output == null ? null : formattableBody(encoding, output));
-        doAnswer(answerCompleteWith(result)).when(service)
+        doAnswer(answerCompleteWith(result)).when(server)
             .operationsPOST(any(), any(), any(ApiPath.class), any(OperationInputBody.class));
 
         final var request = buildRequest(HttpMethod.POST, OPERATIONS_PATH_WITH_ID, encoding, input);
         final var response = dispatch(request);
-        verify(service).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
+        verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         final var expectedClass = encoding.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class;
@@ -124,14 +124,14 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void postOperationsNoContent() throws Exception {
         final var result = new InvokeResult(null);
-        doAnswer(answerCompleteWith(result)).when(service)
+        doAnswer(answerCompleteWith(result)).when(server)
             .operationsPOST(any(), any(), any(ApiPath.class), any(OperationInputBody.class));
 
         // post request with no content and no content-type header
         // can be used to invoke rpc with no input defined
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, OPERATIONS_PATH_WITH_ID);
         final var response = dispatch(request);
-        verify(service).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
+        verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
         assertEquals(API_PATH, apiPathCaptor.getValue());
 
         // empty body expected to be passed using a wrapper object of server default encoding
