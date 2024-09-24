@@ -9,17 +9,10 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FutureCallback;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
@@ -63,25 +56,10 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
 
     private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
             final QueryStringDecoder decoder, final FullHttpRequest msg) {
-        dispatcher.dispatch(decoder, msg, new FutureCallback<>() {
+        dispatcher.dispatch(decoder, msg, new RestconfRequest() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
                 msg.release();
-                respond(ctx, streamId, response);
-            }
-
-            @Override
-            public void onFailure(final Throwable throwable) {
-                msg.release();
-
-                final var message = throwable.getMessage();
-                final var content = message == null ? Unpooled.EMPTY_BUFFER
-                    : ByteBufUtil.writeUtf8(ctx.alloc(), message);
-                final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                    content);
-                response.headers()
-                    .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
-                    .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
                 respond(ctx, streamId, response);
             }
         });

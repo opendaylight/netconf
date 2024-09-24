@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 
-import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.security.Principal;
@@ -24,9 +23,9 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
 @NonNullByDefault
 abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
     protected final RequestParameters requestParameters;
-    private final FutureCallback<FullHttpResponse> callback;
+    private final RestconfRequest callback;
 
-    NettyServerRequest(final RequestParameters requestParameters, final FutureCallback<FullHttpResponse> callback) {
+    NettyServerRequest(final RequestParameters requestParameters, final RestconfRequest callback) {
         super(requestParameters.queryParameters(), requestParameters.defaultPrettyPrint(),
             requestParameters.errorTagMapping());
         this.requestParameters = requireNonNull(requestParameters);

@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -18,7 +17,7 @@ import org.opendaylight.restconf.server.api.OptionsResult;
 
 @NonNullByDefault
 final class OptionsServerRequest extends NettyServerRequest<OptionsResult> {
-    OptionsServerRequest(final RequestParameters requestParameters, final FutureCallback<FullHttpResponse> callback) {
+    OptionsServerRequest(final RequestParameters requestParameters, final RestconfRequest callback) {
         super(requestParameters, callback);
     }
 
