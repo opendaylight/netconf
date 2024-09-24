@@ -17,7 +17,6 @@ import io.netty.util.AsciiString;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
@@ -50,16 +49,16 @@ public final class RestconfStreamService implements EventStreamService {
     private static final int ERROR_BUF_SIZE = 2048;
 
     private final RestconfStream.Registry streamRegistry;
-    private final String basePath;
+    private final String restconf;
     private final ErrorTagMapping errorTagMapping;
     private final RestconfStream.EncodingName defaultEncoding;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    public RestconfStreamService(final RestconfStream.Registry registry, final URI baseUri,
+    public RestconfStreamService(final RestconfStream.Registry registry, final String restconf,
             final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
             final PrettyPrintParam defaultPrettyPrint) {
-        this.streamRegistry = requireNonNull(registry);
-        basePath = requireNonNull(baseUri).getPath();
+        streamRegistry = requireNonNull(registry);
+        this.restconf = requireNonNull(restconf);
         defaultEncoding = NettyMediaTypes.JSON_TYPES.contains(defaultAcceptType) ? RFC8040_JSON : RFC8040_XML;
         this.errorTagMapping = errorTagMapping;
         this.defaultPrettyPrint = defaultPrettyPrint;
@@ -71,7 +70,7 @@ public final class RestconfStreamService implements EventStreamService {
         // parse URI.
         // pattern /basePath/streams/streamEncoding/streamName
         final var decoder = new QueryStringDecoder(requestUri);
-        final var pathParams = PathParameters.from(decoder.path(), basePath);
+        final var pathParams = PathParameters.from(decoder.path(), restconf);
         if (!PathParameters.STREAMS.equals(pathParams.apiResource())) {
             callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, INVALID_STREAM_URI_ERROR, defaultEncoding));
             return;
@@ -95,7 +94,7 @@ public final class RestconfStreamService implements EventStreamService {
         // Try starting stream via registry stream subscriber
         final var sender = new RestconfStream.Sender() {
             @Override
-            public void sendDataMessage(String data) {
+            public void sendDataMessage(final String data) {
                 listener.onEventField("data", data);
             }
 

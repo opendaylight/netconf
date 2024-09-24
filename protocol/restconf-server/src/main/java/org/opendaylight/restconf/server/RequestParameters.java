@@ -14,11 +14,13 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -31,7 +33,7 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
  */
 @NonNullByDefault
 final class RequestParameters {
-    private final URI baseUri;
+    private final String restconf;
     private final PathParameters pathParameters;
     private final AsciiString contentType;
     private final AsciiString defaultAcceptType;
@@ -41,10 +43,10 @@ final class RequestParameters {
     private final @Nullable Principal principal;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    RequestParameters(final URI baseUri, final QueryStringDecoder decoder, final FullHttpRequest request,
+    RequestParameters(final String restconf, final QueryStringDecoder decoder, final FullHttpRequest request,
             final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
             final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
-        this.baseUri = requireNonNull(baseUri);
+        this.restconf = requireNonNull(restconf);
         this.request = requireNonNull(request);
         this.principal = principal;
         this.errorTagMapping = requireNonNull(errorTagMapping);
@@ -52,7 +54,7 @@ final class RequestParameters {
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
         contentType = extractContentType(request, defaultAcceptType);
-        pathParameters = PathParameters.from(decoder.path(), baseUri.getPath());
+        pathParameters = PathParameters.from(decoder.path(), restconf);
         queryParameters = QueryParameters.ofMultiValue(decoder.parameters());
     }
 
@@ -78,21 +80,40 @@ final class RequestParameters {
     }
 
     /**
-     * Returns base URI configured.
+     * Returns this request's base URI.
      *
-     * @return base URI value
+     * @return base URI
      */
     public URI baseUri() {
-        return baseUri;
-    }
+        final var uri = request.uri();
+        if (HttpUtil.isAsteriskForm(uri)) {
+            // FIXME: should be 400 Bad Request
+            throw new IllegalStateException("Unexpected asterisk");
+        }
 
-    /**
-     * Returns base path of URI configured.
-     *
-     * @return base path value
-     */
-    public String basePath() {
-        return baseUri.getPath();
+        final String scheme;
+        final String authority;
+
+        if (HttpUtil.isOriginForm(uri)) {
+            // FIXME: derive from somewhere
+            scheme = null;
+            authority = request.headers().get(HttpHeaderNames.HOST);
+            if (authority == null) {
+                // FIXME: should be 400 Bad Request
+                throw new IllegalStateException("Missing Host header");
+            }
+        } else {
+            final var reqUri = URI.create(uri);
+            scheme = reqUri.getScheme();
+            authority = reqUri.getAuthority();
+
+        }
+
+        try {
+            return new URI(scheme, authority, restconf + "/", null, null);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Failed to create construct base URI", e);
+        }
     }
 
     /**

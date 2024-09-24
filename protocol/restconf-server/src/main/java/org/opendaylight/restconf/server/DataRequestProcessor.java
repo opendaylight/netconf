@@ -146,7 +146,7 @@ final class DataRequestProcessor {
                     case CreateResourceResult createResult -> {
                         yield responseBuilder(params, HttpResponseStatus.CREATED)
                             .setHeader(HttpHeaderNames.LOCATION,
-                                params.baseUri() + PathParameters.DATA + "/" + createResult.createdPath())
+                                params.baseUri().toString() + PathParameters.DATA + "/" + createResult.createdPath())
                             .setMetadataHeaders(createResult)
                             .build();
                     }

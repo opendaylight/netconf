@@ -63,7 +63,7 @@ public class AbstractRequestProcessorTest {
     void beforeEach() {
         doReturn(null).when(principalService).acquirePrincipal(any());
         dispatcher = new RestconfRequestDispatcher(service, principalService,
-            BASE_URI, ERROR_TAG_MAPPING, DEFAULT_ENCODING.responseType, PRETTY_PRINT);
+            BASE_PATH, ERROR_TAG_MAPPING, DEFAULT_ENCODING.responseType, PRETTY_PRINT);
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {

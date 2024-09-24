@@ -18,7 +18,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
-import java.net.URI;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -29,7 +28,7 @@ import org.slf4j.LoggerFactory;
 final class RestconfRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
 
-    private final URI baseUri;
+    private final String restconf;
     private final RestconfServer restconfService;
     private final PrincipalService principalService;
     private final ErrorTagMapping errorTagMapping;
@@ -37,18 +36,18 @@ final class RestconfRequestDispatcher {
     private final PrettyPrintParam defaultPrettyPrint;
 
     RestconfRequestDispatcher(final RestconfServer restconfService, final PrincipalService principalService,
-            final URI baseUri, final ErrorTagMapping errorTagMapping,
+            final String restconf, final ErrorTagMapping errorTagMapping,
             final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
         this.restconfService = requireNonNull(restconfService);
         this.principalService = requireNonNull(principalService);
-        this.baseUri = requireNonNull(baseUri);
+        this.restconf = requireNonNull(restconf);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.defaultAcceptType = requireNonNull(defaultAcceptType);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), restconfService.getClass());
         LOG.info("Base path: {}, default accept: {}, default pretty print: {}",
-            baseUri, defaultAcceptType, defaultPrettyPrint.value());
+            restconf, defaultAcceptType, defaultPrettyPrint.value());
     }
 
     @SuppressWarnings("IllegalCatch")
@@ -57,7 +56,7 @@ final class RestconfRequestDispatcher {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
 
         final var principal = principalService.acquirePrincipal(request);
-        final var params = new RequestParameters(baseUri, decoder, request, principal,
+        final var params = new RequestParameters(restconf, decoder, request, principal,
             errorTagMapping, defaultAcceptType, defaultPrettyPrint);
         try {
             switch (params.pathParameters().apiResource()) {
