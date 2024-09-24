@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "941c9539_fe479a9c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-24T12:51:45Z",
+      "side": 0,
+      "message": "why are we losing this?",
+      "range": {
+        "startLine": 114,
+        "startChar": 4,
+        "endLine": 114,
+        "endChar": 54
+      },
+      "revId": "5cc43e790a9b027d37b6f7b3a928b1e1b8a66864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
