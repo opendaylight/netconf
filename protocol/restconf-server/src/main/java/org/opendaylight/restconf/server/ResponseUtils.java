@@ -54,11 +54,6 @@ final class ResponseUtils {
         // hidden on purpose
     }
 
-    static FullHttpResponse optionsResponse(final RequestParameters params, final String allowHeaderValue) {
-        return responseBuilder(params, HttpResponseStatus.OK)
-            .setHeader(HttpHeaderNames.ALLOW, allowHeaderValue).build();
-    }
-
     static FullHttpResponse unmappedRequestErrorResponse(final RequestParameters params) {
         return responseBuilder(params, responseStatus(ErrorTag.DATA_MISSING, params.errorTagMapping()))
             .setBody(new YangErrorsBody(UNMAPPED_REQUEST_SERVER_ERROR)).build();

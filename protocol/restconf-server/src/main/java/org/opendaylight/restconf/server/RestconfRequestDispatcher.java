@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.server.NettyMediaTypes.RESTCONF_TYPES;
 import static org.opendaylight.restconf.server.NettyMediaTypes.YANG_PATCH_TYPES;
-import static org.opendaylight.restconf.server.ResponseUtils.optionsResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.responseStatus;
 import static org.opendaylight.restconf.server.ResponseUtils.simpleErrorResponse;
@@ -19,6 +18,8 @@ import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErro
 import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTypeErrorResponse;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -462,6 +463,13 @@ final class RestconfRequestDispatcher {
             final Function<InputStream, T> jsonBodyBuilder, final Function<InputStream, T> xmlBodyBuilder) {
         return NettyMediaTypes.JSON_TYPES.contains(params.contentType())
             ? jsonBodyBuilder.apply(params.requestBody()) : xmlBodyBuilder.apply(params.requestBody());
+    }
+
+    private static FullHttpResponse optionsResponse(final RequestParameters params, final String allowHeaderValue) {
+        final var response = new DefaultFullHttpResponse(params.protocolVersion(), HttpResponseStatus.OK,
+            Unpooled.EMPTY_BUFFER);
+        response.headers().set(HttpHeaderNames.ALLOW, allowHeaderValue);
+        return response;
     }
 
     private record ModuleFile(ApiPath mountPath, String name) {
