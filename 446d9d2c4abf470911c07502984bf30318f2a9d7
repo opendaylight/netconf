@@ -50,6 +50,29 @@
       "message": "Use URI constructor instead: https://git.opendaylight.org/gerrit/c/netconf/+/113649",
       "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f2f7230_242a1969",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiRequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-24T14:17:14Z",
+      "side": 1,
+      "message": "Most certainly not!\n\nWe have just spent a year eliminating buffering, and we will *not* be re-introducing it.",
+      "range": {
+        "startLine": 140,
+        "startChar": 31,
+        "endLine": 140,
+        "endChar": 78
+      },
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
