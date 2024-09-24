@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "74d4c754_600ee71a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-24T14:19:32Z",
+      "side": 1,
+      "message": "why do we even need it?  we should be just fine with host-relative addressing",
+      "parentUuid": "9c65ac6c_86a7b564",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57ab26f8_d461a234",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
         "patchSetId": 5
@@ -31,6 +49,29 @@
       "writtenOn": "2024-09-24T13:27:05Z",
       "side": 1,
       "message": "This is configured by NettyEndpoint configuration. IMO let\u0027s reuse it.",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6db6c81_326f5339",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-24T14:19:32Z",
+      "side": 1,
+      "message": "why do we even need a separate port?",
+      "range": {
+        "startLine": 51,
+        "startChar": 34,
+        "endLine": 51,
+        "endChar": 38
+      },
       "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
