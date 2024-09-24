@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9a584a07_d57ebd8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-24T20:30:13Z",
+      "side": 1,
+      "message": "This will be resolved via https://git.opendaylight.org/gerrit/c/netconf/+/113658",
+      "revId": "98f847704bacfe381a99d4778aec7f8db66117d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dfd8ed78_1d2a353f",
         "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
         "patchSetId": 1
