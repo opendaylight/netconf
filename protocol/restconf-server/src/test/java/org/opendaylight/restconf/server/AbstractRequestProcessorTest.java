@@ -61,7 +61,7 @@ public class AbstractRequestProcessorTest {
     }
 
     @Mock
-    protected RestconfServer service;
+    protected RestconfServer server;
     @Mock
     private PrincipalService principalService;
     @Mock
@@ -74,7 +74,7 @@ public class AbstractRequestProcessorTest {
     @BeforeEach
     void beforeEach() {
         doReturn(null).when(principalService).acquirePrincipal(any());
-        dispatcher = new RestconfRequestDispatcher(service, principalService,
+        dispatcher = new RestconfRequestDispatcher(server, principalService,
             BASE_URI, ERROR_TAG_MAPPING, DEFAULT_ENCODING.responseType, PRETTY_PRINT);
     }
 

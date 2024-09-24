@@ -70,7 +70,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void getYangLibraryVersion(final TestEncoding encoding, final String content) {
         final var result = formattableBody(encoding, content);
-        doAnswer(answerCompleteWith(result)).when(service).yangLibraryVersionGET(any());
+        doAnswer(answerCompleteWith(result)).when(server).yangLibraryVersionGET(any());
 
         final var request = buildRequest(HttpMethod.GET, YANG_LIBRARY_VERSION_URI, encoding, null);
         final var response = dispatch(request);
@@ -83,9 +83,9 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         final var result = new ModulesGetResult(charSource(content));
         final var revision = hasRevision ? REVISION_VALUE : null;
         if (encoding.isYin()) {
-            doAnswer(answerCompleteWith(result)).when(service).modulesYinGET(any(), eq(MODULE_FILENAME), eq(revision));
+            doAnswer(answerCompleteWith(result)).when(server).modulesYinGET(any(), eq(MODULE_FILENAME), eq(revision));
         } else {
-            doAnswer(answerCompleteWith(result)).when(service).modulesYangGET(any(), eq(MODULE_FILENAME), eq(revision));
+            doAnswer(answerCompleteWith(result)).when(server).modulesYangGET(any(), eq(MODULE_FILENAME), eq(revision));
         }
 
         final var uri = MODULE_URI + (hasRevision ? REVISION_PARAM : "");
@@ -100,10 +100,10 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         final var result = new ModulesGetResult(charSource(content));
         final var revision = hasRevision ? REVISION_VALUE : null;
         if (encoding.isYin()) {
-            doAnswer(answerCompleteWith(result)).when(service)
+            doAnswer(answerCompleteWith(result)).when(server)
                 .modulesYinGET(any(), eq(MOUNT_API_PATH), eq(MODULE_FILENAME), eq(revision));
         } else {
-            doAnswer(answerCompleteWith(result)).when(service)
+            doAnswer(answerCompleteWith(result)).when(server)
                 .modulesYangGET(any(), eq(MOUNT_API_PATH), eq(MODULE_FILENAME), eq(revision));
         }
         final var uri = MODULE_URI_WITH_MOUNT + (hasRevision ? REVISION_PARAM : "");
@@ -139,9 +139,9 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
 
         final var result = new ModulesGetResult(source);
         if (encoding.isYin()) {
-            doAnswer(answerCompleteWith(result)).when(service).modulesYinGET(any(), eq(MODULE_FILENAME), isNull());
+            doAnswer(answerCompleteWith(result)).when(server).modulesYinGET(any(), eq(MODULE_FILENAME), isNull());
         } else {
-            doAnswer(answerCompleteWith(result)).when(service).modulesYangGET(any(), eq(MODULE_FILENAME), isNull());
+            doAnswer(answerCompleteWith(result)).when(server).modulesYangGET(any(), eq(MODULE_FILENAME), isNull());
         }
 
         final var request = buildRequest(HttpMethod.GET, MODULE_URI, encoding, null);

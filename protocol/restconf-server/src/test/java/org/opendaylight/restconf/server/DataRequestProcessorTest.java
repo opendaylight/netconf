@@ -103,7 +103,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void optionsDataStore() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH);
-        doAnswer(answerCompleteWith(OptionsResult.DATASTORE)).when(service).dataOPTIONS(any());
+        doAnswer(answerCompleteWith(OptionsResult.DATASTORE)).when(server).dataOPTIONS(any());
 
         final var response = dispatch(request);
         assertResponse(response, HttpResponseStatus.OK);
@@ -117,7 +117,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void optionsDataStoreReadOnly() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH);
-        doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(service).dataOPTIONS(any());
+        doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(server).dataOPTIONS(any());
 
         final var response = dispatch(request);
         assertResponse(response, HttpResponseStatus.OK);
@@ -127,7 +127,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void optionsOperation() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
-        doAnswer(answerCompleteWith(OptionsResult.ACTION)).when(service).dataOPTIONS(any(), any());
+        doAnswer(answerCompleteWith(OptionsResult.ACTION)).when(server).dataOPTIONS(any(), any());
 
         final var response = dispatch(request);
         assertResponse(response, HttpResponseStatus.OK);
@@ -137,7 +137,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void optionsResource() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
-        doAnswer(answerCompleteWith(OptionsResult.RESOURCE)).when(service).dataOPTIONS(any(), any());
+        doAnswer(answerCompleteWith(OptionsResult.RESOURCE)).when(server).dataOPTIONS(any(), any());
 
         final var response = dispatch(request);
         assertResponse(response, HttpResponseStatus.OK);
@@ -151,7 +151,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void optionsReadOnly() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
-        doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(service).dataOPTIONS(any(), any());
+        doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(server).dataOPTIONS(any(), any());
 
         final var response = dispatch(request);
         assertResponse(response, HttpResponseStatus.OK);
@@ -162,7 +162,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void getDataRoot(final TestEncoding encoding, final String content) {
         final var result = new DataGetResult(formattableBody(encoding, content), ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(service).dataGET(any());
+        doAnswer(answerCompleteWith(result)).when(server).dataGET(any());
 
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
         final var response = dispatch(request);
@@ -176,11 +176,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void getDataById(final TestEncoding encoding, final String content) {
         final var result = new DataGetResult(formattableBody(encoding, content), null, null);
-        doAnswer(answerCompleteWith(result)).when(service).dataGET(any(), any(ApiPath.class));
+        doAnswer(answerCompleteWith(result)).when(server).dataGET(any(), any(ApiPath.class));
 
         final var request = buildRequest(HttpMethod.GET, DATA_PATH_WITH_ID, encoding, null);
         final var response = dispatch(request);
-        verify(service).dataGET(any(), apiPathCaptor.capture());
+        verify(server).dataGET(any(), apiPathCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
@@ -191,11 +191,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataRoot(final TestEncoding encoding, final String content) throws Exception {
         final var result = new CreateResourceResult(NEW_API_PATH, ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(service).dataPOST(any(), any(ChildBody.class));
+        doAnswer(answerCompleteWith(result)).when(server).dataPOST(any(), any(ChildBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPOST(any(), childBodyCaptor.capture());
+        verify(server).dataPOST(any(), childBodyCaptor.capture());
 
         final var expectedClass = encoding.isJson() ? JsonChildBody.class : XmlChildBody.class;
         assertInputContent(childBodyCaptor.getValue(), expectedClass, content);
@@ -209,12 +209,12 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataWithId(final TestEncoding encoding, final String content) throws Exception {
         final var result = new CreateResourceResult(NEW_API_PATH, null, null);
-        doAnswer(answerCompleteWith(result)).when(service)
+        doAnswer(answerCompleteWith(result)).when(server)
             .dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPOST(any(), apiPathCaptor.capture(), dataPostBodyCaptor.capture());
+        verify(server).dataPOST(any(), apiPathCaptor.capture(), dataPostBodyCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         final var expectedClass = encoding.isJson() ? JsonDataPostBody.class : XmlDataPostBody.class;
@@ -228,11 +228,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataRootRpc(final TestEncoding encoding, final String content) throws Exception {
         final var invokeResult = new InvokeResult(formattableBody(encoding, content));
-        doAnswer(answerCompleteWith(invokeResult)).when(service).dataPOST(any(), any(ChildBody.class));
+        doAnswer(answerCompleteWith(invokeResult)).when(server).dataPOST(any(), any(ChildBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPOST(any(), childBodyCaptor.capture());
+        verify(server).dataPOST(any(), childBodyCaptor.capture());
 
         final var expectedClass = encoding.isJson() ? JsonChildBody.class : XmlChildBody.class;
         assertInputContent(childBodyCaptor.getValue(), expectedClass, content);
@@ -244,12 +244,12 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataWithIdRpc(final TestEncoding encoding, final String content) throws Exception {
         final var invokeResult = new InvokeResult(formattableBody(encoding, content));
-        doAnswer(answerCompleteWith(invokeResult)).when(service)
+        doAnswer(answerCompleteWith(invokeResult)).when(server)
             .dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPOST(any(), apiPathCaptor.capture(), dataPostBodyCaptor.capture());
+        verify(server).dataPOST(any(), apiPathCaptor.capture(), dataPostBodyCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         final var expectedClass = encoding.isJson() ? JsonDataPostBody.class : XmlDataPostBody.class;
@@ -262,11 +262,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodingsWithCreatedFlag")
     void putDataRoot(final TestEncoding encoding, final String content, final boolean created) throws Exception {
         final var result = new DataPutResult(created, ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(service).dataPUT(any(), any(ResourceBody.class));
+        doAnswer(answerCompleteWith(result)).when(server).dataPUT(any(), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PUT, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPUT(any(), resourceBodyCaptor.capture());
+        verify(server).dataPUT(any(), resourceBodyCaptor.capture());
 
         final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
         assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
@@ -279,12 +279,12 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodingsWithCreatedFlag")
     void putDataWithId(final TestEncoding encoding, final String content, final boolean created) throws Exception {
         final var result = new DataPutResult(created, null, null);
-        doAnswer(answerCompleteWith(result)).when(service)
+        doAnswer(answerCompleteWith(result)).when(server)
             .dataPUT(any(), any(ApiPath.class), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PUT, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPUT(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
+        verify(server).dataPUT(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
@@ -297,11 +297,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void patchDataRoot(final TestEncoding encoding, final String content) throws Exception {
         final var result = new DataPatchResult(null, null);
-        doAnswer(answerCompleteWith(result)).when(service).dataPATCH(any(), any(ResourceBody.class));
+        doAnswer(answerCompleteWith(result)).when(server).dataPATCH(any(), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPATCH(any(), resourceBodyCaptor.capture());
+        verify(server).dataPATCH(any(), resourceBodyCaptor.capture());
 
         final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
         assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
@@ -312,12 +312,12 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void patchDataWithId(final TestEncoding encoding, final String content) throws Exception {
         final var result = new DataPatchResult(ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(service)
+        doAnswer(answerCompleteWith(result)).when(server)
             .dataPATCH(any(), any(ApiPath.class), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(service).dataPATCH(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
+        verify(server).dataPATCH(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
         final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
@@ -331,11 +331,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     void yangPatch(final TestEncoding encoding, final String input, final PatchStatusContext output,
             final ErrorTag expectedErrorTag, final List<String> expectedContentMessage) throws Exception {
         final var result = new DataYangPatchResult(output);
-        doAnswer(answerCompleteWith(result)).when(service).dataPATCH(any(), any(PatchBody.class));
+        doAnswer(answerCompleteWith(result)).when(server).dataPATCH(any(), any(PatchBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, input);
         final var response = dispatch(request);
-        verify(service).dataPATCH(any(), patchBodyCaptor.capture());
+        verify(server).dataPATCH(any(), patchBodyCaptor.capture());
 
         final var expectedClass = encoding.isJson() ? JsonPatchBody.class : XmlPatchBody.class;
         assertInputContent(patchBodyCaptor.getValue(), expectedClass, input);
@@ -382,11 +382,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void deleteData() {
         final var result = Empty.value();
-        doAnswer(answerCompleteWith(result)).when(service).dataDELETE(any(), any(ApiPath.class));
+        doAnswer(answerCompleteWith(result)).when(server).dataDELETE(any(), any(ApiPath.class));
 
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE, DATA_PATH_WITH_ID);
         final var response = dispatch(request);
-        verify(service).dataDELETE(any(), apiPathCaptor.capture());
+        verify(server).dataDELETE(any(), apiPathCaptor.capture());
         assertEquals(API_PATH, apiPathCaptor.getValue());
         assertResponse(response, HttpResponseStatus.NO_CONTENT);
     }

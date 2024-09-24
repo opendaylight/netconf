@@ -95,7 +95,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void runtimeException(final TestEncoding encoding) {
         final var errorMessage = "runtime-error";
-        doThrow(new IllegalStateException(errorMessage)).when(service).dataGET(any());
+        doThrow(new IllegalStateException(errorMessage)).when(server).dataGET(any());
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
         final var response = dispatch(request);
         assertErrorResponse(response, encoding, ErrorTag.OPERATION_FAILED, errorMessage);
@@ -113,7 +113,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void encodingResponseFailure(final TestEncoding encoding) throws IOException {
         final var result = new DataGetResult(body);
-        doAnswer(answerCompleteWith(result)).when(service).dataGET(any());
+        doAnswer(answerCompleteWith(result)).when(server).dataGET(any());
 
         final var errorMessage = "encoding-error";
         final var exception = new IOException(errorMessage);
