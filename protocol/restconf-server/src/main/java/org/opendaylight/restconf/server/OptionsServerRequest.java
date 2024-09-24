@@ -39,7 +39,7 @@ final class OptionsServerRequest extends NettyServerRequest<OptionsResult> {
     }
 
     private FullHttpResponse withoutPatch(final String allow) {
-        return withoutPatch(requestParameters.protocolVersion(), allow);
+        return withoutPatch(requestParams.protocolVersion(), allow);
     }
 
     static FullHttpResponse withoutPatch(final HttpVersion version, final String allow) {
