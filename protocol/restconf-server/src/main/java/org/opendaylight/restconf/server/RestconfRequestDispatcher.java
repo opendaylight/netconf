@@ -19,7 +19,6 @@ import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErro
 import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTypeErrorResponse;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -99,8 +98,7 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final QueryStringDecoder decoder, final FullHttpRequest request,
-            final FutureCallback<FullHttpResponse> callback) {
+    void dispatch(final QueryStringDecoder decoder, final FullHttpRequest request, final RestconfRequest callback) {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
 
         final var principal = principalService.acquirePrincipal(request);
@@ -128,7 +126,7 @@ final class RestconfRequestDispatcher {
      * Process a request to <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.1">RFC 8040 {+restconf}/data</a>
      * resource.
      */
-    private void processDataRequest(final RequestParameters params, final FutureCallback<FullHttpResponse> callback) {
+    private void processDataRequest(final RequestParameters params, final RestconfRequest callback) {
         final var contentType = params.contentType();
         final var apiPath = extractApiPath(params);
         switch (params.method().name()) {
@@ -180,8 +178,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void getData(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void getData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         final var request = new NettyServerRequest<DataGetResult>(params, callback) {
             @Override
             FullHttpResponse transform(final DataGetResult result) {
@@ -198,8 +195,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void postData(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void postData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         if (apiPath.isEmpty()) {
             server.dataPOST(postRequest(params, callback),
                 requestBody(params, JsonChildBody::new, XmlChildBody::new));
@@ -210,7 +206,7 @@ final class RestconfRequestDispatcher {
     }
 
     private static <T extends DataPostResult> ServerRequest<T> postRequest(final RequestParameters params,
-            final FutureCallback<FullHttpResponse> callback) {
+            final RestconfRequest callback) {
         return new NettyServerRequest<>(params, callback) {
             @Override
             FullHttpResponse transform(final DataPostResult result) {
@@ -232,8 +228,7 @@ final class RestconfRequestDispatcher {
         };
     }
 
-    private void putData(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void putData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         final var request = new NettyServerRequest<DataPutResult>(params, callback) {
             @Override
             FullHttpResponse transform(final DataPutResult result) {
@@ -249,8 +244,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void patchData(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void patchData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         final var request = new NettyServerRequest<DataPatchResult>(params, callback) {
             @Override
             FullHttpResponse transform(final DataPatchResult result) {
@@ -265,8 +259,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void yangPatchData(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void yangPatchData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         final var request = new NettyServerRequest<DataYangPatchResult>(params, callback) {
             @Override
             FullHttpResponse transform(final DataYangPatchResult result) {
@@ -305,8 +298,7 @@ final class RestconfRequestDispatcher {
         return HttpResponseStatus.INTERNAL_SERVER_ERROR;
     }
 
-    private void deleteData(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void deleteData(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         server.dataDELETE(new NettyServerRequest<>(params, callback) {
             @Override
             FullHttpResponse transform(final Empty result) {
@@ -319,8 +311,7 @@ final class RestconfRequestDispatcher {
      * Process a request to
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC 8040 {+restconf}/operations</a> resource.
      */
-    private void processOperationsRequest(final RequestParameters params,
-            final FutureCallback<FullHttpResponse> callback) {
+    private void processOperationsRequest(final RequestParameters params, final RestconfRequest callback) {
         final var apiPath = extractApiPath(params);
         switch (params.method().name()) {
             case "OPTIONS" -> {
@@ -344,8 +335,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void getOperations(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
-            final ApiPath apiPath) {
+    private void getOperations(final RequestParameters params, final RestconfRequest callback, final ApiPath apiPath) {
         final var request = new NettyServerRequest<FormattableBody>(params, callback) {
             @Override
             FullHttpResponse transform(final FormattableBody result) {
@@ -359,7 +349,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void postOperations(final RequestParameters params, final FutureCallback<FullHttpResponse> callback,
+    private void postOperations(final RequestParameters params, final RestconfRequest callback,
             final ApiPath apiPath) {
         server.operationsPOST(new NettyServerRequest<>(params, callback) {
             @Override
@@ -381,8 +371,7 @@ final class RestconfRequestDispatcher {
      * Process a request to
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">{+restconf}/yang-library-version</a> resource.
      */
-    private void processYangLibraryVersion(final RequestParameters params,
-            final FutureCallback<FullHttpResponse> callback) {
+    private void processYangLibraryVersion(final RequestParameters params, final RestconfRequest callback) {
         switch (params.method().name()) {
             case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
             case "HEAD", "GET" -> server.yangLibraryVersionGET(new NettyServerRequest<>(params, callback) {
@@ -398,7 +387,7 @@ final class RestconfRequestDispatcher {
     /**
      * Access to YANG modules.
      */
-    private void processModules(final RequestParameters params, final FutureCallback<FullHttpResponse> callback) {
+    private void processModules(final RequestParameters params, final RestconfRequest callback) {
         switch (params.method().name()) {
             case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
             case "HEAD", "GET" -> getModule(params, callback);
@@ -406,7 +395,7 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    private void getModule(final RequestParameters params, final FutureCallback<FullHttpResponse> callback) {
+    private void getModule(final RequestParameters params, final RestconfRequest callback) {
         final var file = extractModuleFile(params.pathParameters().childIdentifier());
         final var revision = params.queryParameters().lookup(REVISION);
         if (file.name().isEmpty()) {
@@ -419,7 +408,7 @@ final class RestconfRequestDispatcher {
             .contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YIN_XML, true);
         if (acceptYin && !acceptYang) {
             // YIN if explicitly requested
-            final var request = getModuleRequest(params, callback,NettyMediaTypes.APPLICATION_YIN_XML);
+            final var request = getModuleRequest(params, callback, NettyMediaTypes.APPLICATION_YIN_XML);
             if (file.mountPath.isEmpty()) {
                 server.modulesYinGET(request, file.name(), revision);
             } else {
@@ -427,7 +416,7 @@ final class RestconfRequestDispatcher {
             }
         } else {
             // YANG by default, incl accept any
-            final var request = getModuleRequest(params, callback,NettyMediaTypes.APPLICATION_YANG);
+            final var request = getModuleRequest(params, callback, NettyMediaTypes.APPLICATION_YANG);
             if (file.mountPath.isEmpty()) {
                 server.modulesYangGET(request, file.name(), revision);
             } else {
@@ -437,7 +426,7 @@ final class RestconfRequestDispatcher {
     }
 
     private static ServerRequest<ModulesGetResult> getModuleRequest(final RequestParameters params,
-            final FutureCallback<FullHttpResponse> callback, final AsciiString mediaType) {
+            final RestconfRequest callback, final AsciiString mediaType) {
         return new NettyServerRequest<>(params, callback) {
             @Override
             FullHttpResponse transform(final ModulesGetResult result) {

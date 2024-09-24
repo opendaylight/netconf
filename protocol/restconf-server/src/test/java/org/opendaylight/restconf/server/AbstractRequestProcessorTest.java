@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.PathParameters.DATA;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
-import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -65,7 +64,7 @@ public class AbstractRequestProcessorTest {
     @Mock
     private PrincipalService principalService;
     @Mock
-    private FutureCallback<FullHttpResponse> callback;
+    private RestconfRequest callback;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
 
