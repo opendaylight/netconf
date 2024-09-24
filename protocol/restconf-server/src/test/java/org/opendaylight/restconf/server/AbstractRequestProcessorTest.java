@@ -18,6 +18,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,12 +42,23 @@ public class AbstractRequestProcessorTest {
     protected static final String ID_PATH = "test-model:root";
     protected static final String NEW_ID_PATH = "test-model:new";
     protected static final String MOUNT_PATH = "test-model:root/sub/tree/mount:point";
-    protected static final ApiPath API_PATH = RequestUtils.extractApiPath(ID_PATH);
-    protected static final ApiPath NEW_API_PATH = RequestUtils.extractApiPath(NEW_ID_PATH);
-    protected static final ApiPath MOUNT_API_PATH = RequestUtils.extractApiPath(MOUNT_PATH);
     protected static final TestEncoding DEFAULT_ENCODING = TestEncoding.JSON;
     protected static final String XML_CONTENT = "xml-content";
     protected static final String JSON_CONTENT = "json-content";
+
+    protected static final ApiPath API_PATH;
+    protected static final ApiPath NEW_API_PATH;
+    protected static final ApiPath MOUNT_API_PATH;
+
+    static {
+        try {
+            API_PATH = ApiPath.parse(ID_PATH);
+            NEW_API_PATH = ApiPath.parse(NEW_ID_PATH);
+            MOUNT_API_PATH = ApiPath.parse(MOUNT_PATH);
+        } catch (ParseException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     @Mock
     protected RestconfServer service;

@@ -10,8 +10,6 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.server.NettyMediaTypes.RESTCONF_TYPES;
 import static org.opendaylight.restconf.server.NettyMediaTypes.YANG_PATCH_TYPES;
-import static org.opendaylight.restconf.server.RequestUtils.extractApiPath;
-import static org.opendaylight.restconf.server.RequestUtils.requestBody;
 import static org.opendaylight.restconf.server.ResponseUtils.optionsResponse;
 import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 import static org.opendaylight.restconf.server.ResponseUtils.responseStatus;
@@ -31,9 +29,13 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.function.Function;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
@@ -461,9 +463,28 @@ final class RestconfRequestDispatcher {
         if (splitIndex < 0) {
             return new ModuleFile(ApiPath.empty(), path);
         }
-        final var apiPath = RequestUtils.extractApiPath(path.substring(0, splitIndex));
+        final var apiPath = extractApiPath(path.substring(0, splitIndex));
         final var name = splitIndex == lastIndex ? "" : path.substring(splitIndex + 1);
         return new ModuleFile(apiPath, name);
+    }
+
+    private static ApiPath extractApiPath(final RequestParameters params) {
+        return extractApiPath(params.pathParameters().childIdentifier());
+    }
+
+    private static ApiPath extractApiPath(final String path) {
+        try {
+            return ApiPath.parse(path);
+        } catch (ParseException e) {
+            throw new ServerErrorException(ErrorTag.BAD_ELEMENT,
+                "API Path value '%s' is invalid. %s".formatted(path, e.getMessage()), e);
+        }
+    }
+
+    private static <T extends ConsumableBody> T requestBody(final RequestParameters params,
+            final Function<InputStream, T> jsonBodyBuilder, final Function<InputStream, T> xmlBodyBuilder) {
+        return NettyMediaTypes.JSON_TYPES.contains(params.contentType())
+            ? jsonBodyBuilder.apply(params.requestBody()) : xmlBodyBuilder.apply(params.requestBody());
     }
 
     private record ModuleFile(ApiPath mountPath, String name) {
