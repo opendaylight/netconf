@@ -47,26 +47,38 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
     @Mock
     private FormattableBody body;
 
+
+    @ParameterizedTest
+    @MethodSource
+    void notFoundRequest(final HttpMethod method, final String uri) {
+        final var response = dispatch(buildRequest(method, uri, DEFAULT_ENCODING, CONTENT));
+        assertResponse(response, HttpResponseStatus.NOT_FOUND);
+    }
+
+    private static Stream<Arguments> notFoundRequest() {
+        return Stream.of(
+            // does not match {+restconf}
+            Arguments.of(HttpMethod.GET, "/"),
+            Arguments.of(HttpMethod.GET, "/foo"),
+            // {+restconf}, see the corresponding FIXME
+            Arguments.of(HttpMethod.GET, BASE_PATH),
+            Arguments.of(HttpMethod.GET, BASE_PATH + "/test"));
+    }
+
     @ParameterizedTest
     @MethodSource
     void unmappedRequest(final TestEncoding encoding, final HttpMethod method, final String uri) {
-        final var request = buildRequest(method, uri, encoding, CONTENT);
-        final var response = dispatch(request);
+        final var response = dispatch(buildRequest(method, uri, encoding, CONTENT));
         assertErrorResponse(response, encoding, ErrorTag.DATA_MISSING, UNMAPPED_REQUEST_ERROR);
     }
 
     private static Stream<Arguments> unmappedRequest() {
         return Stream.of(
             // no processor matching api resource
-            Arguments.of(DEFAULT_ENCODING, HttpMethod.GET, "/"),
-            Arguments.of(DEFAULT_ENCODING, HttpMethod.GET, BASE_PATH),
-            Arguments.of(DEFAULT_ENCODING, HttpMethod.GET, BASE_PATH + "/test"),
             // valid URI, unsupported HTTP method (1 per URI used)
             Arguments.of(TestEncoding.XML, HttpMethod.PUT, OPERATIONS_PATH),
             Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + YANG_LIBRARY_VERSION),
-            Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + MODULES),
-            Arguments.of(TestEncoding.XML, HttpMethod.POST, "/.well-known/host-meta"),
-            Arguments.of(TestEncoding.XML, HttpMethod.POST, "/.well-known/host-meta.json")
+            Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + MODULES)
         );
     }
 
