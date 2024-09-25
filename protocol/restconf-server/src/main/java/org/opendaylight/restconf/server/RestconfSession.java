@@ -18,13 +18,19 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>. It acts
@@ -32,6 +38,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
  * connections.
  */
 final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest> implements TransportSession {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
 
     // Does NOT include CONNECT nor TRACE
@@ -41,24 +48,60 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
 
     private final RestconfRequestDispatcher dispatcher;
     private final WellKnownResources wellKnown;
+    private final HttpScheme scheme;
 
-    RestconfSession(final WellKnownResources wellKnown, final RestconfRequestDispatcher dispatcher) {
+    RestconfSession(final WellKnownResources wellKnown, final RestconfRequestDispatcher dispatcher,
+            final HttpScheme scheme) {
         super(FullHttpRequest.class, false);
         this.wellKnown = requireNonNull(wellKnown);
         this.dispatcher = requireNonNull(dispatcher);
+        this.scheme = requireNonNull(scheme);
     }
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        final var headers = msg.headers();
         // non-null indicates HTTP/2 request, which we need to propagate to any response
-        final var streamId = msg.headers().getInt(STREAM_ID);
+        final var streamId = headers.getInt(STREAM_ID);
         final var version = msg.protocolVersion();
 
         // first things first:
+        // - HTTP semantics: we MUST have the equivalent of a Host header, as per
+        //   https://www.rfc-editor.org/rfc/rfc9110#section-7.2
+        // - HTTP/1.1 protocol: it is a 400 Bad Request, as per
+        //   https://www.rfc-editor.org/rfc/rfc9112#section-3.2, if
+        //   - there are multiple values
+        //   - the value is invalid
+        final var hostItr = headers.valueStringIterator(HttpHeaderNames.HOST);
+        if (!hostItr.hasNext()) {
+            LOG.debug("No Host header in request {}", msg);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
+            return;
+        }
+        final var host = hostItr.next();
+        if (hostItr.hasNext()) {
+            LOG.debug("Multiple Host header values in request {}", msg);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
+            return;
+        }
+        final URI hostUri;
+        try {
+            hostUri = hostUriOf(scheme, host);
+        } catch (URISyntaxException e) {
+            LOG.debug("Invalid Host header value '{}'", host, e);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
+            return;
+        }
+
+        // next up:
         // - check if we implement requested method
         // - we do NOT implement CONNECT method, which is the only valid use of URIs in authority-form
         final var method = msg.method();
         if (!IMPLEMENTED_METHODS.contains(method)) {
+            LOG.debug("Method {} not implemented", method);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED));
             return;
@@ -74,9 +117,37 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             return;
         }
 
-        // FIXME: finish Target URI reconstruction as per https://www.rfc-editor.org/rfc/rfc9112#section-3.3
+        // we are down to three possibilities:
+        // - origin-form, as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.1
+        // - absolute-form, as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.2
+        // - authority-form, as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.3
+        // BUT but we do not implement the CONNECT method, so let's enlist URI's services first
+        final URI requestUri;
+        try {
+            requestUri = new URI(uri);
+        } catch (URISyntaxException e) {
+            LOG.debug("Invalid request-target '{}'", uri, e);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
+            return;
+        }
 
-        final var decoder = new QueryStringDecoder(uri);
+        // as per https://www.rfc-editor.org/rfc/rfc9112#section-3.3
+        final URI targetUri;
+        if (requestUri.isAbsolute()) {
+            // absolute-form is the Target URI
+            targetUri = requestUri;
+        } else if (HttpUtil.isOriginForm(requestUri)) {
+            // origin-form needs to be combined with Host header
+            targetUri = hostUri.resolve(requestUri);
+        } else {
+            LOG.debug("Unsupported request-target '{}'", requestUri);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
+            return;
+        }
+
+        final var decoder = new QueryStringDecoder(targetUri);
         final var path = decoder.path();
 
         if (path.startsWith("/.well-known/")) {
@@ -90,13 +161,19 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     }
 
     @VisibleForTesting
-    static FullHttpResponse asteriskRequest(final HttpVersion version, final HttpMethod method) {
+    static @NonNull FullHttpResponse asteriskRequest(final HttpVersion version, final HttpMethod method) {
         if (HttpMethod.OPTIONS.equals(method)) {
             final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.OK);
             response.headers().set(HttpHeaderNames.ALLOW, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
             return response;
         }
+        LOG.debug("Invalid use of '*' with method {}", method);
         return new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST);
+    }
+
+    @VisibleForTesting
+    static @NonNull URI hostUriOf(final HttpScheme scheme, final String host) throws URISyntaxException {
+        return new URI(scheme.toString(), host, null, null, null).parseServerAuthority();
     }
 
     private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
