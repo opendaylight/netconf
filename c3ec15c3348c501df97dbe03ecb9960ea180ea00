@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "458a34fc_ac1c8d31",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-09-25T12:35:33Z",
+      "side": 1,
+      "message": "We already have domRpcRouter so creating new object will lead to disconnect between actions and rpc services. I used this line in Actions patch for it to work.\n\nfinal var domActionService \u003d new RouterDOMActionService(domRpcRouter);\n\nNot sure if you had some idea behind making new object or if this was just a typo but this needs to be addressed.",
+      "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
