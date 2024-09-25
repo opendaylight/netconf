@@ -11,8 +11,13 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
@@ -41,7 +46,14 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         // non-null indicates HTTP/2 request, which we need to propagate to any response
         final var streamId = msg.headers().getInt(STREAM_ID);
         final var version = msg.protocolVersion();
-        final var decoder = new QueryStringDecoder(msg.uri());
+
+        final var uri = msg.uri();
+        if (HttpUtil.isAsteriskForm(uri)) {
+            respond(ctx, streamId, asteriskRequest(version, msg.method()));
+            return;
+        }
+
+        final var decoder = new QueryStringDecoder(uri);
         final var path = decoder.path();
 
         if (path.startsWith("/.well-known/")) {
@@ -52,6 +64,22 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             // Defer to dispatcher
             dispatchRequest(ctx, version, streamId, decoder, msg);
         }
+    }
+
+    static FullHttpResponse asteriskRequest(final HttpVersion version, final HttpMethod method) {
+        // "*" (asterisk-form) as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.4: it is only applicable to
+        // OPTIONS method as per https://www.rfc-editor.org/rfc/rfc9110#section-9.3.7, but we need to be mindful of
+        // unimplementented methods
+        return switch (method.name()) {
+            case "OPTIONS" -> {
+                final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.OK);
+                response.headers().set(HttpHeaderNames.ALLOW, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
+                yield response;
+            }
+            case "DELETE", "GET", "HEAD", "PATCH", "POST", "PUT" ->
+                new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST);
+            default -> new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED);
+        };
     }
 
     private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
