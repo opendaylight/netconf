@@ -22,6 +22,30 @@
       },
       "revId": "5cc43e790a9b027d37b6f7b3a928b1e1b8a66864",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f769eb81_ab16d6b7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-25T08:16:47Z",
+      "side": 0,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/113497/comment/2ab90739_23445e72/",
+      "parentUuid": "941c9539_fe479a9c",
+      "range": {
+        "startLine": 114,
+        "startChar": 4,
+        "endLine": 114,
+        "endChar": 54
+      },
+      "revId": "5cc43e790a9b027d37b6f7b3a928b1e1b8a66864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
