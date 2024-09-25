@@ -9,12 +9,16 @@ package org.opendaylight.restconf.server;
 
 import static org.opendaylight.restconf.server.TestUtils.assertOptionsResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponse;
+import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
+import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +30,7 @@ class WellKnownResourcesTest {
     private static final WellKnownResources RESOURCES = new WellKnownResources("testRestconf");
 
     @ParameterizedTest
-    @ValueSource(strings = {XRD_SUFFIX, JRD_SUFFIX})
+    @ValueSource(strings = { XRD_SUFFIX, JRD_SUFFIX })
     void options(final String uri) {
         assertOptionsResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri), "GET, HEAD, OPTIONS");
     }
@@ -53,5 +57,12 @@ class WellKnownResourcesTest {
                     }
                 }""")
         );
+    }
+
+    @Test
+    void putHostMeta() {
+        final var response = RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.POST, JRD_SUFFIX);
+        assertResponse(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }
 }

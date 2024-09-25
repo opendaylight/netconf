@@ -78,7 +78,7 @@ final class WellKnownResources {
             case "GET" -> getResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
             case "HEAD" -> headResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
             case "OPTIONS" -> optionsResponse(version);
-            default -> notImplemented(version);
+            default -> methodNotAllowed(version);
         };
     }
 
@@ -88,7 +88,7 @@ final class WellKnownResources {
             case "GET" -> getResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
             case "HEAD" -> headResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
             case "OPTIONS" -> optionsResponse(version);
-            default -> notImplemented(version);
+            default -> methodNotAllowed(version);
         };
     }
 
@@ -108,8 +108,8 @@ final class WellKnownResources {
         return setAllowHeader(new DefaultFullHttpResponse(version, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER));
     }
 
-    private static FullHttpResponse notImplemented(final HttpVersion version) {
-        return setAllowHeader(new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED));
+    private static FullHttpResponse methodNotAllowed(final HttpVersion version) {
+        return setAllowHeader(new DefaultFullHttpResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED));
     }
 
     private static FullHttpResponse setAllowHeader(final FullHttpResponse response) {
