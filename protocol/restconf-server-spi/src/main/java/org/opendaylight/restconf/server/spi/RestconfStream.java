@@ -71,12 +71,11 @@ public final class RestconfStream<T> {
     @NonNullByDefault
     public interface LocationProvider {
         /**
-         * Return the base location URL of the streams service based on request URI.
+         * Return the base location URL of the streams service based on JAXRS server we are running on.
          *
-         * @param restconfURI request base URI, with trailing slash
          * @return base location URL
          */
-        URI baseStreamLocation(URI restconfURI);
+        String baseStreamLocation();
     }
 
     /**
