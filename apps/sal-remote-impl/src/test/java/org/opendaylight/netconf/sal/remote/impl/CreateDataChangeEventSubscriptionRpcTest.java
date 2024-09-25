@@ -93,7 +93,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         doCallRealMethod().when(dataBroker).extension(any());
         rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(
-            restconfURI -> restconfURI.resolve(TEST_STREAMS), dataBroker), databindProvider, dataBroker);
+            () -> RESTCONF_URI + TEST_STREAMS, dataBroker), databindProvider, dataBroker);
     }
 
     @Test

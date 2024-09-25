@@ -217,7 +217,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> AbstractInstanceIdentifierTest.IID_DATABIND;
-        streamRegistry = new MdsalRestconfStreamRegistry(x -> x, domDataBroker);
+        streamRegistry = new MdsalRestconfStreamRegistry(String::new, domDataBroker);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
