@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecad5115_20e33f5c",
+        "filename": "keystore/plaintext-localfile/src/main/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorage.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-09-25T12:54:48Z",
+      "side": 1,
+      "message": "Thanks, done.",
+      "parentUuid": "374b0c8d_537866e0",
+      "range": {
+        "startLine": 193,
+        "startChar": 28,
+        "endLine": 193,
+        "endChar": 85
+      },
+      "revId": "422f9810b229cbf7ca85dde1d7e4aae5c8820060",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "869459be_794cdde0",
@@ -54,6 +78,30 @@
       "writtenOn": "2024-09-23T20:13:32Z",
       "side": 1,
       "message": "use a beforeEach() to generate a per-test temporary directory via Files.createTempDirectory() and remove it afterEach()",
+      "range": {
+        "startLine": 54,
+        "startChar": 54,
+        "endLine": 54,
+        "endChar": 60
+      },
+      "revId": "422f9810b229cbf7ca85dde1d7e4aae5c8820060",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89d35c7c_289ca410",
+        "filename": "keystore/plaintext-localfile/src/test/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorageTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-09-25T12:54:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "869459be_794cdde0",
       "range": {
         "startLine": 54,
         "startChar": 54,
