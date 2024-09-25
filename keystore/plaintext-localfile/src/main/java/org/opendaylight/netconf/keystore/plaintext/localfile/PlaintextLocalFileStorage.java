@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -250,7 +249,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
                 props.load(in);
             }
         }
-        final var data = new LinkedList<StorageEntry>();
+        final var data = new ArrayList<StorageEntry>();
         for (var name : props.stringPropertyNames()) {
             final var value = props.getProperty(name, "");
             if (!value.isEmpty()) {

@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.keystore.plaintext.cli;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
@@ -18,7 +18,7 @@ public class List extends AbstractCommand {
     @Override
     @SuppressWarnings("RegexpSinglelineJava")
     final void executeCommand() {
-        final var unsorted = new LinkedList<String>();
+        final var unsorted = new ArrayList<String>();
         for (var entry : storage) {
             unsorted.add(toString(entry.getKey()));
         }

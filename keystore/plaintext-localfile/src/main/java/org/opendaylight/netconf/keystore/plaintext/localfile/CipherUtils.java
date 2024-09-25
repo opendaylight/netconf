@@ -12,9 +12,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import org.bouncycastle.crypto.io.CipherInputStream;
 import org.bouncycastle.crypto.io.CipherOutputStream;
@@ -73,7 +73,7 @@ final class CipherUtils {
             final var nonce = in.readNBytes(NONCE_BYTES);
             try (var cipherIn = new CipherInputStream(in, cipher(DECRYPTING_MODE, secret, nonce))) {
                 StorageEntry entry;
-                final var collection = new LinkedList<StorageEntry>();
+                final var collection = new ArrayList<StorageEntry>();
                 while ((entry = readEntry(cipherIn)) != null) {
                     collection.add(entry);
                 }
