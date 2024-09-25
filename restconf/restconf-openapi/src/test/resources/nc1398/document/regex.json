@@ -1,0 +1,213 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "version": "1.0.0",
+        "title": "regex",
+        "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8181/"
+        }
+    ],
+    "paths": {
+        "/rests/data": {
+            "post": {
+                "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+                "summary": "POST - Controller - regex - regex",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cntr": {
+                                        "$ref": "#/components/schemas/regex_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "tags": [
+                    "Controller regex"
+                ],
+                "parameters": []
+            }
+        },
+        "/rests/data/regex:cntr": {
+            "put": {
+                "description": "",
+                "summary": "PUT - regex - Controller - cntr",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "regex:cntr": {
+                                        "$ref": "#/components/schemas/regex_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "204": {
+                        "description": "Updated"
+                    }
+                },
+                "tags": [
+                    "Controller regex"
+                ],
+                "parameters": []
+            },
+            "patch": {
+                "description": "",
+                "summary": "PATCH - regex - Controller - cntr",
+                "requestBody": {
+                    "description": "cntr",
+                    "content": {
+                        "application/yang-data+json": {
+                            "schema": {
+                                "properties": {
+                                    "regex:cntr": {
+                                        "$ref": "#/components/schemas/regex_cntr",
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "application/yang-data+xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/regex_cntr"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "Updated"
+                    }
+                },
+                "tags": [
+                    "Controller regex"
+                ],
+                "parameters": []
+            },
+            "delete": {
+                "description": "",
+                "summary": "DELETE - Controller - regex - cntr",
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    }
+                },
+                "tags": [
+                    "Controller regex"
+                ],
+                "parameters": []
+            },
+            "get": {
+                "description": "",
+                "summary": "GET - Controller - regex - cntr",
+                "responses": {
+                    "200": {
+                        "description": "200",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/regex_cntr"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cntr": {
+                                            "$ref": "#/components/schemas/regex_cntr",
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Controller regex"
+                ],
+                "parameters": [
+                    {
+                        "name": "content",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "enum": [
+                                "config",
+                                "nonconfig",
+                                "all"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "regex_cntr": {
+                "title": "regex_cntr",
+                "type": "object",
+                "properties": {
+                    "lf": {
+                        "description": "",
+                        "type": "string",
+                        "example": "!!!!!!!!!!!!!!!!!!!!",
+                        "minLength": 20,
+                        "maxLength": 100
+                    }
+                },
+                "xml": {
+                    "name": "cntr",
+                    "namespace": "urn:regex"
+                }
+            }
+        },
+        "securitySchemes": {
+            "basicAuth": {
+                "scheme": "basic",
+                "type": "http"
+            }
+        }
+    },
+    "security": [
+        {
+            "basicAuth": []
+        }
+    ]
+}
