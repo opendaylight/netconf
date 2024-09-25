@@ -12,26 +12,16 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpClientUpgradeHandler;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http2.Http2ClientUpgradeCodec;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
-import io.netty.handler.ssl.ApplicationProtocolNames;
-import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
-import io.netty.handler.ssl.SslHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tls.TLSClient;
@@ -45,13 +35,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
 /**
  * A {@link HTTPTransportStack} acting as a client.
  */
-public final class HTTPClient extends HTTPTransportStack {
+public abstract sealed class HTTPClient extends HTTPTransportStack permits PlainHTTPClient, TlsHTTPClient {
     private final ClientRequestDispatcher dispatcher;
     private final ClientAuthProvider authProvider;
     private final boolean http2;
 
-    private HTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider,
-            final boolean http2) {
+    HTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider, final boolean http2) {
         super(listener);
         this.authProvider = authProvider;
         this.http2 = http2;
@@ -103,32 +92,25 @@ public final class HTTPClient extends HTTPTransportStack {
             default -> throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         }
 
-        final var client = new HTTPClient(listener, ClientAuthProvider.ofNullable(httpParams), http2);
-        final var underlay = tlsParams == null
-            ? TCPClient.connect(client.asListener(), bootstrap, tcpParams)
-            : TLSClient.connect(client.asListener(), bootstrap, tcpParams, new HttpSslHandlerFactory(tlsParams, http2));
+        final HTTPClient client;
+        final ListenableFuture<? extends TransportStack> underlay;
+        if (tlsParams != null) {
+            client = new TlsHTTPClient(listener, ClientAuthProvider.ofNullable(httpParams), http2);
+            underlay = TLSClient.connect(client.asListener(), bootstrap, tcpParams,
+                new HttpSslHandlerFactory(tlsParams, http2));
+        } else {
+            client = new PlainHTTPClient(listener, ClientAuthProvider.ofNullable(httpParams), http2);
+            underlay = TCPClient.connect(client.asListener(), bootstrap, tcpParams);
+        }
         return transformUnderlay(client, underlay);
     }
 
     @Override
     protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var pipeline = underlayChannel.channel().pipeline();
-        final boolean ssl = pipeline.get(SslHandler.class) != null;
-
         if (http2) {
             // External HTTP 2 to internal HTTP 1.1 adapter handler
-            final var connectionHandler = Http2Utils.connectionHandler(false, MAX_HTTP_CONTENT_LENGTH);
-            if (ssl) {
-                // Application protocol negotiator over TLS
-                pipeline.addLast(apnHandler(underlayChannel, connectionHandler));
-            } else {
-                // Cleartext upgrade flow
-                final var sourceCodec = new HttpClientCodec();
-                final var upgradeHandler = new HttpClientUpgradeHandler(sourceCodec,
-                    new Http2ClientUpgradeCodec(connectionHandler), MAX_HTTP_CONTENT_LENGTH);
-                pipeline.addLast(sourceCodec, upgradeHandler, upgradeRequestHandler(underlayChannel));
-            }
-
+            initializePipeline(underlayChannel, pipeline, Http2Utils.connectionHandler(false, MAX_HTTP_CONTENT_LENGTH));
         } else {
             // HTTP 1.1
             pipeline.addLast(new HttpClientCodec(), new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
@@ -136,7 +118,7 @@ public final class HTTPClient extends HTTPTransportStack {
         }
     }
 
-    private void configureEndOfPipeline(final TransportChannel underlayChannel, final ChannelPipeline pipeline) {
+    final void configureEndOfPipeline(final TransportChannel underlayChannel, final ChannelPipeline pipeline) {
         if (authProvider != null) {
             pipeline.addLast(authProvider);
         }
@@ -148,45 +130,6 @@ public final class HTTPClient extends HTTPTransportStack {
         addTransportChannel(new HTTPTransportChannel(underlayChannel));
     }
 
-    private ApplicationProtocolNegotiationHandler apnHandler(final TransportChannel underlayChannel,
-            final Http2ConnectionHandler connectionHandler) {
-        return new ApplicationProtocolNegotiationHandler("") {
-            @Override
-            protected void configurePipeline(final ChannelHandlerContext ctx, final String protocol) {
-                if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
-                    final var pipeline = ctx.pipeline();
-                    pipeline.addLast(connectionHandler);
-                    configureEndOfPipeline(underlayChannel, pipeline);
-                    return;
-                }
-                ctx.close();
-                throw new IllegalStateException("unknown protocol: " + protocol);
-            }
-        };
-    }
-
-    private ChannelHandler upgradeRequestHandler(final TransportChannel underlayChannel) {
-        return new ChannelInboundHandlerAdapter() {
-            @Override
-            public void channelActive(final ChannelHandlerContext ctx) throws Exception {
-                // Trigger upgrade with an OPTIONS request targetting the server itself, as per
-                // https://www.rfc-editor.org/rfc/rfc7231#section-4.3.7
-                // required headers and flow will be handled by HttpClientUpgradeHandler
-                ctx.writeAndFlush(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "*"));
-                ctx.fireChannelActive();
-            }
-
-            @Override
-            public void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) {
-                // process upgrade result
-                if (evt == HttpClientUpgradeHandler.UpgradeEvent.UPGRADE_SUCCESSFUL) {
-                    final var pipeline = ctx.pipeline();
-                    configureEndOfPipeline(underlayChannel, pipeline);
-                    pipeline.remove(this);
-                } else if (evt == HttpClientUpgradeHandler.UpgradeEvent.UPGRADE_REJECTED) {
-                    notifyTransportChannelFailed(new IllegalStateException("Server rejected HTTP/2 upgrade request"));
-                }
-            }
-        };
-    }
+    abstract void initializePipeline(TransportChannel underlayChannel, ChannelPipeline pipeline,
+            Http2ConnectionHandler connectionHandler);
 }
