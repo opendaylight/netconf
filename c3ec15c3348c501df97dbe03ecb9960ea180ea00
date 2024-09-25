@@ -16,6 +16,29 @@
       "message": "We already have domRpcRouter so creating new object will lead to disconnect between actions and rpc services. I used this line in Actions patch for it to work.\n\nfinal var domActionService \u003d new RouterDOMActionService(domRpcRouter);\n\nNot sure if you had some idea behind making new object or if this was just a typo but this needs to be addressed.",
       "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66fcc8b1_351bd8bd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/DataE2ETest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-25T17:51:18Z",
+      "side": 1,
+      "message": "let\u0027s use an artist name which contains a \u0027/\u0027 character, i.e. is percent-encoded in request",
+      "range": {
+        "startLine": 26,
+        "startChar": 65,
+        "endLine": 26,
+        "endChar": 71
+      },
+      "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
