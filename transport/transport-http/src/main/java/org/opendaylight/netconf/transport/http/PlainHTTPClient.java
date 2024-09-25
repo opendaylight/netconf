@@ -14,6 +14,7 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpClientUpgradeHandler;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.Http2ClientUpgradeCodec;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
@@ -26,7 +27,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 final class PlainHTTPClient extends HTTPClient {
     PlainHTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider,
             final boolean http2) {
-        super(listener, authProvider, http2);
+        super(listener, HttpScheme.HTTP, authProvider, http2);
     }
 
     @Override

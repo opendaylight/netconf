@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -30,8 +31,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
     private final AuthHandlerFactory authHandlerFactory;
 
-    HTTPServer(final TransportChannelListener listener, final AuthHandlerFactory authHandlerFactory) {
-        super(listener);
+    HTTPServer(final TransportChannelListener listener, final HttpScheme scheme,
+            final AuthHandlerFactory authHandlerFactory) {
+        super(listener, scheme);
         this.authHandlerFactory = authHandlerFactory;
     }
 
@@ -106,7 +108,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
             pipeline.addLast(authHandlerFactory.create());
         }
 
-        addTransportChannel(new HTTPTransportChannel(underlayChannel));
+        addTransportChannel(new HTTPTransportChannel(underlayChannel, scheme()));
     }
 
     abstract void initializePipeline(ChannelPipeline pipeline, Http2ConnectionHandler connectionHandler);

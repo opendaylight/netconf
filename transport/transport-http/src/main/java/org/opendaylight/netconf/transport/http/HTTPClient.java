@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -40,8 +41,9 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
     private final ClientAuthProvider authProvider;
     private final boolean http2;
 
-    HTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider, final boolean http2) {
-        super(listener);
+    HTTPClient(final TransportChannelListener listener, final HttpScheme scheme, final ClientAuthProvider authProvider,
+            final boolean http2) {
+        super(listener, scheme);
         this.authProvider = authProvider;
         this.http2 = http2;
         dispatcher = http2 ? new ClientHttp2RequestDispatcher() : new ClientHttp1RequestDispatcher();
@@ -127,7 +129,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         // signal client transport is ready to send requests
         // NB. while server signals readiness on exit from initChannel(),
         // client needs additional confirmation for upgrade completion in case of HTTP/2 cleartext flow
-        addTransportChannel(new HTTPTransportChannel(underlayChannel));
+        addTransportChannel(new HTTPTransportChannel(underlayChannel, scheme()));
     }
 
     abstract void initializePipeline(TransportChannel underlayChannel, ChannelPipeline pipeline,
