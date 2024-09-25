@@ -34,6 +34,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.function.Function;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -82,6 +83,11 @@ final class RestconfRequestDispatcher {
     private final AsciiString defaultAcceptType;
     private final PrettyPrintParam defaultPrettyPrint;
 
+    // baseUri.getPath(), i.e. "{+restconf}"
+    private final String plusRestconf;
+    // cached plusRestconf.length()
+    private final int plusRestconfLen;
+
     RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
             final URI baseUri, final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
             final PrettyPrintParam defaultPrettyPrint) {
@@ -92,6 +98,9 @@ final class RestconfRequestDispatcher {
         this.defaultAcceptType = requireNonNull(defaultAcceptType);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
+        plusRestconf = baseUri.getPath();
+        plusRestconfLen = plusRestconf.length();
+
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
         LOG.info("Base path: {}, default accept: {}, default pretty print: {}",
             baseUri, defaultAcceptType, defaultPrettyPrint.value());
@@ -100,6 +109,27 @@ final class RestconfRequestDispatcher {
     @SuppressWarnings("IllegalCatch")
     void dispatch(final QueryStringDecoder decoder, final FullHttpRequest request, final RestconfRequest callback) {
         LOG.debug("Dispatching {} {}", request.method(), request.uri());
+
+        final var path = decoder.path();
+        if (!path.startsWith(plusRestconf)) {
+            callback.onSuccess(notFound(request));
+            return;
+        }
+
+        final var suffix = path.substring(plusRestconfLen);
+        // TODO: are '/restconf' and '/restconf/' the same thing? for now we treat them as such for now
+        if (suffix.isEmpty() || suffix.equals("/")) {
+            // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
+            //        correct: we should be reporting the entire API Resource, as described in
+            //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
+            callback.onSuccess(notFound(request));
+            return;
+        }
+
+        if (!suffix.startsWith("/")) {
+            callback.onSuccess(notFound(request));
+            return;
+        }
 
         final var principal = principalService.acquirePrincipal(request);
         final var params = new RequestParameters(baseUri, decoder, request, principal, errorTagMapping,
@@ -112,14 +142,18 @@ final class RestconfRequestDispatcher {
                 case PathParameters.MODULES -> processModules(params, callback);
                 default -> callback.onSuccess(
                     HttpMethod.OPTIONS.equals(params.method())
-                        ? optionsResponse(params, HttpMethod.OPTIONS.name())
-                        : unmappedRequestErrorResponse(params));
+                        ? optionsResponse(params, HttpMethod.OPTIONS.name()) : notFound(request));
             }
         } catch (RuntimeException e) {
             LOG.error("Error processing request {} {}", request.method(), request.uri(), e);
             final var errorTag = e instanceof ServerErrorException see ? see.errorTag() : ErrorTag.OPERATION_FAILED;
             callback.onSuccess(simpleErrorResponse(params, errorTag, e.getMessage()));
         }
+    }
+
+    @NonNullByDefault
+    private static FullHttpResponse notFound(final FullHttpRequest request) {
+        return new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.NOT_FOUND);
     }
 
     /**
