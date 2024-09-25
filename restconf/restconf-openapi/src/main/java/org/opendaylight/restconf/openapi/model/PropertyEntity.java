@@ -94,6 +94,8 @@ public class PropertyEntity {
     private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES = Map.of("\\\\d", "[0-9]",
         "\\\\D", "[^0-9]", "\\\\s", "[ \t\n\f\r]", "\\\\S", "[^ \t\n\f\r]",
         "\\\\w", "[a-zA-Z_0-9]", "\\\\W", "[^a-zA-Z_0-9]");
+    // Maximum number of candidates tried at each step when a string example is generated with constraints
+    private static final int MAX_CANDIDATES_ALLOWED = 100;
 
     private final @NonNull DataSchemaNode node;
     private final @NonNull JsonGenerator generator;
@@ -699,19 +701,28 @@ public class PropertyEntity {
 
     private static String prepareExample(final List<ExampleCandidate> candidates, final int minLength,
             final int maxLength) {
+        if (candidates.isEmpty()) {
+            throw new IllegalArgumentException("No candidates found");
+        }
+
         final var nextCandidates = new ArrayList<ExampleCandidate>();
         for (var candidate : candidates) {
             final var string = candidate.string();
             final var state = candidate.state();
 
             if (string.length() >= minLength && state.isAccept()) {
-                return candidate.string();
+                return string;
             }
 
             if (string.length() < maxLength) {
                 final var transitions = state.getSortedTransitions(false);
-                transitions.forEach(t -> nextCandidates.add(
+                final var toAdd = Math.min(MAX_CANDIDATES_ALLOWED - nextCandidates.size(), transitions.size());
+                transitions.subList(0, toAdd).forEach(t -> nextCandidates.add(
                     new ExampleCandidate(string + t.getMin(), t.getDest())));
+            }
+
+            if (nextCandidates.size() >= MAX_CANDIDATES_ALLOWED) {
+                break;
             }
         }
 

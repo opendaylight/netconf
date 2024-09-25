@@ -1,0 +1,16 @@
+module regex {
+    namespace "urn:regex";
+    prefix "re";
+    revision 2024-09-25 {
+        description "Initial revision.";
+    }
+
+    container cntr {
+        leaf lf {
+            type string {
+                length "20..100";
+                pattern "[a-zA-Z0-9!$%^()\[\]_\-~{}.+]*";
+            }
+        }
+    }
+}
