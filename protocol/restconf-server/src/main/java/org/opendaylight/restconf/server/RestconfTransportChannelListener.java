@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -45,7 +46,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                 new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
                     configuration.defaultAcceptType(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            new RestconfSession(wellKnown, dispatcher));
+            new RestconfSession(wellKnown, dispatcher, ((HTTPTransportChannel) channel).scheme()));
     }
 
     @Override
