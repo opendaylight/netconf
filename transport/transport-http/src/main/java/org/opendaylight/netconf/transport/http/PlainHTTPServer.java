@@ -12,6 +12,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
@@ -28,7 +29,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
  */
 final class PlainHTTPServer extends HTTPServer {
     PlainHTTPServer(final TransportChannelListener listener, final AuthHandlerFactory authHandlerFactory) {
-        super(listener, authHandlerFactory);
+        super(listener, HttpScheme.HTTP, authHandlerFactory);
     }
 
     @Override
