@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9ae0b5e_daf6aba9",
+        "filename": "keystore/plaintext-localfile/src/test/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorageTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-25T23:50:25Z",
+      "side": 1,
+      "message": "follow https://github.com/opendaylight/controller/commit/c2d5bde5bbe00c155a3f348220d169ecee5f4573#diff-f87b696cb4fd95ab829c383c70fc23e4b2e967a79dbc9e897423a7de90aace29R90 instead\n\nalso, this needs to be per-test, not static final, as otherwise the tests cannot run concurrently",
+      "range": {
+        "startLine": 57,
+        "startChar": 54,
+        "endLine": 57,
+        "endChar": 73
+      },
+      "revId": "53436a60ad6a3bf121be0cfac7cd481072d1d5ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
