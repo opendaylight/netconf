@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.http;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
@@ -20,7 +21,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
  */
 final class TlsHTTPClient extends HTTPClient {
     TlsHTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider, final boolean http2) {
-        super(listener, authProvider, http2);
+        super(listener, HttpScheme.HTTPS, authProvider, http2);
     }
 
     @Override
