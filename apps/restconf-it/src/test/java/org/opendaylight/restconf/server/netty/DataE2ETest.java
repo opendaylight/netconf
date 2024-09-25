@@ -140,8 +140,194 @@ class DataE2ETest extends AbstractE2ETest {
     }
 
     @Test
-    void invokeYangPatchTest() {
-        // TODO
+    void invokeYangPatchTest() throws Exception {
+        // CRUD
+        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON, """
+            {
+                "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "patch1",
+                    "edit" : [
+                        {
+                            "edit-id": "edit1",
+                            "operation": "create",
+                            "target": "/album=album1",
+                            "value": {
+                                "album": {
+                                    "name": "album1",
+                                    "genre": "example-jukebox:rock",
+                                    "year": 2020
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit2",
+                            "operation": "create",
+                            "target": "/album=album2",
+                            "value": {
+                                "album": {
+                                    "name": "album2",
+                                    "genre": "example-jukebox:jazz",
+                                    "year": 2020
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit3",
+                            "operation": "replace",
+                            "target": "/album=album1",
+                            "value": {
+                                "album": {
+                                    "name": "album1",
+                                    "genre": "example-jukebox:pop",
+                                    "year": 2024
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit4",
+                            "operation": "delete",
+                            "target": "/album=album2"
+                        }
+                    ]
+                }
+            }""");
+        assertEquals(HttpResponseStatus.OK, response.status());
+
+        // read (validate result)
+        assertContentJson(ITEM_URI, """
+            {
+                "example-jukebox:artist": [
+                    {
+                        "name": "artist",
+                        "album": [
+                            {
+                                "name": "album1",
+                                "genre": "example-jukebox:pop",
+                                "year": 2024
+                            }
+                        ]
+                    }
+                ]
+            }""");
+    }
+
+    @Test
+    void invokeYangPatchMissingErrorTest() throws Exception {
+        // One correct edit, one - not
+        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON, """
+            {
+                "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "patch1",
+                    "edit" : [
+                        {
+                            "edit-id": "edit1",
+                            "operation": "create",
+                            "target": "/album=album1",
+                            "value": {
+                                "album": {
+                                    "name": "album1",
+                                    "genre": "example-jukebox:rock",
+                                    "year": 2020
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit2",
+                            "operation": "delete",
+                            "target": "/album=album2"
+                        }
+                    ]
+                }
+            }""");
+        assertContentJson(response, """
+            {
+                "ietf-yang-patch:yang-patch-status": {
+                    "patch-id":"patch1",
+                    "edit-status": {
+                        "edit": [
+                        {
+                            "edit-id":"edit1",
+                            "ok":[null]
+                        },
+                        {
+                            "edit-id":"edit2",
+                            "errors": {
+                                "error": [
+                                {
+                                    "error-type":"protocol",
+                                    "error-tag":"data-missing",
+                                    "error-path":
+                                    "/example-jukebox:jukebox/library/artist[name='artist']/album[name='album2']",
+                                    "error-message":"Data does not exist"
+                                }]
+                            }
+                        }]
+                    }
+                }
+            }""");
+    }
+
+    @Test
+    void invokeYangPatchExistsErrorTest() throws Exception {
+        // One correct edit, one - not
+        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON, """
+            {
+                "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "patch1",
+                    "edit" : [
+                        {
+                            "edit-id": "edit1",
+                            "operation": "create",
+                            "target": "/album=album1",
+                            "value": {
+                                "album": {
+                                    "name": "album1",
+                                    "genre": "example-jukebox:rock",
+                                    "year": 2020
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit2",
+                            "operation": "create",
+                            "target": "/album=album1",
+                            "value": {
+                                "album": {
+                                    "name": "album1",
+                                    "genre": "example-jukebox:jazz",
+                                    "year": 2020
+                                }
+                            }
+                        }
+                    ]
+                }
+            }""");
+        assertContentJson(response, """
+            {
+                "ietf-yang-patch:yang-patch-status": {
+                    "patch-id":"patch1",
+                    "edit-status": {
+                        "edit": [
+                        {
+                            "edit-id":"edit1",
+                            "ok":[null]
+                        },
+                        {
+                            "edit-id":"edit2",
+                            "errors": {
+                                "error": [
+                                {
+                                    "error-type":"protocol",
+                                    "error-tag":"data-exists",
+                                    "error-path":
+                                    "/example-jukebox:jukebox/library/artist[name='artist']/album[name='album1']",
+                                    "error-message":"Data already exists"
+                                }]
+                            }
+                        }]
+                    }
+                }
+            }""");
     }
 
     @Test

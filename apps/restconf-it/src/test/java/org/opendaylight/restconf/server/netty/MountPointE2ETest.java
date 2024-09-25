@@ -38,6 +38,7 @@ import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
+import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.netty.TestUtils.TestEncryptionService;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -238,6 +239,72 @@ class MountPointE2ETest extends AbstractE2ETest {
         } finally {
             streamClient.shutdown().get(2, TimeUnit.SECONDS);
         }
+    }
+
+    @Test
+    void invokeYangPatchTest() throws Exception {
+        startDeviceSimulator(true);
+        mountDeviceJson();
+
+        // CRUD
+        var response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON, """
+            {
+                "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "patch1",
+                    "edit" : [
+                        {
+                            "edit-id": "edit1",
+                            "operation": "create",
+                            "target": "",
+                            "value": {
+                                "device-sim:data-root": {
+                                    "name": "device",
+                                    "properties": [{
+                                        "id": "id1",
+                                        "name": "name1",
+                                        "value": "value1"
+                                    }]
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit2",
+                            "operation": "merge",
+                            "target": "",
+                            "value": {
+                                "device-sim:data-root": {
+                                    "properties": [{
+                                        "id": "id2",
+                                        "name": "name2",
+                                        "value": "value2"
+                                    }]
+                                }
+                            }
+                        },
+                        {
+                            "edit-id": "edit1",
+                            "operation": "delete",
+                            "target": "properties=id1"
+                        }
+                    ]
+                }
+            }""");
+        assertEquals(HttpResponseStatus.OK, response.status());
+
+        // read (validate result)
+        assertContentJson(DEVICE_DATA_ROOT_URI, """
+            {
+                "device-sim:data-root": {
+                    "name": "device",
+                    "properties": [
+                        {
+                            "id": "id2",
+                            "name": "name2",
+                            "value": "value2"
+                        }
+                    ]
+                }
+            }""");
     }
 
     private void startDeviceSimulator(final boolean mdsal) throws Exception {
