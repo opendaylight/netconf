@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29822939_90ecdb05",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-25T06:29:50Z",
+      "side": 1,
+      "message": "Then we can move restconf to EndpointConfiguration to be shared by both JAXRS and Netty",
+      "revId": "b1512b1bd956559a22c8ba52eb67e286d3c34c87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
