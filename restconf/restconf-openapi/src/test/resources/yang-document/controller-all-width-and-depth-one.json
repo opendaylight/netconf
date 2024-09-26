@@ -250,7 +250,7 @@
         ]
       }
     },
-    "/rests/operations/action-types:list={name}/list-action": {
+    "/rests/data/action-types:list={name}/list-action": {
       "post": {
         "description": "",
         "summary": "POST - Controller - action-types - list-action",

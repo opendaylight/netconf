@@ -250,7 +250,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - list-action",
@@ -437,7 +437,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - container-action",
@@ -921,7 +921,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:nc-list={nc-name}/nc-list-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:nc-list={nc-name}/nc-list-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - nc-list-action",
@@ -1108,7 +1108,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:nc-container/nc-container-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:nc-container/nc-container-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - nc-container-action",
