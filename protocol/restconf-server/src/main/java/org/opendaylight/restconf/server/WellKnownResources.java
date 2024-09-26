@@ -60,8 +60,8 @@ final class WellKnownResources {
 
     FullHttpResponse request(final HttpVersion version, final HttpMethod method, final String suffix) {
         return switch (suffix) {
-            case "host-meta" -> requestXRD(version, method);
-            case "host-meta.json" -> requestJRD(version, method);
+            case "/host-meta" -> requestXRD(version, method);
+            case "/host-meta.json" -> requestJRD(version, method);
             default -> new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND);
         };
     }
