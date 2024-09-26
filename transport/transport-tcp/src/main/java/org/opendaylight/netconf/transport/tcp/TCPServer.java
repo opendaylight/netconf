@@ -59,9 +59,9 @@ public final class TCPServer extends TCPTransportStack {
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @NonNull ListenableFuture<TCPServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
-                throws UnsupportedConfigurationException {
+    public static @NonNull ListenableFuture<TCPServer> listen(
+            final TransportChannelListener<? super TCPTransportChannel> listener, final ServerBootstrap bootstrap,
+            final TcpServerGrouping listenParams) throws UnsupportedConfigurationException {
         NettyTransportSupport.configureKeepalives(bootstrap, listenParams.getKeepalives());
 
         final var ret = SettableFuture.<TCPServer>create();
