@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Glue between a {@link RestconfServer} and a transport stack instance.
  */
-final class RestconfTransportChannelListener implements TransportChannelListener {
+final class RestconfTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
     private final RestconfStream.Registry streamRegistry;
@@ -40,13 +39,13 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     }
 
     @Override
-    public void onTransportChannelEstablished(final TransportChannel channel) {
+    public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(
             new ServerSseHandler(
                 new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
                     configuration.defaultAcceptType(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            new RestconfSession(wellKnown, dispatcher, ((HTTPTransportChannel) channel).scheme()));
+            new RestconfSession(wellKnown, dispatcher, channel.scheme()));
     }
 
     @Override
