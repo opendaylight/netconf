@@ -56,8 +56,8 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = """
         SessionListener has default implementations which we do not care about. We have all subclasses in this package
         and neither of them has additional state""")
-    SSHTransportStack(final TransportChannelListener listener, final FactoryManager factoryManager,
-            final IoHandler handler) {
+    SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
+            final FactoryManager factoryManager, final IoHandler handler) {
         super(listener);
         ioService = new TransportIoService(factoryManager, handler);
         factoryManager.addSessionListener(this);

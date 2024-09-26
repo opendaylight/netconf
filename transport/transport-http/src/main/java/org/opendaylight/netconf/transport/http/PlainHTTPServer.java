@@ -28,7 +28,8 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
  * An {@link HTTPServer} operating over plain TCP.
  */
 final class PlainHTTPServer extends HTTPServer {
-    PlainHTTPServer(final TransportChannelListener listener, final AuthHandlerFactory authHandlerFactory) {
+    PlainHTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener,
+            final AuthHandlerFactory authHandlerFactory) {
         super(listener, HttpScheme.HTTP, authHandlerFactory);
     }
 

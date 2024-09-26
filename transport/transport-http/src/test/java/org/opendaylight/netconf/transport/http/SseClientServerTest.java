@@ -247,7 +247,7 @@ class SseClientServerTest {
         }
     }
 
-    private static class TestTransportListener implements TransportChannelListener {
+    private static class TestTransportListener implements TransportChannelListener<TransportChannel> {
         private final Consumer<Channel> initializer;
         private volatile boolean initialized;
 

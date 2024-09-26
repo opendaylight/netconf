@@ -41,8 +41,8 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
     private final ClientAuthProvider authProvider;
     private final boolean http2;
 
-    HTTPClient(final TransportChannelListener listener, final HttpScheme scheme, final ClientAuthProvider authProvider,
-            final boolean http2) {
+    HTTPClient(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme,
+            final ClientAuthProvider authProvider, final boolean http2) {
         super(listener, scheme);
         this.authProvider = authProvider;
         this.http2 = http2;
