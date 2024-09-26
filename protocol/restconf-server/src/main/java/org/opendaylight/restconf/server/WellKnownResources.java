@@ -30,7 +30,7 @@ import io.netty.util.AsciiString;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc6415#appendix-A">RFC 6415, appendix A</a>
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
-final class WellKnownResources {
+final class WellKnownResources implements ServerResource {
     private final ByteBuf jrd;
     private final ByteBuf xrd;
 
@@ -58,10 +58,15 @@ final class WellKnownResources {
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT, format.formatted(args)).asReadOnly());
     }
 
+    @Override
+    public String segment() {
+        return ".well-known";
+    }
+
     FullHttpResponse request(final HttpVersion version, final HttpMethod method, final String suffix) {
         return switch (suffix) {
-            case "host-meta" -> requestXRD(version, method);
-            case "host-meta.json" -> requestJRD(version, method);
+            case "/host-meta" -> requestXRD(version, method);
+            case "/host-meta.json" -> requestJRD(version, method);
             default -> new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND);
         };
     }
