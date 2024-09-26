@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.restconf.server.PathParameters.DATA;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -36,7 +35,7 @@ public class AbstractRequestProcessorTest {
 
     protected static final String BASE_PATH = "/rests";
     protected static final URI BASE_URI = URI.create("http://somehost:1234" + BASE_PATH);
-    protected static final String DATA_PATH = BASE_PATH + DATA;
+    protected static final String DATA_PATH = BASE_PATH + "/data";
     protected static final String ID_PATH = "test-model:root";
     protected static final String NEW_ID_PATH = "test-model:new";
     protected static final String MOUNT_PATH = "test-model:root/sub/tree/mount:point";
@@ -77,7 +76,10 @@ public class AbstractRequestProcessorTest {
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {
-        dispatcher.dispatch(BASE_URI.resolve(request.uri()), request, callback);
+        final var targetUri = BASE_URI.resolve(request.uri());
+        final var peeler = new SegmentPeeler(targetUri);
+        peeler.next();
+        dispatcher.dispatch(targetUri, peeler, request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }
