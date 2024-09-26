@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * @param <C> associated {@link TransportChannel} type
  */
 public abstract class AbstractTransportStack<C extends TransportChannel> implements TransportStack {
-    private final @NonNull TransportChannelListener listener;
+    private final @NonNull TransportChannelListener<? super C> listener;
 
     /**
      * Polymorphic state. It can be in one of four states:
@@ -42,7 +42,7 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
      */
     private Object state;
 
-    protected AbstractTransportStack(final TransportChannelListener listener) {
+    protected AbstractTransportStack(final TransportChannelListener<? super C> listener) {
         this.listener = requireNonNull(listener);
     }
 
