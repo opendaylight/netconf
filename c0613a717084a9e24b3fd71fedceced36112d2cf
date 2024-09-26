@@ -16,6 +16,24 @@
       "message": "protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final clientStackGrouping)",
       "revId": "c0613a717084a9e24b3fd71fedceced36112d2cf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0868ee6f_93ec6f4e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-26T08:09:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ea27fa0_8529bea0",
+      "revId": "c0613a717084a9e24b3fd71fedceced36112d2cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

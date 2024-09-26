@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8adbfcb4_4c6e5315",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-26T08:09:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "458a34fc_ac1c8d31",
+      "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66fcc8b1_351bd8bd",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-09-25T17:51:18Z",
       "side": 1,
       "message": "let\u0027s use an artist name which contains a \u0027/\u0027 character, i.e. is percent-encoded in request",
+      "range": {
+        "startLine": 26,
+        "startChar": 65,
+        "endLine": 26,
+        "endChar": 71
+      },
+      "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aa703bc_1ee3f324",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/DataE2ETest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-26T08:09:48Z",
+      "side": 1,
+      "message": "issue with encoded slash parsing belongs to URI parsing not to data CRUD processing\nplease create a jira issue to address the bug properly",
+      "parentUuid": "66fcc8b1_351bd8bd",
       "range": {
         "startLine": 26,
         "startChar": 65,
