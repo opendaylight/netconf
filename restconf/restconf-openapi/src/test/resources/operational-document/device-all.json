@@ -127,7 +127,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
       "post": {
         "tags": [
           "123 action-types"
@@ -183,7 +183,7 @@
         "summary": "POST - 123 - action-types - list-action"
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
       "post": {
         "tags": [
           "123 action-types"
@@ -1139,7 +1139,7 @@
         "summary": "PATCH - action-types - 123 - container"
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action": {
       "post": {
         "tags": [
           "123 action-types"
