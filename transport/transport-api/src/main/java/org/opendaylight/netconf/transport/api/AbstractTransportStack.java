@@ -42,7 +42,7 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
      */
     private Object state;
 
-    protected AbstractTransportStack(final TransportChannelListener listener) {
+    protected AbstractTransportStack(final TransportChannelListener<? super C> listener) {
         this.listener = requireNonNull(listener);
     }
 
