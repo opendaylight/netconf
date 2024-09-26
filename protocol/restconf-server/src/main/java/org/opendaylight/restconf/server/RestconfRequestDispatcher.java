@@ -66,7 +66,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class RestconfRequestDispatcher {
+final class RestconfRequestDispatcher implements ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
 
     @VisibleForTesting
@@ -109,26 +109,21 @@ final class RestconfRequestDispatcher {
             defaultPrettyPrint.value());
     }
 
+    @Override
+    public String segment() {
+        // FIXME: last segment of absRestconf
+        throw new UnsupportedOperationException();
+    }
+
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
+    void dispatch(final URI targetUri, final SegmentPeeler peeler, final FullHttpRequest request,
+            final RestconfRequest callback) {
         LOG.debug("Dispatching {} {}", request.method(), targetUri);
 
         // FIXME: this is here just because of test structure
         final var principal = principalService.acquirePrincipal(request);
 
-        // FIXME: NETCONF-1399: we should be operating on raw path, as we need to differentiate between encoded and
-        //                      non-encoded slashes
-        final var decoder = new QueryStringDecoder(targetUri);
-
-        final var path = decoder.path();
-        if (!path.startsWith(absRestconf)) {
-            callback.onSuccess(notFound(request));
-            return;
-        }
-
-        final var suffix = path.substring(absRestconfLen);
-        // TODO: are '/restconf' and '/restconf/' the same thing? for now we treat them as such for now
-        if (suffix.isEmpty() || suffix.equals("/")) {
+        if (!peeler.hasNext()) {
             // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
             //        correct: we should be reporting the entire API Resource, as described in
             //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
@@ -136,22 +131,24 @@ final class RestconfRequestDispatcher {
             return;
         }
 
-        if (!suffix.startsWith("/")) {
-            callback.onSuccess(notFound(request));
-            return;
-        }
+        final var segment = peeler.next();
+        final var rawPath = peeler.remaining();
+        final var rawQuery = targetUri.getRawQuery();
+        final var decoder = new QueryStringDecoder(rawQuery != null ? rawPath + "?" + rawQuery : rawPath);
+        final var params = new RequestParameters(targetUri.resolve(absRestconfSlash), decoder, request, principal,
+            errorTagMapping, defaultAcceptType, defaultPrettyPrint);
 
-        final var params = new RequestParameters(absRestconf, targetUri.resolve(absRestconfSlash), decoder, request,
-            principal, errorTagMapping, defaultAcceptType, defaultPrettyPrint);
+        // FIXME: NETCONF-1399: we should be operating on raw path, as we need to differentiate between encoded and
+        //                      non-encoded slashes
+
         try {
-            switch (params.pathParameters().apiResource()) {
-                case PathParameters.DATA -> processDataRequest(params, callback);
-                case PathParameters.OPERATIONS -> processOperationsRequest(params, callback);
-                case PathParameters.YANG_LIBRARY_VERSION -> processYangLibraryVersion(params, callback);
-                case PathParameters.MODULES -> processModules(params, callback);
-                default -> callback.onSuccess(
-                    HttpMethod.OPTIONS.equals(params.method())
-                        ? optionsResponse(params, HttpMethod.OPTIONS.name()) : notFound(request));
+            switch (segment) {
+                case "data" -> processDataRequest(params, callback);
+                case "operations"-> processOperationsRequest(params, callback);
+                case "yang-library-version" -> processYangLibraryVersion(params, callback);
+                case "modules" -> processModules(params, callback);
+                default -> callback.onSuccess(HttpMethod.OPTIONS.equals(params.method())
+                    ? optionsResponse(params, HttpMethod.OPTIONS.name()) : notFound(request));
             }
         } catch (RuntimeException e) {
             LOG.error("Error processing request {} {}", request.method(), request.uri(), e);
@@ -426,7 +423,7 @@ final class RestconfRequestDispatcher {
     }
 
     private void getModule(final RequestParameters params, final RestconfRequest callback) {
-        final var file = extractModuleFile(params.pathParameters().childIdentifier());
+        final var file = extractModuleFile(params.remainingRawPath().substring(1));
         final var revision = params.queryParameters().lookup(REVISION);
         if (file.name().isEmpty()) {
             callback.onSuccess(simpleErrorResponse(params, ErrorTag.MISSING_ELEMENT, MISSING_FILENAME_ERROR));
@@ -485,7 +482,8 @@ final class RestconfRequestDispatcher {
     }
 
     private static ApiPath extractApiPath(final RequestParameters params) {
-        return extractApiPath(params.pathParameters().childIdentifier());
+        final var str = params.remainingRawPath();
+        return str.isEmpty() ? ApiPath.empty() : extractApiPath(str.substring(1));
     }
 
     private static ApiPath extractApiPath(final String path) {

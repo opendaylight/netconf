@@ -146,20 +146,31 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             return;
         }
 
-        final var path = targetUri.getPath();
-        if (path.startsWith("/.well-known/")) {
+        final var peeler = new SegmentPeeler(targetUri);
+        if (!peeler.hasNext()) {
+            LOG.debug("Refusing access to {}", requestUri);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
+            return;
+        }
+
+        final var segment = peeler.next();
+        if (segment.equals(wellKnown.segment())) {
             // Well-known resources are immediately available and are trivial to service
             msg.release();
-            respond(ctx, streamId, wellKnown.request(version, method, path.substring(13)));
-        } else {
-            // Defer to dispatcher
-            dispatcher.dispatch(targetUri, msg, new RestconfRequest() {
+            respond(ctx, streamId, wellKnown.request(version, method, peeler.remaining()));
+        } else if (segment.equals(dispatcher.segment())) {
+            dispatcher.dispatch(targetUri, peeler, msg, new RestconfRequest() {
                 @Override
                 public void onSuccess(final FullHttpResponse response) {
                     msg.release();
                     respond(ctx, streamId, response);
                 }
             });
+        } else {
+            LOG.debug("No resource for {}", requestUri);
+            msg.release();
+            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
         }
     }
 
