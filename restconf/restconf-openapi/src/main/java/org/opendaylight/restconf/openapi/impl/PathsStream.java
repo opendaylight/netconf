@@ -243,7 +243,7 @@ public final class PathsStream extends InputStream {
             actionContainer.getActions().forEach(actionDef -> {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
                     node.getQName(), modelContext);
-                final var childPath = basePath + OPERATIONS + resourceActionPath;
+                final var childPath = basePath + DATA + resourceActionPath;
                 result.add(processActionPathEntity(actionDef, childPath, actionParams, moduleName,
                     refPath, deviceName, parentNode, listOfParentsForActions));
             });

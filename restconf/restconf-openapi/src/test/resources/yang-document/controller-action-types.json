@@ -142,7 +142,7 @@
         "summary": "PATCH - action-types - Controller - inner-container"
       }
     },
-    "/rests/operations/action-types:container/container-action": {
+    "/rests/data/action-types:container/container-action": {
       "post": {
         "tags": [
           "Controller action-types"
@@ -566,7 +566,7 @@
         "summary": "PATCH - action-types - Controller - list"
       }
     },
-    "/rests/operations/action-types:list={name}/list-action": {
+    "/rests/data/action-types:list={name}/list-action": {
       "post": {
         "tags": [
           "Controller action-types"
@@ -753,7 +753,7 @@
         "summary": "PATCH - action-types - Controller - container"
       }
     },
-    "/rests/operations/action-types:multi-container/inner-container/action": {
+    "/rests/data/action-types:multi-container/inner-container/action": {
       "post": {
         "tags": [
           "Controller action-types"
@@ -1251,7 +1251,7 @@
         ]
       }
     },
-    "/rests/operations/action-types:first-container/second-container/third-container/nested-action": {
+    "/rests/data/action-types:first-container/second-container/third-container/nested-action": {
       "post": {
         "description": "",
         "parameters": [],
@@ -1473,7 +1473,7 @@
         ]
       }
     },
-    "/rests/operations/action-types:nc-list={nc-name}/nc-list-action": {
+    "/rests/data/action-types:nc-list={nc-name}/nc-list-action": {
       "post": {
         "description": "",
         "summary": "POST - Controller - action-types - nc-list-action",
@@ -1660,7 +1660,7 @@
         ]
       }
     },
-    "/rests/operations/action-types:nc-container/nc-container-action": {
+    "/rests/data/action-types:nc-container/nc-container-action": {
       "post": {
         "description": "",
         "summary": "POST - Controller - action-types - nc-container-action",

@@ -302,7 +302,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - list-action",
