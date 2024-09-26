@@ -15,7 +15,6 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.stream.Stream;
@@ -78,7 +77,7 @@ public class AbstractRequestProcessorTest {
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {
-        dispatcher.dispatch(new QueryStringDecoder(request.uri()), request, callback);
+        dispatcher.dispatch(URI.create(request.uri()), request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }
