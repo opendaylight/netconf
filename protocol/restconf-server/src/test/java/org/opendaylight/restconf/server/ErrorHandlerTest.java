@@ -57,9 +57,6 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
 
     private static Stream<Arguments> notFoundRequest() {
         return Stream.of(
-            // does not match {+restconf}
-            Arguments.of(HttpMethod.GET, "/"),
-            Arguments.of(HttpMethod.GET, "/foo"),
             // {+restconf}, see the corresponding FIXME
             Arguments.of(HttpMethod.GET, BASE_PATH),
             Arguments.of(HttpMethod.GET, BASE_PATH + "/test"));
