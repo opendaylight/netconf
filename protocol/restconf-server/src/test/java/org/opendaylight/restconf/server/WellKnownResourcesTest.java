@@ -25,8 +25,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class WellKnownResourcesTest {
-    private static final String XRD_SUFFIX = "host-meta";
-    private static final String JRD_SUFFIX = "host-meta.json";
+    private static final String XRD_SUFFIX = "/host-meta";
+    private static final String JRD_SUFFIX = "/host-meta.json";
     private static final WellKnownResources RESOURCES = new WellKnownResources("testRestconf");
 
     @ParameterizedTest
