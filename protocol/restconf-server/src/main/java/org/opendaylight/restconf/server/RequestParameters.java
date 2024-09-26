@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 
 /**
@@ -31,7 +32,7 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
  */
 @NonNullByDefault
 final class RequestParameters {
-    private final URI baseUri;
+    private final URI restconfURI;
     private final PathParameters pathParameters;
     private final AsciiString contentType;
     private final AsciiString defaultAcceptType;
@@ -41,10 +42,10 @@ final class RequestParameters {
     private final @Nullable Principal principal;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    RequestParameters(final URI baseUri, final QueryStringDecoder decoder, final FullHttpRequest request,
-            final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
+    RequestParameters(final String restconf, final URI restconfURI, final QueryStringDecoder decoder,
+            final FullHttpRequest request, final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
             final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
-        this.baseUri = requireNonNull(baseUri);
+        this.restconfURI = requireNonNull(restconfURI);
         this.request = requireNonNull(request);
         this.principal = principal;
         this.errorTagMapping = requireNonNull(errorTagMapping);
@@ -52,7 +53,7 @@ final class RequestParameters {
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
         contentType = extractContentType(request, defaultAcceptType);
-        pathParameters = PathParameters.from(decoder.path(), baseUri.getPath());
+        pathParameters = PathParameters.from(decoder.path(), restconf);
         queryParameters = QueryParameters.ofMultiValue(decoder.parameters());
     }
 
@@ -78,21 +79,14 @@ final class RequestParameters {
     }
 
     /**
-     * Returns base URI configured.
+     * Returns the absolute URI of {@code {+restconf}/} of this request. This format matches the specification of the
+     * second argument to {@link RestconfServer#operationsPOST(org.opendaylight.restconf.server.api.ServerRequest, URI,
+     * org.opendaylight.restconf.api.ApiPath, org.opendaylight.restconf.server.api.OperationInputBody)}.
      *
-     * @return base URI value
+     * @return absolute URI of {@code {+restconf}/}
      */
-    public URI baseUri() {
-        return baseUri;
-    }
-
-    /**
-     * Returns base path of URI configured.
-     *
-     * @return base path value
-     */
-    public String basePath() {
-        return baseUri.getPath();
+    public URI restconfURI() {
+        return restconfURI;
     }
 
     /**

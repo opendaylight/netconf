@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.util.AsciiString;
-import java.net.URI;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -28,23 +27,23 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull HttpServerStackGrouping transportConfiguration;
     private final @NonNull String groupName;
     private final int groupThreads;
-    private final @NonNull URI baseUri;
+    private final @NonNull String restconf;
     private final @NonNull AsciiString defaultAcceptType;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
-            final URI baseUri, final String groupName, final int groupThreads,
+            final String restconf, final String groupName, final int groupThreads,
             final Encoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
+        this.restconf = requireNonNull(restconf);
         this.groupName = requireNonNull(groupName);
         this.groupThreads = groupThreads;
         this.transportConfiguration = requireNonNull(transportConfiguration);
-        this.baseUri = requireNonNull(baseUri);
-        this.defaultAcceptType = requireNonNull(defaultEncoding).mediaType();
+        defaultAcceptType = requireNonNull(defaultEncoding).mediaType();
     }
 
-    public @NonNull URI baseUri() {
-        return baseUri;
+    public @NonNull String restconf() {
+        return restconf;
     }
 
     public @NonNull String groupName() {
@@ -66,7 +65,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            baseUri, groupName, groupThreads, transportConfiguration, defaultAcceptType);
+            restconf, groupName, groupThreads, transportConfiguration, defaultAcceptType);
     }
 
     @Override
@@ -75,7 +74,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && errorTagMapping().equals(other.errorTagMapping()) && prettyPrint().equals(other.prettyPrint())
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
-            && baseUri.equals(other.baseUri)
+            && restconf.equals(other.restconf)
             && groupName.equals(other.groupName)
             && groupThreads == other.groupThreads
             && transportConfiguration.equals(other.transportConfiguration)
@@ -85,7 +84,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper)
-            .add("restconf", baseUri)
+            .add("restconf", restconf)
             .add("groupName", groupName)
             .add("groupThreads", groupThreads)
             .add("defaultAcceptType", defaultAcceptType)
