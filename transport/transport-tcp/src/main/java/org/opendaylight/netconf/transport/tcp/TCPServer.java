@@ -45,7 +45,7 @@ public final class TCPServer extends TCPTransportStack {
 
     private volatile Channel listenChannel;
 
-    private TCPServer(final TransportChannelListener listener) {
+    private TCPServer(final TransportChannelListener<? super TCPTransportChannel> listener) {
         super(listener);
     }
 

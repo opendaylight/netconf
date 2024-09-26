@@ -21,7 +21,8 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
  * An {@link HTTPServer} operating over TLS.
  */
 final class TlsHTTPServer extends HTTPServer {
-    TlsHTTPServer(final TransportChannelListener listener, final AuthHandlerFactory authHandlerFactory) {
+    TlsHTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener,
+            final AuthHandlerFactory authHandlerFactory) {
         super(listener, authHandlerFactory);
     }
 

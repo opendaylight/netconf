@@ -40,7 +40,7 @@ public final class SSHServer extends SSHTransportStack {
 
     private final String subsystem;
 
-    private SSHServer(final String subsystem, final TransportChannelListener listener,
+    private SSHServer(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final TransportSshServer sshServer) {
         super(listener, sshServer, sshServer.getSessionFactory());
         this.subsystem = requireNonNull(subsystem);
@@ -48,7 +48,7 @@ public final class SSHServer extends SSHTransportStack {
 
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory,
             final ScheduledExecutorService executorService, final String subsystem,
-            final TransportChannelListener listener, final SshServerGrouping serverParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener, final SshServerGrouping serverParams,
             final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
         return new SSHServer(subsystem, listener,
             new TransportSshServer.Builder(ioServiceFactory, executorService)

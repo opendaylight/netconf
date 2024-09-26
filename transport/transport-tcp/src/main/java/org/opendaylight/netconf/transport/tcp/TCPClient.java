@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 public final class TCPClient extends TCPTransportStack {
     private static final @NonNull ListenableFuture<Empty> SHUTDOWN_FUTURE = Futures.immediateFuture(Empty.value());
 
-    private TCPClient(final TransportChannelListener listener) {
+    private TCPClient(final TransportChannelListener<? super TCPTransportChannel> listener) {
         super(listener);
     }
 

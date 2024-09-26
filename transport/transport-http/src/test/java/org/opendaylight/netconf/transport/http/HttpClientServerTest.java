@@ -83,9 +83,9 @@ class HttpClientServerTest {
     @Mock
     private HttpClientStackGrouping clientConfig;
     @Mock
-    private TransportChannelListener serverTransportListener;
+    private TransportChannelListener<TransportChannel> serverTransportListener;
     @Mock
-    private TransportChannelListener clientTransportListener;
+    private TransportChannelListener<TransportChannel> clientTransportListener;
 
     @BeforeAll
     static void beforeAll() {
