@@ -142,7 +142,7 @@
         "summary": "PATCH - action-types - Controller - inner-container"
       }
     },
-    "/rests/operations/action-types:container/container-action": {
+    "/rests/data/action-types:container/container-action": {
       "post": {
         "tags": [
           "Controller action-types"
@@ -566,7 +566,7 @@
         "summary": "PATCH - action-types - Controller - list"
       }
     },
-    "/rests/operations/action-types:list={name}/list-action": {
+    "/rests/data/action-types:list={name}/list-action": {
       "post": {
         "tags": [
           "Controller action-types"
@@ -753,7 +753,7 @@
         "summary": "PATCH - action-types - Controller - container"
       }
     },
-    "/rests/operations/action-types:multi-container/inner-container/action": {
+    "/rests/data/action-types:multi-container/inner-container/action": {
       "post": {
         "tags": [
           "Controller action-types"
