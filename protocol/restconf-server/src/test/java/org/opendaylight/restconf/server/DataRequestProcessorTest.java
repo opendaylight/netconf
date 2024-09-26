@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.restconf.server.PathParameters.DATA;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
 import static org.opendaylight.restconf.server.TestUtils.assertContentSimplified;
 import static org.opendaylight.restconf.server.TestUtils.assertInputContent;
@@ -70,7 +69,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 
 class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     private static final String DATA_PATH_WITH_ID = DATA_PATH + "/" + ID_PATH;
-    private static final String PATH_CREATED = BASE_URI + DATA + "/" + NEW_ID_PATH;
+    private static final String PATH_CREATED = BASE_URI + "/data/" + NEW_ID_PATH;
 
     private static final ConfigurationMetadata.EntityTag ETAG =
         new ConfigurationMetadata.EntityTag(Long.toHexString(System.currentTimeMillis()), true);
