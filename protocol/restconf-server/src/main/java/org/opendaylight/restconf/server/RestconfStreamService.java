@@ -17,7 +17,6 @@ import io.netty.util.AsciiString;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
@@ -55,11 +54,11 @@ public final class RestconfStreamService implements EventStreamService {
     private final RestconfStream.EncodingName defaultEncoding;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    public RestconfStreamService(final RestconfStream.Registry registry, final URI baseUri,
+    public RestconfStreamService(final RestconfStream.Registry registry, final String restconf,
             final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
             final PrettyPrintParam defaultPrettyPrint) {
-        this.streamRegistry = requireNonNull(registry);
-        basePath = requireNonNull(baseUri).getPath();
+        streamRegistry = requireNonNull(registry);
+        basePath = requireNonNull(restconf);
         defaultEncoding = NettyMediaTypes.JSON_TYPES.contains(defaultAcceptType) ? RFC8040_JSON : RFC8040_XML;
         this.errorTagMapping = errorTagMapping;
         this.defaultPrettyPrint = defaultPrettyPrint;
@@ -95,7 +94,7 @@ public final class RestconfStreamService implements EventStreamService {
         // Try starting stream via registry stream subscriber
         final var sender = new RestconfStream.Sender() {
             @Override
-            public void sendDataMessage(String data) {
+            public void sendDataMessage(final String data) {
                 listener.onEventField("data", data);
             }
 

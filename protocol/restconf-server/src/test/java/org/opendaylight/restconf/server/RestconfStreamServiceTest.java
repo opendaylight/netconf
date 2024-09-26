@@ -25,7 +25,6 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 import static org.opendaylight.restconf.server.TestUtils.assertErrorContent;
 
 import io.netty.handler.codec.http.QueryStringEncoder;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +56,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 @ExtendWith(MockitoExtension.class)
 class RestconfStreamServiceTest {
 
-    private static final URI BASE_URI = URI.create("http://somehost:5678/rests");
-    private static final String URI_PREFIX = BASE_URI.getPath() + STREAMS;
+    private static final String BASE_PATH = "/rests";
+    private static final String URI_PREFIX = BASE_PATH + STREAMS;
     private static final String URI_TEMPLATE = URI_PREFIX + "/%s/%s";
     private static final String XML = "xml";
     private static final String JSON = "json";
@@ -91,8 +90,8 @@ class RestconfStreamServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        streamService = new RestconfStreamService(registry, BASE_URI,
-            ERROR_TAG_MAPPING, APPLICATION_JSON, PrettyPrintParam.FALSE);
+        streamService = new RestconfStreamService(registry, BASE_PATH, ERROR_TAG_MAPPING, APPLICATION_JSON,
+            PrettyPrintParam.FALSE);
     }
 
     @ParameterizedTest

@@ -32,9 +32,9 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
         this.configuration = requireNonNull(configuration);
-        wellKnown = new WellKnownResources(configuration.baseUri().getPath());
+        wellKnown = new WellKnownResources(configuration.restconf());
 
-        dispatcher = new RestconfRequestDispatcher(server, principalService, configuration.baseUri(),
+        dispatcher = new RestconfRequestDispatcher(server, principalService, configuration.restconf(),
             configuration.errorTagMapping(), configuration.defaultAcceptType(), configuration.prettyPrint());
     }
 
@@ -42,7 +42,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(
             new ServerSseHandler(
-                new RestconfStreamService(streamRegistry, configuration.baseUri(), configuration.errorTagMapping(),
+                new RestconfStreamService(streamRegistry, configuration.restconf(), configuration.errorTagMapping(),
                     configuration.defaultAcceptType(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
             new RestconfSession(wellKnown, dispatcher, channel.scheme()));

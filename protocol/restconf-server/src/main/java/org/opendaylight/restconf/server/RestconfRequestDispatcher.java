@@ -76,34 +76,37 @@ final class RestconfRequestDispatcher {
     @VisibleForTesting
     static final String SOURCE_READ_FAILURE_ERROR = "Failure reading module source: ";
 
-    private final URI baseUri;
     private final RestconfServer server;
     private final PrincipalService principalService;
     private final ErrorTagMapping errorTagMapping;
     private final AsciiString defaultAcceptType;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    // baseUri.getPath(), i.e. "{+restconf}"
-    private final String plusRestconf;
-    // cached plusRestconf.length()
-    private final int plusRestconfLen;
+    // '/{+restconf}/', i.e. an absolute path conforming to RestconfServer's 'restconfURI'
+    private final URI absRestconfSlash;
+    // '/{+restconf}', i.e. an absolute path to {+restconf}
+    private final String absRestconf;
+    // cached length of absRestconf
+    private final int absRestconfLen;
 
     RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
-            final URI baseUri, final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
+            final String restconf, final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
             final PrettyPrintParam defaultPrettyPrint) {
         this.server = requireNonNull(server);
         this.principalService = requireNonNull(principalService);
-        this.baseUri = requireNonNull(baseUri);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.defaultAcceptType = requireNonNull(defaultAcceptType);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
-        plusRestconf = baseUri.getPath();
-        plusRestconfLen = plusRestconf.length();
+        // TODO: this needs a better specification: which of '/foo', 'foo', 'foo/', '/foo/' is valid?
+        //       this code assumes '/foo' or 'foo' are okay
+        absRestconf = restconf.startsWith("/") ? restconf : "/" + restconf;
+        absRestconfLen = absRestconf.length();
+        absRestconfSlash = URI.create(absRestconf + "/");
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
-        LOG.info("Base path: {}, default accept: {}, default pretty print: {}",
-            baseUri, defaultAcceptType, defaultPrettyPrint.value());
+        LOG.info("Base path: {}, default accept: {}, default pretty print: {}", absRestconf, defaultAcceptType,
+            defaultPrettyPrint.value());
     }
 
     @SuppressWarnings("IllegalCatch")
@@ -118,12 +121,12 @@ final class RestconfRequestDispatcher {
         final var decoder = new QueryStringDecoder(targetUri);
 
         final var path = decoder.path();
-        if (!path.startsWith(plusRestconf)) {
+        if (!path.startsWith(absRestconf)) {
             callback.onSuccess(notFound(request));
             return;
         }
 
-        final var suffix = path.substring(plusRestconfLen);
+        final var suffix = path.substring(absRestconfLen);
         // TODO: are '/restconf' and '/restconf/' the same thing? for now we treat them as such for now
         if (suffix.isEmpty() || suffix.equals("/")) {
             // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
@@ -138,8 +141,8 @@ final class RestconfRequestDispatcher {
             return;
         }
 
-        final var params = new RequestParameters(baseUri, decoder, request, principal, errorTagMapping,
-            defaultAcceptType, defaultPrettyPrint);
+        final var params = new RequestParameters(absRestconf, targetUri.resolve(absRestconfSlash), decoder, request,
+            principal, errorTagMapping, defaultAcceptType, defaultPrettyPrint);
         try {
             switch (params.pathParameters().apiResource()) {
                 case PathParameters.DATA -> processDataRequest(params, callback);
@@ -256,7 +259,7 @@ final class RestconfRequestDispatcher {
                     case CreateResourceResult createResult -> {
                         yield responseBuilder(requestParams, HttpResponseStatus.CREATED)
                             .setHeader(HttpHeaderNames.LOCATION,
-                                requestParams.baseUri() + PathParameters.DATA + "/" + createResult.createdPath())
+                                requestParams.restconfURI() + "data/" + createResult.createdPath())
                             .setMetadataHeaders(createResult)
                             .build();
                     }
@@ -395,13 +398,8 @@ final class RestconfRequestDispatcher {
                 return output == null ? simpleResponse(requestParams, HttpResponseStatus.NO_CONTENT)
                     : responseBuilder(requestParams, HttpResponseStatus.OK).setBody(output).build();
             }
-        }, restconfUri(params.baseUri()), apiPath,
+        }, params.restconfURI(), apiPath,
             requestBody(params, JsonOperationInputBody::new, XmlOperationInputBody::new));
-    }
-
-    private static URI restconfUri(final URI uri) {
-        // we need to add `/` at the end of RESTCONF base path to create correct streams URLs
-        return URI.create(uri.toString().concat("/"));
     }
 
     /**
