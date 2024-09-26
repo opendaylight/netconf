@@ -77,7 +77,9 @@ public class AbstractRequestProcessorTest {
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {
-        dispatcher.dispatch(URI.create(request.uri()), request, callback);
+        final var targetUri = URI.create(request.uri());
+        final var peeler = new SegmentPeeler(targetUri);
+        dispatcher.dispatch(targetUri, peeler, request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }

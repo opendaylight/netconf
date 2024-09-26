@@ -107,7 +107,8 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
+    void dispatch(final URI targetUri, final SegmentPeeler peeler, final FullHttpRequest request,
+            final RestconfRequest callback) {
         LOG.debug("Dispatching {} {}", request.method(), targetUri);
 
         // FIXME: this is here just because of test structure
