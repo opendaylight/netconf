@@ -31,7 +31,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
     private final AuthHandlerFactory authHandlerFactory;
 
-    HTTPServer(final TransportChannelListener listener, final HttpScheme scheme,
+    HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme,
             final AuthHandlerFactory authHandlerFactory) {
         super(listener, scheme);
         this.authHandlerFactory = authHandlerFactory;
@@ -76,8 +76,9 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
         };
     }
 
-    private static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final Tcp tcpCase, final @Nullable AuthHandlerFactory authHandlerFactory)
+    private static @NonNull ListenableFuture<HTTPServer> listen(
+            final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
+            final Tcp tcpCase, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var tcp = tcpCase.getTcp();
         final var server = new PlainHTTPServer(listener, authHandlerFactory != null ? authHandlerFactory
@@ -86,8 +87,9 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
             TCPServer.listen(server.asListener(), bootstrap, tcp.nonnullTcpServerParameters()));
     }
 
-    private static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final Tls tlsCase, final @Nullable AuthHandlerFactory authHandlerFactory)
+    private static @NonNull ListenableFuture<HTTPServer> listen(
+            final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
+            final Tls tlsCase, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var tls = tlsCase.getTls();
         final var server = new TlsHTTPServer(listener, authHandlerFactory != null ? authHandlerFactory

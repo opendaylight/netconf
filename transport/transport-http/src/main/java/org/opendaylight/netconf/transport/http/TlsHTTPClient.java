@@ -20,7 +20,8 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
  * An {@link HTTPClient} operating over TLS.
  */
 final class TlsHTTPClient extends HTTPClient {
-    TlsHTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider, final boolean http2) {
+    TlsHTTPClient(final TransportChannelListener<? super HTTPTransportChannel> listener,
+            final ClientAuthProvider authProvider, final boolean http2) {
         super(listener, HttpScheme.HTTPS, authProvider, http2);
     }
 
