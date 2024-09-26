@@ -34,6 +34,24 @@
       "parentUuid": "29822939_90ecdb05",
       "revId": "b1512b1bd956559a22c8ba52eb67e286d3c34c87",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7a5b695_ed081911",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-26T21:05:45Z",
+      "side": 1,
+      "message": "so I am not quite sure how we want to end up controlling {+restconf}:\n\n1. localhost:8181/restconf is historically the draft spec\n2. localhost:8181/rests is historically the RFC spec\n3. localhost:8182/rests is the Netty RFC spec\n\nnow, I would *really* like to:\n- have 3 default to localhost:8182/restconf\n- have 3 still configurable\n- have the knob reasonably-named\n\nso that:\n- default matches the RFC\n- /restconf makes it clear it is RESTCONF\n- it is changeable by user (for example for interop testing of discovery)\n\ncan I punt this comment to a separate issue/patch?",
+      "parentUuid": "6adde1f3_def397f0",
+      "revId": "b1512b1bd956559a22c8ba52eb67e286d3c34c87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
