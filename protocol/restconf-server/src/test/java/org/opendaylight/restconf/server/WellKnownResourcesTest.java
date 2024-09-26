@@ -25,20 +25,21 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class WellKnownResourcesTest {
-    private static final String XRD_SUFFIX = "host-meta";
-    private static final String JRD_SUFFIX = "host-meta.json";
+    private static final String XRD_SUFFIX = "/host-meta";
+    private static final String JRD_SUFFIX = "/host-meta.json";
     private static final WellKnownResources RESOURCES = new WellKnownResources("testRestconf");
 
     @ParameterizedTest
     @ValueSource(strings = { XRD_SUFFIX, JRD_SUFFIX })
     void options(final String uri) {
-        assertOptionsResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri), "GET, HEAD, OPTIONS");
+        assertOptionsResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, new SegmentPeeler(uri)),
+            "GET, HEAD, OPTIONS");
     }
 
     @ParameterizedTest
     @MethodSource
     void getHostMeta(final String uri, final AsciiString contentType, final String content) {
-        assertResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.GET, uri),
+        assertResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.GET, new SegmentPeeler(uri)),
             HttpResponseStatus.OK, contentType, content);
     }
 
@@ -61,7 +62,7 @@ class WellKnownResourcesTest {
 
     @Test
     void putHostMeta() {
-        final var response = RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.POST, JRD_SUFFIX);
+        final var response = RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.POST, new SegmentPeeler(JRD_SUFFIX));
         assertResponse(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }

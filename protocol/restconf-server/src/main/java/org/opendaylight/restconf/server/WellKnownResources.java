@@ -20,7 +20,10 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Well-known resources supported by a particular host.
@@ -31,6 +34,7 @@ import io.netty.util.AsciiString;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
 final class WellKnownResources {
+    private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
     private final ByteBuf jrd;
     private final ByteBuf xrd;
 
@@ -58,11 +62,15 @@ final class WellKnownResources {
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT, format.formatted(args)).asReadOnly());
     }
 
-    FullHttpResponse request(final HttpVersion version, final HttpMethod method, final String suffix) {
+    FullHttpResponse request(final HttpVersion version, final HttpMethod method, final SegmentPeeler peeler) {
+        final var suffix = QueryStringDecoder.decodeComponent(peeler.remaining());
         return switch (suffix) {
-            case "host-meta" -> requestXRD(version, method);
-            case "host-meta.json" -> requestJRD(version, method);
-            default -> new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND);
+            case "/host-meta" -> requestXRD(version, method);
+            case "/host-meta.json" -> requestJRD(version, method);
+            default -> {
+                LOG.debug("Suffix '{}' not recognized", suffix);
+                yield new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND);
+            }
         };
     }
 
