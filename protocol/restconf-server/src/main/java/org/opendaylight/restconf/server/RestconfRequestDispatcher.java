@@ -107,14 +107,16 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final QueryStringDecoder decoder, final FullHttpRequest request, final RestconfRequest callback) {
-        LOG.debug("Dispatching {} {}", request.method(), request.uri());
+    void dispatch(final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
+        LOG.debug("Dispatching {} {}", request.method(), targetUri);
 
         // FIXME: this is here just because of test structure
         final var principal = principalService.acquirePrincipal(request);
 
-        // FIXME: we should be operating on raw path, as we need to differentiate between encoded and non-encoded
-        //        slashes
+        // FIXME: NETCONF-1399: we should be operating on raw path, as we need to differentiate between encoded and
+        //                      non-encoded slashes
+        final var decoder = new QueryStringDecoder(targetUri);
+
         final var path = decoder.path();
         if (!path.startsWith(plusRestconf)) {
             callback.onSuccess(notFound(request));

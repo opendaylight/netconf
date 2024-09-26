@@ -21,7 +21,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -147,16 +146,20 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             return;
         }
 
-        final var decoder = new QueryStringDecoder(targetUri);
-        final var path = decoder.path();
-
+        final var path = targetUri.getPath();
         if (path.startsWith("/.well-known/")) {
             // Well-known resources are immediately available and are trivial to service
             msg.release();
             respond(ctx, streamId, wellKnown.request(version, method, path.substring(13)));
         } else {
             // Defer to dispatcher
-            dispatchRequest(ctx, version, streamId, decoder, msg);
+            dispatcher.dispatch(targetUri, msg, new RestconfRequest() {
+                @Override
+                public void onSuccess(final FullHttpResponse response) {
+                    msg.release();
+                    respond(ctx, streamId, response);
+                }
+            });
         }
     }
 
@@ -178,17 +181,6 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             throw new URISyntaxException(host, "Illegal Host header");
         }
         return ret;
-    }
-
-    private void dispatchRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
-            final QueryStringDecoder decoder, final FullHttpRequest msg) {
-        dispatcher.dispatch(decoder, msg, new RestconfRequest() {
-            @Override
-            public void onSuccess(final FullHttpResponse response) {
-                msg.release();
-                respond(ctx, streamId, response);
-            }
-        });
     }
 
     private static void respond(final ChannelHandlerContext ctx, final Integer streamId,
