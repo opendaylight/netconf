@@ -24,11 +24,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as a TLS server.
  */
 public final class TLSServer extends TLSTransportStack {
-    private TLSServer(final TransportChannelListener listener, final SslContext sslContext) {
+    private TLSServer(final TransportChannelListener<? super TLSTransportChannel> listener,
+            final SslContext sslContext) {
         super(listener, sslContext);
     }
 
-    private TLSServer(final TransportChannelListener listener, final SslHandlerFactory factory) {
+    private TLSServer(final TransportChannelListener<? super TLSTransportChannel> listener,
+            final SslHandlerFactory factory) {
         super(listener, factory);
     }
 
