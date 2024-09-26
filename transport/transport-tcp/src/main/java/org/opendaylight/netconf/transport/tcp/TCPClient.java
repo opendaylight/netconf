@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 public final class TCPClient extends TCPTransportStack {
     private static final @NonNull ListenableFuture<Empty> SHUTDOWN_FUTURE = Futures.immediateFuture(Empty.value());
 
-    private TCPClient(final TransportChannelListener listener) {
+    private TCPClient(final TransportChannelListener<? super TCPTransportChannel> listener) {
         super(listener);
     }
 
@@ -40,9 +40,9 @@ public final class TCPClient extends TCPTransportStack {
      * @throws UnsupportedConfigurationException when {@code connectParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @NonNull ListenableFuture<TCPClient> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final TcpClientGrouping connectParams)
-                throws UnsupportedConfigurationException {
+    public static @NonNull ListenableFuture<TCPClient> connect(
+            final TransportChannelListener<? super TCPTransportChannel> listener, final Bootstrap bootstrap,
+            final TcpClientGrouping connectParams) throws UnsupportedConfigurationException {
         NettyTransportSupport.configureKeepalives(bootstrap, connectParams.getKeepalives());
 
         final var ret = SettableFuture.<TCPClient>create();
