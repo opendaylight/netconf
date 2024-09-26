@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
 import java.util.Map;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -19,7 +18,6 @@ import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.framework.FrameworkUtil;
@@ -179,27 +177,18 @@ public final class OSGiNorthbound {
         final var tlsCertKey = TlsUtils.readCertificateKey(configuration.tls$_$certificate(),
             configuration.tls$_$private$_$key());
 
-        final Transport transport;
-        final String scheme;
-        if (tlsCertKey != null) {
-            scheme = "https";
-            transport = ConfigUtils.serverTransportTls(configuration.bind$_$address(), configuration.bind$_$port(),
-                tlsCertKey.certificate(), tlsCertKey.privateKey());
-        } else {
-            scheme = "http";
-            transport = ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
-        }
+        final var transport = tlsCertKey != null
+            ? ConfigUtils.serverTransportTls(configuration.bind$_$address(), configuration.bind$_$port(),
+                tlsCertKey.certificate(), tlsCertKey.privateKey())
+            : ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
 
-        // FIXME: use seven-argument URI constructor instead, which correctly handles IPv6 addresses
-        final var baseUri = URI.create("%s://%s:%d/%s".formatted(scheme, configuration.host$_$name(),
-            configuration.bind$_$port(), configuration.restconf()));
         return NettyEndpoint.props(
             new NettyEndpointConfiguration(
                 configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
                 PrettyPrintParam.of(configuration.pretty$_$print()),
                 Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
                 Uint32.valueOf(configuration.heartbeat$_$interval()),
-                baseUri,
+                configuration.restconf(),
                 configuration.group$_$name(),
                 configuration.group$_$threads(),
                 NettyEndpointConfiguration.Encoding.from(configuration.default$_$encoding()),
