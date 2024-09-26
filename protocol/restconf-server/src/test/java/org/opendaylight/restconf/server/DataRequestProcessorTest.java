@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.restconf.server.PathParameters.DATA;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
 import static org.opendaylight.restconf.server.TestUtils.assertContentSimplified;
 import static org.opendaylight.restconf.server.TestUtils.assertInputContent;
@@ -40,6 +39,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
@@ -67,10 +68,12 @@ import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     private static final String DATA_PATH_WITH_ID = DATA_PATH + "/" + ID_PATH;
-    private static final String PATH_CREATED = BASE_URI + DATA + "/" + NEW_ID_PATH;
+    private static final String DATA_PATH_WITH_ID_SLASH = DATA_PATH_WITH_ID + "/foo=%2f";
+    private static final String PATH_CREATED = BASE_URI + "/data/" + NEW_ID_PATH;
 
     private static final ConfigurationMetadata.EntityTag ETAG =
         new ConfigurationMetadata.EntityTag(Long.toHexString(System.currentTimeMillis()), true);
@@ -388,6 +391,22 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         final var response = dispatch(request);
         verify(server).dataDELETE(any(), apiPathCaptor.capture());
         assertEquals(API_PATH, apiPathCaptor.getValue());
+        assertResponse(response, HttpResponseStatus.NO_CONTENT);
+    }
+
+    @Test
+    void deleteDataDecode() {
+        final var result = Empty.value();
+        doAnswer(answerCompleteWith(result)).when(server).dataDELETE(any(), any(ApiPath.class));
+
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE,
+            DATA_PATH_WITH_ID_SLASH);
+        final var response = dispatch(request);
+        verify(server).dataDELETE(any(), apiPathCaptor.capture());
+
+        assertEquals(ApiPath.of(List.of(
+            new ApiIdentifier("test-model", Unqualified.of("root")),
+            ListInstance.of(null, Unqualified.of("foo"), "/"))), apiPathCaptor.getValue());
         assertResponse(response, HttpResponseStatus.NO_CONTENT);
     }
 }
