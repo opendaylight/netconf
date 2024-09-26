@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * A {@link TransportChannelListener} which initializes NETCONF server implementations working on top
  * of a {@link TransportChannel}.
  */
-public final class ServerTransportInitializer implements TransportChannelListener {
+public final class ServerTransportInitializer implements TransportChannelListener<TransportChannel> {
     private static final Logger LOG = LoggerFactory.getLogger(ServerTransportInitializer.class);
     private static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
 
