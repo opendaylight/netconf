@@ -24,24 +24,28 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as a TLS client.
  */
 public final class TLSClient extends TLSTransportStack {
-    private TLSClient(final TransportChannelListener listener, final SslContext sslContext) {
+    private TLSClient(final TransportChannelListener<? super TLSTransportChannel> listener,
+            final SslContext sslContext) {
         super(listener, sslContext);
     }
 
-    private TLSClient(final TransportChannelListener listener, final SslHandlerFactory factory) {
+    private TLSClient(final TransportChannelListener<? super TLSTransportChannel> listener,
+            final SslHandlerFactory factory) {
         super(listener, factory);
     }
 
-    public static @NonNull ListenableFuture<TLSClient> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final TcpClientGrouping connectParams, final SslHandlerFactory factory)
+    public static @NonNull ListenableFuture<TLSClient> connect(
+            final TransportChannelListener<? super TLSTransportChannel> listener, final Bootstrap bootstrap,
+            final TcpClientGrouping connectParams, final SslHandlerFactory factory)
                 throws UnsupportedConfigurationException {
         final var client = new TLSClient(listener, factory);
         return transformUnderlay(client, TCPClient.connect(client.asListener(), bootstrap, connectParams));
     }
 
-    public static @NonNull ListenableFuture<TLSClient> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams, final SslHandlerFactory factory)
-            throws UnsupportedConfigurationException {
+    public static @NonNull ListenableFuture<TLSClient> listen(
+            final TransportChannelListener<? super TLSTransportChannel> listener, final ServerBootstrap bootstrap,
+            final TcpServerGrouping listenParams, final SslHandlerFactory factory)
+                throws UnsupportedConfigurationException {
         final var client = new TLSClient(listener, factory);
         return transformUnderlay(client, TCPServer.listen(client.asListener(), bootstrap, listenParams));
     }
