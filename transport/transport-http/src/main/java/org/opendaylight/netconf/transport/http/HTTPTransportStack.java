@@ -20,7 +20,7 @@ public abstract sealed class HTTPTransportStack extends AbstractOverlayTransport
 
     private final @NonNull HttpScheme scheme;
 
-    HTTPTransportStack(final TransportChannelListener listener, final HttpScheme scheme) {
+    HTTPTransportStack(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme) {
         super(listener);
         this.scheme = requireNonNull(scheme);
     }

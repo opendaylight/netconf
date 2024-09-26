@@ -80,15 +80,15 @@ class TlsClientServerTest {
     @Mock
     private TlsClientGrouping tlsClientConfig;
     @Mock
-    private TransportChannelListener clientListener;
+    private TransportChannelListener<TransportChannel> clientListener;
     @Mock
     private TcpServerGrouping tcpServerConfig;
     @Mock
     private TlsServerGrouping tlsServerConfig;
     @Mock
-    private TransportChannelListener serverListener;
+    private TransportChannelListener<TransportChannel> serverListener;
     @Mock
-    private TransportChannelListener otherServerListener;
+    private TransportChannelListener<TransportChannel> otherServerListener;
 
     @Captor
     ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
