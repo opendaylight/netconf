@@ -33,7 +33,7 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
 
     private volatile TransportStack underlay = null;
 
-    protected AbstractOverlayTransportStack(final TransportChannelListener listener) {
+    protected AbstractOverlayTransportStack(final TransportChannelListener<? super C> listener) {
         super(listener);
     }
 
@@ -42,7 +42,7 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
         return underlay.shutdown();
     }
 
-    protected final @NonNull TransportChannelListener asListener() {
+    protected final @NonNull TransportChannelListener<TransportChannel> asListener() {
         return asListener;
     }
 
