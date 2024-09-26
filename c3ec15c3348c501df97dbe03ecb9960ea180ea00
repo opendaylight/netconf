@@ -105,6 +105,30 @@
       },
       "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45168f03_e1d5d951",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/DataE2ETest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-09-26T09:56:58Z",
+      "side": 1,
+      "message": "1. agree\n2. We are testing common/generic case here, not all the cases. Using slash in a key value is eligible case but rare one\n3. https://lf-opendaylight.atlassian.net/browse/NETCONF-1399\n\nSo what was the point to -1 to review with demand to make a change resulting build failure?",
+      "parentUuid": "55dbe261_3756e015",
+      "range": {
+        "startLine": 26,
+        "startChar": 65,
+        "endLine": 26,
+        "endChar": 71
+      },
+      "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
