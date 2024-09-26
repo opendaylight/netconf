@@ -19,7 +19,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CallHomeTransportChannelListener implements TransportChannelListener {
+public class CallHomeTransportChannelListener implements TransportChannelListener<TransportChannel> {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeTransportChannelListener.class);
 
     private final @NonNull NetconfClientSessionNegotiatorFactory negotiationFactory;
