@@ -58,9 +58,9 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams)
-                throws UnsupportedConfigurationException {
+    public static final @NonNull ListenableFuture<HTTPServer> listen(
+            final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
+            final HttpServerStackGrouping listenParams) throws UnsupportedConfigurationException {
         return listen(listener, bootstrap, listenParams, null);
     }
 
@@ -76,9 +76,10 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams,
-            final @Nullable AuthHandlerFactory authHandlerFactory) throws UnsupportedConfigurationException {
+    public static final @NonNull ListenableFuture<HTTPServer> listen(
+            final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
+            final HttpServerStackGrouping listenParams, final @Nullable AuthHandlerFactory authHandlerFactory)
+                throws UnsupportedConfigurationException {
         final var transport = requireNonNull(listenParams).getTransport();
         return switch (transport) {
             case Tcp tcpCase -> listen(listener, bootstrap, tcpCase, authHandlerFactory);

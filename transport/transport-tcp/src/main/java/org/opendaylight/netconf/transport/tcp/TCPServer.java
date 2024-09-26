@@ -61,9 +61,9 @@ public final class TCPServer extends TCPTransportStack {
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @NonNull ListenableFuture<TCPServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
-                throws UnsupportedConfigurationException {
+    public static @NonNull ListenableFuture<TCPServer> listen(
+            final TransportChannelListener<? super TCPTransportChannel> listener, final ServerBootstrap bootstrap,
+            final TcpServerGrouping listenParams) throws UnsupportedConfigurationException {
         final var localBinds = listenParams.nonnullLocalBind().values();
         final var localBind = switch (localBinds.size()) {
             case 0 -> throw new UnsupportedConfigurationException("No bind addresses provided");

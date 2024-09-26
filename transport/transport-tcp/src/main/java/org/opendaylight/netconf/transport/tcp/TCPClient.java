@@ -39,9 +39,9 @@ public final class TCPClient extends TCPTransportStack {
      * @throws UnsupportedConfigurationException when {@code connectParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @NonNull ListenableFuture<TCPClient> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final TcpClientGrouping connectParams)
-                throws UnsupportedConfigurationException {
+    public static @NonNull ListenableFuture<TCPClient> connect(
+            final TransportChannelListener<? super TCPTransportChannel> listener, final Bootstrap bootstrap,
+            final TcpClientGrouping connectParams) throws UnsupportedConfigurationException {
         final var keepalives = connectParams.getKeepalives();
         if (keepalives != null) {
             final var options = NettyTransportSupport.getTcpKeepaliveOptions();

@@ -34,15 +34,17 @@ public final class TLSServer extends TLSTransportStack {
         super(listener, factory);
     }
 
-    public static @NonNull ListenableFuture<TLSServer> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final TcpClientGrouping connectParams, final SslHandlerFactory factory)
-            throws UnsupportedConfigurationException {
+    public static @NonNull ListenableFuture<TLSServer> connect(
+            final TransportChannelListener<? super TLSTransportChannel> listener, final Bootstrap bootstrap,
+            final TcpClientGrouping connectParams, final SslHandlerFactory factory)
+                throws UnsupportedConfigurationException {
         final var server = new TLSServer(listener, factory);
         return transformUnderlay(server, TCPClient.connect(server.asListener(), bootstrap, connectParams));
     }
 
-    public static @NonNull ListenableFuture<TLSServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams, final SslHandlerFactory factory)
+    public static @NonNull ListenableFuture<TLSServer> listen(
+            final TransportChannelListener<? super TLSTransportChannel> listener, final ServerBootstrap bootstrap,
+            final TcpServerGrouping listenParams, final SslHandlerFactory factory)
                 throws UnsupportedConfigurationException {
         final var server = new TLSServer(listener, factory);
         return transformUnderlay(server, TCPServer.listen(server.asListener(), bootstrap, listenParams));

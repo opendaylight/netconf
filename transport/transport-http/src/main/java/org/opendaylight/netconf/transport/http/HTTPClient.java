@@ -78,9 +78,9 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code connectParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static ListenableFuture<HTTPClient> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final HttpClientStackGrouping connectParams, final boolean http2)
-            throws UnsupportedConfigurationException {
+    public static ListenableFuture<HTTPClient> connect(
+            final TransportChannelListener<? super HTTPTransportChannel> listener, final Bootstrap bootstrap,
+            final HttpClientStackGrouping connectParams, final boolean http2) throws UnsupportedConfigurationException {
         final HttpClientGrouping httpParams;
         final TcpClientGrouping tcpParams;
         final TlsClientGrouping tlsParams;
