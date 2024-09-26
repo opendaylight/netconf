@@ -2864,7 +2864,7 @@
         "summary": "PATCH - test-container-childs - 123 - nested-container-two-keys"
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
       "post": {
         "tags": [
           "123 action-types"
@@ -6193,7 +6193,7 @@
         "summary": "PATCH - typed-params - 123 - instance-identifier"
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action": {
       "post": {
         "tags": [
           "123 action-types"
@@ -9772,7 +9772,7 @@
         "summary": "PATCH - toaster2 - 123 - cont11"
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
       "post": {
         "tags": [
           "123 action-types"
@@ -12436,7 +12436,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:first-container/second-container/third-container/nested-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:first-container/second-container/third-container/nested-action": {
       "post": {
         "description": "",
         "parameters": [],
@@ -12763,7 +12763,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:nc-list={nc-name}/nc-list-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:nc-list={nc-name}/nc-list-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - nc-list-action",
@@ -12950,7 +12950,7 @@
         ]
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:nc-container/nc-container-action": {
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:nc-container/nc-container-action": {
       "post": {
         "description": "",
         "summary": "POST - 123 - action-types - nc-container-action",
