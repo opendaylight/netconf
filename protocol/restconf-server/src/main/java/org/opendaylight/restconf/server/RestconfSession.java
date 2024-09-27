@@ -155,11 +155,11 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         }
 
         final var segment = peeler.next();
-        if (".well-known".equals(segment)) {
+        if (segment.equals(wellKnown.segment())) {
             // Well-known resources are immediately available and are trivial to service
             msg.release();
             respond(ctx, streamId, wellKnown.request(version, method, peeler));
-        } else if (segment.equals(dispatcher.firstSegment())) {
+        } else if (segment.equals(dispatcher.segment())) {
             dispatcher.dispatch(targetUri, peeler, msg, new RestconfRequest() {
                 @Override
                 public void onSuccess(final FullHttpResponse response) {

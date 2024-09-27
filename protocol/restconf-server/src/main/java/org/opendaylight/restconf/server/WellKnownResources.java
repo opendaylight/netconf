@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc6415#appendix-A">RFC 6415, appendix A</a>
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
-final class WellKnownResources {
+final class WellKnownResources implements ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
     private final ByteBuf jrd;
     private final ByteBuf xrd;
@@ -60,6 +60,11 @@ final class WellKnownResources {
     private static ByteBuf newDescriptor(final String format, final Object... args) {
         return Unpooled.unreleasableBuffer(
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT, format.formatted(args)).asReadOnly());
+    }
+
+    @Override
+    public String segment() {
+        return ".well-known";
     }
 
     FullHttpResponse request(final HttpVersion version, final HttpMethod method, final SegmentPeeler peeler) {
