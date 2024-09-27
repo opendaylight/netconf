@@ -31,7 +31,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
 import org.opendaylight.netconf.keystore.plaintext.api.PlaintextStorage;
@@ -114,13 +113,13 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     }
 
     @Override
-    public byte @Nullable [] lookup(final byte @NonNull [] key) {
+    public byte[] lookup(final byte[] key) {
         final var entry = lookupEntry(key);
         return entry != null ? entry.getValue() : null;
     }
 
     @Override
-    public byte @Nullable [] removeKey(final byte @NonNull [] key) throws IOException {
+    public byte[] removeKey(final byte[] key) throws IOException {
         final var toRemove = lookupEntry(key);
         if (toRemove == null) {
             return null;
@@ -132,7 +131,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     }
 
     @Override
-    public boolean removeEntry(final byte @NonNull [] key, final byte @NonNull [] value) throws IOException {
+    public boolean removeEntry(final byte[] key, final byte[] value) throws IOException {
         final var entries = new HashSet<>(entries());
         final var removed = entries.remove(new StorageEntry(key, value));
         if (removed) {
@@ -142,7 +141,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     }
 
     @Override
-    public byte @Nullable [] insertEntry(final byte @NonNull [] key, final byte @NonNull [] value) throws IOException {
+    public byte[] insertEntry(final byte[] key, final byte[] value) throws IOException {
         final var existing = lookupEntry(key);
         if (existing != null) {
             return existing.getValue();
@@ -154,7 +153,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     }
 
     @Override
-    public byte @Nullable [] putEntry(final byte @NonNull [] key, final byte @NonNull [] value) throws IOException {
+    public byte[] putEntry(final byte[] key, final byte[] value) throws IOException {
         final var previous = lookupEntry(key);
         final var entries = new HashSet<>(entries());
         if (previous != null) {
@@ -219,7 +218,6 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     }
 
     private static byte[] validateSecret(final byte[] secret) {
-        requireNonNull(secret);
         if (secret.length != 16 && secret.length != 32) {
             throw new IllegalArgumentException("Invalid secret length " + secret.length
                 + ". Expected 16 or 32.");
@@ -228,7 +226,6 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     }
 
     private static File validateFile(final File file) {
-        requireNonNull(file);
         if (file.exists() && Files.isSymbolicLink(file.toPath())) {
             throw new IllegalArgumentException("Symbolic link detected in file path " + file.getPath());
         }
