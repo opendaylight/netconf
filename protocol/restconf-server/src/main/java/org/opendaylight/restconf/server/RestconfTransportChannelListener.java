@@ -9,6 +9,8 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
@@ -27,14 +29,23 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final NettyEndpointConfiguration configuration;
     private final RestconfRequestDispatcher dispatcher;
     private final WellKnownResources wellKnown;
+    private final String restconf;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
         this.configuration = requireNonNull(configuration);
-        wellKnown = new WellKnownResources(configuration.restconf());
 
-        dispatcher = new RestconfRequestDispatcher(server, principalService, configuration.restconf(),
+        // Reconstruct root API path in encoded form
+        final var apiRootPath = configuration.apiRootPath();
+        final var sb = new StringBuilder();
+        for (var segment : apiRootPath) {
+            sb.append('/').append(URLEncoder.encode(segment, StandardCharsets.UTF_8));
+        }
+        restconf = sb.toString();
+
+        wellKnown = new WellKnownResources(restconf);
+        dispatcher = new RestconfRequestDispatcher(server, principalService, apiRootPath, sb.append('/').toString(),
             configuration.errorTagMapping(), configuration.defaultAcceptType(), configuration.prettyPrint());
     }
 
@@ -42,7 +53,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(
             new ServerSseHandler(
-                new RestconfStreamService(streamRegistry, configuration.restconf(), configuration.errorTagMapping(),
+                new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
                     configuration.defaultAcceptType(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
             new RestconfSession(wellKnown, dispatcher, channel.scheme()));

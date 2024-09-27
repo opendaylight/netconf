@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,8 +73,8 @@ public class AbstractRequestProcessorTest {
     @BeforeEach
     void beforeEach() {
         doReturn(null).when(principalService).acquirePrincipal(any());
-        dispatcher = new RestconfRequestDispatcher(server, principalService, BASE_PATH, ERROR_TAG_MAPPING,
-            DEFAULT_ENCODING.responseType, PRETTY_PRINT);
+        dispatcher = new RestconfRequestDispatcher(server, principalService, List.of("rests"), "/rests/",
+            ERROR_TAG_MAPPING, DEFAULT_ENCODING.responseType, PRETTY_PRINT);
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {

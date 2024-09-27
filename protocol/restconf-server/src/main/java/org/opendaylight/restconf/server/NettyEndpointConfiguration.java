@@ -9,9 +9,18 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
@@ -24,40 +33,142 @@ import org.opendaylight.yangtools.yang.common.Uint32;
  * Configuration of the Netty RESTCONF server endpoint.
  */
 public final class NettyEndpointConfiguration extends EndpointConfiguration {
+    // characters not valid in 'pchar' ABNF rule of RFC3986 encoded form
+    private static final CharMatcher NOT_PCHAR;
+
+    static {
+        //  ALPHA         =  %x41-5A / %x61-7A
+        final var alpha = CharMatcher.inRange('a', 'z').or(CharMatcher.inRange('A', 'Z'));
+        //  DIGIT         =  %x30-39
+        final var digit = CharMatcher.inRange('0', '9');
+        //  unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+        final var unreserved = alpha.or(digit).or(CharMatcher.anyOf("-._~"));
+        //  sub-delims    = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+        final var subDelims = CharMatcher.anyOf("!$&'()*+,;=");
+        //  pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+        NOT_PCHAR = unreserved.or(subDelims).or(CharMatcher.is('%')).or(CharMatcher.anyOf(":@")).negate().precomputed();
+    }
+
     private final @NonNull HttpServerStackGrouping transportConfiguration;
     private final @NonNull String groupName;
     private final int groupThreads;
-    private final @NonNull String restconf;
+    private final @NonNull List<String> apiRootPath;
     private final @NonNull AsciiString defaultAcceptType;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
-            final String restconf, final String groupName, final int groupThreads,
+            final List<String> apiRootPath, final String groupName, final int groupThreads,
             final Encoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
-        this.restconf = requireNonNull(restconf);
         this.groupName = requireNonNull(groupName);
         this.groupThreads = groupThreads;
         this.transportConfiguration = requireNonNull(transportConfiguration);
         defaultAcceptType = requireNonNull(defaultEncoding).mediaType();
+
+        if (apiRootPath.isEmpty()) {
+            throw new IllegalArgumentException("empty apiRootPath");
+        }
+        if (apiRootPath.getFirst().isEmpty()) {
+            throw new IllegalArgumentException("empty first apiRootPath segment");
+        }
+        this.apiRootPath = List.copyOf(apiRootPath);
     }
 
-    public @NonNull String restconf() {
-        return restconf;
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+            final String groupName, final int groupThreads, final Encoding defaultEncoding,
+            final HttpServerStackGrouping transportConfiguration) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            parsePathRootless(apiRootPath), groupName, groupThreads, defaultEncoding, transportConfiguration);
     }
 
+    @Beta
+    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
+        this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
+            "restconf-server", 0, Encoding.JSON, transportConfiguration);
+    }
+
+    /**
+     * Parse a string conforming to RFC3986 'path-rootless' ABNF rule into a series of segments.
+     *
+     * @param str String to parser
+     * @return Parsed segments
+     * @throws IllegalArgumentException if the string is not valid
+     */
+    @VisibleForTesting
+    static List<String> parsePathRootless(final String str) {
+        final var len = str.length();
+        if (len == 0) {
+            throw new IllegalArgumentException("Empty path");
+        }
+
+        //  path-rootless = segment-nz *( "/" segment )
+        //  segment       = *pchar
+        //  segment-nz    = 1*pchar
+        //  pct-encoded   = "%" HEXDIG HEXDIG
+        //  HEXDIG         =  DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+        final var tmp = new ArrayList<String>();
+        var offset = 0;
+        while (offset < len) {
+            final var begin = offset;
+            final var slash = str.indexOf('/', begin);
+            final var end = slash != -1 ? slash : len;
+            offset = end + 1;
+
+            final var segment = str.substring(begin, end);
+            final var bad = NOT_PCHAR.indexIn(segment);
+            if (bad != -1) {
+                final var idx = begin + bad;
+                throw new IllegalArgumentException(
+                    "Invalid character '%s' at offset %s".formatted(str.charAt(idx), idx));
+            }
+
+            final String decoded;
+            try {
+                decoded = QueryStringDecoder.decodeComponent(segment);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Cannot decode segment '%s' at offset %s".formatted(segment, begin),
+                    e);
+            }
+            tmp.add(decoded);
+        }
+
+        if (tmp.getFirst().isEmpty()) {
+            throw new IllegalArgumentException("Empty first segment");
+        }
+        return List.copyOf(tmp);
+    }
+
+    /**
+     * Returns the path to RESTCONF root API resource, expressed as a non-empty list of segments in unencoded form.
+     * The first segment is guaranteed to be non-empty.
+     *
+     * @return the path to RESTCONF root API resource
+     */
+    public @NonNull List<String> apiRootPath() {
+        return apiRootPath;
+    }
+
+    @Beta
     public @NonNull String groupName() {
         return groupName;
     }
 
+    @Beta
     public int groupThreads() {
         return groupThreads;
     }
 
+    /**
+     * Returns the HTTP endpoint configuration.
+     *
+     * @return the HTTP endpoint configuration
+     */
     public @NonNull HttpServerStackGrouping transportConfiguration() {
         return transportConfiguration;
     }
 
+    @Beta
     public @NonNull AsciiString defaultAcceptType() {
         return defaultAcceptType;
     }
@@ -65,7 +176,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            restconf, groupName, groupThreads, transportConfiguration, defaultAcceptType);
+            apiRootPath, groupName, groupThreads, transportConfiguration, defaultAcceptType);
     }
 
     @Override
@@ -74,7 +185,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && errorTagMapping().equals(other.errorTagMapping()) && prettyPrint().equals(other.prettyPrint())
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
-            && restconf.equals(other.restconf)
+            && apiRootPath.equals(other.apiRootPath)
             && groupName.equals(other.groupName)
             && groupThreads == other.groupThreads
             && transportConfiguration.equals(other.transportConfiguration)
@@ -84,7 +195,9 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper)
-            .add("restconf", restconf)
+            .add("restconf", apiRootPath.stream()
+                .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
+                .collect(Collectors.joining("/")))
             .add("groupName", groupName)
             .add("groupThreads", groupThreads)
             .add("defaultAcceptType", defaultAcceptType)
