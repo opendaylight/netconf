@@ -101,6 +101,19 @@ public final class OSGiNorthbound {
 
         @AttributeDefinition(description = "Path to private key file")
         String tls$_$private$_$key() default "";
+
+        @AttributeDefinition(min = "1", description = """
+            The URI path of the RESTCONF API root resource. This value will be used as the result of {+restconf} URI
+            Template. The format of this string must be conform to the "path-rootless" ABNF rule of RFC3986 and is
+            subject to decoding of any percent-encoded octets. Valid examples include, without the double quotes:
+
+              - "restconf", which is the default value and results in the same expansion as RFC8040, i.e. the RESTCONF
+                data resource being located at /restconf/data
+              - "foo/bar/baz", which results in the RESTCONF data resource being located at /foo/bar/baz/data
+              - "foo%2f", which results in the RESTCONF data resource being located at /foo//data, where "foo/" is a
+                single segment, i.e. must be correctly percent-encoded by clients attempting to access it.
+            """)
+        String api$_$root$_$path() default "restconf";
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -185,7 +198,7 @@ public final class OSGiNorthbound {
                 PrettyPrintParam.of(configuration.pretty$_$print()),
                 Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
                 Uint32.valueOf(configuration.heartbeat$_$interval()),
-                configuration.restconf(),
+                configuration.api$_$root$_$path(),
                 configuration.group$_$name(),
                 configuration.group$_$threads(),
                 NettyEndpointConfiguration.Encoding.from(configuration.default$_$encoding()),
