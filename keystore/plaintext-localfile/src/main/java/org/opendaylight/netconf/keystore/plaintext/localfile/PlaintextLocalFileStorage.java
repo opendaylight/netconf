@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -92,22 +91,17 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
 
     @Override
     public final Iterator<Map.Entry<byte[], byte[]>> iterator() {
-        final var array = entries().toArray(StorageEntry[]::new);
-        return new Iterator<>() {
-            private final int maxIndex = array.length - 1;
-            private int index = -1;
+        final var it = entries().iterator();
 
+        return new Iterator<>() {
             @Override
             public boolean hasNext() {
-                return index < maxIndex;
+                return it.hasNext();
             }
 
             @Override
             public Map.Entry<byte[], byte[]> next() {
-                if (index >= maxIndex) {
-                    throw new NoSuchElementException();
-                }
-                return array[++index];
+                return it.next();
             }
         };
     }
