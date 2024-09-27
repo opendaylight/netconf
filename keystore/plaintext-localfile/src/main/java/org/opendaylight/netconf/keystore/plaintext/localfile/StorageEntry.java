@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.keystore.plaintext.localfile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -21,6 +22,10 @@ record StorageEntry(byte[] key, byte[] value) {
         if (value.length == 0) {
             throw new IllegalArgumentException("value is empty");
         }
+    }
+
+    StorageEntry(final String key, final String value) {
+        this(key.getBytes(StandardCharsets.UTF_8), value.getBytes(StandardCharsets.UTF_8));
     }
 
     byte[] publicValue() {

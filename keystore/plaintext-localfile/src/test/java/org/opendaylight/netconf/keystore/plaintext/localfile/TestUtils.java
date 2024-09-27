@@ -21,13 +21,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 import org.opendaylight.netconf.keystore.plaintext.api.PlaintextStorage;
 
 final class TestUtils {
-    static final Collection<StorageEntry> TEST_ENTRIES = IntStream.range(0, 10)
-        .mapToObj(index -> storageEntry("key-" + index, "value-" + index)).toList();
+    static final List<StorageEntry> TEST_ENTRIES = IntStream.range(0, 10)
+        .mapToObj(index -> new StorageEntry("key-" + index, "value-" + index))
+        .toList();
 
     private TestUtils() {
         // utility class
@@ -63,14 +65,6 @@ final class TestUtils {
         try (var in = Base64.getDecoder().wrap(new FileInputStream(file))) {
             return in.readAllBytes();
         }
-    }
-
-    static StorageEntry storageEntry(final String key, final String value) {
-        return new StorageEntry(bytesOf(key), bytesOf(value));
-    }
-
-    static byte[] bytesOf(final String string) {
-        return string.getBytes(StandardCharsets.UTF_8);
     }
 
     static void assertFileContains(final File file, final byte[] secret, final Collection<StorageEntry> entries)
