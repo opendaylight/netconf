@@ -36,6 +36,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
@@ -68,7 +69,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class RestconfRequestDispatcher {
+final class RestconfRequestDispatcher implements ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
 
     @VisibleForTesting
@@ -84,7 +85,7 @@ final class RestconfRequestDispatcher {
     private final AsciiString defaultAcceptType;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    private final String firstSegment;
+    private final @NonNull String segment;
     private final List<String> otherSegments;
 
     // '/{+restconf}/', i.e. an absolute path conforming to RestconfServer's 'restconfURI'
@@ -100,7 +101,7 @@ final class RestconfRequestDispatcher {
         this.defaultAcceptType = requireNonNull(defaultAcceptType);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
-        firstSegment = segments.getFirst();
+        segment = segments.getFirst();
         otherSegments = segments.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
@@ -108,8 +109,9 @@ final class RestconfRequestDispatcher {
             defaultPrettyPrint.value());
     }
 
-    String firstSegment() {
-        return firstSegment;
+    @Override
+    public String segment() {
+        return segment;
     }
 
     @SuppressWarnings("IllegalCatch")
