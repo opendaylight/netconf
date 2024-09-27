@@ -52,6 +52,24 @@
       "parentUuid": "6adde1f3_def397f0",
       "revId": "b1512b1bd956559a22c8ba52eb67e286d3c34c87",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ceabe34c_00c12477",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-09-27T18:52:43Z",
+      "side": 1,
+      "message": "-ETIMEDOUT\n\nI have a follow-up patch to deal with this here: https://git.opendaylight.org/gerrit/c/netconf/+/113751",
+      "parentUuid": "a7a5b695_ed081911",
+      "revId": "b1512b1bd956559a22c8ba52eb67e286d3c34c87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
