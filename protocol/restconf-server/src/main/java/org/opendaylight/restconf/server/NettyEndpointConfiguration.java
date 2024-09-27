@@ -9,9 +9,14 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.util.AsciiString;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
@@ -27,23 +32,37 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull HttpServerStackGrouping transportConfiguration;
     private final @NonNull String groupName;
     private final int groupThreads;
-    private final @NonNull String restconf;
+    private final @NonNull List<String> apiRootPath;
     private final @NonNull AsciiString defaultAcceptType;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
-            final String restconf, final String groupName, final int groupThreads,
+            final List<String> apiRootPath, final String groupName, final int groupThreads,
             final Encoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
-        this.restconf = requireNonNull(restconf);
         this.groupName = requireNonNull(groupName);
         this.groupThreads = groupThreads;
         this.transportConfiguration = requireNonNull(transportConfiguration);
         defaultAcceptType = requireNonNull(defaultEncoding).mediaType();
+
+        if (apiRootPath.isEmpty()) {
+            throw new IllegalArgumentException("empty apiRootPath");
+        }
+        if (apiRootPath.getFirst().isEmpty()) {
+            throw new IllegalArgumentException("empty first apiRootPath segment");
+        }
+        this.apiRootPath = List.copyOf(apiRootPath);
     }
 
-    public @NonNull String restconf() {
-        return restconf;
+    @Beta
+    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
+        this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000),
+            List.of("restconf"), "restconf-server", 0, Encoding.JSON, transportConfiguration);
+    }
+
+    // FIXME: document and clarify it is non-empty list of segments, first being non-empty, in decoded form
+    public @NonNull List<String> apiRootPath() {
+        return apiRootPath;
     }
 
     public @NonNull String groupName() {
@@ -65,7 +84,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            restconf, groupName, groupThreads, transportConfiguration, defaultAcceptType);
+            apiRootPath, groupName, groupThreads, transportConfiguration, defaultAcceptType);
     }
 
     @Override
@@ -74,7 +93,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && errorTagMapping().equals(other.errorTagMapping()) && prettyPrint().equals(other.prettyPrint())
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
-            && restconf.equals(other.restconf)
+            && apiRootPath.equals(other.apiRootPath)
             && groupName.equals(other.groupName)
             && groupThreads == other.groupThreads
             && transportConfiguration.equals(other.transportConfiguration)
@@ -84,7 +103,9 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper)
-            .add("restconf", restconf)
+            .add("restconf", apiRootPath.stream()
+                .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
+                .collect(Collectors.joining("/")))
             .add("groupName", groupName)
             .add("groupThreads", groupThreads)
             .add("defaultAcceptType", defaultAcceptType)
