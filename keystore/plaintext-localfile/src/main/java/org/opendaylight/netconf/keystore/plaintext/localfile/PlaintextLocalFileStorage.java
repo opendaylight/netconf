@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -116,12 +115,13 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
 
     @Override
     public byte @Nullable [] lookup(final byte @NonNull [] key) {
-        return findByKey(key).map(StorageEntry::getValue).orElse(null);
+        final var entry = lookupEntry(key);
+        return entry != null ? entry.getValue() : null;
     }
 
     @Override
     public byte @Nullable [] removeKey(final byte @NonNull [] key) throws IOException {
-        final var toRemove = findByKey(key).orElse(null);
+        final var toRemove = lookupEntry(key);
         if (toRemove == null) {
             return null;
         }
@@ -143,7 +143,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
 
     @Override
     public byte @Nullable [] insertEntry(final byte @NonNull [] key, final byte @NonNull [] value) throws IOException {
-        final var existing = findByKey(key).orElse(null);
+        final var existing = lookupEntry(key);
         if (existing != null) {
             return existing.getValue();
         }
@@ -155,7 +155,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
 
     @Override
     public byte @Nullable [] putEntry(final byte @NonNull [] key, final byte @NonNull [] value) throws IOException {
-        final var previous = findByKey(key).orElse(null);
+        final var previous = lookupEntry(key);
         final var entries = new HashSet<>(entries());
         if (previous != null) {
             if (Arrays.equals(previous.value(), value)) {
@@ -174,8 +174,14 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
         return entries == null ? Set.of() : entries;
     }
 
-    private Optional<StorageEntry> findByKey(final byte @NonNull [] key) {
-        return entries().stream().filter(entry -> Arrays.equals(key, entry.key())).findFirst();
+    private @Nullable StorageEntry lookupEntry(final byte[] key) {
+        requireNonNull(key);
+        for (var entry : entries()) {
+            if (Arrays.equals(key, entry.key())) {
+                return entry;
+            }
+        }
+        return null;
     }
 
     private void updateWith(final Set<StorageEntry> mutable) throws IOException {
