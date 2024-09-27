@@ -101,7 +101,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
 
             @Override
             public Map.Entry<byte[], byte[]> next() {
-                return it.next();
+                return it.next().toEntry();
             }
         };
     }
@@ -109,7 +109,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     @Override
     public byte[] lookup(final byte[] key) {
         final var entry = lookupEntry(key);
-        return entry != null ? entry.getValue() : null;
+        return entry != null ? entry.publicValue() : null;
     }
 
     @Override
@@ -138,7 +138,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
     public byte[] insertEntry(final byte[] key, final byte[] value) throws IOException {
         final var existing = lookupEntry(key);
         if (existing != null) {
-            return existing.getValue();
+            return existing.publicValue();
         }
         final var entries = new HashSet<>(entries());
         entries.add(new StorageEntry(key, value));
@@ -159,7 +159,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
         }
         entries.add(new StorageEntry(key, value));
         updateWith(Set.copyOf(entries));
-        return previous == null ? null : previous.getValue();
+        return previous == null ? null : previous.publicValue();
     }
 
     private Set<StorageEntry> entries() {
