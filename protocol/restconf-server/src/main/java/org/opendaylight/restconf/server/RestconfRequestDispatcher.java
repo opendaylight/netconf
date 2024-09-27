@@ -33,9 +33,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
@@ -88,32 +88,23 @@ final class RestconfRequestDispatcher {
     private final List<String> otherSegments;
 
     // '/{+restconf}/', i.e. an absolute path conforming to RestconfServer's 'restconfURI'
-    private final URI absRestconfSlash;
+    private final URI restconfPath;
 
     RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
-            final String restconf, final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
-            final PrettyPrintParam defaultPrettyPrint) {
+            final List<String> segments, final String restconfPath, final ErrorTagMapping errorTagMapping,
+            final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
         this.server = requireNonNull(server);
         this.principalService = requireNonNull(principalService);
+        this.restconfPath = URI.create(requireNonNull(restconfPath));
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.defaultAcceptType = requireNonNull(defaultAcceptType);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
-        // split the 'restconf' string into its decoded segments
-        final var absRestconf = restconf.startsWith("/") ? restconf : "/" + restconf;
-        final var tmp = new ArrayDeque<String>();
-        new SegmentPeeler(absRestconf).forEachRemaining(tmp::add);
-
-        // TODO: this needs a better specification: which of '/foo', 'foo', 'foo/', '/foo/' is valid?
-        //       this code assumes '/foo' or 'foo' are okay
-        absRestconfSlash = URI.create(absRestconf + "/");
-
-        // separatate the first segment from the others
-        firstSegment = tmp.remove();
-        otherSegments = List.copyOf(tmp);
+        firstSegment = segments.getFirst();
+        otherSegments = segments.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
-        LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconf, defaultAcceptType,
+        LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconfPath, defaultAcceptType,
             defaultPrettyPrint.value());
     }
 
@@ -149,7 +140,7 @@ final class RestconfRequestDispatcher {
         final var rawPath = peeler.remaining();
         final var rawQuery = targetUri.getRawQuery();
         final var decoder = new QueryStringDecoder(rawQuery != null ? rawPath + "?" + rawQuery : rawPath);
-        final var params = new RequestParameters(targetUri.resolve(absRestconfSlash), decoder, request, principal,
+        final var params = new RequestParameters(targetUri.resolve(restconfPath), decoder, request, principal,
             errorTagMapping, defaultAcceptType, defaultPrettyPrint);
 
         try {
