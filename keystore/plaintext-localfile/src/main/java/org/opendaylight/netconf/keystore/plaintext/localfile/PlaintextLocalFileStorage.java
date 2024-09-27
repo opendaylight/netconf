@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -248,10 +247,9 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
         }
         final var data = new ArrayList<StorageEntry>();
         for (var name : props.stringPropertyNames()) {
-            final var value = props.getProperty(name, "");
-            if (!value.isEmpty()) {
-                data.add(
-                    new StorageEntry(name.getBytes(StandardCharsets.UTF_8), value.getBytes(StandardCharsets.UTF_8)));
+            final var value = props.getProperty(name);
+            if (value != null) {
+                data.add(new StorageEntry(name, value));
             }
         }
         try (var fos = new FileOutputStream(file)) {

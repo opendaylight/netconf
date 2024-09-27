@@ -22,7 +22,6 @@ import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.pr
 import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.preparePropertiesFile;
 import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.prepareSecretFile;
 import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.secretFromFile;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.storageEntry;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,15 +41,15 @@ import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
 @ExtendWith(MockitoExtension.class)
 class PlaintextLocalFileStorageTest {
 
-    private static final StorageEntry ENTRY_1 = storageEntry("key-1", "value-1");
-    private static final StorageEntry ENTRY_1_MODIFIED = storageEntry("key-1", "value-1-modified");
-    private static final StorageEntry ENTRY_2 = storageEntry("key-2", "value-2");
-    private static final StorageEntry ENTRY_2_MODIFIED = storageEntry("key-2", "value-3-modified");
-    private static final StorageEntry ENTRY_3 = storageEntry("key-3", "value-3");
-    private static final StorageEntry ENTRY_3_MODIFIED = storageEntry("key-3", "value-3-modified");
-    private static final StorageEntry ENTRY_4 = storageEntry("key-4", "value-4");
+    private static final StorageEntry ENTRY_1 = new StorageEntry("key-1", "value-1");
+    private static final StorageEntry ENTRY_1_MODIFIED = new StorageEntry("key-1", "value-1-modified");
+    private static final StorageEntry ENTRY_2 = new StorageEntry("key-2", "value-2");
+    private static final StorageEntry ENTRY_2_MODIFIED = new StorageEntry("key-2", "value-3-modified");
+    private static final StorageEntry ENTRY_3 = new StorageEntry("key-3", "value-3");
+    private static final StorageEntry ENTRY_3_MODIFIED = new StorageEntry("key-3", "value-3-modified");
+    private static final StorageEntry ENTRY_4 = new StorageEntry("key-4", "value-4");
     private static final Collection<StorageEntry> INITIAL_DATA = List.of(ENTRY_1, ENTRY_2, ENTRY_3);
-    private static final Collection<StorageEntry> DEFAULT_DATA = List.of(storageEntry("admin", "admin"));
+    private static final Collection<StorageEntry> DEFAULT_DATA = List.of(new StorageEntry("admin", "admin"));
 
     @TempDir
     private static File tempDir;
@@ -225,7 +224,7 @@ class PlaintextLocalFileStorageTest {
         return new PlaintextLocalFileStorage(secret, storageFile);
     }
 
-    private static File symLink(File file) throws IOException {
+    private static File symLink(final File file) throws IOException {
         final var link = Path.of(file.getAbsolutePath() + ".lnk");
         Files.createSymbolicLink(link, file.toPath());
         return link.toFile();
