@@ -7,16 +7,10 @@
  */
 package org.opendaylight.netconf.keystore.plaintext.localfile;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.Arrays;
-import java.util.Map;
 
-record StorageEntry(byte[] key, byte[] value) implements Map.Entry<byte[], byte[]> {
-
+record StorageEntry(byte[] key, byte[] value) {
     StorageEntry {
-        requireNonNull(key);
-        requireNonNull(value);
         if (key.length == 0) {
             throw new IllegalArgumentException("key is empty");
         }
@@ -26,36 +20,13 @@ record StorageEntry(byte[] key, byte[] value) implements Map.Entry<byte[], byte[
     }
 
     @Override
-    public byte[] getKey() {
-        return Arrays.copyOf(key, key.length);
-    }
-
-    @Override
-    public byte[] getValue() {
-        return Arrays.copyOf(value, value.length);
-    }
-
-    @Override
-    public byte[] setValue(byte[] bytes) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        StorageEntry that = (StorageEntry) object;
-        return Arrays.equals(key, that.key) && Arrays.equals(value, that.value);
+    public boolean equals(final Object obj) {
+        return this == obj || obj instanceof StorageEntry other && Arrays.equals(key, other.key)
+            && Arrays.equals(value, other.value);
     }
 
     @Override
     public int hashCode() {
-        int result = Arrays.hashCode(key);
-        result = 31 * result + Arrays.hashCode(value);
-        return result;
+        return 31 * Arrays.hashCode(key) + Arrays.hashCode(value);
     }
 }

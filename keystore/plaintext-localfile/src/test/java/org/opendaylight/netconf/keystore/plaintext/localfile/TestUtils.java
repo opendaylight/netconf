@@ -53,7 +53,7 @@ final class TestUtils {
         }
     }
 
-    static void prepareSecretFile(final File file, byte[] secret) throws IOException {
+    static void prepareSecretFile(final File file, final byte[] secret) throws IOException {
         try (var out = Base64.getEncoder().wrap(new FileOutputStream(file))) {
             out.write(secret);
         }
@@ -89,7 +89,7 @@ final class TestUtils {
         // ensure all expected entries can be extracted
         assertNotNull(storage);
         for (var entry : entries) {
-            assertArrayEquals(entry.getValue(), storage.lookup(entry.getKey()));
+            assertArrayEquals(entry.value(), storage.lookup(entry.key()));
         }
         // validate iterator contain all the expected entries
         final var fromIterator = new ArrayList<Map.Entry<byte[], byte[]>>(entries.size());
