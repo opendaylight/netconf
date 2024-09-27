@@ -23,10 +23,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>keystore-plaintext-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-annotations</artifactId>
             <optional>true</optional>
@@ -40,12 +36,8 @@
             <artifactId>org.eclipse.jdt.annotation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.framework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>keystore-plaintext-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
