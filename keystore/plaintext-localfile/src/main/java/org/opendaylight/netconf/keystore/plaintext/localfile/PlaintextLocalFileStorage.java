@@ -141,7 +141,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
             return existing.publicValue();
         }
         final var entries = new HashSet<>(entries());
-        entries.add(new StorageEntry(key, value));
+        entries.add(new StorageEntry(key.clone(), value.clone()));
         updateWith(Set.copyOf(entries));
         return null;
     }
@@ -157,7 +157,7 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
             }
             entries.remove(previous);
         }
-        entries.add(new StorageEntry(key, value));
+        entries.add(new StorageEntry(key.clone(), value.clone()));
         updateWith(Set.copyOf(entries));
         return previous == null ? null : previous.publicValue();
     }
