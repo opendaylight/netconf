@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79ec9fe4_92bc89f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-30T12:07:45Z",
+      "side": 1,
+      "message": "Needs rebase when parent change will chnage.",
+      "revId": "e70a717357cdbd0e9413c917266424a483f9fff6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
