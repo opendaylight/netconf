@@ -16,6 +16,23 @@
       "message": "Needs rebase on parent change when it changes.",
       "revId": "386f84b6afbd7f03c1f8f34a82bc95b585081e94",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b00010e_29c66879",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-09-30T12:31:18Z",
+      "side": 1,
+      "message": "Add description which says what a request is providing and what we are providing in example.",
+      "revId": "386f84b6afbd7f03c1f8f34a82bc95b585081e94",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
