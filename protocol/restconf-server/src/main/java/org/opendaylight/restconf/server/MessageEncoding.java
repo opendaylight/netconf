@@ -9,9 +9,14 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.util.AsciiString;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 
 /**
@@ -25,13 +30,25 @@ public enum MessageEncoding {
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.2">RFC7952, section 5.2</a>.
      */
     JSON(NettyMediaTypes.APPLICATION_YANG_DATA_JSON, NettyMediaTypes.APPLICATION_YANG_PATCH_JSON,
-        EncodingName.RFC8040_JSON, NettyMediaTypes.APPLICATION_JSON),
+            EncodingName.RFC8040_JSON, HttpHeaderValues.APPLICATION_JSON) {
+        @Override
+        void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
+                throws IOException {
+            body.formatToJSON(prettyPrint, out);
+        }
+    },
     /**
      * JSON encoding, as specified in <a href="https://www.rfc-editor.org/rfc/rfc7950">RFC7950</a> and extended in
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.1">RFC7952, section 5.1</a>.
      */
     XML(NettyMediaTypes.APPLICATION_YANG_DATA_XML, NettyMediaTypes.APPLICATION_YANG_PATCH_XML,
-        EncodingName.RFC8040_XML, NettyMediaTypes.APPLICATION_XML , NettyMediaTypes.TEXT_XML);
+            EncodingName.RFC8040_XML, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
+        @Override
+        void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
+                throws IOException {
+            body.formatToXML(prettyPrint, out);
+        }
+    };
 
     private final AsciiString dataMediaType;
     private final AsciiString patchMediaType;
@@ -86,4 +103,14 @@ public enum MessageEncoding {
     boolean producesDataCompatibleWith(final AsciiString mediaType) {
         return dataMediaType.equals(mediaType) || compatibleDataMediaTypes.contains(mediaType);
     }
+
+    /**
+     * Process a {@link FormattableBody}, invoking its formatting method appropriate for this encoding.
+     *
+     * @param body body to format
+     * @param prettyPrint pretty-print parameter
+     * @param out output stream
+     * @throws IOException when an I/O error occurs
+     */
+    abstract void formatBody(FormattableBody body, PrettyPrintParam prettyPrint, OutputStream out) throws IOException;
 }
