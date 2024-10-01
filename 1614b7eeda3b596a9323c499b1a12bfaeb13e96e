@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3f83269_230a3411",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-01T14:21:06Z",
+      "side": 1,
+      "message": "With?",
+      "revId": "1614b7eeda3b596a9323c499b1a12bfaeb13e96e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7638d3a_0962c937",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-01T14:21:06Z",
+      "side": 1,
+      "message": "3986 or so?",
+      "revId": "1614b7eeda3b596a9323c499b1a12bfaeb13e96e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
