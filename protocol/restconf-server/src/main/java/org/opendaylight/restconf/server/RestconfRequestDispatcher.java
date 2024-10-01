@@ -81,7 +81,7 @@ final class RestconfRequestDispatcher {
     private final RestconfServer server;
     private final PrincipalService principalService;
     private final ErrorTagMapping errorTagMapping;
-    private final AsciiString defaultAcceptType;
+    private final MessageEncoding defaultEncoding;
     private final PrettyPrintParam defaultPrettyPrint;
 
     private final String firstSegment;
@@ -92,20 +92,20 @@ final class RestconfRequestDispatcher {
 
     RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
             final List<String> segments, final String restconfPath, final ErrorTagMapping errorTagMapping,
-            final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
+            final MessageEncoding defaultEncoding, final PrettyPrintParam defaultPrettyPrint) {
         this.server = requireNonNull(server);
         this.principalService = requireNonNull(principalService);
         this.restconfPath = URI.create(requireNonNull(restconfPath));
         this.errorTagMapping = requireNonNull(errorTagMapping);
-        this.defaultAcceptType = requireNonNull(defaultAcceptType);
+        this.defaultEncoding = requireNonNull(defaultEncoding);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
         firstSegment = segments.getFirst();
         otherSegments = segments.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
-        LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconfPath, defaultAcceptType,
-            defaultPrettyPrint.value());
+        LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconfPath,
+            defaultEncoding.mediaType(), defaultPrettyPrint.value());
     }
 
     String firstSegment() {
@@ -141,7 +141,7 @@ final class RestconfRequestDispatcher {
         final var rawQuery = targetUri.getRawQuery();
         final var decoder = new QueryStringDecoder(rawQuery != null ? rawPath + "?" + rawQuery : rawPath);
         final var params = new RequestParameters(targetUri.resolve(restconfPath), decoder, request, principal,
-            errorTagMapping, defaultAcceptType, defaultPrettyPrint);
+            errorTagMapping, defaultEncoding, defaultPrettyPrint);
 
         try {
             switch (segment) {
