@@ -51,18 +51,14 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     private final @NonNull HttpServerStackGrouping transportConfiguration;
-    private final @NonNull String groupName;
-    private final int groupThreads;
     private final @NonNull List<String> apiRootPath;
     private final @NonNull Encoding defaultEncoding;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
-            final List<String> apiRootPath, final String groupName, final int groupThreads,
-            final Encoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
+            final List<String> apiRootPath, final Encoding defaultEncoding,
+            final HttpServerStackGrouping transportConfiguration) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
-        this.groupName = requireNonNull(groupName);
-        this.groupThreads = groupThreads;
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
 
@@ -77,16 +73,15 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
-            final String groupName, final int groupThreads, final Encoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration) {
+            final Encoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), groupName, groupThreads, defaultEncoding, transportConfiguration);
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            "restconf-server", 0, Encoding.JSON, transportConfiguration);
+            Encoding.JSON, transportConfiguration);
     }
 
     /**
@@ -150,16 +145,6 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return apiRootPath;
     }
 
-    @Beta
-    public @NonNull String groupName() {
-        return groupName;
-    }
-
-    @Beta
-    public int groupThreads() {
-        return groupThreads;
-    }
-
     /**
      * Returns the HTTP endpoint configuration.
      *
@@ -177,7 +162,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, groupName, groupThreads, transportConfiguration, defaultEncoding);
+            apiRootPath, transportConfiguration, defaultEncoding);
     }
 
     @Override
@@ -186,10 +171,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && errorTagMapping().equals(other.errorTagMapping()) && prettyPrint().equals(other.prettyPrint())
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
-            && apiRootPath.equals(other.apiRootPath)
-            && groupName.equals(other.groupName)
-            && groupThreads == other.groupThreads
-            && transportConfiguration.equals(other.transportConfiguration)
+            && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
             && defaultEncoding.equals(other.defaultEncoding);
     }
 
@@ -199,8 +181,6 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             .add("restconf", apiRootPath.stream()
                 .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
                 .collect(Collectors.joining("/")))
-            .add("groupName", groupName)
-            .add("groupThreads", groupThreads)
             .add("defaultEncoding", defaultEncoding)
             .add("transportConfiguration", transportConfiguration);
     }
