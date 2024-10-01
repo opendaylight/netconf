@@ -52,7 +52,7 @@ final class RequestParameters {
         this.defaultEncoding = requireNonNull(defaultEncoding);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
-        contentType = extractContentType(request, defaultEncoding.mediaType());
+        contentType = extractContentType(request, defaultEncoding.dataMediaType());
         remainingRawPath = decoder.rawPath();
         queryParameters = QueryParameters.ofMultiValue(decoder.parameters());
     }
@@ -141,7 +141,7 @@ final class RequestParameters {
      * @return default value configured
      */
     public AsciiString defaultAcceptType() {
-        return defaultEncoding.mediaType();
+        return defaultEncoding.dataMediaType();
     }
 
     /**
