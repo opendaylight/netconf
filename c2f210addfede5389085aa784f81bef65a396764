@@ -16,6 +16,24 @@
       "message": "Why do we need it? Why not List.of?",
       "revId": "c2f210addfede5389085aa784f81bef65a396764",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f54dce64_47732bfa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/GetRootEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-01T07:46:27Z",
+      "side": 1,
+      "message": "parameters list will be modified here https://github.com/opendaylight/netconf/blob/b7d653e49f7a93170cb2db3ab3291a5520fda73f/restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/GetEntity.java#L84",
+      "parentUuid": "54328800_c960656e",
+      "revId": "c2f210addfede5389085aa784f81bef65a396764",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
