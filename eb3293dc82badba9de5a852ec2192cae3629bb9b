@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a40b22c6_a6d8c500",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-10-01T15:21:35Z",
+      "side": 1,
+      "message": "Json files for width and depth should not be here - as I see those parameters was not cherry-picked into version 7",
+      "revId": "eb3293dc82badba9de5a852ec2192cae3629bb9b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {
