@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
+import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.NettyEndpoint;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
@@ -87,11 +88,11 @@ public final class OSGiNorthbound {
         @AttributeDefinition(min = "1", max = "65535")
         int bind$_$port() default 8182;
 
-        @AttributeDefinition(description = "Thread name prefix to be used by Netty's thread executor")
-        String group$_$name() default "restconf-server";
+        @AttributeDefinition(name = "Number of Netty boss threads.", min = "0")
+        int boss$_$threads() default 0;
 
-        @AttributeDefinition(min = "0", description = "Netty's thread limit. 0 means no limits.")
-        int group$_$threads() default 0;
+        @AttributeDefinition(name = "Number of Netty worker threads", min = "0")
+        int worker$_$threads() default 0;
 
         @AttributeDefinition(description = "Default encoding for outgoing messages. Expected 'xml' or 'json'.")
         String default$_$encoding() default "json";
@@ -123,8 +124,10 @@ public final class OSGiNorthbound {
 
     private ComponentInstance<JaxRsEndpoint> jaxrs;
     private ComponentInstance<NettyEndpoint> nettyEndpoint;
+    private RestconfBootstrapFactory bootstrapFactory;
     private Map<String, ?> jaxrsProps;
     private Map<String, ?> nettyEndpointProps;
+    private RestconfBootstrapFactory.Configuration bootstrapFactoryConfig;
 
     @Activate
     public OSGiNorthbound(
@@ -134,11 +137,15 @@ public final class OSGiNorthbound {
             final ComponentFactory<NettyEndpoint> nettyEndpointFactory,
             final Configuration configuration) {
         this.jaxrsFactory = requireNonNull(jaxrsFactory);
+        this.nettyEndpointFactory = requireNonNull(nettyEndpointFactory);
+
         jaxrsProps = newJaxrsProps(configuration);
         jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
 
-        this.nettyEndpointFactory = requireNonNull(nettyEndpointFactory);
-        nettyEndpointProps = newNettyEndpointProps(configuration);
+        bootstrapFactoryConfig = newBootstrapConfiguration(configuration);
+        bootstrapFactory = new RestconfBootstrapFactory(bootstrapFactoryConfig);
+
+        nettyEndpointProps = newNettyEndpointProps(bootstrapFactory, configuration);
         nettyEndpoint = nettyEndpointFactory.newInstance(FrameworkUtil.asDictionary(nettyEndpointProps));
 
         LOG.info("Global RESTCONF northbound pools started");
@@ -153,13 +160,27 @@ public final class OSGiNorthbound {
             jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
             LOG.debug("JAX-RS northbound restarted with {}", jaxrsProps);
         }
-        final var newNettyEndpointProps = newNettyEndpointProps(configuration);
+
+        // allocate new bootstrap factory if needed
+        final var newBoostrapFactoryConfig = newBootstrapConfiguration(configuration);
+        final var bootstrap = newBoostrapFactoryConfig.equals(bootstrapFactoryConfig) ? bootstrapFactory
+            : new RestconfBootstrapFactory(newBoostrapFactoryConfig);
+
+        final var newNettyEndpointProps = newNettyEndpointProps(bootstrap, configuration);
         if (!newNettyEndpointProps.equals(nettyEndpointProps)) {
             nettyEndpoint.dispose();
             nettyEndpointProps = newNettyEndpointProps;
             nettyEndpoint = nettyEndpointFactory.newInstance(FrameworkUtil.asDictionary(nettyEndpointProps));
             LOG.debug("Netty northbound restarted with {}", nettyEndpointProps);
         }
+
+        // close and replace old bootstrap factory if needed
+        if (bootstrap != bootstrapFactory) {
+            bootstrapFactory.close();
+            bootstrapFactoryConfig = newBoostrapFactoryConfig;
+            bootstrapFactory = bootstrap;
+        }
+
         LOG.debug("Applied {}", configuration);
     }
 
@@ -169,7 +190,14 @@ public final class OSGiNorthbound {
         jaxrs = null;
         nettyEndpoint.dispose();
         nettyEndpoint = null;
+        bootstrapFactory.close();
+        bootstrapFactory = null;
         LOG.info("Global RESTCONF northbound pools stopped");
+    }
+
+    private static RestconfBootstrapFactory.Configuration newBootstrapConfiguration(final Configuration configuration) {
+        return new RestconfBootstrapFactory.Configuration(configuration.boss$_$threads(),
+            configuration.worker$_$threads());
     }
 
     private static Map<String, ?> newJaxrsProps(final Configuration configuration) {
@@ -181,7 +209,8 @@ public final class OSGiNorthbound {
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count()));
     }
 
-    private static Map<String, ?> newNettyEndpointProps(final Configuration configuration) {
+    private static Map<String, ?> newNettyEndpointProps(final BootstrapFactory bootstrapFactory,
+            final Configuration configuration) {
         // FIXME: do not start the endpoint if we fail to read the files (i.e. secure-on-failure)!
         // TODO: why are we even using separate files here?
         final var tlsCertKey = TlsUtils.readCertificateKey(configuration.tls$_$certificate(),
@@ -192,15 +221,13 @@ public final class OSGiNorthbound {
                 tlsCertKey.certificate(), tlsCertKey.privateKey())
             : ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
 
-        return NettyEndpoint.props(
-            new NettyEndpointConfiguration(
-                configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-                PrettyPrintParam.of(configuration.pretty$_$print()),
-                Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
-                Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
-                configuration.group$_$name(), configuration.group$_$threads(),
-                NettyEndpointConfiguration.Encoding.from(configuration.default$_$encoding()),
-                new HttpServerStackConfiguration(transport))
+        return NettyEndpoint.props(bootstrapFactory, new NettyEndpointConfiguration(
+            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
+            PrettyPrintParam.of(configuration.pretty$_$print()),
+            Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
+            Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
+            NettyEndpointConfiguration.Encoding.from(configuration.default$_$encoding()),
+            new HttpServerStackConfiguration(transport))
         );
     }
 }
