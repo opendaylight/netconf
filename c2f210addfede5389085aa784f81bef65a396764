@@ -34,6 +34,24 @@
       "parentUuid": "54328800_c960656e",
       "revId": "c2f210addfede5389085aa784f81bef65a396764",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f396d93d_c7394b96",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/GetRootEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-01T07:46:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f54dce64_47732bfa",
+      "revId": "c2f210addfede5389085aa784f81bef65a396764",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
