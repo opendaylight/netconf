@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Reference;
 public final class NettyEndpoint {
     public static final String FACTORY_NAME = "org.opendaylight.restconf.server.NettyEndpoint";
 
+    private static final String PROP_BOOTSTRAP_FACTORY = ".bootstrapFactory";
     private static final String PROP_CONFIGURATION = ".configuration";
 
     private final HTTPServer httpServer;
@@ -32,15 +33,15 @@ public final class NettyEndpoint {
     @Activate
     public NettyEndpoint(@Reference final RestconfServer server, @Reference final PrincipalService principalService,
             @Reference final RestconfStream.Registry streamRegistry, final Map<String, ?> props) {
-        this(server, principalService, streamRegistry, (NettyEndpointConfiguration) props.get(PROP_CONFIGURATION));
+        this(server, principalService, streamRegistry, (BootstrapFactory) props.get(PROP_BOOTSTRAP_FACTORY),
+            (NettyEndpointConfiguration) props.get(PROP_CONFIGURATION));
     }
 
     public NettyEndpoint(final RestconfServer server, final PrincipalService principalService,
-            final RestconfStream.Registry streamRegistry, final NettyEndpointConfiguration configuration) {
+            final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
+            final NettyEndpointConfiguration configuration) {
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
-
-        final var bootstrapFactory = new BootstrapFactory(configuration.groupName(), configuration.groupThreads());
         try {
             httpServer = HTTPServer.listen(listener, bootstrapFactory.newServerBootstrap(),
                 configuration.transportConfiguration(), principalService).get();
@@ -58,7 +59,8 @@ public final class NettyEndpoint {
         }
     }
 
-    public static Map<String, ?> props(final NettyEndpointConfiguration configuration) {
-        return Map.of(PROP_CONFIGURATION, configuration);
+    public static Map<String, ?> props(final BootstrapFactory bootstrapFactory,
+            final NettyEndpointConfiguration configuration) {
+        return Map.of(PROP_BOOTSTRAP_FACTORY, bootstrapFactory, PROP_CONFIGURATION, configuration);
     }
 }
