@@ -8,12 +8,9 @@
 package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.server.spi.RestconfStream.EncodingName.RFC8040_JSON;
-import static org.opendaylight.restconf.server.spi.RestconfStream.EncodingName.RFC8040_XML;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.AsciiString;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -55,11 +52,14 @@ public final class RestconfStreamService implements EventStreamService {
     private final PrettyPrintParam defaultPrettyPrint;
 
     public RestconfStreamService(final RestconfStream.Registry registry, final String restconf,
-            final ErrorTagMapping errorTagMapping, final AsciiString defaultAcceptType,
+            final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
             final PrettyPrintParam defaultPrettyPrint) {
         streamRegistry = requireNonNull(registry);
         basePath = requireNonNull(restconf);
-        defaultEncoding = NettyMediaTypes.JSON_TYPES.contains(defaultAcceptType) ? RFC8040_JSON : RFC8040_XML;
+        this.defaultEncoding = switch (defaultEncoding) {
+            case JSON -> RestconfStream.EncodingName.RFC8040_JSON;
+            case XML -> RestconfStream.EncodingName.RFC8040_XML;
+        };
         this.errorTagMapping = errorTagMapping;
         this.defaultPrettyPrint = defaultPrettyPrint;
     }
@@ -131,7 +131,7 @@ public final class RestconfStreamService implements EventStreamService {
             new YangErrorsBody(List.of(new ServerError(ErrorType.PROTOCOL, errorTag, errorMessage)));
         final var statusCode = errorTagMapping.statusOf(errorTag).code();
         try (var out = new ByteArrayOutputStream(ERROR_BUF_SIZE)) {
-            if (RFC8040_JSON.equals(encoding)) {
+            if (RestconfStream.EncodingName.RFC8040_JSON.equals(encoding)) {
                 yangErrorsBody.formatToJSON(defaultPrettyPrint, out);
                 return new ErrorResponseException(statusCode, out.toString(StandardCharsets.UTF_8),
                     NettyMediaTypes.APPLICATION_YANG_DATA_JSON);
