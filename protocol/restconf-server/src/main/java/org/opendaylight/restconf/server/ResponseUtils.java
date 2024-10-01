@@ -17,7 +17,6 @@ import io.netty.handler.codec.DateFormatter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
@@ -25,9 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.ServerError;
@@ -160,38 +157,38 @@ final class ResponseUtils {
     }
 
     private static AsciiString responseTypeFromAccept(final RequestParameters params) {
-        final var acceptTypes = extractAcceptTypes(params.requestHeaders());
-        if (!acceptTypes.isEmpty()) {
-            // if accept type is not defined or client accepts both xml and json types
-            // the server configured default will be used
-            boolean isJson = false;
-            boolean isXml = false;
-            for (var acceptType : acceptTypes) {
-                isJson |= NettyMediaTypes.JSON_TYPES.contains(acceptType);
-                isXml |= NettyMediaTypes.XML_TYPES.contains(acceptType);
-            }
-            if (isJson && !isXml) {
-                return NettyMediaTypes.APPLICATION_YANG_DATA_JSON;
-            }
-            if (isXml && !isJson) {
-                return NettyMediaTypes.APPLICATION_YANG_DATA_XML;
-            }
+        final var acceptValues = params.requestHeaders().getAll(HttpHeaderNames.ACCEPT);
+        if (acceptValues.isEmpty()) {
+            return params.defaultAcceptType();
         }
-        return params.defaultAcceptType();
-    }
 
-    private static @NonNull List<AsciiString> extractAcceptTypes(final HttpHeaders headers) {
-        final var acceptValues = headers.getAll(HttpHeaderNames.ACCEPT);
-        if (acceptValues == null || acceptValues.isEmpty()) {
-            return List.of();
-        }
-        final var list = new ArrayList<AsciiString>();
+        // FIXME: this algorithm is quite naive and ignores https://www.rfc-editor.org/rfc/rfc9110#name-accept, i.e.
+        //        it does not handle wildcards at all.
+        //        furthermore it completely ignores https://www.rfc-editor.org/rfc/rfc9110#name-quality-values, i.e.
+        //        it does not consider client-supplied weights during media type selection AND it treats q=0 as an
+        //        inclusion of a media type rather than its exclusion
+        final var acceptTypes = new ArrayList<AsciiString>();
         for (var accept : acceptValues) {
             // use english locale lowercase to ignore possible case variants
             for (var type : COMMA_SPLITTER.split(accept.toLowerCase(Locale.ENGLISH))) {
-                list.add(AsciiString.of(type.trim()));
+                acceptTypes.add(AsciiString.of(type.trim()));
             }
         }
-        return list;
+
+        // if accept type is not defined or client accepts both xml and json types
+        // the server configured default will be used
+        boolean isJson = false;
+        boolean isXml = false;
+        for (var acceptType : acceptTypes) {
+            isJson |= NettyMediaTypes.JSON_TYPES.contains(acceptType);
+            isXml |= NettyMediaTypes.XML_TYPES.contains(acceptType);
+        }
+        if (isJson && !isXml) {
+            return NettyMediaTypes.APPLICATION_YANG_DATA_JSON;
+        }
+        if (isXml && !isJson) {
+            return NettyMediaTypes.APPLICATION_YANG_DATA_XML;
+        }
+        return params.defaultAcceptType();
     }
 }
