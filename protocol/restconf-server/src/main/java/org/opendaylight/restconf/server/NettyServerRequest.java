@@ -8,52 +8,56 @@
 package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import java.security.Principal;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
-@NonNullByDefault
-abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
-    final RequestParameters requestParams;
+/**
+ * The {@link ServerRequest}s implementation we are passing to {@link RestconfServer}. Completion callbacks are routed
+ * through the supplied {@link AbstractPendingRequest} towards the supplied {@link PendingRequestListener}.
+ */
+final class NettyServerRequest<T> extends MappingServerRequest<T> {
+    private final @NonNull AbstractPendingRequest<T> request;
+    private final @NonNull PendingRequestListener listener;
 
-    private final RestconfRequest callback;
+    private NettyServerRequest(final EndpointInvariants invariants, final AbstractPendingRequest<T> request,
+            final PendingRequestListener listener) {
+        super(QueryParameters.ofMultiValue(new QueryStringDecoder(request.targetUri).parameters()),
+            invariants.defaultPrettyPrint(), invariants.errorTagMapping());
+        this.request = requireNonNull(request);
+        this.listener = requireNonNull(listener);
+    }
 
-    NettyServerRequest(final RequestParameters requestParams, final RestconfRequest callback) {
-        super(requestParams.queryParameters(), requestParams.defaultPrettyPrint(), requestParams.errorTagMapping());
-        this.requestParams = requireNonNull(requestParams);
-        this.callback = requireNonNull(callback);
+    NettyServerRequest(final AbstractPendingRequest<@NonNull T> request, final PendingRequestListener listener) {
+        this(request.invariants, request, listener);
     }
 
     @Override
-    public final @Nullable Principal principal() {
-        return requestParams.principal();
+    public Principal principal() {
+        return request.principal;
     }
 
     @Override
-    protected final void onSuccess(final T result) {
-        callback.onSuccess(transform(result));
-    }
-
-    @Override
-    protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
-        callback.onSuccess(responseBuilder(requestParams, HttpResponseStatus.valueOf(status.code()))
-            .setBody(body)
-            .build());
-    }
-
-    @Override
-    public final @Nullable TransportSession session() {
+    public TransportSession session() {
         // FIXME: NETCONF-714: return the correct NettyTransportSession, RestconfSession in our case
         return null;
     }
 
-    abstract FullHttpResponse transform(T result);
+    @Override
+    protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
+        request.onFailure(listener, this, status, body);
+    }
+
+    @Override
+    protected void onSuccess(final T result) {
+        request.onSuccess(listener, this, result);
+    }
 }

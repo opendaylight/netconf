@@ -10,23 +10,20 @@ package org.opendaylight.restconf.server;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_JSON;
-import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_XML;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_DATA_JSON;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_DATA_XML;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_PATCH_JSON;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YANG_PATCH_XML;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_YIN_XML;
-import static org.opendaylight.restconf.server.NettyMediaTypes.JSON_TYPES;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.io.CharSource;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -38,6 +35,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.mockito.stubbing.Answer;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -55,25 +53,26 @@ final class TestUtils {
         // hidden on purpose
     }
 
-    @SuppressWarnings("unchecked")
-    static <T> Answer<Void> answerCompleteWith(T result) {
+    static <T> Answer<Void> answerCompleteWith(final T result) {
         return invocation -> {
             // server request is always first arg in RestconfServer
-            final var serverRequest =  (ServerRequest<T>) invocation.getArgument(0);
-            serverRequest.completeWith(result);
+            invocation.<ServerRequest<T>>getArgument(0).completeWith(result);
             return null;
         };
     }
 
     static FullHttpRequest buildRequest(final HttpMethod method, final String uri, final TestEncoding encoding,
             final String content) {
-        final var contentBuf = content == null ? Unpooled.EMPTY_BUFFER
-            : Unpooled.wrappedBuffer(content.getBytes(StandardCharsets.UTF_8));
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri, contentBuf);
-        if (method != HttpMethod.GET) {
-            request.headers().set(HttpHeaderNames.CONTENT_TYPE, encoding.requestType);
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri);
+        final var headers = request.headers();
+        if (!HttpMethod.GET.equals(method)) {
+            final var buf = request.content();
+            buf.writeBytes(content.getBytes(StandardCharsets.UTF_8));
+            headers
+                .set(HttpHeaderNames.CONTENT_TYPE, encoding.requestType)
+                .setInt(HttpHeaderNames.CONTENT_LENGTH, buf.readableBytes());
         }
-        request.headers().set(HttpHeaderNames.ACCEPT, encoding.responseType);
+        headers.set(HttpHeaderNames.ACCEPT, encoding.responseType);
         return request;
     }
 
@@ -91,7 +90,7 @@ final class TestUtils {
             }
 
             @Override
-            protected MoreObjects.ToStringHelper addToStringAttributes(MoreObjects.ToStringHelper helper) {
+            protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper helper) {
                 return helper;
             }
         };
@@ -129,7 +128,7 @@ final class TestUtils {
         }
     }
 
-    static void assertErrorResponse(final FullHttpResponse response, TestEncoding encoding,
+    static void assertErrorResponse(final FullHttpResponse response, final TestEncoding encoding,
             final ErrorTag expectedErrorTag, final String expectedMessage) {
         assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.status().code());
         assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, encoding.responseType));
@@ -163,17 +162,21 @@ final class TestUtils {
     }
 
     enum TestEncoding {
-        XML(APPLICATION_XML, APPLICATION_YANG_DATA_XML),
-        JSON(APPLICATION_JSON, APPLICATION_YANG_DATA_JSON),
+        XML(HttpHeaderValues.APPLICATION_XML, APPLICATION_YANG_DATA_XML),
+        JSON(HttpHeaderValues.APPLICATION_JSON, APPLICATION_YANG_DATA_JSON),
         YANG_PATCH_XML(APPLICATION_YANG_PATCH_XML, APPLICATION_YANG_DATA_XML),
         YANG_PATCH_JSON(APPLICATION_YANG_PATCH_JSON, APPLICATION_YANG_DATA_JSON),
         YANG(null, APPLICATION_YANG),
         YIN(null, APPLICATION_YIN_XML);
 
+        private static final Set<AsciiString> JSON_TYPES = Set.of(
+            NettyMediaTypes.APPLICATION_YANG_DATA_JSON, NettyMediaTypes.APPLICATION_YANG_PATCH_JSON,
+            HttpHeaderValues.APPLICATION_JSON);
+
         AsciiString requestType;
         AsciiString responseType;
 
-        TestEncoding(AsciiString requestType, AsciiString responseType) {
+        TestEncoding(final AsciiString requestType, final AsciiString responseType) {
             this.requestType = requestType;
             this.responseType = responseType;
         }
