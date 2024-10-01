@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed68f1f9_803a61d1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-01T20:40:38Z",
+      "side": 1,
+      "message": "\u0027We propagate\u0027, I skipped the verb again",
+      "parentUuid": "f3f83269_230a3411",
+      "revId": "1614b7eeda3b596a9323c499b1a12bfaeb13e96e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7638d3a_0962c937",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22991577_97f5ea8e",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-01T20:40:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7638d3a_0962c937",
+      "revId": "1614b7eeda3b596a9323c499b1a12bfaeb13e96e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab20da21_d70a8e51",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-10-01T14:23:15Z",
       "side": 1,
       "message": "IMO: These belong to following patch",
+      "revId": "1614b7eeda3b596a9323c499b1a12bfaeb13e96e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e833d0c2_cdf6b4e3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-01T20:40:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab20da21_d70a8e51",
       "revId": "1614b7eeda3b596a9323c499b1a12bfaeb13e96e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
