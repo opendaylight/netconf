@@ -35,7 +35,7 @@ final class RequestParameters {
     private final URI restconfURI;
     private final String remainingRawPath;
     private final AsciiString contentType;
-    private final AsciiString defaultAcceptType;
+    private final MessageEncoding defaultEncoding;
     private final QueryParameters queryParameters;
     private final FullHttpRequest request;
     private final ErrorTagMapping errorTagMapping;
@@ -44,15 +44,15 @@ final class RequestParameters {
 
     RequestParameters(final URI restconfURI, final QueryStringDecoder decoder, final FullHttpRequest request,
             final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
-            final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
+            final MessageEncoding defaultEncoding, final PrettyPrintParam defaultPrettyPrint) {
         this.restconfURI = requireNonNull(restconfURI);
         this.request = requireNonNull(request);
         this.principal = principal;
         this.errorTagMapping = requireNonNull(errorTagMapping);
-        this.defaultAcceptType = requireNonNull(defaultAcceptType);
+        this.defaultEncoding = requireNonNull(defaultEncoding);
         this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
 
-        contentType = extractContentType(request, defaultAcceptType);
+        contentType = extractContentType(request, defaultEncoding.mediaType());
         remainingRawPath = decoder.rawPath();
         queryParameters = QueryParameters.ofMultiValue(decoder.parameters());
     }
@@ -141,7 +141,7 @@ final class RequestParameters {
      * @return default value configured
      */
     public AsciiString defaultAcceptType() {
-        return defaultAcceptType;
+        return defaultEncoding.mediaType();
     }
 
     /**

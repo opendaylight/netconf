@@ -16,7 +16,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_JSON;
 import static org.opendaylight.restconf.server.PathParameters.STREAMS;
 import static org.opendaylight.restconf.server.RestconfStreamService.INVALID_STREAM_URI_ERROR;
 import static org.opendaylight.restconf.server.RestconfStreamService.MISSING_PARAMS_ERROR;
@@ -90,7 +89,7 @@ class RestconfStreamServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        streamService = new RestconfStreamService(registry, BASE_PATH, ERROR_TAG_MAPPING, APPLICATION_JSON,
+        streamService = new RestconfStreamService(registry, BASE_PATH, ERROR_TAG_MAPPING, MessageEncoding.JSON,
             PrettyPrintParam.FALSE);
     }
 

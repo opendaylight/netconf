@@ -14,7 +14,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.AsciiString;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -52,11 +50,11 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     private final @NonNull HttpServerStackGrouping transportConfiguration;
     private final @NonNull List<String> apiRootPath;
-    private final @NonNull Encoding defaultEncoding;
+    private final @NonNull MessageEncoding defaultEncoding;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
-            final List<String> apiRootPath, final Encoding defaultEncoding,
+            final List<String> apiRootPath, final MessageEncoding defaultEncoding,
             final HttpServerStackGrouping transportConfiguration) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
@@ -73,7 +71,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
-            final Encoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration);
     }
@@ -81,7 +79,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            Encoding.JSON, transportConfiguration);
+            MessageEncoding.JSON, transportConfiguration);
     }
 
     /**
@@ -155,8 +153,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     @Beta
-    public @NonNull AsciiString defaultAcceptType() {
-        return defaultEncoding.mediaType();
+    public @NonNull MessageEncoding defaultEncoding() {
+        return defaultEncoding;
     }
 
     @Override
@@ -183,33 +181,5 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
             .add("transportConfiguration", transportConfiguration);
-    }
-
-    @NonNullByDefault
-    public enum Encoding {
-        XML("xml", NettyMediaTypes.APPLICATION_YANG_DATA_XML),
-        JSON("json", NettyMediaTypes.APPLICATION_YANG_DATA_JSON);
-
-        private final String id;
-        private final AsciiString mediaType;
-
-        Encoding(final String id, final AsciiString mediaType) {
-            this.id = id;
-            this.mediaType = mediaType;
-        }
-
-        public AsciiString mediaType() {
-            return mediaType;
-        }
-
-        public static Encoding from(final String value) {
-            requireNonNull(value);
-            for (var encoding : values()) {
-                if (encoding.id.equalsIgnoreCase(value)) {
-                    return encoding;
-                }
-            }
-            throw new IllegalArgumentException("Unsupported encoding value");
-        }
     }
 }

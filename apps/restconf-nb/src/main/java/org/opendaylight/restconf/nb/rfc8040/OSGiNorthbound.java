@@ -10,9 +10,11 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpoint;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
@@ -226,8 +228,17 @@ public final class OSGiNorthbound {
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
-            NettyEndpointConfiguration.Encoding.from(configuration.default$_$encoding()),
-            new HttpServerStackConfiguration(transport))
+            parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport))
         );
+    }
+
+    private static @NonNull MessageEncoding parseDefaultEncoding(final String str) {
+        if ("json".equalsIgnoreCase(str)) {
+            return MessageEncoding.JSON;
+        } else if ("xml".equalsIgnoreCase(str)) {
+            return MessageEncoding.XML;
+        } else {
+            throw new IllegalArgumentException("Invalid default-encoding '" + str + "'");
+        }
     }
 }
