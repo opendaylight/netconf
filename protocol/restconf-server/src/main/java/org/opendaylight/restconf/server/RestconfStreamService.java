@@ -56,10 +56,7 @@ public final class RestconfStreamService implements EventStreamService {
             final PrettyPrintParam defaultPrettyPrint) {
         streamRegistry = requireNonNull(registry);
         basePath = requireNonNull(restconf);
-        this.defaultEncoding = switch (defaultEncoding) {
-            case JSON -> RestconfStream.EncodingName.RFC8040_JSON;
-            case XML -> RestconfStream.EncodingName.RFC8040_XML;
-        };
+        this.defaultEncoding = defaultEncoding.streamEncodingName();
         this.errorTagMapping = errorTagMapping;
         this.defaultPrettyPrint = defaultPrettyPrint;
     }

@@ -105,7 +105,7 @@ final class RestconfRequestDispatcher {
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
         LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconfPath,
-            defaultEncoding.mediaType(), defaultPrettyPrint.value());
+            defaultEncoding.dataMediaType(), defaultPrettyPrint.value());
     }
 
     String firstSegment() {
