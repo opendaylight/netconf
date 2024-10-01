@@ -7,12 +7,19 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.handler.codec.http.FullHttpResponse;
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.io.CharSource;
+import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-// FIXME: NETCONF-1379: eliminate this class
+/**
+ * A {@link Response} containing a {@link CharSource} with some accompanying headers.
+ */
 @NonNullByDefault
-abstract class RestconfRequest {
-
-    abstract void onSuccess(FullHttpResponse response);
+record CharSourceResponse(CharSource source, AsciiString mediaType) implements Response {
+    CharSourceResponse {
+        requireNonNull(source);
+        requireNonNull(mediaType);
+    }
 }

@@ -82,7 +82,7 @@ public class AbstractRequestProcessorTest {
         final var peeler = new SegmentPeeler(targetUri);
         assertEquals("rests", peeler.next());
         final var nettyMethod = request.method();
-        dispatcher.dispatch(switch (nettyMethod.name()) {
+        dispatcher.dispatch(peeler, switch (nettyMethod.name()) {
             case "DELETE" -> ImplementedMethod.DELETE;
             case "GET" -> ImplementedMethod.GET;
             case "OPTIONS" -> ImplementedMethod.OPTIONS;
@@ -90,7 +90,7 @@ public class AbstractRequestProcessorTest {
             case "POST" -> ImplementedMethod.POST;
             case "PUT" -> ImplementedMethod.PUT;
             default -> throw new AssertionError("Unhandled method " + nettyMethod);
-        }, targetUri, peeler, request, callback);
+        }, targetUri, request, callback);
         verify(callback).onSuccess(responseCaptor.capture());
         return responseCaptor.getValue();
     }
