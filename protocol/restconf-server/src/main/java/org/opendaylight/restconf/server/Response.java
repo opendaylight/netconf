@@ -7,12 +7,12 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.handler.codec.http.FullHttpResponse;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-// FIXME: NETCONF-1379: eliminate this class
+/**
+ * A response to request.
+ */
 @NonNullByDefault
-abstract class RestconfRequest {
-
-    abstract void onSuccess(FullHttpResponse response);
+sealed interface Response permits CharSourceResponse, CompletedRequest, FormattableDataResponse {
+    // Nothing else here
 }
