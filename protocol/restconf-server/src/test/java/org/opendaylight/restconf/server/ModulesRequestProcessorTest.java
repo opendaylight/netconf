@@ -15,9 +15,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.YANG_LIBRARY_VERSION;
+import static org.opendaylight.restconf.server.PendingModulesGet.SOURCE_READ_FAILURE_ERROR;
 import static org.opendaylight.restconf.server.RestconfRequestDispatcher.MISSING_FILENAME_ERROR;
-import static org.opendaylight.restconf.server.RestconfRequestDispatcher.REVISION;
-import static org.opendaylight.restconf.server.RestconfRequestDispatcher.SOURCE_READ_FAILURE_ERROR;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
 import static org.opendaylight.restconf.server.TestUtils.assertErrorResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertOptionsResponse;
@@ -50,7 +49,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     private static final String MODULE_URI = MODULES_PATH + MODULE_FILENAME;
     private static final String MODULE_URI_WITH_MOUNT = MODULES_PATH + MOUNT_PATH + "/" + MODULE_FILENAME;
     private static final String REVISION_VALUE = "revision-value";
-    private static final String REVISION_PARAM = "?" + REVISION + "=" + REVISION_VALUE;
+    private static final String REVISION_PARAM = "?revision=" + REVISION_VALUE;
     private static final String YANG_CONTENT = "yang-content";
     private static final String YIN_CONTENT = "yin-content";
 
