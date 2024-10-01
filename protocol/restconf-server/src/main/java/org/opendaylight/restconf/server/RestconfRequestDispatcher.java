@@ -18,13 +18,15 @@ import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErro
 import static org.opendaylight.restconf.server.ResponseUtils.unsupportedMediaTypeErrorResponse;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.VerifyException;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
@@ -32,11 +34,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
+import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -53,6 +59,7 @@ import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
+import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -90,6 +97,10 @@ final class RestconfRequestDispatcher {
     // '/{+restconf}/', i.e. an absolute path conforming to RestconfServer's 'restconfURI'
     private final URI restconfPath;
 
+    private static final @NonNull PreparedRequest NOT_ACCEPTABLE_DATA =
+        // FIXME: list acceptable media types
+        ImmediateResponse.notAcceptable(null);
+
     RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
             final List<String> segments, final String restconfPath, final ErrorTagMapping errorTagMapping,
             final MessageEncoding defaultEncoding, final PrettyPrintParam defaultPrettyPrint) {
@@ -115,16 +126,36 @@ final class RestconfRequestDispatcher {
     @SuppressWarnings("IllegalCatch")
     void dispatch(final URI targetUri, final SegmentPeeler peeler, final FullHttpRequest request,
             final RestconfRequest callback) {
-        LOG.debug("Dispatching {} {}", request.method(), targetUri);
-
         // FIXME: this is here just because of test structure
         final var principal = principalService.acquirePrincipal(request);
+
+        switch (prepare(principal, targetUri, peeler, request)) {
+            case ImmediateResponse immediate -> callback.onSuccess(immediate.toHttpResponse(request.protocolVersion()));
+            case RequestHandle handle -> {
+                LOG.debug("Dispatching {} {}", request.method(), targetUri);
+
+
+            }
+        }
+    }
+
+    /**
+     * Prepare to service a request. Preparation here includes all activities which can be done without having access
+     * and without blocking.
+     *
+     * @param targetUri resolved Target URI
+     * @param peeler the {@link SegmentPeeler} holding the unprocessed part of the request path
+     * @param request the request itself
+     * @return A {@link PreparedStatement}
+     */
+    @NonNull PreparedRequest prepare(final Principal principal, final URI targetUri, final SegmentPeeler peeler,
+            final HttpRequest request) {
+        LOG.debug("Preparing {} {}", request.method(), targetUri);
 
         // peel all other segments out
         for (var segment : otherSegments) {
             if (!peeler.hasNext() || !segment.equals(peeler.next())) {
-                callback.onSuccess(notFound(request));
-                return;
+                return ImmediateResponse.notFound();
             }
         }
 
@@ -132,37 +163,169 @@ final class RestconfRequestDispatcher {
             // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
             //        correct: we should be reporting the entire API Resource, as described in
             //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
-            callback.onSuccess(notFound(request));
-            return;
+            return ImmediateResponse.notFound();
         }
 
-        final var segment = peeler.next();
-        final var rawPath = peeler.remaining();
-        final var rawQuery = targetUri.getRawQuery();
-        final var decoder = new QueryStringDecoder(rawQuery != null ? rawPath + "?" + rawQuery : rawPath);
-        final var params = new RequestParameters(targetUri.resolve(restconfPath), decoder, request, principal,
-            errorTagMapping, defaultEncoding, defaultPrettyPrint);
+        return switch (peeler.next()) {
+            case "data" -> prepareData(principal, targetUri, peeler, request);
+            case "operations" -> prepareOperations(principal, targetUri, peeler, request);
+            case "yang-library-version" -> prepareYangLibraryVersion(principal, targetUri, peeler, request);
+            case "modules" -> prepareModules(principal, targetUri, peeler, request);
+            default -> ImmediateResponse.notFound();
+        };
+    }
 
-        try {
-            switch (segment) {
-                case "data" -> processDataRequest(params, callback);
-                case "operations" -> processOperationsRequest(params, callback);
-                case "yang-library-version" -> processYangLibraryVersion(params, callback);
-                case "modules" -> processModules(params, callback);
-                default -> callback.onSuccess(HttpMethod.OPTIONS.equals(params.method())
-                    ? optionsResponse(params, HttpMethod.OPTIONS.name()) : notFound(request));
-            }
-        } catch (RuntimeException e) {
-            LOG.error("Error processing request {} {}", request.method(), request.uri(), e);
-            final var errorTag = e instanceof ServerErrorException see ? see.errorTag() : ErrorTag.OPERATION_FAILED;
-            callback.onSuccess(simpleErrorResponse(params, errorTag, e.getMessage()));
+    private @NonNull PreparedRequest prepareData(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request) {
+        return switch (request.method().name()) {
+            // delete target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.7
+            case "DELETE" -> prepareDataDELETE(principal, peeler);
+            // retrieve data and metadata for a resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.3
+            case "GET" -> prepareDataGET(principal, targetUri, peeler, request, true);
+            // HEAD is same as GET but without content -> https://www.rfc-editor.org/rfc/rfc8040#section-4.2
+            case "HEAD" -> prepareDataGET(principal, targetUri, peeler, request, false);
+            // resource options -> https://www.rfc-editor.org/rfc/rfc8040#section-4.1
+            case "OPTIONS" -> prepareWithApiPath(peeler, DataOptionsRequest::new);
+            // PATCH -> https://www.rfc-editor.org/rfc/rfc8040#section-4.6
+            case "PATCH" -> prepareDataPATCH(principal, targetUri, peeler, request);
+            // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
+            // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
+            case "POST" -> prepareDataPOST(principal, targetUri, peeler, request);
+            // create or replace target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.5
+            case "PUT" -> prepareDataPUT(principal, targetUri, peeler, request);
+            default -> throw new VerifyException("Should never be reached");
+        };
+    }
+
+    private static @NonNull PreparedRequest prepareDataDELETE(final Principal principal, final SegmentPeeler peeler) {
+        return prepareWithApiPath(peeler, apiPath -> apiPath.isEmpty()
+            ? ImmediateResponse.methodNotAllowed(OptionsResult.DATASTORE) : new DataDeleteRequest(apiPath));
+    }
+
+    // Commom handling for both GET and HEAD methods
+    private @NonNull PreparedRequest prepareDataGET(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request, final boolean withContent) {
+        // Attempt to choose an encoding based on user's preference. If we cannot pick one, responding with a 406 status
+        // and list the encodings we support
+        final var encoding = chooseEncoding(request.headers());
+        return encoding == null ? NOT_ACCEPTABLE_DATA
+            : prepareWithApiPath(peeler, apiPath -> new DataGetRequest(encoding, apiPath, withContent));
+    }
+
+    private @NonNull PreparedRequest prepareDataPATCH(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request) {
+        if (RESTCONF_TYPES.contains(contentType)) {
+            // Plain RESTCONF patch = merge target resource content ->
+            // https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1
+            patchData(params, callback, apiPath);
+        } else if (YANG_PATCH_TYPES.contains(contentType)) {
+            // YANG Patch = ordered list of edits that are applied to the target datastore ->
+            // https://www.rfc-editor.org/rfc/rfc8072#section-2
+            yangPatchData(params, callback, apiPath);
+        } else {
+            callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
         }
+    }
+
+    private @NonNull PreparedRequest prepareDataPOST(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request) {
+        if (RESTCONF_TYPES.contains(contentType)) {
+            // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
+            // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
+            postData(params, callback, apiPath);
+        } else {
+            callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
+        }
+    }
+
+    private @NonNull PreparedRequest prepareDataPUT(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request) {
+        if (RESTCONF_TYPES.contains(contentType)) {
+            putData(params, callback, apiPath);
+        } else {
+            callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
+        }
+    }
+
+    private @NonNull PreparedRequest prepareOperations(final Principal principal, final URI targetUri,
+        final SegmentPeeler peeler, final HttpRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private @NonNull PreparedRequest prepareYangLibraryVersion(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private @NonNull PreparedRequest prepareModules(final Principal principal, final URI targetUri,
+            final SegmentPeeler peeler, final HttpRequest request) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @NonNullByDefault
-    private static FullHttpResponse notFound(final FullHttpRequest request) {
-        return new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.NOT_FOUND);
+    private static PreparedRequest prepareWithApiPath(final SegmentPeeler peeler,
+            final Function<ApiPath, PreparedRequest> function) {
+        final var remaining = peeler.remaining();
+        final ApiPath apiPath;
+        if (!remaining.isEmpty()) {
+            final var path = remaining.substring(1);
+            try {
+                apiPath = ApiPath.parse(path);
+            } catch (ParseException e) {
+                return ImmediateResponse.badRequest(path, e);
+            }
+        } else {
+            apiPath = ApiPath.empty();
+        }
+        return function.apply(apiPath);
     }
+
+    @Nullable MessageEncoding chooseEncoding(final HttpHeaders headers) {
+        final var acceptValues = headers.getAll(HttpHeaderNames.ACCEPT);
+        if (acceptValues.isEmpty()) {
+            return defaultEncoding;
+        }
+
+        for (var acceptValue : acceptValues) {
+            final var encoding = matchEncoding(acceptValue);
+            if (encoding != null) {
+                return encoding;
+            }
+        }
+        return null;
+    }
+
+    private static @Nullable MessageEncoding matchEncoding(final String acceptValue) {
+        // FIXME: match media types
+        throw new UnsupportedOperationException();
+    }
+
+//    private void xxx() {
+//
+//        final var rawPath = peeler.remaining();
+//        final var rawQuery = targetUri.getRawQuery();
+//        final var decoder = new QueryStringDecoder(rawQuery != null ? rawPath + "?" + rawQuery : rawPath);
+//        final var params = new RequestParameters(targetUri.resolve(restconfPath), decoder, request, principal,
+//            errorTagMapping, defaultAcceptType, defaultPrettyPrint);
+//
+//        try {
+//            switch (segment) {
+//                case "data" -> processDataRequest(params, callback);
+//                case "operations" -> processOperationsRequest(params, callback);
+//                case "yang-library-version" -> processYangLibraryVersion(params, callback);
+//                case "modules" -> processModules(params, callback);
+//                default -> callback.onSuccess(HttpMethod.OPTIONS.equals(params.method())
+//                    ? optionsResponse(params, HttpMethod.OPTIONS.name()) : notFound(request));
+//            }
+//        } catch (RuntimeException e) {
+//            LOG.error("Error processing request {} {}", request.method(), request.uri(), e);
+//            final var errorTag = e instanceof ServerErrorException see ? see.errorTag() : ErrorTag.OPERATION_FAILED;
+//            callback.onSuccess(simpleErrorResponse(params, errorTag, e.getMessage()));
+//        }
+//    }
 
     /**
      * Process a request to <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.1">RFC 8040 {+restconf}/data</a>
