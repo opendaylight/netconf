@@ -53,7 +53,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void optionsRoot() {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, OPERATIONS_PATH);
-        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
+        assertOptionsResponse(dispatch(request), "GET,HEAD,OPTIONS");
     }
 
     @Test
@@ -62,7 +62,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
             OPERATIONS_PATH_WITH_ID);
         doAnswer(answerCompleteWith(OptionsResult.RPC)).when(server).operationsOPTIONS(any(), any());
 
-        assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS, POST");
+        assertOptionsResponse(dispatch(request), "GET,HEAD,OPTIONS,POST");
     }
 
     @ParameterizedTest
