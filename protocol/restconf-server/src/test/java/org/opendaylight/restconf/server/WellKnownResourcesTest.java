@@ -12,6 +12,7 @@ import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -50,7 +51,7 @@ class WellKnownResourcesTest {
                 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
                     <Link rel="restconf" href="testRestconf"/>
                 </XRD>"""),
-            Arguments.of(JRD_SUFFIX, NettyMediaTypes.APPLICATION_JSON, """
+            Arguments.of(JRD_SUFFIX, HttpHeaderValues.APPLICATION_JSON, """
                 {
                     "links" : {
                         "rel" : "restconf",
