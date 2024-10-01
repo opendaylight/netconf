@@ -8,11 +8,19 @@
 package org.opendaylight.restconf.server;
 
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpVersion;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-// FIXME: NETCONF-1379: eliminate this class
+/**
+ * A {@link PreparedRequest} which is already complete, this qualifying to be a {@link Response}.
+ */
 @NonNullByDefault
-abstract class RestconfRequest {
-
-    abstract void onSuccess(FullHttpResponse response);
+non-sealed interface CompletedRequest extends PreparedRequest, Response {
+    /**
+     * Return a {@link FullHttpResponse} representation of this object.
+     *
+     * @param version HTTP version to use
+     * @return a {@link FullHttpResponse}
+     */
+    FullHttpResponse toHttpResponse(HttpVersion version);
 }
