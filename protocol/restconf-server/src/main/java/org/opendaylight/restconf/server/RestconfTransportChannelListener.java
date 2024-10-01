@@ -46,7 +46,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
         wellKnown = new WellKnownResources(restconf);
         dispatcher = new RestconfRequestDispatcher(server, principalService, apiRootPath, sb.append('/').toString(),
-            configuration.errorTagMapping(), configuration.defaultAcceptType(), configuration.prettyPrint());
+            configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint());
     }
 
     @Override
@@ -54,7 +54,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         channel.channel().pipeline().addLast(
             new ServerSseHandler(
                 new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
-                    configuration.defaultAcceptType(), configuration.prettyPrint()),
+                    configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
             new RestconfSession(wellKnown, dispatcher, channel.scheme()));
     }
