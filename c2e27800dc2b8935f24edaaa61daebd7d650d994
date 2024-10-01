@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "064690b4_b59d4dc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-01T07:07:19Z",
+      "side": 1,
+      "message": "Cannot be merged without https://git.opendaylight.org/gerrit/c/netconf/+/113581.",
+      "revId": "c2e27800dc2b8935f24edaaa61daebd7d650d994",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
