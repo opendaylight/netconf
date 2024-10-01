@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -53,7 +54,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull String groupName;
     private final int groupThreads;
     private final @NonNull List<String> apiRootPath;
-    private final @NonNull AsciiString defaultAcceptType;
+    private final @NonNull Encoding defaultEncoding;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
@@ -63,7 +64,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         this.groupName = requireNonNull(groupName);
         this.groupThreads = groupThreads;
         this.transportConfiguration = requireNonNull(transportConfiguration);
-        defaultAcceptType = requireNonNull(defaultEncoding).mediaType();
+        this.defaultEncoding = requireNonNull(defaultEncoding);
 
         if (apiRootPath.isEmpty()) {
             throw new IllegalArgumentException("empty apiRootPath");
@@ -170,13 +171,13 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     @Beta
     public @NonNull AsciiString defaultAcceptType() {
-        return defaultAcceptType;
+        return defaultEncoding.mediaType();
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, groupName, groupThreads, transportConfiguration, defaultAcceptType);
+            apiRootPath, groupName, groupThreads, transportConfiguration, defaultEncoding);
     }
 
     @Override
@@ -189,7 +190,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && groupName.equals(other.groupName)
             && groupThreads == other.groupThreads
             && transportConfiguration.equals(other.transportConfiguration)
-            && defaultAcceptType.equals(other.defaultAcceptType);
+            && defaultEncoding.equals(other.defaultEncoding);
     }
 
     @Override
@@ -200,10 +201,11 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .collect(Collectors.joining("/")))
             .add("groupName", groupName)
             .add("groupThreads", groupThreads)
-            .add("defaultAcceptType", defaultAcceptType)
+            .add("defaultEncoding", defaultEncoding)
             .add("transportConfiguration", transportConfiguration);
     }
 
+    @NonNullByDefault
     public enum Encoding {
         XML("xml", NettyMediaTypes.APPLICATION_YANG_DATA_XML),
         JSON("json", NettyMediaTypes.APPLICATION_YANG_DATA_JSON);
