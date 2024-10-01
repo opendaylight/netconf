@@ -7,18 +7,11 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.util.AsciiString;
-import java.util.Set;
-import java.util.stream.Stream;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
-final class NettyMediaTypes {
-    public static final AsciiString TEXT_XML = AsciiString.cached("text/xml");
-    public static final AsciiString APPLICATION_XML = HttpHeaderValues.APPLICATION_XML;
-    public static final AsciiString APPLICATION_JSON = HttpHeaderValues.APPLICATION_JSON;
-
+public final class NettyMediaTypes {
     /**
      * A {@link AsciiString} constant representing {@value MediaTypes#APPLICATION_XRD_XML} media type.
      *
@@ -66,17 +59,7 @@ final class NettyMediaTypes {
      */
     public static final AsciiString APPLICATION_YIN_XML = AsciiString.cached(YangConstants.RFC6020_YIN_MEDIA_TYPE);
 
-
-    static final Set<AsciiString> RESTCONF_TYPES = Set.of(TEXT_XML, APPLICATION_XML, APPLICATION_JSON,
-        APPLICATION_YANG_DATA_XML, APPLICATION_YANG_DATA_JSON);
-    static final Set<AsciiString> JSON_TYPES = Set.of(APPLICATION_JSON, APPLICATION_YANG_DATA_JSON,
-        APPLICATION_YANG_PATCH_JSON);
-    static final Set<AsciiString> XML_TYPES = Set.of(TEXT_XML, APPLICATION_XML, APPLICATION_YANG_DATA_XML,
-        APPLICATION_YANG_PATCH_XML, APPLICATION_XRD_XML, APPLICATION_YIN_XML);
-    static final Set<AsciiString> YANG_PATCH_TYPES = Set.of(APPLICATION_YANG_PATCH_XML, APPLICATION_YANG_PATCH_JSON);
-
-    static final String ACCEPT_PATCH_HEADER_VALUE = String.join(", ",
-        Stream.concat(RESTCONF_TYPES.stream(), YANG_PATCH_TYPES.stream()).map(AsciiString::toString).sorted().toList());
+    public static final AsciiString TEXT_XML = AsciiString.cached("text/xml");
 
     private NettyMediaTypes() {
         // hidden on purpose
