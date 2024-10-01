@@ -7,12 +7,11 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.handler.codec.http.FullHttpResponse;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
-// FIXME: NETCONF-1379: eliminate this class
-@NonNullByDefault
-abstract class RestconfRequest {
-
-    abstract void onSuccess(FullHttpResponse response);
+/**
+ * The result of
+ * {@link RestconfRequestDispatcher#prepare(java.net.URI, SegmentPeeler, io.netty.handler.codec.http.HttpRequest)}. This
+ * can either be a {@link CompletedRequest} or a {@link PendingRequest}.
+ */
+sealed interface PreparedRequest permits CompletedRequest, PendingRequest {
+    // Nothing else
 }

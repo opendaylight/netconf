@@ -39,6 +39,20 @@ import org.slf4j.LoggerFactory;
  * as glue between a Netty channel and a RESTCONF server and may be servicing one (HTTP/1.1) or more (HTTP/2) logical
  * connections.
  */
+// FIXME: HTTP/1.1 and HTTP/2 behave differently w.r.t. incoming requests and their servicing:
+//        1. HTTP/1.1 uses pipelining, therefore:
+//           - we cannot halt incoming pipeline
+//           - we may run request prepare() while a request is executing in the background, but
+//           - we MUST send responses out in the same order we have received them
+//           - SSE GET turns the session into a sender, i.e. no new requests can be processed
+//        2. HTTP/2 uses concurrent execution, therefore
+//           - we need to track which streams are alive and support terminating pruning requests when client resets
+//             a stream
+//           - SSE is nothing special
+//           - we have Http2Settings, which has framesize -- which we should use when streaming responses
+//        We support HTTP/1.1 -> HTTP/2 upgrade for the first request only -- hence we know before processing the first
+//        result which mode of operation is effective. We probably need to have two subclasses of this thing, with
+//        HTTP/1.1 and HTTP/2 specializations.
 final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest> implements TransportSession {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
@@ -161,19 +175,37 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             // Well-known resources are immediately available and are trivial to service
             msg.release();
             respond(ctx, streamId, wellKnown.request(version, method, peeler));
-        } else if (segment.equals(dispatcher.firstSegment())) {
-            dispatcher.dispatch(method, targetUri, peeler, msg, new RestconfRequest() {
-                @Override
-                public void onSuccess(final FullHttpResponse response) {
-                    msg.release();
-                    respond(ctx, streamId, response);
-                }
-            });
-        } else {
+            return;
+        }
+        if (!segment.equals(dispatcher.firstSegment())) {
+            // Does not match the dispatcher -- we are done now
             LOG.debug("No resource for {}", requestUri);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
+            return;
         }
+
+        // FIXME: NETCONF-1379: first part of integration here:
+        //        - invoke dispatcher.prepare() from here first
+        //        - handle CompletedRequest to synchronous dispatch just like the above two cases, as it is that simple
+
+        dispatcher.dispatch(method, targetUri, peeler, msg, new RestconfRequest() {
+            @Override
+            public void onSuccess(final FullHttpResponse response) {
+                msg.release();
+                respond(ctx, streamId, response);
+            }
+        });
+
+        // FIXME: NETCONF-1379: second part of integration here:
+        //        - we will have PendingRequest<?>, which is the asynchronous invocation
+        //        - add a new field to track them:
+        //          ConcurrentMap<PendingRequest<?>, RequestContext> executingRequests;
+        //        - RequestContext is a DTO that holds streamId, ctx, msg (maybe) and perhaps some more state as needed
+        //        - this class implements PendingRequestListener:
+        //          - when request{Completed,Failed} is invoked, perform executingRequests.remove(req) to get
+        //            the corresponding RequestContext
+        //          - use that to call respond() with a formatted response (for now)
     }
 
     @VisibleForTesting

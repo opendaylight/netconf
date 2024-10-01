@@ -7,12 +7,15 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.handler.codec.http.FullHttpResponse;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-// FIXME: NETCONF-1379: eliminate this class
+/**
+ * An entity listening to {@link PendingRequest}s completions.
+ */
 @NonNullByDefault
-abstract class RestconfRequest {
+interface PendingRequestListener {
 
-    abstract void onSuccess(FullHttpResponse response);
+    void requestComplete(PendingRequest<?> request, Response reply);
+
+    void requestFailed(PendingRequest<?> request, Exception cause);
 }

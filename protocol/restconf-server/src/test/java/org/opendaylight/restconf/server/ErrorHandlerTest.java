@@ -7,18 +7,14 @@
  */
 package org.opendaylight.restconf.server;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.OPERATIONS;
 import static org.opendaylight.restconf.server.PathParameters.YANG_LIBRARY_VERSION;
-import static org.opendaylight.restconf.server.ResponseUtils.ENCODING_RESPONSE_ERROR;
-import static org.opendaylight.restconf.server.ResponseUtils.UNMAPPED_REQUEST_ERROR;
-import static org.opendaylight.restconf.server.ResponseUtils.UNSUPPORTED_MEDIA_TYPE_ERROR;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
-import static org.opendaylight.restconf.server.TestUtils.assertErrorContent;
-import static org.opendaylight.restconf.server.TestUtils.assertErrorResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
@@ -30,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -37,7 +34,6 @@ import org.mockito.Mock;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 class ErrorHandlerTest extends AbstractRequestProcessorTest {
     private static final String OPERATIONS_PATH = BASE_PATH + OPERATIONS;
@@ -64,14 +60,14 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
 
     @ParameterizedTest
     @MethodSource
-    void unmappedRequest(final TestEncoding encoding, final HttpMethod method, final String uri) {
+    void methodNotAllowed(final TestEncoding encoding, final HttpMethod method, final String uri) {
         final var response = dispatch(buildRequest(method, uri, encoding, CONTENT));
-        assertErrorResponse(response, encoding, ErrorTag.DATA_MISSING, UNMAPPED_REQUEST_ERROR);
+        assertEquals(HttpResponseStatus.METHOD_NOT_ALLOWED, response.status());
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }
 
-    private static Stream<Arguments> unmappedRequest() {
+    private static Stream<Arguments> methodNotAllowed() {
         return Stream.of(
-            // no processor matching api resource
             // valid URI, unsupported HTTP method (1 per URI used)
             Arguments.of(TestEncoding.XML, HttpMethod.PUT, OPERATIONS_PATH),
             Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + YANG_LIBRARY_VERSION),
@@ -85,19 +81,37 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
         final var request = buildRequest(method, uri, encoding, CONTENT);
         request.headers().remove(HttpHeaderNames.CONTENT_TYPE);
         final var response = dispatch(request);
-        final var content = response.content().toString(StandardCharsets.UTF_8);
         assertResponse(response, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
-        assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, encoding.responseType));
-        assertErrorContent(content, encoding, ErrorTag.INVALID_VALUE, UNSUPPORTED_MEDIA_TYPE_ERROR);
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ACCEPT, """
+            application/yang-data+json, \
+            application/yang-data+xml, \
+            application/json, \
+            application/xml, \
+            text/xml"""));
     }
 
     private static Stream<Arguments> unsupportedMediaType() {
         return Stream.of(
             Arguments.of(TestEncoding.XML, HttpMethod.POST, DATA_PATH),
             Arguments.of(TestEncoding.JSON, HttpMethod.PUT, DATA_PATH),
-            Arguments.of(TestEncoding.XML, HttpMethod.PATCH, DATA_PATH),
             Arguments.of(TestEncoding.JSON, HttpMethod.POST, OPERATIONS_WITH_ID_PATH)
         );
+    }
+
+    @Test
+    void unsupportedMediaTypePatch() {
+        final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, TestEncoding.XML, CONTENT);
+        request.headers().remove(HttpHeaderNames.CONTENT_TYPE);
+        final var response = dispatch(request);
+        assertResponse(response, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ACCEPT, """
+            application/yang-data+json, \
+            application/yang-data+xml, \
+            application/yang-patch+json, \
+            application/yang-patch+xml, \
+            application/json, \
+            application/xml, \
+            text/xml"""));
     }
 
     @ParameterizedTest
@@ -107,7 +121,8 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
         doThrow(new IllegalStateException(errorMessage)).when(server).dataGET(any());
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
         final var response = dispatch(request);
-        assertErrorResponse(response, encoding, ErrorTag.OPERATION_FAILED, errorMessage);
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
+        assertEquals("runtime-error", response.content().toString(StandardCharsets.UTF_8));
     }
 
     @ParameterizedTest
@@ -115,7 +130,9 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
     void apiPathParseFailure(final TestEncoding encoding) {
         final var request = buildRequest(HttpMethod.GET, DATA_PATH + "/-invalid", encoding, null);
         final var response = dispatch(request);
-        assertErrorResponse(response, encoding, ErrorTag.BAD_ELEMENT, "API Path");
+        assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
+        assertEquals("Bad request path '-invalid': 'Expecting [a-zA-Z_], not '-''",
+            response.content().toString(StandardCharsets.UTF_8));
     }
 
     @ParameterizedTest
@@ -134,6 +151,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
 
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
         final var response = dispatch(request);
-        assertErrorResponse(response, encoding, ErrorTag.OPERATION_FAILED, ENCODING_RESPONSE_ERROR + errorMessage);
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
+        assertEquals("encoding-error", response.content().toString(StandardCharsets.UTF_8));
     }
 }
