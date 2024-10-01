@@ -7,15 +7,13 @@
  */
 package org.opendaylight.restconf.server;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.OPERATIONS;
 import static org.opendaylight.restconf.server.PathParameters.YANG_LIBRARY_VERSION;
-import static org.opendaylight.restconf.server.ResponseUtils.ENCODING_RESPONSE_ERROR;
-import static org.opendaylight.restconf.server.ResponseUtils.UNMAPPED_REQUEST_ERROR;
-import static org.opendaylight.restconf.server.ResponseUtils.UNSUPPORTED_MEDIA_TYPE_ERROR;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
 import static org.opendaylight.restconf.server.TestUtils.assertErrorContent;
 import static org.opendaylight.restconf.server.TestUtils.assertErrorResponse;
@@ -64,14 +62,14 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
 
     @ParameterizedTest
     @MethodSource
-    void unmappedRequest(final TestEncoding encoding, final HttpMethod method, final String uri) {
+    void methodNotAllowed(final TestEncoding encoding, final HttpMethod method, final String uri) {
         final var response = dispatch(buildRequest(method, uri, encoding, CONTENT));
-        assertErrorResponse(response, encoding, ErrorTag.DATA_MISSING, UNMAPPED_REQUEST_ERROR);
+        assertEquals(HttpResponseStatus.METHOD_NOT_ALLOWED, response.status());
+        assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }
 
-    private static Stream<Arguments> unmappedRequest() {
+    private static Stream<Arguments> methodNotAllowed() {
         return Stream.of(
-            // no processor matching api resource
             // valid URI, unsupported HTTP method (1 per URI used)
             Arguments.of(TestEncoding.XML, HttpMethod.PUT, OPERATIONS_PATH),
             Arguments.of(TestEncoding.XML, HttpMethod.POST, BASE_PATH + YANG_LIBRARY_VERSION),
@@ -88,7 +86,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
         final var content = response.content().toString(StandardCharsets.UTF_8);
         assertResponse(response, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, encoding.responseType));
-        assertErrorContent(content, encoding, ErrorTag.INVALID_VALUE, UNSUPPORTED_MEDIA_TYPE_ERROR);
+        assertErrorContent(content, encoding, ErrorTag.INVALID_VALUE, "Request media type is not supported.");
     }
 
     private static Stream<Arguments> unsupportedMediaType() {
@@ -134,6 +132,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
 
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
         final var response = dispatch(request);
-        assertErrorResponse(response, encoding, ErrorTag.OPERATION_FAILED, ENCODING_RESPONSE_ERROR + errorMessage);
+        assertErrorResponse(response, encoding, ErrorTag.OPERATION_FAILED,
+            "Exception encoding response content. " + errorMessage);
     }
 }

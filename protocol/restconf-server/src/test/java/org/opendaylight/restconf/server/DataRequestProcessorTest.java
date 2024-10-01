@@ -113,8 +113,13 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         assertResponseHeaders(response, Map.of(
             HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS, PATCH, POST, PUT",
             HttpHeaderNames.ACCEPT_PATCH, """
-                application/json, application/xml, application/yang-data+json, application/yang-data+xml, \
-                application/yang-patch+json, application/yang-patch+xml, text/xml"""));
+                application/yang-data+json, \
+                application/yang-data+xml, \
+                application/yang-patch+json, \
+                application/yang-patch+xml, \
+                application/json, \
+                application/xml, \
+                text/xml"""));
     }
 
     @Test
@@ -147,8 +152,13 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         assertResponseHeaders(response, Map.of(
             HttpHeaderNames.ALLOW, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
             HttpHeaderNames.ACCEPT_PATCH, """
-                application/json, application/xml, application/yang-data+json, application/yang-data+xml, \
-                application/yang-patch+json, application/yang-patch+xml, text/xml"""));
+                application/yang-data+json, \
+                application/yang-data+xml, \
+                application/yang-patch+json, \
+                application/yang-patch+xml, \
+                application/json, \
+                application/xml, \
+                text/xml"""));
     }
 
     @Test

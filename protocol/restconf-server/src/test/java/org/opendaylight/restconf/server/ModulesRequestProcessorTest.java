@@ -7,17 +7,16 @@
  */
 package org.opendaylight.restconf.server;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.opendaylight.restconf.server.AbstractPendingModulesGet.SOURCE_READ_FAILURE_ERROR;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.YANG_LIBRARY_VERSION;
-import static org.opendaylight.restconf.server.RestconfRequestDispatcher.MISSING_FILENAME_ERROR;
-import static org.opendaylight.restconf.server.RestconfRequestDispatcher.REVISION;
-import static org.opendaylight.restconf.server.RestconfRequestDispatcher.SOURCE_READ_FAILURE_ERROR;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
 import static org.opendaylight.restconf.server.TestUtils.assertErrorResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertOptionsResponse;
@@ -33,6 +32,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -50,7 +50,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     private static final String MODULE_URI = MODULES_PATH + MODULE_FILENAME;
     private static final String MODULE_URI_WITH_MOUNT = MODULES_PATH + MOUNT_PATH + "/" + MODULE_FILENAME;
     private static final String REVISION_VALUE = "revision-value";
-    private static final String REVISION_PARAM = "?" + REVISION + "=" + REVISION_VALUE;
+    private static final String REVISION_PARAM = "?revision=" + REVISION_VALUE;
     private static final String YANG_CONTENT = "yang-content";
     private static final String YIN_CONTENT = "yin-content";
 
@@ -127,7 +127,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     void noFilenameError(final TestEncoding encoding, final TestEncoding errorEncoding) {
         final var request = buildRequest(HttpMethod.GET, MODULES_PATH, encoding, null);
         final var response = dispatch(request);
-        assertErrorResponse(response, errorEncoding, ErrorTag.MISSING_ELEMENT, MISSING_FILENAME_ERROR);
+        assertEquals(HttpResponseStatus.NOT_FOUND, response.status());
     }
 
     @ParameterizedTest
@@ -135,7 +135,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     void sourceReadFailure(final TestEncoding encoding, final TestEncoding errorEncoding) throws IOException {
         final var errorMessage = "source-read-failure";
         doReturn(byteSource).when(source).asByteSource(any());
-        doThrow(new IOException(errorMessage)).when(byteSource).read();
+        doThrow(new IOException(errorMessage)).when(byteSource).copyTo(any(OutputStream.class));
 
         final var result = new ModulesGetResult(source);
         if (encoding.isYin()) {
