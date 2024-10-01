@@ -8,52 +8,57 @@
 package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.server.ResponseUtils.responseBuilder;
 
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import java.security.Principal;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
 
-@NonNullByDefault
-abstract class NettyServerRequest<T> extends MappingServerRequest<T> {
-    final RequestParameters requestParams;
+/**
+ * Abstract base class for {@link ServerRequest}s originating in this package.
+ */
+final class NettyServerRequest<T> extends MappingServerRequest<T> {
+    private final @NonNull RequestCompleter completer;
+    private final @NonNull PendingRequest<T> request;
+    private final Principal principal;
 
-    private final RestconfRequest callback;
+    private NettyServerRequest(final EndpointInvariants invariants, final PendingRequest<T> request,
+            final RequestCompleter completer, final Principal principal) {
+        super(QueryParameters.ofMultiValue(new QueryStringDecoder(request.targetUri).parameters()),
+            invariants.defaultPrettyPrint(), invariants.errorTagMapping());
+        this.request = requireNonNull(request);
+        this.completer = requireNonNull(completer);
+        this.principal = principal;
+    }
 
-    NettyServerRequest(final RequestParameters requestParams, final RestconfRequest callback) {
-        super(requestParams.queryParameters(), requestParams.defaultPrettyPrint(), requestParams.errorTagMapping());
-        this.requestParams = requireNonNull(requestParams);
-        this.callback = requireNonNull(callback);
+    NettyServerRequest(final PendingRequest<@NonNull T> request, final RequestCompleter completer,
+            final Principal principal) {
+        this(request.invariants, request, completer, principal);
     }
 
     @Override
-    public final @Nullable Principal principal() {
-        return requestParams.principal();
+    public Principal principal() {
+        return principal;
     }
 
     @Override
-    protected final void onSuccess(final T result) {
-        callback.onSuccess(transform(result));
-    }
-
-    @Override
-    protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
-        callback.onSuccess(responseBuilder(requestParams, HttpResponseStatus.valueOf(status.code()))
-            .setBody(body)
-            .build());
-    }
-
-    @Override
-    public final @Nullable TransportSession session() {
+    public TransportSession session() {
         // FIXME: NETCONF-714: return the correct NettyTransportSession, RestconfSession in our case
         return null;
     }
 
-    abstract FullHttpResponse transform(T result);
+    @Override
+    protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
+        request.onFailure(completer, this, status, body);
+    }
+
+    @Override
+    protected void onSuccess(final T result) {
+        request.onSuccess(completer, this, result);
+    }
 }
