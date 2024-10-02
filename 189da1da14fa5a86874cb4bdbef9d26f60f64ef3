@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b62cdfd_8ab006a2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-02T06:35:05Z",
+      "side": 1,
+      "message": "requireNonNull",
+      "revId": "189da1da14fa5a86874cb4bdbef9d26f60f64ef3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
