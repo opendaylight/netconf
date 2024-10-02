@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a028485_32fbdae9",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/OperationsE2ETest.java",
+        "patchSetId": 47
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-02T08:10:06Z",
+      "side": 1,
+      "message": "This RPC is on controller by default",
+      "revId": "1e5650562c3a6573f4007c4c319b2802292df5d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
