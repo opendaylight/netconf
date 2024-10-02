@@ -113,7 +113,7 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
      *
      * @return the effective {@link PrettyPrintParam}
      */
-    protected final @NonNull PrettyPrintParam prettyPrint() {
+    public final @NonNull PrettyPrintParam prettyPrint() {
         return prettyPrint;
     }
 
