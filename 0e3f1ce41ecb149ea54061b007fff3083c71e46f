@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d710ecb1_eee88c4b",
+        "filename": "apps/restconf-it/src/main/yang/device-sim@2024-09-17.yang",
+        "patchSetId": 46
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45614f61_1ae473ec",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d2d453f_e177255d",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-09-30T14:39:43Z",
       "side": 1,
       "message": "new line",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a67a1ae_b03ee4e5",
+        "filename": "apps/restconf-it/src/main/yang/example-action@2024-09-19.yang",
+        "patchSetId": 46
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d2d453f_e177255d",
       "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afb6e18d_b2c0763f",
+        "filename": "apps/restconf-it/src/main/yang/example-jukebox@2015-04-04.yang",
+        "patchSetId": 46
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ff2ab49_4f7537da",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "024c06f3_50451e71",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-09-30T14:39:43Z",
       "side": 1,
       "message": "Is there reason for this to be protected?\nIt should be ok to keep everything package private and not protected.",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe818088_3b2c031f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "these constants are for usage by descendants.\nthere is no artifact needing these within the package,\nso there is no reason to expose to the package.",
+      "parentUuid": "024c06f3_50451e71",
       "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "354fbe42_57fbe28f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "1d237a59_b7b2459b",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6665899_557245c5",
@@ -116,6 +206,24 @@
       "writtenOn": "2024-09-30T14:39:43Z",
       "side": 1,
       "message": "wrong indent",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abfb1ae7_59fcf795",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6665899_557245c5",
       "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3f36101_13a2d6a6",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "145136bc_dbb1c361",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9c66857_45be59ac",
@@ -150,6 +276,24 @@
       "writtenOn": "2024-09-30T14:39:43Z",
       "side": 1,
       "message": "final",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "392c9e9c_e426a247",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9c66857_45be59ac",
       "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -171,6 +315,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49be3464_62a48948",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4edc9d8_4c9a9a4b",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4767d786_581d37e3",
@@ -184,6 +346,24 @@
       "writtenOn": "2024-09-30T14:39:43Z",
       "side": 1,
       "message": "final",
+      "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "769be36a_4fdbdb93",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4767d786_581d37e3",
       "revId": "0e3f1ce41ecb149ea54061b007fff3083c71e46f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

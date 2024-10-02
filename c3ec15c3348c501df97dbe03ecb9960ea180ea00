@@ -129,6 +129,30 @@
       },
       "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb42d44e_5ef4b205",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/DataE2ETest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-10-02T06:12:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45168f03_e1d5d951",
+      "range": {
+        "startLine": 26,
+        "startChar": 65,
+        "endLine": 26,
+        "endChar": 71
+      },
+      "revId": "c3ec15c3348c501df97dbe03ecb9960ea180ea00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
