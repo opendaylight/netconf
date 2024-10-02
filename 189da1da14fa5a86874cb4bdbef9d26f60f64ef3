@@ -16,6 +16,24 @@
       "message": "requireNonNull",
       "revId": "189da1da14fa5a86874cb4bdbef9d26f60f64ef3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e6db9cb_c9b60dea",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-02T06:42:50Z",
+      "side": 1,
+      "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/113789",
+      "parentUuid": "9b62cdfd_8ab006a2",
+      "revId": "189da1da14fa5a86874cb4bdbef9d26f60f64ef3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
