@@ -17,7 +17,6 @@ import io.netty.handler.codec.DateFormatter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import java.io.IOException;
@@ -116,7 +115,7 @@ final class ResponseUtils {
         }
 
         ResponseBuilder setBody(final byte[] bytes) {
-            if (!HttpMethod.HEAD.equals(params.method())) {
+            if (params.method() != ImplementedMethod.HEAD) {
                 // don't write content if head only requested
                 response.content().writeBytes(bytes);
             }
@@ -138,7 +137,7 @@ final class ResponseUtils {
             final FormattableBody body) {
         final var contentType = responseTypeFromAccept(params);
         try (var out = new CountingOutputStream(
-            HttpMethod.HEAD.equals(params.method())
+            params.method() == ImplementedMethod.HEAD
                 // don't write content if head only requested
                 ? OutputStream.nullOutputStream()
                 : new ByteBufOutputStream(response.content()))) {

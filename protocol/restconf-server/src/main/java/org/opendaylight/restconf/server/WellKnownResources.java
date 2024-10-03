@@ -17,7 +17,6 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -62,7 +61,7 @@ final class WellKnownResources {
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT, format.formatted(args)).asReadOnly());
     }
 
-    FullHttpResponse request(final HttpVersion version, final HttpMethod method, final SegmentPeeler peeler) {
+    FullHttpResponse request(final HttpVersion version, final ImplementedMethod method, final SegmentPeeler peeler) {
         final var suffix = QueryStringDecoder.decodeComponent(peeler.remaining());
         return switch (suffix) {
             case "/host-meta" -> requestXRD(version, method);
@@ -75,27 +74,27 @@ final class WellKnownResources {
     }
 
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.1
-    private FullHttpResponse requestXRD(final HttpVersion version, final HttpMethod method) {
+    private FullHttpResponse requestXRD(final HttpVersion version, final ImplementedMethod method) {
         // FIXME: https://www.rfc-editor.org/rfc/rfc6415#appendix-A paragraph 2 says:
         //
         //           The client MAY request a JRD representation using the HTTP "Accept"
         //           request header field with a value of "application/json"
         //
         //        so we should be checking Accept and redirect to requestJRD()
-        return switch (method.name()) {
-            case "GET" -> getResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
-            case "HEAD" -> headResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
-            case "OPTIONS" -> optionsResponse(version);
+        return switch (method) {
+            case GET -> getResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
+            case HEAD -> headResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
+            case OPTIONS -> optionsResponse(version);
             default -> methodNotAllowed(version);
         };
     }
 
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.2
-    private FullHttpResponse requestJRD(final HttpVersion version, final HttpMethod method) {
-        return switch (method.name()) {
-            case "GET" -> getResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
-            case "HEAD" -> headResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
-            case "OPTIONS" -> optionsResponse(version);
+    private FullHttpResponse requestJRD(final HttpVersion version, final ImplementedMethod method) {
+        return switch (method) {
+            case GET -> getResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
+            case HEAD -> headResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
+            case OPTIONS -> optionsResponse(version);
             default -> methodNotAllowed(version);
         };
     }

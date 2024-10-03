@@ -12,7 +12,6 @@ import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
@@ -32,14 +31,15 @@ class WellKnownResourcesTest {
     @ParameterizedTest
     @ValueSource(strings = { XRD_SUFFIX, JRD_SUFFIX })
     void options(final String uri) {
-        assertOptionsResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, new SegmentPeeler(uri)),
+        assertOptionsResponse(
+            RESOURCES.request(HttpVersion.HTTP_1_1, ImplementedMethod.OPTIONS, new SegmentPeeler(uri)),
             "GET, HEAD, OPTIONS");
     }
 
     @ParameterizedTest
     @MethodSource
     void getHostMeta(final String uri, final AsciiString contentType, final String content) {
-        assertResponse(RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.GET, new SegmentPeeler(uri)),
+        assertResponse(RESOURCES.request(HttpVersion.HTTP_1_1, ImplementedMethod.GET, new SegmentPeeler(uri)),
             HttpResponseStatus.OK, contentType, content);
     }
 
@@ -62,7 +62,8 @@ class WellKnownResourcesTest {
 
     @Test
     void putHostMeta() {
-        final var response = RESOURCES.request(HttpVersion.HTTP_1_1, HttpMethod.POST, new SegmentPeeler(JRD_SUFFIX));
+        final var response = RESOURCES.request(HttpVersion.HTTP_1_1, ImplementedMethod.POST,
+            new SegmentPeeler(JRD_SUFFIX));
         assertResponse(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }
