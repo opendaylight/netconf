@@ -24,7 +24,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
@@ -36,6 +35,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
@@ -113,9 +113,9 @@ final class RestconfRequestDispatcher {
     }
 
     @SuppressWarnings("IllegalCatch")
-    void dispatch(final URI targetUri, final SegmentPeeler peeler, final FullHttpRequest request,
-            final RestconfRequest callback) {
-        LOG.debug("Dispatching {} {}", request.method(), targetUri);
+    void dispatch(final @NonNull ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
+            final FullHttpRequest request, final RestconfRequest callback) {
+        LOG.debug("Dispatching {} {}", method, targetUri);
 
         // FIXME: this is here just because of test structure
         final var principal = principalService.acquirePrincipal(request);
@@ -140,7 +140,7 @@ final class RestconfRequestDispatcher {
         final var rawPath = peeler.remaining();
         final var rawQuery = targetUri.getRawQuery();
         final var decoder = new QueryStringDecoder(rawQuery != null ? rawPath + "?" + rawQuery : rawPath);
-        final var params = new RequestParameters(targetUri.resolve(restconfPath), decoder, request, principal,
+        final var params = new RequestParameters(method, targetUri.resolve(restconfPath), decoder, request, principal,
             errorTagMapping, defaultEncoding, defaultPrettyPrint);
 
         try {
@@ -149,11 +149,11 @@ final class RestconfRequestDispatcher {
                 case "operations" -> processOperationsRequest(params, callback);
                 case "yang-library-version" -> processYangLibraryVersion(params, callback);
                 case "modules" -> processModules(params, callback);
-                default -> callback.onSuccess(HttpMethod.OPTIONS.equals(params.method())
-                    ? optionsResponse(params, HttpMethod.OPTIONS.name()) : notFound(request));
+                default -> callback.onSuccess(method == ImplementedMethod.OPTIONS
+                    ? optionsResponse(params, ImplementedMethod.OPTIONS.toString()) : notFound(request));
             }
         } catch (RuntimeException e) {
-            LOG.error("Error processing request {} {}", request.method(), request.uri(), e);
+            LOG.error("Error processing request {} {}", method, request.uri(), e);
             final var errorTag = e instanceof ServerErrorException see ? see.errorTag() : ErrorTag.OPERATION_FAILED;
             callback.onSuccess(simpleErrorResponse(params, errorTag, e.getMessage()));
         }
@@ -171,9 +171,9 @@ final class RestconfRequestDispatcher {
     private void processDataRequest(final RequestParameters params, final RestconfRequest callback) {
         final var contentType = params.contentType();
         final var apiPath = extractApiPath(params);
-        switch (params.method().name()) {
+        switch (params.method()) {
             // resource options -> https://www.rfc-editor.org/rfc/rfc8040#section-4.1
-            case "OPTIONS" -> {
+            case OPTIONS -> {
                 final var request = new OptionsServerRequest(params, callback);
                 if (apiPath.isEmpty()) {
                     server.dataOPTIONS(request);
@@ -183,8 +183,8 @@ final class RestconfRequestDispatcher {
             }
             // retrieve data and metadata for a resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.3
             // HEAD is same as GET but without content -> https://www.rfc-editor.org/rfc/rfc8040#section-4.2
-            case "HEAD", "GET" -> getData(params, callback, apiPath);
-            case "POST" -> {
+            case HEAD, GET -> getData(params, callback, apiPath);
+            case POST -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
                     // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
@@ -193,7 +193,7 @@ final class RestconfRequestDispatcher {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
             }
-            case "PUT" -> {
+            case PUT -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // create or replace target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.5
                     putData(params, callback, apiPath);
@@ -201,7 +201,7 @@ final class RestconfRequestDispatcher {
                     callback.onSuccess(unsupportedMediaTypeErrorResponse(params));
                 }
             }
-            case "PATCH" -> {
+            case PATCH -> {
                 if (RESTCONF_TYPES.contains(contentType)) {
                     // Plain RESTCONF patch = merge target resource content ->
                     // https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1
@@ -215,7 +215,7 @@ final class RestconfRequestDispatcher {
                 }
             }
             // delete target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.7
-            case "DELETE" -> deleteData(params, callback, apiPath);
+            case DELETE -> deleteData(params, callback, apiPath);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
@@ -357,8 +357,8 @@ final class RestconfRequestDispatcher {
      */
     private void processOperationsRequest(final RequestParameters params, final RestconfRequest callback) {
         final var apiPath = extractApiPath(params);
-        switch (params.method().name()) {
-            case "OPTIONS" -> {
+        switch (params.method()) {
+            case OPTIONS -> {
                 if (apiPath.isEmpty()) {
                     callback.onSuccess(OptionsServerRequest.withoutPatch(params.protocolVersion(),
                         "GET, HEAD, OPTIONS"));
@@ -366,8 +366,8 @@ final class RestconfRequestDispatcher {
                     server.operationsOPTIONS(new OptionsServerRequest(params, callback), apiPath);
                 }
             }
-            case "HEAD", "GET" -> getOperations(params, callback, apiPath);
-            case "POST" -> {
+            case HEAD, GET -> getOperations(params, callback, apiPath);
+            case POST -> {
                 if (NettyMediaTypes.RESTCONF_TYPES.contains(params.contentType())) {
                     // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2
                     postOperations(params, callback, apiPath);
@@ -406,9 +406,9 @@ final class RestconfRequestDispatcher {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">{+restconf}/yang-library-version</a> resource.
      */
     private void processYangLibraryVersion(final RequestParameters params, final RestconfRequest callback) {
-        switch (params.method().name()) {
-            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
-            case "HEAD", "GET" -> server.yangLibraryVersionGET(new FormattableServerRequest(params, callback));
+        switch (params.method()) {
+            case OPTIONS -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
+            case HEAD, GET -> server.yangLibraryVersionGET(new FormattableServerRequest(params, callback));
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
@@ -417,9 +417,9 @@ final class RestconfRequestDispatcher {
      * Access to YANG modules.
      */
     private void processModules(final RequestParameters params, final RestconfRequest callback) {
-        switch (params.method().name()) {
-            case "OPTIONS" -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
-            case "HEAD", "GET" -> getModule(params, callback);
+        switch (params.method()) {
+            case OPTIONS -> callback.onSuccess(optionsResponse(params, "GET, HEAD, OPTIONS"));
+            case HEAD, GET -> getModule(params, callback);
             default -> callback.onSuccess(unmappedRequestErrorResponse(params));
         }
     }
