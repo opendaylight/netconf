@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpRequest;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -15,5 +15,5 @@ import org.opendaylight.netconf.transport.http.AuthHandlerFactory;
 
 public interface PrincipalService extends AuthHandlerFactory {
 
-    @Nullable Principal acquirePrincipal(@NonNull FullHttpRequest request);
+    @Nullable Principal acquirePrincipal(@NonNull HttpRequest request);
 }

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpRequest;
 import java.security.Principal;
 import java.util.Map;
@@ -57,7 +56,7 @@ public final class AAAShiroPrincipalService implements PrincipalService {
     }
 
     @Override
-    public @Nullable Principal acquirePrincipal(final FullHttpRequest request) {
+    public @Nullable Principal acquirePrincipal(final HttpRequest request) {
         final var uuidStr = request.headers().get(PRINCIPAL_UUID_HEADER);
         UUID uuid = null;
         try {
