@@ -14,7 +14,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.PathParameters.OPERATIONS;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
-import static org.opendaylight.restconf.server.TestUtils.assertInputContent;
 import static org.opendaylight.restconf.server.TestUtils.assertOptionsResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
@@ -46,9 +45,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     private static final URI RESTCONF_URI = URI.create(BASE_URI.toString().concat("/"));
 
     @Captor
-    ArgumentCaptor<ApiPath> apiPathCaptor;
-    @Captor
-    ArgumentCaptor<OperationInputBody> inputCaptor;
+    private ArgumentCaptor<ApiPath> apiPathCaptor;
 
     @Test
     void optionsRoot() {
@@ -94,16 +91,16 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource
     void postOperations(final TestEncoding encoding, final String input, final String output) throws Exception {
         final var result = new InvokeResult(output == null ? null : formattableBody(encoding, output));
-        doAnswer(answerCompleteWith(result)).when(server)
-            .operationsPOST(any(), any(), any(ApiPath.class), any(OperationInputBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class, 3, result);
+        doAnswer(answer).when(server).operationsPOST(any(), any(), any(ApiPath.class), any(OperationInputBody.class));
 
         final var request = buildRequest(HttpMethod.POST, OPERATIONS_PATH_WITH_ID, encoding, input);
         final var response = dispatch(request);
-        verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
+        verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), any());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
-        final var expectedClass = encoding.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class;
-        assertInputContent(inputCaptor.getValue(), expectedClass, input);
+        answer.assertContent(input);
 
         if (output == null) {
             assertResponse(response, HttpResponseStatus.NO_CONTENT);
@@ -124,20 +121,20 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @Test
     void postOperationsNoContent() throws Exception {
         final var result = new InvokeResult(null);
-        doAnswer(answerCompleteWith(result)).when(server)
+        final var answer = new FuglyRestconfServerAnswer(
+            DEFAULT_ENCODING.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class, 3, result);
+        doAnswer(answer).when(server)
             .operationsPOST(any(), any(), any(ApiPath.class), any(OperationInputBody.class));
 
         // post request with no content and no content-type header
         // can be used to invoke rpc with no input defined
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, OPERATIONS_PATH_WITH_ID);
         final var response = dispatch(request);
-        verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), inputCaptor.capture());
+        verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), any());
         assertEquals(API_PATH, apiPathCaptor.getValue());
 
         // empty body expected to be passed using a wrapper object of server default encoding
-        final var expectedClass =
-            DEFAULT_ENCODING.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class;
-        assertInputContent(inputCaptor.getValue(), expectedClass, "");
+        answer.assertContent("");
         assertResponse(response, HttpResponseStatus.NO_CONTENT);
     }
 }

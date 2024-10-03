@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.restconf.server.NettyMediaTypes.APPLICATION_JSON;
@@ -33,16 +32,13 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.mockito.stubbing.Answer;
-import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -52,18 +48,8 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 
 final class TestUtils {
     private static final byte[] INVALID_CONTENT = "invalid-content".getBytes(StandardCharsets.UTF_8);
-    private static final Method INPUT_STREAM_METHOD;
 
     static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
-
-    static {
-        try {
-            INPUT_STREAM_METHOD = ConsumableBody.class.getDeclaredMethod("consume");
-            INPUT_STREAM_METHOD.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
 
     private TestUtils() {
         // hidden on purpose
@@ -118,15 +104,6 @@ final class TestUtils {
                 return new StringReader(content);
             }
         };
-    }
-
-    static <T extends ConsumableBody, S extends T> void assertInputContent(final T inputObj,
-            final Class<S> expectedClass, final String expectedContent) throws Exception {
-        final var consumable = assertInstanceOf(expectedClass, inputObj);
-        try (var input = (InputStream) INPUT_STREAM_METHOD.invoke(consumable)) {
-            final var content = new String(input.readAllBytes(), StandardCharsets.UTF_8);
-            assertEquals(expectedContent, content);
-        }
     }
 
     static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus) {

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.TestUtils.answerCompleteWith;
 import static org.opendaylight.restconf.server.TestUtils.assertContentSimplified;
-import static org.opendaylight.restconf.server.TestUtils.assertInputContent;
 import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
@@ -84,15 +83,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     );
 
     @Captor
-    ArgumentCaptor<ApiPath> apiPathCaptor;
-    @Captor
-    ArgumentCaptor<ChildBody> childBodyCaptor;
-    @Captor
-    ArgumentCaptor<DataPostBody> dataPostBodyCaptor;
-    @Captor
-    ArgumentCaptor<ResourceBody> resourceBodyCaptor;
-    @Captor
-    ArgumentCaptor<PatchBody> patchBodyCaptor;
+    private ArgumentCaptor<ApiPath> apiPathCaptor;
 
     private static Stream<Arguments> encodingsWithCreatedFlag() {
         return Stream.of(
@@ -194,14 +185,14 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataRoot(final TestEncoding encoding, final String content) throws Exception {
         final var result = new CreateResourceResult(NEW_API_PATH, ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(server).dataPOST(any(), any(ChildBody.class));
+        final var answer = new FuglyRestconfServerAnswer(encoding.isJson() ? JsonChildBody.class : XmlChildBody.class,
+            1, result);
+        doAnswer(answer).when(server).dataPOST(any(), any(ChildBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPOST(any(), childBodyCaptor.capture());
 
-        final var expectedClass = encoding.isJson() ? JsonChildBody.class : XmlChildBody.class;
-        assertInputContent(childBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
 
         assertResponse(response, HttpResponseStatus.CREATED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.LOCATION, PATH_CREATED));
@@ -212,16 +203,16 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataWithId(final TestEncoding encoding, final String content) throws Exception {
         final var result = new CreateResourceResult(NEW_API_PATH, null, null);
-        doAnswer(answerCompleteWith(result)).when(server)
-            .dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonDataPostBody.class : XmlDataPostBody.class, 2, result);
+        doAnswer(answer).when(server).dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPOST(any(), apiPathCaptor.capture(), dataPostBodyCaptor.capture());
+        verify(server).dataPOST(any(), apiPathCaptor.capture(), any());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
-        final var expectedClass = encoding.isJson() ? JsonDataPostBody.class : XmlDataPostBody.class;
-        assertInputContent(dataPostBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
 
         assertResponse(response, HttpResponseStatus.CREATED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.LOCATION, PATH_CREATED));
@@ -231,14 +222,13 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataRootRpc(final TestEncoding encoding, final String content) throws Exception {
         final var invokeResult = new InvokeResult(formattableBody(encoding, content));
-        doAnswer(answerCompleteWith(invokeResult)).when(server).dataPOST(any(), any(ChildBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonChildBody.class : XmlChildBody.class, 1, invokeResult);
+        doAnswer(answer).when(server).dataPOST(any(), any(ChildBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPOST(any(), childBodyCaptor.capture());
-
-        final var expectedClass = encoding.isJson() ? JsonChildBody.class : XmlChildBody.class;
-        assertInputContent(childBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
 
         assertResponse(response, HttpResponseStatus.OK);
     }
@@ -247,16 +237,16 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void postDataWithIdRpc(final TestEncoding encoding, final String content) throws Exception {
         final var invokeResult = new InvokeResult(formattableBody(encoding, content));
-        doAnswer(answerCompleteWith(invokeResult)).when(server)
-            .dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonDataPostBody.class : XmlDataPostBody.class, 2, invokeResult);
+        doAnswer(answer).when(server).dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPOST(any(), apiPathCaptor.capture(), dataPostBodyCaptor.capture());
+        verify(server).dataPOST(any(), apiPathCaptor.capture(), any());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
-        final var expectedClass = encoding.isJson() ? JsonDataPostBody.class : XmlDataPostBody.class;
-        assertInputContent(dataPostBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
 
         assertResponse(response, HttpResponseStatus.OK);
     }
@@ -265,14 +255,14 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodingsWithCreatedFlag")
     void putDataRoot(final TestEncoding encoding, final String content, final boolean created) throws Exception {
         final var result = new DataPutResult(created, ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(server).dataPUT(any(), any(ResourceBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class, 1, result);
+        doAnswer(answer).when(server).dataPUT(any(), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PUT, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPUT(any(), resourceBodyCaptor.capture());
 
-        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
-        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
 
         assertResponse(response, created ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT);
         assertResponseHeaders(response, META_HEADERS);
@@ -282,16 +272,16 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodingsWithCreatedFlag")
     void putDataWithId(final TestEncoding encoding, final String content, final boolean created) throws Exception {
         final var result = new DataPutResult(created, null, null);
-        doAnswer(answerCompleteWith(result)).when(server)
-            .dataPUT(any(), any(ApiPath.class), any(ResourceBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class, 2, result);
+        doAnswer(answer).when(server).dataPUT(any(), any(ApiPath.class), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PUT, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPUT(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
+        verify(server).dataPUT(any(), apiPathCaptor.capture(), any());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
-        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
-        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
 
         assertResponse(response, created ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT);
     }
@@ -300,14 +290,13 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void patchDataRoot(final TestEncoding encoding, final String content) throws Exception {
         final var result = new DataPatchResult(null, null);
-        doAnswer(answerCompleteWith(result)).when(server).dataPATCH(any(), any(ResourceBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class, 1, result);
+        doAnswer(answer).when(server).dataPATCH(any(), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPATCH(any(), resourceBodyCaptor.capture());
-
-        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
-        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
         assertResponse(response, HttpResponseStatus.OK);
     }
 
@@ -315,16 +304,16 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("encodings")
     void patchDataWithId(final TestEncoding encoding, final String content) throws Exception {
         final var result = new DataPatchResult(ETAG, LAST_MODIFIED);
-        doAnswer(answerCompleteWith(result)).when(server)
-            .dataPATCH(any(), any(ApiPath.class), any(ResourceBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class, 2, result);
+        doAnswer(answer).when(server).dataPATCH(any(), any(ApiPath.class), any(ResourceBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH_WITH_ID, encoding, content);
         final var response = dispatch(request);
-        verify(server).dataPATCH(any(), apiPathCaptor.capture(), resourceBodyCaptor.capture());
+        verify(server).dataPATCH(any(), apiPathCaptor.capture(), any(ResourceBody.class));
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
-        final var expectedClass = encoding.isJson() ? JsonResourceBody.class : XmlResourceBody.class;
-        assertInputContent(resourceBodyCaptor.getValue(), expectedClass, content);
+        answer.assertContent(content);
         assertResponse(response, HttpResponseStatus.OK);
         assertResponseHeaders(response, META_HEADERS);
     }
@@ -334,14 +323,13 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     void yangPatch(final TestEncoding encoding, final String input, final PatchStatusContext output,
             final ErrorTag expectedErrorTag, final List<String> expectedContentMessage) throws Exception {
         final var result = new DataYangPatchResult(output);
-        doAnswer(answerCompleteWith(result)).when(server).dataPATCH(any(), any(PatchBody.class));
+        final var answer = new FuglyRestconfServerAnswer(
+            encoding.isJson() ? JsonPatchBody.class : XmlPatchBody.class, 1, result);
+        doAnswer(answer).when(server).dataPATCH(any(), any(PatchBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, input);
         final var response = dispatch(request);
-        verify(server).dataPATCH(any(), patchBodyCaptor.capture());
-
-        final var expectedClass = encoding.isJson() ? JsonPatchBody.class : XmlPatchBody.class;
-        assertInputContent(patchBodyCaptor.getValue(), expectedClass, input);
+        answer.assertContent(input);
 
         final var expectedStatus = expectedErrorTag == null ? HttpResponseStatus.OK
             : HttpResponseStatus.valueOf(TestUtils.ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code());
