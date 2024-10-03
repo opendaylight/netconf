@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e8ef70f_e927cb07",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-03T12:02:10Z",
+      "side": 1,
+      "message": "changed because we use the instance of `DOMDataTreeReadWriteTransaction#merge` and write data directly to the datastore without using `RestconfTransaction#merge`",
+      "parentUuid": "61de9129_43707b50",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee74f553_664f3db9",
@@ -52,6 +70,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "369e9ecf_03598462",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-03T12:02:10Z",
+      "side": 1,
+      "message": "Empty subtree will be preserved only in `NetconfREstconfTransaction`, and we need `ensureParentByMerge` because in the next patch, we will add checks for resources that can be merged",
+      "parentUuid": "a6155be1_b1e7b003",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3d637b4_350f863e",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-03T12:02:10Z",
+      "side": 1,
+      "message": "Originally we wanted to get rid of it, but due to changes of requirements (restriction for implicit lists and presence containers), in other way we will produce a lot of boilerplate code when check type of resource before using `emptySubtree logic`",
+      "parentUuid": "ee74f553_664f3db9",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6515b446_97b9f09a",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2ae1a7c_d10a81d5",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-03T12:02:10Z",
+      "side": 1,
+      "message": "we need ensureParentByMerge because in the next patch we will add checks for resources that can be merged",
+      "parentUuid": "6515b446_97b9f09a",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "926d2419_b237444e",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-10-03T10:44:50Z",
       "side": 1,
       "message": "This should work without mergeImpl",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac4e9300_139d2e29",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-03T12:02:10Z",
+      "side": 1,
+      "message": "yes probably we can save `ensureParentsByMerge`, and do not `merge` data before `put` it",
+      "parentUuid": "926d2419_b237444e",
       "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
