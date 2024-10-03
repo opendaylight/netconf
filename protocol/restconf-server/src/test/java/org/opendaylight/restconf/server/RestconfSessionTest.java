@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpVersion;
@@ -28,7 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class RestconfSessionTest {
     @Test
     void asteriskRequestOptions() {
-        final var response = RestconfSession.asteriskRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS);
+        final var response = RestconfSession.asteriskRequest(HttpVersion.HTTP_1_1, ImplementedMethod.OPTIONS);
         assertEquals(HttpResponseStatus.OK, response.status());
         assertEquals(Unpooled.EMPTY_BUFFER, response.content());
         assertEquals(
@@ -38,7 +37,7 @@ class RestconfSessionTest {
 
     @ParameterizedTest
     @MethodSource
-    void asteriskRequestImplemented(final HttpMethod method) {
+    void asteriskRequestImplemented(final ImplementedMethod method) {
         final var response = RestconfSession.asteriskRequest(HttpVersion.HTTP_1_1, method);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         assertEquals(Unpooled.EMPTY_BUFFER, response.content());
@@ -48,12 +47,12 @@ class RestconfSessionTest {
     private static List<Arguments> asteriskRequestImplemented() {
         // CONNECT and TRACE are excluded on purpose
         return List.of(
-            Arguments.of(HttpMethod.DELETE),
-            Arguments.of(HttpMethod.GET),
-            Arguments.of(HttpMethod.HEAD),
-            Arguments.of(HttpMethod.PATCH),
-            Arguments.of(HttpMethod.POST),
-            Arguments.of(HttpMethod.PUT));
+            Arguments.of(ImplementedMethod.DELETE),
+            Arguments.of(ImplementedMethod.GET),
+            Arguments.of(ImplementedMethod.HEAD),
+            Arguments.of(ImplementedMethod.PATCH),
+            Arguments.of(ImplementedMethod.POST),
+            Arguments.of(ImplementedMethod.PUT));
     }
 
     @ParameterizedTest

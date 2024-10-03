@@ -13,7 +13,6 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
@@ -32,6 +31,7 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
  */
 @NonNullByDefault
 final class RequestParameters {
+    private final ImplementedMethod method;
     private final URI restconfURI;
     private final String remainingRawPath;
     private final AsciiString contentType;
@@ -42,9 +42,10 @@ final class RequestParameters {
     private final @Nullable Principal principal;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    RequestParameters(final URI restconfURI, final QueryStringDecoder decoder, final FullHttpRequest request,
-            final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
+    RequestParameters(final ImplementedMethod method, final URI restconfURI, final QueryStringDecoder decoder,
+            final FullHttpRequest request, final @Nullable Principal principal, final ErrorTagMapping errorTagMapping,
             final MessageEncoding defaultEncoding, final PrettyPrintParam defaultPrettyPrint) {
+        this.method = requireNonNull(method);
         this.restconfURI = requireNonNull(restconfURI);
         this.request = requireNonNull(request);
         this.principal = principal;
@@ -62,8 +63,8 @@ final class RequestParameters {
      *
      * @return request method
      */
-    public HttpMethod method() {
-        return request.method();
+    public ImplementedMethod method() {
+        return method;
     }
 
     /**
