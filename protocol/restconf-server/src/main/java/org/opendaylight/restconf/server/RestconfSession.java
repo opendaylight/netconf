@@ -25,7 +25,10 @@ import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.slf4j.Logger;
@@ -40,10 +43,9 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     private static final Logger LOG = LoggerFactory.getLogger(RestconfSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
 
-    // Does NOT include CONNECT nor TRACE
-    private static final Set<HttpMethod> IMPLEMENTED_METHODS = Set.of(
-        HttpMethod.DELETE, HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.PATCH, HttpMethod.POST,
-        HttpMethod.PUT);
+    private static final Map<HttpMethod, ImplementedMethod> IMPLEMENTED_METHODS =
+        Arrays.stream(ImplementedMethod.values())
+            .collect(Collectors.toUnmodifiableMap(ImplementedMethod::httpMethod, Function.identity()));
 
     private final RestconfRequestDispatcher dispatcher;
     private final WellKnownResources wellKnown;
@@ -98,9 +100,10 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         // next up:
         // - check if we implement requested method
         // - we do NOT implement CONNECT method, which is the only valid use of URIs in authority-form
-        final var method = msg.method();
-        if (!IMPLEMENTED_METHODS.contains(method)) {
-            LOG.debug("Method {} not implemented", method);
+        final var nettyMethod = msg.method();
+        final var method = IMPLEMENTED_METHODS.get(nettyMethod);
+        if (method == null) {
+            LOG.debug("Method {} not implemented", nettyMethod);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED));
             return;
@@ -160,7 +163,7 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             msg.release();
             respond(ctx, streamId, wellKnown.request(version, method, peeler));
         } else if (segment.equals(dispatcher.firstSegment())) {
-            dispatcher.dispatch(targetUri, peeler, msg, new RestconfRequest() {
+            dispatcher.dispatch(method, targetUri, peeler, msg, new RestconfRequest() {
                 @Override
                 public void onSuccess(final FullHttpResponse response) {
                     msg.release();
@@ -175,8 +178,8 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     }
 
     @VisibleForTesting
-    static @NonNull FullHttpResponse asteriskRequest(final HttpVersion version, final HttpMethod method) {
-        if (HttpMethod.OPTIONS.equals(method)) {
+    static @NonNull FullHttpResponse asteriskRequest(final HttpVersion version, final ImplementedMethod method) {
+        if (method == ImplementedMethod.OPTIONS) {
             final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.OK);
             response.headers().set(HttpHeaderNames.ALLOW, "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
             return response;
