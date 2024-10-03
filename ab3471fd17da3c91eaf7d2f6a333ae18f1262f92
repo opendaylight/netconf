@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "61de9129_43707b50",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-03T10:44:50Z",
+      "side": 1,
+      "message": "IMO it \"should\" stay as it was, maybe",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee74f553_664f3db9",
         "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
         "patchSetId": 22
@@ -14,6 +31,57 @@
       "writtenOn": "2024-10-03T10:29:16Z",
       "side": 1,
       "message": "We wanted to get rid of ensureParentsByMerge?",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6155be1_b1e7b003",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-03T10:44:50Z",
+      "side": 1,
+      "message": "IMO preserve merging empty subtree, but ensureParentsByMerge seems to be not necessary at all",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6515b446_97b9f09a",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-03T10:44:50Z",
+      "side": 1,
+      "message": "Remove ensureParentsByMerge and bring back merging empty subtree",
+      "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "926d2419_b237444e",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-03T10:44:50Z",
+      "side": 1,
+      "message": "This should work without mergeImpl",
       "revId": "ab3471fd17da3c91eaf7d2f6a333ae18f1262f92",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
