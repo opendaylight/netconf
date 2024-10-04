@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040, section 3.3.3</a>.
  */
 @NonNullByDefault
-final class YLVResource extends AbstractResource {
+final class YLVResource extends AbstractLeafResource {
     YLVResource(final EndpointInvariants invariants) {
         super(invariants);
     }

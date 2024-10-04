@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.AsciiString;
 import java.net.URI;
 import java.security.Principal;
+import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * point in the past.
  */
 @NonNullByDefault
-abstract sealed class AbstractResource permits DataResource, OperationsResource, YLVResource, ModulesResource {
+abstract sealed class AbstractResource permits AbstractLeafResource, RestconfRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
 
     static final CompletedRequest METHOD_NOT_ALLOWED_READ_ONLY =
@@ -70,8 +71,19 @@ abstract sealed class AbstractResource permits DataResource, OperationsResource,
         this.invariants = requireNonNull(invariants);
     }
 
-    abstract PreparedRequest prepare(ImplementedMethod method, URI targetUri, HttpHeaders headers,
-        @Nullable Principal principal, String path);
+    /**
+     * Prepare to service a request, by binding the request HTTP method and the request path to a resource and
+     * validating request headers in that context. This method is required to not block.
+     *
+     * @param peeler the {@link SegmentPeeler} holding the unprocessed part of the request path
+     * @param method the method being invoked
+     * @param targetUri the URI of the target resource
+     * @param headers request headers
+     * @param principal the {@link Principal} making this request, {@code null} if not known
+     * @return A {@link PreparedStatement}
+     */
+    abstract PreparedRequest prepare(SegmentPeeler peeler, ImplementedMethod method, URI targetUri, HttpHeaders headers,
+        @Nullable Principal principal);
 
     static final PreparedRequest optionalApiPath(final String path, final Function<ApiPath, PreparedRequest> func) {
         return path.isEmpty() ? func.apply(ApiPath.empty()) : requiredApiPath(path, func);
