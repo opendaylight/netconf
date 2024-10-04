@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.api.TransportSession;
