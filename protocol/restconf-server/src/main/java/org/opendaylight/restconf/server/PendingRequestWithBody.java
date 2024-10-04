@@ -41,8 +41,14 @@ abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> ex
     }
 
     @Override
-    final void execute(final NettyServerRequest<T> request, final InputStream body) {
-        try (var wrapped = wrapBody(body)) {
+    final void execute(final NettyServerRequest<T> request, final @Nullable InputStream body) {
+        // Our APIs require the body to be present due to how JAX-RS operates. If we have gotten rid of the body, or
+        // the user has not supplied one, provide an empty body here.
+        //
+        // TODO: Once we do not need to worry about JAX-RS, let's revisit RestconfServer's APIs and allow passing a null
+        //       to indicate an empty/missing body. That may be problematic, but at least OperationInputBody would
+        //       benefit.
+        try (var wrapped = wrapBody(body != null ? body : InputStream.nullInputStream())) {
             execute(request, wrapped);
         }
     }

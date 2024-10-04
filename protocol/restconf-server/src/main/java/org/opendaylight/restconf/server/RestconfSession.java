@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -181,18 +182,23 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
     //          - when request{Completed,Failed} is invoked, perform executingRequests.remove(req) to get
     //            the corresponding RequestContext
     //          - use that to call respond() with a formatted response (for now)
-    //
-    // TODO: We are entering here owning a 'content' reference, which we'll need to relinquish eventually. The way we
-    //       should tackle that is forwarding an ByteBufOutputStream with release-on-close set.
     private static void executeRequest(final ChannelHandlerContext ctx, final HttpVersion version,
             final Integer streamId, final PendingRequest<?> pending, final ByteBuf content) {
+        // We are invoked with content's reference and need to make sure it gets released.
+        final ByteBufInputStream body;
+        if (content.isReadable()) {
+            body = new ByteBufInputStream(content, true);
+        } else {
+            content.release();
+            body = null;
+        }
+
         new RestconfRequest() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
-                content.release();
                 respond(ctx, streamId, response);
             }
-        }.execute(pending, version, content);
+        }.execute(pending, version, body);
     }
 
     @VisibleForTesting
