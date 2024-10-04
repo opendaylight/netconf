@@ -83,7 +83,7 @@ public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHa
 
     protected HttpResponse errorResponse(final HttpRequest request, final HttpResponseStatus status) {
         final var response = new DefaultFullHttpResponse(request.protocolVersion(), status, Unpooled.EMPTY_BUFFER);
-        Http2Utils.copyStreamId(request, response);
+        ServerSseHandler.copyStreamId(request, response);
         return response;
     }
 }

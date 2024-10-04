@@ -18,7 +18,12 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpScheme;
+import io.netty.handler.codec.http2.DefaultHttp2Connection;
+import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
+import io.netty.handler.codec.http2.Http2FrameLogger;
+import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
+import io.netty.handler.logging.LogLevel;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -37,6 +42,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
  * A {@link HTTPTransportStack} acting as a client.
  */
 public abstract sealed class HTTPClient extends HTTPTransportStack permits PlainHTTPClient, TlsHTTPClient {
+    private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Client");
+
     private final ClientRequestDispatcher dispatcher;
     private final ClientAuthProvider authProvider;
     private final boolean http2;
@@ -112,7 +119,17 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         final var pipeline = underlayChannel.channel().pipeline();
         if (http2) {
             // External HTTP 2 to internal HTTP 1.1 adapter handler
-            initializePipeline(underlayChannel, pipeline, Http2Utils.connectionHandler(false, MAX_HTTP_CONTENT_LENGTH));
+            final var connection = new DefaultHttp2Connection(false);
+            final var frameListener = Http2ToHttpAdapter.builder(connection)
+                    .maxContentLength(MAX_HTTP_CONTENT_LENGTH)
+                    .build();
+
+            initializePipeline(underlayChannel, pipeline, new HttpToHttp2ConnectionHandlerBuilder()
+                .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
+                .connection(connection)
+                .frameLogger(FRAME_LOGGER)
+                .gracefulShutdownTimeoutMillis(0L)
+                .build());
         } else {
             // HTTP 1.1
             pipeline.addLast(new HttpClientCodec(), new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));

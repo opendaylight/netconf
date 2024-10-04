@@ -120,7 +120,7 @@ class SseClientServerTest {
                             ? new DefaultFullHttpResponse(msg.protocolVersion(), OK, OK_CONTENT.copy())
                             : new DefaultFullHttpResponse(msg.protocolVersion(), NOT_FOUND, Unpooled.EMPTY_BUFFER);
                         response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
-                        Http2Utils.copyStreamId(msg, response);
+                        ServerSseHandler.copyStreamId(msg, response);
                         ctx.writeAndFlush(response);
                     }
                 });
