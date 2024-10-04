@@ -59,10 +59,36 @@ final class RestconfRequestDispatcher extends AbstractResource {
             "operations", new OperationsResource(invariants),
             "yang-library-version", new YLVResource(invariants),
             "modules", new ModulesResource(invariants));
+    }
 
-        LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
-        LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconfPath,
-            defaultEncoding.dataMediaType(), defaultPrettyPrint.value());
+    @Override
+    PreparedRequest prepare(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final Principal principal) {
+        LOG.debug("Preparing {} {}", method, targetUri);
+
+        // peel all other segments out
+        for (var segment : otherSegments) {
+            if (!peeler.hasNext() || !segment.equals(peeler.next())) {
+                return NOT_FOUND;
+            }
+        }
+
+        if (!peeler.hasNext()) {
+            // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
+            //        correct: we should be reporting the entire API Resource, as described in
+            //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
+            LOG.debug("Not servicing root request");
+            return NOT_FOUND;
+        }
+
+        final var segment = peeler.next();
+        final var resource = resources.get(segment);
+        if (resource != null) {
+            return resource.prepare(peeler, method, targetUri, headers, principal);
+        }
+
+        LOG.debug("Resource for '{}' not found", segment);
+        return NOT_FOUND;
     }
 
     String firstSegment() {
@@ -164,35 +190,5 @@ final class RestconfRequestDispatcher extends AbstractResource {
                 }, content.readableBytes() == 0 ? InputStream.nullInputStream() : new ByteBufInputStream(content));
             }
         }
-    }
-
-    @Override
-    PreparedRequest prepare(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final Principal principal) {
-        LOG.debug("Preparing {} {}", method, targetUri);
-
-        // peel all other segments out
-        for (var segment : otherSegments) {
-            if (!peeler.hasNext() || !segment.equals(peeler.next())) {
-                return NOT_FOUND;
-            }
-        }
-
-        if (!peeler.hasNext()) {
-            // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
-            //        correct: we should be reporting the entire API Resource, as described in
-            //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
-            LOG.debug("Not servicing root request");
-            return NOT_FOUND;
-        }
-
-        final var segment = peeler.next();
-        final var resource = resources.get(segment);
-        if (resource != null) {
-            return resource.prepare(peeler, method, targetUri, headers, principal);
-        }
-
-        LOG.debug("Resource for '{}' not found", segment);
-        return NOT_FOUND;
     }
 }
