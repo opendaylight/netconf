@@ -77,7 +77,7 @@ public class AbstractRequestProcessorTest {
     @BeforeEach
     void beforeEach() {
         doReturn(null).when(principalService).acquirePrincipal(any());
-        apiResource = new APIResource(server, principalService, List.of("rests"), "/rests/", ERROR_TAG_MAPPING,
+        apiResource = new APIResource(server, principalService, List.of(), "/rests/", ERROR_TAG_MAPPING,
             MessageEncoding.JSON, PRETTY_PRINT);
     }
 
