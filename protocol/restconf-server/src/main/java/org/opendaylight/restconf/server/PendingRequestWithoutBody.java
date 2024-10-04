@@ -31,15 +31,22 @@ abstract non-sealed class PendingRequestWithoutBody<T> extends AbstractPendingRe
     }
 
     @Override
-    final void execute(final NettyServerRequest<T> request, final InputStream body) {
-        try {
-            body.close();
-        } catch (IOException e) {
-            // Not much else we can do, really
-            LOG.debug("Failed to close body, proceeding anyway", e);
+    final void execute(final NettyServerRequest<T> request, final @Nullable InputStream body) {
+        if (body != null) {
+            closeBody(body);
         }
         execute(request);
     }
 
     abstract void execute(NettyServerRequest<T> request);
+
+    private void closeBody(final InputStream body) {
+        LOG.debug("Unexpected body in {}, closing it", this, body);
+        try {
+            body.close();
+        } catch (IOException e) {
+            // Not much else we can do, really
+            LOG.warn("Failed to close unexpected body, proceeding anyway", e);
+        }
+    }
 }

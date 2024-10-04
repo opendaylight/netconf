@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -21,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,7 @@ abstract class RestconfRequest {
 
     abstract void onSuccess(FullHttpResponse response);
 
-    final void execute(final PendingRequest<?> pending, final HttpVersion version, final ByteBuf content) {
+    final void execute(final PendingRequest<?> pending, final HttpVersion version, final @Nullable InputStream body) {
         pending.execute(new PendingRequestListener() {
             @Override
             public void requestFailed(final PendingRequest<?> request, final Exception cause) {
@@ -113,6 +112,6 @@ abstract class RestconfRequest {
 
                 onSuccess(response);
             }
-        }, content.readableBytes() == 0 ? InputStream.nullInputStream() : new ByteBufInputStream(content));
+        }, body);
     }
 }
