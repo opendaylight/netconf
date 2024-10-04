@@ -16,6 +16,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * RESTCONF /data resource, as defined in
@@ -31,45 +32,46 @@ final class DataResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final String path) {
+    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return switch (method) {
-            case DELETE -> prepareDelete(targetUri, headers, principal, path);
-            case GET -> prepareGet(targetUri, headers, principal, path, true);
-            case HEAD -> prepareGet(targetUri, headers, principal, path, false);
-            case OPTIONS -> prepareOptions(targetUri, principal, path);
-            case PATCH -> preparePatch(targetUri, headers, principal, path);
-            case POST -> preparePost(targetUri, headers, principal, path);
-            case PUT -> preparePut(targetUri, headers, principal, path);
+            case DELETE -> prepareDelete(session, targetUri, principal, path);
+            case GET -> prepareGet(session, targetUri, headers, principal, path, true);
+            case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
+            case OPTIONS -> prepareOptions(session, targetUri, principal, path);
+            case PATCH -> preparePatch(session, targetUri, headers, principal, path);
+            case POST -> preparePost(session, targetUri, headers, principal, path);
+            case PUT -> preparePut(session, targetUri, headers, principal, path);
         };
     }
 
     // delete target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.7
-    private PreparedRequest prepareDelete(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareDelete(final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final String path) {
         return path.isEmpty() ? METHOD_NOT_ALLOWED_DATASTORE : requiredApiPath(path,
-            apiPath -> new PendingDataDelete(invariants, targetUri, principal, apiPath));
+            apiPath -> new PendingDataDelete(invariants, session, targetUri, principal, apiPath));
     }
 
     // retrieve data and metadata for a resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.3
     // HEAD is same as GET but without content -> https://www.rfc-editor.org/rfc/rfc8040#section-4.2
-    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         // Attempt to choose an encoding based on user's preference. If we cannot pick one, responding with a 406 status
         // and list the encodings we support
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? NOT_ACCEPTABLE_DATA : optionalApiPath(path,
-            apiPath -> new PendingDataGet(invariants, targetUri, principal, withContent, encoding, apiPath));
+            apiPath -> new PendingDataGet(invariants, session, targetUri, principal, withContent, encoding, apiPath));
     }
 
     // resource options -> https://www.rfc-editor.org/rfc/rfc8040#section-4.1
-    private PreparedRequest prepareOptions(final URI targetUri, final @Nullable Principal principal,
-            final String path) {
-        return optionalApiPath(path, apiPath -> new PendingDataOptions(invariants, targetUri, principal, apiPath));
+    private PreparedRequest prepareOptions(final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final String path) {
+        return optionalApiPath(path,
+            apiPath -> new PendingDataOptions(invariants, session, targetUri, principal, apiPath));
     }
 
     // PATCH -> https://www.rfc-editor.org/rfc/rfc8040#section-4.6
-    private PreparedRequest preparePatch(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest preparePatch(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         final var contentType = headers.get(HttpHeaderNames.CONTENT_TYPE);
         if (contentType == null) {
@@ -87,14 +89,15 @@ final class DataResource extends AbstractLeafResource {
                 // Plain RESTCONF patch = merge target resource content ->
                 // https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1
                 return optionalApiPath(path,
-                    apiPath -> new PendingDataPatchPlain(invariants, targetUri, principal, encoding, apiPath));
+                    apiPath -> new PendingDataPatchPlain(invariants, session, targetUri, principal, encoding, apiPath));
             }
             if (encoding.patchMediaType().equals(mediaType)) {
                 // YANG Patch = ordered list of edits that are applied to the target datastore ->
                 // https://www.rfc-editor.org/rfc/rfc8072#section-2
                 final var accept = chooseOutputEncoding(headers);
                 return accept == null ? NOT_ACCEPTABLE_DATA : optionalApiPath(path,
-                    apiPath -> new PendingDataPatchYang(invariants, targetUri, principal, encoding, accept, apiPath));
+                    apiPath -> new PendingDataPatchYang(invariants, session, targetUri, principal, encoding, accept,
+                        apiPath));
             }
         }
 
@@ -103,41 +106,41 @@ final class DataResource extends AbstractLeafResource {
 
     // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
     // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
-    private PreparedRequest preparePost(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest preparePost(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         return switch (chooseInputEncoding(headers)) {
             case UNRECOGNIZED, UNSPECIFIED -> UNSUPPORTED_MEDIA_TYPE_DATA;
-            case NOT_PRESENT -> preparePost(targetUri, headers, principal, path, invariants.defaultEncoding());
-            case JSON -> preparePost(targetUri, headers, principal, path, MessageEncoding.JSON);
-            case XML -> preparePost(targetUri, headers, principal, path, MessageEncoding.XML);
+            case NOT_PRESENT -> preparePost(session, targetUri, headers, principal, path, invariants.defaultEncoding());
+            case JSON -> preparePost(session, targetUri, headers, principal, path, MessageEncoding.JSON);
+            case XML -> preparePost(session, targetUri, headers, principal, path, MessageEncoding.XML);
         };
     }
 
-    private PreparedRequest preparePost(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest preparePost(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final MessageEncoding content) {
         if (path.isEmpty()) {
-            return new PendingDataCreate(invariants, targetUri, principal, content);
+            return new PendingDataCreate(invariants, session, targetUri, principal, content);
         }
 
         final var accept = chooseOutputEncoding(headers);
         return accept == null ? NOT_ACCEPTABLE_DATA : requiredApiPath(path,
-            apiPath -> new PendingDataPost(invariants, targetUri, principal, content, accept, apiPath));
+            apiPath -> new PendingDataPost(invariants, session, targetUri, principal, content, accept, apiPath));
     }
 
     // create or replace target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.5
-    private PreparedRequest preparePut(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest preparePut(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         return switch (chooseInputEncoding(headers)) {
             case UNRECOGNIZED, UNSPECIFIED -> UNSUPPORTED_MEDIA_TYPE_DATA;
-            case NOT_PRESENT -> preparePut(targetUri, principal, path, invariants.defaultEncoding());
-            case JSON -> preparePut(targetUri, principal, path, MessageEncoding.JSON);
-            case XML -> preparePut(targetUri, principal, path, MessageEncoding.XML);
+            case NOT_PRESENT -> preparePut(session, targetUri, principal, path, invariants.defaultEncoding());
+            case JSON -> preparePut(session, targetUri, principal, path, MessageEncoding.JSON);
+            case XML -> preparePut(session, targetUri, principal, path, MessageEncoding.XML);
         };
     }
 
-    private PreparedRequest preparePut(final URI targetUri, final @Nullable Principal principal, final String path,
-            final MessageEncoding encoding) {
+    private PreparedRequest preparePut(final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final String path, final MessageEncoding encoding) {
         return optionalApiPath(path,
-            apiPath -> new PendingDataPut(invariants, targetUri, principal, encoding, apiPath));
+            apiPath -> new PendingDataPut(invariants, session, targetUri, principal, encoding, apiPath));
     }
 }

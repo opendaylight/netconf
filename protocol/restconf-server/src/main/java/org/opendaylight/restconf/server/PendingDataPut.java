@@ -15,15 +15,16 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A PUT request to the /data resource.
  */
 @NonNullByDefault
 final class PendingDataPut extends PendingRequestWithResource<DataPutResult> {
-    PendingDataPut(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final MessageEncoding contentEncoding, final ApiPath apiPath) {
-        super(invariants, targetUri, principal, contentEncoding, apiPath);
+    PendingDataPut(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final MessageEncoding contentEncoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, principal, contentEncoding, apiPath);
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +57,8 @@ final class APIResource extends AbstractResource {
     }
 
     @Override
-    PreparedRequest prepare(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final Principal principal) {
+    PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final HttpHeaders headers, final Principal principal) {
         LOG.debug("Preparing {} {}", method, targetUri);
 
         // peel all other segments out
@@ -68,13 +69,13 @@ final class APIResource extends AbstractResource {
         }
 
         if (!peeler.hasNext()) {
-            return prepare(method, targetUri, headers, principal);
+            return prepare(session, method, targetUri, headers, principal);
         }
 
         final var segment = peeler.next();
         final var resource = resources.get(segment);
         if (resource != null) {
-            return resource.prepare(peeler, method, targetUri, headers, principal);
+            return resource.prepare(peeler, session, method, targetUri, headers, principal);
         }
 
         LOG.debug("Resource for '{}' not found", segment);
@@ -85,8 +86,8 @@ final class APIResource extends AbstractResource {
     //        we should be reporting the entire API Resource, as described in
     //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
     @NonNullByDefault
-    private static PreparedRequest prepare(final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final @Nullable Principal principal) {
+    private static PreparedRequest prepare(final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final HttpHeaders headers, final @Nullable Principal principal) {
         LOG.debug("Not servicing root request");
         return NOT_FOUND;
     }
@@ -96,11 +97,12 @@ final class APIResource extends AbstractResource {
     }
 
     @NonNullByDefault
-    void dispatch(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
-            final FullHttpRequest request, final RestconfRequest callback) {
+    void dispatch(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
         final var version = request.protocolVersion();
+        final var principal = principalService.acquirePrincipal(request);
 
-        switch (prepare(peeler, method, targetUri, request.headers(), principalService.acquirePrincipal(request))) {
+        switch (prepare(peeler, session, method, targetUri, request.headers(), principal)) {
             case CompletedRequest completed -> callback.onSuccess(completed.toHttpResponse(version));
             case PendingRequest<?> pending -> {
                 LOG.debug("Dispatching {} {}", method, targetUri);

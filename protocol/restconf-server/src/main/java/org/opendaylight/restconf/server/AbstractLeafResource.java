@@ -12,6 +12,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An {@link AbstractResource} which receives the trailing part of the request part.
@@ -24,11 +25,12 @@ abstract sealed class AbstractLeafResource extends AbstractResource
     }
 
     @Override
-    final PreparedRequest prepare(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final @Nullable Principal principal) {
-        return prepare(method, targetUri, headers, principal, peeler.remaining());
+    final PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session,
+            final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
+            final @Nullable Principal principal) {
+        return prepare(session, method, targetUri, headers, principal, peeler.remaining());
     }
 
-    abstract PreparedRequest prepare(ImplementedMethod method, URI targetUri, HttpHeaders headers,
-        @Nullable Principal principal, String path);
+    abstract PreparedRequest prepare(TransportSession session, ImplementedMethod method, URI targetUri,
+        HttpHeaders headers, @Nullable Principal principal, String path);
 }

@@ -8,7 +8,8 @@
 package org.opendaylight.restconf.server;
 
 /**
- * The result of {@link AbstractResource#prepare(java.net.URI, SegmentPeeler, io.netty.handler.codec.http.HttpRequest)}.
+ * The result of {@link AbstractResource#prepare(SegmentPeeler, org.opendaylight.restconf.server.api.TransportSession,
+ * ImplementedMethod, java.net.URI, io.netty.handler.codec.http.HttpHeaders, java.security.Principal)}.
  * This can either be a {@link CompletedRequest} or a {@link PendingRequest}.
  */
 sealed interface PreparedRequest permits CompletedRequest, PendingRequest {

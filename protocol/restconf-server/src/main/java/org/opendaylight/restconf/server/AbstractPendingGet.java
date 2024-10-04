@@ -15,6 +15,7 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An abstract base class for {@link PendingRequest}s servicing both GET and HEAD requests. It handles result
@@ -32,9 +33,9 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 abstract class AbstractPendingGet<T> extends AbstractPendingRequest<T> {
     private final boolean withContent;
 
-    AbstractPendingGet(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final boolean withContent) {
-        super(invariants, targetUri, principal);
+    AbstractPendingGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final boolean withContent) {
+        super(invariants, session, targetUri, principal);
         this.withContent = withContent;
     }
 
