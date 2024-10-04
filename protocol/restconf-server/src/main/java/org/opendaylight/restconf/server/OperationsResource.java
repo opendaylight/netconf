@@ -31,29 +31,29 @@ final class OperationsResource extends AbstractLeafResource {
     PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         return switch (method) {
-            case GET -> prepareOperationsGet(targetUri, headers, principal, path, true);
-            case HEAD -> prepareOperationsGet(targetUri, headers, principal, path, false);
-            case OPTIONS -> prepareOperationsOptions(targetUri, principal, path);
-            case POST -> prepareOperationsPost(targetUri, headers, principal, path);
-            default -> prepareOperationsDefault(targetUri, path);
+            case GET -> prepareGet(targetUri, headers, principal, path, true);
+            case HEAD -> prepareGet(targetUri, headers, principal, path, false);
+            case OPTIONS -> prepareOptions(targetUri, principal, path);
+            case POST -> preparePost(targetUri, headers, principal, path);
+            default -> prepareDefault(targetUri, path);
         };
     }
 
-    private PreparedRequest prepareOperationsGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? NOT_ACCEPTABLE_DATA : optionalApiPath(path,
             apiPath -> new PendingOperationsGet(invariants, targetUri, principal, encoding, apiPath, withContent));
     }
 
-    private PreparedRequest prepareOperationsOptions(final URI targetUri, final @Nullable Principal principal,
+    private PreparedRequest prepareOptions(final URI targetUri, final @Nullable Principal principal,
             final String path) {
         return path.isEmpty() ? AbstractPendingOptions.READ_ONLY
             : requiredApiPath(path, apiPath -> new PendingOperationsOptions(invariants, targetUri, principal, apiPath));
     }
 
     // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2
-    private PreparedRequest prepareOperationsPost(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest preparePost(final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         final var accept = chooseOutputEncoding(headers);
         return accept == null ? NOT_ACCEPTABLE_DATA : switch (chooseInputEncoding(headers)) {
@@ -71,12 +71,11 @@ final class OperationsResource extends AbstractLeafResource {
             apiPath -> new PendingOperationsPost(invariants, targetUri, principal, content, accept, apiPath));
     }
 
-    private static PreparedRequest prepareOperationsDefault(final URI targetUri, final String path) {
+    private static PreparedRequest prepareDefault(final URI targetUri, final String path) {
         return path.isEmpty() ? METHOD_NOT_ALLOWED_READ_ONLY
             // TODO: This is incomplete. We are always reporting 405 Method Not Allowed, but we can do better.
             //       We should fire off an OPTIONS request for the apiPath and see if it exists: if it does not,
             //       we should report a 404 Not Found instead.
             : requiredApiPath(path, apiPath -> METHOD_NOT_ALLOWED_RPC);
     }
-
 }
