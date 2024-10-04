@@ -61,10 +61,22 @@ final class TestUtils {
         };
     }
 
+    static FullHttpRequest newOptionsRequest(final String uri) {
+        return newRequest(HttpMethod.OPTIONS, uri);
+    }
+
+    static FullHttpRequest newRequest(final HttpMethod method, final String uri) {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri);
+        request.headers().set(HttpHeaderNames.HOST, AbstractRequestProcessorTest.HOST);
+        return request;
+    }
+
     static FullHttpRequest buildRequest(final HttpMethod method, final String uri, final TestEncoding encoding,
             final String content) {
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri);
-        final var headers = request.headers();
+        final var headers = request.headers()
+            .set(HttpHeaderNames.HOST, AbstractRequestProcessorTest.HOST)
+            .set(HttpHeaderNames.ACCEPT, encoding.responseType);
         if (!HttpMethod.GET.equals(method)) {
             final var buf = request.content();
             buf.writeBytes(content.getBytes(StandardCharsets.UTF_8));
@@ -72,7 +84,6 @@ final class TestUtils {
                 .set(HttpHeaderNames.CONTENT_TYPE, encoding.requestType)
                 .setInt(HttpHeaderNames.CONTENT_LENGTH, buf.readableBytes());
         }
-        headers.set(HttpHeaderNames.ACCEPT, encoding.responseType);
         return request;
     }
 
@@ -157,7 +168,7 @@ final class TestUtils {
     }
 
     static void assertOptionsResponse(final FullHttpResponse response, final String expectedAllowHeader) {
-        assertEquals(response.status(), HttpResponseStatus.OK);
+        assertEquals(HttpResponseStatus.OK, response.status());
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, expectedAllowHeader));
     }
 

@@ -18,11 +18,11 @@ import static org.opendaylight.restconf.server.TestUtils.assertOptionsResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
 import static org.opendaylight.restconf.server.TestUtils.formattableBody;
+import static org.opendaylight.restconf.server.TestUtils.newOptionsRequest;
+import static org.opendaylight.restconf.server.TestUtils.newRequest;
 
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import java.net.URI;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -49,14 +49,13 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsRoot() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, OPERATIONS_PATH);
+        final var request = newOptionsRequest(OPERATIONS_PATH);
         assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
     }
 
     @Test
     void optionsOperations() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS,
-            OPERATIONS_PATH_WITH_ID);
+        final var request = newOptionsRequest(OPERATIONS_PATH_WITH_ID);
         doAnswer(answerCompleteWith(OptionsResult.RPC)).when(server).operationsOPTIONS(any(), any());
 
         assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS, POST");
@@ -128,7 +127,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
 
         // post request with no content and no content-type header
         // can be used to invoke rpc with no input defined
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, OPERATIONS_PATH_WITH_ID);
+        final var request = newRequest(HttpMethod.POST, OPERATIONS_PATH_WITH_ID);
         final var response = dispatch(request);
         verify(server).operationsPOST(any(), eq(RESTCONF_URI), apiPathCaptor.capture(), any());
         assertEquals(API_PATH, apiPathCaptor.getValue());
