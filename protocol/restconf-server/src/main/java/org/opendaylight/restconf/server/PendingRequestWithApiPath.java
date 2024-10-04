@@ -17,10 +17,10 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
- * An {@link AbstractPendingRequest} with a corresponding (potentially empty) {@link ApiPath}.
+ * An {@link PendingRequestWithoutBody} with a corresponding (potentially empty) {@link ApiPath}.
  */
 @NonNullByDefault
-abstract class PendingRequestWithApiPath<T> extends AbstractPendingRequest<T> {
+abstract class PendingRequestWithApiPath<T> extends PendingRequestWithoutBody<T> {
     final ApiPath apiPath;
 
     PendingRequestWithApiPath(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
