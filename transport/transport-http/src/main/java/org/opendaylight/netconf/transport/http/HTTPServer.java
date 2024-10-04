@@ -13,7 +13,13 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpScheme;
+import io.netty.handler.codec.http2.DefaultHttp2Connection;
+import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
+import io.netty.handler.codec.http2.Http2FrameLogger;
+import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
+import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
+import io.netty.handler.logging.LogLevel;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -32,6 +38,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
  * last handler. Doing so will provide a predictable API surface as to how the pipeline is set up.
  */
 public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
+    private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Server");
+
     private final AuthHandlerFactory authHandlerFactory;
 
     HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme,
@@ -104,10 +112,21 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
 
     @Override
     protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
-        // External HTTP 2 to internal HTTP 1.1 adapter handler
         final var pipeline = underlayChannel.channel().pipeline();
 
-        initializePipeline(pipeline, Http2Utils.connectionHandler(true, MAX_HTTP_CONTENT_LENGTH));
+        // External HTTP 2 to internal HTTP 1.1 adapter handler
+        final var connection = new DefaultHttp2Connection(true);
+        final var frameListener = new InboundHttp2ToHttpAdapterBuilder(connection)
+            .maxContentLength(MAX_HTTP_CONTENT_LENGTH)
+            .propagateSettings(true)
+            .build();
+
+        initializePipeline(pipeline, new HttpToHttp2ConnectionHandlerBuilder()
+            .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
+            .connection(connection)
+            .frameLogger(FRAME_LOGGER)
+            .gracefulShutdownTimeoutMillis(0L)
+            .build());
 
         if (authHandlerFactory != null) {
             pipeline.addLast(authHandlerFactory.create());
