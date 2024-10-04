@@ -27,14 +27,14 @@ final class YLVResource extends AbstractLeafResource {
     PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         return !path.isEmpty() ? NOT_FOUND : switch (method) {
-            case GET -> prepareYangLibraryVersionGet(targetUri, headers, principal, true);
-            case HEAD -> prepareYangLibraryVersionGet(targetUri, headers, principal, false);
+            case GET -> prepareGet(targetUri, headers, principal, true);
+            case HEAD -> prepareGet(targetUri, headers, principal, false);
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
-    private PreparedRequest prepareYangLibraryVersionGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final boolean withContent) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? UNSUPPORTED_MEDIA_TYPE_DATA
