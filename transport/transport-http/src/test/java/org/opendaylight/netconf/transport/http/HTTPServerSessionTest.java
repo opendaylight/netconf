@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server;
+package org.opendaylight.netconf.transport.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,10 +24,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class RestconfSessionTest {
+class HTTPServerSessionTest {
     @Test
     void asteriskRequestOptions() {
-        final var response = RestconfSession.asteriskRequest(HttpVersion.HTTP_1_1, ImplementedMethod.OPTIONS);
+        final var response = HTTPServerSession.asteriskRequest(HttpVersion.HTTP_1_1, ImplementedMethod.OPTIONS);
         assertEquals(HttpResponseStatus.OK, response.status());
         assertEquals(Unpooled.EMPTY_BUFFER, response.content());
         assertEquals(
@@ -38,7 +38,7 @@ class RestconfSessionTest {
     @ParameterizedTest
     @MethodSource
     void asteriskRequestImplemented(final ImplementedMethod method) {
-        final var response = RestconfSession.asteriskRequest(HttpVersion.HTTP_1_1, method);
+        final var response = HTTPServerSession.asteriskRequest(HttpVersion.HTTP_1_1, method);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         assertEquals(Unpooled.EMPTY_BUFFER, response.content());
         assertEquals(new DefaultHttpHeaders(), response.headers());
@@ -58,7 +58,7 @@ class RestconfSessionTest {
     @ParameterizedTest
     @MethodSource
     void hostUriOfValid(final String expected, final HttpScheme scheme, final String host) throws Exception {
-        assertEquals(URI.create(expected), RestconfSession.hostUriOf(scheme, host));
+        assertEquals(URI.create(expected), HTTPServerSession.hostUriOf(scheme, host));
     }
 
     private static List<Arguments> hostUriOfValid() {
@@ -70,21 +70,21 @@ class RestconfSessionTest {
     @Test
     void hostUriOfInvalidPort() {
         final var ex = assertThrows(URISyntaxException.class,
-            () -> RestconfSession.hostUriOf(HttpScheme.HTTP, "foo:abc"));
+            () -> HTTPServerSession.hostUriOf(HttpScheme.HTTP, "foo:abc"));
         assertEquals("Illegal character in port number at index 11: http://foo:abc", ex.getMessage());
     }
 
     @Test
     void hostUriOfInvalidHostname() {
         final var ex = assertThrows(URISyntaxException.class,
-            () -> RestconfSession.hostUriOf(HttpScheme.HTTP, "--"));
+            () -> HTTPServerSession.hostUriOf(HttpScheme.HTTP, "--"));
         assertEquals("Illegal character in hostname at index 7: http://--", ex.getMessage());
     }
 
     @Test
     void hostUriOfWithUser() {
         final var ex = assertThrows(URISyntaxException.class,
-            () -> RestconfSession.hostUriOf(HttpScheme.HTTP, "user@host"));
+            () -> HTTPServerSession.hostUriOf(HttpScheme.HTTP, "user@host"));
         assertEquals("Illegal Host header: user@host", ex.getMessage());
     }
 }
