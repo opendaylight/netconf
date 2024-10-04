@@ -40,6 +40,23 @@ import org.slf4j.LoggerFactory;
 abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
 
+    /**
+     * A {@link CompletedRequest} reporting {@code 405 Method Not Allowed} and indicating support only for
+     * {@code OPTIONS} method.
+     */
+    static final CompletedRequest OPTIONS_ONLY_METHOD_NOT_ALLOWED;
+    /**
+     * A {@link CompletedRequest} reporting {@code 200 OK} and containing only {@code Allow: OPTIONS} header.
+     */
+    static final CompletedRequest OPTIONS_ONLY_OK;
+
+    static {
+        final var headers = DefaultHttpHeadersFactory.headersFactory().newHeaders()
+            .set(HttpHeaderNames.ALLOW, "OPTIONS");
+        OPTIONS_ONLY_METHOD_NOT_ALLOWED = new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
+        OPTIONS_ONLY_OK = new DefaultCompletedRequest(HttpResponseStatus.OK, headers);
+    }
+
     static final CompletedRequest METHOD_NOT_ALLOWED_READ_ONLY =
         new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
     static final CompletedRequest NOT_FOUND = new DefaultCompletedRequest(HttpResponseStatus.NOT_FOUND);

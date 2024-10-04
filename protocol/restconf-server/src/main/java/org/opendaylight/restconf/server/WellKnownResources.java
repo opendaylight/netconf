@@ -13,14 +13,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc6415#appendix-A">RFC 6415, appendix A</a>
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
+@NonNullByDefault
 final class WellKnownResources {
     private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
     private final ByteBuf jrd;
@@ -61,20 +62,27 @@ final class WellKnownResources {
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT, format.formatted(args)).asReadOnly());
     }
 
-    FullHttpResponse request(final HttpVersion version, final ImplementedMethod method, final SegmentPeeler peeler) {
+    // Well-known resources are immediately available
+    CompletedRequest request(final SegmentPeeler peeler, final ImplementedMethod method) {
+        if (!peeler.hasNext()) {
+            // We only support OPTIONS
+            return method == ImplementedMethod.OPTIONS ? AbstractResource.OPTIONS_ONLY_OK
+                : AbstractResource.OPTIONS_ONLY_METHOD_NOT_ALLOWED;
+        }
+
         final var suffix = QueryStringDecoder.decodeComponent(peeler.remaining());
         return switch (suffix) {
-            case "/host-meta" -> requestXRD(version, method);
-            case "/host-meta.json" -> requestJRD(version, method);
+            case "/host-meta" -> requestXRD(method);
+            case "/host-meta.json" -> requestJRD(method);
             default -> {
                 LOG.debug("Suffix '{}' not recognized", suffix);
-                yield new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND);
+                yield AbstractResource.NOT_FOUND;
             }
         };
     }
 
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.1
-    private FullHttpResponse requestXRD(final HttpVersion version, final ImplementedMethod method) {
+    private CompletedRequest requestXRD(final ImplementedMethod method) {
         // FIXME: https://www.rfc-editor.org/rfc/rfc6415#appendix-A paragraph 2 says:
         //
         //           The client MAY request a JRD representation using the HTTP "Accept"
@@ -82,53 +90,35 @@ final class WellKnownResources {
         //
         //        so we should be checking Accept and redirect to requestJRD()
         return switch (method) {
-            case GET -> getResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
-            case HEAD -> headResponse(version, NettyMediaTypes.APPLICATION_XRD_XML, xrd);
-            case OPTIONS -> optionsResponse(version);
-            default -> methodNotAllowed(version);
+            case GET -> getResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
+            case HEAD -> headResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
+            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
+            default -> AbstractResource.METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.2
-    private FullHttpResponse requestJRD(final HttpVersion version, final ImplementedMethod method) {
+    private CompletedRequest requestJRD(final ImplementedMethod method) {
         return switch (method) {
-            case GET -> getResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
-            case HEAD -> headResponse(version, HttpHeaderValues.APPLICATION_JSON, jrd);
-            case OPTIONS -> optionsResponse(version);
-            default -> methodNotAllowed(version);
+            case GET -> getResponse(HttpHeaderValues.APPLICATION_JSON, jrd);
+            case HEAD -> headResponse(HttpHeaderValues.APPLICATION_JSON, jrd);
+            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
+            default -> AbstractResource.METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
-    private static FullHttpResponse getResponse(final HttpVersion version, final AsciiString contentType,
-            final ByteBuf content) {
-        return setContentHeaders(new DefaultFullHttpResponse(version, HttpResponseStatus.OK, content.slice()),
-            contentType, content);
+    private static CompletedRequest getResponse(final AsciiString contentType, final ByteBuf content) {
+        return new DefaultCompletedRequest(HttpResponseStatus.OK, contentHeaders(contentType, content),
+            content.slice());
     }
 
-    private static FullHttpResponse headResponse(final HttpVersion version, final AsciiString contentType,
-            final ByteBuf content) {
-        return setContentHeaders(new DefaultFullHttpResponse(version, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER),
-            contentType, content);
+    private static CompletedRequest headResponse(final AsciiString contentType, final ByteBuf content) {
+        return new DefaultCompletedRequest(HttpResponseStatus.OK, contentHeaders(contentType, content));
     }
 
-    private static FullHttpResponse optionsResponse(final HttpVersion version) {
-        return setAllowHeader(new DefaultFullHttpResponse(version, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER));
-    }
-
-    private static FullHttpResponse methodNotAllowed(final HttpVersion version) {
-        return setAllowHeader(new DefaultFullHttpResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED));
-    }
-
-    private static FullHttpResponse setAllowHeader(final FullHttpResponse response) {
-        response.headers().set(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS");
-        return response;
-    }
-
-    private static FullHttpResponse setContentHeaders(final FullHttpResponse response, final AsciiString contentType,
-            final ByteBuf content) {
-        response.headers()
+    private static HttpHeaders contentHeaders(final AsciiString contentType, final ByteBuf content) {
+        return DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
             .set(HttpHeaderNames.CONTENT_TYPE, contentType)
             .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-        return response;
     }
 }
