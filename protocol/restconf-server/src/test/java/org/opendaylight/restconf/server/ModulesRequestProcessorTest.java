@@ -22,13 +22,12 @@ import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
 import static org.opendaylight.restconf.server.TestUtils.charSource;
 import static org.opendaylight.restconf.server.TestUtils.formattableBody;
+import static org.opendaylight.restconf.server.TestUtils.newOptionsRequest;
 
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -60,7 +59,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @ValueSource(strings = {YANG_LIBRARY_VERSION_URI, MODULES_PATH, MODULE_URI, MODULE_URI_WITH_MOUNT})
     void options(final String uri) {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, uri);
+        final var request = newOptionsRequest(uri);
         assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
     }
 
