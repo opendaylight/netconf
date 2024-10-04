@@ -44,7 +44,8 @@ import org.opendaylight.restconf.server.api.TransportSession;
  * @param <T> server response type
  */
 // Note: not @NonNullByDefault because SpotBugs throws a tantrum on @Nullable field
-abstract class AbstractPendingRequest<T> extends PendingRequest<T> {
+abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
+        permits PendingRequestWithBody, PendingRequestWithoutBody {
     static final @NonNull CompletedRequest NO_CONTENT = new DefaultCompletedRequest(HttpResponseStatus.NO_CONTENT);
     static final @NonNull DefaultHttpHeadersFactory HEADERS_FACTORY = DefaultHttpHeadersFactory.headersFactory();
 

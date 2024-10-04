@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.util.AsciiString;
-import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -23,7 +22,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
  * An abstract class for implementations of a GET or HEAD request to the /modules resource.
  */
 @NonNullByDefault
-abstract sealed class AbstractPendingModulesGet extends AbstractPendingRequest<ModulesGetResult>
+abstract sealed class AbstractPendingModulesGet extends PendingRequestWithoutBody<ModulesGetResult>
         permits PendingModulesGetYang, PendingModulesGetYin {
     private final ApiPath mountPath;
     private final String fileName;
@@ -36,7 +35,7 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingRequest<M
     }
 
     @Override
-    final void execute(final NettyServerRequest<ModulesGetResult> request, final InputStream body) {
+    final void execute(final NettyServerRequest<ModulesGetResult> request) {
         final var revision = request.queryParameters().lookup("revision");
         if (mountPath.isEmpty()) {
             execute(request, fileName, revision);

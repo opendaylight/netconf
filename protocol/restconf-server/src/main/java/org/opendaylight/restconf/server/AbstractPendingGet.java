@@ -32,7 +32,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
  * @param <T> server response type
  */
 @NonNullByDefault
-abstract class AbstractPendingGet<T> extends AbstractPendingRequest<T> {
+abstract class AbstractPendingGet<T> extends PendingRequestWithoutBody<T> {
     private final boolean withContent;
     final MessageEncoding encoding;
 
