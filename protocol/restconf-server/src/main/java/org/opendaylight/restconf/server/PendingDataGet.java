@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
-import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -36,7 +35,7 @@ final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
     }
 
     @Override
-    void execute(final NettyServerRequest<DataGetResult> request, final InputStream body) {
+    void execute(final NettyServerRequest<DataGetResult> request) {
         if (apiPath.isEmpty()) {
             server().dataGET(request);
         } else {
