@@ -30,14 +30,14 @@ final class ModulesResource extends AbstractLeafResource {
     PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         return switch (method) {
-            case GET -> prepareModulesGet(targetUri, headers, principal, path, true);
-            case HEAD -> prepareModulesGet(targetUri, headers, principal, path, false);
+            case GET -> prepareGet(targetUri, headers, principal, path, true);
+            case HEAD -> prepareGet(targetUri, headers, principal, path, false);
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
-    private PreparedRequest prepareModulesGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         if (path.isEmpty()) {
             return NOT_FOUND;
