@@ -26,7 +26,7 @@ final class PendingOperationsGet extends AbstractDataPendingGet {
 
     PendingOperationsGet(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
             final MessageEncoding encoding, final ApiPath apiPath, final boolean withContent) {
-        super(invariants, targetUri, principal, encoding, withContent);
+        super(invariants, targetUri, principal, withContent, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

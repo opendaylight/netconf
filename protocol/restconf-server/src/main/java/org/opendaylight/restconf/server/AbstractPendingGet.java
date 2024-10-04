@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -33,12 +31,10 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 @NonNullByDefault
 abstract class AbstractPendingGet<T> extends AbstractPendingRequest<T> {
     private final boolean withContent;
-    final MessageEncoding encoding;
 
     AbstractPendingGet(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final MessageEncoding encoding, final boolean withContent) {
+            final boolean withContent) {
         super(invariants, targetUri, principal);
-        this.encoding = requireNonNull(encoding);
         this.withContent = withContent;
     }
 

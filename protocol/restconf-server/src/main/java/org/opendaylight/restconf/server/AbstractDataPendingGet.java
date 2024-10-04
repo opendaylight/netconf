@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.server;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
@@ -25,9 +27,12 @@ import org.opendaylight.restconf.api.FormattableBody;
 @NonNullByDefault
 abstract sealed class AbstractDataPendingGet extends AbstractPendingGet<FormattableBody>
         permits PendingOperationsGet, PendingYangLibraryVersionGet {
+    final MessageEncoding encoding;
+
     AbstractDataPendingGet(final EndpointInvariants invariants, final URI targetUri,
-            final @Nullable Principal principal, final MessageEncoding encoding, final boolean withContent) {
-        super(invariants, targetUri, principal, encoding, withContent);
+            final @Nullable Principal principal, final boolean withContent, final MessageEncoding encoding) {
+        super(invariants, targetUri, principal, withContent);
+        this.encoding = requireNonNull(encoding);
     }
 
     @Override

@@ -20,8 +20,8 @@ import org.opendaylight.restconf.api.FormattableBody;
 @NonNullByDefault
 final class PendingYangLibraryVersionGet extends AbstractDataPendingGet {
     PendingYangLibraryVersionGet(final EndpointInvariants invariants, final URI targetUri,
-            final @Nullable Principal principal, final MessageEncoding encoding, final boolean withContent) {
-        super(invariants, targetUri, principal, encoding, withContent);
+            final @Nullable Principal principal, final boolean withContent, final MessageEncoding encoding) {
+        super(invariants, targetUri, principal, withContent, encoding);
     }
 
     @Override

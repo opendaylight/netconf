@@ -9,6 +9,8 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import java.io.InputStream;
 import java.net.URI;
@@ -22,14 +24,15 @@ import org.opendaylight.restconf.server.api.ModulesGetResult;
  * An abstract class for implementations of a GET or HEAD request to the /modules resource.
  */
 @NonNullByDefault
-abstract sealed class AbstractPendingModulesGet extends AbstractPendingRequest<ModulesGetResult>
+abstract sealed class AbstractPendingModulesGet extends AbstractPendingGet<ModulesGetResult>
         permits PendingModulesGetYang, PendingModulesGetYin {
     private final ApiPath mountPath;
     private final String fileName;
 
     AbstractPendingModulesGet(final EndpointInvariants invariants, final URI targetUri,
-            final @Nullable Principal principal, final ApiPath mountPath, final String fileName) {
-        super(invariants, targetUri, principal);
+            final @Nullable Principal principal, final boolean withContent, final ApiPath mountPath,
+            final String fileName) {
+        super(invariants, targetUri, principal, withContent);
         this.mountPath = requireNonNull(mountPath);
         this.fileName = requireNonNull(fileName);
     }
@@ -49,9 +52,15 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingRequest<M
     abstract void execute(NettyServerRequest<ModulesGetResult> request, ApiPath mountPath, String fileName,
         @Nullable String revision);
 
+
     @Override
-    final CharSourceResponse transformResult(final NettyServerRequest<?> request, final ModulesGetResult result) {
+    final Response transformResultImpl(final NettyServerRequest<?> request, final ModulesGetResult result) {
         return new CharSourceResponse(result.source(), mediaType());
+    }
+
+    @Override
+    final void fillHeaders(final ModulesGetResult result, final HttpHeaders headers) {
+        headers.set(HttpHeaderNames.CONTENT_TYPE, mediaType());
     }
 
     abstract AsciiString mediaType();

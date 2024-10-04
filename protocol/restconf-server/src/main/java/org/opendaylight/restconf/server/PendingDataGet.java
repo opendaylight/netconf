@@ -25,11 +25,13 @@ import org.opendaylight.restconf.server.api.DataGetResult;
  */
 @NonNullByDefault
 final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
+    private final MessageEncoding encoding;
     private final ApiPath apiPath;
 
     PendingDataGet(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final MessageEncoding encoding, final ApiPath apiPath, final boolean withContent) {
-        super(invariants, targetUri, principal, encoding, withContent);
+            final boolean withContent, final MessageEncoding encoding, final ApiPath apiPath) {
+        super(invariants, targetUri, principal, withContent);
+        this.encoding = requireNonNull(encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

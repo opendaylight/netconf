@@ -21,8 +21,9 @@ import org.opendaylight.restconf.server.api.ModulesGetResult;
 @NonNullByDefault
 final class PendingModulesGetYin extends AbstractPendingModulesGet {
     PendingModulesGetYin(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
+            final boolean withContent,
             final ApiPath mountPath, final String fileName) {
-        super(invariants, targetUri, principal, mountPath, fileName);
+        super(invariants, targetUri, principal, withContent, mountPath, fileName);
     }
 
     @Override
