@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * point in the past.
  */
 @NonNullByDefault
-abstract sealed class AbstractResource permits AbstractLeafResource, RestconfRequestDispatcher {
+abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
 
     static final CompletedRequest METHOD_NOT_ALLOWED_READ_ONLY =

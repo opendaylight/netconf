@@ -60,15 +60,14 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         Arrays.stream(ImplementedMethod.values())
             .collect(Collectors.toUnmodifiableMap(ImplementedMethod::httpMethod, Function.identity()));
 
-    private final RestconfRequestDispatcher dispatcher;
     private final WellKnownResources wellKnown;
+    private final APIResource apiResource;
     private final HttpScheme scheme;
 
-    RestconfSession(final WellKnownResources wellKnown, final RestconfRequestDispatcher dispatcher,
-            final HttpScheme scheme) {
+    RestconfSession(final WellKnownResources wellKnown, final APIResource apiResource, final HttpScheme scheme) {
         super(FullHttpRequest.class, false);
         this.wellKnown = requireNonNull(wellKnown);
-        this.dispatcher = requireNonNull(dispatcher);
+        this.apiResource = requireNonNull(apiResource);
         this.scheme = requireNonNull(scheme);
     }
 
@@ -177,7 +176,7 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             respond(ctx, streamId, wellKnown.request(version, method, peeler));
             return;
         }
-        if (!segment.equals(dispatcher.firstSegment())) {
+        if (!segment.equals(apiResource.firstSegment())) {
             // Does not match the dispatcher -- we are done now
             LOG.debug("No resource for {}", requestUri);
             msg.release();
@@ -189,7 +188,7 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         //        - invoke dispatcher.prepare() from here first
         //        - handle CompletedRequest to synchronous dispatch just like the above two cases, as it is that simple
 
-        dispatcher.dispatch(peeler, method, targetUri, msg, new RestconfRequest() {
+        apiResource.dispatch(peeler, method, targetUri, msg, new RestconfRequest() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
                 msg.release();
