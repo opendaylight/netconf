@@ -22,11 +22,14 @@ final class EndpointRoot {
     private final PrincipalService principalService;
     private final WellKnownResources wellKnown;
     private final APIResource apiResource;
+    private final String apiSegment;
 
+    // FIXME: at some point we should just receive a Map of resources with coherent API
     EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown,
-            final APIResource apiResource) {
+            final String apiSegment, final APIResource apiResource) {
         this.principalService = requireNonNull(principalService);
         this.wellKnown = requireNonNull(wellKnown);
+        this.apiSegment = requireNonNull(apiSegment);
         this.apiResource = requireNonNull(apiResource);
     }
 
@@ -42,7 +45,7 @@ final class EndpointRoot {
         final var segment = peeler.next();
         if (segment.equals(".well-known")) {
             return wellKnown.request(peeler, method);
-        } else if (segment.equals(apiResource.firstSegment())) {
+        } else if (segment.equals(apiSegment)) {
             return apiResource.prepare(peeler, session, method, targetUri, request.headers(),
                 principalService.acquirePrincipal(request));
         } else {
