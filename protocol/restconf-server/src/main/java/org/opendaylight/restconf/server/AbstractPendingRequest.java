@@ -91,10 +91,10 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
      * Execute this request on the backend {@link RestconfServer}.
      *
      * @param request the {@link NettyServerRequest} to pass to the server method
-     * @param body request body
+     * @param body request body, or {@code null} if not present or empty
      */
     @NonNullByDefault
-    abstract void execute(NettyServerRequest<T> request, InputStream body);
+    abstract void execute(NettyServerRequest<T> request, @Nullable InputStream body);
 
     @NonNullByDefault
     final void onFailure(final PendingRequestListener listener, final NettyServerRequest<T> request,
