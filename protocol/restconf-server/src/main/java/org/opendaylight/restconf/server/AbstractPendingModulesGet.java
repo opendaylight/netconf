@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An abstract class for implementations of a GET or HEAD request to the /modules resource.
@@ -29,10 +30,10 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingGet<Modul
     private final ApiPath mountPath;
     private final String fileName;
 
-    AbstractPendingModulesGet(final EndpointInvariants invariants, final URI targetUri,
+    AbstractPendingModulesGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final boolean withContent, final ApiPath mountPath,
             final String fileName) {
-        super(invariants, targetUri, principal, withContent);
+        super(invariants, session, targetUri, principal, withContent);
         this.mountPath = requireNonNull(mountPath);
         this.fileName = requireNonNull(fileName);
     }

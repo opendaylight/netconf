@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * Abstract base class for {@link PendingRequestWithBody}s which also produce an output.
@@ -28,10 +29,10 @@ abstract class PendingRequestWithOutput<T, B extends ConsumableBody> extends Pen
     final MessageEncoding acceptEncoding;
     final ApiPath apiPath;
 
-    PendingRequestWithOutput(final EndpointInvariants invariants, final URI targetUri,
+    PendingRequestWithOutput(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final MessageEncoding contentEncoding,
             final MessageEncoding acceptEncoding, final ApiPath apiPath) {
-        super(invariants, targetUri, principal, contentEncoding);
+        super(invariants, session, targetUri, principal, contentEncoding);
         this.acceptEncoding = requireNonNull(acceptEncoding);
         this.apiPath = requireNonNull(apiPath);
     }

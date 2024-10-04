@@ -16,6 +16,7 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An {@link AbstractPendingGet} subclass for YANG Data results in {@link FormattableBody} format and nothing else. The
@@ -29,9 +30,9 @@ abstract sealed class AbstractDataPendingGet extends AbstractPendingGet<Formatta
         permits PendingOperationsGet, PendingYangLibraryVersionGet {
     final MessageEncoding encoding;
 
-    AbstractDataPendingGet(final EndpointInvariants invariants, final URI targetUri,
+    AbstractDataPendingGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final boolean withContent, final MessageEncoding encoding) {
-        super(invariants, targetUri, principal, withContent);
+        super(invariants, session, targetUri, principal, withContent);
         this.encoding = requireNonNull(encoding);
     }
 
