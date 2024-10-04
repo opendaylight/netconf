@@ -49,8 +49,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         final var otherSegments = apiRootPath.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
         root = new EndpointRoot(principalService, new WellKnownResources(restconf), firstSegment,
-            new APIResource(server, principalService, otherSegments, sb.append('/').toString(),
-                configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint()));
+            new APIResource(server, otherSegments, sb.append('/').toString(), configuration.errorTagMapping(),
+                configuration.defaultEncoding(), configuration.prettyPrint()));
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
