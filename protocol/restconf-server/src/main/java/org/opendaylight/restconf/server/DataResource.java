@@ -22,7 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.1>RFC8040, section 3.3.1</a>.
  */
 @NonNullByDefault
-final class DataResource extends AbstractResource {
+final class DataResource extends AbstractLeafResource {
     private static final CompletedRequest METHOD_NOT_ALLOWED_DATASTORE =
         new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_DATASTORE);
 
