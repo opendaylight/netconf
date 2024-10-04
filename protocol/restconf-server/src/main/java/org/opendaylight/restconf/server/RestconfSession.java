@@ -60,15 +60,13 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         Arrays.stream(ImplementedMethod.values())
             .collect(Collectors.toUnmodifiableMap(ImplementedMethod::httpMethod, Function.identity()));
 
-    private final WellKnownResources wellKnown;
-    private final APIResource apiResource;
     private final HttpScheme scheme;
+    private final EndpointRoot root;
 
-    RestconfSession(final WellKnownResources wellKnown, final APIResource apiResource, final HttpScheme scheme) {
+    RestconfSession(final HttpScheme scheme, final EndpointRoot root) {
         super(FullHttpRequest.class, false);
-        this.wellKnown = requireNonNull(wellKnown);
-        this.apiResource = requireNonNull(apiResource);
         this.scheme = requireNonNull(scheme);
+        this.root = requireNonNull(root);
     }
 
     @Override
@@ -161,40 +159,22 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
             return;
         }
 
-        final var peeler = new SegmentPeeler(targetUri);
-        if (!peeler.hasNext()) {
-            LOG.debug("Refusing access to {}", requestUri);
-            msg.release();
-            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
-            return;
-        }
-
-        final var segment = peeler.next();
-        if (".well-known".equals(segment)) {
-            // Well-known resources are immediately available and are trivial to service
-            msg.release();
-            respond(ctx, streamId, wellKnown.request(version, method, peeler));
-            return;
-        }
-        if (!segment.equals(apiResource.firstSegment())) {
-            // Does not match the dispatcher -- we are done now
-            LOG.debug("No resource for {}", requestUri);
-            msg.release();
-            respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_FOUND));
-            return;
-        }
-
-        // FIXME: NETCONF-1379: first part of integration here:
-        //        - invoke dispatcher.prepare() from here first
-        //        - handle CompletedRequest to synchronous dispatch just like the above two cases, as it is that simple
-
-        apiResource.dispatch(peeler, this, method, targetUri, msg, new RestconfRequest() {
-            @Override
-            public void onSuccess(final FullHttpResponse response) {
+        switch (root.prepare(this, method, targetUri, msg)) {
+            case CompletedRequest completed -> {
                 msg.release();
-                respond(ctx, streamId, response);
+                respond(ctx, streamId, completed.toHttpResponse(version));
             }
-        });
+            case PendingRequest<?> pending -> {
+                LOG.debug("Dispatching {} {}", method, targetUri);
+                new RestconfRequest() {
+                    @Override
+                    public void onSuccess(final FullHttpResponse response) {
+                        msg.release();
+                        respond(ctx, streamId, response);
+                    }
+                }.execute(pending, version, msg.content());
+            }
+        }
 
         // FIXME: NETCONF-1379: second part of integration here:
         //        - we will have PendingRequest<?>, which is the asynchronous invocation

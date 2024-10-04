@@ -96,6 +96,7 @@ final class APIResource extends AbstractResource {
         return firstSegment;
     }
 
+    @Deprecated(forRemoval = true)
     @NonNullByDefault
     void dispatch(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
             final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
