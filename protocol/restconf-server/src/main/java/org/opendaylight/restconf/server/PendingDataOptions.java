@@ -14,15 +14,16 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.OptionsResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An OPTIONS request to the /data resource.
  */
 @NonNullByDefault
 final class PendingDataOptions extends AbstractPendingOptions {
-    PendingDataOptions(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, principal, apiPath);
+    PendingDataOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final ApiPath apiPath) {
+        super(invariants, session, targetUri, principal, apiPath);
     }
 
     @Override

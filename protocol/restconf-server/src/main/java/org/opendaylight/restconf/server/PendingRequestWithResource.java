@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 
 /**
@@ -32,9 +33,9 @@ abstract sealed class PendingRequestWithResource<T> extends PendingRequestWithBo
         permits PendingDataPatchPlain, PendingDataPut {
     final ApiPath apiPath;
 
-    PendingRequestWithResource(final EndpointInvariants invariants, final URI targetUri,
+    PendingRequestWithResource(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final MessageEncoding contentEncoding, final ApiPath apiPath) {
-        super(invariants, targetUri, principal, contentEncoding);
+        super(invariants, session, targetUri, principal, contentEncoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

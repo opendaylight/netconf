@@ -15,15 +15,16 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A PATCH request to the /data resource with YANG Data payload.
  */
 @NonNullByDefault
 final class PendingDataPatchPlain extends PendingRequestWithResource<DataPatchResult> {
-    PendingDataPatchPlain(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final MessageEncoding contentEncoding, final ApiPath apiPath) {
-        super(invariants, targetUri, principal, contentEncoding, apiPath);
+    PendingDataPatchPlain(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final MessageEncoding contentEncoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, principal, contentEncoding, apiPath);
     }
 
     @Override
