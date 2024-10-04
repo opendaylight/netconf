@@ -15,6 +15,7 @@ import java.security.Principal;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.TransportSession;
 
