@@ -16,8 +16,6 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -36,19 +34,16 @@ final class APIResource extends AbstractResource {
 
     private final Map<String, AbstractResource> resources;
     private final PrincipalService principalService;
-    private final @NonNull String firstSegment;
     private final List<String> otherSegments;
 
     @NonNullByDefault
-    APIResource(final RestconfServer server, final PrincipalService principalService, final List<String> segments,
+    APIResource(final RestconfServer server, final PrincipalService principalService, final List<String> otherSegments,
             final String restconfPath, final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
             final PrettyPrintParam defaultPrettyPrint) {
         super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
             URI.create(requireNonNull(restconfPath))));
         this.principalService = requireNonNull(principalService);
-
-        firstSegment = segments.getFirst();
-        otherSegments = segments.stream().skip(1).collect(Collectors.toUnmodifiableList());
+        this.otherSegments = requireNonNull(otherSegments);
 
         resources = Map.of(
             "data", new DataResource(invariants),
@@ -91,10 +86,6 @@ final class APIResource extends AbstractResource {
             final URI targetUri, final HttpHeaders headers, final @Nullable Principal principal) {
         LOG.debug("Not servicing root request");
         return NOT_FOUND;
-    }
-
-    String firstSegment() {
-        return firstSegment;
     }
 
     @NonNullByDefault
