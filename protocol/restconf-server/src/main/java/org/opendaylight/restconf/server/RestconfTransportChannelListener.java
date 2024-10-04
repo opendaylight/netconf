@@ -27,8 +27,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     private final RestconfStream.Registry streamRegistry;
     private final NettyEndpointConfiguration configuration;
-    private final RestconfRequestDispatcher dispatcher;
     private final WellKnownResources wellKnown;
+    private final APIResource apiResource;
     private final String restconf;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
@@ -44,7 +44,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         }
         restconf = sb.toString();
         wellKnown = new WellKnownResources(restconf);
-        dispatcher = new RestconfRequestDispatcher(server, principalService, apiRootPath, sb.append('/').toString(),
+        apiResource = new APIResource(server, principalService, apiRootPath, sb.append('/').toString(),
             configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint());
 
         LOG.info("Initialized with service {}", server.getClass());
@@ -59,7 +59,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                 new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
                     configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            new RestconfSession(wellKnown, dispatcher, channel.scheme()));
+            new RestconfSession(wellKnown, apiResource, channel.scheme()));
     }
 
     @Override

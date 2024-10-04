@@ -18,24 +18,29 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME: rename to APIResource
-final class RestconfRequestDispatcher extends AbstractResource {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
+/**
+ * RESTCONF API resource, as defined in
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3>RFC8040, section 3.3</a>.
+ */
+final class APIResource extends AbstractResource {
+    private static final Logger LOG = LoggerFactory.getLogger(APIResource.class);
 
     private final Map<String, AbstractResource> resources;
-    private final @NonNull PrincipalService principalService;
+    private final PrincipalService principalService;
     private final @NonNull String firstSegment;
-    private final @NonNull List<String> otherSegments;
+    private final List<String> otherSegments;
 
-    RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
-            final List<String> segments, final String restconfPath, final ErrorTagMapping errorTagMapping,
-            final MessageEncoding defaultEncoding, final PrettyPrintParam defaultPrettyPrint) {
+    @NonNullByDefault
+    APIResource(final RestconfServer server, final PrincipalService principalService, final List<String> segments,
+            final String restconfPath, final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
+            final PrettyPrintParam defaultPrettyPrint) {
         super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
             URI.create(requireNonNull(restconfPath))));
         this.principalService = requireNonNull(principalService);
@@ -63,11 +68,7 @@ final class RestconfRequestDispatcher extends AbstractResource {
         }
 
         if (!peeler.hasNext()) {
-            // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
-            //        correct: we should be reporting the entire API Resource, as described in
-            //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
-            LOG.debug("Not servicing root request");
-            return NOT_FOUND;
+            return prepare(method, targetUri, headers, principal);
         }
 
         final var segment = peeler.next();
@@ -77,6 +78,16 @@ final class RestconfRequestDispatcher extends AbstractResource {
         }
 
         LOG.debug("Resource for '{}' not found", segment);
+        return NOT_FOUND;
+    }
+
+    // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not correct:
+    //        we should be reporting the entire API Resource, as described in
+    //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
+    @NonNullByDefault
+    private static PreparedRequest prepare(final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final @Nullable Principal principal) {
+        LOG.debug("Not servicing root request");
         return NOT_FOUND;
     }
 
