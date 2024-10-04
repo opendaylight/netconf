@@ -43,10 +43,13 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             sb.append('/').append(URLEncoder.encode(segment, StandardCharsets.UTF_8));
         }
         restconf = sb.toString();
-
         wellKnown = new WellKnownResources(restconf);
         dispatcher = new RestconfRequestDispatcher(server, principalService, apiRootPath, sb.append('/').toString(),
             configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint());
+
+        LOG.info("Initialized with service {}", server.getClass());
+        LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
+            configuration.defaultEncoding(), configuration.prettyPrint().value());
     }
 
     @Override
