@@ -24,45 +24,41 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class RestconfRequestDispatcher {
+// FIXME: rename to APIResource
+final class RestconfRequestDispatcher extends AbstractResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
 
-    private final @NonNull EndpointInvariants invariants;
+    private final Map<String, AbstractResource> resources;
     private final @NonNull PrincipalService principalService;
     private final @NonNull String firstSegment;
     private final @NonNull List<String> otherSegments;
 
-    private final DataResource data;
-    private final OperationsResource operations;
-    private final YLVResource yangLibraryVersion;
-    private final ModulesResource modules;
-
     RestconfRequestDispatcher(final RestconfServer server, final PrincipalService principalService,
             final List<String> segments, final String restconfPath, final ErrorTagMapping errorTagMapping,
             final MessageEncoding defaultEncoding, final PrettyPrintParam defaultPrettyPrint) {
-        invariants = new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
-            URI.create(requireNonNull(restconfPath)));
+        super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
+            URI.create(requireNonNull(restconfPath))));
         this.principalService = requireNonNull(principalService);
 
         firstSegment = segments.getFirst();
         otherSegments = segments.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
-        data = new DataResource(invariants);
-        operations = new OperationsResource(invariants);
-        yangLibraryVersion = new YLVResource(invariants);
-        modules = new ModulesResource(invariants);
+        resources = Map.of(
+            "data", new DataResource(invariants),
+            "operations", new OperationsResource(invariants),
+            "yang-library-version", new YLVResource(invariants),
+            "modules", new ModulesResource(invariants));
 
         LOG.info("{} initialized with service {}", getClass().getSimpleName(), server.getClass());
         LOG.info("Base path: {}, default accept: {}, default pretty print: {}", restconfPath,
@@ -170,26 +166,15 @@ final class RestconfRequestDispatcher {
         }
     }
 
-    /**
-     * Prepare to service a request, by binding the request HTTP method and the request path to a resource and
-     * validating request headers in that context. This method is required to not block.
-     *
-     * @param peeler the {@link SegmentPeeler} holding the unprocessed part of the request path
-     * @param method the method being invoked
-     * @param targetUri the URI of the target resource
-     * @param headers request headers
-     * @param principal the {@link Principal} making this request, {@code null} if not known
-     * @return A {@link PreparedStatement}
-     */
-    @NonNullByDefault
-    private PreparedRequest prepare(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final @Nullable Principal principal) {
+    @Override
+    PreparedRequest prepare(final SegmentPeeler peeler, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final Principal principal) {
         LOG.debug("Preparing {} {}", method, targetUri);
 
         // peel all other segments out
         for (var segment : otherSegments) {
             if (!peeler.hasNext() || !segment.equals(peeler.next())) {
-                return AbstractResource.NOT_FOUND;
+                return NOT_FOUND;
             }
         }
 
@@ -197,17 +182,17 @@ final class RestconfRequestDispatcher {
             // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not
             //        correct: we should be reporting the entire API Resource, as described in
             //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
-            return AbstractResource.NOT_FOUND;
+            LOG.debug("Not servicing root request");
+            return NOT_FOUND;
         }
 
         final var segment = peeler.next();
-        final var path = peeler.remaining();
-        return switch (segment) {
-            case "data" -> data.prepare(method, targetUri, headers, principal, path);
-            case "operations" -> operations.prepare(method, targetUri, headers, principal, path);
-            case "yang-library-version" -> yangLibraryVersion.prepare(method, targetUri, headers, principal, path);
-            case "modules" -> modules.prepare(method, targetUri, headers, principal, path);
-            default -> AbstractResource.NOT_FOUND;
-        };
+        final var resource = resources.get(segment);
+        if (resource != null) {
+            return resource.prepare(peeler, method, targetUri, headers, principal);
+        }
+
+        LOG.debug("Resource for '{}' not found", segment);
+        return NOT_FOUND;
     }
 }
