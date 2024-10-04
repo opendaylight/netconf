@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
-import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -39,7 +38,7 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingGet<Modul
     }
 
     @Override
-    final void execute(final NettyServerRequest<ModulesGetResult> request, final InputStream body) {
+    final void execute(final NettyServerRequest<ModulesGetResult> request) {
         final var revision = request.queryParameters().lookup("revision");
         if (mountPath.isEmpty()) {
             execute(request, fileName, revision);
