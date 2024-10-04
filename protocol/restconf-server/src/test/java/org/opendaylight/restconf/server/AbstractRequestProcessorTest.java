@@ -81,8 +81,13 @@ class AbstractRequestProcessorTest {
         doReturn(null).when(principalService).acquirePrincipal(any());
     }
 
+    @SuppressWarnings("checkstyle:illegalCatch")
     protected final FullHttpResponse dispatch(final FullHttpRequest request) {
-        session.channelRead0(ctx, request);
+        try {
+            session.channelRead(ctx, request);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
         verify(ctx).writeAndFlush(responseCaptor.capture());
         return responseCaptor.getValue();
     }
