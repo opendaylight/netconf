@@ -9,9 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import java.security.Principal;
@@ -34,16 +31,14 @@ final class APIResource extends AbstractResource {
     private static final Logger LOG = LoggerFactory.getLogger(APIResource.class);
 
     private final Map<String, AbstractResource> resources;
-    private final PrincipalService principalService;
     private final List<String> otherSegments;
 
     @NonNullByDefault
-    APIResource(final RestconfServer server, final PrincipalService principalService, final List<String> otherSegments,
-            final String restconfPath, final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
+    APIResource(final RestconfServer server, final List<String> otherSegments, final String restconfPath,
+            final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
             final PrettyPrintParam defaultPrettyPrint) {
         super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
             URI.create(requireNonNull(restconfPath))));
-        this.principalService = requireNonNull(principalService);
         this.otherSegments = requireNonNull(otherSegments);
 
         resources = Map.of(
@@ -87,22 +82,5 @@ final class APIResource extends AbstractResource {
             final URI targetUri, final HttpHeaders headers, final @Nullable Principal principal) {
         LOG.debug("Not servicing root request");
         return NOT_FOUND;
-    }
-
-    @NonNullByDefault
-    @VisibleForTesting
-    @Deprecated(forRemoval = true)
-    void dispatch(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
-            final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
-        final var version = request.protocolVersion();
-        final var principal = principalService.acquirePrincipal(request);
-
-        switch (prepare(peeler, session, method, targetUri, request.headers(), principal)) {
-            case CompletedRequest completed -> callback.onSuccess(completed.toHttpResponse(version));
-            case PendingRequest<?> pending -> {
-                LOG.debug("Dispatching {} {}", method, targetUri);
-                callback.execute(pending, version, new ByteBufInputStream(request.content(), true));
-            }
-        }
     }
 }
