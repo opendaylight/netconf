@@ -32,9 +32,9 @@ abstract non-sealed class PendingRequest<T> implements PreparedRequest {
      * {@link PendingRequestListener}.
      *
      * @param listener the {@link PendingRequestListener} to notify on completion
-     * @param body the HTTP request body
+     * @param body the HTTP request body, {@code null} if not present or empty
      */
-    abstract void execute(PendingRequestListener listener, InputStream body);
+    abstract void execute(PendingRequestListener listener, @Nullable InputStream body);
 
     @Override
     public final int hashCode() {
