@@ -16,6 +16,7 @@ import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * Access to YANG modules. The fact this sits underneath RESTCONF only due to historical reasons.
@@ -27,17 +28,17 @@ final class ModulesResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final String path) {
+    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return switch (method) {
-            case GET -> prepareGet(targetUri, headers, principal, path, true);
-            case HEAD -> prepareGet(targetUri, headers, principal, path, false);
+            case GET -> prepareGet(session, targetUri, headers, principal, path, true);
+            case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
-    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         if (path.isEmpty()) {
             return NOT_FOUND;
@@ -72,7 +73,7 @@ final class ModulesResource extends AbstractLeafResource {
             && !headers.contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YANG, true);
         final var decoded = QueryStringDecoder.decodeComponent(fileName);
 
-        return doYin ? new PendingModulesGetYin(invariants, targetUri, principal, mountPath, decoded)
-            : new PendingModulesGetYang(invariants, targetUri, principal, mountPath, decoded);
+        return doYin ? new PendingModulesGetYin(invariants, session, targetUri, principal, mountPath, decoded)
+            : new PendingModulesGetYang(invariants, session, targetUri, principal, mountPath, decoded);
     }
 }
