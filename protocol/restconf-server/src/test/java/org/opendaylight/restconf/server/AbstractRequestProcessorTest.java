@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -63,7 +64,7 @@ public class AbstractRequestProcessorTest {
     protected RestconfServer server;
     @Mock
     private PrincipalService principalService;
-    @Mock
+    @Spy
     private RestconfRequest callback;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
