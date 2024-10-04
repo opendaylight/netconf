@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.api.OptionsResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * Abstract base class for {@link PendingRequest}s which result in an {@link OptionsResult}. These are mapped to a
@@ -55,9 +56,9 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
     static final CompletedRequest RESOURCE = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_RESOURCE);
     static final CompletedRequest RPC = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_RPC);
 
-    AbstractPendingOptions(final EndpointInvariants invariants, final URI targetUri,
+    AbstractPendingOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final ApiPath apiPath) {
-        super(invariants, targetUri, principal, apiPath);
+        super(invariants, session, targetUri, principal, apiPath);
     }
 
     @Override

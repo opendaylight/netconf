@@ -14,6 +14,7 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An {@link AbstractPendingRequest} with a corresponding (potentially empty) {@link ApiPath}.
@@ -22,9 +23,9 @@ import org.opendaylight.restconf.api.ApiPath;
 abstract class PendingRequestWithApiPath<T> extends AbstractPendingRequest<T> {
     final ApiPath apiPath;
 
-    PendingRequestWithApiPath(final EndpointInvariants invariants, final URI targetUri,
+    PendingRequestWithApiPath(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final ApiPath apiPath) {
-        super(invariants, targetUri, principal);
+        super(invariants, session, targetUri, principal);
         this.apiPath = requireNonNull(apiPath);
     }
 }
