@@ -69,13 +69,13 @@ public class AbstractRequestProcessorTest {
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
 
-    private RestconfRequestDispatcher dispatcher;
+    private APIResource apiResource;
 
     @BeforeEach
     void beforeEach() {
         doReturn(null).when(principalService).acquirePrincipal(any());
-        dispatcher = new RestconfRequestDispatcher(server, principalService, List.of("rests"), "/rests/",
-            ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT);
+        apiResource = new APIResource(server, principalService, List.of("rests"), "/rests/", ERROR_TAG_MAPPING,
+            MessageEncoding.JSON, PRETTY_PRINT);
     }
 
     protected FullHttpResponse dispatch(final FullHttpRequest request) {
@@ -83,7 +83,7 @@ public class AbstractRequestProcessorTest {
         final var peeler = new SegmentPeeler(targetUri);
         assertEquals("rests", peeler.next());
         final var nettyMethod = request.method();
-        dispatcher.dispatch(peeler, switch (nettyMethod.name()) {
+        apiResource.dispatch(peeler, switch (nettyMethod.name()) {
             case "DELETE" -> ImplementedMethod.DELETE;
             case "GET" -> ImplementedMethod.GET;
             case "OPTIONS" -> ImplementedMethod.OPTIONS;
