@@ -22,7 +22,7 @@ import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
- * A {@link PendingRequestWithEncoding} with a significant {@link ConsumableBody}. This class communicates takes care
+ * An {@link AbstractPendingRequest} with a significant {@link ConsumableBody}. This class communicates takes care
  * of wrapping the incoming {@link InputStream} body with the corresponding {@link ConsumableBody} and ensures it gets
  * deallocated when no longer needed.
  *
@@ -30,7 +30,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
  * @param <B> request message body type
  */
 @NonNullByDefault
-abstract class PendingRequestWithBody<T, B extends ConsumableBody> extends AbstractPendingRequest<T> {
+abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> extends AbstractPendingRequest<T> {
     // Note naming: derived from 'Content-Type'
     final MessageEncoding contentEncoding;
 
