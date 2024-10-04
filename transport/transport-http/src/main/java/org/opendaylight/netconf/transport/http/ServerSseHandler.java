@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.STREAM_ID;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.transport.http.Http2Utils.copyStreamId;
 import static org.opendaylight.netconf.transport.http.SseUtils.chunksOf;
 
 import io.netty.buffer.ByteBuf;
@@ -22,6 +22,7 @@ import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
@@ -207,4 +208,18 @@ public final class ServerSseHandler extends ChannelInboundHandlerAdapter impleme
             eventStream.close();
         }
     }
+
+    /**
+     * Copies HTTP/2 associated stream id value (if exists) from one HTTP 1.1 message to another.
+     *
+     * @param from the message object to copy value from
+     * @param to the message object to copy value to
+     */
+    static void copyStreamId(final HttpMessage from, final HttpMessage to) {
+        final var streamId = from.headers().getInt(STREAM_ID.text());
+        if (streamId != null) {
+            to.headers().setInt(STREAM_ID.text(), streamId);
+        }
+    }
+
 }
