@@ -18,9 +18,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.AsciiString;
-import java.net.URI;
-import java.security.Principal;
-import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
@@ -28,7 +25,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.restconf.server.api.TransportSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +34,11 @@ import org.slf4j.LoggerFactory;
  * point in the past.
  */
 @NonNullByDefault
-abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
+abstract sealed class AbstractResource extends Resource permits AbstractLeafResource, APIResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
 
     static final CompletedRequest METHOD_NOT_ALLOWED_READ_ONLY =
         new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
-    static final CompletedRequest NOT_FOUND = new DefaultCompletedRequest(HttpResponseStatus.NOT_FOUND);
 
     static final CompletedRequest NOT_ACCEPTABLE_DATA;
     static final CompletedRequest UNSUPPORTED_MEDIA_TYPE_DATA;
@@ -71,21 +66,6 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
     AbstractResource(final EndpointInvariants invariants) {
         this.invariants = requireNonNull(invariants);
     }
-
-    /**
-     * Prepare to service a request, by binding the request HTTP method and the request path to a resource and
-     * validating request headers in that context. This method is required to not block.
-     *
-     * @param peeler the {@link SegmentPeeler} holding the unprocessed part of the request path
-     * @param session the {@link TransportSession} on which this request is being invoked
-     * @param method the method being invoked
-     * @param targetUri the URI of the target resource
-     * @param headers request headers
-     * @param principal the {@link Principal} making this request, {@code null} if not known
-     * @return A {@link PreparedStatement}
-     */
-    abstract PreparedRequest prepare(SegmentPeeler peeler, TransportSession session, ImplementedMethod method,
-        URI targetUri, HttpHeaders headers, @Nullable Principal principal);
 
     static final PreparedRequest optionalApiPath(final String path, final Function<ApiPath, PreparedRequest> func) {
         return path.isEmpty() ? func.apply(ApiPath.empty()) : requiredApiPath(path, func);
