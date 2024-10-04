@@ -19,7 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC 8040, section 3.3.2</a>.
  */
 @NonNullByDefault
-final class OperationsResource extends AbstractResource {
+final class OperationsResource extends AbstractLeafResource {
     private static final CompletedRequest METHOD_NOT_ALLOWED_RPC =
         new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_RPC);
 
