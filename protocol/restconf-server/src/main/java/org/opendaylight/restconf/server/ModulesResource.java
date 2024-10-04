@@ -21,7 +21,7 @@ import org.opendaylight.restconf.api.ApiPath;
  * Access to YANG modules. The fact this sits underneath RESTCONF only due to historical reasons.
  */
 @NonNullByDefault
-final class ModulesResource extends AbstractResource {
+final class ModulesResource extends AbstractLeafResource {
     ModulesResource(final EndpointInvariants invariants) {
         super(invariants);
     }
