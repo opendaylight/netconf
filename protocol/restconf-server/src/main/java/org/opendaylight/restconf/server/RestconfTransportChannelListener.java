@@ -27,8 +27,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     private final RestconfStream.Registry streamRegistry;
     private final NettyEndpointConfiguration configuration;
-    private final WellKnownResources wellKnown;
-    private final APIResource apiResource;
+    private final EndpointRoot root;
     private final String restconf;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
@@ -43,9 +42,10 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             sb.append('/').append(URLEncoder.encode(segment, StandardCharsets.UTF_8));
         }
         restconf = sb.toString();
-        wellKnown = new WellKnownResources(restconf);
-        apiResource = new APIResource(server, principalService, apiRootPath, sb.append('/').toString(),
-            configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint());
+
+        root = new EndpointRoot(principalService, new WellKnownResources(restconf),
+            new APIResource(server, principalService, apiRootPath, sb.append('/').toString(),
+                configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint()));
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
@@ -59,7 +59,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                 new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
                     configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            new RestconfSession(wellKnown, apiResource, channel.scheme()));
+            new RestconfSession(channel.scheme(), root));
     }
 
     @Override

@@ -33,14 +33,15 @@ class WellKnownResourcesTest {
     @ValueSource(strings = { XRD_SUFFIX, JRD_SUFFIX })
     void options(final String uri) {
         assertOptionsResponse(
-            RESOURCES.request(HttpVersion.HTTP_1_1, ImplementedMethod.OPTIONS, new SegmentPeeler(uri)),
+            RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.OPTIONS).toHttpResponse(HttpVersion.HTTP_1_1),
             "GET, HEAD, OPTIONS");
     }
 
     @ParameterizedTest
     @MethodSource
     void getHostMeta(final String uri, final AsciiString contentType, final String content) {
-        assertResponse(RESOURCES.request(HttpVersion.HTTP_1_1, ImplementedMethod.GET, new SegmentPeeler(uri)),
+        assertResponse(
+            RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET).toHttpResponse(HttpVersion.HTTP_1_1),
             HttpResponseStatus.OK, contentType, content);
     }
 
@@ -63,8 +64,8 @@ class WellKnownResourcesTest {
 
     @Test
     void putHostMeta() {
-        final var response = RESOURCES.request(HttpVersion.HTTP_1_1, ImplementedMethod.POST,
-            new SegmentPeeler(JRD_SUFFIX));
+        final var response = RESOURCES.request(new SegmentPeeler(JRD_SUFFIX), ImplementedMethod.POST)
+            .toHttpResponse(HttpVersion.HTTP_1_1);
         assertResponse(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }
