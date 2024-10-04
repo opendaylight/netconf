@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -27,7 +26,7 @@ final class PendingYangLibraryVersionGet extends AbstractDataPendingGet {
     }
 
     @Override
-    void execute(final NettyServerRequest<FormattableBody> request, final InputStream body) {
+    void execute(final NettyServerRequest<FormattableBody> request) {
         server().yangLibraryVersionGET(request);
     }
 }

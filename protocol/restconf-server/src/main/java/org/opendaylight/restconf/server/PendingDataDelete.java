@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -27,7 +26,7 @@ final class PendingDataDelete extends PendingRequestWithApiPath<Empty> {
     }
 
     @Override
-    void execute(final NettyServerRequest<Empty> request, final InputStream body) {
+    void execute(final NettyServerRequest<Empty> request) {
         server().dataDELETE(request, apiPath);
     }
 

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -33,7 +32,7 @@ final class PendingOperationsGet extends AbstractDataPendingGet {
     }
 
     @Override
-    void execute(final NettyServerRequest<FormattableBody> request, final InputStream body) {
+    void execute(final NettyServerRequest<FormattableBody> request) {
         if (apiPath.isEmpty()) {
             server().operationsGET(request);
         } else {
