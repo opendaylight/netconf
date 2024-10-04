@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A PATCH request to the /data resource with YANG Data payload.
@@ -23,9 +24,9 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 final class PendingDataPatchPlain extends PendingRequestWithResourceBody<DataPatchResult> {
     private final ApiPath apiPath;
 
-    PendingDataPatchPlain(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, encoding);
+    PendingDataPatchPlain(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

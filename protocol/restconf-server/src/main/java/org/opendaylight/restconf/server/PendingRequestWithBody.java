@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ConsumableBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A {@link PendingRequestWithEncoding} with a significant {@link ConsumableBody}. This class communicates takes care
@@ -22,8 +23,9 @@ import org.opendaylight.restconf.api.ConsumableBody;
  */
 @NonNullByDefault
 abstract class PendingRequestWithBody<T, B extends ConsumableBody> extends PendingRequestWithEncoding<T> {
-    PendingRequestWithBody(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding) {
-        super(invariants, targetUri, encoding);
+    PendingRequestWithBody(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding) {
+        super(invariants, session, targetUri, encoding);
     }
 
     @Override

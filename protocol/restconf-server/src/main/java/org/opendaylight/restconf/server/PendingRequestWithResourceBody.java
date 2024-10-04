@@ -13,6 +13,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 
 /**
@@ -24,9 +25,9 @@ import org.opendaylight.restconf.server.api.XmlResourceBody;
  */
 @NonNullByDefault
 abstract class PendingRequestWithResourceBody<T> extends PendingRequestWithBody<T, ResourceBody> {
-    PendingRequestWithResourceBody(final EndpointInvariants invariants, final URI targetUri,
-            final MessageEncoding encoding) {
-        super(invariants, targetUri, encoding);
+    PendingRequestWithResourceBody(final EndpointInvariants invariants, final TransportSession session,
+            final URI targetUri, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, encoding);
     }
 
     @Override

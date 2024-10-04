@@ -13,6 +13,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An abstract base class for {@link PendingRequest}s servicing both GET and HEAD requests. It handles result
@@ -28,9 +29,9 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 abstract class AbstractPendingGet<T> extends PendingRequestWithEncoding<T> {
     private final boolean withContent;
 
-    AbstractPendingGet(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final boolean withContent) {
-        super(invariants, targetUri, encoding);
+    AbstractPendingGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final boolean withContent) {
+        super(invariants, session, targetUri, encoding);
         this.withContent = withContent;
     }
 

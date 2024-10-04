@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An {@link AbstractPendingGet} subclass for YANG Data results in {@link FormattableBody} format and nothing else. The
@@ -23,9 +24,9 @@ import org.opendaylight.restconf.api.FormattableBody;
 @NonNullByDefault
 abstract sealed class AbstractDataPendingGet extends AbstractPendingGet<FormattableBody>
         permits PendingOperationsGet, PendingYangLibraryVersionGet {
-    AbstractDataPendingGet(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final boolean withContent) {
-        super(invariants, targetUri, encoding, withContent);
+    AbstractDataPendingGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final boolean withContent) {
+        super(invariants, session, targetUri, encoding, withContent);
     }
 
     @Override

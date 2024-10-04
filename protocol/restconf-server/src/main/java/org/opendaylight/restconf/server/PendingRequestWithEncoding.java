@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Date;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A {@link PendingRequest} with an attached {@link MessageEncoding}.
@@ -26,9 +27,9 @@ import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 abstract class PendingRequestWithEncoding<T> extends AbstractPendingRequest<T> {
     final MessageEncoding encoding;
 
-    PendingRequestWithEncoding(final EndpointInvariants invariants, final URI targetUri,
+    PendingRequestWithEncoding(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final MessageEncoding encoding) {
-        super(invariants, targetUri);
+        super(invariants, session, targetUri);
         this.encoding = requireNonNull(encoding);
     }
 

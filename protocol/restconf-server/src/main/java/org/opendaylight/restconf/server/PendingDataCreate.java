@@ -13,6 +13,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 
 /**
@@ -20,8 +21,9 @@ import org.opendaylight.restconf.server.api.XmlChildBody;
  */
 @NonNullByDefault
 final class PendingDataCreate extends AbstractPendingDataPost<CreateResourceResult, ChildBody> {
-    PendingDataCreate(final EndpointInvariants invariants, final URI targetUri,  final MessageEncoding encoding) {
-        super(invariants, targetUri, encoding);
+    PendingDataCreate(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding) {
+        super(invariants, session, targetUri, encoding);
     }
 
     @Override

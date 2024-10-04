@@ -15,6 +15,7 @@ import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * Abstract base class for POST requests on /data resource and its children.
@@ -25,8 +26,9 @@ import org.opendaylight.restconf.server.api.InvokeResult;
 @NonNullByDefault
 abstract class AbstractPendingDataPost<T extends DataPostResult, B extends ConsumableBody>
         extends PendingRequestWithBody<T, B> {
-    AbstractPendingDataPost(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding) {
-        super(invariants, targetUri, encoding);
+    AbstractPendingDataPost(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding) {
+        super(invariants, session, targetUri, encoding);
     }
 
     @Override

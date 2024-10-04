@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A PUT request to the /data resource.
@@ -23,9 +24,9 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 final class PendingDataPut extends PendingRequestWithResourceBody<DataPutResult> {
     private final ApiPath apiPath;
 
-    PendingDataPut(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, encoding);
+    PendingDataPut(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

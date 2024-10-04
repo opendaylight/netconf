@@ -16,6 +16,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 
 /**
@@ -25,9 +26,9 @@ import org.opendaylight.restconf.server.api.XmlDataPostBody;
 final class PendingDataPost extends AbstractPendingDataPost<DataPostResult, DataPostBody> {
     private final ApiPath apiPath;
 
-    PendingDataPost(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, encoding);
+    PendingDataPost(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

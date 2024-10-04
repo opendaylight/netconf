@@ -11,15 +11,16 @@ import java.io.InputStream;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A GET or HEAD request to the /yang-library-version resource.
  */
 @NonNullByDefault
 final class PendingYangLibraryVersionGet extends AbstractDataPendingGet {
-    PendingYangLibraryVersionGet(final EndpointInvariants invariants, final URI targetUri,
-            final MessageEncoding encoding, final boolean withContent) {
-        super(invariants, targetUri, encoding, withContent);
+    PendingYangLibraryVersionGet(final EndpointInvariants invariants, final TransportSession session,
+            final URI targetUri, final MessageEncoding encoding, final boolean withContent) {
+        super(invariants, session, targetUri, encoding, withContent);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An abstract implementation of {@link PendingRequest} contract for RESTCONF endpoint. This class and its subclasses
@@ -42,10 +43,12 @@ abstract class AbstractPendingRequest<T> extends PendingRequest<T> {
     static final DefaultHttpHeadersFactory HEADERS_FACTORY = DefaultHttpHeadersFactory.headersFactory();
 
     final EndpointInvariants invariants;
+    final TransportSession session;
     final URI targetUri;
 
-    AbstractPendingRequest(final EndpointInvariants invariants, final URI targetUri) {
+    AbstractPendingRequest(final EndpointInvariants invariants, final TransportSession session, final URI targetUri) {
         this.invariants = requireNonNull(invariants);
+        this.session = requireNonNull(session);
         this.targetUri = requireNonNull(targetUri);
     }
 

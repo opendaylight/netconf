@@ -14,6 +14,7 @@ import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A GET or HEAD request to the /operations resource.
@@ -22,9 +23,9 @@ import org.opendaylight.restconf.api.FormattableBody;
 final class PendingOperationsGet extends AbstractDataPendingGet {
     private final ApiPath apiPath;
 
-    PendingOperationsGet(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final ApiPath apiPath, final boolean withContent) {
-        super(invariants, targetUri, encoding, withContent);
+    PendingOperationsGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final ApiPath apiPath, final boolean withContent) {
+        super(invariants, session, targetUri, encoding, withContent);
         this.apiPath = requireNonNull(apiPath);
     }
 

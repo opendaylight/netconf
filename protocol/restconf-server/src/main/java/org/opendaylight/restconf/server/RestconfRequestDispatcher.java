@@ -41,6 +41,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,13 +105,13 @@ final class RestconfRequestDispatcher {
         return firstSegment;
     }
 
-    void dispatch(final @NonNull ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
-            final FullHttpRequest request, final RestconfRequest callback) {
+    void dispatch(final @NonNull TransportSession session, final @NonNull ImplementedMethod method, final URI targetUri,
+            final SegmentPeeler peeler, final FullHttpRequest request, final RestconfRequest callback) {
         final var version = request.protocolVersion();
         // FIXME: this is here just because of test structure
         final var principal = principalService.acquirePrincipal(request);
 
-        switch (prepare(method, targetUri, peeler, request)) {
+        switch (prepare(session, method, targetUri, peeler, request)) {
             case CompletedRequest completed -> callback.onSuccess(completed.toHttpResponse(version));
             case PendingRequest<?> pending -> {
                 LOG.debug("Dispatching {} {}", request.method(), targetUri);
@@ -211,8 +212,8 @@ final class RestconfRequestDispatcher {
      * @param request the request itself
      * @return A {@link PreparedStatement}
      */
-    private @NonNull PreparedRequest prepare(final ImplementedMethod method, final URI targetUri,
-            final SegmentPeeler peeler, final HttpRequest request) {
+    private @NonNull PreparedRequest prepare(final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final SegmentPeeler peeler, final HttpRequest request) {
         LOG.debug("Preparing {} {}", method, request.uri());
 
         // peel all other segments out
@@ -231,10 +232,10 @@ final class RestconfRequestDispatcher {
 
         final var headers = request.headers();
         return switch (peeler.next()) {
-            case "data" -> prepareData(method, targetUri, peeler, headers);
-            case "operations" -> prepareOperations(method, targetUri, peeler, headers);
-            case "yang-library-version" -> prepareYangLibraryVersion(method, targetUri, peeler, headers);
-            case "modules" -> prepareModules(method, targetUri, peeler, headers);
+            case "data" -> prepareData(session, method, targetUri, peeler, headers);
+            case "operations" -> prepareOperations(session, method, targetUri, peeler, headers);
+            case "yang-library-version" -> prepareYangLibraryVersion(session, method, targetUri, peeler, headers);
+            case "modules" -> prepareModules(session, method, targetUri, peeler, headers);
             default -> NOT_FOUND;
         };
     }
@@ -243,41 +244,41 @@ final class RestconfRequestDispatcher {
      * Process a request to <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.1">RFC 8040 {+restconf}/data</a>
      * resource.
      */
-    private @NonNull PreparedRequest prepareData(final ImplementedMethod method, final URI targetUri,
-            final SegmentPeeler peeler, final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareData(final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final SegmentPeeler peeler, final HttpHeaders headers) {
         return switch (method) {
             // delete target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.7
             case DELETE -> prepareWithApiPath(peeler, apiPath -> apiPath.isEmpty() ? METHOD_NOT_ALLOWED_DATASTORE
-                : new PendingDataDelete(invariants, targetUri, apiPath));
+                : new PendingDataDelete(invariants, session, targetUri, apiPath));
             // retrieve data and metadata for a resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.3
-            case GET -> prepareDataGet(targetUri, peeler, headers, true);
+            case GET -> prepareDataGet(session, targetUri, peeler, headers, true);
             // HEAD is same as GET but without content -> https://www.rfc-editor.org/rfc/rfc8040#section-4.2
-            case HEAD -> prepareDataGet(targetUri, peeler, headers, false);
+            case HEAD -> prepareDataGet(session, targetUri, peeler, headers, false);
             // resource options -> https://www.rfc-editor.org/rfc/rfc8040#section-4.1
             case OPTIONS -> prepareWithApiPath(peeler,
-                apiPath -> new PendingDataOptions(invariants, targetUri, apiPath));
+                apiPath -> new PendingDataOptions(invariants, session, targetUri, apiPath));
             // PATCH -> https://www.rfc-editor.org/rfc/rfc8040#section-4.6
-            case PATCH -> prepareDataPatch(targetUri, peeler, headers);
+            case PATCH -> prepareDataPatch(session, targetUri, peeler, headers);
             // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
             // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
-            case POST -> prepareDataPost(targetUri, peeler, headers);
+            case POST -> prepareDataPost(session, targetUri, peeler, headers);
             // create or replace target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.5
-            case PUT -> prepareDataPut(targetUri, peeler, headers);
+            case PUT -> prepareDataPut(session, targetUri, peeler, headers);
         };
     }
 
     // Common handling for both GET and HEAD methods
-    private @NonNull PreparedRequest prepareDataGet(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers, final boolean withContent) {
+    private @NonNull PreparedRequest prepareDataGet(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers, final boolean withContent) {
         // Attempt to choose an encoding based on user's preference. If we cannot pick one, responding with a 406 status
         // and list the encodings we support
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? NOT_ACCEPTABLE_DATA : prepareWithApiPath(peeler,
-            apiPath -> new PendingDataGet(invariants, targetUri, encoding, apiPath, withContent));
+            apiPath -> new PendingDataGet(invariants, session, targetUri, encoding, apiPath, withContent));
     }
 
-    private @NonNull PreparedRequest prepareDataPatch(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareDataPatch(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers) {
         final var contentTypeValue = headers.get(HttpHeaderNames.CONTENT_TYPE);
         if (contentTypeValue == null) {
             return UNSUPPORTED_MEDIA_TYPE_PATCH;
@@ -290,13 +291,13 @@ final class RestconfRequestDispatcher {
                 // Plain RESTCONF patch = merge target resource content ->
                 // https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1
                 return prepareWithApiPath(peeler,
-                    apiPath -> new PendingDataPatchPlain(invariants, targetUri, encoding, apiPath));
+                    apiPath -> new PendingDataPatchPlain(invariants, session, targetUri, encoding, apiPath));
             }
             if (encoding.patchMediaType().equals(contentType)) {
                 // YANG Patch = ordered list of edits that are applied to the target datastore ->
                 // https://www.rfc-editor.org/rfc/rfc8072#section-2
                 return prepareWithApiPath(peeler,
-                    apiPath -> new PendingDataPatchYang(invariants, targetUri, encoding, apiPath));
+                    apiPath -> new PendingDataPatchYang(invariants, session, targetUri, encoding, apiPath));
             }
         }
 
@@ -305,36 +306,37 @@ final class RestconfRequestDispatcher {
 
     // create resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1
     // or invoke an action -> https://www.rfc-editor.org/rfc/rfc8040#section-3.6
-    private @NonNull PreparedRequest prepareDataPost(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareDataPost(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers) {
         return switch (chooseInputEncoding(headers)) {
             case UNRECOGNIZED, UNSPECIFIED -> UNSUPPORTED_MEDIA_TYPE_DATA;
-            case NOT_PRESENT -> prepareDataPost(targetUri, peeler, invariants.defaultEncoding());
-            case JSON -> prepareDataPost(targetUri, peeler, MessageEncoding.JSON);
-            case XML -> prepareDataPost(targetUri, peeler, MessageEncoding.XML);
+            case NOT_PRESENT -> prepareDataPost(session, targetUri, peeler, invariants.defaultEncoding());
+            case JSON -> prepareDataPost(session, targetUri, peeler, MessageEncoding.JSON);
+            case XML -> prepareDataPost(session, targetUri, peeler, MessageEncoding.XML);
         };
     }
 
-    private @NonNull PreparedRequest prepareDataPost(final URI targetUri, final SegmentPeeler peeler,
-            final MessageEncoding encoding) {
+    private @NonNull PreparedRequest prepareDataPost(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final MessageEncoding encoding) {
         return prepareWithApiPath(peeler, apiPath -> apiPath.isEmpty()
-            ? new PendingDataCreate(invariants, targetUri, encoding)
-            : new PendingDataPost(invariants, targetUri, encoding, apiPath));
+            ? new PendingDataCreate(invariants, session, targetUri, encoding)
+            : new PendingDataPost(invariants, session, targetUri, encoding, apiPath));
     }
 
-    private @NonNull PreparedRequest prepareDataPut(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareDataPut(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers) {
         return switch (chooseInputEncoding(headers)) {
             case UNRECOGNIZED, UNSPECIFIED -> UNSUPPORTED_MEDIA_TYPE_DATA;
-            case NOT_PRESENT -> prepareDataPut(targetUri, peeler, invariants.defaultEncoding());
-            case JSON -> prepareDataPut(targetUri, peeler, MessageEncoding.JSON);
-            case XML -> prepareDataPut(targetUri, peeler, MessageEncoding.XML);
+            case NOT_PRESENT -> prepareDataPut(session, targetUri, peeler, invariants.defaultEncoding());
+            case JSON -> prepareDataPut(session, targetUri, peeler, MessageEncoding.JSON);
+            case XML -> prepareDataPut(session, targetUri, peeler, MessageEncoding.XML);
         };
     }
 
-    private @NonNull PreparedRequest prepareDataPut(final URI targetUri, final SegmentPeeler peeler,
-            final MessageEncoding encoding) {
-        return prepareWithApiPath(peeler, apiPath -> new PendingDataPut(invariants, targetUri, encoding, apiPath));
+    private @NonNull PreparedRequest prepareDataPut(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final MessageEncoding encoding) {
+        return prepareWithApiPath(peeler,
+            apiPath -> new PendingDataPut(invariants, session, targetUri, encoding, apiPath));
     }
 
     /**
@@ -342,14 +344,14 @@ final class RestconfRequestDispatcher {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC 8040 {+restconf}/operations</a> resource.
      */
     @NonNullByDefault
-    private PreparedRequest prepareOperations(final ImplementedMethod method, final URI targetUri,
-            final SegmentPeeler peeler, final HttpHeaders headers) {
+    private PreparedRequest prepareOperations(final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final SegmentPeeler peeler, final HttpHeaders headers) {
         return switch (method) {
-            case GET -> prepareOperationsGet(targetUri, peeler, headers, true);
-            case HEAD -> prepareOperationsGet(targetUri, peeler, headers, false);
-            case OPTIONS -> prepareWithApiPath(peeler, apiPath -> apiPath.isEmpty()
-                ? AbstractPendingOptions.READ_ONLY : new PendingOperationsOptions(invariants, targetUri, apiPath));
-            case POST -> prepareOperationsPost(targetUri, peeler, headers);
+            case GET -> prepareOperationsGet(session, targetUri, peeler, headers, true);
+            case HEAD -> prepareOperationsGet(session, targetUri, peeler, headers, false);
+            case OPTIONS -> prepareWithApiPath(peeler, apiPath -> apiPath.isEmpty() ? AbstractPendingOptions.READ_ONLY
+                : new PendingOperationsOptions(invariants, session, targetUri, apiPath));
+            case POST -> prepareOperationsPost(session, targetUri, peeler, headers);
             default -> prepareWithApiPath(peeler, apiPath -> apiPath.isEmpty() ? METHOD_NOT_ALLOWED_READ_ONLY
                 // TODO: This is incomplete. We are always reporting 405 Method Not Allowed, but we can do better.
                 //       We should fire off an OPTIONS request for the apiPath and see if it exists: if it does not,
@@ -358,68 +360,70 @@ final class RestconfRequestDispatcher {
         };
     }
 
-    private @NonNull PreparedRequest prepareOperationsGet(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers, final boolean withContent) {
+    private @NonNull PreparedRequest prepareOperationsGet(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers, final boolean withContent) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? NOT_ACCEPTABLE_DATA : prepareWithApiPath(peeler,
-            apiPath -> new PendingOperationsGet(invariants, targetUri, encoding, apiPath, withContent));
+            apiPath -> new PendingOperationsGet(invariants, session, targetUri, encoding, apiPath, withContent));
     }
 
     // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2
-    private @NonNull PreparedRequest prepareOperationsPost(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareOperationsPost(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? NOT_ACCEPTABLE_DATA : switch (chooseInputEncoding(headers)) {
-            case NOT_PRESENT -> prepareOperationsPost(targetUri, peeler, invariants.defaultEncoding(), encoding);
-            case JSON -> prepareOperationsPost(targetUri, peeler, MessageEncoding.JSON, encoding);
-            case XML -> prepareOperationsPost(targetUri, peeler, MessageEncoding.XML, encoding);
+            case NOT_PRESENT ->
+                prepareOperationsPost(session, targetUri, peeler, invariants.defaultEncoding(), encoding);
+            case JSON -> prepareOperationsPost(session, targetUri, peeler, MessageEncoding.JSON, encoding);
+            case XML -> prepareOperationsPost(session, targetUri, peeler, MessageEncoding.XML, encoding);
             case UNRECOGNIZED, UNSPECIFIED -> UNSUPPORTED_MEDIA_TYPE_DATA;
         };
     }
 
-    private @NonNull PreparedRequest prepareOperationsPost(final URI targetUri, final SegmentPeeler peeler,
-            final MessageEncoding inputEncoding, final MessageEncoding outputEncoding) {
+    private @NonNull PreparedRequest prepareOperationsPost(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final MessageEncoding inputEncoding, final MessageEncoding outputEncoding) {
         return prepareWithApiPath(peeler,
             // FIXME: use inputEncoding
-            apiPath -> new PendingOperationsPost(invariants, targetUri, outputEncoding, apiPath));
+            apiPath -> new PendingOperationsPost(invariants, session, targetUri, outputEncoding, apiPath));
     }
 
     /**
      * Prepare a request to
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">{+restconf}/yang-library-version</a> resource.
      */
-    private @NonNull PreparedRequest prepareYangLibraryVersion(final ImplementedMethod method, final URI targetUri,
-            final SegmentPeeler peeler, final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareYangLibraryVersion(final TransportSession session,
+            final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
+            final HttpHeaders headers) {
         return peeler.remaining().isEmpty() ? switch (method) {
-            case GET -> prepareYangLibraryVersionGet(targetUri, headers, true);
-            case HEAD -> prepareYangLibraryVersionGet(targetUri, headers, false);
+            case GET -> prepareYangLibraryVersionGet(session, targetUri, headers, true);
+            case HEAD -> prepareYangLibraryVersionGet(session, targetUri, headers, false);
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
         } : NOT_FOUND;
     }
 
-    private @NonNull PreparedRequest prepareYangLibraryVersionGet(final URI targetUri, final HttpHeaders headers,
-            final boolean withContent) {
+    private @NonNull PreparedRequest prepareYangLibraryVersionGet(final TransportSession session, final URI targetUri,
+            final HttpHeaders headers, final boolean withContent) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? UNSUPPORTED_MEDIA_TYPE_DATA
-            : new PendingYangLibraryVersionGet(invariants, targetUri, encoding, withContent);
+            : new PendingYangLibraryVersionGet(invariants, session, targetUri, encoding, withContent);
     }
 
     /**
      * Access to YANG modules.
      */
-    private @NonNull PreparedRequest prepareModules(final ImplementedMethod method, final URI targetUri,
-            final SegmentPeeler peeler, final HttpHeaders headers) {
+    private @NonNull PreparedRequest prepareModules(final TransportSession session, final ImplementedMethod method,
+            final URI targetUri, final SegmentPeeler peeler, final HttpHeaders headers) {
         return switch (method) {
-            case GET -> prepareModulesGet(targetUri, peeler, headers, true);
-            case HEAD -> prepareModulesGet(targetUri, peeler, headers, false);
+            case GET -> prepareModulesGet(session, targetUri, peeler, headers, true);
+            case HEAD -> prepareModulesGet(session, targetUri, peeler, headers, false);
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
-    private @NonNull PreparedRequest prepareModulesGet(final URI targetUri, final SegmentPeeler peeler,
-            final HttpHeaders headers, final boolean withContent) {
+    private @NonNull PreparedRequest prepareModulesGet(final TransportSession session, final URI targetUri,
+            final SegmentPeeler peeler, final HttpHeaders headers, final boolean withContent) {
         final var remaining = peeler.remaining();
         if (remaining.isEmpty()) {
             return NOT_FOUND;
@@ -454,8 +458,8 @@ final class RestconfRequestDispatcher {
             && !headers.contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YANG, true);
         final var decoded = QueryStringDecoder.decodeComponent(fileName);
 
-        return doYin ? new PendingModulesGetYin(invariants, targetUri, mountPath, decoded)
-            : new PendingModulesGetYang(invariants, targetUri, mountPath, decoded);
+        return doYin ? new PendingModulesGetYin(invariants, session, targetUri, mountPath, decoded)
+            : new PendingModulesGetYang(invariants, session, targetUri, mountPath, decoded);
     }
 
     @NonNullByDefault

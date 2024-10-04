@@ -30,6 +30,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 @ExtendWith(MockitoExtension.class)
 public class AbstractRequestProcessorTest {
@@ -64,6 +65,8 @@ public class AbstractRequestProcessorTest {
     @Mock
     private PrincipalService principalService;
     @Mock
+    private TransportSession session;
+    @Mock
     private RestconfRequest callback;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
@@ -82,7 +85,7 @@ public class AbstractRequestProcessorTest {
         final var peeler = new SegmentPeeler(targetUri);
         assertEquals("rests", peeler.next());
         final var nettyMethod = request.method();
-        dispatcher.dispatch(switch (nettyMethod.name()) {
+        dispatcher.dispatch(session, switch (nettyMethod.name()) {
             case "DELETE" -> ImplementedMethod.DELETE;
             case "GET" -> ImplementedMethod.GET;
             case "OPTIONS" -> ImplementedMethod.OPTIONS;

@@ -16,6 +16,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 
 /**
@@ -25,9 +26,9 @@ import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 final class PendingOperationsPost extends PendingRequestWithBody<InvokeResult, OperationInputBody> {
     private final ApiPath apiPath;
 
-    PendingOperationsPost(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, encoding);
+    PendingOperationsPost(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

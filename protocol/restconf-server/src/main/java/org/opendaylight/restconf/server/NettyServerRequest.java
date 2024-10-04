@@ -50,8 +50,7 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
 
     @Override
     public TransportSession session() {
-        // FIXME: NETCONF-714: return the correct NettyTransportSession, RestconfSession in our case
-        return null;
+        return request.session;
     }
 
     @Override

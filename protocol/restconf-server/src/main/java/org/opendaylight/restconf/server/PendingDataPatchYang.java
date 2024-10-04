@@ -18,6 +18,7 @@ import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -29,9 +30,9 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 final class PendingDataPatchYang extends PendingRequestWithBody<DataYangPatchResult, PatchBody> {
     private final ApiPath apiPath;
 
-    PendingDataPatchYang(final EndpointInvariants invariants, final URI targetUri, final MessageEncoding encoding,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, encoding);
+    PendingDataPatchYang(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final MessageEncoding encoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 

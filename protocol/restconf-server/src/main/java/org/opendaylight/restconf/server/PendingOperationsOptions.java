@@ -14,6 +14,7 @@ import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.OptionsResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * An OPTIONS request to the /operations resource.
@@ -22,8 +23,9 @@ import org.opendaylight.restconf.server.api.OptionsResult;
 final class PendingOperationsOptions extends AbstractPendingOptions {
     private final ApiPath apiPath;
 
-    PendingOperationsOptions(final EndpointInvariants invariants, final URI targetUri, final ApiPath apiPath) {
-        super(invariants, targetUri);
+    PendingOperationsOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final ApiPath apiPath) {
+        super(invariants, session, targetUri);
         this.apiPath = requireNonNull(apiPath);
     }
 

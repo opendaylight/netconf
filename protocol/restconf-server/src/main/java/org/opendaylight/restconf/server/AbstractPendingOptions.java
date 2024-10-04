@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.api.OptionsResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * Abstract base class for {@link PendingRequest}s which result in an {@link OptionsResult}. These are mapped to a
@@ -52,8 +53,8 @@ abstract class AbstractPendingOptions extends AbstractPendingRequest<OptionsResu
     static final CompletedRequest RESOURCE = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_RESOURCE);
     static final CompletedRequest RPC = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_RPC);
 
-    AbstractPendingOptions(final EndpointInvariants invariants, final URI targetUri) {
-        super(invariants, targetUri);
+    AbstractPendingOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri) {
+        super(invariants, session, targetUri);
     }
 
     @Override

@@ -189,7 +189,7 @@ final class RestconfSession extends SimpleChannelInboundHandler<FullHttpRequest>
         //        - invoke dispatcher.prepare() from here first
         //        - handle CompletedRequest to synchronous dispatch just like the above two cases, as it is that simple
 
-        dispatcher.dispatch(method, targetUri, peeler, msg, new RestconfRequest() {
+        dispatcher.dispatch(this, method, targetUri, peeler, msg, new RestconfRequest() {
             @Override
             public void onSuccess(final FullHttpResponse response) {
                 msg.release();
