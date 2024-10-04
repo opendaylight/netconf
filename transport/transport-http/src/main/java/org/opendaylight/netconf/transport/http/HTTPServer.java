@@ -26,7 +26,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.transport.Tls;
 
 /**
- * A {@link HTTPTransportStack} acting as a server.
+ * A {@link HTTPTransportStack} acting as a server. When this stack is set up, {@link HTTPTransportChannel}s reported
+ * to the {@link TransportChannelListener} are set up such they support both HTTP/1.1 and HTTP/2. The details of the
+ * setup are subject to change and users are advised to attach their own subclass of {@link HTTPServerSession} as the
+ * last handler. Doing so will provide a predictable API surface as to how the pipeline is set up.
  */
 public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
     private final AuthHandlerFactory authHandlerFactory;

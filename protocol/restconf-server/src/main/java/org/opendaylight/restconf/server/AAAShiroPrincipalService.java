@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import java.security.Principal;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.shiro.web.env.AAAShiroWebEnvironment;
 import org.opendaylight.netconf.transport.http.AbstractBasicAuthHandler;
 import org.opendaylight.netconf.transport.http.AuthHandler;
@@ -33,21 +33,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AAA services integration.
- * Replicates the behavior of org.opendaylight.aaa.authenticator.ODLAuthenticator with no usage of servlet API.
+ * AAA services integration. Replicates the behavior of org.opendaylight.aaa.authenticator.ODLAuthenticator without the
+ * use of Servlet API.
  */
 @Singleton
 @Component(immediate = true)
 public final class AAAShiroPrincipalService implements PrincipalService {
     private static final Logger LOG = LoggerFactory.getLogger(AAAShiroPrincipalService.class);
     private static final String PRINCIPAL_UUID_HEADER = "x-restconf-principal-uuid";
+
     private final SecurityManager securityManager;
     private final Map<UUID, Principal> principalMap = new ConcurrentHashMap<>();
 
     @Activate
     public AAAShiroPrincipalService(@Reference final AAAShiroWebEnvironment env) {
-        requireNonNull(env);
-        this.securityManager = requireNonNull(env.getSecurityManager());
+        this(env.getSecurityManager());
     }
 
     @Inject
@@ -56,15 +56,21 @@ public final class AAAShiroPrincipalService implements PrincipalService {
     }
 
     @Override
-    public @Nullable Principal acquirePrincipal(final HttpRequest request) {
-        final var uuidStr = request.headers().get(PRINCIPAL_UUID_HEADER);
-        UUID uuid = null;
-        try {
-            uuid = uuidStr == null ? null : UUID.fromString(uuidStr);
-        } catch (IllegalArgumentException e) {
-            // ignore invalid value
+    public Principal acquirePrincipal(final HttpHeaders headers) {
+        final var uuidStr = headers.get(PRINCIPAL_UUID_HEADER);
+        if (uuidStr == null) {
+            LOG.debug("No {} header present", PRINCIPAL_UUID_HEADER);
+            return null;
         }
-        return uuid == null ? null : principalMap.remove(uuid);
+
+        final UUID uuid;
+        try {
+            uuid = UUID.fromString(uuidStr);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Ignoring invalid header value", e);
+            return null;
+        }
+        return principalMap.remove(uuid);
     }
 
     @Override

@@ -9,9 +9,10 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
@@ -34,7 +35,7 @@ final class EndpointRoot {
     }
 
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
-            final HttpRequest request) {
+            final HttpHeaders headers) {
         final var peeler = new SegmentPeeler(targetUri);
         if (!peeler.hasNext()) {
             // We only support OPTIONS
@@ -46,8 +47,8 @@ final class EndpointRoot {
         if (segment.equals(".well-known")) {
             return wellKnown.request(peeler, method);
         } else if (segment.equals(apiSegment)) {
-            return apiResource.prepare(peeler, session, method, targetUri, request.headers(),
-                principalService.acquirePrincipal(request));
+            return apiResource.prepare(peeler, session, method, targetUri, headers,
+                principalService.acquirePrincipal(headers));
         } else {
             return AbstractResource.NOT_FOUND;
         }
