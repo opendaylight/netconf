@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A {@link PendingRequestWithEncoding} with a significant {@link ConsumableBody}. This class communicates takes care
@@ -33,9 +34,9 @@ abstract class PendingRequestWithBody<T, B extends ConsumableBody> extends Abstr
     // Note naming: derived from 'Content-Type'
     final MessageEncoding contentEncoding;
 
-    PendingRequestWithBody(final EndpointInvariants invariants, final URI targetUri,
+    PendingRequestWithBody(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final MessageEncoding contentEncoding) {
-        super(invariants, targetUri, principal);
+        super(invariants, session, targetUri, principal);
         this.contentEncoding = requireNonNull(contentEncoding);
     }
 

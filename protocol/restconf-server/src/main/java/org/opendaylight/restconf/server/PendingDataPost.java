@@ -18,6 +18,7 @@ import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 
 /**
@@ -25,9 +26,10 @@ import org.opendaylight.restconf.server.api.XmlDataPostBody;
  */
 @NonNullByDefault
 final class PendingDataPost extends PendingRequestWithOutput<DataPostResult, DataPostBody> {
-    PendingDataPost(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final MessageEncoding contentEncoding, final MessageEncoding acceptEncoding, final ApiPath apiPath) {
-        super(invariants, targetUri, principal, contentEncoding, acceptEncoding, apiPath);
+    PendingDataPost(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final MessageEncoding contentEncoding,
+            final MessageEncoding acceptEncoding, final ApiPath apiPath) {
+        super(invariants, session, targetUri, principal, contentEncoding, acceptEncoding, apiPath);
     }
 
     @Override

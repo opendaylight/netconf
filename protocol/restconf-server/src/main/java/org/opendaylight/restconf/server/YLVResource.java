@@ -12,6 +12,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * RESTCONF /yang-library-version resource, as defined in
@@ -24,20 +25,20 @@ final class YLVResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final String path) {
+    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return !path.isEmpty() ? NOT_FOUND : switch (method) {
-            case GET -> prepareGet(targetUri, headers, principal, true);
-            case HEAD -> prepareGet(targetUri, headers, principal, false);
+            case GET -> prepareGet(session, targetUri, headers, principal, true);
+            case HEAD -> prepareGet(session, targetUri, headers, principal, false);
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
         };
     }
 
-    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final boolean withContent) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? UNSUPPORTED_MEDIA_TYPE_DATA
-            : new PendingYangLibraryVersionGet(invariants, targetUri, principal, encoding, withContent);
+            : new PendingYangLibraryVersionGet(invariants, session, targetUri, principal, encoding, withContent);
     }
 }

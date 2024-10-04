@@ -13,6 +13,7 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -20,9 +21,9 @@ import org.opendaylight.yangtools.yang.common.Empty;
  */
 @NonNullByDefault
 final class PendingDataDelete extends PendingRequestWithApiPath<Empty> {
-    PendingDataDelete(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final ApiPath apiPath) {
-        super(invariants, targetUri, principal, apiPath);
+    PendingDataDelete(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final ApiPath apiPath) {
+        super(invariants, session, targetUri, principal, apiPath);
     }
 
     @Override

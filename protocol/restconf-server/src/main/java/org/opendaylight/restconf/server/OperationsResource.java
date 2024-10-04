@@ -13,6 +13,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * RESTCONF /operations resource, as defined in
@@ -28,49 +29,52 @@ final class OperationsResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final String path) {
+    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return switch (method) {
-            case GET -> prepareGet(targetUri, headers, principal, path, true);
-            case HEAD -> prepareGet(targetUri, headers, principal, path, false);
-            case OPTIONS -> prepareOptions(targetUri, principal, path);
-            case POST -> preparePost(targetUri, headers, principal, path);
-            default -> prepareDefault(targetUri, path);
+            case GET -> prepareGet(session, targetUri, headers, principal, path, true);
+            case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
+            case OPTIONS -> prepareOptions(session, targetUri, principal, path);
+            case POST -> preparePost(session, targetUri, headers, principal, path);
+            default -> prepareDefault(session, targetUri, path);
         };
     }
 
-    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest prepareGet(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         final var encoding = chooseOutputEncoding(headers);
         return encoding == null ? NOT_ACCEPTABLE_DATA : optionalApiPath(path,
-            apiPath -> new PendingOperationsGet(invariants, targetUri, principal, encoding, apiPath, withContent));
+            apiPath -> new PendingOperationsGet(invariants, session, targetUri, principal, encoding, apiPath,
+                withContent));
     }
 
-    private PreparedRequest prepareOptions(final URI targetUri, final @Nullable Principal principal,
-            final String path) {
-        return path.isEmpty() ? AbstractPendingOptions.READ_ONLY
-            : requiredApiPath(path, apiPath -> new PendingOperationsOptions(invariants, targetUri, principal, apiPath));
+    private PreparedRequest prepareOptions(final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final String path) {
+        return path.isEmpty() ? AbstractPendingOptions.READ_ONLY : requiredApiPath(path,
+            apiPath -> new PendingOperationsOptions(invariants, session, targetUri, principal, apiPath));
     }
 
     // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2
-    private PreparedRequest preparePost(final URI targetUri, final HttpHeaders headers,
+    private PreparedRequest preparePost(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path) {
         final var accept = chooseOutputEncoding(headers);
         return accept == null ? NOT_ACCEPTABLE_DATA : switch (chooseInputEncoding(headers)) {
-            case NOT_PRESENT -> preparePost(targetUri, principal, path, invariants.defaultEncoding(), accept);
-            case JSON -> preparePost(targetUri, principal, path, MessageEncoding.JSON, accept);
-            case XML -> preparePost(targetUri, principal, path, MessageEncoding.XML, accept);
+            case NOT_PRESENT -> preparePost(session, targetUri, principal, path, invariants.defaultEncoding(), accept);
+            case JSON -> preparePost(session, targetUri, principal, path, MessageEncoding.JSON, accept);
+            case XML -> preparePost(session, targetUri, principal, path, MessageEncoding.XML, accept);
             case UNRECOGNIZED, UNSPECIFIED -> UNSUPPORTED_MEDIA_TYPE_DATA;
         };
     }
 
-    private PreparedRequest preparePost(final URI targetUri, final @Nullable Principal principal, final String path,
-            final MessageEncoding content, final MessageEncoding accept) {
+    private PreparedRequest preparePost(final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final String path, final MessageEncoding content,
+            final MessageEncoding accept) {
         return optionalApiPath(path,
-            apiPath -> new PendingOperationsPost(invariants, targetUri, principal, content, accept, apiPath));
+            apiPath -> new PendingOperationsPost(invariants, session, targetUri, principal, content, accept, apiPath));
     }
 
-    private static PreparedRequest prepareDefault(final URI targetUri, final String path) {
+    private static PreparedRequest prepareDefault(final TransportSession session, final URI targetUri,
+            final String path) {
         return path.isEmpty() ? METHOD_NOT_ALLOWED_READ_ONLY
             // TODO: This is incomplete. We are always reporting 405 Method Not Allowed, but we can do better.
             //       We should fire off an OPTIONS request for the apiPath and see if it exists: if it does not,

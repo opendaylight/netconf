@@ -14,15 +14,16 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A GET or HEAD request to the /modules resource in YANG form.
  */
 @NonNullByDefault
 final class PendingModulesGetYang extends AbstractPendingModulesGet {
-    PendingModulesGetYang(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final ApiPath mountPath, final String fileName) {
-        super(invariants, targetUri, principal, mountPath, fileName);
+    PendingModulesGetYang(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final ApiPath mountPath, final String fileName) {
+        super(invariants, session, targetUri, principal, mountPath, fileName);
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
  * A GET or HEAD request to the /data resource.
@@ -27,9 +28,10 @@ import org.opendaylight.restconf.server.api.DataGetResult;
 final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
     private final ApiPath apiPath;
 
-    PendingDataGet(final EndpointInvariants invariants, final URI targetUri, final @Nullable Principal principal,
-            final MessageEncoding encoding, final ApiPath apiPath, final boolean withContent) {
-        super(invariants, targetUri, principal, encoding, withContent);
+    PendingDataGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
+            final @Nullable Principal principal, final MessageEncoding encoding, final ApiPath apiPath,
+            final boolean withContent) {
+        super(invariants, session, targetUri, principal, encoding, withContent);
         this.apiPath = requireNonNull(apiPath);
     }
 
