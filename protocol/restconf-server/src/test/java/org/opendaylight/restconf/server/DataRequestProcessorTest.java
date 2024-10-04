@@ -17,14 +17,14 @@ import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
 import static org.opendaylight.restconf.server.TestUtils.formattableBody;
+import static org.opendaylight.restconf.server.TestUtils.newOptionsRequest;
+import static org.opendaylight.restconf.server.TestUtils.newRequest;
 
 import io.netty.handler.codec.DateFormatter;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
@@ -96,7 +96,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsDataStore() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH);
+        final var request = newOptionsRequest(DATA_PATH);
         doAnswer(answerCompleteWith(OptionsResult.DATASTORE)).when(server).dataOPTIONS(any());
 
         final var response = dispatch(request);
@@ -115,7 +115,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsDataStoreReadOnly() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH);
+        final var request = newOptionsRequest(DATA_PATH);
         doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(server).dataOPTIONS(any());
 
         final var response = dispatch(request);
@@ -125,7 +125,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsOperation() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
+        final var request = newOptionsRequest(DATA_PATH_WITH_ID);
         doAnswer(answerCompleteWith(OptionsResult.ACTION)).when(server).dataOPTIONS(any(), any());
 
         final var response = dispatch(request);
@@ -135,7 +135,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsResource() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
+        final var request = newOptionsRequest(DATA_PATH_WITH_ID);
         doAnswer(answerCompleteWith(OptionsResult.RESOURCE)).when(server).dataOPTIONS(any(), any());
 
         final var response = dispatch(request);
@@ -154,7 +154,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsReadOnly() {
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, DATA_PATH_WITH_ID);
+        final var request = newOptionsRequest(DATA_PATH_WITH_ID);
         doAnswer(answerCompleteWith(OptionsResult.READ_ONLY)).when(server).dataOPTIONS(any(), any());
 
         final var response = dispatch(request);
@@ -370,7 +370,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         final var result = Empty.value();
         doAnswer(answerCompleteWith(result)).when(server).dataDELETE(any(), any(ApiPath.class));
 
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE, DATA_PATH_WITH_ID);
+        final var request = newRequest(HttpMethod.DELETE, DATA_PATH_WITH_ID);
         final var response = dispatch(request);
         verify(server).dataDELETE(any(), apiPathCaptor.capture());
         assertEquals(API_PATH, apiPathCaptor.getValue());
@@ -382,8 +382,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         final var result = Empty.value();
         doAnswer(answerCompleteWith(result)).when(server).dataDELETE(any(), any(ApiPath.class));
 
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE,
-            DATA_PATH_WITH_ID_SLASH);
+        final var request = newRequest(HttpMethod.DELETE, DATA_PATH_WITH_ID_SLASH);
         final var response = dispatch(request);
         verify(server).dataDELETE(any(), apiPathCaptor.capture());
 
