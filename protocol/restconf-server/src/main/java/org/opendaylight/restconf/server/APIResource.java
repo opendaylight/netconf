@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
@@ -97,6 +98,8 @@ final class APIResource extends AbstractResource {
     }
 
     @NonNullByDefault
+    @VisibleForTesting
+    @Deprecated(forRemoval = true)
     void dispatch(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
             final URI targetUri, final FullHttpRequest request, final RestconfRequest callback) {
         final var version = request.protocolVersion();
