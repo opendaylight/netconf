@@ -118,7 +118,7 @@ class HttpClientServerTest {
                         response.headers()
                             .set(CONTENT_TYPE, TEXT_PLAIN)
                             .setInt(CONTENT_LENGTH, response.content().readableBytes());
-                        Http2Utils.copyStreamId(msg, response);
+                        ServerSseHandler.copyStreamId(msg, response);
 
                         // emulate asynchronous server request processing - run in separate thread with 100 millis delay
                         scheduledExecutor.schedule(() -> ctx.writeAndFlush(response), 100, TimeUnit.MILLISECONDS);
