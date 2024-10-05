@@ -74,10 +74,16 @@ public final class SSHClient extends SSHTransportStack {
 
     @Override
     void onKeyEstablished(final Session session) throws IOException {
+        final var clientSession = cast(session);
+        if (clientSession.isAuthenticated()) {
+            // Case of key re-exchange - if session is once authenticated, it does not need to be made again
+            return;
+        }
+
         // server key is accepted, trigger authentication flow
-        final var sessionId = sessionId(session);
+        final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
-        cast(session).auth().addListener(future -> onAuthComplete(future, sessionId));
+        clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
     }
 
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
