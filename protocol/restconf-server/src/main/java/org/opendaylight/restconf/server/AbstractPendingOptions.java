@@ -20,6 +20,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * Abstract base class for {@link PendingRequest}s which result in an {@link OptionsResult}. These are mapped to a
