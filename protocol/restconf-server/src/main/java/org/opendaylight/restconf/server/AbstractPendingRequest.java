@@ -27,6 +27,7 @@ import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * An abstract implementation of {@link PendingRequest} contract for RESTCONF endpoint. This class and its subclasses

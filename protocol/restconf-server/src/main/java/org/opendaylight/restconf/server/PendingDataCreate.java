@@ -17,6 +17,7 @@ import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlChildBody;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * A POST request to the /data resource.
