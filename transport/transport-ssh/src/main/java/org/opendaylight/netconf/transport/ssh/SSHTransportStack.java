@@ -116,6 +116,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     public final void sessionEvent(final Session session, final Event event) {
         final var sessionId = sessionId(session);
         switch (event) {
+            case null -> throw new NullPointerException();
             case KeyEstablished -> {
                 LOG.debug("New key established on session {}", sessionId);
                 try {
@@ -136,9 +137,6 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
             }
             case KexCompleted -> {
                 LOG.debug("Key exchange completed on session {}", sessionId);
-            }
-            default -> {
-                LOG.debug("Ignoring event {} on session {}", event, sessionId);
             }
         }
     }
