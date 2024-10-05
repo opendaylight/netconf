@@ -63,8 +63,9 @@ public class UserAuthSessionListener implements SessionListener {
 
     @Override
     public void sessionEvent(Session session, Event event) {
-        if (Event.KeyEstablished == event && session instanceof ClientSession clientSession) {
-            // server key is accepted, trigger authentication flow
+        if (Event.KeyEstablished == event && session instanceof ClientSession clientSession
+            && !clientSession.isAuthenticated()) {
+            // server key is accepted, trigger authentication flow, unless we already did
             try {
                 clientSession.auth().addListener(future -> {
                     if (!future.isSuccess()) {
