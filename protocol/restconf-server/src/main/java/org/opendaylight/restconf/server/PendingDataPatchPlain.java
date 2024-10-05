@@ -16,6 +16,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * A PATCH request to the /data resource with YANG Data payload.

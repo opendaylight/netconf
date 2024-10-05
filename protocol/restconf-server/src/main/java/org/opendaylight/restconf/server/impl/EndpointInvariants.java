@@ -5,13 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server;
+package org.opendaylight.restconf.server.impl;
 
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 
@@ -22,13 +23,13 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
  *                     {@code restconfURI} contract
  */
 @NonNullByDefault
-record EndpointInvariants(
+public record EndpointInvariants(
         RestconfServer server,
         PrettyPrintParam defaultPrettyPrint,
         ErrorTagMapping errorTagMapping,
         MessageEncoding defaultEncoding,
         URI restconfPath) {
-    EndpointInvariants {
+    public EndpointInvariants {
         requireNonNull(server);
         requireNonNull(defaultPrettyPrint);
         requireNonNull(errorTagMapping);

@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * Abstract base class for {@link PendingRequestWithBody}s which also produce an output.
