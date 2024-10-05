@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 interface PendingRequestListener {
 
-    void requestComplete(PendingRequest<?> request, Response reply);
+    void requestComplete(PendingRequest<?> request, Response response);
 
     void requestFailed(PendingRequest<?> request, Exception cause);
 }
