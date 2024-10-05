@@ -30,6 +30,7 @@ import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,6 +18,7 @@ import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * A POST request to the /operations resource.

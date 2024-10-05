@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * An abstract base class for {@link PendingRequest}s servicing both GET and HEAD requests. It handles result
