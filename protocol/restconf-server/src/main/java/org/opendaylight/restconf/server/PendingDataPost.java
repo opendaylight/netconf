@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * A POST request to a child of /data resource.

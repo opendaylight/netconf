@@ -20,6 +20,7 @@ import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * An {@link AbstractPendingRequest} with a significant {@link ConsumableBody}. This class communicates takes care

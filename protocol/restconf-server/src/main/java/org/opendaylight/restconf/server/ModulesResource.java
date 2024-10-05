@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * Access to YANG modules. The fact this sits underneath RESTCONF only due to historical reasons.
