@@ -19,6 +19,7 @@ import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * A {@link PendingRequestWithBody} with a {@link ResourceBody}.
