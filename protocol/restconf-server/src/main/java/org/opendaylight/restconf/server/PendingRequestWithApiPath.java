@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
  * An {@link PendingRequestWithoutBody} with a corresponding (potentially empty) {@link ApiPath}.
