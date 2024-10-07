@@ -7,8 +7,9 @@
  */
 package org.opendaylight.restconf.openapi.jaxrs;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
+import static java.util.Objects.requireNonNull;
+
+import com.fasterxml.jackson.core.JsonFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -26,12 +27,10 @@ import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
 public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity> {
-    private final JsonGenerator generator;
-    private final ByteArrayOutputStream stream;
+    private final JsonFactory factory;
 
-    public OpenApiBodyWriter(final JsonGenerator generator, final ByteArrayOutputStream stream) {
-        this.generator = generator;
-        this.stream = stream;
+    public OpenApiBodyWriter(final JsonFactory factory) {
+        this.factory = requireNonNull(factory);
     }
 
     @Override
@@ -44,13 +43,8 @@ public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity>
     public void writeTo(final OpenApiEntity entity, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        entity.generate(generator);
-        generator.flush();
-    }
-
-    public byte[] readFrom() {
-        final var bytes = stream.toByteArray();
-        stream.reset();
-        return bytes;
+        try (var generator = factory.createGenerator(entityStream)) {
+            entity.generate(generator);
+        }
     }
 }

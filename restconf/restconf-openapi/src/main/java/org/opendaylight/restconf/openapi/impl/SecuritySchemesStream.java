@@ -18,30 +18,28 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.SecuritySchemesEntity;
 import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject;
 
 public final class SecuritySchemesStream extends InputStream {
-    private final OpenApiBodyWriter writer;
+    private final OpenApiBodyBuffer buffer;
     private final SecuritySchemesEntity securitySchemesEntity;
 
     private Reader reader;
     private ReadableByteChannel channel;
 
-    public SecuritySchemesStream(final OpenApiBodyWriter writer,
+    public SecuritySchemesStream(final OpenApiBodyBuffer buffer,
             final Map<String, SecuritySchemeObject> securitySchemes) {
-        this.writer = writer;
-        this.securitySchemesEntity = new SecuritySchemesEntity(securitySchemes);
+        this.buffer = buffer;
+        securitySchemesEntity = new SecuritySchemesEntity(securitySchemes);
     }
 
     @Override
     public int read() throws IOException {
         if (reader == null) {
             reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(securitySchemesEntity)),
-                    StandardCharsets.UTF_8));
+                new InputStreamReader(writeNextEntity(securitySchemesEntity), StandardCharsets.UTF_8));
         }
         return reader.read();
     }
@@ -49,14 +47,12 @@ public final class SecuritySchemesStream extends InputStream {
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
         if (channel == null) {
-            final var stream = new ByteArrayInputStream(writeNextEntity(securitySchemesEntity));
-            channel = Channels.newChannel(stream);
+            channel = Channels.newChannel(writeNextEntity(securitySchemesEntity));
         }
         return channel.read(ByteBuffer.wrap(array, off, len));
     }
 
-    private byte[] writeNextEntity(final OpenApiEntity next) throws IOException {
-        writer.writeTo(next, null, null, null, null, null, null);
-        return writer.readFrom();
+    private ByteArrayInputStream writeNextEntity(final OpenApiEntity next) throws IOException {
+        return buffer.entityInputStream(next);
     }
 }

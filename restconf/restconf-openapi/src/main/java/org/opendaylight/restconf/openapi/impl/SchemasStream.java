@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.NodeSchemaEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.RpcSchemaEntity;
@@ -48,7 +47,7 @@ public final class SchemasStream extends InputStream {
     private static final String OUTPUT_SUFFIX = "_output";
 
     private final Iterator<? extends Module> iterator;
-    private final OpenApiBodyWriter writer;
+    private final OpenApiBodyBuffer buffer;
     private final EffectiveModelContext modelContext;
     private final boolean isForSingleModule;
     private final ByteArrayOutputStream stream;
@@ -60,13 +59,13 @@ public final class SchemasStream extends InputStream {
     private ReadableByteChannel channel;
     private boolean eof;
 
-    public SchemasStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
+    public SchemasStream(final EffectiveModelContext modelContext, final OpenApiBodyBuffer buffer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
             final ByteArrayOutputStream stream, final JsonGenerator generator, final int width,
             final int depth) {
         this.iterator = iterator;
         this.modelContext = modelContext;
-        this.writer = writer;
+        this.buffer = buffer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
         this.generator = generator;
@@ -89,9 +88,9 @@ public final class SchemasStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (iterator.hasNext()) {
-                reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(
+                reader = new BufferedReader(new InputStreamReader(
                     writeNextEntity(new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule,
-                            width, depth)))),
+                            width, depth))),
                         StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
@@ -121,8 +120,8 @@ public final class SchemasStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (iterator.hasNext()) {
-                channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
-                    new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule, width, depth)))));
+                channel = Channels.newChannel(writeNextEntity(
+                    new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule, width, depth))));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -136,9 +135,8 @@ public final class SchemasStream extends InputStream {
         return read;
     }
 
-    private byte[] writeNextEntity(final OpenApiEntity entity) throws IOException {
-        writer.writeTo(entity, null, null, null, null, null, null);
-        return writer.readFrom();
+    private ByteArrayInputStream writeNextEntity(final OpenApiEntity entity) throws IOException {
+        return buffer.entityInputStream(entity);
     }
 
     private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext modelContext,

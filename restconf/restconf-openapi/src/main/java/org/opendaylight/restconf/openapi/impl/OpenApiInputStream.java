@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.InfoEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiVersionEntity;
 import org.opendaylight.restconf.openapi.model.SecurityEntity;
@@ -48,15 +47,15 @@ public final class OpenApiInputStream extends InputStream {
             final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
             final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
             final String basePath, final int width, final int depth) throws IOException {
-        final OpenApiBodyWriter writer = new OpenApiBodyWriter(generator, stream);
-        stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
-        stack.add(new InfoStream(new InfoEntity(title), writer));
-        stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), writer));
-        stack.add(new PathsStream(modelContext, writer, deviceName, urlPrefix, isForSingleModule, includeDataStore,
+        final var buffer = new OpenApiBodyBuffer(generator, stream);
+        stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), buffer));
+        stack.add(new InfoStream(new InfoEntity(title), buffer));
+        stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), buffer));
+        stack.add(new PathsStream(modelContext, buffer, deviceName, urlPrefix, isForSingleModule, includeDataStore,
             modules.iterator(), basePath, stream, generator, width, depth));
-        stack.add(new ComponentsStream(modelContext, writer, generator, stream, modules.iterator(), isForSingleModule,
+        stack.add(new ComponentsStream(modelContext, buffer, generator, stream, modules.iterator(), isForSingleModule,
             width, depth));
-        stack.add(new SecurityStream(writer, new SecurityEntity(security)));
+        stack.add(new SecurityStream(buffer, new SecurityEntity(security)));
     }
 
     @Override

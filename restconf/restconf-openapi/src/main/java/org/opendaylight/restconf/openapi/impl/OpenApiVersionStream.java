@@ -17,27 +17,25 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiVersionEntity;
 
 public final class OpenApiVersionStream extends InputStream {
     private final OpenApiVersionEntity entity;
-    private final OpenApiBodyWriter writer;
+    private final OpenApiBodyBuffer buffer;
 
     private Reader reader;
     private ReadableByteChannel channel;
 
-    public OpenApiVersionStream(final OpenApiVersionEntity entity, final OpenApiBodyWriter writer) {
+    public OpenApiVersionStream(final OpenApiVersionEntity entity, final OpenApiBodyBuffer buffer) {
         this.entity = entity;
-        this.writer = writer;
+        this.buffer = buffer;
     }
 
     @Override
     public int read() throws IOException {
         if (reader == null) {
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(entity)), StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(writeNextEntity(entity), StandardCharsets.UTF_8));
         }
         return reader.read();
     }
@@ -45,13 +43,12 @@ public final class OpenApiVersionStream extends InputStream {
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
         if (channel == null) {
-            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(entity)));
+            channel = Channels.newChannel(writeNextEntity(entity));
         }
         return channel.read(ByteBuffer.wrap(array, off, len));
     }
 
-    private byte[] writeNextEntity(final OpenApiEntity next) throws IOException {
-        writer.writeTo(next, null, null, null, null, null, null);
-        return writer.readFrom();
+    private ByteArrayInputStream writeNextEntity(final OpenApiEntity next) throws IOException {
+        return buffer.entityInputStream(next);
     }
 }

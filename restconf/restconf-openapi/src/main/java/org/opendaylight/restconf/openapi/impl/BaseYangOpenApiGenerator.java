@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -53,10 +54,10 @@ public abstract class BaseYangOpenApiGenerator {
             portionOfModels, basePath, width, depth);
     }
 
-    public MetadataStream getControllerModulesMeta(final int offset, final int limit) throws IOException {
+    public MetadataEntity getControllerModulesMeta(final int offset, final int limit) throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
-        return new MetadataStream(offset, limit, modulesWithoutDuplications.size(),
+        return new MetadataEntity(offset, limit, modulesWithoutDuplications.size(),
             configModulesList(modulesWithoutDuplications).size());
     }
 

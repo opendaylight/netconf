@@ -7,18 +7,39 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
-import static java.util.Objects.requireNonNull;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 
 public final class MetadataEntity extends OpenApiEntity {
+    private static final String TOTAL_MODULES = "totalModules";
+    private static final String CONFIG_MODULES = "configModules";
+    private static final String NON_CONFIG_MODULES = "nonConfigModules";
+    private static final String CURRENT_PAGE = "currentPage";
+    private static final String TOTAL_PAGES = "totalPages";
+
     private final @NonNull Map<String, ?> mappedMetadata;
 
-    public MetadataEntity(final @NonNull Map<String, ?> mappedMetadata) {
-        this.mappedMetadata = requireNonNull(mappedMetadata);
+    public MetadataEntity(final int offset, final int limit, final long allModules, final long configModules) {
+        mappedMetadata = limit == 0 && offset == 0
+            ? Map.of(
+                TOTAL_MODULES, allModules,
+                CONFIG_MODULES, configModules,
+                NON_CONFIG_MODULES, allModules - configModules,
+                CURRENT_PAGE, 1,
+                TOTAL_PAGES, 1)
+            : Map.of(
+                TOTAL_MODULES, allModules,
+                CONFIG_MODULES, configModules,
+                NON_CONFIG_MODULES, allModules - configModules,
+                "limit", limit,
+                "offset", offset,
+                CURRENT_PAGE, offset / limit + 1,
+                TOTAL_PAGES, configModules / limit + 1,
+                "previousOffset", Math.max(offset - limit, 0),
+                "nextOffset", Math.min(offset + limit, configModules)
+            );
     }
 
     @Override
