@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -21,21 +22,16 @@ import org.opendaylight.restconf.server.api.TransportSession;
  */
 @NonNullByDefault
 final class EndpointRoot {
+    private final Map<String, ServerResource> resources;
     private final PrincipalService principalService;
-    private final WellKnownResources wellKnown;
-    private final APIResource apiResource;
-    private final String apiSegment;
 
     // FIXME: at some point we should just receive a Map of resources with coherent API
-    EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown,
-            final String apiSegment, final APIResource apiResource) {
+    EndpointRoot(final PrincipalService principalService, final Map<String, ServerResource> resources) {
         this.principalService = requireNonNull(principalService);
-        this.wellKnown = requireNonNull(wellKnown);
-        this.apiSegment = requireNonNull(apiSegment);
-        this.apiResource = requireNonNull(apiResource);
+        this.resources = requireNonNull(resources);
     }
 
-    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+    PreparedRequest prepareRequest(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers) {
         final var peeler = new SegmentPeeler(targetUri);
         if (!peeler.hasNext()) {
@@ -44,14 +40,12 @@ final class EndpointRoot {
                 : CompletedRequests.METHOD_NOT_ALLOWED_OPTIONS;
         }
 
-        final var segment = peeler.next();
-        if (segment.equals(".well-known")) {
-            return wellKnown.request(peeler, method);
-        } else if (segment.equals(apiSegment)) {
-            return apiResource.prepare(peeler, session, method, targetUri, headers,
+        final var resource = resources.get(peeler.next());
+        return switch (resource) {
+            case null -> CompletedRequests.NOT_FOUND;
+            case WellKnownResources wellKnown -> wellKnown.prepareRequest(peeler, method, headers);
+            case RestconfServerResource restconf -> restconf.prepareRequest(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
-        } else {
-            return CompletedRequests.NOT_FOUND;
-        }
+        };
     }
 }

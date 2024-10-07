@@ -34,7 +34,7 @@ final class DataResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+    PreparedRequest prepareRequest(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return switch (method) {
             case DELETE -> prepareDelete(session, targetUri, principal, path);
