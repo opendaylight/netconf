@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84e76870_2c51d134",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractResource.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T11:28:30Z",
+      "side": 1,
+      "message": "We want org.opendaylight.restconf.server.PreparedStatement",
+      "revId": "cee3aa324dac054c157c7ebda236364db6e18d21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
