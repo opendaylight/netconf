@@ -52,7 +52,7 @@ final class OperationsResource extends AbstractLeafResource {
 
     private PreparedRequest prepareOptions(final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final String path) {
-        return path.isEmpty() ? AbstractPendingOptions.READ_ONLY : requiredApiPath(path,
+        return path.isEmpty() ? CompletedRequests.OK_GET : requiredApiPath(path,
             apiPath -> new PendingOperationsOptions(invariants, session, targetUri, principal, apiPath));
     }
 
@@ -77,7 +77,7 @@ final class OperationsResource extends AbstractLeafResource {
 
     private static PreparedRequest prepareDefault(final TransportSession session, final URI targetUri,
             final String path) {
-        return path.isEmpty() ? METHOD_NOT_ALLOWED_READ_ONLY
+        return path.isEmpty() ? CompletedRequests.METHOD_NOT_ALLOWED_GET
             // TODO: This is incomplete. We are always reporting 405 Method Not Allowed, but we can do better.
             //       We should fire off an OPTIONS request for the apiPath and see if it exists: if it does not,
             //       we should report a 404 Not Found instead.

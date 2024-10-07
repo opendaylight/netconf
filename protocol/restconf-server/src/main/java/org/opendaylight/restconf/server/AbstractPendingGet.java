@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.URI;
@@ -47,7 +48,7 @@ abstract class AbstractPendingGet<T> extends PendingRequestWithoutBody<T> {
             return transformResultImpl(request, result);
         }
 
-        final var headers = HEADERS_FACTORY.newEmptyHeaders();
+        final var headers = DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders();
         fillHeaders(result, headers);
         return new DefaultCompletedRequest(HttpResponseStatus.OK, headers);
     }
