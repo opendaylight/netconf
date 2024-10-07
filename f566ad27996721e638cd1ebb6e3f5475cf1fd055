@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaf4dc5c_ef77e109",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DefaultCompletedRequest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T12:39:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b98af2a_b9fd0e99",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45c1d5bd_51b51031",
@@ -69,6 +87,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e86e9f7b_8e9751b2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/PendingRequestWithBody.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T12:39:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45c1d5bd_51b51031",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6366b668_9be25f0d",
@@ -82,6 +118,24 @@
       "writtenOn": "2024-10-07T12:15:04Z",
       "side": 1,
       "message": "unnecessary ;",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5be27d9b_047f6031",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestBodyHandling.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T12:39:33Z",
+      "side": 1,
+      "message": "we actually need to differentiate these two cases, because the server is allowed to make a guess if the body is not specified.\n\nit is not something we are doing right now, but if/when we do, the choosing code should not change",
+      "parentUuid": "6366b668_9be25f0d",
       "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
