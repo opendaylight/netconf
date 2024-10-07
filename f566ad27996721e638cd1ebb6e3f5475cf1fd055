@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4dcb918_d8e4b738",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractPendingRequest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T12:39:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a0690c9_d6a7b46b",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "538574db_6ee6b877",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-07T11:31:14Z",
       "side": 1,
       "message": "CharSourceResponse(@NonNull CharSource source, @NonNull AsciiString mediaType) or can non null be default as well",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "512a8920_6010db61",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/CharSourceResponse.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T12:39:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "538574db_6ee6b877",
       "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
