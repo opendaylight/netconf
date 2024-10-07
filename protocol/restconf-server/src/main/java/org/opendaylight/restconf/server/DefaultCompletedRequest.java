@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -28,18 +29,20 @@ import org.eclipse.jdt.annotation.Nullable;
  * @param content response body content
  */
 // TODO: body + no content-type should be disallowed: reconsider the design of this class
+@Beta
 @NonNullByDefault
-record DefaultCompletedRequest(HttpResponseStatus status, @Nullable HttpHeaders headers, @Nullable ByteBuf content)
+public record DefaultCompletedRequest(HttpResponseStatus status, @Nullable HttpHeaders headers,
+        @Nullable ByteBuf content)
         implements CompletedRequest {
-    DefaultCompletedRequest {
+    public DefaultCompletedRequest {
         requireNonNull(status);
     }
 
-    DefaultCompletedRequest(final HttpResponseStatus status) {
+    public DefaultCompletedRequest(final HttpResponseStatus status) {
         this(status, null, null);
     }
 
-    DefaultCompletedRequest(final HttpResponseStatus status, final HttpHeaders headers) {
+    public DefaultCompletedRequest(final HttpResponseStatus status, final HttpHeaders headers) {
         this(status, requireNonNull(headers), null);
     }
 

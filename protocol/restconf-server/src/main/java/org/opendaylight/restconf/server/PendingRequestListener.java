@@ -7,13 +7,15 @@
  */
 package org.opendaylight.restconf.server;
 
+import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * An entity listening to {@link PendingRequest}s completions.
  */
+@Beta
 @NonNullByDefault
-interface PendingRequestListener {
+public interface PendingRequestListener {
 
     void requestComplete(PendingRequest<?> request, Response response);
 
