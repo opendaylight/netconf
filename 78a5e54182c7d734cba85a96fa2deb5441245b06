@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde9b189_7a106e57",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ModulesResource.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T12:11:43Z",
+      "side": 1,
+      "message": "withContent is not used",
+      "revId": "78a5e54182c7d734cba85a96fa2deb5441245b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
