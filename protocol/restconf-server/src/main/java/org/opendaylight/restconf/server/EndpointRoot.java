@@ -13,6 +13,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.restconf.server.api.TransportSession;
 
 /**
