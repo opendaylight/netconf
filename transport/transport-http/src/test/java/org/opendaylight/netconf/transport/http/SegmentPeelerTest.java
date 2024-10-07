@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server;
+package org.opendaylight.netconf.transport.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.transport.http.SegmentPeeler;
 
 class SegmentPeelerTest {
     @Test
