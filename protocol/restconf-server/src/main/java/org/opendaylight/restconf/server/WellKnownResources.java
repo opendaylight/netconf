@@ -22,6 +22,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
