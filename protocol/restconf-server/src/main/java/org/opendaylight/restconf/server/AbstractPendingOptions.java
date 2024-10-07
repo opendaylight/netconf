@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
+import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -47,17 +48,16 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
         HttpHeaderValues.APPLICATION_XML.toString(),
         NettyMediaTypes.TEXT_XML.toString()));
 
-    static final HttpHeaders HEADERS_ACTION = headers("OPTIONS, POST");
     static final HttpHeaders HEADERS_DATASTORE = patchHeaders("GET, HEAD, OPTIONS, PATCH, POST, PUT");
-    static final HttpHeaders HEADERS_READ_ONLY = headers("GET, HEAD, OPTIONS");
-    static final HttpHeaders HEADERS_RESOURCE = patchHeaders("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
     static final HttpHeaders HEADERS_RPC = headers("GET, HEAD, OPTIONS, POST");
 
-    static final EmptyRequestResponse ACTION = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_ACTION);
-    static final EmptyRequestResponse DATASTORE = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_DATASTORE);
-    static final EmptyRequestResponse READ_ONLY = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_READ_ONLY);
-    static final EmptyRequestResponse RESOURCE = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RESOURCE);
-    static final EmptyRequestResponse RPC = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RPC);
+    private static final EmptyRequestResponse ACTION =
+        new EmptyRequestResponse(HttpResponseStatus.OK, headers("OPTIONS, POST"));
+    private static final EmptyRequestResponse DATASTORE =
+        new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_DATASTORE);
+    private static final EmptyRequestResponse RESOURCE = new EmptyRequestResponse(HttpResponseStatus.OK,
+        patchHeaders("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT"));
+    private static final EmptyRequestResponse RPC = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RPC);
 
     AbstractPendingOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final ApiPath apiPath) {
@@ -69,14 +69,14 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
         return switch (result) {
             case ACTION -> ACTION;
             case DATASTORE -> DATASTORE;
-            case READ_ONLY -> READ_ONLY;
+            case READ_ONLY -> CompletedRequests.OK_GET;
             case RESOURCE -> RESOURCE;
             case RPC -> RPC;
         };
     }
 
     private static HttpHeaders headers(final String allowValue) {
-        return HEADERS_FACTORY.newEmptyHeaders().set(HttpHeaderNames.ALLOW, allowValue);
+        return DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders().set(HttpHeaderNames.ALLOW, allowValue);
     }
 
     private static HttpHeaders patchHeaders(final String allowValue) {

@@ -36,15 +36,15 @@ final class ModulesResource extends AbstractLeafResource {
         return switch (method) {
             case GET -> prepareGet(session, targetUri, headers, principal, path, true);
             case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
-            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
-            default -> METHOD_NOT_ALLOWED_READ_ONLY;
+            case OPTIONS -> CompletedRequests.OK_GET;
+            default -> CompletedRequests.METHOD_NOT_ALLOWED_GET;
         };
     }
 
     private PreparedRequest prepareGet(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         if (path.isEmpty()) {
-            return NOT_FOUND;
+            return CompletedRequests.NOT_FOUND;
         }
 
         // optional mountPath followed by file name separated by slash
@@ -66,7 +66,7 @@ final class ModulesResource extends AbstractLeafResource {
         }
 
         if (fileName.isEmpty()) {
-            return NOT_FOUND;
+            return CompletedRequests.NOT_FOUND;
         }
 
         // YIN if explicitly requested

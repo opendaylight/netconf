@@ -47,27 +47,6 @@ import org.slf4j.LoggerFactory;
 abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
 
-    /**
-     * A {@link EmptyRequestResponse} reporting {@code 405 Method Not Allowed} and indicating support only for
-     * {@code OPTIONS} method.
-     */
-    static final EmptyRequestResponse OPTIONS_ONLY_METHOD_NOT_ALLOWED;
-    /**
-     * A {@link CompletedRequest} reporting {@code 200 OK} and containing only {@code Allow: OPTIONS} header.
-     */
-    static final EmptyRequestResponse OPTIONS_ONLY_OK;
-
-    static {
-        final var headers = DefaultHttpHeadersFactory.headersFactory().newHeaders()
-            .set(HttpHeaderNames.ALLOW, "OPTIONS");
-        OPTIONS_ONLY_METHOD_NOT_ALLOWED = new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
-        OPTIONS_ONLY_OK = new EmptyRequestResponse(HttpResponseStatus.OK, headers);
-    }
-
-    static final EmptyRequestResponse METHOD_NOT_ALLOWED_READ_ONLY =
-        new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
-    static final CompletedRequest NOT_FOUND = new EmptyRequestResponse(HttpResponseStatus.NOT_FOUND);
-
     static final EmptyRequestResponse NOT_ACCEPTABLE_DATA;
     static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_DATA;
     static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_PATCH;

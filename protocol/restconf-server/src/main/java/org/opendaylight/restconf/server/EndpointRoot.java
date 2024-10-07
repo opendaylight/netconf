@@ -41,8 +41,8 @@ final class EndpointRoot {
         final var peeler = new SegmentPeeler(targetUri);
         if (!peeler.hasNext()) {
             // We only support OPTIONS
-            return method == ImplementedMethod.OPTIONS ? AbstractResource.OPTIONS_ONLY_OK
-                : AbstractResource.OPTIONS_ONLY_METHOD_NOT_ALLOWED;
+            return method == ImplementedMethod.OPTIONS ? CompletedRequests.OK_OPTIONS
+                : CompletedRequests.METHOD_NOT_ALLOWED_OPTIONS;
         }
 
         final var segment = peeler.next();
@@ -52,7 +52,7 @@ final class EndpointRoot {
             return apiResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
         } else {
-            return AbstractResource.NOT_FOUND;
+            return CompletedRequests.NOT_FOUND;
         }
     }
 }
