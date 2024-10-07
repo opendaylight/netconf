@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
@@ -48,9 +49,10 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         final var firstSegment = apiRootPath.getFirst();
         final var otherSegments = apiRootPath.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
-        root = new EndpointRoot(principalService, new WellKnownResources(restconf), firstSegment,
-            new APIResource(server, otherSegments, sb.append('/').toString(), configuration.errorTagMapping(),
-                configuration.defaultEncoding(), configuration.prettyPrint()));
+        root = new EndpointRoot(principalService, Map.of(
+                ".well-known", new WellKnownResources(restconf),
+                firstSegment, new APIResource(server, otherSegments, sb.append('/').toString(),
+                    configuration.errorTagMapping(), configuration.defaultEncoding(), configuration.prettyPrint())));
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,

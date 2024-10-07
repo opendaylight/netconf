@@ -35,13 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for various RESTCONF HTTP resources, either defined in
+ * A {@link ServerResource} for various RESTCONF HTTP resources, either defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3">RFC8040, section 3.3</a>, or those made up by us at some
  * point in the past.
  */
 @NonNullByDefault
-abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
+abstract sealed class RestconfServerResource extends ServerResource permits AbstractLeafResource, APIResource {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfServerResource.class);
 
     static final CompletedRequest NOT_ACCEPTABLE_DATA;
     static final CompletedRequest UNSUPPORTED_MEDIA_TYPE_DATA;
@@ -66,7 +66,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
 
     final EndpointInvariants invariants;
 
-    AbstractResource(final EndpointInvariants invariants) {
+    RestconfServerResource(final EndpointInvariants invariants) {
         this.invariants = requireNonNull(invariants);
     }
 
@@ -82,7 +82,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
      * @param principal the {@link Principal} making this request, {@code null} if not known
      * @return A {@link PreparedRequest}
      */
-    abstract PreparedRequest prepare(SegmentPeeler peeler, TransportSession session, ImplementedMethod method,
+    abstract PreparedRequest prepareRequest(SegmentPeeler peeler, TransportSession session, ImplementedMethod method,
         URI targetUri, HttpHeaders headers, @Nullable Principal principal);
 
     static final PreparedRequest optionalApiPath(final String path, final Function<ApiPath, PreparedRequest> func) {
