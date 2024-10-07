@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.jaxrs;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -50,7 +49,7 @@ public final class WebInitializer implements AutoCloseable {
                 .servlet(servletSupport.createHttpServletBuilder(new Application() {
                     @Override
                     public Set<Object> getSingletons() {
-                        return Set.of(openApiService, new JacksonJaxbJsonProvider());
+                        return Set.of(openApiService);
                     }
                 }).build())
                 .addUrlPattern("/api/v3/*")

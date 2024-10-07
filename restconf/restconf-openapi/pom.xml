@@ -18,6 +18,10 @@
   <artifactId>restconf-openapi</artifactId>
   <packaging>bundle</packaging>
 
+  <properties>
+    <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>dk.brics</groupId>
@@ -26,8 +30,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -45,12 +49,16 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>jakarta.ws.rs</groupId>
-      <artifactId>jakarta.ws.rs-api</artifactId>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.annotation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.aaa.web</groupId>
@@ -99,6 +107,11 @@
 
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
       <scope>test</scope>
     </dependency>
@@ -110,6 +123,11 @@
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-test-util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -119,15 +137,10 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
-
           <instructions>
             <Bundle-Name>Restconf OpenAPI Generator</Bundle-Name>
             <Embed-Dependency>automaton</Embed-Dependency>
-            <Export-Package>
-              com.fasterxml.jackson.datatype.*
-            </Export-Package>
           </instructions>
-
         </configuration>
       </plugin>
     </plugins>
