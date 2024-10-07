@@ -68,8 +68,8 @@ final class WellKnownResources {
     CompletedRequest request(final SegmentPeeler peeler, final ImplementedMethod method) {
         if (!peeler.hasNext()) {
             // We only support OPTIONS
-            return method == ImplementedMethod.OPTIONS ? AbstractResource.OPTIONS_ONLY_OK
-                : AbstractResource.OPTIONS_ONLY_METHOD_NOT_ALLOWED;
+            return method == ImplementedMethod.OPTIONS ? CompletedRequests.OK_OPTIONS
+                : CompletedRequests.METHOD_NOT_ALLOWED_OPTIONS;
         }
 
         final var suffix = QueryStringDecoder.decodeComponent(peeler.remaining());
@@ -78,7 +78,7 @@ final class WellKnownResources {
             case "/host-meta.json" -> requestJRD(method);
             default -> {
                 LOG.debug("Suffix '{}' not recognized", suffix);
-                yield AbstractResource.NOT_FOUND;
+                yield CompletedRequests.NOT_FOUND;
             }
         };
     }
@@ -94,8 +94,8 @@ final class WellKnownResources {
         return switch (method) {
             case GET -> getResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
             case HEAD -> headResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
-            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
-            default -> AbstractResource.METHOD_NOT_ALLOWED_READ_ONLY;
+            case OPTIONS -> CompletedRequests.OK_GET;
+            default -> CompletedRequests.METHOD_NOT_ALLOWED_GET;
         };
     }
 
@@ -104,8 +104,8 @@ final class WellKnownResources {
         return switch (method) {
             case GET -> getResponse(HttpHeaderValues.APPLICATION_JSON, jrd);
             case HEAD -> headResponse(HttpHeaderValues.APPLICATION_JSON, jrd);
-            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
-            default -> AbstractResource.METHOD_NOT_ALLOWED_READ_ONLY;
+            case OPTIONS -> CompletedRequests.OK_GET;
+            default -> CompletedRequests.METHOD_NOT_ALLOWED_GET;
         };
     }
 
