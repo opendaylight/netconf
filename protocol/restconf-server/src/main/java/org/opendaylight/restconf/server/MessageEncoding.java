@@ -32,7 +32,7 @@ public enum MessageEncoding {
     JSON(NettyMediaTypes.APPLICATION_YANG_DATA_JSON, NettyMediaTypes.APPLICATION_YANG_PATCH_JSON,
             EncodingName.RFC8040_JSON, HttpHeaderValues.APPLICATION_JSON) {
         @Override
-        void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
+        public void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
             body.formatToJSON(prettyPrint, out);
         }
@@ -44,7 +44,7 @@ public enum MessageEncoding {
     XML(NettyMediaTypes.APPLICATION_YANG_DATA_XML, NettyMediaTypes.APPLICATION_YANG_PATCH_XML,
             EncodingName.RFC8040_XML, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
         @Override
-        void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
+        public void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
             body.formatToXML(prettyPrint, out);
         }
@@ -68,7 +68,7 @@ public enum MessageEncoding {
      *
      * @return A media type
      */
-    AsciiString dataMediaType() {
+    public AsciiString dataMediaType() {
         return dataMediaType;
     }
 
@@ -77,7 +77,7 @@ public enum MessageEncoding {
      *
      * @return A media type
      */
-    AsciiString patchMediaType() {
+    public AsciiString patchMediaType() {
         return patchMediaType;
     }
 
@@ -86,7 +86,7 @@ public enum MessageEncoding {
      *
      * @return A stream {@link EncodingName}
      */
-    EncodingName streamEncodingName() {
+    public EncodingName streamEncodingName() {
         return streamEncodingName;
     }
 
@@ -100,7 +100,7 @@ public enum MessageEncoding {
      * @param mediaType requested media type
      * @return {@code true} if this encoding can be used to produce specified media type
      */
-    boolean producesDataCompatibleWith(final AsciiString mediaType) {
+    public boolean producesDataCompatibleWith(final AsciiString mediaType) {
         return dataMediaType.equals(mediaType) || compatibleDataMediaTypes.contains(mediaType);
     }
 
@@ -112,5 +112,6 @@ public enum MessageEncoding {
      * @param out output stream
      * @throws IOException when an I/O error occurs
      */
-    abstract void formatBody(FormattableBody body, PrettyPrintParam prettyPrint, OutputStream out) throws IOException;
+    public abstract void formatBody(FormattableBody body, PrettyPrintParam prettyPrint, OutputStream out)
+        throws IOException;
 }
