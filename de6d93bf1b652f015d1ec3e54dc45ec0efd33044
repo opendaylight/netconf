@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a66c6b11_04a52473",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractResource.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T13:29:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11045a0c_b124f303",
+      "revId": "de6d93bf1b652f015d1ec3e54dc45ec0efd33044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "daa5644f_d7068216",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-10-07T12:10:43Z",
       "side": 1,
       "message": "headers is not used",
+      "revId": "de6d93bf1b652f015d1ec3e54dc45ec0efd33044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a141fdd_2acb61a4",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataResource.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T13:29:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daa5644f_d7068216",
       "revId": "de6d93bf1b652f015d1ec3e54dc45ec0efd33044",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
