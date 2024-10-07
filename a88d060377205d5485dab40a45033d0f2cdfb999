@@ -16,6 +16,24 @@
       "message": "Held back until we have a netconf-9 branch",
       "revId": "a88d060377205d5485dab40a45033d0f2cdfb999",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "954215a6_419091d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T14:35:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed8e218f_005ada57",
+      "revId": "a88d060377205d5485dab40a45033d0f2cdfb999",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
