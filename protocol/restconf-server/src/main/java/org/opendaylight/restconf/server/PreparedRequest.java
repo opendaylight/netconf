@@ -7,11 +7,16 @@
  */
 package org.opendaylight.restconf.server;
 
+import com.google.common.annotations.Beta;
+import org.opendaylight.netconf.transport.http.SegmentPeeler;
+import org.opendaylight.restconf.server.impl.AbstractResource;
+
 /**
  * The result of {@link AbstractResource#prepare(SegmentPeeler, org.opendaylight.restconf.server.api.TransportSession,
  * ImplementedMethod, java.net.URI, io.netty.handler.codec.http.HttpHeaders, java.security.Principal)}.
  * This can either be a {@link CompletedRequest} or a {@link PendingRequest}.
  */
-sealed interface PreparedRequest permits CompletedRequest, PendingRequest {
+@Beta
+public sealed interface PreparedRequest permits CompletedRequest, PendingRequest {
     // Nothing else
 }
