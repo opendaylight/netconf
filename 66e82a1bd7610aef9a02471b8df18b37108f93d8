@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2835558_31e9df15",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfTransportChannelListener.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T12:20:14Z",
+      "side": 1,
+      "message": "We can use final var otherSegments \u003d apiRootPath.stream().skip(1).toList();",
+      "revId": "66e82a1bd7610aef9a02471b8df18b37108f93d8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
