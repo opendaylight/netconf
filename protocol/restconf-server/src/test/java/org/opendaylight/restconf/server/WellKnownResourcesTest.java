@@ -24,6 +24,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.SegmentPeeler;
 
 class WellKnownResourcesTest {
     private static final String XRD_SUFFIX = "/host-meta";
