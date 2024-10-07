@@ -33,6 +33,40 @@
       "message": "CharSourceResponse(@NonNull CharSource source, @NonNull AsciiString mediaType) or can non null be default as well",
       "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45c1d5bd_51b51031",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/PendingRequestWithBody.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T12:15:04Z",
+      "side": 1,
+      "message": "request is not used",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6366b668_9be25f0d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RequestBodyHandling.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T12:15:04Z",
+      "side": 1,
+      "message": "unnecessary ;",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
