@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b98af2a_b9fd0e99",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DefaultCompletedRequest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T12:16:01Z",
+      "side": 1,
+      "message": "wrong params in javadoc",
+      "revId": "f566ad27996721e638cd1ebb6e3f5475cf1fd055",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "45c1d5bd_51b51031",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/PendingRequestWithBody.java",
         "patchSetId": 25
