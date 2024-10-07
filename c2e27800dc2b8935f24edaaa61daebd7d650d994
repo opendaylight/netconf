@@ -16,6 +16,46 @@
       "message": "Cannot be merged without https://git.opendaylight.org/gerrit/c/netconf/+/113581.",
       "revId": "c2e27800dc2b8935f24edaaa61daebd7d650d994",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbc3ab13_b416f3c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T14:47:15Z",
+      "side": 1,
+      "message": "the OpenApiService change from Response to InputStream is not exactly nice, as it ignores the implementation reality -- where we are writing things out.\n\nso perhaps this needs a better look underneath to see what is it exactly that we are doing, because we should really prefer a MessageBodyWriters, which is consistent what we have in RESTCONF (JaxRsFormattableBodyWriter).\n\nthat way we can then ride the same infra restconf-server will will have to support FormattableBody -- and plugin whatever we end up having here.",
+      "revId": "c2e27800dc2b8935f24edaaa61daebd7d650d994",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf2c7b6a_4f5f71ce",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T14:47:15Z",
+      "side": 1,
+      "message": "whitespace typo",
+      "range": {
+        "startLine": 63,
+        "startChar": 40,
+        "endLine": 63,
+        "endChar": 41
+      },
+      "revId": "c2e27800dc2b8935f24edaaa61daebd7d650d994",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
