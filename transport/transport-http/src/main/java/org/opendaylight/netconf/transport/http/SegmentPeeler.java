@@ -5,10 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server;
+package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URI;
@@ -21,18 +22,19 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * as a sequence of strings. The {@link #nextRaw()} method reports each segment as a raw string, whereas the
  * {@link #next()} method also performs a round of percent-decoding.
  */
+@Beta
 @NonNullByDefault
-final class SegmentPeeler implements Iterator<String> {
+public final class SegmentPeeler implements Iterator<String> {
     private final String rawPath;
 
     // Pointer to the first character of the next segment
     private int next;
 
-    SegmentPeeler(final URI uri) {
+    public SegmentPeeler(final URI uri) {
         this(requireNonNull(uri.getRawPath(), () -> "No path present in " + uri));
     }
 
-    SegmentPeeler(final String rawPath) {
+    public SegmentPeeler(final String rawPath) {
         final var length = rawPath.length();
         if (length == 0 || rawPath.charAt(0) != '/') {
             throw new IllegalArgumentException("Path must start with a '/'");
@@ -81,7 +83,7 @@ final class SegmentPeeler implements Iterator<String> {
      *
      * @return the remaining path
      */
-    String remaining() {
+    public String remaining() {
         return rawPath.substring(next - 1);
     }
 
