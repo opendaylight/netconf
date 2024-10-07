@@ -29,7 +29,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.DeleteEntity;
 import org.opendaylight.restconf.openapi.model.GetEntity;
 import org.opendaylight.restconf.openapi.model.GetRootEntity;
@@ -65,7 +64,7 @@ public final class PathsStream extends InputStream {
     private static final String DATA = "data";
 
     private final Iterator<? extends Module> iterator;
-    private final OpenApiBodyWriter writer;
+    private final OpenApiBodyBuffer buffer;
     private final EffectiveModelContext modelContext;
     private final String deviceName;
     private final String urlPrefix;
@@ -83,13 +82,13 @@ public final class PathsStream extends InputStream {
     private ReadableByteChannel channel;
     private boolean eof;
 
-    public PathsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
+    public PathsStream(final EffectiveModelContext modelContext, final OpenApiBodyBuffer buffer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
             final ByteArrayOutputStream stream, final JsonGenerator generator, final int width,
             final int depth) {
         this.iterator = iterator;
-        this.writer = writer;
+        this.buffer = buffer;
         this.modelContext = modelContext;
         this.isForSingleModule = isForSingleModule;
         this.deviceName = deviceName;
@@ -120,7 +119,7 @@ public final class PathsStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 reader = new BufferedReader(
-                    new InputStreamReader(new PathStream(toPaths(iterator.next()), writer), StandardCharsets.UTF_8));
+                    new InputStreamReader(new PathStream(toPaths(iterator.next()), buffer), StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
             }
@@ -149,7 +148,7 @@ public final class PathsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (iterator.hasNext()) {
-                channel = Channels.newChannel(new PathStream(toPaths(iterator.next()), writer));
+                channel = Channels.newChannel(new PathStream(toPaths(iterator.next()), buffer));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }

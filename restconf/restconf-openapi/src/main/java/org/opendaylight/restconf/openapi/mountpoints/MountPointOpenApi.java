@@ -24,8 +24,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
-import org.opendaylight.restconf.openapi.impl.MetadataStream;
 import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
+import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -166,7 +166,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             portionOfModules, basePath, width, depth);
     }
 
-    public MetadataStream getMountPointApiMeta(final Long id, final int offset, final int limit)
+    public MetadataEntity getMountPointApiMeta(final Long id, final int offset, final int limit)
             throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
@@ -176,7 +176,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
 
         final var modulesWithoutDuplications = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
-        return new MetadataStream(offset, limit, modulesWithoutDuplications.size(),
+        return new MetadataEntity(offset, limit, modulesWithoutDuplications.size(),
             BaseYangOpenApiGenerator.configModulesList(modulesWithoutDuplications).size());
     }
 

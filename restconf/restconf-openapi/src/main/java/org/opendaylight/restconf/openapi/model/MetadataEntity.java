@@ -7,27 +7,50 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
-import static java.util.Objects.requireNonNull;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
-import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 
 public final class MetadataEntity extends OpenApiEntity {
-    private final @NonNull Map<String, ?> mappedMetadata;
+    private final int offset;
+    private final int limit;
+    private final long allModules;
+    private final long configModules;
 
-    public MetadataEntity(final @NonNull Map<String, ?> mappedMetadata) {
-        this.mappedMetadata = requireNonNull(mappedMetadata);
+    public MetadataEntity(final int offset, final int limit, final long allModules, final long configModules) {
+        this.offset = offset;
+        this.limit = limit;
+        this.allModules = allModules;
+        this.configModules = configModules;
+        if (offset > limit) {
+            throw new IllegalArgumentException("Offset %s is greater than limit %s".formatted(offset, limit));
+        }
     }
 
     @Override
     public void generate(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeStartObject();
         generator.writeObjectFieldStart("metadata");
-        for (final var entry : mappedMetadata.entrySet()) {
-            generator.writeStringField(entry.getKey(), entry.getValue().toString());
+        generator.writeStringField("totalModules", String.valueOf(allModules));
+        generator.writeStringField("configModules", String.valueOf(configModules));
+        generator.writeStringField("nonConfigModules", String.valueOf(allModules - configModules));
+
+        final long currentPage;
+        final long totalPages;
+        if (limit != 0 || offset != 0) {
+            generator.writeStringField("limit", String.valueOf(limit));
+            generator.writeStringField("offset", String.valueOf(offset));
+            generator.writeStringField("previousOffset", String.valueOf(Math.max(offset - limit, 0)));
+            generator.writeStringField("nextOffset", String.valueOf(Math.min(offset + limit, configModules)));
+            currentPage = offset / limit + 1;
+            totalPages = configModules / limit + 1;
+        } else {
+            currentPage = 1;
+            totalPages = 1;
         }
+        generator.writeStringField("currentPage", String.valueOf(currentPage));
+        generator.writeStringField("totalPages", String.valueOf(totalPages));
+
         generator.writeEndObject();
         generator.writeEndObject();
     }

@@ -20,7 +20,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.security.Http;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -30,7 +29,7 @@ public final class ComponentsStream extends InputStream {
     private static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
 
     private final Iterator<? extends Module> iterator;
-    private final OpenApiBodyWriter writer;
+    private final OpenApiBodyBuffer buffer;
     private final EffectiveModelContext modelContext;
     private final JsonGenerator generator;
     private final ByteArrayOutputStream stream;
@@ -43,13 +42,13 @@ public final class ComponentsStream extends InputStream {
     private Reader reader;
     private ReadableByteChannel channel;
 
-    public ComponentsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
+    public ComponentsStream(final EffectiveModelContext modelContext, final OpenApiBodyBuffer buffer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule, final int width,
             final int depth) {
         this.iterator = iterator;
         this.modelContext = modelContext;
-        this.writer = writer;
+        this.buffer = buffer;
         this.generator = generator;
         this.stream = stream;
         this.isForSingleModule = isForSingleModule;
@@ -69,14 +68,14 @@ public final class ComponentsStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (!schemasWritten) {
-                reader = new InputStreamReader(new SchemasStream(modelContext, writer, iterator, isForSingleModule,
+                reader = new InputStreamReader(new SchemasStream(modelContext, buffer, iterator, isForSingleModule,
                     stream, generator, width, depth), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
             }
             if (!securityWritten) {
-                reader = new InputStreamReader(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
+                reader = new InputStreamReader(new SecuritySchemesStream(buffer, Map.of(BASIC_AUTH_NAME,
                     OPEN_API_BASIC_AUTH)), StandardCharsets.UTF_8);
                 read = reader.read();
                 securityWritten = true;
@@ -103,14 +102,14 @@ public final class ComponentsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (!schemasWritten) {
-                channel = Channels.newChannel(new SchemasStream(modelContext, writer, iterator, isForSingleModule,
+                channel = Channels.newChannel(new SchemasStream(modelContext, buffer, iterator, isForSingleModule,
                     stream, generator, width, depth));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;
             }
             if (!securityWritten) {
-                channel = Channels.newChannel(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
+                channel = Channels.newChannel(new SecuritySchemesStream(buffer, Map.of(BASIC_AUTH_NAME,
                     OPEN_API_BASIC_AUTH)));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 securityWritten = true;

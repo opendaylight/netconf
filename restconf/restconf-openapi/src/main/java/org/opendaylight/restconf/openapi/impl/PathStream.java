@@ -18,20 +18,19 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Deque;
-import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.PathEntity;
 
 public final class PathStream extends InputStream {
     private final Deque<PathEntity> stack;
-    private final OpenApiBodyWriter writer;
+    private final OpenApiBodyBuffer buffer;
 
     private Reader reader;
     private ReadableByteChannel channel;
 
-    public PathStream(final Deque<PathEntity> paths, final OpenApiBodyWriter writer) {
-        this.stack = paths;
-        this.writer = writer;
+    public PathStream(final Deque<PathEntity> paths, final OpenApiBodyBuffer buffer) {
+        stack = paths;
+        this.buffer = buffer;
     }
 
     @Override
@@ -40,8 +39,7 @@ public final class PathStream extends InputStream {
             if (stack.isEmpty()) {
                 return -1;
             }
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())), StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(writeNextEntity(stack.pop()), StandardCharsets.UTF_8));
         }
 
         var read = reader.read();
@@ -49,8 +47,7 @@ public final class PathStream extends InputStream {
             if (stack.isEmpty()) {
                 return -1;
             }
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())), StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(writeNextEntity(stack.pop()), StandardCharsets.UTF_8));
             read = reader.read();
         }
 
@@ -63,21 +60,20 @@ public final class PathStream extends InputStream {
             if (stack.isEmpty()) {
                 return -1;
             }
-            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(stack.pop())));
+            channel = Channels.newChannel(writeNextEntity(stack.pop()));
         }
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (stack.isEmpty()) {
                 return -1;
             }
-            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(stack.pop())));
+            channel = Channels.newChannel(writeNextEntity(stack.pop()));
             read = channel.read(ByteBuffer.wrap(array, off, len));
         }
         return read;
     }
 
-    private byte[] writeNextEntity(final OpenApiEntity entity) throws IOException {
-        writer.writeTo(entity, null, null, null, null, null, null);
-        return writer.readFrom();
+    private ByteArrayInputStream writeNextEntity(final OpenApiEntity entity) throws IOException {
+        return buffer.entityInputStream(entity);
     }
 }
