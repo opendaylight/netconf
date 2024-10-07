@@ -27,7 +27,7 @@ final class YLVResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+    PreparedRequest prepareRequest(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return !path.isEmpty() ? CompletedRequests.NOT_FOUND : switch (method) {
             case GET -> prepareGet(session, targetUri, headers, principal, true);

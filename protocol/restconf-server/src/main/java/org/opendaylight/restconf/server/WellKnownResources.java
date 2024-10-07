@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
 @NonNullByDefault
-final class WellKnownResources {
+final class WellKnownResources extends ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
     private final ByteBuf jrd;
     private final ByteBuf xrd;
@@ -65,7 +65,8 @@ final class WellKnownResources {
     }
 
     // Well-known resources are immediately available
-    CompletedRequest request(final SegmentPeeler peeler, final ImplementedMethod method) {
+    CompletedRequest prepareRequest(final SegmentPeeler peeler, final ImplementedMethod method,
+            final HttpHeaders headers) {
         if (!peeler.hasNext()) {
             // We only support OPTIONS
             return method == ImplementedMethod.OPTIONS ? CompletedRequests.OK_OPTIONS
@@ -123,4 +124,5 @@ final class WellKnownResources {
             .set(HttpHeaderNames.CONTENT_TYPE, contentType)
             .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
     }
+
 }
