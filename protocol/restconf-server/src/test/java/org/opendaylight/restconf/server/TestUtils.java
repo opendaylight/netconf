@@ -44,7 +44,7 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
-final class TestUtils {
+public final class TestUtils {
     private static final byte[] INVALID_CONTENT = "invalid-content".getBytes(StandardCharsets.UTF_8);
 
     static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
@@ -116,12 +116,12 @@ final class TestUtils {
         };
     }
 
-    static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus) {
+    public static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus) {
         assertNotNull(response);
         assertEquals(expectedStatus, response.status());
     }
 
-    static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus,
+    public static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus,
             final CharSequence expectedContentType, final String expectedContent) {
         assertResponse(response, expectedStatus);
         final var contentBuf = response.content();
@@ -130,7 +130,7 @@ final class TestUtils {
         assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, expectedContentType));
     }
 
-    static void assertResponseHeaders(final FullHttpResponse response, final Map<CharSequence, Object> headers) {
+    public static void assertResponseHeaders(final FullHttpResponse response, final Map<CharSequence, Object> headers) {
         for (var entry : headers.entrySet()) {
             final var headerName = entry.getKey().toString();
             final var headerValue = String.valueOf(entry.getValue());
@@ -139,7 +139,7 @@ final class TestUtils {
         }
     }
 
-    static void assertErrorResponse(final FullHttpResponse response, final TestEncoding encoding,
+    public static void assertErrorResponse(final FullHttpResponse response, final TestEncoding encoding,
             final ErrorTag expectedErrorTag, final String expectedMessage) {
         assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.status().code());
         assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, encoding.responseType));
@@ -147,13 +147,13 @@ final class TestUtils {
             expectedErrorTag, expectedMessage);
     }
 
-    static void assertErrorContent(final String content, final TestEncoding encoding, final ErrorTag expectedErrorTag,
-            final String expectedMessage) {
+    public static void assertErrorContent(final String content, final TestEncoding encoding,
+            final ErrorTag expectedErrorTag, final String expectedMessage) {
         assertContentSimplified(content, encoding,
             List.of(ErrorType.PROTOCOL.elementBody(), expectedErrorTag.elementBody(), expectedMessage));
     }
 
-    static void assertContentSimplified(final String content, final TestEncoding encoding,
+    public static void assertContentSimplified(final String content, final TestEncoding encoding,
             final List<String> expectedWithin) {
         // simplified encoding validation
         if (encoding.isJson()) {
@@ -167,7 +167,7 @@ final class TestUtils {
         }
     }
 
-    static void assertOptionsResponse(final FullHttpResponse response, final String expectedAllowHeader) {
+    public static void assertOptionsResponse(final FullHttpResponse response, final String expectedAllowHeader) {
         assertEquals(HttpResponseStatus.OK, response.status());
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, expectedAllowHeader));
     }

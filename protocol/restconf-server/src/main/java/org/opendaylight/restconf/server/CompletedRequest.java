@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * A {@link PreparedRequest} which is already complete, this qualifying to be a {@link Response}.
  */
 @NonNullByDefault
-non-sealed interface CompletedRequest extends PreparedRequest, Response {
+public non-sealed interface CompletedRequest extends PreparedRequest, Response {
     /**
      * Return a {@link FullHttpResponse} representation of this object.
      *
