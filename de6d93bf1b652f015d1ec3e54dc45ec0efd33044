@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11045a0c_b124f303",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractResource.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-07T12:18:09Z",
+      "side": 1,
+      "message": "Then javadoc of PreparedRequest should be updated as well",
+      "revId": "de6d93bf1b652f015d1ec3e54dc45ec0efd33044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "daa5644f_d7068216",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataResource.java",
         "patchSetId": 3
