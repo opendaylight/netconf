@@ -33,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.impl.EndpointRoot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -7,12 +7,14 @@
  */
 package org.opendaylight.restconf.server;
 
+import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * A response to request.
  */
+@Beta
 @NonNullByDefault
-sealed interface Response permits CharSourceResponse, CompletedRequest, FormattableDataResponse {
+public sealed interface Response permits CharSourceResponse, CompletedRequest, FormattableDataResponse {
     // Nothing else here
 }
