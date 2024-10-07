@@ -18,6 +18,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
 @NonNullByDefault
-final class WellKnownResources {
+final class WellKnownResources extends ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
     private final ByteBuf jrd;
     private final ByteBuf xrd;
@@ -65,7 +66,8 @@ final class WellKnownResources {
     }
 
     // Well-known resources are immediately available
-    CompletedRequest request(final SegmentPeeler peeler, final ImplementedMethod method) {
+    CompletedRequest prepareRequest(final SegmentPeeler peeler, final ImplementedMethod method,
+            final HttpHeaders headers) {
         if (!peeler.hasNext()) {
             // We only support OPTIONS
             return method == ImplementedMethod.OPTIONS ? CompletedRequests.OK_OPTIONS
@@ -74,7 +76,7 @@ final class WellKnownResources {
 
         final var suffix = QueryStringDecoder.decodeComponent(peeler.remaining());
         return switch (suffix) {
-            case "/host-meta" -> requestXRD(method);
+            case "/host-meta" -> requestXRD(method, headers);
             case "/host-meta.json" -> requestJRD(method);
             default -> {
                 LOG.debug("Suffix '{}' not recognized", suffix);
@@ -84,13 +86,16 @@ final class WellKnownResources {
     }
 
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.1
-    private CompletedRequest requestXRD(final ImplementedMethod method) {
-        // FIXME: https://www.rfc-editor.org/rfc/rfc6415#appendix-A paragraph 2 says:
-        //
-        //           The client MAY request a JRD representation using the HTTP "Accept"
-        //           request header field with a value of "application/json"
-        //
-        //        so we should be checking Accept and redirect to requestJRD()
+    private CompletedRequest requestXRD(final ImplementedMethod method, final HttpHeaders headers) {
+        // https://www.rfc-editor.org/rfc/rfc6415#appendix-A paragraph 2:
+        //      The client MAY request a JRD representation using the HTTP "Accept"
+        //      request header field with a value of "application/json"
+        for (var acceptValue : headers.getAll(HttpHeaderNames.ACCEPT)) {
+            if (HttpHeaderValues.APPLICATION_JSON.equals(HttpUtil.getMimeType(acceptValue))) {
+                return requestJRD(method);
+            }
+        }
+
         return switch (method) {
             case GET -> getResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
             case HEAD -> headResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
@@ -123,4 +128,5 @@ final class WellKnownResources {
             .set(HttpHeaderNames.CONTENT_TYPE, contentType)
             .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
     }
+
 }

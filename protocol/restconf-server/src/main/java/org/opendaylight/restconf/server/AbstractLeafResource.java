@@ -18,22 +18,22 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
 /**
- * An {@link AbstractResource} which receives the trailing part of the request part.
+ * An {@link RestconfServerResource} which receives the trailing part of the request part.
  */
 @NonNullByDefault
-abstract sealed class AbstractLeafResource extends AbstractResource
+abstract sealed class AbstractLeafResource extends RestconfServerResource
         permits DataResource, OperationsResource, YLVResource, ModulesResource {
     AbstractLeafResource(final EndpointInvariants invariants) {
         super(invariants);
     }
 
     @Override
-    final PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session,
+    final PreparedRequest prepareRequest(final SegmentPeeler peeler, final TransportSession session,
             final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal) {
-        return prepare(session, method, targetUri, headers, principal, peeler.remaining());
+        return prepareRequest(session, method, targetUri, headers, principal, peeler.remaining());
     }
 
-    abstract PreparedRequest prepare(TransportSession session, ImplementedMethod method, URI targetUri,
+    abstract PreparedRequest prepareRequest(TransportSession session, ImplementedMethod method, URI targetUri,
         HttpHeaders headers, @Nullable Principal principal, String path);
 }

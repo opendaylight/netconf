@@ -82,7 +82,7 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     protected void processRequest(final ChannelHandlerContext ctx, final Integer streamId,
             final ImplementedMethod method, final URI targetUri, final HttpVersion version, final HttpHeaders headers,
             final ByteBuf body) {
-        switch (root.prepare(this, method, targetUri, headers)) {
+        switch (root.prepareRequest(this, method, targetUri, headers)) {
             case CompletedRequest completed -> {
                 body.release();
                 respond(ctx, streamId, completed.toHttpResponse(version));
