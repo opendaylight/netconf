@@ -16,6 +16,24 @@
       "message": "withContent is not used",
       "revId": "78a5e54182c7d734cba85a96fa2deb5441245b06",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e05ee59f_4de5ff1e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ModulesResource.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-07T12:59:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cde9b189_7a106e57",
+      "revId": "78a5e54182c7d734cba85a96fa2deb5441245b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
