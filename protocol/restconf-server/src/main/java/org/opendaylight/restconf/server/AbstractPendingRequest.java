@@ -47,9 +47,6 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
 // Note: not @NonNullByDefault because SpotBugs throws a tantrum on @Nullable field
 abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
         permits PendingRequestWithBody, PendingRequestWithoutBody {
-    static final @NonNull CompletedRequest NO_CONTENT = new DefaultCompletedRequest(HttpResponseStatus.NO_CONTENT);
-    static final @NonNull DefaultHttpHeadersFactory HEADERS_FACTORY = DefaultHttpHeadersFactory.headersFactory();
-
     final @NonNull EndpointInvariants invariants;
     final @NonNull TransportSession session;
     final @NonNull URI targetUri;
@@ -126,7 +123,7 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
 
     @NonNullByDefault
     static final HttpHeaders metadataHeaders(final ConfigurationMetadata metadata) {
-        return setMetadataHeaders(HEADERS_FACTORY.newEmptyHeaders(), metadata);
+        return setMetadataHeaders(DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders(), metadata);
     }
 
     static final HttpHeaders setMetadataHeaders(final HttpHeaders headers, final ConfigurationMetadata metadata) {

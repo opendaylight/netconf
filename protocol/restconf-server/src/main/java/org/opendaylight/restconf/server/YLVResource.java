@@ -29,11 +29,11 @@ final class YLVResource extends AbstractLeafResource {
     @Override
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final @Nullable Principal principal, final String path) {
-        return !path.isEmpty() ? NOT_FOUND : switch (method) {
+        return !path.isEmpty() ? CompletedRequests.NOT_FOUND : switch (method) {
             case GET -> prepareGet(session, targetUri, headers, principal, true);
             case HEAD -> prepareGet(session, targetUri, headers, principal, false);
-            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
-            default -> METHOD_NOT_ALLOWED_READ_ONLY;
+            case OPTIONS -> CompletedRequests.OK_GET;
+            default -> CompletedRequests.METHOD_NOT_ALLOWED_GET;
         };
     }
 
