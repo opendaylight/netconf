@@ -19,6 +19,7 @@ import io.netty.handler.codec.http.HttpScheme;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
@@ -60,8 +61,6 @@ class AbstractRequestProcessorTest {
         }
     }
 
-    private static final WellKnownResources WELL_KNOWN = new WellKnownResources(BASE_PATH);
-
     @Mock
     protected RestconfServer server;
     @Mock
@@ -76,8 +75,8 @@ class AbstractRequestProcessorTest {
     @BeforeEach
     void beforeEach() {
         session = new RestconfSession(HttpScheme.HTTP,
-            new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
-                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT)));
+            new EndpointRoot(principalService, Map.of(BASE_PATH.substring(1),
+                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT))));
         doReturn(null).when(principalService).acquirePrincipal(any());
     }
 

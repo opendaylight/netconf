@@ -30,10 +30,10 @@ import org.slf4j.LoggerFactory;
  * RESTCONF API resource, as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3>RFC8040, section 3.3</a>.
  */
-final class APIResource extends AbstractResource {
+final class APIResource extends RestconfServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(APIResource.class);
 
-    private final Map<String, AbstractResource> resources;
+    private final Map<String, RestconfServerResource> resources;
     private final List<String> otherSegments;
 
     @NonNullByDefault
@@ -52,8 +52,8 @@ final class APIResource extends AbstractResource {
     }
 
     @Override
-    PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
-            final URI targetUri, final HttpHeaders headers, final Principal principal) {
+    PreparedRequest prepareRequest(final SegmentPeeler peeler, final TransportSession session,
+            final ImplementedMethod method, final URI targetUri, final HttpHeaders headers, final Principal principal) {
         LOG.debug("Preparing {} {}", method, targetUri);
 
         // peel all other segments out
@@ -70,7 +70,7 @@ final class APIResource extends AbstractResource {
         final var segment = peeler.next();
         final var resource = resources.get(segment);
         if (resource != null) {
-            return resource.prepare(peeler, session, method, targetUri, headers, principal);
+            return resource.prepareRequest(peeler, session, method, targetUri, headers, principal);
         }
 
         LOG.debug("Resource for '{}' not found", segment);
