@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84b80d92_75d072fc",
+        "filename": "apps/restconf-it/src/main/yang/device-sim@2024-09-17.yang",
+        "patchSetId": 50
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T08:58:15Z",
+      "side": 1,
+      "message": "Move this to test resources",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10ac724e_002ea360",
+        "filename": "apps/restconf-it/src/main/yang/example-action@2024-09-19.yang",
+        "patchSetId": 50
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T08:58:15Z",
+      "side": 1,
+      "message": "Move it to test resources",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6d578c7_d332e077",
+        "filename": "apps/restconf-it/src/main/yang/example-jukebox@2015-04-04.yang",
+        "patchSetId": 50
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T08:58:15Z",
+      "side": 1,
+      "message": "Move it to test resources",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
