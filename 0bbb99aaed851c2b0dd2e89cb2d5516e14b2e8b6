@@ -50,6 +50,57 @@
       "message": "Move it to test resources",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "001e6ffd_8baaf9aa",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T10:37:55Z",
+      "side": 1,
+      "message": "clientStreamService \u003d null;\n        streamControl \u003d null;\n        \n        can be handled in mount point and stream tests",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fa9b0d1_23df55f0",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T10:37:55Z",
+      "side": 1,
+      "message": "protected  FullHttpRequest - one space is enough",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffa2a5fa_6e7d4649",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T10:37:55Z",
+      "side": 1,
+      "message": "Can be simple lambda",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
