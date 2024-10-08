@@ -57,7 +57,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         SessionListener has default implementations which we do not care about. We have all subclasses in this package
         and neither of them has additional state""")
     SSHTransportStack(final TransportChannelListener listener, final FactoryManager factoryManager,
-            final IoHandler handler) {
+                      final IoHandler handler) {
         super(listener);
         ioService = new TransportIoService(factoryManager, handler);
         factoryManager.addSessionListener(this);

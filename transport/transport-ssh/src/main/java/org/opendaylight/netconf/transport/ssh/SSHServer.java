@@ -47,9 +47,9 @@ public final class SSHServer extends SSHTransportStack {
     }
 
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory,
-            final ScheduledExecutorService executorService, final String subsystem,
-            final TransportChannelListener listener, final SshServerGrouping serverParams,
-            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+                        final ScheduledExecutorService executorService, final String subsystem,
+                        final TransportChannelListener listener, final SshServerGrouping serverParams,
+                        final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
         return new SSHServer(subsystem, listener,
             new TransportSshServer.Builder(ioServiceFactory, executorService)
                 .serverParams(serverParams)

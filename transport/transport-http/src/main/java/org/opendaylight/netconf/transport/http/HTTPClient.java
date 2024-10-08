@@ -51,7 +51,7 @@ public final class HTTPClient extends HTTPTransportStack {
     private final boolean http2;
 
     private HTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider,
-            final boolean http2) {
+                       final boolean http2) {
         super(listener);
         this.authProvider = authProvider;
         this.http2 = http2;

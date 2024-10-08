@@ -37,8 +37,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
     }
 
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
-            final TransportChannelListener listener, final TcpClientGrouping connectParams,
-            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+                                                              final TransportChannelListener listener, final TcpClientGrouping connectParams,
+                                                              final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
         return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
             .connect(newBootstrap(), connectParams);
     }
@@ -55,16 +55,16 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws NullPointerException if any of required parameters is null
      */
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
-            final TransportChannelListener listener, final TcpClientGrouping connectParams,
-            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+                                                              final TransportChannelListener listener, final TcpClientGrouping connectParams,
+                                                              final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
         return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
             .connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
-            final TransportChannelListener listener, final TcpServerGrouping listenParams,
-            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+                                                             final TransportChannelListener listener, final TcpServerGrouping listenParams,
+                                                             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
         return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
             .listen(newServerBootstrap(), listenParams);
     }
@@ -82,16 +82,16 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws NullPointerException if any of required parameters is null
      */
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
-            final TransportChannelListener listener, final TcpServerGrouping listenParams,
-            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+                                                             final TransportChannelListener listener, final TcpServerGrouping listenParams,
+                                                             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
         return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
             .listen(newServerBootstrap(), listenParams);
     }
 
     public @NonNull ListenableFuture<SSHServer> connectServer(final String subsystem,
-            final TransportChannelListener listener, final TcpClientGrouping connectParams,
-            final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
+                                                              final TransportChannelListener listener, final TcpClientGrouping connectParams,
+                                                              final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
         return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null)
             .connect(newBootstrap(), connectParams);
     }
@@ -110,8 +110,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws IllegalArgumentException if both configurator and serverParams are null
      */
     public @NonNull ListenableFuture<SSHServer> connectServer(final String subsystem,
-            final TransportChannelListener listener, final TcpClientGrouping connectParams,
-            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
+                                                              final TransportChannelListener listener, final TcpClientGrouping connectParams,
+                                                              final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
         checkArgument(serverParams != null || configurator != null,
             "Neither server parameters nor factory configurator is defined");
@@ -120,8 +120,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
     }
 
     public @NonNull ListenableFuture<SSHServer> listenServer(final String subsystem,
-            final TransportChannelListener listener, final TcpServerGrouping connectParams,
-            final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
+                                                             final TransportChannelListener listener, final TcpServerGrouping connectParams,
+                                                             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
         return listenServer(subsystem, listener, connectParams, requireNonNull(serverParams), null);
     }
 
@@ -139,8 +139,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws IllegalArgumentException if both configurator and serverParams are null
      */
     public @NonNull ListenableFuture<SSHServer> listenServer(final String subsystem,
-            final TransportChannelListener listener, final TcpServerGrouping listenParams,
-            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
+                                                             final TransportChannelListener listener, final TcpServerGrouping listenParams,
+                                                             final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
         checkArgument(serverParams != null || configurator != null,
             "Neither server parameters nor factory configurator is defined");
