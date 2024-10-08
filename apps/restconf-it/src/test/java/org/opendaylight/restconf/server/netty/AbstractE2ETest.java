@@ -107,7 +107,7 @@ import org.slf4j.LoggerFactory;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
-abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
