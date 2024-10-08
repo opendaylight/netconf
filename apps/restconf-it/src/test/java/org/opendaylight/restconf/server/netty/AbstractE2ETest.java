@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -58,6 +59,7 @@ import org.opendaylight.mdsal.binding.dom.adapter.BindingAdapterFactory;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
@@ -74,6 +76,11 @@ import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
+import org.opendaylight.restconf.openapi.impl.OpenApiGeneratorRFC8040;
+import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
+import org.opendaylight.restconf.openapi.netty.OpenApiResourceProvider;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
@@ -99,6 +106,7 @@ import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
@@ -106,7 +114,7 @@ import org.slf4j.LoggerFactory;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
-abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -117,19 +125,34 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
+    protected static final String RESTS = "rests";
+    protected static final String BASE_PATH = "/openapi";
+    protected static final String API_V3_PATH = BASE_PATH + "/api/v3";
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
+    protected static final String TOASTER = "toaster";
+    protected static final String TOASTER_REV = "2009-11-20";
+    /**
+     * Model toaster@2009-11-19 is used for test correct generating of openapi with models with same name and another
+     * revision date. We want to test that the same model is not duplicated and loaded just the newest version.
+     */
+    protected static final String TOASTER_OLD_REV = "2009-11-19";
+
     protected static String localAddress;
     protected static BootstrapFactory bootstrapFactory;
     protected static SSHTransportStackFactory sshTransportStackFactory;
+    protected DOMDataBroker domDataBroker;
     protected HttpClientStackGrouping clientStackGrouping;
     protected HttpClientStackGrouping invalidClientStackGrouping;
     protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
     protected ActionProviderService actionProviderService;
+    protected OpenApiService openApiService;
+    protected OpenApiResourceProvider openApiResourceProvider;
+    protected SimpleNettyEndpoint endpoint;
 
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
 
-    private SimpleNettyEndpoint endpoint;
     private String host;
 
     @BeforeAll
@@ -142,7 +165,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @BeforeEach
     void beforeEach() throws Exception {
         // transport configuration
-        final var port = randomBindablePort();
+        final var port = 8182;
         host = localAddress + ":" + port;
         final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
         final var serverStackGrouping = new HttpServerStackGrouping() {
@@ -178,7 +201,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
         // MDSAL services
         setup();
-        final var domDataBroker = getDomBroker();
+        domDataBroker = getDomBroker();
         final var schemaContext = getRuntimeContext().modelContext();
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
@@ -205,8 +228,20 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping);
+            RESTS, MessageEncoding.JSON, serverStackGrouping);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
+
+        // Separate context with only toaster model
+        final var openApiSchemaContext = YangParserTestUtils.parseYangResourceDirectory("/toaster/");
+        final var openApiSchemaService = new FixedDOMSchemaService(openApiSchemaContext);
+
+        // OpenApi
+        final var mountPointOpenApiGeneratorRFC8040 = new MountPointOpenApiGeneratorRFC8040(openApiSchemaService,
+            domMountPointService, RESTS);
+        openApiService = new OpenApiServiceImpl(mountPointOpenApiGeneratorRFC8040,
+            new OpenApiGeneratorRFC8040(openApiSchemaService, RESTS));
+        openApiResourceProvider = new OpenApiResourceProvider(openApiService);
+        endpoint.registerWebResource(openApiResourceProvider);
     }
 
     @AfterEach
