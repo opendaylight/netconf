@@ -12,7 +12,7 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 /**
  * An {@link AAAEncryptionService} which performs no encryption at all.
  */
-final class NullAAAEncryptionService implements AAAEncryptionService {
+public final class NullAAAEncryptionService implements AAAEncryptionService {
     @Override
     public byte[] encrypt(final byte[] data) {
         return data;
