@@ -105,6 +105,91 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "18f5cc7e_2c0a87f7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:55:11Z",
+      "side": 1,
+      "message": "missing yang-library-version",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0db0506_abe319f7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:55:11Z",
+      "side": 1,
+      "message": "delete this line",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc77ca66_9ca05d64",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:55:11Z",
+      "side": 1,
+      "message": "Why not parametrized?",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d1efbbb_48e2db59",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:55:11Z",
+      "side": 1,
+      "message": "private",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f37940f_9dbf1aef",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/DataE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:55:11Z",
+      "side": 1,
+      "message": "Are we able to assert output?",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5cc2493f_6df61192",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
         "patchSetId": 50
