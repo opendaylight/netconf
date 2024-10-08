@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2808b1e6_487fdc0c",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-08T08:47:28Z",
+      "side": 1,
+      "message": "@NonNullByDefault does not play nice with OutputStream\n@NonNull ... does not really play a part, as it\u0027s just an internal thing",
+      "parentUuid": "70e1cc89_ac55dfb2",
+      "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ec29045_f655fcf3",
