@@ -36,7 +36,7 @@ import org.opendaylight.restconf.server.PrincipalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class OpenApiRequestDispatcher {
+public class OpenApiRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(OpenApiRequestDispatcher.class);
     private static final ResourceData NO_RESOURCE = new ResourceData("", Unpooled.EMPTY_BUFFER, "");
     private static final ObjectMapper OM = new ObjectMapper();
@@ -50,7 +50,7 @@ class OpenApiRequestDispatcher {
 
     private final Cache<String, ResourceData> resourceCache;
 
-    OpenApiRequestDispatcher(final @NonNull PrincipalService principalService,
+    public OpenApiRequestDispatcher(final @NonNull PrincipalService principalService,
         final @NonNull OpenApiService openApiService, final @NonNull URI baseUri,
         final @NonNull URI restconfServerUri) {
         this.principalService = requireNonNull(principalService);
