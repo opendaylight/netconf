@@ -45,7 +45,7 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-class MountPointE2ETest extends AbstractE2ETest {
+public class MountPointE2ETest extends AbstractE2ETest {
     private static final YangModuleInfo DEVICE_YANG_MODEL =
         org.opendaylight.yang.svc.v1.test.device.simulator.rev240917.YangModuleInfoImpl.getInstance();
     private static final YangModuleInfo NOTIFICATION_MODEL = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
@@ -111,7 +111,7 @@ class MountPointE2ETest extends AbstractE2ETest {
 
     @Test
     void dataCRUDJsonTest() throws Exception {
-        startDeviceSimulator(true);
+        startDeviceSimulator(true, DEVICE_YANG_MODEL);
         mountDeviceJson();
 
         // create
@@ -179,7 +179,7 @@ class MountPointE2ETest extends AbstractE2ETest {
     @Test
     @SuppressWarnings("checkstyle:LineLength")
     void notificationStreamJsonTest() throws Exception {
-        startDeviceSimulator(false);
+        startDeviceSimulator(false, DEVICE_YANG_MODEL);
         mountDeviceJson();
 
         var response = invokeRequest(HttpMethod.POST, """
@@ -248,7 +248,7 @@ class MountPointE2ETest extends AbstractE2ETest {
 
     @Test
     void yangPatchJsonTest() throws Exception {
-        startDeviceSimulator(true);
+        startDeviceSimulator(true, DEVICE_YANG_MODEL);
         mountDeviceJson();
 
         // CRUD
@@ -313,7 +313,7 @@ class MountPointE2ETest extends AbstractE2ETest {
             }""");
     }
 
-    private void startDeviceSimulator(final boolean mdsal) throws Exception {
+    protected void startDeviceSimulator(final boolean mdsal, final YangModuleInfo... models) throws Exception {
         // mdsal = true --> settable mode, mdsal datastore
         // mdsal = false --> simulated mode, data is taken from conf files
         devicePort = randomBindablePort();
@@ -324,17 +324,19 @@ class MountPointE2ETest extends AbstractE2ETest {
             .setAuthProvider((usr, pwd) -> DEVICE_USERNAME.equals(usr) && DEVICE_PASSWORD.equals(pwd))
             .setMdSal(mdsal);
         if (mdsal) {
-            configBuilder.setModels(Set.of(DEVICE_YANG_MODEL));
+            configBuilder.setModels(Set.of(models));
         } else {
+            final var withNotifications = Set.of(models);
+            Set.of(models).add(NOTIFICATION_MODEL);
             configBuilder
-                .setModels(Set.of(DEVICE_YANG_MODEL, NOTIFICATION_MODEL))
+                .setModels(withNotifications)
                 .setNotificationFile(new File(getClass().getResource("/device-sim-notifications.xml").toURI()));
         }
         deviceSimulator = new NetconfDeviceSimulator(configBuilder.build());
         deviceSimulator.start();
     }
 
-    private void mountDeviceJson() throws Exception {
+    protected void mountDeviceJson() throws Exception {
         // validate topology node is defined
         assertContentJson(TOPOLOGY_URI,
             """

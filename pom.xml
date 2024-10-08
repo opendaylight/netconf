@@ -48,6 +48,7 @@
 
         <module>keystore</module>
         <module>truststore</module>
+        <module>apps/restconf-it</module>
     </modules>
 
     <profiles>
