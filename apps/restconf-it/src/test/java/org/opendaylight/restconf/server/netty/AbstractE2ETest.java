@@ -117,6 +117,9 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
+    protected static final String RESTS = "rests";
+    protected static final String TOASTER = "toaster";
+
     protected static String localAddress;
     protected static BootstrapFactory bootstrapFactory;
     protected static SSHTransportStackFactory sshTransportStackFactory;
