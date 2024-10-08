@@ -1,0 +1,97 @@
+module toaster {
+
+  yang-version 1;
+
+  namespace
+    "http://netconfcentral.org/ns/toaster";
+
+  prefix toast;
+
+  organization "Netconf Central";
+
+  contact
+    "Andy Bierman <andy@netconfcentral.org>";
+
+  description
+    "YANG version of the TOASTER-MIB.";
+
+  revision "2009-11-19" {
+    description
+      "Changes for testing same module name with another revision. We need to have loaded the newest version.";
+  }
+
+  container toaster {
+    presence
+    "Indicates the toaster service is available";
+    description
+      "Top-level container for all toaster database objects.";
+    leaf toasterManufacturer {
+      type string;
+      config false;
+      mandatory true;
+      description
+        "The name of the toaster's manufacturer. For instance,
+        Microsoft Toaster.";
+    }
+
+    leaf toasterModelNumber {
+      type string;
+      config false;
+      mandatory true;
+      description
+        "The name of the toaster's model. For instance,
+        Radiant Automatic.";
+    }
+
+    leaf toasterStatus {
+      type enumeration {
+        enum "up" {
+          value 1;
+          description
+            "The toaster knob position is up.
+            No toast is being made now.";
+        }
+        enum "down" {
+          value 2;
+          description
+            "The toaster knob position is down.
+            Toast is being made now.";
+        }
+      }
+      config false;
+      mandatory true;
+      description
+        "This variable indicates the current state of
+        the toaster.";
+    }
+
+    leaf darknessFactor {
+      type uint32;
+      config true;
+      default 1000;
+      description
+        "The darkness factor. Basically, the number of ms to multiple the doneness value by.";
+    }
+  } // container toaster
+
+  rpc cancel-toast {
+    description
+      "Stop making toast, if any is being made.
+      A 'resource-denied' error will be returned
+      if the toaster service is disabled.";
+  } // rpc cancel-toast
+
+  rpc restock-toaster {
+    description
+      "Restocks the toaster with the amount of bread specified.";
+
+    input {
+      leaf amountOfBreadToStock {
+        type uint32;
+        description
+          "Indicates the amount of bread to re-stock";
+      }
+    }
+  } // rpc restock-toaster
+
+} // module toaster

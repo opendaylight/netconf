@@ -45,7 +45,7 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-class MountPointE2ETest extends AbstractE2ETest {
+public class MountPointE2ETest extends AbstractE2ETest {
     private static final YangModuleInfo DEVICE_YANG_MODEL =
         org.opendaylight.yang.svc.v1.test.device.simulator.rev240917.YangModuleInfoImpl.getInstance();
     private static final YangModuleInfo NOTIFICATION_MODEL = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
