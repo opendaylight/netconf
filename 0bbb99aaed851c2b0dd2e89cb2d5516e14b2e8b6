@@ -135,6 +135,125 @@
       "message": "static final class TestTransportListener implements TransportChannelListener\u003cTransportChannel\u003e",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "284afe39_7b87b5d2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "write some message to exception, see above",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a4836e6_1db8e7bb",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "final",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6356ef0_24ddb723",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "// no encryption",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da5debcf_48f9908b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "final",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1548137_1053a0c5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "final",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18334517_a4781d84",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "overriding this method is not needed IMO",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b8709d1_ab3732ca",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/YangLibraryE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T11:00:49Z",
+      "side": 1,
+      "message": "asddress TODO - its simple IMO",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
