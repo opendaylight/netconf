@@ -23,6 +23,8 @@ import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
+import org.opendaylight.restconf.server.NettyEndpoint;
+import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -46,6 +48,14 @@ public final class OpenApiServiceImpl implements OpenApiService {
             final @Reference DOMMountPointService mountPointService,
             final @Reference JaxRsEndpoint jaxrsEndpoint) {
         this(schemaService, mountPointService, jaxrsEndpoint.configuration().restconf());
+    }
+
+    // FIXME this constructor exist only for Netty tests at the moment. At some point it should replace main constructor
+    //  that use JaxRsEndpoint
+    public OpenApiServiceImpl(final DOMSchemaService schemaService,
+            final DOMMountPointService mountPointService,
+            final NettyEndpointConfiguration nettyEndpointConfiguration) {
+        this(schemaService, mountPointService, nettyEndpointConfiguration.apiRootPath().getFirst());
     }
 
     private OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,

@@ -152,6 +152,10 @@
       <artifactId>jackson-databind</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.opendaylight.netconf</groupId>
+          <artifactId>restconf-server</artifactId>
+      </dependency>
   </dependencies>
 
   <build>
