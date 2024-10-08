@@ -102,13 +102,13 @@ class SshClientServerTest {
     @Mock
     private SshClientGrouping sshClientConfig;
     @Mock
-    private TransportChannelListener clientListener;
+    private TransportChannelListener<T> clientListener;
     @Mock
     private TcpServerGrouping tcpServerConfig;
     @Mock
     private SshServerGrouping sshServerConfig;
     @Mock
-    private TransportChannelListener serverListener;
+    private TransportChannelListener<T> serverListener;
 
     @Captor
     private ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
@@ -366,7 +366,7 @@ class SshClientServerTest {
         // place channelInactive handlers on a server side channel when connection is established
         final var firstHandlerFuture = SettableFuture.<Boolean>create();
         final var lastHandlerFuture = SettableFuture.<Boolean>create();
-        final var serverTransportListener = new TransportChannelListener() {
+        final var serverTransportListener = new TransportChannelListener<T>() {
             @Override
             public void onTransportChannelEstablished(final TransportChannel channel) {
                 channel.channel().pipeline().addFirst("FIRST", new ChannelInboundHandlerAdapter() {

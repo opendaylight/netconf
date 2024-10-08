@@ -45,7 +45,7 @@ public final class TCPServer extends TCPTransportStack {
 
     private volatile Channel listenChannel;
 
-    private TCPServer(final TransportChannelListener listener) {
+    private TCPServer(final TransportChannelListener<T> listener) {
         super(listener);
     }
 
@@ -59,7 +59,7 @@ public final class TCPServer extends TCPTransportStack {
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @NonNull ListenableFuture<TCPServer> listen(final TransportChannelListener listener,
+    public static @NonNull ListenableFuture<TCPServer> listen(final TransportChannelListener<T> listener,
             final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
                 throws UnsupportedConfigurationException {
         NettyTransportSupport.configureKeepalives(bootstrap, listenParams.getKeepalives());

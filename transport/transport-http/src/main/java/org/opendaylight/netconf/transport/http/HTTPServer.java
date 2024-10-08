@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
     private final AuthHandlerFactory authHandlerFactory;
 
-    HTTPServer(final TransportChannelListener listener, final AuthHandlerFactory authHandlerFactory) {
+    HTTPServer(final TransportChannelListener<T> listener, final AuthHandlerFactory authHandlerFactory) {
         super(listener);
         this.authHandlerFactory = authHandlerFactory;
     }
@@ -45,7 +45,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener<T> listener,
             final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams)
                 throws UnsupportedConfigurationException {
         return listen(listener, bootstrap, listenParams, null);
@@ -63,7 +63,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener<T> listener,
             final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams,
             final @Nullable AuthHandlerFactory authHandlerFactory) throws UnsupportedConfigurationException {
         final var transport = requireNonNull(listenParams).getTransport();
@@ -74,7 +74,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
         };
     }
 
-    private static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+    private static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener<T> listener,
             final ServerBootstrap bootstrap, final Tcp tcpCase, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var tcp = tcpCase.getTcp();
@@ -84,7 +84,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
             TCPServer.listen(server.asListener(), bootstrap, tcp.nonnullTcpServerParameters()));
     }
 
-    private static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+    private static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener<T> listener,
             final ServerBootstrap bootstrap, final Tls tlsCase, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var tls = tlsCase.getTls();

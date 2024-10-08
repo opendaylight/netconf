@@ -21,7 +21,7 @@ import org.opendaylight.netconf.transport.api.TransportStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class ClientTransportChannelListener implements TransportChannelListener, FutureListener<NetconfClientSession>,
+final class ClientTransportChannelListener implements TransportChannelListener<T>, FutureListener<NetconfClientSession>,
         FutureCallback<TransportStack> {
     private static final Logger LOG = LoggerFactory.getLogger(ClientTransportChannelListener.class);
 

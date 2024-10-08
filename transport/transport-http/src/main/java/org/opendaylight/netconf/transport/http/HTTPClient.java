@@ -50,8 +50,8 @@ public final class HTTPClient extends HTTPTransportStack {
     private final ClientAuthProvider authProvider;
     private final boolean http2;
 
-    private HTTPClient(final TransportChannelListener listener, final ClientAuthProvider authProvider,
-            final boolean http2) {
+    private HTTPClient(final TransportChannelListener<T> listener, final ClientAuthProvider authProvider,
+                       final boolean http2) {
         super(listener);
         this.authProvider = authProvider;
         this.http2 = http2;
@@ -80,7 +80,7 @@ public final class HTTPClient extends HTTPTransportStack {
      * @throws UnsupportedConfigurationException when {@code connectParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static ListenableFuture<HTTPClient> connect(final TransportChannelListener listener,
+    public static ListenableFuture<HTTPClient> connect(final TransportChannelListener<T> listener,
             final Bootstrap bootstrap, final HttpClientStackGrouping connectParams, final boolean http2)
             throws UnsupportedConfigurationException {
         final HttpClientGrouping httpParams;

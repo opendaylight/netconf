@@ -21,7 +21,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
  */
 public abstract sealed class TCPTransportStack extends AbstractTransportStack<TCPTransportChannel>
         permits TCPClient, TCPServer {
-    TCPTransportStack(final TransportChannelListener listener) {
+    TCPTransportStack(final TransportChannelListener<T> listener) {
         super(listener);
     }
 

@@ -14,7 +14,7 @@ public abstract sealed class HTTPTransportStack extends AbstractOverlayTransport
         permits HTTPClient, HTTPServer {
     static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
 
-    HTTPTransportStack(final TransportChannelListener listener) {
+    HTTPTransportStack(final TransportChannelListener<T> listener) {
         super(listener);
     }
 }

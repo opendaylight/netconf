@@ -100,7 +100,7 @@ class NetconfClientFactoryImplTest {
     @Mock
     private NetconfClientSessionListener sessionListener;
     @Mock
-    private TransportChannelListener serverTransportListener;
+    private TransportChannelListener<T> serverTransportListener;
     @Mock
     private SshServerGrouping sshServerParams;
 

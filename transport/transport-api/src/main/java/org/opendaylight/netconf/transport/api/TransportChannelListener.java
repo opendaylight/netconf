@@ -12,7 +12,7 @@ import org.eclipse.jdt.annotation.NonNull;
 /**
  * Transport-level channel event listener.
  */
-public interface TransportChannelListener {
+public interface TransportChannelListener<T> {
     /**
      * Invoked when a {@link TransportChannel} is established. Implementations of this method are expected to attach
      * to validate the channel and connect it to the messages layer.

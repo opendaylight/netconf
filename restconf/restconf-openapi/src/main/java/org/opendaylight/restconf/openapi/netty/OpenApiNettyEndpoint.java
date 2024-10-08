@@ -107,8 +107,8 @@ public final class OpenApiNettyEndpoint {
         };
     }
 
-    private static TransportChannelListener transportChannelListener(final OpenApiRequestDispatcher dispatcher) {
-        return new TransportChannelListener() {
+    private static TransportChannelListener<T> transportChannelListener(final OpenApiRequestDispatcher dispatcher) {
+        return new TransportChannelListener<T>() {
             @Override
             public void onTransportChannelEstablished(@NonNull TransportChannel channel) {
                 channel.channel().pipeline().addLast(new DispatcherHandler(dispatcher));

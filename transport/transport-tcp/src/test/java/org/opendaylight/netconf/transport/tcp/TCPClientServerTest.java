@@ -46,11 +46,11 @@ class TCPClientServerTest {
     @Mock
     private TcpClientGrouping clientGrouping;
     @Mock
-    private TransportChannelListener clientListener;
+    private TransportChannelListener<T> clientListener;
     @Mock
     private TcpServerGrouping serverGrouping;
     @Mock
-    private TransportChannelListener serverListener;
+    private TransportChannelListener<T> serverListener;
 
     private static EventLoopGroup GROUP;
 

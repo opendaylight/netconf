@@ -21,11 +21,11 @@ public abstract sealed class TLSTransportStack extends AbstractOverlayTransportS
         permits TLSClient, TLSServer {
     private final SslHandlerFactory factory;
 
-    TLSTransportStack(final TransportChannelListener listener, final SslContext sslContext) {
+    TLSTransportStack(final TransportChannelListener<T> listener, final SslContext sslContext) {
         this(listener, new FixedSslHandlerFactory(sslContext));
     }
 
-    TLSTransportStack(final TransportChannelListener listener, final SslHandlerFactory factory) {
+    TLSTransportStack(final TransportChannelListener<T> listener, final SslHandlerFactory factory) {
         super(listener);
         this.factory = requireNonNull(factory);
     }

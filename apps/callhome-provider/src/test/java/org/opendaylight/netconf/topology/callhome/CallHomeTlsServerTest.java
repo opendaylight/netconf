@@ -275,7 +275,7 @@ class CallHomeTlsServerTest {
 
     // Same as org.opendaylight.netconf.server.ServerTransportInitializer but with explicit fireChannelActive()
     private record TestNetconfServerInitializer(NetconfServerSessionNegotiatorFactory negotiatorFactory)
-        implements TransportChannelListener {
+        implements TransportChannelListener<T> {
 
         @Override
         public void onTransportChannelEstablished(final TransportChannel channel) {

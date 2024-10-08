@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Glue between a {@link RestconfServer} and a transport stack instance.
  */
-final class RestconfTransportChannelListener implements TransportChannelListener {
+final class RestconfTransportChannelListener implements TransportChannelListener<T> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
     private final RestconfStream.Registry streamRegistry;
