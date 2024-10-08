@@ -54,8 +54,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
             new OpenApiGeneratorRFC8040(schemaService, restconf));
     }
 
+    // FIXME Public for end-to-end testing openapi over Netty. Constructor that uses NettyEndpoint should be used
+    //  instead when we get one.
     @VisibleForTesting
-    OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
+    public OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
                        final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040) {
         mountPointOpenApiRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040).getMountPointOpenApi();
         this.openApiGeneratorRFC8040 = requireNonNull(openApiGeneratorRFC8040);

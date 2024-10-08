@@ -1,0 +1,304 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "toaster",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8182/"
+    }
+  ],
+  "paths": {
+    "/rests/operations/toaster:cancel-toast": {
+      "post": {
+        "description": "Stop making toast, if any is being made.\nA 'resource-denied' error will be returned\nif the toaster service is disabled.",
+        "summary": "POST - Controller - toaster - cancel-toast",
+        "requestBody": {
+          "description": "cancel-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster"
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC cancel-toast success"
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/toaster:restock-toaster": {
+      "post": {
+        "description": "Restocks the toaster with the amount of bread specified.",
+        "summary": "POST - Controller - toaster - restock-toaster",
+        "requestBody": {
+          "description": "restock-toaster_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster_restock-toaster_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_restock-toaster_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC restock-toaster success"
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/data": {
+      "post": {
+        "description": "YANG version of the TOASTER-MIB.\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - toaster - toaster",
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/data/toaster:toaster": {
+      "put": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PUT - toaster - Controller - toaster",
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster:toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PATCH - toaster - Controller - toaster",
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster:toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "DELETE - Controller - toaster - toaster",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "GET - Controller - toaster - toaster",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster_toaster"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "toaster": {
+                      "$ref": "#/components/schemas/toaster_toaster",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "toaster_restock-toaster_input": {
+        "title": "toaster_restock-toaster_input",
+        "type": "object",
+        "properties": {
+          "amountOfBreadToStock": {
+            "description": "Indicates the amount of bread to re-stock",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster"
+        }
+      },
+      "toaster_toaster": {
+        "title": "toaster_toaster",
+        "type": "object",
+        "description": "Top-level container for all toaster database objects.",
+        "properties": {
+          "darknessFactor": {
+            "description": "The darkness factor. Basically, the number of ms to multiple the doneness value by.",
+            "type": "integer",
+            "format": "int64",
+            "default": 1000,
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "toaster",
+          "namespace": "http://netconfcentral.org/ns/toaster"
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
