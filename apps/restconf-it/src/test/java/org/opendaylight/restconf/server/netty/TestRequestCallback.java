@@ -13,7 +13,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 
-final class TestRequestCallback implements FutureCallback<FullHttpResponse> {
+public final class TestRequestCallback implements FutureCallback<FullHttpResponse> {
     private volatile boolean completed;
     private volatile FullHttpResponse response;
 
@@ -33,11 +33,11 @@ final class TestRequestCallback implements FutureCallback<FullHttpResponse> {
         throw new IllegalStateException("Failed request ", throwable);
     }
 
-    FullHttpResponse response() {
+    public FullHttpResponse response() {
         return response;
     }
 
-    boolean completed() {
+    public boolean completed() {
         return completed;
     }
 }
