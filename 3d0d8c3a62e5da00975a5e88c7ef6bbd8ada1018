@@ -68,6 +68,24 @@
       "message": "while (remaining \u003e 0); we are not decrementing by 1, how are we sure we get exactly 0 at the end?",
       "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b79efba0_e15899b8",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingSupport.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-08T08:39:44Z",
+      "side": 1,
+      "message": "remaining is initialized at len, we decrement it always by \u003c\u003d remaining\n\nif remaining were to become \u003c 0, we would\u0027ve transferred more than \u0027len\u0027 bytes -- i.e. we did the wrong thing",
+      "parentUuid": "6ec29045_f655fcf3",
+      "revId": "3d0d8c3a62e5da00975a5e88c7ef6bbd8ada1018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
