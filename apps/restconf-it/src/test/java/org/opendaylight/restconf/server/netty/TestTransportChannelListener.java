@@ -14,16 +14,16 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 
-final class TestTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
+public final class TestTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
     private final Consumer<HTTPTransportChannel> initializer;
 
     private volatile boolean initialized;
 
-    TestTransportChannelListener(final Consumer<HTTPTransportChannel> initializer) {
+    public TestTransportChannelListener(final Consumer<HTTPTransportChannel> initializer) {
         this.initializer = requireNonNull(initializer);
     }
 
-    boolean initialized() {
+    public boolean initialized() {
         return initialized;
     }
 
