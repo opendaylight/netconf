@@ -101,6 +101,40 @@
       "message": "Can be simple lambda",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cc2493f_6df61192",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T10:46:38Z",
+      "side": 1,
+      "message": "Delete this line",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22febc13_2af2cee5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-08T10:46:38Z",
+      "side": 1,
+      "message": "static final class TestTransportListener implements TransportChannelListener\u003cTransportChannel\u003e",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
