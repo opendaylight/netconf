@@ -22,6 +22,30 @@
       },
       "revId": "53436a60ad6a3bf121be0cfac7cd481072d1d5ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c52dbb62_52870f89",
+        "filename": "keystore/plaintext-localfile/src/test/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorageTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-10-08T11:45:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9ae0b5e_daf6aba9",
+      "range": {
+        "startLine": 57,
+        "startChar": 54,
+        "endLine": 57,
+        "endChar": 73
+      },
+      "revId": "53436a60ad6a3bf121be0cfac7cd481072d1d5ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
