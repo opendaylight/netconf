@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.openapi.impl;
+package org.opendaylight.restconf.openapi.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Set;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
-public class DefinitionNames {
+final class DefinitionNames {
     private final HashMap<SchemaNode, String> discriminators;
     private final Set<String> names;
 
-    public DefinitionNames() {
+    DefinitionNames() {
         names = new HashSet<>();
         discriminators = new HashMap<>();
     }
@@ -32,7 +32,7 @@ public class DefinitionNames {
         return discriminator;
     }
 
-    public String pickDiscriminator(final SchemaNode node, final List<String> clearNames) {
+    String pickDiscriminator(final SchemaNode node, final List<String> clearNames) {
         String discriminator = "";
         for (final String clearName: clearNames) {
             if (names.contains(clearName)) {
@@ -54,11 +54,11 @@ public class DefinitionNames {
         }
     }
 
-    public boolean isListedNode(final SchemaNode node, final String name) {
+    boolean isListedNode(final SchemaNode node, final String name) {
         return discriminators.containsKey(node) && names.contains(name);
     }
 
-    public String getDiscriminator(final SchemaNode node) {
+    String getDiscriminator(final SchemaNode node) {
         return discriminators.get(node);
     }
 }

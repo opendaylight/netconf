@@ -7,14 +7,19 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
@@ -23,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -40,6 +46,8 @@ abstract class AbstractDocumentTest {
         .node(QName.create("", "nodes"))
         .node(QName.create("", "node"))
         .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
+
+    private static final JsonFactory JSON_FACTORY = new JsonFactoryBuilder().build();
 
     private static OpenApiService openApiService;
 
@@ -69,11 +77,7 @@ abstract class AbstractDocumentTest {
     protected static String getAllModulesDoc(final int width, final int depth, final int offset,
             final int limit) throws Exception {
         final var getAllController = createMockUriInfo(URI + "single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, width, depth, offset, limit)
-            .getEntity();
-
-        return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return assertOpenApiEntity(openApiService.getAllModulesDoc(getAllController, width, depth, offset, limit));
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {
@@ -82,28 +86,19 @@ abstract class AbstractDocumentTest {
             uri = uri + "(" + revision + ")";
         }
         final var getModuleController = createMockUriInfo(uri);
-        final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, getModuleController, 0, 0);
-
-        return new String(((OpenApiInputStream) controllerDocModule.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, getModuleController, 0, 0));
     }
 
     protected static String getMountDoc(final int width, final int depth, final int offset,
             final int limit) throws Exception {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, width, depth, offset, limit);
-
-        return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return assertOpenApiEntity(openApiService.getMountDoc("1", getAllDevice, width, depth, offset, limit));
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
         final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
-        final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice, 0, 0);
-
-        return new String(((OpenApiInputStream) deviceDoc.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return assertOpenApiEntity(openApiService.getMountDocByModule("1", moduleName, revision, getDevice, 0, 0));
     }
 
     protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
@@ -120,5 +115,16 @@ abstract class AbstractDocumentTest {
         when(info.getBaseUri()).thenReturn(uri);
 
         return info;
+    }
+
+    private static String assertOpenApiEntity(final Response response) {
+        final var entity = assertInstanceOf(OpenApiEntity.class, response.getEntity());
+        final var sw = new StringWriter();
+        try (var generator = JSON_FACTORY.createGenerator(sw)) {
+            entity.generate(generator);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        return sw.toString();
     }
 }

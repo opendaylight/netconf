@@ -24,7 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
-import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
+import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -124,7 +124,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
             final String revision, final int width, final int depth) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext modelContext = getModelContext(iid);
@@ -142,8 +142,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             width, depth);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final int width,
-            final int depth, final int offset, final int limit) throws IOException {
+    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final Long id, final int width, final int depth,
+            final int offset, final int limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
@@ -162,7 +162,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
-        return new OpenApiInputStream(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
+        return new DocumentEntity(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
             portionOfModules, basePath, width, depth);
     }
 
@@ -185,7 +185,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiInputStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
+    private DocumentEntity generateDataStoreOpenApi(final EffectiveModelContext modelContext,
             final UriInfo uriInfo, final String urlPrefix, final String deviceName, final int width,
             final int depth) throws IOException {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
@@ -193,7 +193,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
         final var modules = BaseYangOpenApiGenerator.getModulesWithoutDuplications(modelContext);
-        return new OpenApiInputStream(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
+        return new DocumentEntity(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
             modules, basePath, width, depth);
     }
 
