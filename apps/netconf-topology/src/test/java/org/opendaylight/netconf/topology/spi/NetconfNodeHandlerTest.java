@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -309,5 +310,55 @@ class NetconfNodeHandlerTest {
         verify(delegate).onDeviceFailed(captor.capture());
         assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
         assertEquals(1, keyAuthHandler.attempts());
+    }
+
+    @Test
+    void backoffMillisValueTest() {
+        // Prepare environment.
+        final var minBackoffMillis = 20000L;
+        final var netconfNodeHandler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager,
+            schemaAssembler, new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            sslContextFactoryProvider),
+            deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
+            .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+            .setPort(new PortNumber(Uint16.valueOf(9999)))
+            .setReconnectOnChangedSchema(true)
+            .setSchemaless(true)
+            .setTcpOnly(true)
+            .setBackoffMultiplier(Decimal64.valueOf("1"))
+            .setConcurrentRpcLimit(Uint16.ONE)
+            .setMaxConnectionAttempts(Uint32.ZERO)
+            .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+            .setMinBackoffMillis(Uint16.valueOf(minBackoffMillis))
+            .setKeepaliveDelay(Uint32.valueOf(1000))
+            .setConnectionTimeoutMillis(Uint32.valueOf(1000))
+            .setMaxBackoffMillis(Uint32.valueOf(40000))
+            .setBackoffJitter(Decimal64.valueOf("0.1"))
+            .setCredentials(new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername("testuser")
+                    .setPassword("testpassword")
+                    .build())
+                .build())
+            .build(), null);
+
+        // Test 1000 iterations and pick the smallest value.
+        // Less iteration has higher chance to not catch NETCONF-1408 issue.
+        final var backoffCaptor = ArgumentCaptor.forClass(Long.class);
+        doReturn(timeout).when(timer).newTimeout(any(), backoffCaptor.capture(), any());
+        long minValue = minBackoffMillis;
+        for (int i = 1; i < 1000; i++) {
+            netconfNodeHandler.onDeviceFailed(new AssertionError("schema failure"));
+            assertEquals(i, netconfNodeHandler.attempts());
+            final var currentValue = backoffCaptor.getValue();
+            if (currentValue < minValue) {
+                minValue = currentValue;
+            }
+        }
+
+        // Verify that smallest value is not less than expected timeout. minBackoffMillis * (1 - backoffJitter).
+        final var minAcceptableBackoffValue = minBackoffMillis * 0.9;
+        assertTrue(minValue >= minAcceptableBackoffValue,
+            "Expected larger backoff value than " + minAcceptableBackoffValue  + ", current min value " + minValue);
     }
 }
