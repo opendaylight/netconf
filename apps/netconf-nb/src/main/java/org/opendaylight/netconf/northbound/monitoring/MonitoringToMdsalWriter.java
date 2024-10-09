@@ -13,6 +13,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import java.util.function.Consumer;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -25,8 +26,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionKey;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -41,12 +44,12 @@ import org.slf4j.LoggerFactory;
 public final class MonitoringToMdsalWriter implements AutoCloseable, CapabilitiesListener, SessionsListener {
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringToMdsalWriter.class);
 
-    private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
-    private static final InstanceIdentifier<Schemas> SCHEMAS_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(NetconfState.class).child(Schemas.class);
-    private static final InstanceIdentifier<Sessions> SESSIONS_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(NetconfState.class).child(Sessions.class);
+    private static final @NonNull DataObjectIdentifier<Capabilities> CAPABILITIES_OBJID =
+        DataObjectIdentifier.builder(NetconfState.class).child(Capabilities.class).build();
+    private static final @NonNull DataObjectIdentifier<Schemas> SCHEMAS_OBJID =
+        DataObjectIdentifier.builder(NetconfState.class).child(Schemas.class).build();
+    private static final @NonNull DataObjectIdentifier<Sessions> SESSIONS_OBJID =
+        DataObjectIdentifier.builder(NetconfState.class).child(Sessions.class).build();
 
     private final DataBroker dataBroker;
     private final Registration capabilitiesReg;
@@ -68,19 +71,17 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, Capabilitie
         sessionsReg.close();
         capabilitiesReg.close();
         runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL,
-                InstanceIdentifier.create(NetconfState.class)));
+            DataObjectIdentifier.builder(NetconfState.class).build()));
     }
 
     @Override
     public void onSessionStarted(final Session session) {
-        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL,
-            SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key()), session));
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, session(session.key()), session));
     }
 
     @Override
     public void onSessionEnded(final Session session) {
-        runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL,
-            SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key())));
+        runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL, session(session.key())));
     }
 
     @Override
@@ -90,17 +91,16 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, Capabilitie
 
     @Override
     public void onCapabilitiesChanged(final Capabilities capabilities) {
-        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER,
-                capabilities));
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_OBJID, capabilities));
     }
 
     @Override
     public void onSchemasChanged(final Schemas schemas) {
-        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_OBJID, schemas));
     }
 
     private void runTransaction(final Consumer<WriteTransaction> txUser) {
-        final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
+        final var tx = dataBroker.newWriteOnlyTransaction();
         txUser.accept(tx);
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
@@ -116,9 +116,12 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, Capabilitie
     }
 
     private static void updateSessions(final WriteTransaction tx, final Collection<Session> sessions) {
-        for (Session session : sessions) {
-            tx.put(LogicalDatastoreType.OPERATIONAL, SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key()),
-                session);
+        for (var session : sessions) {
+            tx.put(LogicalDatastoreType.OPERATIONAL, session(session.key()), session);
         }
+    }
+
+    private static @NonNull WithKey<Session, SessionKey> session(final @NonNull SessionKey key) {
+        return SESSIONS_OBJID.toBuilder().child(Session.class, key).build();
     }
 }
