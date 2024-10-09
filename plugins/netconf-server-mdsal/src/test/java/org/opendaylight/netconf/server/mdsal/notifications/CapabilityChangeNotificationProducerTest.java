@@ -8,13 +8,13 @@
 package org.opendaylight.netconf.server.mdsal.notifications;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -37,8 +37,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
 import org.opendaylight.yangtools.binding.DataObject;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,8 +60,8 @@ class CapabilityChangeNotificationProducerTest {
 
     @BeforeEach
     void setUp() {
-        doReturn(listenerRegistration).when(dataBroker).registerTreeChangeListener(any(DataTreeIdentifier.class),
-                any(DataTreeChangeListener.class));
+        doReturn(listenerRegistration).when(dataBroker).registerTreeChangeListener(eq(LogicalDatastoreType.OPERATIONAL),
+            any(DataObjectIdentifier.class), any(DataTreeChangeListener.class));
 
         doNothing().when(baseNotificationPublisherRegistration).onCapabilityChanged(any(NetconfCapabilityChange.class));
 
@@ -74,11 +74,11 @@ class CapabilityChangeNotificationProducerTest {
 
     @Test
     void testOnDataChangedCreate() {
-        final InstanceIdentifier<Capabilities> capabilitiesIdentifier =
-                InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
-        final Set<Uri> newCapabilitiesList = Set.of(new Uri("newCapability"), new Uri("createdCapability"));
-        Capabilities newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
-        Map<InstanceIdentifier<?>, DataObject> createdData = new HashMap<>();
+        final var capabilitiesIdentifier = DataObjectIdentifier.builder(NetconfState.class).child(Capabilities.class)
+            .build();
+        final var newCapabilitiesList = Set.of(new Uri("newCapability"), new Uri("createdCapability"));
+        final var newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
+        final var createdData = new HashMap<DataObjectIdentifier<?>, DataObject>();
         createdData.put(capabilitiesIdentifier, newCapabilities);
         verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, null, newCapabilities,
                 changedCapabilitesFrom(newCapabilitiesList, Set.of()));
@@ -98,10 +98,9 @@ class CapabilityChangeNotificationProducerTest {
 
     @Test
     void testOnDataChangedDelete() {
-        final Set<Uri> originalCapabilitiesList =
+        final var originalCapabilitiesList =
             Set.of(new Uri("originalCapability"), new Uri("anotherOriginalCapability"));
-        final Capabilities originalCapabilities =
-            new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
+        final var originalCapabilities = new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
         doReturn(DataObjectModification.ModificationType.DELETE).when(objectModification).modificationType();
         doReturn(objectModification).when(treeModification).getRootNode();
         doReturn(originalCapabilities).when(objectModification).dataBefore();
@@ -110,10 +109,9 @@ class CapabilityChangeNotificationProducerTest {
             .onCapabilityChanged(changedCapabilitesFrom(Set.of(), originalCapabilitiesList));
     }
 
-    @SuppressWarnings("unchecked")
     private void verifyDataTreeChange(final DataObjectModification.ModificationType modificationType,
-                                      final Capabilities originalCapabilities, final Capabilities updatedCapabilities,
-                                      final NetconfCapabilityChange expectedChange) {
+            final Capabilities originalCapabilities, final Capabilities updatedCapabilities,
+            final NetconfCapabilityChange expectedChange) {
         doReturn(modificationType).when(objectModification).modificationType();
         doReturn(objectModification).when(treeModification).getRootNode();
         doReturn(originalCapabilities).when(objectModification).dataBefore();
@@ -123,14 +121,13 @@ class CapabilityChangeNotificationProducerTest {
     }
 
     private static NetconfCapabilityChange changedCapabilitesFrom(final Set<Uri> added, final Set<Uri> deleted) {
-        NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
-        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(
-                new ServerBuilder().setServer(Empty.value()).build()).build());
-
-        netconfCapabilityChangeBuilder.setModifiedCapability(Set.of());
-        netconfCapabilityChangeBuilder.setAddedCapability(added);
-        netconfCapabilityChangeBuilder.setDeletedCapability(deleted);
-
-        return netconfCapabilityChangeBuilder.build();
+        return new NetconfCapabilityChangeBuilder()
+            .setChangedBy(new ChangedByBuilder()
+                .setServerOrUser(new ServerBuilder().setServer(Empty.value()).build())
+                .build())
+            .setModifiedCapability(Set.of())
+            .setAddedCapability(added)
+            .setDeletedCapability(deleted)
+            .build();
     }
 }

@@ -25,6 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 
+@Deprecated(forRemoval = true)
 @ExtendWith(MockitoExtension.class)
 class YangLibraryNotificationProducerTest {
     @Mock
