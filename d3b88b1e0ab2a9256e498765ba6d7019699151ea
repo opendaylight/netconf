@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db7d1543_1779a658",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-09T11:03:50Z",
+      "side": 1,
+      "message": "these should become long",
+      "range": {
+        "startLine": 171,
+        "startChar": 32,
+        "endLine": 171,
+        "endChar": 50
+      },
+      "revId": "d3b88b1e0ab2a9256e498765ba6d7019699151ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
