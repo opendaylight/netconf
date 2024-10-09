@@ -59,12 +59,16 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        channel.channel().pipeline().addLast(
+        final var nettyChannel = channel.channel();
+        final var pipeline = nettyChannel.pipeline();
+        final var session = new RestconfSession(channel.scheme(), root);
+        pipeline.addLast(
             new ServerSseHandler(
                 new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
                     configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            new RestconfSession(channel.scheme(), root));
+            session);
+        nettyChannel.closeFuture().addListener(ignored -> session.close());
     }
 
     @Override
