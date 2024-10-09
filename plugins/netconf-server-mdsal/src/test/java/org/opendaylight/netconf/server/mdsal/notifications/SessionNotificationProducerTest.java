@@ -9,6 +9,7 @@ package org.opendaylight.netconf.server.mdsal.notifications;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -25,6 +26,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -61,7 +63,8 @@ class SessionNotificationProducerTest {
 
     @BeforeEach
     void setUp() {
-        doReturn(listenerRegistration).when(dataBroker).registerTreeChangeListener(any(), any());
+        doReturn(listenerRegistration).when(dataBroker)
+            .registerTreeChangeListener(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
 
         doReturn(registration).when(netconfNotificationCollector).registerBaseNotificationPublisher();
 
