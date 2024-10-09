@@ -23,7 +23,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredentialBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ final class DefaultAddKeystoreEntry extends AbstractEncryptingRpc implements Add
 
         final var tx = newTransaction();
         encrypted.forEach(keypair -> tx.put(LogicalDatastoreType.CONFIGURATION,
-            InstanceIdentifier.create(Keystore.class).child(KeyCredential.class, keypair.key()), keypair));
+            DataObjectIdentifier.builder(Keystore.class).child(KeyCredential.class, keypair.key()).build(), keypair));
         return tx.commit().transform(commitInfo -> {
             LOG.debug("Updated keypairs: {}", plain.keySet());
             return RpcResultBuilder.success(new AddKeystoreEntryOutputBuilder().build()).build();

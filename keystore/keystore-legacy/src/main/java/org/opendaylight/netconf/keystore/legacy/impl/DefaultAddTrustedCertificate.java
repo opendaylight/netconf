@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificateBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ final class DefaultAddTrustedCertificate extends AbstractEncryptingRpc implement
 
         final var tx = newTransaction();
         certificates.forEach(cert -> tx.put(LogicalDatastoreType.CONFIGURATION,
-            InstanceIdentifier.create(Keystore.class).child(TrustedCertificate.class, cert.key()), cert));
+            DataObjectIdentifier.builder(Keystore.class).child(TrustedCertificate.class, cert.key()).build(), cert));
         return tx.commit().transform(commitInfo -> {
             LOG.debug("Updated trusted certificates: {}", certs.keySet());
             return RpcResultBuilder.success(new AddTrustedCertificateOutputBuilder().build()).build();

@@ -28,7 +28,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
@@ -39,12 +38,12 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -101,9 +100,8 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             @Reference final ClusterSingletonServiceProvider cssProvider,
             @Reference final AAAEncryptionService encryptionService) {
         this.encryptionService = requireNonNull(encryptionService);
-        configListener = dataBroker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
-            new ConfigListener(this));
+        configListener = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            DataObjectIdentifier.builder(Keystore.class).build(), new ConfigListener(this));
         rpcSingleton = cssProvider.registerClusterSingletonService(
             new RpcSingleton(dataBroker, rpcProvider, encryptionService));
 
