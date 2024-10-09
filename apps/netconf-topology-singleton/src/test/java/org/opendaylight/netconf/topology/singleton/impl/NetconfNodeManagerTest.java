@@ -83,7 +83,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -211,8 +210,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NodeId nodeId = new NodeId("device");
         final NodeKey nodeKey = new NodeKey(nodeId);
         final String topologyId = "topology-netconf";
-        final InstanceIdentifier<Node> nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(
-                nodeKey, topologyId);
+        final var nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(nodeKey, topologyId);
 
         netconfNodeManager.registerDataTreeChangeListener(topologyId, nodeKey);
         verify(mockDataBroker).registerTreeChangeListener(any(), eq(netconfNodeManager));
@@ -224,7 +222,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
-        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).step();
+        doReturn(Iterables.getLast(nodeListPath.steps())).when(mockDataObjModification).step();
         doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
 
@@ -310,14 +308,13 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NodeId nodeId = new NodeId("device");
         final NodeKey nodeKey = new NodeKey(nodeId);
         final String topologyId = "topology-netconf";
-        final InstanceIdentifier<Node> nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(
-                nodeKey, topologyId);
+        final var nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(nodeKey, topologyId);
 
         final NetconfNodeAugment netconfNodeAugment = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
-        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).step();
+        doReturn(Iterables.getLast(nodeListPath.steps())).when(mockDataObjModification).step();
         doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
 

@@ -58,7 +58,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev24
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -145,7 +145,7 @@ class AbstractNetconfTopologyTest {
     void testFailToDecryptPassword() throws Exception {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
-        doNothing().when(wtx).merge(any(), any(InstanceIdentifier.class), any());
+        doNothing().when(wtx).merge(any(), any(DataObjectIdentifier.class), any());
 
         final var schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
         final var topology = new TestingNetconfTopologyImpl("id", clientFactory, timer, schemaAssembler,
@@ -223,7 +223,7 @@ class AbstractNetconfTopologyTest {
 
         @Override
         protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final Credentials credentials,
-                boolean lockDatastore) {
+                final boolean lockDatastore) {
             return delegate;
         }
     }

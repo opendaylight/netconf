@@ -129,14 +129,13 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.binding.DataObject;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.Rpc;
 import org.opendaylight.yangtools.binding.data.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -177,7 +176,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final String TOPOLOGY_ID = NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME;
-    private static final @NonNull KeyedInstanceIdentifier<Node, NodeKey> NODE_INSTANCE_ID =
+    private static final DataObjectIdentifier.@NonNull WithKey<Node, NodeKey> NODE_INSTANCE_ID =
         NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(new NodeId("node-id")), TOPOLOGY_ID);
 
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
@@ -439,7 +438,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
                 for (var dataTreeModification : changes) {
                     var rootNode = dataTreeModification.getRootNode();
-                    var path = dataTreeModification.getRootPath().path();
+                    var path = dataTreeModification.path();
                     switch (rootNode.modificationType()) {
                         case WRITE:
                         case SUBTREE_MODIFIED:
@@ -630,7 +629,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private static void writeNetconfNode(final String cacheDir, final DataBroker dataBroker) throws Exception {
         putData(dataBroker, NODE_INSTANCE_ID, new NodeBuilder()
-            .withKey(NODE_INSTANCE_ID.getKey())
+            .withKey(NODE_INSTANCE_ID.key())
             .addAugmentation(new NetconfNodeAugmentBuilder()
                 .setNetconfNode(new NetconfNodeBuilder()
                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -654,7 +653,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             .build());
     }
 
-    private static <T extends DataObject> void putData(final DataBroker databroker, final InstanceIdentifier<T> path,
+    private static <T extends DataObject> void putData(final DataBroker databroker, final DataObjectIdentifier<T> path,
             final T data) throws Exception {
         final var writeTx = databroker.newWriteOnlyTransaction();
         writeTx.put(LogicalDatastoreType.CONFIGURATION, path, data);
@@ -692,7 +691,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         dataBrokerTest.setup();
 
         final var path = NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID);
-        putData(dataBrokerTest.getDataBroker(), path, new TopologyBuilder().withKey(path.getKey()).build());
+        putData(dataBrokerTest.getDataBroker(), path, new TopologyBuilder().withKey(path.key()).build());
         return dataBrokerTest;
     }
 
