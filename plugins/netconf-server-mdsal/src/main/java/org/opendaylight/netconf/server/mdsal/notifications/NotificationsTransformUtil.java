@@ -23,7 +23,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.binding.EventInstantAware;
 import org.opendaylight.yangtools.binding.Notification;
 import org.opendaylight.yangtools.binding.data.codec.api.BindingNormalizedNodeSerializer;
-import org.opendaylight.yangtools.binding.data.codec.spi.BindingDOMCodecFactory;
+import org.opendaylight.yangtools.binding.data.codec.dynamic.BindingDataCodecFactory;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -37,7 +37,7 @@ final class NotificationsTransformUtil {
     private final BindingNormalizedNodeSerializer serializer;
 
     NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
-            final BindingDOMCodecFactory codecFactory) throws YangParserException {
+            final BindingDataCodecFactory codecFactory) throws YangParserException {
         final var ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
             Netconf.class, NetconfConfigChange.class, YangLibraryChange.class, YangLibraryUpdate.class);
         modelContext = ctx.modelContext();
@@ -45,7 +45,7 @@ final class NotificationsTransformUtil {
                 .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
                 .findFirst()
                 .isPresent());
-        serializer = codecFactory.createBindingDOMCodec(ctx);
+        serializer = codecFactory.newBindingDataCodec(ctx).nodeSerializer();
     }
 
     /**
