@@ -26,6 +26,8 @@ import io.netty.util.AsciiString;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -33,6 +35,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +74,7 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     private static final Logger LOG = LoggerFactory.getLogger(RestconfSession.class);
 
     private final ConcurrentMap<PendingRequest<?>, RequestContext> executingRequests = new ConcurrentHashMap<>();
+    private final List<Registration> resources = new ArrayList<>();
     private final EndpointRoot root;
 
     RestconfSession(final HttpScheme scheme, final EndpointRoot root) {
@@ -131,6 +135,18 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
             context.respond(formatException(cause, context.version));
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
+        }
+    }
+
+    @Override
+    public void registerResource(final Registration registration) {
+        resources.add(registration);
+    }
+
+    @Override
+    public void close() {
+        for (var resource : resources) {
+            resource.close();
         }
     }
 

@@ -88,7 +88,10 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
         if (add(channel)) {
             // The channel is tracked in state, make sure we remove it when it goes away. Invoke the user listener only
             // after that, so our listener fires first (and the user does not have a chance to close() before that).
-            ch.closeFuture().addListener(ignored -> remove(channel));
+            ch.closeFuture().addListener(ignored -> {
+                remove(channel);
+                listener.onTransportChannelClosed(channel);
+            });
             listener.onTransportChannelEstablished(channel);
         } else {
             // We are already shutting down, just close the channel
@@ -98,6 +101,10 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
 
     protected final void notifyTransportChannelFailed(final @NonNull Throwable cause) {
         listener.onTransportChannelFailed(cause);
+    }
+
+    protected final void notifyTransportChannelClosed(final TransportChannel channel) {
+        listener.onTransportChannelClosed(channel);
     }
 
     @Override

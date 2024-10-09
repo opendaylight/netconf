@@ -48,6 +48,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -296,6 +297,11 @@ class CallHomeTlsServerTest {
         @Override
         public void onTransportChannelFailed(final Throwable cause) {
             LOG.error("Call-Home client's transport channel failed", cause);
+        }
+
+        @Override
+        public void onTransportChannelClosed(@NonNull TransportChannel channel) {
+            LOG.info("Transport channel closed {}", channel);
         }
     }
 }
