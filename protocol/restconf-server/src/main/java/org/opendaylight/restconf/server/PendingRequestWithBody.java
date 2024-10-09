@@ -16,6 +16,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
@@ -64,8 +65,8 @@ abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> ex
      */
     abstract B wrapBody(InputStream body);
 
-    final Response transformCreateResource(final CreateResourceResult result) {
-        return new DefaultCompletedRequest(HttpResponseStatus.CREATED,
+    final EmptyRequestResponse transformCreateResource(final CreateResourceResult result) {
+        return new EmptyRequestResponse(HttpResponseStatus.CREATED,
             metadataHeaders(result).set(HttpHeaderNames.LOCATION, restconfURI() + "data/" + result.createdPath()));
     }
 

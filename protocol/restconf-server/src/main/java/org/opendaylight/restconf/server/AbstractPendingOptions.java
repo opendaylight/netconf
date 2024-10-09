@@ -16,6 +16,7 @@ import java.security.Principal;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.PendingRequest;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.api.OptionsResult;
@@ -51,11 +52,11 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
     static final HttpHeaders HEADERS_RESOURCE = patchHeaders("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
     static final HttpHeaders HEADERS_RPC = headers("GET, HEAD, OPTIONS, POST");
 
-    static final CompletedRequest ACTION = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_ACTION);
-    static final CompletedRequest DATASTORE = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_DATASTORE);
-    static final CompletedRequest READ_ONLY = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_READ_ONLY);
-    static final CompletedRequest RESOURCE = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_RESOURCE);
-    static final CompletedRequest RPC = new DefaultCompletedRequest(HttpResponseStatus.OK, HEADERS_RPC);
+    static final EmptyRequestResponse ACTION = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_ACTION);
+    static final EmptyRequestResponse DATASTORE = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_DATASTORE);
+    static final EmptyRequestResponse READ_ONLY = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_READ_ONLY);
+    static final EmptyRequestResponse RESOURCE = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RESOURCE);
+    static final EmptyRequestResponse RPC = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RPC);
 
     AbstractPendingOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final ApiPath apiPath) {
@@ -63,7 +64,7 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
     }
 
     @Override
-    final CompletedRequest transformResult(final NettyServerRequest<?> request, final OptionsResult result) {
+    final EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final OptionsResult result) {
         return switch (result) {
             case ACTION -> ACTION;
             case DATASTORE -> DATASTORE;

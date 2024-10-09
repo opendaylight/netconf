@@ -22,6 +22,9 @@ import java.util.Date;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.PendingRequest;
+import org.opendaylight.netconf.transport.http.PendingRequestListener;
+import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
@@ -47,7 +50,7 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
 // Note: not @NonNullByDefault because SpotBugs throws a tantrum on @Nullable field
 abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
         permits PendingRequestWithBody, PendingRequestWithoutBody {
-    static final @NonNull CompletedRequest NO_CONTENT = new DefaultCompletedRequest(HttpResponseStatus.NO_CONTENT);
+    static final @NonNull EmptyRequestResponse NO_CONTENT = new EmptyRequestResponse(HttpResponseStatus.NO_CONTENT);
     static final @NonNull DefaultHttpHeadersFactory HEADERS_FACTORY = DefaultHttpHeadersFactory.headersFactory();
 
     final @NonNull EndpointInvariants invariants;
@@ -79,7 +82,7 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    final void execute(final PendingRequestListener listener, final InputStream body) {
+    public final void execute(final PendingRequestListener listener, final InputStream body) {
         try {
             execute(new NettyServerRequest<>(this, listener), body);
         } catch (RuntimeException e) {

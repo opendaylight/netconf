@@ -38,8 +38,8 @@ final class PendingDataPut extends PendingRequestWithResource<DataPutResult> {
     }
 
     @Override
-    CompletedRequest transformResult(final NettyServerRequest<?> request, final DataPutResult result) {
-        return new DefaultCompletedRequest(
+    EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final DataPutResult result) {
+        return new EmptyRequestResponse(
             result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT, metadataHeaders(result));
     }
 }

@@ -17,6 +17,7 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 
@@ -26,8 +27,8 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
  */
 @NonNullByDefault
 final class DataResource extends AbstractLeafResource {
-    private static final CompletedRequest METHOD_NOT_ALLOWED_DATASTORE =
-        new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_DATASTORE);
+    private static final EmptyRequestResponse METHOD_NOT_ALLOWED_DATASTORE =
+        new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_DATASTORE);
 
     DataResource(final EndpointInvariants invariants) {
         super(invariants);

@@ -32,7 +32,7 @@ final class PendingDataDelete extends PendingRequestWithApiPath<Empty> {
     }
 
     @Override
-    CompletedRequest transformResult(final NettyServerRequest<?> request, final Empty result) {
+    EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final Empty result) {
         return NO_CONTENT;
     }
 }

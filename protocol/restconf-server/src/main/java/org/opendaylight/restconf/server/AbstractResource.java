@@ -25,7 +25,10 @@ import java.util.List;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.BytebufRequestResponse;
+import org.opendaylight.netconf.transport.http.CompletedRequest;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
@@ -44,29 +47,29 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
 
     /**
-     * A {@link CompletedRequest} reporting {@code 405 Method Not Allowed} and indicating support only for
+     * A {@link EmptyRequestResponse} reporting {@code 405 Method Not Allowed} and indicating support only for
      * {@code OPTIONS} method.
      */
-    static final CompletedRequest OPTIONS_ONLY_METHOD_NOT_ALLOWED;
+    static final EmptyRequestResponse OPTIONS_ONLY_METHOD_NOT_ALLOWED;
     /**
      * A {@link CompletedRequest} reporting {@code 200 OK} and containing only {@code Allow: OPTIONS} header.
      */
-    static final CompletedRequest OPTIONS_ONLY_OK;
+    static final EmptyRequestResponse OPTIONS_ONLY_OK;
 
     static {
         final var headers = DefaultHttpHeadersFactory.headersFactory().newHeaders()
             .set(HttpHeaderNames.ALLOW, "OPTIONS");
-        OPTIONS_ONLY_METHOD_NOT_ALLOWED = new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
-        OPTIONS_ONLY_OK = new DefaultCompletedRequest(HttpResponseStatus.OK, headers);
+        OPTIONS_ONLY_METHOD_NOT_ALLOWED = new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
+        OPTIONS_ONLY_OK = new EmptyRequestResponse(HttpResponseStatus.OK, headers);
     }
 
-    static final CompletedRequest METHOD_NOT_ALLOWED_READ_ONLY =
-        new DefaultCompletedRequest(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
-    static final CompletedRequest NOT_FOUND = new DefaultCompletedRequest(HttpResponseStatus.NOT_FOUND);
+    static final EmptyRequestResponse METHOD_NOT_ALLOWED_READ_ONLY =
+        new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
+    static final CompletedRequest NOT_FOUND = new EmptyRequestResponse(HttpResponseStatus.NOT_FOUND);
 
-    static final CompletedRequest NOT_ACCEPTABLE_DATA;
-    static final CompletedRequest UNSUPPORTED_MEDIA_TYPE_DATA;
-    static final CompletedRequest UNSUPPORTED_MEDIA_TYPE_PATCH;
+    static final EmptyRequestResponse NOT_ACCEPTABLE_DATA;
+    static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_DATA;
+    static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_PATCH;
 
     static {
         final var factory = DefaultHttpHeadersFactory.headersFactory();
@@ -79,9 +82,9 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
             HttpHeaderValues.APPLICATION_XML.toString(),
             NettyMediaTypes.TEXT_XML.toString())));
 
-        NOT_ACCEPTABLE_DATA = new DefaultCompletedRequest(HttpResponseStatus.NOT_ACCEPTABLE, headers);
-        UNSUPPORTED_MEDIA_TYPE_DATA = new DefaultCompletedRequest(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, headers);
-        UNSUPPORTED_MEDIA_TYPE_PATCH = new DefaultCompletedRequest(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE,
+        NOT_ACCEPTABLE_DATA = new EmptyRequestResponse(HttpResponseStatus.NOT_ACCEPTABLE, headers);
+        UNSUPPORTED_MEDIA_TYPE_DATA = new EmptyRequestResponse(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, headers);
+        UNSUPPORTED_MEDIA_TYPE_PATCH = new EmptyRequestResponse(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE,
             factory.newEmptyHeaders().set(HttpHeaderNames.ACCEPT, AbstractPendingOptions.ACCEPTED_PATCH_MEDIA_TYPES));
     }
 
@@ -123,7 +126,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
 
     static final CompletedRequest badApiPath(final String path, final ParseException cause) {
         LOG.debug("Failed to parse API path", cause);
-        return new DefaultCompletedRequest(HttpResponseStatus.BAD_REQUEST, null,
+        return new BytebufRequestResponse(HttpResponseStatus.BAD_REQUEST,
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT,
                 "Bad request path '%s': '%s'".formatted(path, cause.getMessage())));
     }

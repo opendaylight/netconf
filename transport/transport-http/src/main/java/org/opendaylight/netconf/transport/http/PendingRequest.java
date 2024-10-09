@@ -5,8 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server;
+package org.opendaylight.netconf.transport.http;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.io.InputStream;
@@ -25,8 +26,9 @@ import org.eclipse.jdt.annotation.Nullable;
  *
  * @param <T> server response type
  */
+@Beta
 @NonNullByDefault
-abstract non-sealed class PendingRequest<T> implements PreparedRequest {
+public abstract non-sealed class PendingRequest<T> implements PreparedRequest {
     /**
      * Execute this request. Implementations are required to (eventually) signal completion via supplied
      * {@link PendingRequestListener}.
@@ -34,7 +36,7 @@ abstract non-sealed class PendingRequest<T> implements PreparedRequest {
      * @param listener the {@link PendingRequestListener} to notify on completion
      * @param body the HTTP request body, {@code null} if not present or empty
      */
-    abstract void execute(PendingRequestListener listener, @Nullable InputStream body);
+    public abstract void execute(PendingRequestListener listener, @Nullable InputStream body);
 
     @Override
     public final int hashCode() {
