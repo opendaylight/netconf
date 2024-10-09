@@ -34,8 +34,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,17 +73,17 @@ class MonitoringToMdsalWriterTest {
         inOrder.verify(sessionsReg).close();
         inOrder.verify(capabilityReg).close();
         inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL,
-            InstanceIdentifier.create(NetconfState.class));
+            DataObjectIdentifier.builder(NetconfState.class).build());
         inOrder.verify(writeTransaction).commit();
     }
 
     @Test
     void testOnCapabilityChanged() {
-        final var capabilitiesId = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
+        final var capabilitiesId = DataObjectIdentifier.builder(NetconfState.class).child(Capabilities.class).build();
         final var capabilities = new CapabilitiesBuilder().build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTransaction)
-            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onCapabilitiesChanged(capabilities);
@@ -94,11 +94,11 @@ class MonitoringToMdsalWriterTest {
 
     @Test
     void testOnSchemasChanged() {
-        final var schemasId = InstanceIdentifier.create(NetconfState.class).child(Schemas.class);
+        final var schemasId = DataObjectIdentifier.builder(NetconfState.class).child(Schemas.class).build();
         final var schemas = new SchemasBuilder().build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTransaction)
-            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSchemasChanged(schemas);
@@ -112,14 +112,14 @@ class MonitoringToMdsalWriterTest {
         final var session = new SessionBuilder().setSessionId(Uint32.ONE).build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTransaction)
-            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSessionStarted(session);
         final var inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL,
-            InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session.key()),
-            session);
+            DataObjectIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class, session.key())
+                .build(), session);
         inOrder.verify(writeTransaction).commit();
     }
 
@@ -128,13 +128,14 @@ class MonitoringToMdsalWriterTest {
         final var session = new SessionBuilder().setSessionId(Uint32.ONE).build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTransaction)
-            .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
+            .delete(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class));
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSessionEnded(session);
         final var inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL,
-            InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session.key()));
+            DataObjectIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class, session.key())
+                .build());
         inOrder.verify(writeTransaction).commit();
     }
 
@@ -144,17 +145,17 @@ class MonitoringToMdsalWriterTest {
         final var session2 = new SessionBuilder().setSessionId(Uint32.TWO).build();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTransaction)
-            .put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any());
+            .put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class), any());
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer.onSessionsUpdated(List.of(session1, session2));
         final var inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL,
-            InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session1.key()),
-            session1);
+            DataObjectIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class, session1.key())
+                .build(), session1);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL,
-            InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session2.key()),
-            session2);
+            DataObjectIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class, session2.key())
+                .build(), session2);
         inOrder.verify(writeTransaction).commit();
     }
 
