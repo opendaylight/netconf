@@ -19,7 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.RemovePrivateKeyOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKeyKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ final class DefaultRemovePrivateKey extends AbstractRpc implements RemovePrivate
         final var tx = newTransaction();
         for (var key : keys) {
             tx.delete(LogicalDatastoreType.CONFIGURATION,
-                InstanceIdentifier.create(Keystore.class).child(PrivateKey.class, key));
+                DataObjectIdentifier.builder(Keystore.class).child(PrivateKey.class, key).build());
         }
 
         return tx.commit().transform(commitInfo -> {
