@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.server.mdsal.notifications;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
@@ -25,6 +27,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 
+@Deprecated(forRemoval = true)
 @ExtendWith(MockitoExtension.class)
 class YangLibraryNotificationProducerTest {
     @Mock
@@ -43,7 +46,8 @@ class YangLibraryNotificationProducerTest {
         doNothing().when(yangLibraryPublisherRegistration).onYangLibraryChange(any(YangLibraryChange.class));
         doReturn(yangLibraryPublisherRegistration).when(netconfNotificationCollector)
                 .registerYangLibraryPublisher();
-        doReturn(registration).when(dataBroker).registerDataListener(any(), any());
+        doReturn(registration).when(dataBroker)
+            .registerDataListener(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
 
         yangLibraryNotificationProducer = new YangLibraryNotificationProducer(netconfNotificationCollector, dataBroker);
     }

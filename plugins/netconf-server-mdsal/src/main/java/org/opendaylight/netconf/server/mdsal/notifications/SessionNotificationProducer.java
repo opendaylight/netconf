@@ -10,7 +10,6 @@ package org.opendaylight.netconf.server.mdsal.notifications;
 import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -21,8 +20,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEndBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStartBuilder;
+import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -45,10 +44,8 @@ public final class SessionNotificationProducer implements DataTreeChangeListener
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
-        sessionListenerRegistration = dataBroker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL,
-                InstanceIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class).build()),
-            this);
+        sessionListenerRegistration = dataBroker.registerTreeChangeListener(LogicalDatastoreType.OPERATIONAL,
+            DataObjectReference.builder(NetconfState.class).child(Sessions.class).child(Session.class).build(), this);
     }
 
     @Override
