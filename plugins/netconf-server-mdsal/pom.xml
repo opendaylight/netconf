@@ -98,7 +98,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>binding-data-codec-spi</artifactId>
+      <artifactId>binding-data-codec-dynamic</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -185,11 +185,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>binding-data-codec-dynamic</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>

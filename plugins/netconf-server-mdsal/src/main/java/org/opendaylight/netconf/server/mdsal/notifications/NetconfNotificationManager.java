@@ -45,7 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yangtools.binding.Notification;
-import org.opendaylight.yangtools.binding.data.codec.spi.BindingDOMCodecFactory;
+import org.opendaylight.yangtools.binding.data.codec.dynamic.BindingDataCodecFactory;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
@@ -102,7 +102,7 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     @Inject
     @Activate
     public NetconfNotificationManager(@Reference final YangParserFactory parserFactory,
-            @Reference final BindingRuntimeGenerator generator, @Reference final BindingDOMCodecFactory codecFactory)
+            @Reference final BindingRuntimeGenerator generator, @Reference final BindingDataCodecFactory codecFactory)
                 throws YangParserException {
         transformUtil = new NotificationsTransformUtil(parserFactory, generator, codecFactory);
     }
