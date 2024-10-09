@@ -14,10 +14,8 @@ import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -77,7 +75,6 @@ public final class PathsEntity extends OpenApiEntity {
         boolean hasRootPostLink = false;
         boolean hasAddedDataStore = false;
 
-        final var result = new ArrayDeque<PathEntity>();
         for (var module : modules) {
             if (includeDataStore && !hasAddedDataStore) {
                 final var childNode = module.getChildNodes().stream()
@@ -88,9 +85,9 @@ public final class PathsEntity extends OpenApiEntity {
                     final var dataPath = basePath + DATA + urlPrefix;
                     final var post = new PostEntity(childNode.orElseThrow(), deviceName, module.getName(),
                         List.of(), childNode.orElseThrow().getQName().getLocalName(), module, List.of(), true);
-                    result.add(new PathEntity(dataPath, post, new GetRootEntity(deviceName, "data")));
+                    new PathEntity(dataPath, post, new GetRootEntity(deviceName, "data")).generate(generator);
                     final var operationsPath = basePath + OPERATIONS + urlPrefix;
-                    result.add(new PathEntity(operationsPath, new GetRootEntity(deviceName, "operations")));
+                    new PathEntity(operationsPath, new GetRootEntity(deviceName, "operations")).generate(generator);
                     hasAddedDataStore = true;
                 }
             }
@@ -101,8 +98,7 @@ public final class PathsEntity extends OpenApiEntity {
                 final var post = new PostEntity(rpc, deviceName, module.getName(), List.of(), localName, null,
                     List.of(), false);
                 final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
-                final var entity = new PathEntity(resolvedPath, post);
-                result.add(entity);
+                new PathEntity(resolvedPath, post).generate(generator);
             }
 
             final var childNodes = widthList(module, width);
@@ -114,32 +110,28 @@ public final class PathsEntity extends OpenApiEntity {
                 if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                     if (isConfig && !hasRootPostLink && isForSingleModule) {
                         final var resolvedPath = basePath + DATA + urlPrefix;
-                        result.add(new PathEntity(resolvedPath,
+                        new PathEntity(resolvedPath,
                             new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of(),
-                                false)));
+                                false)).generate(generator);
                         hasRootPostLink = true;
                     }
                     //process first node
                     final var pathParams = new ArrayList<ParameterEntity>();
                     final var localName = moduleName + ":" + nodeLocalName;
                     final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-                    processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, null,
+                    processChildNode(generator, node, pathParams, moduleName, path, nodeLocalName, isConfig, null,
                         List.of(), 0);
                 }
-            }
-
-            for (var path = result.poll(); path != null; path = result.poll()) {
-                path.generate(generator);
             }
         }
 
         generator.writeEndObject();
     }
 
-    private void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
-            final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
+    private void processChildNode(final JsonGenerator generator, final DataSchemaNode node,
+            final List<ParameterEntity> pathParams, final String moduleName, final String path, final String refPath,
             final boolean isConfig, final SchemaNode parentNode, final List<SchemaNode> parentNodes,
-            final int nodeDepth) {
+            final int nodeDepth) throws IOException {
         if (depth > 0 && nodeDepth + 1 > depth) {
             return;
         }
@@ -147,10 +139,11 @@ public final class PathsEntity extends OpenApiEntity {
         final var fullName = resolveFullNameFromNode(node.getQName(), modelContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node, width, depth, nodeDepth);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
-            result.add(processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName,
-                firstChild));
+            processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName, firstChild)
+                .generate(generator);
         } else {
-            result.add(processDataPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName));
+            processDataPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName)
+                .generate(generator);
         }
         final var listOfParents = new ArrayList<>(parentNodes);
         if (parentNode != null) {
@@ -160,13 +153,12 @@ public final class PathsEntity extends OpenApiEntity {
             final var listOfParentsForActions = new ArrayList<>(listOfParents);
             listOfParentsForActions.add(node);
             final var actionParams = new ArrayList<>(pathParams);
-            actionContainer.getActions().forEach(actionDef -> {
+            for (var actionDef : actionContainer.getActions()) {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
                     node.getQName(), modelContext);
-                final var childPath = basePath + DATA + resourceActionPath;
-                result.add(processActionPathEntity(actionDef, childPath, actionParams, moduleName,
-                    refPath, deviceName, parentNode, listOfParentsForActions));
-            });
+                processActionPathEntity(actionDef, basePath + DATA + resourceActionPath, actionParams, moduleName,
+                    refPath, deviceName, parentNode, listOfParentsForActions).generate(generator);
+            }
         }
         final var childNodes = widthList((DataNodeContainer) node, width);
         for (final var childNode : childNodes) {
@@ -176,7 +168,7 @@ public final class PathsEntity extends OpenApiEntity {
                 final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), modelContext);
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
-                processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
+                processChildNode(generator, childNode, childParams, moduleName, resourceDataPath, newRefPath, newConfig,
                     node, listOfParents, nodeDepth + 1);
             }
         }
