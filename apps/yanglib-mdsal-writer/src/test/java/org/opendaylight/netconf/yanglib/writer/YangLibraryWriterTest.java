@@ -58,20 +58,20 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.ModuleSetBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.SchemaBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 @ExtendWith(MockitoExtension.class)
 class YangLibraryWriterTest {
     private static final YangLibrarySchemaSourceUrlProvider URL_PROVIDER = (moduleSetName, moduleName, revision) ->
             Set.of(new Uri("/url/to/" + moduleName + (revision == null ? "" : "/" + revision)));
-    private static final InstanceIdentifier<YangLibrary> YANG_LIBRARY_PATH =
-        InstanceIdentifier.create(YangLibrary.class);
+    private static final DataObjectIdentifier<YangLibrary> YANG_LIBRARY_PATH =
+        DataObjectIdentifier.builder(YangLibrary.class).build();
     @Deprecated
-    private static final InstanceIdentifier<ModulesState> MODULES_STATE_PATH =
-        InstanceIdentifier.create(ModulesState.class);
+    private static final DataObjectIdentifier<ModulesState> MODULES_STATE_PATH =
+        DataObjectIdentifier.builder(ModulesState.class).build();
     private static final boolean WITH_LEGACY = true;
     private static final boolean NO_LEGACY = false;
     private static final boolean WITH_URLS = true;

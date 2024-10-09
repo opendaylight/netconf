@@ -23,8 +23,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
  */
 final class YangLibraryWriter implements FutureCallback<Empty> {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibraryWriter.class);
-    private static final InstanceIdentifier<YangLibrary> YANG_LIBRARY_INSTANCE_IDENTIFIER =
-        InstanceIdentifier.create(YangLibrary.class);
+    private static final DataObjectIdentifier<YangLibrary> YANG_LIBRARY_INSTANCE_IDENTIFIER =
+        DataObjectIdentifier.builder(YangLibrary.class).build();
     @Deprecated
-    private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
-        InstanceIdentifier.create(ModulesState.class);
+    private static final DataObjectIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
+        DataObjectIdentifier.builder(ModulesState.class).build();
 
     private final AtomicLong idCounter = new AtomicLong();
     private final AtomicBoolean closed = new AtomicBoolean();

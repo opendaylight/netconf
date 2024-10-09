@@ -18,7 +18,7 @@ import org.opendaylight.mdsal.eos.dom.api.DOMEntityOwnershipService;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.impl.EOSClusterSingletonServiceProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 
 //TODO: Migrate this test to JUnit5 after migrating the mdsal tests.
 public class YangLibraryWriterSingletonIntegrationTest extends AbstractConcurrentDataBrokerTest {
@@ -46,7 +46,8 @@ public class YangLibraryWriterSingletonIntegrationTest extends AbstractConcurren
 
     private boolean yangLibraryExists() throws Exception {
         try (var tx = getDataBroker().newReadOnlyTransaction()) {
-            return tx.exists(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(YangLibrary.class)).get();
+            return tx.exists(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(YangLibrary.class).build())
+                .get();
         }
     }
 }
