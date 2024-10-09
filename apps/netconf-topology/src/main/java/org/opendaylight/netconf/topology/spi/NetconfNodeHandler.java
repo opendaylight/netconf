@@ -127,7 +127,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
-    private long lastBackoff;
+    private long lastMultipliedBackoff;
     @GuardedBy("this")
     private Task currentTask;
 
@@ -205,7 +205,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     public synchronized void connect() {
         attempts = 1;
-        lastBackoff = minBackoff;
+        lastMultipliedBackoff = minBackoff;
         lockedConnect();
     }
 
@@ -327,14 +327,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // First connection attempt gets initialized to minimum backoff, each subsequent is exponentially backed off
         // by backoffMultiplier (default 1.5) until reach max sleep and randomized by +/- jitter (default 0.1).
         if (attempts != 0) {
-            final var currentBackoff = Math.min(lastBackoff * backoffMultiplier, maxBackoff);
-            backoffMillis = (long) (currentBackoff * (Math.random() * (jitter * 2) + (1 - jitter)));
+            lastMultipliedBackoff = (long) Math.min(lastMultipliedBackoff * backoffMultiplier, maxBackoff);
+            backoffMillis = (long) (lastMultipliedBackoff * (Math.random() * (jitter * 2) + (1 - jitter)));
         } else {
+            lastMultipliedBackoff = minBackoff;
             backoffMillis = minBackoff;
         }
 
         attempts++;
-        lastBackoff = backoffMillis;
         LOG.debug("Retrying {} connection attempt {} after {} milliseconds", deviceId, attempts, backoffMillis);
 
         // Schedule a task for the right time. We always go through the executor to eliminate the special case of
@@ -385,5 +385,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @VisibleForTesting
     synchronized long attempts() {
         return attempts;
+    }
+
+    @VisibleForTesting
+    synchronized long lastBackOff() {
+        return lastMultipliedBackoff;
     }
 }
