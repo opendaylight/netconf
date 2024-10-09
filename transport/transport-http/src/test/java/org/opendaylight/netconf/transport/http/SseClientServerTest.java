@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -264,6 +265,11 @@ class SseClientServerTest {
         @Override
         public void onTransportChannelFailed(final Throwable cause) {
             throw new IllegalStateException("HTTP connection failure", cause);
+        }
+
+        @Override
+        public void onTransportChannelClosed(@NonNull TransportChannel channel) {
+            // not used
         }
     }
 }

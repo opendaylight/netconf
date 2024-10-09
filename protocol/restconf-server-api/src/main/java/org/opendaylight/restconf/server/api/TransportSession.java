@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.api;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * A transport session on which a {@link ServerRequest} is occurring. This typically the TCP or TLS connection
@@ -16,6 +17,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @Beta
 @NonNullByDefault
-public interface TransportSession {
+public interface TransportSession extends Registration {
     // FIXME: NETCONF-714: add the option to register resources for cleanup
+    void registerResource(Registration registration);
 }

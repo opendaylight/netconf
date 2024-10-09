@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -56,5 +57,10 @@ public final class ServerTransportInitializer implements TransportChannelListene
     @Override
     public void onTransportChannelFailed(final Throwable cause) {
         LOG.error("Transport channel failed", cause);
+    }
+
+    @Override
+    public void onTransportChannelClosed(@NonNull TransportChannel channel) {
+        // No-op
     }
 }
