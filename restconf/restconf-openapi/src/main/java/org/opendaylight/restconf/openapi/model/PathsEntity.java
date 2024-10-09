@@ -123,8 +123,8 @@ public final class PathsEntity extends OpenApiEntity {
                     final var pathParams = new ArrayList<ParameterEntity>();
                     final var localName = moduleName + ":" + nodeLocalName;
                     final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-                    processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, modelContext,
-                        deviceName, basePath, null, List.of(), width, depth, 0);
+                    processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, null,
+                        List.of(), 0);
                 }
             }
 
@@ -136,11 +136,10 @@ public final class PathsEntity extends OpenApiEntity {
         generator.writeEndObject();
     }
 
-    private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
+    private void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
-            final boolean isConfig, final EffectiveModelContext modelContext, final String deviceName,
-            final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes, final int width,
-            final int depth, final int nodeDepth) {
+            final boolean isConfig, final SchemaNode parentNode, final List<SchemaNode> parentNodes,
+            final int nodeDepth) {
         if (depth > 0 && nodeDepth + 1 > depth) {
             return;
         }
@@ -148,11 +147,10 @@ public final class PathsEntity extends OpenApiEntity {
         final var fullName = resolveFullNameFromNode(node.getQName(), modelContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node, width, depth, nodeDepth);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
-            result.add(processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig,
-                fullName, firstChild, deviceName));
+            result.add(processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName,
+                firstChild));
         } else {
-            result.add(processDataPathEntity(node, resourcePath, pathParams, moduleName, refPath,
-                isConfig, fullName, deviceName));
+            result.add(processDataPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName));
         }
         final var listOfParents = new ArrayList<>(parentNodes);
         if (parentNode != null) {
@@ -179,7 +177,7 @@ public final class PathsEntity extends OpenApiEntity {
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    modelContext, deviceName, basePath, node, listOfParents, width, depth, nodeDepth + 1);
+                    node, listOfParents, nodeDepth + 1);
             }
         }
     }
@@ -197,9 +195,9 @@ public final class PathsEntity extends OpenApiEntity {
             .findFirst().orElse(null);
     }
 
-    private static PathEntity processDataPathEntity(final SchemaNode node, final String resourcePath,
+    private PathEntity processDataPathEntity(final SchemaNode node, final String resourcePath,
             final List<ParameterEntity> pathParams, final String moduleName, final String refPath,
-            final boolean isConfig, final String fullName, final String deviceName) {
+            final boolean isConfig, final String fullName) {
         if (isConfig) {
             return new PathEntity(resourcePath,
                 new PatchEntity(node, deviceName, moduleName, pathParams, refPath, fullName),
@@ -212,9 +210,9 @@ public final class PathsEntity extends OpenApiEntity {
         }
     }
 
-    private static PathEntity processTopPathEntity(final SchemaNode node, final String resourcePath,
+    private PathEntity processTopPathEntity(final SchemaNode node, final String resourcePath,
             final List<ParameterEntity> pathParams, final String moduleName, final String refPath,
-            final boolean isConfig, final String fullName, final SchemaNode childNode, final String deviceName) {
+            final boolean isConfig, final String fullName, final SchemaNode childNode) {
         if (isConfig) {
             final var childNodeRefPath = refPath + "_" + childNode.getQName().getLocalName();
             var post = new PostEntity(childNode, deviceName, moduleName, pathParams, childNodeRefPath, node,
