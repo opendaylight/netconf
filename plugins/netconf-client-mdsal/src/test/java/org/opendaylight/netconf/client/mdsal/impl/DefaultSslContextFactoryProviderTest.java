@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
@@ -31,6 +32,7 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
@@ -86,7 +88,7 @@ class DefaultSslContextFactoryProviderTest {
         doAnswer(inv -> {
             listener = inv.getArgument(1);
             return registration;
-        }).when(dataBroker).registerTreeChangeListener(any(), any());
+        }).when(dataBroker).registerTreeChangeListener(eq(LogicalDatastoreType.CONFIGURATION), any(), any());
         doReturn(registration).when(cssProvider).registerClusterSingletonService(any());
         keystore = new DefaultNetconfKeystoreService(dataBroker, rpcProvider, cssProvider, encryptionService);
     }

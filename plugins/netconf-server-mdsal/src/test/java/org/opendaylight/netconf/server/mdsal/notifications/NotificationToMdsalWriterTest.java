@@ -28,8 +28,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationToMdsalWriterTest {
@@ -47,7 +47,7 @@ class NotificationToMdsalWriterTest {
         final NetconfNotificationCollector notificationCollector = mock(NetconfNotificationCollector.class);
 
         doReturn(registration).when(notificationCollector).registerStreamListener(any());
-        doNothing().when(tx).delete(any(), any(InstanceIdentifier.class));
+        doNothing().when(tx).delete(any(), any(DataObjectIdentifier.class));
         doReturn(emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
@@ -56,11 +56,11 @@ class NotificationToMdsalWriterTest {
 
     @Test
     void testStreamRegistration() {
-        doNothing().when(tx).merge(any(), any(InstanceIdentifier.class), any());
+        doNothing().when(tx).merge(any(), any(DataObjectIdentifier.class), any());
         final var testStreamName = new StreamNameType("TESTSTREAM");
         final var testStream = new StreamBuilder().setName(testStreamName).build();
-        final var streamIdentifier = InstanceIdentifier.create(Netconf.class)
-                .child(Streams.class).child(Stream.class, testStream.key());
+        final var streamIdentifier = DataObjectIdentifier.builder(Netconf.class)
+                .child(Streams.class).child(Stream.class, testStream.key()).build();
 
         writer.onStreamRegistered(testStream);
 
@@ -76,7 +76,7 @@ class NotificationToMdsalWriterTest {
     void testClose() {
         doNothing().when(registration).close();
 
-        final var streamIdentifier = InstanceIdentifier.create(Netconf.class);
+        final var streamIdentifier = DataObjectIdentifier.builder(Netconf.class).build();
 
         writer.close();
 
