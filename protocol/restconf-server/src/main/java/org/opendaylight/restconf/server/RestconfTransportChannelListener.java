@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
@@ -65,6 +66,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                     configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
             new RestconfSession(channel.scheme(), root));
+    }
+
+    @Override
+    public void onTransportChannelClosed(final TransportChannel channel) {
+        channel.channel().pipeline().remove(RestconfSession.class).close();
     }
 
     @Override
