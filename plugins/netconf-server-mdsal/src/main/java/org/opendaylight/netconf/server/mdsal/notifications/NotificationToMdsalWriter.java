@@ -23,8 +23,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamKey;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 @Component(service = { })
 public final class NotificationToMdsalWriter implements NetconfNotificationStreamListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationToMdsalWriter.class);
-    private static final InstanceIdentifier<Streams> STREAMS =
-        InstanceIdentifier.builder(Netconf.class).child(Streams.class).build();
+    private static final DataObjectIdentifier<Streams> STREAMS =
+        DataObjectIdentifier.builder(Netconf.class).child(Streams.class).build();
 
     private final DataBroker dataBroker;
     private final Registration notificationRegistration;
@@ -58,7 +58,7 @@ public final class NotificationToMdsalWriter implements NetconfNotificationStrea
         notificationRegistration.close();
 
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
-        tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(Netconf.class));
+        tx.delete(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(Netconf.class).build());
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
@@ -77,7 +77,7 @@ public final class NotificationToMdsalWriter implements NetconfNotificationStrea
     public void onStreamRegistered(final Stream stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        tx.merge(LogicalDatastoreType.OPERATIONAL, STREAMS.child(Stream.class, stream.key()), stream);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, stream(stream.key()), stream);
 
         try {
             tx.commit().get();
@@ -91,7 +91,7 @@ public final class NotificationToMdsalWriter implements NetconfNotificationStrea
     public void onStreamUnregistered(final StreamNameType stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        tx.delete(LogicalDatastoreType.OPERATIONAL, STREAMS.child(Stream.class, new StreamKey(stream)));
+        tx.delete(LogicalDatastoreType.OPERATIONAL, stream(new StreamKey(stream)));
 
         try {
             tx.commit().get();
@@ -99,5 +99,9 @@ public final class NotificationToMdsalWriter implements NetconfNotificationStrea
         } catch (InterruptedException | ExecutionException e) {
             LOG.warn("Unable to unregister stream {}", stream, e);
         }
+    }
+
+    private static DataObjectIdentifier.WithKey<Stream, StreamKey> stream(final StreamKey key) {
+        return STREAMS.toBuilder().child(Stream.class, key).build();
     }
 }

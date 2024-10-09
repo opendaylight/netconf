@@ -22,6 +22,7 @@ import java.util.Date;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.PendingRequest;
 import org.opendaylight.netconf.transport.http.PendingRequestListener;
 import org.opendaylight.netconf.transport.http.Response;
