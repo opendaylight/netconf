@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -40,7 +41,7 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final int width, final int depth,
+    public DocumentEntity getControllerModulesDoc(final UriInfo uriInfo, final int width, final int depth,
             final int offset, final int limit) throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
@@ -50,7 +51,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var basePath = getBasePath();
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
         final var portionOfModels = getModelsSublist(modulesWithoutDuplications, offset, limit);
-        return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
+        return new DocumentEntity(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
             portionOfModels, basePath, width, depth);
     }
 
@@ -61,14 +62,14 @@ public abstract class BaseYangOpenApiGenerator {
             configModulesList(modulesWithoutDuplications).size());
     }
 
-    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
+    public DocumentEntity getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
             final int width, final int depth) throws IOException {
         final var modelContext = schemaService.getGlobalContext();
         Preconditions.checkState(modelContext != null);
         return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME, width, depth);
     }
 
-    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+    public DocumentEntity getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
             final int width, final int depth) throws IOException {
         final Optional<Revision> rev;
@@ -89,7 +90,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modules = List.of(module);
-        return new OpenApiInputStream(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
+        return new DocumentEntity(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
             modules, basePath, width, depth);
     }
 

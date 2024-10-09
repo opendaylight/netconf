@@ -1,43 +1,26 @@
 /*
- * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.openapi.impl;
+package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opendaylight.restconf.openapi.model.DeleteEntity;
-import org.opendaylight.restconf.openapi.model.GetEntity;
-import org.opendaylight.restconf.openapi.model.GetRootEntity;
-import org.opendaylight.restconf.openapi.model.ParameterEntity;
-import org.opendaylight.restconf.openapi.model.ParameterSchemaEntity;
-import org.opendaylight.restconf.openapi.model.PatchEntity;
-import org.opendaylight.restconf.openapi.model.PathEntity;
-import org.opendaylight.restconf.openapi.model.PostEntity;
-import org.opendaylight.restconf.openapi.model.PutEntity;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -59,158 +42,98 @@ import org.opendaylight.yangtools.yang.model.api.type.Uint32TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Uint64TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
 
-public final class PathsStream extends InputStream {
+public final class PathsEntity extends OpenApiEntity {
     private static final String OPERATIONS = "operations";
     private static final String DATA = "data";
 
-    private final Iterator<? extends Module> iterator;
-    private final OpenApiBodyBuffer buffer;
-    private final EffectiveModelContext modelContext;
-    private final String deviceName;
-    private final String urlPrefix;
-    private final String basePath;
+    private final @NonNull EffectiveModelContext modelContext;
+    private final @NonNull String deviceName;
+    private final @NonNull String urlPrefix;
     private final boolean isForSingleModule;
     private final boolean includeDataStore;
-    private final ByteArrayOutputStream stream;
-    private final JsonGenerator generator;
+    private final @NonNull Collection<? extends Module> modules;
+    private final @NonNull String basePath;
     private final int width;
     private final int depth;
 
-    private boolean hasRootPostLink;
-    private boolean hasAddedDataStore;
-    private Reader reader;
-    private ReadableByteChannel channel;
-    private boolean eof;
-
-    public PathsStream(final EffectiveModelContext modelContext, final OpenApiBodyBuffer buffer,
-            final String deviceName, final String urlPrefix, final boolean isForSingleModule,
-            final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final int width,
-            final int depth) {
-        this.iterator = iterator;
-        this.buffer = buffer;
-        this.modelContext = modelContext;
+    public PathsEntity(final EffectiveModelContext modelContext, final String deviceName, final String urlPrefix,
+            final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
+            final String basePath, final int width, final int depth) {
+        this.modelContext = requireNonNull(modelContext);
+        this.deviceName = requireNonNull(deviceName);
+        this.urlPrefix = requireNonNull(urlPrefix);
         this.isForSingleModule = isForSingleModule;
-        this.deviceName = deviceName;
-        this.urlPrefix = urlPrefix;
         this.includeDataStore = includeDataStore;
-        this.basePath = basePath;
-        this.stream = stream;
-        this.generator = generator;
+        this.modules = requireNonNull(modules);
+        this.basePath = requireNonNull(basePath);
         this.width = width;
         this.depth = depth;
-        hasRootPostLink = false;
-        hasAddedDataStore = false;
     }
 
     @Override
-    public int read() throws IOException {
-        if (eof) {
-            return -1;
-        }
-        if (reader == null) {
-            generator.writeObjectFieldStart("paths");
-            generator.flush();
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
-            stream.reset();
-        }
-        var read = reader.read();
-        while (read == -1) {
-            if (iterator.hasNext()) {
-                reader = new BufferedReader(
-                    new InputStreamReader(new PathStream(toPaths(iterator.next()), buffer), StandardCharsets.UTF_8));
-                read = reader.read();
-                continue;
-            }
-            generator.writeEndObject();
-            generator.flush();
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
-            stream.reset();
-            eof = true;
-            return reader.read();
-        }
-        return read;
-    }
+    public void generate(final JsonGenerator generator) throws IOException {
+        generator.writeObjectFieldStart("paths");
 
-    @Override
-    public int read(final byte[] array, final int off, final int len) throws IOException {
-        if (eof) {
-            return -1;
-        }
-        if (channel == null) {
-            generator.writeObjectFieldStart("paths");
-            generator.flush();
-            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
-            stream.reset();
-        }
-        var read = channel.read(ByteBuffer.wrap(array, off, len));
-        while (read == -1) {
-            if (iterator.hasNext()) {
-                channel = Channels.newChannel(new PathStream(toPaths(iterator.next()), buffer));
-                read = channel.read(ByteBuffer.wrap(array, off, len));
-                continue;
-            }
-            generator.writeEndObject();
-            generator.flush();
-            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
-            stream.reset();
-            eof = true;
-            return channel.read(ByteBuffer.wrap(array, off, len));
-        }
-        return read;
-    }
+        boolean hasRootPostLink = false;
+        boolean hasAddedDataStore = false;
 
-    private Deque<PathEntity> toPaths(final Module module) {
         final var result = new ArrayDeque<PathEntity>();
-        if (includeDataStore && !hasAddedDataStore) {
-            final var childNode = module.getChildNodes().stream()
-                .filter(node -> node.isConfiguration()
-                    && (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode))
-                .findFirst();
-            if (childNode.isPresent()) {
-                final var dataPath = basePath + DATA + urlPrefix;
-                final var post = new PostEntity(childNode.orElseThrow(), deviceName, module.getName(),
-                    List.of(), childNode.orElseThrow().getQName().getLocalName(), module, List.of(), true);
-                result.add(new PathEntity(dataPath, post, new GetRootEntity(deviceName, "data")));
-                final var operationsPath = basePath + OPERATIONS + urlPrefix;
-                result.add(new PathEntity(operationsPath, new GetRootEntity(deviceName, "operations")));
-                hasAddedDataStore = true;
-            }
-        }
-        // RPC operations (via post) - RPCs have their own path
-        for (final var rpc : module.getRpcs()) {
-            final var localName = rpc.getQName().getLocalName();
-            final var post = new PostEntity(rpc, deviceName, module.getName(), List.of(), localName, null,
-                List.of(), false);
-            final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
-            final var entity = new PathEntity(resolvedPath, post);
-            result.add(entity);
-        }
-        final var childNodes = widthList(module, width);
-        for (final var node : childNodes) {
-            final var moduleName = module.getName();
-            final boolean isConfig = node.isConfiguration();
-            final var nodeLocalName = node.getQName().getLocalName();
-
-            if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                if (isConfig && !hasRootPostLink && isForSingleModule) {
-                    final var resolvedPath = basePath + DATA + urlPrefix;
-                    result.add(new PathEntity(resolvedPath,
-                        new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of(),
-                            false)));
-                    hasRootPostLink = true;
+        for (var module : modules) {
+            if (includeDataStore && !hasAddedDataStore) {
+                final var childNode = module.getChildNodes().stream()
+                    .filter(node -> node.isConfiguration()
+                        && (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode))
+                    .findFirst();
+                if (childNode.isPresent()) {
+                    final var dataPath = basePath + DATA + urlPrefix;
+                    final var post = new PostEntity(childNode.orElseThrow(), deviceName, module.getName(),
+                        List.of(), childNode.orElseThrow().getQName().getLocalName(), module, List.of(), true);
+                    result.add(new PathEntity(dataPath, post, new GetRootEntity(deviceName, "data")));
+                    final var operationsPath = basePath + OPERATIONS + urlPrefix;
+                    result.add(new PathEntity(operationsPath, new GetRootEntity(deviceName, "operations")));
+                    hasAddedDataStore = true;
                 }
-                //process first node
-                final var pathParams = new ArrayList<ParameterEntity>();
-                final var localName = moduleName + ":" + nodeLocalName;
-                final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, modelContext,
-                    deviceName, basePath, null, List.of(), width, depth, 0);
+            }
+
+            // RPC operations (via post) - RPCs have their own path
+            for (final var rpc : module.getRpcs()) {
+                final var localName = rpc.getQName().getLocalName();
+                final var post = new PostEntity(rpc, deviceName, module.getName(), List.of(), localName, null,
+                    List.of(), false);
+                final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
+                final var entity = new PathEntity(resolvedPath, post);
+                result.add(entity);
+            }
+
+            final var childNodes = widthList(module, width);
+            for (final var node : childNodes) {
+                final var moduleName = module.getName();
+                final boolean isConfig = node.isConfiguration();
+                final var nodeLocalName = node.getQName().getLocalName();
+
+                if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
+                    if (isConfig && !hasRootPostLink && isForSingleModule) {
+                        final var resolvedPath = basePath + DATA + urlPrefix;
+                        result.add(new PathEntity(resolvedPath,
+                            new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of(),
+                                false)));
+                        hasRootPostLink = true;
+                    }
+                    //process first node
+                    final var pathParams = new ArrayList<ParameterEntity>();
+                    final var localName = moduleName + ":" + nodeLocalName;
+                    final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
+                    processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, modelContext,
+                        deviceName, basePath, null, List.of(), width, depth, 0);
+                }
+            }
+
+            for (var path = result.poll(); path != null; path = result.poll()) {
+                path.generate(generator);
             }
         }
-        return result;
+
+        generator.writeEndObject();
     }
 
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,

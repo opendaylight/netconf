@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -68,10 +67,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
+        final var entity = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
             requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
             requireNonNullElse(limit, 0));
-        return Response.ok(stream).build();
+        return Response.ok(entity).build();
     }
 
     @Override
@@ -88,9 +87,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo,
+        final var entity = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo,
             requireNonNullElse(width, 0), requireNonNullElse(depth, 0));
-        return Response.ok(stream).build();
+        return Response.ok(entity).build();
     }
 
     /**
@@ -103,10 +102,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getListOfMounts(final UriInfo uriInfo) {
-        final List<MountPointInstance> entity = mountPointOpenApiRFC8040
-                .getInstanceIdentifiers().entrySet().stream()
-                .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        final var entity = mountPointOpenApiRFC8040
+            .getInstanceIdentifiers().entrySet().stream()
+            .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toList());
         return Response.ok(entity).build();
     }
 
@@ -114,28 +113,26 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getMountDocByModule(final String instanceNum, final String module,
             final String revision, final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision,
-                requireNonNullElse(width, 0),requireNonNullElse(depth, 0));
-        return Response.ok(stream).build();
+        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
+            revision, requireNonNullElse(width, 0),requireNonNullElse(depth, 0));
+        return Response.ok(entity).build();
     }
 
     @Override
     public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-                requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
-                requireNonNullElse(limit, 0));
-        return Response.ok(stream).build();
+        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
+            requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
+            requireNonNullElse(limit, 0));
+        return Response.ok(entity).build();
     }
 
     @Override
     public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
-        final var metaStream = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
-                requireNonNullElse(offset, 0), requireNonNullElse(limit, 0));
-        return Response.ok(metaStream).build();
+        final var entity = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
+            requireNonNullElse(offset, 0), requireNonNullElse(limit, 0));
+        return Response.ok(entity).build();
     }
 }

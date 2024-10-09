@@ -9,15 +9,31 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import org.opendaylight.restconf.openapi.model.security.Http;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
-/**
- * TODO use this class to simplify SchemasStream.
- */
 public final class ComponentsEntity extends OpenApiEntity {
+    // FIXME: duplicate of BaseYangOpenApiGenerator.SECURITY?
+    private static final String BASIC_AUTH_NAME = "basicAuth";
+    private static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
+
+    private final SchemasEntity schemas;
+    private final SecuritySchemesEntity securitySchemes;
+
+    public ComponentsEntity(final EffectiveModelContext modelContext, final Collection<? extends Module> modules,
+            final boolean isForSingleModule, final int width, final int depth) {
+        schemas = new SchemasEntity(modelContext, modules, isForSingleModule, width, depth);
+        securitySchemes = new SecuritySchemesEntity(Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
+    }
 
     @Override
     public void generate(final JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart("components");
+        schemas.generate(generator);
+        securitySchemes.generate(generator);
         generator.writeEndObject();
     }
 }
