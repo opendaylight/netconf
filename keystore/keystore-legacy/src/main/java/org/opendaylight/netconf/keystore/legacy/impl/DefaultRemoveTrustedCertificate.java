@@ -19,7 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.RemoveTrustedCertificateOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificateKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ final class DefaultRemoveTrustedCertificate extends AbstractRpc implements Remov
         final var tx = newTransaction();
         for (var key : keys) {
             tx.delete(LogicalDatastoreType.CONFIGURATION,
-                InstanceIdentifier.create(Keystore.class).child(TrustedCertificate.class, key));
+                DataObjectIdentifier.builder(Keystore.class).child(TrustedCertificate.class, key).build());
         }
 
         return tx.commit().transform(commitInfo -> {

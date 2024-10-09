@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKeyBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -106,7 +106,8 @@ final class DefaultAddPrivateKey extends AbstractEncryptingRpc implements AddPri
 
         final var tx = newTransaction();
         privateKeys.forEach(privateKey -> tx.put(LogicalDatastoreType.CONFIGURATION,
-            InstanceIdentifier.create(Keystore.class).child(PrivateKey.class, privateKey.key()), privateKey));
+            DataObjectIdentifier.builder(Keystore.class).child(PrivateKey.class, privateKey.key()).build(),
+            privateKey));
         return tx.commit().transform(commitInfo -> {
             LOG.debug("Added private keys: {}", keys.keySet());
             return RpcResultBuilder.success(new AddPrivateKeyOutputBuilder().build()).build();
