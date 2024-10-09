@@ -41,7 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.trusted.certificates.TrustedCertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.rpc.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -75,7 +75,7 @@ class NetconfKeystoreRpcsTest {
         rpc.invoke(input).get();
 
         verify(writeTx, times(input.nonnullKeyCredential().size()))
-            .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+            .put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class), any(DataObject.class));
     }
 
     private static AddKeystoreEntryInput getKeystoreEntryInput() throws Exception {
@@ -105,7 +105,7 @@ class NetconfKeystoreRpcsTest {
         rpc.invoke(input).get();
 
         verify(writeTx, times(input.nonnullPrivateKey().size()))
-            .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+            .put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class), any(DataObject.class));
     }
 
     private static AddPrivateKeyInput getPrivateKeyInput() throws Exception {
@@ -144,7 +144,7 @@ class NetconfKeystoreRpcsTest {
         rpc.invoke(input).get();
 
         verify(writeTx, times(input.nonnullTrustedCertificate().size()))
-            .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+            .put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class), any(DataObject.class));
     }
 
     private static AddTrustedCertificateInput getTrustedCertificateInput() throws Exception {
