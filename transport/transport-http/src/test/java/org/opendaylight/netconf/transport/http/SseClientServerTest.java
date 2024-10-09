@@ -265,5 +265,10 @@ class SseClientServerTest {
         public void onTransportChannelFailed(final Throwable cause) {
             throw new IllegalStateException("HTTP connection failure", cause);
         }
+
+        @Override
+        public void onTransportChannelClosed(final TransportChannel channel) {
+            // not used
+        }
     }
 }

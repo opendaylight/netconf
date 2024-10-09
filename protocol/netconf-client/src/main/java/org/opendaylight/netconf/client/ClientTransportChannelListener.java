@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
@@ -48,6 +49,11 @@ final class ClientTransportChannelListener implements TransportChannelListener<T
     @Override
     public void onTransportChannelFailed(final Throwable cause) {
         sessionFuture.setException(cause);
+    }
+
+    @Override
+    public void onTransportChannelClosed(final TransportChannel channel) {
+        sessionFuture.setFuture(Futures.immediateFuture(null));
     }
 
     @Override
