@@ -272,42 +272,21 @@ public final class PathsEntity extends OpenApiEntity {
     }
 
     private static String getAllowedType(final ListSchemaNode list, final QName key) {
-        final var keyType = ((LeafSchemaNode) list.getDataChildByName(key)).getType();
-
         // see: https://datatracker.ietf.org/doc/html/rfc7950#section-4.2.4
         // see: https://swagger.io/docs/specification/data-models/data-types/
-        // TODO: Java 21 use pattern matching for switch
-        if (keyType instanceof Int8TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Int16TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Int32TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Int64TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Uint8TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Uint16TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Uint32TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof Uint64TypeDefinition) {
-            return "integer";
-        }
-        if (keyType instanceof DecimalTypeDefinition) {
-            return "number";
-        }
-        if (keyType instanceof BooleanTypeDefinition) {
-            return "boolean";
-        }
-
-        return "string";
+        return switch (((LeafSchemaNode) list.getDataChildByName(key)).getType()) {
+            // TODO: Use unnamed patterns when we have Java 22+
+            case Int8TypeDefinition def -> "integer";
+            case Int16TypeDefinition def -> "integer";
+            case Int32TypeDefinition def -> "integer";
+            case Int64TypeDefinition def -> "integer";
+            case Uint8TypeDefinition def -> "integer";
+            case Uint16TypeDefinition def -> "integer";
+            case Uint32TypeDefinition def -> "integer";
+            case Uint64TypeDefinition def -> "integer";
+            case DecimalTypeDefinition def -> "number";
+            case BooleanTypeDefinition def -> "boolean";
+            default -> "string";
+        };
     }
 }
