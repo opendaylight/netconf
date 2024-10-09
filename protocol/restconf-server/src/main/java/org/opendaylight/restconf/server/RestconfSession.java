@@ -13,10 +13,13 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpVersion;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * A RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>. It acts
@@ -25,6 +28,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
  */
 final class RestconfSession extends HTTPServerSession implements TransportSession {
     private final EndpointRoot root;
+    private final List<Registration> resources = new ArrayList<>();
 
     RestconfSession(final HttpScheme scheme, final EndpointRoot root) {
         super(scheme);
@@ -35,5 +39,17 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
             final HttpVersion version, final HttpHeaders headers) {
         return root.prepare(this, method, targetUri, headers);
+    }
+
+    @Override
+    public void registerResource(final Registration registration) {
+        resources.add(registration);
+    }
+
+    @Override
+    public void close() {
+        for (var resource : resources) {
+            resource.close();
+        }
     }
 }

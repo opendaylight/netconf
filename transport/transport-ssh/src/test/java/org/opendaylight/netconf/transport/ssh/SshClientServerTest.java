@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import org.apache.commons.codec.digest.Crypt;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -387,6 +388,11 @@ class SshClientServerTest {
 
             @Override
             public void onTransportChannelFailed(final Throwable cause) {
+                // not used
+            }
+
+            @Override
+            public void onTransportChannelClosed(final TransportChannel channel) {
                 // not used
             }
         };

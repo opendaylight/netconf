@@ -76,4 +76,9 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
     public void onTransportChannelFailed(final Throwable cause) {
         statusRecorder.onTransportChannelFailure(cause);
     }
+
+    @Override
+    public void onTransportChannelClosed(final TransportChannel channel) {
+        statusRecorder.reportDisconnected(contextManager.findByChannel(channel.channel()).id());
+    }
 }

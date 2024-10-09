@@ -26,6 +26,11 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
         }
 
         @Override
+        public void onTransportChannelClosed(final TransportChannel channel) {
+            // No-op
+        }
+
+        @Override
         public void onTransportChannelEstablished(final TransportChannel channel) {
             onUnderlayChannelEstablished(channel);
         }
