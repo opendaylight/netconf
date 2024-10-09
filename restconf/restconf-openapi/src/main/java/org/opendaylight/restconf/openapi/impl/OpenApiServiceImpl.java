@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
@@ -28,7 +27,6 @@ import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
 
 /**
  * This service generates swagger (See
@@ -67,17 +65,16 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final var entity = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
-            requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
-            requireNonNullElse(limit, 0));
+        final var entity = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, unboxOrZero(width),
+            unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
         return Response.ok(entity).build();
     }
 
     @Override
     public Response getAllModulesMeta(final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final var metaStream = openApiGeneratorRFC8040.getControllerModulesMeta(requireNonNullElse(offset, 0),
-            requireNonNullElse(limit, 0));
+        final var metaStream = openApiGeneratorRFC8040.getControllerModulesMeta(unboxOrZero(offset),
+            unboxOrZero(limit));
         return Response.ok(metaStream).build();
     }
 
@@ -87,8 +84,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final var entity = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo,
-            requireNonNullElse(width, 0), requireNonNullElse(depth, 0));
+        final var entity = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, unboxOrZero(width),
+            unboxOrZero(depth));
         return Response.ok(entity).build();
     }
 
@@ -110,11 +107,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getMountDocByModule(final String instanceNum, final String module,
-            final String revision, final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
-            throws IOException {
+    public Response getMountDocByModule(final String instanceNum, final String module, final String revision,
+            final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
         final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
-            revision, requireNonNullElse(width, 0),requireNonNullElse(depth, 0));
+            revision, unboxOrZero(width), unboxOrZero(depth));
         return Response.ok(entity).build();
     }
 
@@ -123,8 +119,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
         final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-            requireNonNullElse(width, 0), requireNonNullElse(depth, 0), requireNonNullElse(offset, 0),
-            requireNonNullElse(limit, 0));
+            unboxOrZero(width), unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
         return Response.ok(entity).build();
     }
 
@@ -132,7 +127,11 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
         final var entity = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
-            requireNonNullElse(offset, 0), requireNonNullElse(limit, 0));
+            unboxOrZero(offset), unboxOrZero(limit));
         return Response.ok(entity).build();
+    }
+
+    private static int unboxOrZero(final @Nullable Integer value) {
+        return value != null ? value : 0;
     }
 }
