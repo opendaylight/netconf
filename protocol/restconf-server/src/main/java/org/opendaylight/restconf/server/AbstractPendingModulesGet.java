@@ -13,9 +13,12 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.ByteSourceResponse;
+import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -53,10 +56,9 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingGet<Modul
     abstract void execute(NettyServerRequest<ModulesGetResult> request, ApiPath mountPath, String fileName,
         @Nullable String revision);
 
-
     @Override
     final Response transformResultImpl(final NettyServerRequest<?> request, final ModulesGetResult result) {
-        return new CharSourceResponse(result.source(), mediaType());
+        return new ByteSourceResponse(result.source().asByteSource(StandardCharsets.UTF_8), mediaType());
     }
 
     @Override

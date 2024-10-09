@@ -38,7 +38,7 @@ final class PendingDataPatchPlain extends PendingRequestWithResource<DataPatchRe
     }
 
     @Override
-    Response transformResult(final NettyServerRequest<?> request, final DataPatchResult result) {
-        return new DefaultCompletedRequest(HttpResponseStatus.OK, metadataHeaders(result));
+    EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final DataPatchResult result) {
+        return new EmptyRequestResponse(HttpResponseStatus.OK, metadataHeaders(result));
     }
 }

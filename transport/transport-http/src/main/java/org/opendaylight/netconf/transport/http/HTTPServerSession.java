@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -26,10 +28,13 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -45,12 +50,51 @@ import org.slf4j.LoggerFactory;
  * {@link TransportChannelListener}.
  */
 @Beta
-public abstract class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest> {
+public abstract class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest>
+        implements PendingRequestListener {
+    /**
+     * Transport-level details about a {@link PendingRequest} execution.
+     *
+     * @param ctx the {@link ChannelHandlerContext} on which the request is occuring
+     * @param streamId the HTTP/2 stream ID, if present
+     * @param version HTTP version of the request
+     */
+    @NonNullByDefault
+    public record RequestContext(ChannelHandlerContext ctx, HttpVersion version, @Nullable Integer streamId) {
+        public RequestContext {
+            requireNonNull(ctx);
+            requireNonNull(version);
+        }
+
+        public void respond(final FullHttpResponse response) {
+            HTTPServerSession.respond(ctx, streamId, response);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
     private static final Map<HttpMethod, ImplementedMethod> ALL_METHODS = Arrays.stream(ImplementedMethod.values())
         .collect(Collectors.toUnmodifiableMap(ImplementedMethod::httpMethod, Function.identity()));
 
+    // FIXME: HTTP/1.1 and HTTP/2 behave differently w.r.t. incoming requests and their servicing:
+    //  1. HTTP/1.1 uses pipelining, therefore:
+    //     - we cannot halt incoming pipeline
+    //     - we may run request prepare() while a request is executing in the background, but
+    //     - we MUST send responses out in the same order we have received them
+    //     - SSE GET turns the session into a sender, i.e. no new requests can be processed
+    //  2. HTTP/2 uses concurrent execution, therefore
+    //     - we need to track which streams are alive and support terminating pruning requests when client resets
+    //       a stream
+    //     - SSE is nothing special
+    //     - we have Http2Settings, which has framesize -- which we should use when streaming responses
+    //  We support HTTP/1.1 -> HTTP/2 upgrade for the first request only -- hence we know before processing the first
+    //  result which mode of operation is effective. We probably need to have two subclasses of this thing, with
+    //  HTTP/1.1 and HTTP/2 specializations.
+
+    // FIXME: this heavily depends on the object model and is tied to HTTPServer using aggregators, so perhaps we should
+    //        reconsider the design
+
+    private final ConcurrentMap<PendingRequest<?>, RequestContext> executingRequests = new ConcurrentHashMap<>();
     private final HttpScheme scheme;
 
     protected HTTPServerSession(final HttpScheme scheme) {
@@ -148,48 +192,16 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        processRequest(ctx, streamId, method, targetUri, version, msg.headers(), msg.content());
-    }
-
-    /**
-     * Check whether this session implements a particular HTTP method. Default implementation supports all
-     * {@link ImplementedMethod}s.
-     *
-     * @param method an HTTP method
-     * @return an {@link ImplementedMethod}, or {@code null} if the method is not implemented
-     */
-    protected @Nullable ImplementedMethod implementationOf(final @NonNull HttpMethod method) {
-        return ALL_METHODS.get(method);
-    }
-
-    /**
-     * Process an incoming HTTP request. The first two arguments are provided as context, which should be reflected back
-     * to {@link #respond(ChannelHandlerContext, Integer, FullHttpResponse)} when reponding to the request.
-     *
-     * <p>
-     * The ownership of request body is transferred to the implementation of this method. It is its responsibility to
-     * {@link ByteBuf#release()} it when no longer needed.
-     *
-     * @param ctx the {@link ChannelHandlerContext} on which the request is occuring
-     * @param streamId the HTTP/2 stream ID, if present
-     * @param method {@link ImplementedMethod} being requested
-     * @param targetUri URI of the target resource
-     * @param version HTTP version of the request
-     * @param headers request {@link HttpHeaders}
-     * @param body request body, potentially empty
-     */
-    @NonNullByDefault
-    protected abstract void processRequest(ChannelHandlerContext ctx, @Nullable Integer streamId,
-        ImplementedMethod method, URI targetUri, HttpVersion version, HttpHeaders headers, ByteBuf body);
-
-    @NonNullByDefault
-    protected static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
-            final FullHttpResponse response) {
-        requireNonNull(response);
-        if (streamId != null) {
-            response.headers().setInt(STREAM_ID, streamId);
+        switch (prepareRequest(method, targetUri, version, msg.headers())) {
+            case CompletedRequest completed -> {
+                msg.release();
+                respond(ctx, streamId, formatResponse(completed.asResponse(), version));
+            }
+            case PendingRequest<?> pending -> {
+                LOG.debug("Dispatching {} {}", method, targetUri);
+                executeRequest(new RequestContext(ctx, version, streamId), pending, msg.content());
+            }
         }
-        ctx.writeAndFlush(response);
     }
 
     @VisibleForTesting
@@ -210,5 +222,118 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             throw new URISyntaxException(host, "Illegal Host header");
         }
         return ret;
+    }
+
+    /**
+     * Check whether this session implements a particular HTTP method. Default implementation supports all
+     * {@link ImplementedMethod}s.
+     *
+     * @param method an HTTP method
+     * @return an {@link ImplementedMethod}, or {@code null} if the method is not implemented
+     */
+    protected @Nullable ImplementedMethod implementationOf(final @NonNull HttpMethod method) {
+        return ALL_METHODS.get(method);
+    }
+
+    /**
+     * Prepare an incoming HTTP request. The first two arguments are provided as context, which should be reflected back
+     * to {@link #respond(ChannelHandlerContext, Integer, FullHttpResponse)} when reponding to the request.
+     *
+     * <p>
+     * The ownership of request body is transferred to the implementation of this method. It is its responsibility to
+     * {@link ByteBuf#release()} it when no longer needed.
+     *
+     * @param method {@link ImplementedMethod} being requested
+     * @param targetUri URI of the target resource
+     * @param headers request {@link HttpHeaders}
+     */
+    @NonNullByDefault
+    protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpVersion version,
+        HttpHeaders headers);
+
+    private void executeRequest(final RequestContext context, final PendingRequest<?> pending, final ByteBuf content) {
+        // We are invoked with content's reference and need to make sure it gets released.
+        final ByteBufInputStream body;
+        if (content.isReadable()) {
+            body = new ByteBufInputStream(content, true);
+        } else {
+            content.release();
+            body = null;
+        }
+
+        // Remember metadata about the request and then execute it
+        executingRequests.put(pending, context);
+        pending.execute(this, body);
+    }
+
+    @Override
+    public void requestComplete(final PendingRequest<?> request, final Response response) {
+        final var context = executingRequests.remove(request);
+        if (context != null) {
+            context.respond(formatResponse(response, context.version()));
+        } else {
+            LOG.warn("Cannot pair request {}, not sending response {}", request, response, new Throwable());
+        }
+    }
+
+    @Override
+    public void requestFailed(final PendingRequest<?> request, final Exception cause) {
+        LOG.warn("Internal error while processing {}", request, cause);
+        final var context = executingRequests.remove(request);
+        if (context != null) {
+            context.respond(formatException(cause, context.version()));
+        } else {
+            LOG.warn("Cannot pair request, not sending response", new Throwable());
+        }
+    }
+
+    // FIXME: below payloads use a synchronous dump of data into the socket. We cannot safely do that on the event loop,
+    //        because a slow client would end up throttling our IO threads simply because of TCP window and similar
+    //        queuing/backpressure things.
+    //
+    //        we really want to kick off a virtual thread to take care of that, i.e. doing its own synchronous write
+    //        thing, talking to a short queue (SPSC?) of HttpObjects.
+    //
+    //        the event loop of each channel would be the consumer of that queue, picking them off as quickly as
+    //        possible, but execting backpressure if the amount of pending stuff goes up.
+    //
+    //        as for the HttpObjects: this effectively means that the OutputStreams used in the below code should be
+    //        replaced with entities which perform chunking:
+    //        - buffer initial stuff, so that we produce a FullHttpResponse if the payload is below
+    //          256KiB (or so), i.e. producing Content-Length header and dumping the thing in one go
+    //        - otherwise emit just HttpResponse with Transfer-Enconding: chunked and continue sending
+    //          out chunks (of reasonable size).
+    //        - finish up with a LastHttpContent
+
+    @NonNullByDefault
+    private static FullHttpResponse formatResponse(final Response response, final HttpVersion version) {
+        try {
+            // FIXME: require ChannelHandlerContext and use its allocator
+            return response.toHttpResponse(version);
+        } catch (IOException e) {
+            LOG.warn("IO error while converting formatting response", e);
+            return formatException(e, version);
+        }
+    }
+
+    @NonNullByDefault
+    private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
+        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        final var content = response.content();
+        // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
+        //       so we do not want to be too revealing -- hence a message is all the user gets.
+        ByteBufUtil.writeUtf8(content, cause.getMessage());
+        HttpUtil.setContentLength(response, content.readableBytes());
+        return response;
+    }
+
+    @NonNullByDefault
+    protected static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final FullHttpResponse response) {
+        requireNonNull(response);
+        if (streamId != null) {
+            response.headers().setInt(STREAM_ID, streamId);
+        }
+        ctx.writeAndFlush(response);
     }
 }

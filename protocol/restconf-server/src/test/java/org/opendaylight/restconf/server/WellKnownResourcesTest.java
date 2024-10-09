@@ -33,18 +33,16 @@ class WellKnownResourcesTest {
 
     @ParameterizedTest
     @ValueSource(strings = { XRD_SUFFIX, JRD_SUFFIX })
-    void options(final String uri) {
-        assertOptionsResponse(
-            RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.OPTIONS).toHttpResponse(HttpVersion.HTTP_1_1),
-            "GET, HEAD, OPTIONS");
+    void options(final String uri) throws Exception {
+        assertOptionsResponse(RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.OPTIONS).asResponse()
+            .toHttpResponse(HttpVersion.HTTP_1_1), "GET, HEAD, OPTIONS");
     }
 
     @ParameterizedTest
     @MethodSource
-    void getHostMeta(final String uri, final AsciiString contentType, final String content) {
-        assertResponse(
-            RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET).toHttpResponse(HttpVersion.HTTP_1_1),
-            HttpResponseStatus.OK, contentType, content);
+    void getHostMeta(final String uri, final AsciiString contentType, final String content) throws Exception {
+        assertResponse(RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET).asResponse()
+            .toHttpResponse(HttpVersion.HTTP_1_1), HttpResponseStatus.OK, contentType, content);
     }
 
     private static Stream<Arguments> getHostMeta() {
@@ -65,8 +63,8 @@ class WellKnownResourcesTest {
     }
 
     @Test
-    void putHostMeta() {
-        final var response = RESOURCES.request(new SegmentPeeler(JRD_SUFFIX), ImplementedMethod.POST)
+    void putHostMeta() throws Exception {
+        final var response = RESOURCES.request(new SegmentPeeler(JRD_SUFFIX), ImplementedMethod.POST).asResponse()
             .toHttpResponse(HttpVersion.HTTP_1_1);
         assertResponse(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));

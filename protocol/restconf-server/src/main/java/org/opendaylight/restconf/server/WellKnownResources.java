@@ -21,6 +21,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.BytebufRequestResponse;
+import org.opendaylight.netconf.transport.http.CompletedRequest;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.slf4j.Logger;
@@ -109,13 +111,12 @@ final class WellKnownResources {
         };
     }
 
-    private static CompletedRequest getResponse(final AsciiString contentType, final ByteBuf content) {
-        return new DefaultCompletedRequest(HttpResponseStatus.OK, contentHeaders(contentType, content),
-            content.slice());
+    private static BytebufRequestResponse getResponse(final AsciiString contentType, final ByteBuf content) {
+        return new BytebufRequestResponse(HttpResponseStatus.OK, content, contentHeaders(contentType, content));
     }
 
-    private static CompletedRequest headResponse(final AsciiString contentType, final ByteBuf content) {
-        return new DefaultCompletedRequest(HttpResponseStatus.OK, contentHeaders(contentType, content));
+    private static EmptyRequestResponse headResponse(final AsciiString contentType, final ByteBuf content) {
+        return new EmptyRequestResponse(HttpResponseStatus.OK, contentHeaders(contentType, content));
     }
 
     private static HttpHeaders contentHeaders(final AsciiString contentType, final ByteBuf content) {

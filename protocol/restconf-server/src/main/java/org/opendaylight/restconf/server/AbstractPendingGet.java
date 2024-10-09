@@ -15,6 +15,8 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.PendingRequest;
+import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
@@ -49,7 +51,7 @@ abstract class AbstractPendingGet<T> extends PendingRequestWithoutBody<T> {
 
         final var headers = HEADERS_FACTORY.newEmptyHeaders();
         fillHeaders(result, headers);
-        return new DefaultCompletedRequest(HttpResponseStatus.OK, headers);
+        return new EmptyRequestResponse(HttpResponseStatus.OK, headers);
     }
 
     abstract Response transformResultImpl(NettyServerRequest<?> request, T result);
