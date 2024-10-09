@@ -40,7 +40,7 @@ public abstract sealed class SchemaEntity extends OpenApiEntity permits NodeSche
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
             final @NonNull DefinitionNames definitionNames, final int width,
-            final int depth, final @NonNull int nodeDepth) {
+            final int depth, final int nodeDepth) {
         this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
