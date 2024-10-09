@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NotificationsCounter implements DOMNotificationListener {
-
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsCounter.class);
 
     /**
@@ -29,7 +28,6 @@ public class NotificationsCounter implements DOMNotificationListener {
      */
     private static final Pattern NOTIFICATION_NUMBER_PATTERN = Pattern.compile(".*-notif-([0-9]+)");
 
-    private final String nodeId;
     private final BindingNormalizedNodeSerializer serializer;
     private final AtomicLong notifCounter;
     private final long expectedNotificationCount;
@@ -37,7 +35,6 @@ public class NotificationsCounter implements DOMNotificationListener {
     private long totalPrefixesReceived = 0;
 
     public NotificationsCounter(final String nodeId, final BindingNormalizedNodeSerializer serializer) {
-        this.nodeId = nodeId;
         this.serializer = serializer;
         final Matcher matcher = NOTIFICATION_NUMBER_PATTERN.matcher(nodeId);
         Preconditions.checkArgument(matcher.matches());
@@ -63,8 +60,8 @@ public class NotificationsCounter implements DOMNotificationListener {
 
         final var notification = serializer.fromNormalizedNodeNotification(domNotification.getType(),
             domNotification.getBody());
-        if (notification instanceof VRFPREFIXTABLE) {
-            totalPrefixesReceived += ((VRFPREFIXTABLE)notification).getVrfPrefixes().getVrfPrefix().size();
+        if (notification instanceof VRFPREFIXTABLE vrfPrefixTable) {
+            totalPrefixesReceived += vrfPrefixTable.nonnullVrfPrefixes().nonnullVrfPrefix().size();
         }
 
         if (andDecrement == 1) {

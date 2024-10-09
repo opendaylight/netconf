@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -214,7 +214,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
         assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
         assertEquals(e.getErrorTag(), ErrorTag.INVALID_VALUE);
         assertEquals(e.getErrorType(), ErrorType.APPLICATION);
-        assertInstanceOf(MalformedURLException.class, e.getCause());
+        assertInstanceOf(URISyntaxException.class, e.getCause());
     }
 
     @Test
@@ -236,7 +236,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    void testCopyToFile(@TempDir Path tmpDir) throws Exception {
+    void testCopyToFile(@TempDir final Path tmpDir) throws Exception {
         // Initialize config:
         verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_top_modules.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
@@ -267,7 +267,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    void testCopyToFileFromRunning(@TempDir Path tmpDir) throws Exception {
+    void testCopyToFileFromRunning(@TempDir final Path tmpDir) throws Exception {
         // Load copy-config template and replace URL with the URI of target file:
         final String template =
             XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file_from_running.xml");

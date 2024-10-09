@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -24,8 +23,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -49,9 +48,8 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
-        capabilityChangeListenerRegistration = dataBroker.registerTreeChangeListener(
-                DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL,
-                    InstanceIdentifier.builder(NetconfState.class).child(Capabilities.class).build()), this);
+        capabilityChangeListenerRegistration = dataBroker.registerTreeChangeListener(LogicalDatastoreType.OPERATIONAL,
+            DataObjectIdentifier.builder(NetconfState.class).child(Capabilities.class).build(), this);
     }
 
     @Deactivate

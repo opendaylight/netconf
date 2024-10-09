@@ -13,6 +13,8 @@ import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -79,9 +81,9 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
      * @see URL#URL(String, String, int, String)
      */
     private static Document getDocumentFromUrl(final String url) throws DocumentedException {
-        try (InputStream input = openConnection(new URL(url))) {
+        try (InputStream input = openConnection(new URI(url).toURL())) {
             return XmlUtil.readXmlToDocument(input);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new DocumentedException(url + " URL is invalid or unsupported", e,
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         } catch (IOException e) {
