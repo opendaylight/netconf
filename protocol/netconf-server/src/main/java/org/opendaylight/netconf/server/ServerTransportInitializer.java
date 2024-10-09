@@ -57,4 +57,9 @@ public final class ServerTransportInitializer implements TransportChannelListene
     public void onTransportChannelFailed(final Throwable cause) {
         LOG.error("Transport channel failed", cause);
     }
+
+    @Override
+    public void onTransportChannelClosed(final TransportChannel channel) {
+        // No-op
+    }
 }

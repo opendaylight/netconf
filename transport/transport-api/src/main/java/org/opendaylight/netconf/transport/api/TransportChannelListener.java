@@ -30,4 +30,11 @@ public interface TransportChannelListener<T extends TransportChannel> {
      * @param cause Failure cause
      */
     void onTransportChannelFailed(@NonNull Throwable cause);
+
+    /**
+     * Invoked when a {@link TransportChannel} is closed.
+     *
+     * @param channel Closed channel
+     */
+    void onTransportChannelClosed(@NonNull TransportChannel channel);
 }
