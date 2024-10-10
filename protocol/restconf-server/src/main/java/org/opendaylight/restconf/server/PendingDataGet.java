@@ -60,4 +60,9 @@ final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
             .set(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE)
             .set(HttpHeaderNames.CONTENT_TYPE, encoding.dataMediaType());
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return encoding;
+    }
 }

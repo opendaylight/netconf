@@ -40,4 +40,9 @@ final class PendingOperationsGet extends AbstractDataPendingGet {
             server().operationsGET(request, apiPath);
         }
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return encoding;
+    }
 }

@@ -44,4 +44,9 @@ final class PendingModulesGetYin extends AbstractPendingModulesGet {
     AsciiString mediaType() {
         return NettyMediaTypes.APPLICATION_YIN_XML;
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return invariants.defaultEncoding();
+    }
 }

@@ -43,6 +43,11 @@ final class PendingOperationsPost extends PendingRequestWithOutput<InvokeResult,
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        return acceptEncoding;
+    }
+
+    @Override
     OperationInputBody wrapBody(final InputStream body) {
         return switch (contentEncoding) {
             case JSON -> new JsonOperationInputBody(body);

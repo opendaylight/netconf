@@ -30,4 +30,9 @@ final class PendingYangLibraryVersionGet extends AbstractDataPendingGet {
     void execute(final NettyServerRequest<FormattableBody> request) {
         server().yangLibraryVersionGET(request);
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return encoding;
+    }
 }

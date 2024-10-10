@@ -42,4 +42,9 @@ final class PendingDataPut extends PendingRequestWithResource<DataPutResult> {
         return new EmptyRequestResponse(
             result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT, metadataHeaders(result));
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return contentEncoding;
+    }
 }
