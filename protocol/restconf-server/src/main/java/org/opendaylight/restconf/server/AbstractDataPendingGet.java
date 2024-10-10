@@ -34,7 +34,7 @@ abstract sealed class AbstractDataPendingGet extends AbstractPendingGet<Formatta
 
     AbstractDataPendingGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final boolean withContent, final MessageEncoding encoding) {
-        super(invariants, session, targetUri, principal, withContent);
+        super(invariants, session, targetUri, principal, withContent, encoding);
         this.encoding = requireNonNull(encoding);
     }
 

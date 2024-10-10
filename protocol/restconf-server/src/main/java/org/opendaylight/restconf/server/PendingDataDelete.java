@@ -22,8 +22,8 @@ import org.opendaylight.yangtools.yang.common.Empty;
 @NonNullByDefault
 final class PendingDataDelete extends PendingRequestWithApiPath<Empty> {
     PendingDataDelete(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final ApiPath apiPath) {
-        super(invariants, session, targetUri, principal, apiPath);
+            final @Nullable Principal principal, final ApiPath apiPath, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, apiPath, encoding);
     }
 
     @Override

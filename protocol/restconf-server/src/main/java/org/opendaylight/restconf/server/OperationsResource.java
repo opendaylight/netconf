@@ -37,7 +37,7 @@ final class OperationsResource extends AbstractLeafResource {
         return switch (method) {
             case GET -> prepareGet(session, targetUri, headers, principal, path, true);
             case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
-            case OPTIONS -> prepareOptions(session, targetUri, principal, path);
+            case OPTIONS -> prepareOptions(session, targetUri, headers, principal, path);
             case POST -> preparePost(session, targetUri, headers, principal, path);
             default -> prepareDefault(session, targetUri, path);
         };
@@ -52,9 +52,11 @@ final class OperationsResource extends AbstractLeafResource {
     }
 
     private PreparedRequest prepareOptions(final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final String path) {
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
+        final var encoding = chooseOutputEncoding(headers);
         return path.isEmpty() ? AbstractPendingOptions.READ_ONLY : requiredApiPath(path,
-            apiPath -> new PendingOperationsOptions(invariants, session, targetUri, principal, apiPath));
+            apiPath -> new PendingOperationsOptions(invariants, session, targetUri, principal, apiPath,
+                encoding == null ? invariants.defaultEncoding() : encoding));
     }
 
     // invoke rpc -> https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2

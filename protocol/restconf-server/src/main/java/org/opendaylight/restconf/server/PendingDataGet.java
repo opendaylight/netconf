@@ -33,7 +33,7 @@ final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
     PendingDataGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final boolean withContent, final MessageEncoding encoding,
             final ApiPath apiPath) {
-        super(invariants, session, targetUri, principal, withContent);
+        super(invariants, session, targetUri, principal, withContent, encoding);
         this.encoding = requireNonNull(encoding);
         this.apiPath = requireNonNull(apiPath);
     }
