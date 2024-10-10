@@ -37,4 +37,9 @@ abstract class PendingRequestWithOutput<T, B extends ConsumableBody> extends Pen
         this.acceptEncoding = requireNonNull(acceptEncoding);
         this.apiPath = requireNonNull(apiPath);
     }
+
+    @Override
+    final MessageEncoding errorEncoding() {
+        return acceptEncoding;
+    }
 }
