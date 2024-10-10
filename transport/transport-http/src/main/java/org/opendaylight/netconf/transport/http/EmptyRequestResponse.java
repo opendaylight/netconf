@@ -5,27 +5,28 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server;
+package org.opendaylight.netconf.transport.http;
 
+import com.google.common.annotations.Beta;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.AbstractRequestResponse;
-import org.opendaylight.netconf.transport.http.CompletedRequest;
 
 /**
  * A {@link CompletedRequest} which has no body.
  */
-public final class EmptyRequestResponse extends AbstractRequestResponse {
-    public EmptyRequestResponse(final @NonNull HttpResponseStatus status, final @Nullable HttpHeaders headers) {
+@Beta
+@NonNullByDefault
+public final class EmptyRequestResponse extends AbstractRequestResponse implements ReadyResponse {
+    public EmptyRequestResponse(final HttpResponseStatus status, final @Nullable HttpHeaders headers) {
         super(status, headers);
     }
 
-    public EmptyRequestResponse(final @NonNull HttpResponseStatus status) {
+    public EmptyRequestResponse(final HttpResponseStatus status) {
         this(status, null);
     }
 

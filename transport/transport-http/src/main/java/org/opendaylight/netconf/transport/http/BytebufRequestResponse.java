@@ -26,7 +26,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @Beta
 @NonNullByDefault
-public final class BytebufRequestResponse extends AbstractRequestResponse implements ByteBufHolder {
+public final class BytebufRequestResponse extends AbstractRequestResponse implements ByteBufHolder, ReadyResponse {
     private final ByteBuf content;
 
     private BytebufRequestResponse(final HttpResponseStatus status, final @Nullable HttpHeaders headers,

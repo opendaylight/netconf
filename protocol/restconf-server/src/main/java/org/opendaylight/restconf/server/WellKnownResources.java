@@ -23,6 +23,7 @@ import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.BytebufRequestResponse;
 import org.opendaylight.netconf.transport.http.CompletedRequest;
+import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.slf4j.Logger;
