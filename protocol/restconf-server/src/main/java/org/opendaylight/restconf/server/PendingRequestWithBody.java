@@ -44,6 +44,12 @@ abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> ex
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        // TODO: this is not quite right: we should be looking at the Accept header
+        return contentEncoding;
+    }
+
+    @Override
     final void execute(final NettyServerRequest<T> request, final @Nullable InputStream body) {
         // Our APIs require the body to be present due to how JAX-RS operates. If we have gotten rid of the body, or
         // the user has not supplied one, provide an empty body here.

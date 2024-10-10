@@ -73,6 +73,15 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     }
 
     /**
+     * Return the {@link MessageEncoding} to use with errors. Default implementation returns the default encoding.
+     *
+     * @return the {@link MessageEncoding} to use with errors
+     */
+    @NonNull MessageEncoding errorEncoding() {
+        return invariants.defaultEncoding();
+    }
+
+    /**
      * Return the absolute URI pointing at the root API resource, as seen from the perspective of specified request.
      *
      * @return An absolute URI
@@ -104,8 +113,7 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     final void onFailure(final PendingRequestListener listener, final NettyServerRequest<T> request,
             final HttpStatusCode status, final FormattableBody body) {
         listener.requestComplete(this, new FormattableDataResponse(HttpResponseStatus.valueOf(status.code()), null,
-            // FIXME: need to pick encoding
-            body, null, request.prettyPrint()));
+            body, errorEncoding(), request.prettyPrint()));
     }
 
     @NonNullByDefault

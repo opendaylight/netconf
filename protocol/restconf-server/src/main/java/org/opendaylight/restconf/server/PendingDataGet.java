@@ -39,6 +39,11 @@ final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        return encoding;
+    }
+
+    @Override
     void execute(final NettyServerRequest<DataGetResult> request) {
         if (apiPath.isEmpty()) {
             server().dataGET(request);

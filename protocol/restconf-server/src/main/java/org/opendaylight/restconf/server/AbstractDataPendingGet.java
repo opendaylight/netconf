@@ -39,6 +39,11 @@ abstract sealed class AbstractDataPendingGet extends AbstractPendingGet<Formatta
     }
 
     @Override
+    final MessageEncoding errorEncoding() {
+        return encoding;
+    }
+
+    @Override
     final Response transformResultImpl(final NettyServerRequest<?> request, final FormattableBody result) {
         return new FormattableDataResponse(result, encoding, request.prettyPrint());
     }
