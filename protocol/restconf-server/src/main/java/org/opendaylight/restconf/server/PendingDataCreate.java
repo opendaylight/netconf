@@ -41,6 +41,11 @@ final class PendingDataCreate extends PendingRequestWithBody<CreateResourceResul
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        return contentEncoding;
+    }
+
+    @Override
     ChildBody wrapBody(final InputStream body) {
         return switch (contentEncoding) {
             case JSON -> new JsonChildBody(body);

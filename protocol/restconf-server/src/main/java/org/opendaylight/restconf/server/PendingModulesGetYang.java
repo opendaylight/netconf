@@ -44,4 +44,9 @@ final class PendingModulesGetYang extends AbstractPendingModulesGet {
     AsciiString mediaType() {
         return NettyMediaTypes.APPLICATION_YANG;
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return invariants.defaultEncoding();
+    }
 }

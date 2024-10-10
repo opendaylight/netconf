@@ -104,8 +104,7 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     final void onFailure(final PendingRequestListener listener, final NettyServerRequest<T> request,
             final HttpStatusCode status, final FormattableBody body) {
         listener.requestComplete(this, new FormattableDataResponse(HttpResponseStatus.valueOf(status.code()), null,
-            // FIXME: need to pick encoding
-            body, null, request.prettyPrint()));
+            body, errorEncoding(), request.prettyPrint()));
     }
 
     @NonNullByDefault
@@ -122,6 +121,8 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
      */
     @NonNullByDefault
     abstract Response transformResult(NettyServerRequest<?> request, T result);
+
+    abstract MessageEncoding errorEncoding();
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {

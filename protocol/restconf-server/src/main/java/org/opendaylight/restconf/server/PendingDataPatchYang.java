@@ -53,6 +53,11 @@ final class PendingDataPatchYang extends PendingRequestWithOutput<DataYangPatchR
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        return acceptEncoding;
+    }
+
+    @Override
     PatchBody wrapBody(final InputStream body) {
         return switch (contentEncoding) {
             case JSON -> new JsonPatchBody(body);

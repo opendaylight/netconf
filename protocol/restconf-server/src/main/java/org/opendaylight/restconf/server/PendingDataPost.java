@@ -48,6 +48,11 @@ final class PendingDataPost extends PendingRequestWithOutput<DataPostResult, Dat
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        return acceptEncoding;
+    }
+
+    @Override
     DataPostBody wrapBody(final InputStream body) {
         return switch (contentEncoding) {
             case JSON -> new JsonDataPostBody(body);

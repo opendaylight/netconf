@@ -34,4 +34,9 @@ final class PendingDataOptions extends AbstractPendingOptions {
             server().dataOPTIONS(request, apiPath);
         }
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return invariants.defaultEncoding();
+    }
 }

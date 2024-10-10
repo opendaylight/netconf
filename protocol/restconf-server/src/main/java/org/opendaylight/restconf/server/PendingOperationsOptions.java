@@ -30,4 +30,9 @@ final class PendingOperationsOptions extends AbstractPendingOptions {
     void execute(final NettyServerRequest<OptionsResult> request) {
         server().operationsOPTIONS(request, apiPath);
     }
+
+    @Override
+    MessageEncoding errorEncoding() {
+        return invariants.defaultEncoding();
+    }
 }
