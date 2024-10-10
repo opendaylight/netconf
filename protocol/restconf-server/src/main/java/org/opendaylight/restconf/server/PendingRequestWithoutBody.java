@@ -27,8 +27,8 @@ abstract non-sealed class PendingRequestWithoutBody<T> extends AbstractPendingRe
     private static final Logger LOG = LoggerFactory.getLogger(PendingRequestWithoutBody.class);
 
     PendingRequestWithoutBody(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal) {
-        super(invariants, session, targetUri, principal);
+            final @Nullable Principal principal, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, encoding);
     }
 
     @Override

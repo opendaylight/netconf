@@ -25,8 +25,8 @@ abstract class PendingRequestWithApiPath<T> extends PendingRequestWithoutBody<T>
     final ApiPath apiPath;
 
     PendingRequestWithApiPath(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final ApiPath apiPath) {
-        super(invariants, session, targetUri, principal);
+            final @Nullable Principal principal, final ApiPath apiPath, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, encoding);
         this.apiPath = requireNonNull(apiPath);
     }
 }
