@@ -86,6 +86,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63def6ba_e625e929",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "001e6ffd_8baaf9aa",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fa9b0d1_23df55f0",
@@ -99,6 +117,24 @@
       "writtenOn": "2024-10-08T10:37:55Z",
       "side": 1,
       "message": "protected  FullHttpRequest - one space is enough",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d5ba5d3_3fd7a27d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fa9b0d1_23df55f0",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +156,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83d3e564_0065e7b5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AbstractE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ffa2a5fa_6e7d4649",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18f5cc7e_2c0a87f7",
@@ -133,6 +187,24 @@
       "writtenOn": "2024-10-08T11:55:11Z",
       "side": 1,
       "message": "missing yang-library-version",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba8129c6_b5d0f872",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18f5cc7e_2c0a87f7",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +226,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac7b0df9_02c65450",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0db0506_abe319f7",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc77ca66_9ca05d64",
@@ -171,6 +261,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6df7a3fe_395aff5c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "It cannot be parameterized because it is impossible to make createStream() static.",
+      "parentUuid": "bc77ca66_9ca05d64",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d1efbbb_48e2db59",
@@ -184,6 +292,24 @@
       "writtenOn": "2024-10-08T11:55:11Z",
       "side": 1,
       "message": "private",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00bd4b1e_994ef16c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/AuthTest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d1efbbb_48e2db59",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -222,6 +348,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93d44bb4_87e9bba8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cc2493f_6df61192",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22febc13_2af2cee5",
@@ -235,6 +379,24 @@
       "writtenOn": "2024-10-08T10:46:38Z",
       "side": 1,
       "message": "static final class TestTransportListener implements TransportChannelListener\u003cTransportChannel\u003e",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f79306a_02525128",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22febc13_2af2cee5",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -256,6 +418,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bf4a8c7_c4732643",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "284afe39_7b87b5d2",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a4836e6_1db8e7bb",
@@ -269,6 +449,24 @@
       "writtenOn": "2024-10-08T11:00:49Z",
       "side": 1,
       "message": "final",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b99ffdab_bb3915e9",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4836e6_1db8e7bb",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -290,6 +488,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76301b3a_301e884e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6356ef0_24ddb723",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da5debcf_48f9908b",
@@ -303,6 +519,24 @@
       "writtenOn": "2024-10-08T11:00:49Z",
       "side": 1,
       "message": "final",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2b5b126_2f1cfcf1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da5debcf_48f9908b",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -324,6 +558,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b56e3279_9ff176d1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1548137_1053a0c5",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18334517_a4781d84",
@@ -337,6 +589,24 @@
       "writtenOn": "2024-10-08T11:00:49Z",
       "side": 1,
       "message": "overriding this method is not needed IMO",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d262c88_9ac9e28a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/TestUtils.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T07:47:51Z",
+      "side": 1,
+      "message": "TestClientStackGrouping\u0027 must implement abstract method \u0027implementedInterface()\u0027 in \u0027BindingContract\u0027",
+      "parentUuid": "18334517_a4781d84",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
