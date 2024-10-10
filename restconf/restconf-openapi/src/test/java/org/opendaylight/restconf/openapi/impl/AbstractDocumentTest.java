@@ -93,12 +93,12 @@ abstract class AbstractDocumentTest {
             final int limit) throws Exception {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        return assertOpenApiEntity(openApiService.getMountDoc("1", getAllDevice, width, depth, offset, limit));
+        return assertOpenApiEntity(openApiService.getMountDoc(1, getAllDevice, width, depth, offset, limit));
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
         final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
-        return assertOpenApiEntity(openApiService.getMountDocByModule("1", moduleName, revision, getDevice, 0, 0));
+        return assertOpenApiEntity(openApiService.getMountDocByModule(1, moduleName, revision, getDevice, 0, 0));
     }
 
     protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
