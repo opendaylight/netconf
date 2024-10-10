@@ -22,8 +22,8 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
 @NonNullByDefault
 final class PendingOperationsOptions extends AbstractPendingOptions {
     PendingOperationsOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final ApiPath apiPath) {
-        super(invariants, session, targetUri, principal, apiPath);
+            final @Nullable Principal principal, final ApiPath apiPath, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, apiPath, encoding);
     }
 
     @Override

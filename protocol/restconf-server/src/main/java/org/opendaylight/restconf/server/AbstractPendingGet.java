@@ -39,8 +39,8 @@ abstract class AbstractPendingGet<T> extends PendingRequestWithoutBody<T> {
     private final boolean withContent;
 
     AbstractPendingGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final boolean withContent) {
-        super(invariants, session, targetUri, principal);
+            final @Nullable Principal principal, final boolean withContent, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, encoding);
         this.withContent = withContent;
     }
 
