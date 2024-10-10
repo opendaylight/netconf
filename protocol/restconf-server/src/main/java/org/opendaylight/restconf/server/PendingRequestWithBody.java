@@ -38,7 +38,7 @@ abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> ex
 
     PendingRequestWithBody(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final MessageEncoding contentEncoding) {
-        super(invariants, session, targetUri, principal);
+        super(invariants, session, targetUri, principal, contentEncoding);
         this.contentEncoding = requireNonNull(contentEncoding);
     }
 
