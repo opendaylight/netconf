@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7963e361_7965e3d9",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataResource.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T20:10:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37fae516_29f03133",
+      "revId": "f35d49a3ad85d834f3ad6ea8a389ce6e37d567b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4874baad_adff1a9c",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-10-10T14:29:27Z",
       "side": 1,
       "message": "Can we move null check to Abstract#chooseOutputEncoding?\n\nWhen we try we would find out that there already is a branch which returns default encoding.\n\nAccordingly, I assume this patch is not doing the right thing.",
+      "revId": "f35d49a3ad85d834f3ad6ea8a389ce6e37d567b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4bd045b_cc38a810",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/DataResource.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T20:10:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4874baad_adff1a9c",
       "revId": "f35d49a3ad85d834f3ad6ea8a389ce6e37d567b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
