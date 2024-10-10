@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
+import org.opendaylight.netconf.transport.http.rfc6415.HostMeta;
 
 class WellKnownResourcesTest {
     private static final String XRD_SUFFIX = "/host-meta";
@@ -47,17 +48,19 @@ class WellKnownResourcesTest {
 
     private static Stream<Arguments> getHostMeta() {
         return Stream.of(
-            Arguments.of(XRD_SUFFIX, NettyMediaTypes.APPLICATION_XRD_XML, """
-                <?xml version='1.0' encoding='UTF-8'?>
+            Arguments.of(XRD_SUFFIX, HostMeta.MEDIA_TYPE, """
+                <?xml version="1.0" ?>
                 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-                    <Link rel="restconf" href="testRestconf"/>
+                  <Link rel="restconf" href="testRestconf"></Link>
                 </XRD>"""),
             Arguments.of(JRD_SUFFIX, HttpHeaderValues.APPLICATION_JSON, """
                 {
-                    "links" : {
-                        "rel" : "restconf",
-                        "href" : "testRestconf"
+                  "links" : [
+                    {
+                      "rel" : "restconf",
+                      "href" : "testRestconf"
                     }
+                  ]
                 }""")
         );
     }
