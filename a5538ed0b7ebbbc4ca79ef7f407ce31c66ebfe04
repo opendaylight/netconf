@@ -16,6 +16,24 @@
       "message": "See EndpointInvariants#defaultEncoding",
       "revId": "a5538ed0b7ebbbc4ca79ef7f407ce31c66ebfe04",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "528e5eab_99682dbe",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/OperationsResource.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T12:01:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "452f6fee_a3e8a1c9",
+      "revId": "a5538ed0b7ebbbc4ca79ef7f407ce31c66ebfe04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
