@@ -124,7 +124,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final long id, final String module,
             final String revision, final int width, final int depth) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext modelContext = getModelContext(iid);
@@ -142,7 +142,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             width, depth);
     }
 
-    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final Long id, final int width, final int depth,
+    public DocumentEntity getMountPointApi(final UriInfo uriInfo, final long id, final int width, final int depth,
             final int offset, final int limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
@@ -166,8 +166,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             portionOfModules, basePath, width, depth);
     }
 
-    public MetadataEntity getMountPointApiMeta(final Long id, final int offset, final int limit)
-            throws IOException {
+    public MetadataEntity getMountPointApiMeta(final long id, final int offset, final int limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
 

@@ -107,27 +107,27 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getMountDocByModule(final String instanceNum, final String module, final String revision,
+    public Response getMountDocByModule(final long instanceNum, final String module, final String revision,
             final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
-            revision, unboxOrZero(width), unboxOrZero(depth));
+        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, instanceNum, module, revision,
+            unboxOrZero(width), unboxOrZero(depth));
         return Response.ok(entity).build();
     }
 
     @Override
-    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
+    public Response getMountDoc(final long instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-            unboxOrZero(width), unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
+        final var entity = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, instanceNum, unboxOrZero(width),
+            unboxOrZero(depth), unboxOrZero(offset), unboxOrZero(limit));
         return Response.ok(entity).build();
     }
 
     @Override
-    public Response getMountMeta(final String instanceNum, final @Nullable Integer offset,
+    public Response getMountMeta(final long instanceNum, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
-        final var entity = mountPointOpenApiRFC8040.getMountPointApiMeta(Long.parseLong(instanceNum),
-            unboxOrZero(offset), unboxOrZero(limit));
+        final var entity = mountPointOpenApiRFC8040.getMountPointApiMeta(instanceNum, unboxOrZero(offset),
+            unboxOrZero(limit));
         return Response.ok(entity).build();
     }
 
