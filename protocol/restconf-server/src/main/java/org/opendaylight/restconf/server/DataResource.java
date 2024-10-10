@@ -38,10 +38,10 @@ final class DataResource extends AbstractLeafResource {
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final @Nullable Principal principal, final String path) {
         return switch (method) {
-            case DELETE -> prepareDelete(session, targetUri, principal, path);
+            case DELETE -> prepareDelete(session, targetUri, headers, principal, path);
             case GET -> prepareGet(session, targetUri, headers, principal, path, true);
             case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
-            case OPTIONS -> prepareOptions(session, targetUri, principal, path);
+            case OPTIONS -> prepareOptions(session, targetUri, headers, principal, path);
             case PATCH -> preparePatch(session, targetUri, headers, principal, path);
             case POST -> preparePost(session, targetUri, headers, principal, path);
             case PUT -> preparePut(session, targetUri, headers, principal, path);
@@ -50,9 +50,10 @@ final class DataResource extends AbstractLeafResource {
 
     // delete target resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.7
     private PreparedRequest prepareDelete(final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final String path) {
-        return path.isEmpty() ? METHOD_NOT_ALLOWED_DATASTORE : requiredApiPath(path,
-            apiPath -> new PendingDataDelete(invariants, session, targetUri, principal, apiPath));
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
+        final var encoding = chooseOutputEncoding(headers);
+        return encoding == null ? NOT_ACCEPTABLE_DATA : optionalApiPath(path,
+            apiPath -> new PendingDataDelete(invariants, session, targetUri, principal, apiPath, encoding));
     }
 
     // retrieve data and metadata for a resource -> https://www.rfc-editor.org/rfc/rfc8040#section-4.3
@@ -68,9 +69,11 @@ final class DataResource extends AbstractLeafResource {
 
     // resource options -> https://www.rfc-editor.org/rfc/rfc8040#section-4.1
     private PreparedRequest prepareOptions(final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal, final String path) {
+            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
+        final var encoding = chooseOutputEncoding(headers);
         return optionalApiPath(path,
-            apiPath -> new PendingDataOptions(invariants, session, targetUri, principal, apiPath));
+            apiPath -> new PendingDataOptions(invariants, session, targetUri, principal, apiPath,
+                encoding == null ? invariants.defaultEncoding() : encoding));
     }
 
     // PATCH -> https://www.rfc-editor.org/rfc/rfc8040#section-4.6
