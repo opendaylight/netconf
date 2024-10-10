@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.BytebufRequestResponse;
 import org.opendaylight.netconf.transport.http.CompletedRequest;
+import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
