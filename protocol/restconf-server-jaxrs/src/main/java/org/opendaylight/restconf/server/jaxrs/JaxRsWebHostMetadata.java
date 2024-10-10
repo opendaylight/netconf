@@ -60,10 +60,12 @@ public final class JaxRsWebHostMetadata {
     public Response readJsonData() {
         return Response.status(Status.OK)
             .entity("{\n"
-                + "  \"links\" : {\n"
-                + "    \"rel\" : \"restconf\",\n"
-                + "    \"href\" : \"/" + restconfRoot + "\"\n"
-                + "  }\n"
+                + "  \"links\" : [\n"
+                + "    {\n"
+                + "      \"rel\" : \"restconf\",\n"
+                + "      \"href\" : \"/" + restconfRoot + "\"\n"
+                + "    }\n"
+                + "  ]\n"
                 + "}")
             .build();
     }

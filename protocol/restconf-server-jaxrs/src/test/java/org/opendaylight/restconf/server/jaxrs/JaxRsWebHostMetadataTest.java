@@ -20,10 +20,12 @@ class JaxRsWebHostMetadataTest {
         assertEquals(200, response.getStatus());
         assertEquals("""
             {
-              "links" : {
-                "rel" : "restconf",
-                "href" : "/fooBarBaz"
-              }
+              "links" : [
+                {
+                  "rel" : "restconf",
+                  "href" : "/fooBarBaz"
+                }
+              ]
             }""", response.getEntity());
     }
 
