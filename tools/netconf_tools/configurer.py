@@ -72,9 +72,6 @@ def parse_arguments():
         help="Password for ODL Restconf authentication",
     )
     parser.add_argument(
-        "--scope", default="sdn", help="Scope for ODL Restconf authentication"
-    )
-    parser.add_argument(
         "--deviceaddress",
         default="127.0.0.1",
         help="Common IP address for all available devices",
@@ -214,7 +211,6 @@ def main():
         args.odladdress,
         args.restconfuser,
         args.restconfpassword,
-        args.scope,
         args.reuse,
     )
     subst_dict = {}

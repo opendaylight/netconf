@@ -45,18 +45,12 @@ __email__ = "vrpolak@cisco.com"
 #
 # Karaf Keyword definitions.
 #
-def Init_Session(ip, username, password, scope, reuse=True, port="8181"):
+def Init_Session(ip, username, password, reuse=True, port="8181"):
     """Robot keyword, return opaque session object, which handles authentication automatically."""
-    if scope:
-        if reuse:
-            return _TokenReusingSession(ip, username, password, scope, port=port)
-        else:
-            return _TokenClosingSession(ip, username, password, scope, port=port)
+    if reuse:
+        return _BasicReusingSession(ip, username, password, port=port)
     else:
-        if reuse:
-            return _BasicReusingSession(ip, username, password, port=port)
-        else:
-            return _BasicClosingSession(ip, username, password, port=port)
+        return _BasicClosingSession(ip, username, password, port=port)
 
 
 def Get_Using_Session(session, uri, **kwargs):
@@ -127,104 +121,3 @@ class _BasicClosingSession(object):
         self.session = requests.Session()
         self.session.auth = self.auth
         return self.session.request(method, self.rest_prefix + uri, **kwargs)
-
-
-class _TokenReusingSession(object):
-    """Handling of restconf requests using token-based authentication, one session per token."""
-
-    def __init__(self, ip, username, password, scope, port="8181"):
-        """Initialize session using hardcoded text data."""
-        self.auth_url = "http://" + ip + ":" + port + "/oauth2/token"
-        self.rest_prefix = "http://" + ip + ":" + port + "/rests/"
-        self.auth_data = "grant_type=password&username=" + username
-        self.auth_data += "&password=" + password + "&scope=" + scope
-        self.auth_header = {"Content-Type": "application/x-www-form-urlencoded"}
-        self.session = None
-        self.token = None
-        self.refresh_token()
-
-    def refresh_token(self):
-        """Reset session, invoke call to get token, parse it and remember."""
-        if self.session:
-            self.session.close()
-        self.session = requests.Session()
-        resp = self.session.post(
-            self.auth_url, data=self.auth_data, headers=self.auth_header
-        )
-        resp_obj = json.loads(resp.text)
-        try:
-            token = resp_obj["access_token"]
-        except KeyError:
-            raise RuntimeError("Parse failed: " + resp.text)
-        self.token = token
-        # TODO: Use logging so that callers could see token refreshes.
-        # We keep self.session to use for the following restconf requests.
-
-    def oneshot_method(self, method, uri, **kwargs):
-        """Return response of request of given method to given uri (without rests/)."""
-        # Token needs to be merged into headers.
-        authed_headers = kwargs.get("headers", {})
-        authed_headers["Authorization"] = "Bearer " + self.token
-        authed_kwargs = dict(kwargs)  # shallow copy
-        authed_kwargs["headers"] = authed_headers
-        return self.session.request(method, self.rest_prefix + uri, **authed_kwargs)
-
-    def robust_method(self, method, uri, **kwargs):
-        """Try method once; upon 401, refresh token and retry once. Return last response."""
-        resp = self.oneshot_method(method, uri, **kwargs)
-        if resp.status_code != 401:
-            return resp
-        self.refresh_token()
-        return self.oneshot_method(method, uri, **kwargs)
-
-
-class _TokenClosingSession(object):
-    """Handling of restconf requests using token-based authentication, one session per request."""
-
-    def __init__(self, ip, username, password, scope, port="8181"):
-        """Prepare session initialization data using hardcoded text."""
-        self.auth_url = "http://" + ip + ":" + port + "/oauth2/token"
-        self.rest_prefix = "http://" + ip + ":" + port + "/rests/"
-        self.auth_data = "grant_type=password&username=" + username
-        self.auth_data += "&password=" + password + "&scope=" + scope
-        self.auth_header = {"Content-Type": "application/x-www-form-urlencoded"}
-        self.session = None
-        self.token = None
-        self.refresh_token()
-
-    def refresh_token(self):
-        """Reset session, invoke call to get token, parse it and remember."""
-        if self.session:
-            self.session.close()
-        self.session = requests.Session()
-        resp = self.session.post(
-            self.auth_url, data=self.auth_data, headers=self.auth_header
-        )
-        resp_obj = json.loads(resp.text)
-        try:
-            token = resp_obj["access_token"]
-        except KeyError:
-            raise RuntimeError("Parse failed: " + resp.text)
-        self.token = token
-        # TODO: Use logging so that callers could see token refreshes.
-        # We keep self.session to use for the following restconf requests.
-
-    def oneshot_method(self, method, uri, **kwargs):
-        """Reset session, return response of request of given method to given uri (without rests/)."""
-        # This assumes self.session was already initialized.
-        self.session.close()
-        self.session = requests.Session()
-        # Token needs to be merged into headers.
-        authed_headers = kwargs.get("headers", {})
-        authed_headers["Authorization"] = "Bearer " + self.token
-        authed_kwargs = dict(kwargs)  # shallow copy
-        authed_kwargs["headers"] = authed_headers
-        return self.session.request(method, self.rest_prefix + uri, **authed_kwargs)
-
-    def robust_method(self, method, uri, **kwargs):
-        """Try method once; upon 401, refresh token and retry once. Return last response."""
-        resp = self.oneshot_method(method, uri, **kwargs)
-        if resp.status_code != 401:
-            return resp
-        self.refresh_token()
-        return self.oneshot_method(method, uri, **kwargs)
