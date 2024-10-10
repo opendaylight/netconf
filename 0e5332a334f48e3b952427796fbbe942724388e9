@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "613e849f_10f756fb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-10-10T07:17:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "803608be_1b1ff88d",
+      "revId": "0e5332a334f48e3b952427796fbbe942724388e9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2bace3c2_f3a3fb26",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b28edd59_42501985",
+        "filename": "keystore/plaintext-localfile/src/test/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorageTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-10-10T07:17:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa435cdb_17082660",
+      "revId": "0e5332a334f48e3b952427796fbbe942724388e9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9121a5c_8882d04f",
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "582e4eaa_a16a95b9",
+        "filename": "keystore/plaintext-localfile/src/test/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorageTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-10-10T07:17:01Z",
+      "side": 1,
+      "message": "If it fails to create it in beforeEach method.",
+      "parentUuid": "b9121a5c_8882d04f",
+      "revId": "0e5332a334f48e3b952427796fbbe942724388e9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8398041_126652c0",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-10-09T07:44:03Z",
       "side": 1,
       "message": "Why do we need absolute path?",
+      "revId": "0e5332a334f48e3b952427796fbbe942724388e9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a5aebb5_eedfbaa4",
+        "filename": "keystore/plaintext-localfile/src/test/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorageTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-10-10T07:17:01Z",
+      "side": 1,
+      "message": "Without absolute path, test fails due to:\n\nCaused by: java.io.FileNotFoundException: /.../netconf/keystore/plaintext-localfile/target/test-classes/plaintext-local-file-storage-test3148765693019435550/data-file.lnk (No such file or directory)",
+      "parentUuid": "f8398041_126652c0",
       "revId": "0e5332a334f48e3b952427796fbbe942724388e9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
