@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "030f7d8b_db888441",
+        "filename": "apps/restconf-it/src/main/yang/device-sim@2024-09-17.yang",
+        "patchSetId": 50
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T09:57:25Z",
+      "side": 1,
+      "message": "This requires the usage of `yang-maven-plugin` with the specified path for `src/test/resources/yang`. We will stick with the default logic `src/main/yang`.",
+      "parentUuid": "84b80d92_75d072fc",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10ac724e_002ea360",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5646724_36292b2b",
+        "filename": "apps/restconf-it/src/main/yang/example-action@2024-09-19.yang",
+        "patchSetId": 50
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T09:57:25Z",
+      "side": 1,
+      "message": "This requires the usage of `yang-maven-plugin` with the specified path for `src/test/resources/yang`. We will stick with the default logic `src/main/yang`.",
+      "parentUuid": "10ac724e_002ea360",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6d578c7_d332e077",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-10-08T08:58:15Z",
       "side": 1,
       "message": "Move it to test resources",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "890e0ac6_be5daa5f",
+        "filename": "apps/restconf-it/src/main/yang/example-jukebox@2015-04-04.yang",
+        "patchSetId": 50
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T09:57:25Z",
+      "side": 1,
+      "message": "This requires the usage of `yang-maven-plugin` with the specified path for `src/test/resources/yang`. We will stick with the default logic `src/main/yang`.",
+      "parentUuid": "a6d578c7_d332e077",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -327,6 +381,24 @@
       "writtenOn": "2024-10-08T11:55:11Z",
       "side": 1,
       "message": "Are we able to assert output?",
+      "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f1bfb7f_09cf8f6c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/server/netty/DataE2ETest.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-10T09:57:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f37940f_9dbf1aef",
       "revId": "0bbb99aaed851c2b0dd2e89cb2d5516e14b2e8b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
