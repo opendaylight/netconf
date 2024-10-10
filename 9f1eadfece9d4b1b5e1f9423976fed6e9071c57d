@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30a61ea3_69311925",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractPendingModulesGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-10T10:52:46Z",
+      "side": 1,
+      "message": "is encoding nullable?",
+      "revId": "9f1eadfece9d4b1b5e1f9423976fed6e9071c57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdae03a9_f34f42b8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractPendingRequest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-10T10:52:46Z",
+      "side": 1,
+      "message": "requireNonNull",
+      "revId": "9f1eadfece9d4b1b5e1f9423976fed6e9071c57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
