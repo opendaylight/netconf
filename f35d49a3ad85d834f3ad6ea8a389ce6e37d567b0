@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55e14e4f_8b8c44eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-10T14:33:29Z",
+      "side": 1,
+      "message": "return encoding \u003d\u003d null ? NOT_ACCEPTABLE_DATA : optionalApiPath(path,",
+      "revId": "f35d49a3ad85d834f3ad6ea8a389ce6e37d567b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4874baad_adff1a9c",
