@@ -57,14 +57,16 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     final @NonNull TransportSession session;
     final @NonNull URI targetUri;
     final @Nullable Principal principal;
+    final @NonNull MessageEncoding encoding;
 
     @NonNullByDefault
     AbstractPendingRequest(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
-            final @Nullable Principal principal) {
+            final @Nullable Principal principal, final MessageEncoding encoding) {
         this.invariants = requireNonNull(invariants);
         this.session = requireNonNull(session);
         this.targetUri = requireNonNull(targetUri);
         this.principal = principal;
+        this.encoding = requireNonNull(encoding);
     }
 
     final @NonNull RestconfServer server() {
@@ -103,8 +105,7 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     final void onFailure(final PendingRequestListener listener, final NettyServerRequest<T> request,
             final HttpStatusCode status, final FormattableBody body) {
         listener.requestComplete(this, new FormattableDataResponse(HttpResponseStatus.valueOf(status.code()), null,
-            // FIXME: need to pick encoding
-            body, null, request.prettyPrint()));
+            body, encoding, request.prettyPrint()));
     }
 
     @NonNullByDefault

@@ -75,9 +75,11 @@ final class ModulesResource extends AbstractLeafResource {
         final var doYin = headers.contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YIN_XML, true)
             && !headers.contains(HttpHeaderNames.ACCEPT, NettyMediaTypes.APPLICATION_YANG, true);
         final var decoded = QueryStringDecoder.decodeComponent(fileName);
-
+        final var encoding = chooseOutputEncoding(headers);
         return doYin
-            ? new PendingModulesGetYin(invariants, session, targetUri, principal, withContent, mountPath, decoded)
-            : new PendingModulesGetYang(invariants, session, targetUri, principal, withContent, mountPath, decoded);
+            ? new PendingModulesGetYin(invariants, session, targetUri, principal, withContent, mountPath, decoded,
+            encoding)
+            : new PendingModulesGetYang(invariants, session, targetUri, principal, withContent, mountPath, decoded,
+            encoding);
     }
 }

@@ -35,8 +35,8 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingGet<Modul
 
     AbstractPendingModulesGet(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final boolean withContent, final ApiPath mountPath,
-            final String fileName) {
-        super(invariants, session, targetUri, principal, withContent);
+            final String fileName, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, withContent, encoding);
         this.mountPath = requireNonNull(mountPath);
         this.fileName = requireNonNull(fileName);
     }

@@ -24,8 +24,8 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
 final class PendingModulesGetYin extends AbstractPendingModulesGet {
     PendingModulesGetYin(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final boolean withContent, final ApiPath mountPath,
-            final String fileName) {
-        super(invariants, session, targetUri, principal, withContent, mountPath, fileName);
+            final String fileName, final MessageEncoding encoding) {
+        super(invariants, session, targetUri, principal, withContent, mountPath, fileName, encoding);
     }
 
     @Override
