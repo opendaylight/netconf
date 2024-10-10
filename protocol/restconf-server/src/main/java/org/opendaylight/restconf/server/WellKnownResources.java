@@ -9,23 +9,27 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
-import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.AsciiString;
+import java.net.URI;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.http.BytebufRequestResponse;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.CompletedRequest;
 import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.LinkRelation;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
+import org.opendaylight.netconf.transport.http.rfc6415.HostMeta;
+import org.opendaylight.netconf.transport.http.rfc6415.HostMetaJson;
+import org.opendaylight.netconf.transport.http.rfc6415.Link;
+import org.opendaylight.netconf.transport.http.rfc6415.TargetUri;
+import org.opendaylight.netconf.transport.http.rfc6415.XRD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,33 +42,29 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.1">RFC 8040, section 3.1</a>
  */
 @NonNullByDefault
-final class WellKnownResources {
+final class WellKnownResources implements XRD {
     private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
-    private final ByteBuf jrd;
-    private final ByteBuf xrd;
+    private static final EmptyRequestResponse XRD_HEAD = new EmptyRequestResponse(HttpResponseStatus.OK,
+        DefaultHttpHeadersFactory.headersFactory().newHeaders()
+            .set(HttpHeaderNames.CONTENT_TYPE, HostMeta.MEDIA_TYPE));
+    private static final EmptyRequestResponse JRD_HEAD = new EmptyRequestResponse(HttpResponseStatus.OK,
+        DefaultHttpHeadersFactory.headersFactory().newHeaders()
+            .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON));
+
+    private final Map<URI, TargetUri> links;
 
     WellKnownResources(final String restconf) {
-        requireNonNull(restconf);
-        jrd = newDescriptor("""
-            {
-                "links" : {
-                    "rel" : "restconf",
-                    "href" : "%s"
-                }
-            }""", restconf);
-        xrd = newDescriptor("""
-            <?xml version='1.0' encoding='UTF-8'?>
-            <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-                <Link rel="restconf" href="%s"/>
-            </XRD>""", restconf);
+        links = Map.of(LinkRelation.RESTCONF, new TargetUri(LinkRelation.RESTCONF, URI.create(restconf)));
     }
 
-    // The format/args combination here is overly flexible, but it has a secondary use: it defeats SpotBugs analysis.
-    // Since 'format' is an argument instead of a literal, simple bytecode analysis cannot point out
-    // VA_FORMAT_STRING_USES_NEWLINE.
-    private static ByteBuf newDescriptor(final String format, final Object... args) {
-        return Unpooled.unreleasableBuffer(
-            ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT, format.formatted(args)).asReadOnly());
+    @Override
+    public Stream<? extends Link> links() {
+        return links.values().stream().sorted(Comparator.comparing(Link::rel));
+    }
+
+    @Override
+    public @Nullable Link lookupLink(final URI rel) {
+        return links.get(requireNonNull(rel));
     }
 
     // Well-known resources are immediately available
@@ -95,8 +95,8 @@ final class WellKnownResources {
         //
         //        so we should be checking Accept and redirect to requestJRD()
         return switch (method) {
-            case GET -> getResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
-            case HEAD -> headResponse(NettyMediaTypes.APPLICATION_XRD_XML, xrd);
+            case GET -> new HostMeta(this);
+            case HEAD -> XRD_HEAD;
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> AbstractResource.METHOD_NOT_ALLOWED_READ_ONLY;
         };
@@ -105,24 +105,10 @@ final class WellKnownResources {
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.2
     private CompletedRequest requestJRD(final ImplementedMethod method) {
         return switch (method) {
-            case GET -> getResponse(HttpHeaderValues.APPLICATION_JSON, jrd);
-            case HEAD -> headResponse(HttpHeaderValues.APPLICATION_JSON, jrd);
+            case GET -> new HostMetaJson(this);
+            case HEAD -> JRD_HEAD;
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> AbstractResource.METHOD_NOT_ALLOWED_READ_ONLY;
         };
-    }
-
-    private static BytebufRequestResponse getResponse(final AsciiString contentType, final ByteBuf content) {
-        return new BytebufRequestResponse(HttpResponseStatus.OK, content, contentHeaders(contentType, content));
-    }
-
-    private static EmptyRequestResponse headResponse(final AsciiString contentType, final ByteBuf content) {
-        return new EmptyRequestResponse(HttpResponseStatus.OK, contentHeaders(contentType, content));
-    }
-
-    private static HttpHeaders contentHeaders(final AsciiString contentType, final ByteBuf content) {
-        return DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
-            .set(HttpHeaderNames.CONTENT_TYPE, contentType)
-            .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
     }
 }

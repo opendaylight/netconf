@@ -13,12 +13,6 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
 
 public final class NettyMediaTypes {
     /**
-     * A {@link AsciiString} constant representing {@value MediaTypes#APPLICATION_XRD_XML} media type.
-     *
-     * @see <a href="https://www.rfc-editor.org/rfc/rfc6415#section-2">RFC6415, section 2</a>
-     */
-    public static final AsciiString APPLICATION_XRD_XML = AsciiString.cached(MediaTypes.APPLICATION_XRD_XML);
-    /**
      * A {@link AsciiString} constant representing {@value MediaTypes#APPLICATION_YANG_DATA_XML} media type.
      *
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8040#section-11.3.1">RFC8040, section 11.3.1</a>
