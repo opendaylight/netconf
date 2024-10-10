@@ -131,7 +131,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}/{module}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDocByModule(@PathParam("instance") String instanceNum,
+    Response getMountDocByModule(@PathParam("instance") long instanceNum,
                                  @PathParam("module") String module, @QueryParam("revision") String revision,
                                  @Context UriInfo uriInfo, @QueryParam("width") Integer width,
                                  @QueryParam("depth") Integer depth) throws IOException;
@@ -171,7 +171,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
+    Response getMountDoc(@PathParam("instance") long instanceNum, @Context UriInfo uriInfo,
             @QueryParam("width") Integer width, @QueryParam("depth") Integer depth,
             @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) throws IOException;
 
@@ -193,6 +193,6 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}/meta")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountMeta(@PathParam("instance") String instanceNum, @QueryParam("offset") Integer offset,
+    Response getMountMeta(@PathParam("instance") long instanceNum, @QueryParam("offset") Integer offset,
             @QueryParam("limit") Integer limit) throws IOException;
 }
