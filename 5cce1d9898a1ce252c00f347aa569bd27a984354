@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96cc6725_7417ce88",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractPendingRequest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-11T12:49:53Z",
+      "side": 1,
+      "message": "nope, note how that leads to duplicate fields all over the place -- that is a giant red flag",
+      "range": {
+        "startLine": 69,
+        "startChar": 13,
+        "endLine": 69,
+        "endChar": 21
+      },
+      "revId": "5cce1d9898a1ce252c00f347aa569bd27a984354",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b07bed03_39a6a6f0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractPendingRequest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-11T12:49:53Z",
+      "side": 1,
+      "message": "this should be a call to an abstract method called \u0027errorEncoding()\u0027",
+      "range": {
+        "startLine": 108,
+        "startChar": 18,
+        "endLine": 108,
+        "endChar": 26
+      },
+      "revId": "5cce1d9898a1ce252c00f347aa569bd27a984354",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
