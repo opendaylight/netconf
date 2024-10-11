@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ab024d8_2a2af5ae",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-10-11T16:39:50Z",
+      "side": 1,
+      "message": "I don\u0027t think there is anything special in the first attempt (`attempts \u003d\u003d 0`) that requires the `backoffMillis` value to be deterministic. So it would make more sense to add jitter to the first `backoffMillis` like other cases where `attempts !\u003d 0`.\n\nOne thing that would be helpful is clarification of `min-backoff-millis` \u0026 `max-backoff-millis` in that the values are the minimum (initial) \u0026 maximum timeout before jitter is added.",
+      "revId": "b5658e7764ad35414b49b727874dde61ca661af5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
