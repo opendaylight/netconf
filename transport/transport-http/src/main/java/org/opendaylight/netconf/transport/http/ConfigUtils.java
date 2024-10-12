@@ -343,10 +343,10 @@ public final class ConfigUtils {
         };
         final var cert = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208
             .tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder()
-            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                 .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.InlineBuilder()
                 .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore
-                    .rev240208.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.inline
+                    .rev241010.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.inline
                     .InlineDefinitionBuilder()
                     .setPublicKeyFormat(SubjectPublicKeyInfoFormat.VALUE)
                     .setPublicKey(certificate.getPublicKey().getEncoded())

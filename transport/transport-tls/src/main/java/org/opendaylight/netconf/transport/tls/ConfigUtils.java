@@ -33,8 +33,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208.InlineOrKeystoreAsymmetricKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreAsymmetricKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 
 final class ConfigUtils {
@@ -107,7 +107,7 @@ final class ConfigUtils {
             final @NonNull InlineOrKeystoreAsymmetricKeyGrouping input)
             throws UnsupportedConfigurationException {
 
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                         .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class,
                 input.getInlineOrKeystore());
         final var inlineDef = inline.getInlineDefinition();
@@ -139,7 +139,7 @@ final class ConfigUtils {
     static void setEndEntityCertificateWithKey(final @NonNull KeyStore keyStore,
             final @NonNull InlineOrKeystoreEndEntityCertWithKeyGrouping input)
                 throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                         .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
                 input.getInlineOrKeystore());
         final var inlineDef = inline.getInlineDefinition();
