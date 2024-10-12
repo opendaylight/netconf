@@ -84,8 +84,8 @@
             <artifactId>rfc9641</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>keystore-api</artifactId>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9642</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

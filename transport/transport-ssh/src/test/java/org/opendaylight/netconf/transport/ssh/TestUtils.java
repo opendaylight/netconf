@@ -165,17 +165,17 @@ public final class TestUtils {
             .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
             .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore buildAsymmetricKeyLocal(final KeyData data) {
         return buildAsymmetricKeyLocal(data.algorithm(), data.publicKeyBytes(), data.privateKeyBytes());
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
             .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore buildAsymmetricKeyLocal(final String algorithm,
                 final byte[] publicKeyBytes, final byte[] privateKeyBytes) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
             .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.InlineBuilder()
-            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                 .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinitionBuilder()
                 .setPublicKeyFormat(SubjectPublicKeyInfoFormat.VALUE)
                 .setPublicKey(publicKeyBytes)
@@ -185,12 +185,12 @@ public final class TestUtils {
             .build();
     }
 
-    public static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+    public static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
             .inline.or.keystore.end.entity.cert.with.key.grouping.InlineOrKeystore buildEndEntityCertWithKeyLocal(
             final KeyData keyData) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
             .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.InlineBuilder()
-            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                 .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.inline
                 .InlineDefinitionBuilder()
                 .setPublicKeyFormat(SubjectPublicKeyInfoFormat.VALUE)
