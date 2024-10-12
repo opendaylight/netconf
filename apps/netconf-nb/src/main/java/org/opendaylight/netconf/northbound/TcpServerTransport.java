@@ -14,7 +14,9 @@ import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev240208.netconf.server.listen.stack.grouping.transport.tls.tls.TcpServerParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -50,24 +52,24 @@ public final class TcpServerTransport implements AutoCloseable {
             @Reference final OSGiNetconfServer backend, final Configuration configuration) {
         // FIXME: create an instantiation and do not use TLS
         this(factoryHolder, backend.serverTransportInitializer(), new TcpServerParametersBuilder()
-            .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
-            .setLocalPort(new PortNumber(Uint16.valueOf(configuration.portNumber())))
+            .setLocalBind(BindingMap.of(new LocalBindBuilder()
+                .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
+                .setLocalPort(new PortNumber(Uint16.valueOf(configuration.portNumber())))
+                .build()))
             .build());
     }
 
     public TcpServerTransport(final TransportFactoryHolder factoryHolder, final ServerTransportInitializer initializer,
             final TcpServerGrouping listenParams) {
-        final var localAddr = listenParams.requireLocalAddress().stringValue();
-        final var localPort = listenParams.requireLocalPort().getValue();
 
         try {
             tcpServer = TCPServer.listen(initializer, factoryHolder.factory().newServerBootstrap(), listenParams).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
-            LOG.warn("Could not start TCP NETCONF server at {}:{}", localAddr, localPort, e);
+            LOG.warn("Could not start TCP NETCONF server at {}", listenParams.getLocalBind(), e);
             throw new IllegalStateException("Could not start TCP NETCONF server", e);
         }
 
-        LOG.info("TCP NETCONF server at {}:{} started", localAddr, localPort);
+        LOG.info("TCP NETCONF server at {} started", listenParams.getLocalBind());
     }
 
     @Deactivate

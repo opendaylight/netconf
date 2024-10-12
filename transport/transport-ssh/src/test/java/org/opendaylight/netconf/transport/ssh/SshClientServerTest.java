@@ -75,8 +75,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.ServerIdentity;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev240208.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
@@ -136,10 +138,13 @@ class SshClientServerTest {
         final var localPort = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
         socket.close();
 
-        when(tcpServerConfig.getLocalAddress()).thenReturn(localAddress);
-        when(tcpServerConfig.requireLocalAddress()).thenCallRealMethod();
-        when(tcpServerConfig.getLocalPort()).thenReturn(localPort);
-        when(tcpServerConfig.requireLocalPort()).thenCallRealMethod();
+        final var localBind = new LocalBindBuilder()
+            .setLocalAddress(localAddress)
+            .setLocalPort(localPort)
+            .build();
+
+        when(tcpServerConfig.getLocalBind()).thenReturn(BindingMap.of(localBind));
+        when(tcpServerConfig.nonnullLocalBind()).thenCallRealMethod();
 
         when(tcpClientConfig.getRemoteAddress()).thenReturn(new Host(localAddress));
         when(tcpClientConfig.requireRemoteAddress()).thenCallRealMethod();

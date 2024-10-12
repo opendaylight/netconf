@@ -37,8 +37,10 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev240208.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,14 +71,16 @@ class TCPClientServerTest {
     void integrationTest() throws Exception {
         // localhost address, so we do not leak things around
         final var loopbackAddr = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
+        final var localBind = new LocalBindBuilder()
+            .setLocalAddress(loopbackAddr)
+            // note: this lets the server pick any port, we do not care
+            .setLocalPort(new PortNumber(Uint16.ZERO))
+            .build();
 
         // Server-side config
         doReturn(null).when(serverGrouping).getKeepalives();
-        doReturn(loopbackAddr).when(serverGrouping).getLocalAddress();
-        doCallRealMethod().when(serverGrouping).requireLocalAddress();
-        // note: this lets the server pick any port, we do not care
-        doReturn(new PortNumber(Uint16.ZERO)).when(serverGrouping).getLocalPort();
-        doCallRealMethod().when(serverGrouping).requireLocalPort();
+        doReturn(BindingMap.of(localBind)).when(serverGrouping).getLocalBind();
+        doCallRealMethod().when(serverGrouping).nonnullLocalBind();
 
         // Spin up the server and acquire its port
         final var server =

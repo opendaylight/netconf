@@ -210,7 +210,7 @@ module ietf-netconf-server {
               "TCP-level server parameters to listen
                for NETCONF over SSH connections.";
             uses tcps:tcp-server-grouping {
-              refine "local-port" {
+              refine "local-bind/local-port" {
                 default "830";
                 description
                   "The NETCONF server will listen on the
@@ -266,7 +266,7 @@ module ietf-netconf-server {
               "TCP-level server parameters to listen
                for NETCONF over TLS connections.";
             uses tcps:tcp-server-grouping {
-              refine "local-port" {
+              refine "local-bind/local-port" {
                 default "6513";
                 description
                   "The NETCONF server will listen on the

@@ -21,7 +21,7 @@ import io.netty.channel.ChannelInitializer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -62,14 +62,24 @@ public final class TCPServer extends TCPTransportStack {
     public static @NonNull ListenableFuture<TCPServer> listen(final TransportChannelListener listener,
             final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
                 throws UnsupportedConfigurationException {
+        final var localBinds = listenParams.nonnullLocalBind().values();
+        final var localBind = switch (localBinds.size()) {
+            case 0 -> throw new UnsupportedConfigurationException("No bind addresses provided");
+            case 1 -> localBinds.iterator().next();
+            // FIXME: support this case. it is slightly problematic, as we need to provide all-or-nothing semantics
+            //        without leaking channels
+            default -> throw new UnsupportedConfigurationException("Multiple bind addresses provided");
+        };
+
         NettyTransportSupport.configureKeepalives(bootstrap, listenParams.getKeepalives());
 
         final var ret = SettableFuture.<TCPServer>create();
         final var stack = new TCPServer(listener);
         final var initializer = new ListenChannelInitializer(stack);
+
         bootstrap
             .childHandler(initializer)
-            .bind(socketAddressOf(listenParams.requireLocalAddress(), listenParams.requireLocalPort()))
+            .bind(socketAddressOf(localBind.requireLocalAddress(), localBind.requireLocalPort()))
             .addListener((ChannelFutureListener) future -> {
                 final var cause = future.cause();
                 if (cause == null) {
