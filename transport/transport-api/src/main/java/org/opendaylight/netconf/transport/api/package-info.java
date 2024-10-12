@@ -10,14 +10,12 @@
  * lifecycle. See <a href="https://www.rfc-editor.org/rfc/rfc6241#page-9">RFC6241 Figure 1</a> for the architectural
  * placement in the NETCONF stack.
  *
- * <p>
- * In traditional NETCONF operation NETCONF server listens for TCP connections and NETCONF clients connect to it. In
+ * <p>In traditional NETCONF operation NETCONF server listens for TCP connections and NETCONF clients connect to it. In
  * <a href="https://www.rfc-editor.org/rfc/rfc8071#section-2">Call Home</a>, the TCP layer operates the other way
  * around, i.e. NETCONF clients listen for TCP connections and NETCONF servers connect to it. Once the TCP session is
  * established, though, it is the client which initiates both transport-level and NETCONF-level handshakes.
  *
- * <p>
- * Both scenarios are handled by a single set of interfaces:
+ * <p>Both scenarios are handled by a single set of interfaces:
  * <ul>
  *   <li>a {@link TransportStack} represents a transport instance -- a server or a client in either liste or connect
  *       mode.</li>

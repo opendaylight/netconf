@@ -13,17 +13,14 @@ import java.io.Writer;
 /**
  * Custom BufferedWriter optimized for NETCONF pipeline implemented instead of default BufferedWriter provided by JDK..
  *
- * <p>
- * In versions up to and including Java 8, java.io.BufferedWriter initialized its lineSeparator field using
+ * <p>In versions up to and including Java 8, java.io.BufferedWriter initialized its lineSeparator field using
  * AccessController and takes considerable amount of time especially if lots of BufferedWriters are created in the
  * system. This has been rectified in <a href="https://bugs.openjdk.org/browse/JDK-8068498">Java 9</a>.
  *
- * <p>
- * Despite that issue having been fixed we retain this implementation because its methods are not synchronized, hence
+ * <p>Despite that issue having been fixed we retain this implementation because its methods are not synchronized, hence
  * offer a tad better performance.
  *
- * <p>
- * This implementation should only be used if newLine method is not required such as NETCONF message to XML encoders.
+ * <p>This implementation should only be used if newLine method is not required such as NETCONF message to XML encoders.
  */
 public final class BufferedWriter extends Writer {
     private static final int DEFAULT_CHAR_BUFFER_SIZE = 8192;

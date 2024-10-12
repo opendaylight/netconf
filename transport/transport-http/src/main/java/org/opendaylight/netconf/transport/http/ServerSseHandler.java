@@ -36,15 +36,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Server side Server-Sent Event (SSE) Handler.
  *
- * <p>
- * Intercepts GET requests with {@code accept=text/event-stream} header, invokes the
+ * <p>Intercepts GET requests with {@code accept=text/event-stream} header, invokes the
  * {@link EventStreamService#startEventStream(String, EventStreamListener, StartCallback)} using
  * request {@code URI} as parameter. If request is accepted the handler starts an event stream as
  * {@code transfer-encoding=chunked} response: headers are sent immediately, body chunks are sent on
  * service events.
  *
- * <p>
- * If request is not accepted then error response will be returned with error message as response body.
+ * <p>If request is not accepted then error response will be returned with error message as response body.
  * If decline exception is an instance of {@link ErrorResponseException} then explicitly defined
  * {@code content-type} value and response status code will be used in error response header.
  */

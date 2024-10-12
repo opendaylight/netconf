@@ -16,9 +16,8 @@ import org.eclipse.jdt.annotation.NonNull;
  * {@code <edit-config>} operation, as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc6241#section-7.2">RFC6241 section 7.2</a>.
  *
- * <p>
- * This concept is uncharacteristically bound to two separate semantics, but for a good reason: at the end of the day we
- * want to know what the effective operation is.
+ * <p>This concept is uncharacteristically bound to two separate semantics, but for a good reason: at the end of the day
+ * we want to know what the effective operation is.
  */
 public enum EffectiveOperation {
     // operation and default-operation

@@ -26,8 +26,7 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
  * An abstract base class for {@link PendingRequest}s servicing both GET and HEAD requests. It handles result
  * transformation so that of HEAD requests we only respond with appropriate headers.
  *
- * <p>
- * We deliberately do not expose {@link PrettyPrintParam} to {@link #fillHeaders(Object, HttpHeaders)}, so that
+ * <p>We deliberately do not expose {@link PrettyPrintParam} to {@link #fillHeaders(Object, HttpHeaders)}, so that
  * subclasses are not tempted to attempt to attain the {@code Content-Type} header. While this may seem to be
  * a violation of {@code HEAD} method mechanics, it is in fact taking full advantage of efficiencies outline in second
  * paragraph of <a href="https://www.rfc-editor.org/rfc/rfc9110#name-head">RFC9110, section 9.3.2</a>:

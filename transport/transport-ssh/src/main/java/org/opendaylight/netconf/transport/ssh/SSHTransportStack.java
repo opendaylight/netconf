@@ -32,12 +32,10 @@ import org.slf4j.LoggerFactory;
  * An SSH {@link TransportStack}. Instances of this class are built indirectly. The setup of the Netty channel is quite
  * weird. We start off with whatever the underlay sets up.
  *
- * <p>
- * We then add {@link TransportIoSession#getHandler()}, which routes data between the socket and
+ * <p>We then add {@link TransportIoSession#getHandler()}, which routes data between the socket and
  * {@link TransportSshClient} (or {@link TransportSshServer}) -- forming the "bottom half" of the channel.
  *
- * <p>
- * The "upper half" of the channel is formed once the corresponding SSH subsystem is established, via
+ * <p>The "upper half" of the channel is formed once the corresponding SSH subsystem is established, via
  * {@link TransportClientSubsystem}, which installs a {@link OutboundChannelHandler}. These two work together:
  * <ul>
  *   <li>TransportClientSubsystem pumps bytes inbound from the subsystem towards the tail of the channel pipeline</li>

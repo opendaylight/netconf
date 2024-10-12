@@ -137,8 +137,7 @@ class RestconfSchemaServiceTest {
      * Try to get schema with wrong (not valid) identifier catching <code>RestconfDocumentedException</code>. Error
      * type, error tag and error status code are compared to expected values.
      *
-     * <p>
-     * Not valid identifier contains only revision without module name.
+     * <p>Not valid identifier contains only revision without module name.
      */
     @Test
     void getSchemaWrongIdentifierTest() {

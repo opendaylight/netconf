@@ -15,11 +15,10 @@ import org.eclipse.jdt.annotation.NonNull;
 /**
  * An enumeration of HTTP methods we implement. This does not include {@code CONNECT} and {@code TRACE} on purpose.
  *
- * <p>
- * This enumeration is not strictly necessary: we could operate on {@link HttpMethod} comparison and switch on strings
- * provided by {@link HttpMethod#name()}. On the other hand, the logic in {@link HTTPServerSession} checks whether a
- * particular {@link HttpMethod} is implemented -- which requires comparisons. This enumeration allows us to capture
- * the match of that check, so that we can later use cheaper dispatches.
+ * <p>This enumeration is not strictly necessary: we could operate on {@link HttpMethod} comparison and switch on
+ * strings provided by {@link HttpMethod#name()}. On the other hand, the logic in {@link HTTPServerSession} checks
+ * whether a particular {@link HttpMethod} is implemented -- which requires comparisons. This enumeration allows us
+ * to capture the match of that check, so that we can later use cheaper dispatches.
  */
 public enum ImplementedMethod {
     /**

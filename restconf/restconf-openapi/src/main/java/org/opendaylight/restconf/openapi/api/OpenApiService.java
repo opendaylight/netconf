@@ -28,27 +28,20 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  */
 @Path("/")
 public interface OpenApiService {
-
     /**
-     * Generate OpenAPI specification document.
+     * Generate OpenAPI specification document. Generate OpenAPI specification document for modules of controller
+     * model context starting with a module with index specified by {@code offset}. The resulting documentation contains
+     * as many modules as defined by {@code limit}.
      *
-     * <p>
-     * Generate OpenAPI specification document for modules of controller schema context starting with a module with
-     * index specified by {@code offset}. The resulting documentation contains as many modules as defined
-     * by {@code limit}.
-     *
-     * <p>
-     * If user wishes to get document for all modules in controller's model context then value 0 should be used
+     * <p>If user wishes to get document for all modules in controller's model context then value 0 should be used
      * for both {@code offset} and {@code limit}.
      *
-     * <p>
-     * We relly on {@link EffectiveModelContext} usage of {@link ImmutableCollection} which preserves iteration order,
-     * so we are able to read first 40 modules with {@code ?offset=0&limit=20} and consequent request with parameters
-     * {@code ?offset=20&limit=20}.
+     * <p>We relly on {@link EffectiveModelContext} usage of {@link ImmutableCollection} which preserves iteration
+     * order, so we are able to read first 40 modules with {@code ?offset=0&limit=20} and consequent request with
+     * parameters {@code ?offset=20&limit=20}.
      *
-     * <p>
-     * If user uses value out of range for {@code offset} which is greater than number of modules in mount point schema
-     * or negative value, the response will contain empty OpenAPI document. Same if user uses negative value for
+     * <p>If user uses value out of range for {@code offset} which is greater than number of modules in mount point
+     * schema or negative value, the response will contain empty OpenAPI document. Same if user uses negative value for
      * {@code limit}.
      *
      * @param uriInfo Requests {@link UriInfo}.
@@ -75,14 +68,12 @@ public interface OpenApiService {
     /**
      * Generate a metadata document for all or paginated modules of the controller schema context.
      *
-     * <p>
-     * Generates a metadata document for modules of the controller schema context. The resulting metadata will contain
-     * information about all modules in the controller's model context if both {@code offset} and {@code limit}
+     * <p>Generates a metadata document for modules of the controller schema context. The resulting metadata will
+     * contain information about all modules in the controller's model context if both {@code offset} and {@code limit}
      * are set to 0.
      *
-     * <p>
-     * Generate metadata document for modules of controller schema context with specified index and limit. The resulting
-     * metadata provides additional information about actual page and number of pages.
+     * <p>Generate metadata document for modules of controller schema context with specified index and limit. The
+     * resulting metadata provides additional information about actual page and number of pages.
      *
      * @param offset First model to read. 0 means read from the first model.
      * @param limit The number of models to read. 0 means read all models.
@@ -114,9 +105,8 @@ public interface OpenApiService {
     Response getApiExplorer(@Context UriInfo uriInfo);
 
     /**
-     * Generates index document for Swagger UI. This document lists out all
-     * modules with link to get APIs for each module. The API for each module is
-     * served by <code> getDocByModule()</code> method.
+     * Generates index document for Swagger UI. This document lists out all modules with link to get APIs for each
+     * module. The API for each module is served by <code> getDocByModule()</code> method.
      */
     @GET
     @Path("/mounts")
@@ -147,25 +137,20 @@ public interface OpenApiService {
                                  @QueryParam("depth") Integer depth) throws IOException;
 
     /**
-     * Generate OpenAPI specification document listing APIs for all modules of mount point.
+     * Generate OpenAPI specification document listing APIs for all modules of mount point. Generates OpenAPI
+     * specification document listing APIs for all modules of mount point if value 0 is used for both {@code offset}
+     * and {@code limit}.
      *
-     * <p>
-     * Generates OpenAPI specification document listing APIs for all modules of mount point if value 0 is used for both
-     * {@code offset} and {@code limit}.
-     *
-     * <p>
-     * Generate OpenAPI specification document for modules of mount point schema context starting with a module with
+     * <p>Generate OpenAPI specification document for modules of mount point schema context starting with a module with
      * index specified by {@code offset}. The resulting documentation contains as many modules as defined
      * by {@code limit}.
      *
-     * <p>
-     * We relly on {@link EffectiveModelContext} usage of {@link ImmutableCollection} which preserves iteration order,
-     * so we are able to read first 40 modules with {@code ?offset=0&limit=20} and consequent request with parameters
-     * {@code ?offset=20&limit=20}.
+     * <p>We relly on {@link EffectiveModelContext} usage of {@link ImmutableCollection} which preserves iteration
+     * order, so we are able to read first 40 modules with {@code ?offset=0&limit=20} and consequent request with
+     * parameters {@code ?offset=20&limit=20}.
      *
-     * <p>
-     * If user uses value out of range for {@code offset} which is greater than number of modules in mount point schema
-     * or negative value, the response will contain empty OpenAPI document. Same if user uses negative value for
+     * <p>If user uses value out of range for {@code offset} which is greater than number of modules in mount point
+     * schema or negative value, the response will contain empty OpenAPI document. Same if user uses negative value for
      * {@code limit}.
      *
      * @param instanceNum Instance number of the mount point.
@@ -193,13 +178,11 @@ public interface OpenApiService {
     /**
      * Generate a metadata document for all or paginated modules of the mount point schema context.
      *
-     * <p>
-     * Generates a metadata document for modules of the mount point schema context. The resulting metadata will contain
-     * information about all modules in the controller's model context if both {@code offset} and {@code limit}
+     * <p>Generates a metadata document for modules of the mount point schema context. The resulting metadata will
+     * contain information about all modules in the controller's model context if both {@code offset} and {@code limit}
      * are set to 0.
      *
-     * <p>
-     * Generate metadata document for modules of mount point schema context with specified index and limit. The
+     * <p>Generate metadata document for modules of mount point schema context with specified index and limit. The
      * resulting metadata provides additional information about the actual page and number of pages.
      *
      * @param offset First model to read. 0 means read from the first model.

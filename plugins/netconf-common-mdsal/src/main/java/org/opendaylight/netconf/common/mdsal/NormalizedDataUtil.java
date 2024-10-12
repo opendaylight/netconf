@@ -58,8 +58,7 @@ public final class NormalizedDataUtil {
      *       setPrefix() calls as hints -- which are not discoverable.</li>
      * </ul>
      *
-     * <p>
-     * Due to this we perform a quick test for behavior and decide the appropriate strategy.
+     * <p>Due to this we perform a quick test for behavior and decide the appropriate strategy.
      */
     @FunctionalInterface
     private interface NamespaceSetter {

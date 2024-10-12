@@ -25,13 +25,11 @@ import org.slf4j.LoggerFactory;
  * an external component which is dynamically detected on per stream-id basis. This allows dynamically process
  * incoming message chunks (streams) instead of awaiting of full message arrival (aggregation completion).
  *
- * <p>
- * External components are provided by an instance of {@link Http2FrameListenerProvider} which expected to be deployed
- * on same channel pipeline. If there is no such provider or if it provides no frame listener then default (message
- * aggregation) logic will be used. The external frame listener is requested by stream-id on headers frame processing.
- * If the stream-id associate listener is determined on header processing then same one will be used to process
- * subsequent data frames.
- *
+ * <p>External components are provided by an instance of {@link Http2FrameListenerProvider} which expected to be
+ * deployed on same channel pipeline. If there is no such provider or if it provides no frame listener then default
+ * (message aggregation) logic will be used. The external frame listener is requested by stream-id on headers frame
+ * processing. If the stream-id associate listener is determined on header processing then same one will be used to
+ * process subsequent data frames.
  */
 final class Http2ToHttpAdapter extends InboundHttp2ToHttpAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(Http2ToHttpAdapter.class);

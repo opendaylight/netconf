@@ -36,8 +36,7 @@ import org.slf4j.LoggerFactory;
  * SSE stream from server using given connection. Mainly acts as {@link Http2FrameListenerProvider} working as
  * {@link Http2ToHttpAdapter} handler extension.
  *
- * <p>
- * On new SSE stream request submits SSE request to server, then builds {@link ClientHttp2SseService} to handle
+ * <p>On new SSE stream request submits SSE request to server, then builds {@link ClientHttp2SseService} to handle
  * the response frames for associated stream-id. Supports multiple concurrent streams. Only affected stream-id
  * associated traffic is being intercepted.
  */

@@ -20,8 +20,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 /**
  * {@link BasicAuthHandlerFactory} implementation for Basic Authorization.
  *
- * <p>
- * Uses predefined (configured) collection of usernames with password hashes to authenticate/authorize users.
+ * <p>Uses predefined (configured) collection of usernames with password hashes to authenticate/authorize users.
  */
 final class BasicAuthHandlerFactory implements AuthHandlerFactory {
     @NonNullByDefault

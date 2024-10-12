@@ -108,10 +108,9 @@ public abstract class NormalizedNodeWriter implements Flushable, Closeable {
      * Translate a {@link FieldsParam} to a complete list of child nodes organized into levels, suitable for use with
      * {@link NormalizedNodeWriter}.
      *
-     * <p>
-     * Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output it is only
-     * possible to assume on what depth the selected element is placed. Identifiers of intermediary mixin nodes are also
-     * flatten to the same level as identifiers of data nodes.<br>
+     * <p>Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output it is
+     * only possible to assume on what depth the selected element is placed. Identifiers of intermediary mixin nodes are
+     * also flatten to the same level as identifiers of data nodes.<br>
      * Example: field 'a(/b/c);d/e' ('e' is place under choice node 'x') is parsed into following levels:<br>
      * <pre>
      * level 0: ['a', 'd']

@@ -11,12 +11,10 @@
  * <a href="https://datatracker.ietf.org/doc/html/draft-ietf-netconf-tcp-client-server-13">
  * draft-ietf-netconf-tcp-client-server</a>.
  *
- * <p>
- * While this is strictly not a secure transport, it provides a TransportStack and thus can be used as is, for example
- * for testing purposes.
+ * <p>While this is strictly not a secure transport, it provides a TransportStack and thus can be used as is, for
+ * example for testing purposes.
  *
- * <p>
- * The three primary entry points into this package are {@link NettyTransportSupport}, {@link TCPClient} and
+ * <p>The three primary entry points into this package are {@link NettyTransportSupport}, {@link TCPClient} and
  * {@link TCPServer}.
  */
 package org.opendaylight.netconf.transport.tcp;

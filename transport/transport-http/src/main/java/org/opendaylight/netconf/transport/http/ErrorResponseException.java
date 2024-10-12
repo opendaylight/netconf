@@ -16,8 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * {@link com.google.common.util.concurrent.FutureCallback#onFailure(Throwable)} method
  * to be used as error response body.
  *
- * <p>
- * Serves cases when exception handler builds the HTTP response with mandatory response body
+ * <p>Serves cases when exception handler builds the HTTP response with mandatory response body
  * which requires content-type header as well (i.e. RESTCONF server).
  *
  * @see ServerSseHandler

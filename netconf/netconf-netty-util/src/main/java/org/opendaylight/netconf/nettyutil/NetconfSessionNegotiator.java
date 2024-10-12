@@ -279,8 +279,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     /**
      * Remove special inbound handler for hello message. Insert regular netconf xml message (en|de)coders.
      *
-     * <p>
-     * Inbound hello message handler should be kept until negotiation is successful
+     * <p>Inbound hello message handler should be kept until negotiation is successful.
      * It caches any non-hello messages while negotiation is still in progress
      */
     protected final void replaceHelloMessageInboundHandler(final S session) {

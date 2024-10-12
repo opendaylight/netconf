@@ -17,8 +17,7 @@ public interface NetconfDOMFieldsTransactionChain extends DOMTransactionChain {
     /**
      * {@inheritDoc}
      *
-     * <p>
-     * Returned transaction supports specification of returned fields.
+     * <p>Returned transaction supports specification of returned fields.
      */
     @Override
     NetconfDOMFieldsReadTransaction newReadOnlyTransaction();
@@ -26,8 +25,7 @@ public interface NetconfDOMFieldsTransactionChain extends DOMTransactionChain {
     /**
      * {@inheritDoc}
      *
-     * <p>
-     * Returned transaction supports specification of returned fields.
+     * <p>Returned transaction supports specification of returned fields.
      */
     @Override
     NetconfDOMFieldsReadWriteTransaction newReadWriteTransaction();

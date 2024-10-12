@@ -33,12 +33,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Client side Server-Sent Event (SSE) HTTP/2 frame listener implementation.
  *
- * <p>
- * Acts as alternative inbound stream processor invoked by {@link Http2ToHttpAdapter}. Intercepts header and data
+ * <p>Acts as alternative inbound stream processor invoked by {@link Http2ToHttpAdapter}. Intercepts header and data
  * frames for associated stream-id.
  *
- * <p>
- * The expected header frame with response status {@code OK} and {@code content-type=text/event-stream} header
+ * <p>The expected header frame with response status {@code OK} and {@code content-type=text/event-stream} header
  * indicates the stream request being accepted by the server (stream beginning), then subsequent data frames are
  * treated as event messages. Other headers are treated as server request decline, following data frame is treated
  * as error message.

@@ -27,9 +27,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
  * to server methods as implementations of those methods are expected to act on them on multiple layers, i.e. they are
  * not a request invariant at the various processing layers.
  *
- * <p>
- * Every request needs to be completed via one of {@link #completeWith(Object)}, {@link #completeWith(ServerException)}
- * or other {@code completeWith} methods.
+ * <p>Every request needs to be completed via one of {@link #completeWith(Object)},
+ * {@link #completeWith(ServerException)} or other {@code completeWith} methods.
  *
  * @param <T> type of reported result
  */

@@ -50,8 +50,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
  * Utility for normalizing {@link ApiPath}s. An {@link ApiPath} can represent a number of different constructs, as
  * denoted to in the {@link DatabindPath} interface hierarchy.
  *
- * <p>
- * This process is governed by
+ * <p>This process is governed by
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.5.3">RFC8040, section 3.5.3</a>. The URI provides the
  * equivalent of NETCONF XML filter encoding, with data values being escaped RFC7891 strings.
  */

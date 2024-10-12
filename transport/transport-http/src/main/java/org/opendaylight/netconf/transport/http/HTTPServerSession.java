@@ -239,8 +239,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      * Prepare an incoming HTTP request. The first two arguments are provided as context, which should be reflected back
      * to {@link #respond(ChannelHandlerContext, Integer, FullHttpResponse)} when reponding to the request.
      *
-     * <p>
-     * The ownership of request body is transferred to the implementation of this method. It is its responsibility to
+     * <p>The ownership of request body is transferred to the implementation of this method. It is its responsibility to
      * {@link ByteBuf#release()} it when no longer needed.
      *
      * @param method {@link ImplementedMethod} being requested

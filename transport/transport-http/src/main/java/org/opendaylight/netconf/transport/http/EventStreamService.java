@@ -19,13 +19,11 @@ public interface EventStreamService {
      * Accepts SSE stream request using request URI as stream descriptor. Stream request result is delivered through
      * invocation of corresponding method on callback object.
      *
-     * <p>
-     * If request is accepted then {@link StartCallback#onStreamStarted(StreamControl)} method invoked with
+     * <p>If request is accepted then {@link StartCallback#onStreamStarted(StreamControl)} method invoked with
      * a {@link Registration} instance, to be used for stream termination. Stream event to be applied on
      * {@link EventStreamListener} instance provided.
      *
-     * <p>
-     * If request is declined then {@link StartCallback#onStartFailure(Exception)} method invoked with
+     * <p>If request is declined then {@link StartCallback#onStartFailure(Exception)} method invoked with
      * {@link Exception} describing the decline reason.
      *
      * @param requestUri stream request URI

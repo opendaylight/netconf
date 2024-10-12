@@ -19,8 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
  * can be stopped manually. If the session is up, it has to redirect messages to/from user. Handles also malformed
  * messages and unknown requests.
  *
- * <p>
- * This interface should be implemented by a final class representing a protocol specific session.
+ * <p>This interface should be implemented by a final class representing a protocol specific session.
  */
 @NonNullByDefault
 public interface NetconfSession extends Closeable {

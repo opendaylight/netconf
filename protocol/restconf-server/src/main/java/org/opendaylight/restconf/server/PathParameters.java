@@ -15,23 +15,19 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 /**
  * Request URI Path parameters representing RESTCONF API Resource.
  *
- * <p>
- * See <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.3">RFC 8040: API Resource</a>
+ * <p>See <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.3">RFC 8040: API Resource</a>
  *
- * <p>
- * The URI path is being interpreted as a sequence of following elements
+ * <p>The URI path is being interpreted as a sequence of following elements
  * <ul>
  *     <li>Base path {@code "/{+restconf}"} representing root of the "ietf-restconf" module -- mandatory</li>
  *     <li>API resource name -- mandatory</li>
  *     <li>Child identifier within requested resource -- could contain slashes, optional</li>
  * </ul>
  *
- * <p>
- * Only following apiResource values are supported: {@value DATA}, {@value OPERATIONS}, {@value YANG_LIBRARY_VERSION}
+ * <p>Only following apiResource values are supported: {@value DATA}, {@value OPERATIONS}, {@value YANG_LIBRARY_VERSION}
  * and {@value MODULES}.
  *
- * <p>
- * Example. If configured {@code basePath="/rests"} then
+ * <p>Example. If configured {@code basePath="/rests"} then
  * <ul>
  *     <li>Path {@code /rests/data/} will have {@code apiResource="/data"} and empty childIdentifier</li>
  *     <li>Path {@code /rests/data/child/identifier} will have {@code apiResource="/data"} and
@@ -40,12 +36,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *     like {@code "/rests/unknown"} will result both apiResource and childIdentifier being empty</li>
  * </ul>
  *
- * <p>
- * Discovery requests with URI path starting with {@value DISCOVERY_BASE} are also supported. Eligible API resource
+ * <p>Discovery requests with URI path starting with {@value DISCOVERY_BASE} are also supported. Eligible API resource
  * equivalents are {@value HOST_META} and {@value HOST_META_JSON}.
  *
- * <p>
- * See <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.1">RFC 8040: Root Resource Discovery</a>
+ * <p>See <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.1">RFC 8040: Root Resource Discovery</a>
  * and <a href="https://datatracker.ietf.org/doc/html/rfc6415#appendix-A">RFC 6415: JRD Document Format</a>.
  *
  * @param apiResource requested API resource

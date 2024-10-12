@@ -33,15 +33,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Client side Server-Sent Event (SSE) handler for HTTP 1.1.
  *
- * <p>
- * Deployed by {@link ClientHttp1SseService} after SSE stream request sent to process the server response.
+ * <p>Deployed by {@link ClientHttp1SseService} after SSE stream request sent to process the server response.
  * The expected {@link HttpResponse} object (header part) with status {@code OK} and
  * {@code content-type=text/event-stream} header indicates the stream request being accepted by the server
  * (stream beginning), then subsequent {@link HttpContent} objects are treated as event messages.
  * Other responses are treated as server request decline, message content as error message.
  *
- * <p>
- * On request decline or stream end the handler self-removed from a channel pipeline to unblock underlying
+ * <p>On request decline or stream end the handler self-removed from a channel pipeline to unblock underlying
  * HTTP 1 request/response traffic. While being active all the inbound traffic is consumed.
  *
  * @apiNote

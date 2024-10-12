@@ -17,8 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 /**
  * {@link ChannelHandler} serving HTTP requests authentication and authorization.
  *
- * <p>
- * When assigned to channel pipeline expected to respond with status
+ * <p>When assigned to channel pipeline expected to respond with status
  * {@link io.netty.handler.codec.http.HttpResponseStatus#UNAUTHORIZED} if client cannot be authenticated
  * or {@link io.netty.handler.codec.http.HttpResponseStatus#FORBIDDEN} if access to requested resource is not granted
  * to authenticated client.

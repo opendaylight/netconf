@@ -18,11 +18,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
  * Customized XMLMessageWriter that serializes additional header with session metadata along with {@link HelloMessage}.
  * Used by netconf clients to send information about the user, ip address, protocol etc.
  *
- * <p>
- * Hello message with header example:
- *
- * <p>
- *
+ * <p>Hello message with header example:
  * <pre>
  * {@code
  * [tomas;10.0.0.0/10000;tcp;1000;1000;;/home/tomas;;]

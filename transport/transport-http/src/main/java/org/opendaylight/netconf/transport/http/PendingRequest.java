@@ -18,11 +18,10 @@ import org.eclipse.jdt.annotation.Nullable;
  * A {@link PreparedRequest} which is pending execution. This object knows what needs to be executed, where an now based
  * on having seen the contents of the HTTP request line and HTTP headers.
  *
- * <p>
- * The pipeline-side of wiring is using these objects to represent and track asynchronous execution. Once the pipeline
- * has set up everything it needs, it will invoke {@link #execute(PendingRequestListener, InputStream)} to kick off this
- * request. Subclasses are required to notify of request completion by invoking the appropriate method on the supplied
- * {@link PendingRequestListener}.
+ * <p>The pipeline-side of wiring is using these objects to represent and track asynchronous execution. Once the
+ * pipeline has set up everything it needs, it will invoke {@link #execute(PendingRequestListener, InputStream)} to kick
+ * off this request. Subclasses are required to notify of request completion by invoking the appropriate method on the
+ * supplied {@link PendingRequestListener}.
  *
  * @param <T> server response type
  */

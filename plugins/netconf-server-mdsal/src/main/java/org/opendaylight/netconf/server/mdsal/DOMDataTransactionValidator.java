@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 /**
  * A {@link DOMDataBroker} {@link Extension} which allows users to provide Validate capability.
  *
- * <p> See <a href="https://tools.ietf.org/html/rfc4741#section-8.6">RFC4741 section 8.6</a> for details.
+ * <p>See <a href="https://tools.ietf.org/html/rfc4741#section-8.6">RFC4741 section 8.6</a> for details.
  */
 @Beta
 public interface DOMDataTransactionValidator extends Extension {

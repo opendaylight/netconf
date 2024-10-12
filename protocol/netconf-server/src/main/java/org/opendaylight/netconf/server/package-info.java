@@ -10,8 +10,7 @@
  * {@link NetconfServerSessionNegotiator} and {@link NetconfServerSessionNegotiatorFactory} which work in tandem with
  * {@code transport-api} constructs.
  *
- * <p>
- * Given a particular transport stack, the main entrypoint is {@link ServerTransportInitializer}, which is suitable
+ * <p>Given a particular transport stack, the main entrypoint is {@link ServerTransportInitializer}, which is suitable
  * for passing down to the various TransportStack implementations and deals with negotiating the details of a NETCONF
  * session.
  */

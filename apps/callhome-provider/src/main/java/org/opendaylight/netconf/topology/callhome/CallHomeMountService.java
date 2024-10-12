@@ -63,14 +63,12 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 /**
  * Service is responsible for call-home to topology integration.
  *
- * <p>
- * To manage remote device as a topology node the topology component (based on
+ * <p>To manage remote device as a topology node the topology component (based on
  * {@link AbstractNetconfTopology AbstractNetconfTopology}) creates an instance
  * of {@link NetconfNodeHandler NetconfNodeHandler} based on provided
  * {@link Node}.
  *
- * <p>
- * The mentioned NetconfNodeHandler initializes connection to remote device via sequence of following actions (see
+ * <p>The mentioned NetconfNodeHandler initializes connection to remote device via sequence of following actions (see
  * {@link AbstractNetconfTopology#ensureNode(Node) ensureNode(Node)} and
  * {@link NetconfNodeHandler#lockedConnect() connect()}):
  *
@@ -82,15 +80,12 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  *     <li>Builds Netconf client using configuration composed and triggers connection</li>
  * </ul>
  *
- * <p>
- * This service uses custom implementations of {@link NetconfClientConfigurationBuilderFactory} and
+ * <p>This service uses custom implementations of {@link NetconfClientConfigurationBuilderFactory} and
  * {@link NetconfClientFactory} in order to capture the instance of {@link NetconfClientSessionListener} from topology
  * component which is required to establish NETCONF layer. See {@link #createClientConfigurationBuilderFactory()}
  * and {@link #createClientFactory()}.
  *
- * <p>
- * Following sequence of actions is performed when incoming connection is mapped to topology node:
- *
+ * <p>Following sequence of actions is performed when incoming connection is mapped to topology node:
  * <ul>
  *     <li>When incoming connection is identified the {@link CallHomeSshSessionContext} instance expected to be created.
  *     The createContext() method is invoked within protocol associated {@link CallHomeSessionContextManager} --

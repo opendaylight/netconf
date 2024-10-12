@@ -78,7 +78,7 @@ public class CallHomeTlsSessionContextManager extends AbstractCallHomeSessionCon
     /**
      * Builds {@link CallHomeTlsSessionContext} based on {@link Channel} object.
      *
-     * <p> The method expected to be overridden in order to inject
+     * <p>The method expected to be overridden in order to inject
      * {@link org.opendaylight.netconf.client.NetconfClientSessionListener NetconfClientSessionListener} and/or
      * {@link SettableFuture} of a {@link org.opendaylight.netconf.client.NetconfClientSession NetconfClientSession}
      *  to be established on current connection.

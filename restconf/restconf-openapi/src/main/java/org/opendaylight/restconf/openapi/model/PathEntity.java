@@ -25,8 +25,7 @@ public final class PathEntity extends OpenApiEntity {
     /**
      * Construct new path instance pointing to top level config data.
      *
-     * <p>
-     * Paths to top level configuration data allows full CRUD operations (including POST).
+     * <p>Paths to top level configuration data allows full CRUD operations (including POST).
      */
     public PathEntity(final @NonNull String path, final @NonNull PostEntity post, final @NonNull PatchEntity patch,
             final @NonNull PutEntity put, final @NonNull GetEntity get, final @NonNull DeleteEntity delete) {
@@ -41,8 +40,7 @@ public final class PathEntity extends OpenApiEntity {
     /**
      * Construct new path instance pointing child level config data.
      *
-     * <p>
-     * Paths to child level configuration data allows full CRUD operations (except of POST).
+     * <p>Paths to child level configuration data allows full CRUD operations (except of POST).
      */
     public PathEntity(final @NonNull String path, final @NonNull PatchEntity patch,
             final @NonNull PutEntity put, final @NonNull GetEntity get, final @NonNull DeleteEntity delete) {
@@ -57,8 +55,7 @@ public final class PathEntity extends OpenApiEntity {
     /**
      * Construct new path instance pointing to non-config data.
      *
-     * <p>
-     * Paths to non-configuration data are allowed to be read only.
+     * <p>Paths to non-configuration data are allowed to be read only.
      */
     public PathEntity(final @NonNull String path, final @NonNull GetEntity get) {
         this.path = requireNonNull(path);
@@ -72,8 +69,7 @@ public final class PathEntity extends OpenApiEntity {
     /**
      * Construct new path instance pointing to operation (RPC/action).
      *
-     * <p>
-     * Operations are allowed to be invoked only.
+     * <p>Operations are allowed to be invoked only.
      */
     public PathEntity(final @NonNull String path, final @NonNull PostEntity post) {
         this.path = requireNonNull(path);
@@ -87,8 +83,7 @@ public final class PathEntity extends OpenApiEntity {
     /**
      * Construct new path instance pointing to root containers.
      *
-     * <p>
-     * Paths to root device configuration data with specified POST and GET operations.
+     * <p>Paths to root device configuration data with specified POST and GET operations.
      */
     public PathEntity(final @NonNull String path, final @NonNull PostEntity post, final @NonNull GetEntity get) {
         this.path = requireNonNull(path);

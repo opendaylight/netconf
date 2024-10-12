@@ -28,16 +28,14 @@ import org.opendaylight.yangtools.yang.common.YangNames;
  * </pre>
  * To make some sense of this, let's express the same constructs in a more powerful ANTLR4 grammar.
  *
- * <p>
- * {@code path} is a rather simple
+ * <p>{@code path} is a rather simple
  * <pre>
  *    path = api-identifier ("/" api-identifier)*
  * </pre>
  * which is to say a {@code path} is "a sequence of one or more api-identifiers, separated by slashes". This boils in
  * turn down to a list {@link ApiIdentifier}s, which is guaranteed to have at least one item.
  *
- * <p>
- * {@code fields-expr} can be rewritten as three distinct possibilities:
+ * <p>{@code fields-expr} can be rewritten as three distinct possibilities:
  * <pre>
  *    fields-expr : path "(" fields-expr ")"
  *                | path ";" fields-expr
@@ -54,8 +52,7 @@ import org.opendaylight.yangtools.yang.common.YangNames;
  *   path           : api-identifier ("/" api-identifier)*
  * </pre>
  *
- * <p>
- * That ANTLR4 grammar dictates the layout of {@link FieldsParam}. It also shows the parsing is recursive on
+ * <p>That ANTLR4 grammar dictates the layout of {@link FieldsParam}. It also shows the parsing is recursive on
  * {@code node-selectors}, which is what {@link #parse(String)} and
  * {@link NodeSelectorParser#parseSubSelectors(String, int)} deal with.
  */

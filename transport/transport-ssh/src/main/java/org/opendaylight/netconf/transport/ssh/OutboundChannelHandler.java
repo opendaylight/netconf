@@ -27,10 +27,9 @@ import org.slf4j.LoggerFactory;
  * A {@link ChannelOutboundHandler} responsible for redirecting whatever bytes need to be written out on the Netty
  * channel so that they pass into SSHD's output.
  *
- * <p>
- * This class is specialized for {@link ChannelAsyncOutputStream} on purpose, as this handler is invoked from the Netty
- * thread and we do not want to block those. We therefore rely on {@link ChannelAsyncOutputStream}'s single-async-write
- * promise and perform queueing here.
+ * <p>This class is specialized for {@link ChannelAsyncOutputStream} on purpose, as this handler is invoked from the
+ * Netty thread and we do not want to block those. We therefore rely on {@link ChannelAsyncOutputStream}'s
+ * single-async-write promise and perform queueing here.
  */
 final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
     // A write enqueued in pending queue

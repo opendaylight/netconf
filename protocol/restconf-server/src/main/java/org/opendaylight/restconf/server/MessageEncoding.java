@@ -94,8 +94,7 @@ public enum MessageEncoding {
      * Returns {@code true} if YANG Data encoded with this encoding is known to <b>produce</b> content compatible with
      * specified media type.
      *
-     * <p>
-     * WARNING: do not use this method to determine if we can <b>consume</b> content with a particular media type.
+     * <p>WARNING: do not use this method to determine if we can <b>consume</b> content with a particular media type.
      *
      * @param mediaType requested media type
      * @return {@code true} if this encoding can be used to produce specified media type

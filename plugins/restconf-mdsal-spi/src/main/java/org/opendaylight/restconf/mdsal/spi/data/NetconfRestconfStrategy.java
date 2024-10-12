@@ -221,14 +221,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * Translate a {@link FieldsParam} to a list of child node paths saved in lists, suitable for use with
      * {@link NetconfDataTreeService}.
      *
-     * <p>
-     * Fields parser that stores a set of all the leaf {@link LinkedPathElement}s specified in {@link FieldsParam}.
+     * <p>Fields parser that stores a set of all the leaf {@link LinkedPathElement}s specified in {@link FieldsParam}.
      * Using {@link LinkedPathElement} it is possible to create a chain of path arguments and build complete paths
      * since this element contains identifiers of intermediary mixin nodes and also linked to its parent
      * {@link LinkedPathElement}.
      *
-     * <p>
-     * Example: field 'a(b/c;d/e)' ('e' is place under choice node 'x') is parsed into following levels:
+     * <p>Example: field 'a(b/c;d/e)' ('e' is place under choice node 'x') is parsed into following levels:
      * <pre>
      *   - './a' +- 'a/b' - 'b/c'
      *           |

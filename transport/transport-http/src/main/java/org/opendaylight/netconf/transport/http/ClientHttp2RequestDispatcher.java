@@ -26,9 +26,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Client side {@link RequestDispatcher} implementation for HTTP 2.
  *
- * <p>
- * Serves as gateway to Netty {@link Channel}, performs sending requests to server, returns server responses associated.
- * Uses request to response mapping by stream identifier.
+ * <p>Serves as gateway to Netty {@link Channel}, performs sending requests to server, returns server responses
+ * associated. Uses request to response mapping by stream identifier.
  */
 final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp2RequestDispatcher.class);

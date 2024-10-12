@@ -16,8 +16,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * Network Configuration Protocol (NETCONF) Capability URNs</a> IANA registry as well as any other capabilities we
  * explicitly recognize.
  *
- * <p>
- * The basic concept of Capabilities is defined in
+ * <p>The basic concept of Capabilities is defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc6241#section-8">RFC6241 section 8</a>. While that section mentions
  * capabilities are identified by URIs in general, the "identification" part is done through URNs, which are extended
  * to URIs during negotiation by adding a query part where applicable.

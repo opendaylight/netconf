@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
  * Client side {@link EventStreamService} implementation for HTTP 1.1. Serves as entry point to start (request)
  * SSE stream from server using given connection.
  *
- * <p>
- * On start stream request submits the SSE stream request to server then builds and deploys the
+ * <p>On start stream request submits the SSE stream request to server then builds and deploys the
  * {@link ClientHttp1SseHandler} instance to handle the server response. SSE Handler is deployed before
  * {@link HttpObjectAggregator} so it can intercept response header and body chunks immediately on arrival.
  */

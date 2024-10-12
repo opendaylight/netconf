@@ -180,8 +180,7 @@ class RestconfSchemaServiceMountTest {
      * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
      * values.
      *
-     * <p>
-     * Not valid identifier contains only revision without module name.
+     * <p>Not valid identifier contains only revision without module name.
      */
     @Test
     void getSchemaWrongIdentifierMountPointTest() {

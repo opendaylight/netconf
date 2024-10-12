@@ -12,12 +12,10 @@ import com.google.common.util.concurrent.AbstractFuture;
 /**
  * A future that cannot be cancelled.
  *
- * <p>
- * Used to communicate with the device and wait for a response.
- * The only way how to complete it is to call {@link #set(Object)}.
+ * <p>Used to communicate with the device and wait for a response. The only way how to complete it is to call
+ * {@link #set(Object)}.
  */
 final class UncancellableFuture<V> extends AbstractFuture<V> {
-
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
         return false;

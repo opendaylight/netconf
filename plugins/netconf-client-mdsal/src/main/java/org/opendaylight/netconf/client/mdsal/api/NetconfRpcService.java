@@ -49,8 +49,7 @@ public interface NetconfRpcService extends DOMService<NetconfRpcService, Netconf
      *   <li>{@link Unlock}</li>
      * </ul>
      *
-     * <p>
-     * The support for other RPCs is advertized through {@link #supportedExtensions()}.
+     * <p>The support for other RPCs is advertized through {@link #supportedExtensions()}.
      *
      * @param type QName of the RPC to be invoked
      * @param input Input arguments, null if the RPC does not take any.

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.server.api.operations;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -13,15 +12,12 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.w3c.dom.Document;
 
 /**
- * NetconfOperation handles netconf requests. Multiple operations might be
- * capable of handling one request at the same time. In such case, these
- * operations are chained (ordered by HandlingPriority returned by canHandle
- * method) and executed.
+ * NetconfOperation handles netconf requests. Multiple operations might be capable of handling one request at the same
+ * time. In such case, these operations are chained (ordered by HandlingPriority returned by canHandle method) and
+ * executed.
  *
- * <p>
- * Operation can be declared as singleton or last in chain (see abstract
- * implementations in netconf-util). If the operation is not singleton or last,
- * it is responsible for the execution of subsequent operation and for merging
+ * <p>Operation can be declared as singleton or last in chain (see abstract implementations in netconf-util). If the
+ * operation is not singleton or last, it is responsible for the execution of subsequent operation and for merging
  * the results.
  */
 public interface NetconfOperation {

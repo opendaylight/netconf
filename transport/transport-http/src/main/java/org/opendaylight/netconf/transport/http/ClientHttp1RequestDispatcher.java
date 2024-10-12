@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Client side {@link RequestDispatcher} implementation for HTTP 1.1.
  *
- * <p>
- * Serves as gateway to Netty {@link Channel}, performs sending requests to server, returns server responses associated.
- * Uses request to response mapping via queue -- first accepted response is associated with first request sent.
+ * <p>Serves as gateway to Netty {@link Channel}, performs sending requests to server, returns server responses
+ * associated. Uses request to response mapping via queue -- first accepted response is associated with first request
+ * sent.
  */
 final class ClientHttp1RequestDispatcher extends ClientRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp1RequestDispatcher.class);

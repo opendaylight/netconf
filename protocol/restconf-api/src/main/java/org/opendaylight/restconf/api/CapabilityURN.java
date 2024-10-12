@@ -14,8 +14,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * <a href="https://www.iana.org/assignments/restconf-capability-urns/restconf-capability-urns.xhtml">
  * RESTCONF Capability URNs</a> IANA registry as well as any other capabilities we explicitly recognize.
  *
- * <p>
- * The basic concept of Capabilities is defined in
+ * <p>The basic concept of Capabilities is defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-9.1">RFC8040 section 9.1</a>.
  */
 @NonNullByDefault

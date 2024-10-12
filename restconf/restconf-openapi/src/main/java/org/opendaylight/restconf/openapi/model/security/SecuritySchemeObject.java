@@ -13,12 +13,10 @@ public interface SecuritySchemeObject {
     /**
      * Security types enumeration.
      *
-     * <p>
-     * <a href="https://swagger.io/specification/#security-scheme-object">OpenApi spec</a> specifies valid type values:
-     * "apiKey", "http" "mutualTLS", "oauth2", "openIdConnect".
+     * <p><a href="https://swagger.io/specification/#security-scheme-object">OpenApi spec</a> specifies valid type
+     * values: "apiKey", "http" "mutualTLS", "oauth2", "openIdConnect".
      *
-     * <p>
-     * We are only using the "http" which might change in the future, so we will extend the Type enum.
+     * <p>We are only using the "http" which might change in the future, so we will extend the Type enum.
      */
     enum Type {
         http
