@@ -25,46 +25,26 @@ import io.netty.handler.ssl.SslHandler;
 import java.net.SocketAddress;
 import java.security.KeyStore;
 import java.util.List;
+import java.util.Objects;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.CipherSuiteAlgBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSAES128CCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSAES128GCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSAES256GCMSHA384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSCHACHA20POLY1305SHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHEPSKWITHAES128CCM;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHEPSKWITHAES128GCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHEPSKWITHAES256CCM;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHEPSKWITHAES256GCMSHA384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHEPSKWITHCHACHA20POLY1305SHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHERSAWITHAES128CCM;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHERSAWITHAES128GCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHERSAWITHAES256CCM;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHERSAWITHAES256GCMSHA384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSDHERSAWITHCHACHA20POLY1305SHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEECDSAWITHAES128GCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEECDSAWITHAES256GCMSHA384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEECDSAWITHCHACHA20POLY1305SHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEPSKWITHAES128CCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEPSKWITHAES128GCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEPSKWITHAES256GCMSHA384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHEPSKWITHCHACHA20POLY1305SHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHERSAWITHAES128GCMSHA256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHERSAWITHAES256GCMSHA384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240208.TLSECDHERSAWITHCHACHA20POLY1305SHA256;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev240316.TlsCipherSuiteAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreAsymmetricKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.TlsClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.client.identity.auth.type.Certificate;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.client.identity.auth.type.RawPublicKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev240208.HelloParamsGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev240208.TlsVersionBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.TlsServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.tls.server.grouping.server.identity.auth.type.RawPrivateKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev241010.TlsClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev241010.tls.client.grouping.client.identity.auth.type.Certificate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev241010.tls.client.grouping.client.identity.auth.type.RawPublicKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.HelloParamsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.Tls12$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.Tls13$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.TlsVersionBase;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.hello.params.grouping.TlsVersions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.TlsServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.tls.server.grouping.server.identity.auth.type.RawPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststorePublicKeysGrouping;
 
@@ -73,33 +53,39 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.
  * {@link TLSServer} instances.
  */
 public abstract class SslHandlerFactory {
-    private static final ImmutableMap<CipherSuiteAlgBase, String> CIPHER_SUITES =
-        ImmutableMap.<CipherSuiteAlgBase, String>builder()
-            .put(TLSAES128CCMSHA256.VALUE, "TLS_AES_128_CCM_SHA256")
-            .put(TLSAES128GCMSHA256.VALUE, "TLS_AES_128_GCM_SHA256")
-            .put(TLSAES256GCMSHA384.VALUE, "TLS_AES_256_GCM_SHA384")
-            .put(TLSCHACHA20POLY1305SHA256.VALUE, "TLS_CHACHA20_POLY1305_SHA256")
-            .put(TLSDHEPSKWITHAES128CCM.VALUE, "TLS_DHE_PSK_WITH_AES_128_CCM")
-            .put(TLSDHEPSKWITHAES128GCMSHA256.VALUE, "TLS_DHE_PSK_WITH_AES_128_GCM_SHA256")
-            .put(TLSDHEPSKWITHAES256CCM.VALUE, "TLS_DHE_PSK_WITH_AES_256_CCM")
-            .put(TLSDHEPSKWITHAES256GCMSHA384.VALUE, "TLS_DHE_PSK_WITH_AES_256_GCM_SHA384")
-            .put(TLSDHEPSKWITHCHACHA20POLY1305SHA256.VALUE, "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256")
-            .put(TLSDHERSAWITHAES128CCM.VALUE, "TLS_DHE_RSA_WITH_AES_128_CCM")
-            .put(TLSDHERSAWITHAES128GCMSHA256.VALUE, "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256")
-            .put(TLSDHERSAWITHAES256CCM.VALUE, "TLS_DHE_RSA_WITH_AES_256_CCM")
-            .put(TLSDHERSAWITHAES256GCMSHA384.VALUE, "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384")
-            .put(TLSDHERSAWITHCHACHA20POLY1305SHA256.VALUE, "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256")
-            .put(TLSECDHEECDSAWITHAES128GCMSHA256.VALUE, "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256")
-            .put(TLSECDHEECDSAWITHAES256GCMSHA384.VALUE, "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384")
-            .put(TLSECDHEECDSAWITHCHACHA20POLY1305SHA256.VALUE, "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256")
-            .put(TLSECDHEPSKWITHAES128CCMSHA256.VALUE, "TLS_ECDHE_PSK_WITH_AES_128_CCM_SHA256")
-            .put(TLSECDHEPSKWITHAES128GCMSHA256.VALUE, "TLS_ECDHE_PSK_WITH_AES_128_GCM_SHA256")
-            .put(TLSECDHEPSKWITHAES256GCMSHA384.VALUE, "TLS_ECDHE_PSK_WITH_AES_256_GCM_SHA384")
-            .put(TLSECDHEPSKWITHCHACHA20POLY1305SHA256.VALUE, "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256")
-            .put(TLSECDHERSAWITHAES128GCMSHA256.VALUE, "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256")
-            .put(TLSECDHERSAWITHAES256GCMSHA384.VALUE, "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384")
-            .put(TLSECDHERSAWITHCHACHA20POLY1305SHA256.VALUE, "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256")
-            .build();
+    // FIXME: rework this lookup to validate known strings -- the enum contains the string anyway
+    private static final ImmutableMap<TlsCipherSuiteAlgorithm, String> CIPHER_SUITES = index(
+        TlsCipherSuiteAlgorithm.TLSAES128CCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSAES256GCMSHA384,
+        TlsCipherSuiteAlgorithm.TLSCHACHA20POLY1305SHA256,
+        TlsCipherSuiteAlgorithm.TLSDHEPSKWITHAES128CCM,
+        TlsCipherSuiteAlgorithm.TLSDHEPSKWITHAES128GCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSDHEPSKWITHAES256CCM,
+        TlsCipherSuiteAlgorithm.TLSDHEPSKWITHAES256GCMSHA384,
+        TlsCipherSuiteAlgorithm.TLSDHEPSKWITHCHACHA20POLY1305SHA256,
+        TlsCipherSuiteAlgorithm.TLSDHERSAWITHAES128CCM,
+        TlsCipherSuiteAlgorithm.TLSDHERSAWITHAES128GCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSDHERSAWITHAES256CCM,
+        TlsCipherSuiteAlgorithm.TLSDHERSAWITHAES256GCMSHA384,
+        TlsCipherSuiteAlgorithm.TLSDHERSAWITHCHACHA20POLY1305SHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHEECDSAWITHAES128GCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHEECDSAWITHAES256GCMSHA384,
+        TlsCipherSuiteAlgorithm.TLSECDHEECDSAWITHCHACHA20POLY1305SHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHEPSKWITHAES128CCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHEPSKWITHAES128GCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHEPSKWITHAES256GCMSHA384,
+        TlsCipherSuiteAlgorithm.TLSECDHEPSKWITHCHACHA20POLY1305SHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHERSAWITHAES128GCMSHA256,
+        TlsCipherSuiteAlgorithm.TLSECDHERSAWITHAES256GCMSHA384,
+        TlsCipherSuiteAlgorithm.TLSECDHERSAWITHCHACHA20POLY1305SHA256);
+
+    private static ImmutableMap<TlsCipherSuiteAlgorithm, String> index(final TlsCipherSuiteAlgorithm... algs) {
+        final var builder = ImmutableMap.<TlsCipherSuiteAlgorithm, String>builderWithExpectedSize(algs.length);
+        for (var alg : algs) {
+            builder.put(alg, alg.getName());
+        }
+        return builder.build();
+    }
 
     /**
      * Builds {@link SslHandler} instance for given {@link Channel}.
@@ -174,7 +160,7 @@ public abstract class SslHandlerFactory {
         final SslContextBuilder builder;
         final var authType = serverIdentity.getAuthType();
         if (authType
-                instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208
+                instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010
                            .tls.server.grouping.server.identity.auth.type.Certificate cert) {
             // if-feature "server-ident-x509-cert"
             final var certificate = cert.getCertificate();
@@ -251,10 +237,7 @@ public abstract class SslHandlerFactory {
         if (helloParams != null) {
             final var tlsVersions = helloParams.getTlsVersions();
             if (tlsVersions != null) {
-                final var versions = tlsVersions.getTlsVersion();
-                if (versions != null && !versions.isEmpty()) {
-                    builder.protocols(createTlsStrings(versions));
-                }
+                builder.protocols(createTlsStrings(createTlsVersions(tlsVersions)));
             }
             final var cipherSuites = helloParams.getCipherSuites();
             if (cipherSuites != null) {
@@ -271,6 +254,25 @@ public abstract class SslHandlerFactory {
         }
     }
 
+    private static List<TlsVersionBase> createTlsVersions(final TlsVersions versions)
+            throws UnsupportedOperationException {
+        final var min = tlsIntVal(Objects.requireNonNullElse(versions.getMin(), Tls12$I.VALUE));
+        final var max = tlsIntVal(Objects.requireNonNullElse(versions.getMax(), Tls13$I.VALUE));
+
+
+    }
+
+    private static int tlsIntVal(final TlsVersionBase ver) throws UnsupportedOperationException {
+
+
+        return switch (ver) {
+            case Tls12$I x -> null;
+            case Tls13$I x -> null;
+            throw new UnsupportedOperationException("Unsupported TLS version " + ver);
+        };
+    }
+
+
     private static String[] createTlsStrings(final List<TlsVersionBase> versions)
             throws UnsupportedConfigurationException {
         // FIXME: cache these
@@ -286,7 +288,7 @@ public abstract class SslHandlerFactory {
         return ret;
     }
 
-    private static ImmutableList<String> createCipherStrings(final List<CipherSuiteAlgBase> ciphers)
+    private static ImmutableList<String> createCipherStrings(final List<TlsCipherSuiteAlgorithm> ciphers)
             throws UnsupportedConfigurationException {
         // FIXME: cache these
         final var builder = ImmutableList.<String>builderWithExpectedSize(ciphers.size());
