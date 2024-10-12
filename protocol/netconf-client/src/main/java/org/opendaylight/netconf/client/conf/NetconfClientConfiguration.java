@@ -20,7 +20,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tls.SslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.SshClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.TlsClientGrouping;
 

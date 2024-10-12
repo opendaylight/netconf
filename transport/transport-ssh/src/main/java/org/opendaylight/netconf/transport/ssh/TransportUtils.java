@@ -35,168 +35,136 @@ import org.opendaylight.netconf.shaded.sshd.common.signature.Signature;
 import org.opendaylight.netconf.shaded.sshd.server.ServerBuilder;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.EcdsaSha2Nistp256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.EcdsaSha2Nistp384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.EcdsaSha2Nistp521;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.PublicKeyAlgBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.RsaSha2256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.RsaSha2512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.SshDss;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.SshEd25519;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240208.SshRsa;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.AEADAES128GCM;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.AEADAES256GCM;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Aes128Cbc;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Aes128Ctr;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Aes192Cbc;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Aes192Ctr;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Aes256Cbc;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Aes256Ctr;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Arcfour128;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.Arcfour256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.BlowfishCbc;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.EncryptionAlgBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.None;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240208.TripleDesCbc;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.Curve25519Sha256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.Curve448Sha512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup14Sha1;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup14Sha256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup15Sha512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup16Sha512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup17Sha512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup18Sha512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroup1Sha1;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroupExchangeSha1;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.DiffieHellmanGroupExchangeSha256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.EcdhSha2Nistp256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.EcdhSha2Nistp384;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.EcdhSha2Nistp521;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240208.KeyExchangeAlgBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.HmacMd5;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.HmacMd596;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.HmacSha1;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.HmacSha196;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.HmacSha2256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.HmacSha2512;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240208.MacAlgBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.transport.params.grouping.Encryption;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.transport.params.grouping.HostKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.transport.params.grouping.KeyExchange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev240316.SshPublicKeyAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev240316.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev240316.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev240316.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.Encryption;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.HostKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 
 final class TransportUtils {
-    private static final Map<EncryptionAlgBase, NamedFactory<Cipher>> CIPHERS =
-            ImmutableMap.<EncryptionAlgBase, NamedFactory<Cipher>>builder()
-                    .put(AEADAES128GCM.VALUE, BuiltinCiphers.aes128gcm)
-                    .put(AEADAES256GCM.VALUE, BuiltinCiphers.aes256cbc)
-                    .put(Aes128Cbc.VALUE, BuiltinCiphers.aes128cbc)
-                    .put(Aes128Ctr.VALUE, BuiltinCiphers.aes128ctr)
-                    .put(Aes192Cbc.VALUE, BuiltinCiphers.aes192cbc)
-                    .put(Aes192Ctr.VALUE, BuiltinCiphers.aes192ctr)
-                    .put(Aes256Cbc.VALUE, BuiltinCiphers.aes256cbc)
-                    .put(Aes256Ctr.VALUE, BuiltinCiphers.aes256ctr)
-                    .put(Arcfour128.VALUE, BuiltinCiphers.arcfour128)
-                    .put(Arcfour256.VALUE, BuiltinCiphers.arcfour256)
-                    .put(BlowfishCbc.VALUE, BuiltinCiphers.blowfishcbc)
-                    .put(TripleDesCbc.VALUE, BuiltinCiphers.tripledescbc)
-                    .put(None.VALUE, BuiltinCiphers.none)
-                    .build();
-    private static final List<NamedFactory<Cipher>> DEFAULT_CIPHERS =
-            ImmutableList.<NamedFactory<Cipher>>builder().addAll(BaseBuilder.DEFAULT_CIPHERS_PREFERENCE).build();
+    private static final Map<
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm,
+        NamedFactory<Cipher>> CIPHERS = ImmutableMap.<
+            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm,
+            NamedFactory<Cipher>>builder()
+                .put(wrap(SshEncryptionAlgorithm.AEADAES128GCM), BuiltinCiphers.aes128gcm)
+                .put(wrap(SshEncryptionAlgorithm.AEADAES256GCM), BuiltinCiphers.aes256cbc)
+                .put(wrap(SshEncryptionAlgorithm.Aes128Cbc), BuiltinCiphers.aes128cbc)
+                .put(wrap(SshEncryptionAlgorithm.Aes128Ctr), BuiltinCiphers.aes128ctr)
+                .put(wrap(SshEncryptionAlgorithm.Aes192Cbc), BuiltinCiphers.aes192cbc)
+                .put(wrap(SshEncryptionAlgorithm.Aes192Ctr), BuiltinCiphers.aes192ctr)
+                .put(wrap(SshEncryptionAlgorithm.Aes256Cbc), BuiltinCiphers.aes256cbc)
+                .put(wrap(SshEncryptionAlgorithm.Aes256Ctr), BuiltinCiphers.aes256ctr)
+                .put(wrap(SshEncryptionAlgorithm.Arcfour128), BuiltinCiphers.arcfour128)
+                .put(wrap(SshEncryptionAlgorithm.Arcfour256), BuiltinCiphers.arcfour256)
+                .put(wrap(SshEncryptionAlgorithm.BlowfishCbc), BuiltinCiphers.blowfishcbc)
+                .put(wrap(SshEncryptionAlgorithm._3desCbc), BuiltinCiphers.tripledescbc)
+                .put(wrap(SshEncryptionAlgorithm.None), BuiltinCiphers.none)
+                .build();
 
-    private static final Map<KeyExchangeAlgBase, KeyExchangeFactory> CLIENT_KEXS;
-    private static final Map<KeyExchangeAlgBase, KeyExchangeFactory> SERVER_KEXS;
+    private static final List<NamedFactory<Cipher>> DEFAULT_CIPHERS = ImmutableList.<NamedFactory<Cipher>>builder()
+        .addAll(BaseBuilder.DEFAULT_CIPHERS_PREFERENCE)
+        .build();
+
+    private static final Map<
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
+        KeyExchangeFactory> CLIENT_KEXS;
+    private static final ImmutableMap<
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
+        KeyExchangeFactory> SERVER_KEXS;
     private static final List<KeyExchangeFactory> DEFAULT_CLIENT_KEXS;
     private static final List<KeyExchangeFactory> DEFAULT_SERVER_KEXS;
 
     static {
-        final var factories = Maps.filterValues(ImmutableMap.<KeyExchangeAlgBase, BuiltinDHFactories>builder()
-                .put(Curve25519Sha256.VALUE, BuiltinDHFactories.curve25519)
-                .put(Curve448Sha512.VALUE, BuiltinDHFactories.curve448)
-                .put(DiffieHellmanGroup1Sha1.VALUE, BuiltinDHFactories.dhg1)
-                .put(DiffieHellmanGroup14Sha1.VALUE, BuiltinDHFactories.dhg14)
-                .put(DiffieHellmanGroup14Sha256.VALUE, BuiltinDHFactories.dhg14_256)
-                .put(DiffieHellmanGroup15Sha512.VALUE, BuiltinDHFactories.dhg15_512)
-                .put(DiffieHellmanGroup16Sha512.VALUE, BuiltinDHFactories.dhg16_512)
-                .put(DiffieHellmanGroup17Sha512.VALUE, BuiltinDHFactories.dhg17_512)
-                .put(DiffieHellmanGroup18Sha512.VALUE, BuiltinDHFactories.dhg18_512)
-                .put(DiffieHellmanGroupExchangeSha1.VALUE, BuiltinDHFactories.dhgex)
-                .put(DiffieHellmanGroupExchangeSha256.VALUE, BuiltinDHFactories.dhgex256)
-                /*
-                .put(EcdhSha21284010045311.VALUE, null)
-                .put(EcdhSha213132016.VALUE, null)
-                .put(EcdhSha21313201.VALUE, null)
-                .put(EcdhSha213132026.VALUE, null)
-                .put(EcdhSha213132027.VALUE, null)
-                .put(EcdhSha213132033.VALUE, null)
-                .put(EcdhSha213132036.VALUE, null)
-                .put(EcdhSha213132037.VALUE, null)
-                .put(EcdhSha213132038.VALUE, null)
-                 */
-                .put(EcdhSha2Nistp256.VALUE, BuiltinDHFactories.ecdhp256)
-                .put(EcdhSha2Nistp384.VALUE, BuiltinDHFactories.ecdhp384)
-                .put(EcdhSha2Nistp521.VALUE, BuiltinDHFactories.ecdhp521)
-                /*
-                .put(EcmqvSha2.VALUE, null)
-                .put(ExtInfoC.VALUE, null)
-                .put(ExtInfoS.VALUE, null)
-                 Gss*
-                 TODO: provide solution for remaining (commented out) KEX algorithms missing in BuiltinDHFactories
-                */
+        final var factories = Maps.filterValues(ImmutableMap.<
+            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
+            BuiltinDHFactories>builder()
+                .put(wrap(SshKeyExchangeAlgorithm.Curve25519Sha256), BuiltinDHFactories.curve25519)
+                .put(wrap(SshKeyExchangeAlgorithm.Curve448Sha512), BuiltinDHFactories.curve448)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup1Sha1), BuiltinDHFactories.dhg1)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup14Sha1), BuiltinDHFactories.dhg14)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup14Sha256), BuiltinDHFactories.dhg14_256)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup15Sha512), BuiltinDHFactories.dhg15_512)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup16Sha512), BuiltinDHFactories.dhg16_512)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup17Sha512), BuiltinDHFactories.dhg17_512)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup18Sha512), BuiltinDHFactories.dhg18_512)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha1), BuiltinDHFactories.dhgex)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha256), BuiltinDHFactories.dhgex256)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha21284010045311, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132016, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha21313201, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132026, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132027, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132033, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132036, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132037, null)
+                // .put(SshKeyExchangeAlgorithm.EcdhSha213132038, null)
+                .put(wrap(SshKeyExchangeAlgorithm.EcdhSha2Nistp256), BuiltinDHFactories.ecdhp256)
+                .put(wrap(SshKeyExchangeAlgorithm.EcdhSha2Nistp384), BuiltinDHFactories.ecdhp384)
+                .put(wrap(SshKeyExchangeAlgorithm.EcdhSha2Nistp521), BuiltinDHFactories.ecdhp521)
+                // TODO: provide solution for remaining (commented out) KEX algorithms missing in BuiltinDHFactories
+                // .put(SshKeyExchangeAlgorithm.EcmqvSha2, null)
+                // .put(SshKeyExchangeAlgorithm.ExtInfoC, null)
+                // .put(SshKeyExchangeAlgorithm.ExtInfoS, null)
+                //  Gss*
                 .build(), BuiltinDHFactories::isSupported);
 
         CLIENT_KEXS = ImmutableMap.copyOf(Maps.transformValues(factories, ClientBuilder.DH2KEX::apply));
         SERVER_KEXS = ImmutableMap.copyOf(Maps.transformValues(factories, ServerBuilder.DH2KEX::apply));
         DEFAULT_CLIENT_KEXS =
-                ImmutableList.copyOf(Lists.transform(BaseBuilder.DEFAULT_KEX_PREFERENCE, ClientBuilder.DH2KEX::apply));
+            ImmutableList.copyOf(Lists.transform(BaseBuilder.DEFAULT_KEX_PREFERENCE, ClientBuilder.DH2KEX::apply));
         DEFAULT_SERVER_KEXS =
-                ImmutableList.copyOf(Lists.transform(BaseBuilder.DEFAULT_KEX_PREFERENCE, ServerBuilder.DH2KEX::apply));
+            ImmutableList.copyOf(Lists.transform(BaseBuilder.DEFAULT_KEX_PREFERENCE, ServerBuilder.DH2KEX::apply));
     }
 
-    private static final Map<MacAlgBase, NamedFactory<Mac>> MACS =
-            ImmutableMap.<MacAlgBase, NamedFactory<Mac>>builder()
-                    .put(HmacMd5.VALUE, BuiltinMacs.hmacmd5)
-                    .put(HmacMd596.VALUE, BuiltinMacs.hmacmd596)
-                    .put(HmacSha1.VALUE, BuiltinMacs.hmacsha1)
-                    .put(HmacSha196.VALUE, BuiltinMacs.hmacsha196)
-                    .put(HmacSha2256.VALUE, BuiltinMacs.hmacsha256)
-                    .put(HmacSha2512.VALUE, BuiltinMacs.hmacsha512)
-                    /*
-                     AeadAes128Gcm.VALUE
-                     AeadAes256Gcm.VALUE
-                     None.VALUE
-                     openssh ETM extensions
-                     TODO provide solution for remaining (commented out) macs missing in BuiltinMacs
-                      */
-                    .build();
+    private static final ImmutableMap<
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm,
+        NamedFactory<Mac>> MACS = ImmutableMap.<
+            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm,
+            NamedFactory<Mac>>builder()
+                .put(wrap(SshMacAlgorithm.HmacMd5), BuiltinMacs.hmacmd5)
+                .put(wrap(SshMacAlgorithm.HmacMd596), BuiltinMacs.hmacmd596)
+                .put(wrap(SshMacAlgorithm.HmacSha1), BuiltinMacs.hmacsha1)
+                .put(wrap(SshMacAlgorithm.HmacSha196), BuiltinMacs.hmacsha196)
+                .put(wrap(SshMacAlgorithm.HmacSha2256), BuiltinMacs.hmacsha256)
+                .put(wrap(SshMacAlgorithm.HmacSha2512), BuiltinMacs.hmacsha512)
+                // TODO: provide solution for remaining (commented out) macs missing in BuiltinMacs
+                // SshMacAlgorithm.AeadAes128Gcm
+                // SshMacAlgorithm.AeadAes256Gcm
+                // SshMacAlgorithm.None
+                // openssh ETM extensions
+                .build();
     private static final List<NamedFactory<Mac>> DEFAULT_MACS =
             ImmutableList.<NamedFactory<Mac>>builder().addAll(BaseBuilder.DEFAULT_MAC_PREFERENCE).build();
 
-    static final Map<PublicKeyAlgBase, NamedFactory<Signature>> SIGNATURES =
-            ImmutableMap.<PublicKeyAlgBase, NamedFactory<Signature>>builder()
-                    .put(EcdsaSha2Nistp256.VALUE, BuiltinSignatures.nistp256)
-                    .put(EcdsaSha2Nistp384.VALUE, BuiltinSignatures.nistp384)
-                    .put(EcdsaSha2Nistp521.VALUE, BuiltinSignatures.nistp521)
-                    .put(RsaSha2512.VALUE, BuiltinSignatures.rsaSHA512)
-//                    .put(PgpSignDss.VALUE, null)
-//                    .put(PgpSignRsa.VALUE, null)
-                    .put(RsaSha2256.VALUE, BuiltinSignatures.rsaSHA256)
-//                    .put(SpkiSignRsa.VALUE, null)
-//                    .put(SpkiSignDss.VALUE, null)
-                    .put(SshDss.VALUE, BuiltinSignatures.dsa)
-//                    .put(SshEd448.VALUE, null)
-                    .put(SshEd25519.VALUE, BuiltinSignatures.ed25519)
-                    .put(SshRsa.VALUE, BuiltinSignatures.rsa)
-                    /*
-                    .put(X509v3EcdsaSha2Nistp256.VALUE, null)
-                    .put(X509v3EcdsaSha2Nistp384.VALUE, null)
-                    .put(X509v3EcdsaSha2Nistp521.VALUE, null)
-                    .put(X509v3Rsa2048Sha256.VALUE, null)
-                    .put(X509v3SshDss.VALUE, null)
-                    .put(X509v3SshRsa.VALUE, null)
-                    .put(Null.VALUE, null)
-                     TODO provide solution for remaining (commented out) signatures missing in BuiltinSignatures
-                    */
+    static final Map<
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
+        NamedFactory<Signature>> SIGNATURES = ImmutableMap.<
+            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
+            NamedFactory<Signature>>builder()
+                    .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp256), BuiltinSignatures.nistp256)
+                    .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp384), BuiltinSignatures.nistp384)
+                    .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp521), BuiltinSignatures.nistp521)
+                    .put(wrap(SshPublicKeyAlgorithm.RsaSha2512), BuiltinSignatures.rsaSHA512)
+                    // .put(wrap(SshPublicKeyAlgorithm.PgpSignDss), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.PgpSignRsa), null)
+                    .put(wrap(SshPublicKeyAlgorithm.RsaSha2256), BuiltinSignatures.rsaSHA256)
+                    // .put(wrap(SshPublicKeyAlgorithm.SpkiSignRsa), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.SpkiSignDss), null)
+                    .put(wrap(SshPublicKeyAlgorithm.SshDss), BuiltinSignatures.dsa)
+                    // .put(wrap(SshPublicKeyAlgorithm.SshEd448), null)
+                    .put(wrap(SshPublicKeyAlgorithm.SshEd25519), BuiltinSignatures.ed25519)
+                    .put(wrap(SshPublicKeyAlgorithm.SshRsa), BuiltinSignatures.rsa)
+                    // TODO: provide solution for remaining (commented out) signatures missing in BuiltinSignatures
+                    // .put(wrap(SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp256), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp384), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp521), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.X509v3Rsa2048Sha256), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.X509v3SshDss), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.X509v3SshRsa), null)
+                    // .put(wrap(SshPublicKeyAlgorithm.Null), null)
                     .build();
 
     static final List<NamedFactory<Signature>> DEFAULT_SIGNATURES =
@@ -238,9 +206,10 @@ final class TransportUtils {
         return getKexFactories(keyExchange, SERVER_KEXS, DEFAULT_SERVER_KEXS);
     }
 
-    private static List<KeyExchangeFactory> getKexFactories(final KeyExchange keyExchange,
-            final Map<KeyExchangeAlgBase, KeyExchangeFactory> map,
-            final List<KeyExchangeFactory> defaultResult) throws UnsupportedConfigurationException {
+    private static List<KeyExchangeFactory> getKexFactories(final KeyExchange keyExchange, final Map<
+            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
+            KeyExchangeFactory> map, final List<KeyExchangeFactory> defaultResult)
+                    throws UnsupportedConfigurationException {
         if (keyExchange != null) {
             final var kexAlg = keyExchange.getKeyExchangeAlg();
             if (kexAlg != null && !kexAlg.isEmpty()) {
@@ -251,7 +220,7 @@ final class TransportUtils {
     }
 
     public static List<NamedFactory<Mac>> getMacFactories(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
                     .transport.params.grouping.Mac mac) throws UnsupportedConfigurationException {
         if (mac != null) {
             final var macAlg = mac.getMacAlg();
@@ -265,14 +234,37 @@ final class TransportUtils {
     private static <K, V> List<V> mapValues(final Map<K, V> map, final List<K> values, final String errorTemplate)
             throws UnsupportedConfigurationException {
         final var builder = ImmutableList.<V>builderWithExpectedSize(values.size());
-        for (K value : values) {
-            final V mapped = map.get(value);
+        for (var value : values) {
+            final var mapped = map.get(value);
             if (mapped == null) {
                 throw new UnsupportedOperationException(String.format(errorTemplate, value));
             }
             builder.add(mapped);
         }
         return builder.build();
+    }
+
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshEncryptionAlgorithm wrap(final SshEncryptionAlgorithm alg) {
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshEncryptionAlgorithm(alg);
+    }
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshKeyExchangeAlgorithm wrap(final SshKeyExchangeAlgorithm alg) {
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshKeyExchangeAlgorithm(alg);
+    }
+
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshMacAlgorithm wrap(final SshMacAlgorithm alg) {
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshMacAlgorithm(alg);
+    }
+
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshPublicKeyAlgorithm wrap(final SshPublicKeyAlgorithm alg) {
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshPublicKeyAlgorithm(alg);
     }
 
     static <T> T checkCast(final Class<T> clazz, final Object obj) throws IOException {

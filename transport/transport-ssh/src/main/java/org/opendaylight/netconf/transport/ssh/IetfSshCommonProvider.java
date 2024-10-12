@@ -10,9 +10,9 @@ package org.opendaylight.netconf.transport.ssh;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.IetfSshCommonData;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.SshX509Certs;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.TransportParams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.IetfSshCommonData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshX509Certs;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParams;
 import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 

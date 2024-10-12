@@ -63,8 +63,16 @@
             <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>org.eclipse.jdt.annotation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>binding-spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
@@ -75,12 +83,20 @@
             <artifactId>iana-crypt-hash</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc6991-ietf-yang-types</artifactId>
+            <groupId>org.opendaylight.mdsal.binding.model.iana</groupId>
+            <artifactId>iana-ssh-encryption-algs</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc8341</artifactId>
+            <groupId>org.opendaylight.mdsal.binding.model.iana</groupId>
+            <artifactId>iana-ssh-key-exchange-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.iana</groupId>
+            <artifactId>iana-ssh-mac-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.iana</groupId>
+            <artifactId>iana-ssh-public-key-algs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
@@ -101,6 +117,18 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc9643-ietf-tcp-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9644-ietf-ssh-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9644-ietf-ssh-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9644-ietf-ssh-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

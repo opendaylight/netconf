@@ -31,9 +31,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ssh.client.grouping.server.authentication.SshHostKeys;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.TransportParamsGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.transport.params.grouping.KeyExchange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.server.authentication.SshHostKeys;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
@@ -67,18 +67,18 @@ final class ConfigUtils {
     }
 
     static List<KeyPair> extractServerHostKeys(
-            final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208
+            final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
                     .ssh.server.grouping.server.identity.HostKey> serverHostKeys)
             throws UnsupportedConfigurationException {
         var listBuilder = ImmutableList.<KeyPair>builder();
         for (var hostKey : serverHostKeys) {
             if (hostKey.getHostKeyType()
-                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208
+                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
                     .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey publicKey
                     && publicKey.getPublicKey() != null) {
                 listBuilder.add(extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
             } else if (hostKey.getHostKeyType()
-                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208
+                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
                     .ssh.server.grouping.server.identity.host.key.host.key.type.Certificate certificate
                     && certificate.getCertificate() != null) {
                 listBuilder.add(extractCertificateEntry(certificate.getCertificate()).getKey());
