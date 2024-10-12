@@ -57,7 +57,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.client.authentication.users.UserBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.client.authentication.users.user.PasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.client.authentication.users.user.PublicKeysBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 
 public final class TestUtils {
@@ -123,15 +123,15 @@ public final class TestUtils {
             .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline buildTruststorePublicKeyLocal(
             final KeyData keyData) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore._public.keys.grouping.inline.or.truststore.InlineBuilder()
-            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
                 .inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.InlineDefinitionBuilder()
                 .setPublicKey(BindingMap.of(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
-                    .rev240208.inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.inline.definition
+                    .rev241010.inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.inline.definition
                     .PublicKeyBuilder()
                         .setName(PUBLIC_KEY_NAME)
                         .setPublicKeyFormat(SshPublicKeyFormat.VALUE)
@@ -150,12 +150,12 @@ public final class TestUtils {
             .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore.certs.grouping.inline.or.truststore.Inline buildTruststoreCertificatesLocal(
             final byte[] certificateBytes) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore.certs.grouping.inline.or.truststore.InlineBuilder()
-            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
                 .inline.or.truststore.certs.grouping.inline.or.truststore.inline.InlineDefinitionBuilder()
                 .setCertificate(BindingMap.of(new CertificateBuilder()
                     .setName(CERTIFICATE_NAME)
@@ -231,15 +231,15 @@ public final class TestUtils {
             .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline buildPublicKeyLocal(
             final byte[] publicKeyBytes) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore._public.keys.grouping.inline.or.truststore.InlineBuilder()
-            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
                 .inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.InlineDefinitionBuilder()
                 .setPublicKey(BindingMap.of(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
-                    .truststore.rev240208.inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.inline
+                    .truststore.rev241010.inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.inline
                     .definition.PublicKeyBuilder()
                     .setPublicKeyFormat(SshPublicKeyFormat.VALUE)
                     .setName(PUBLIC_KEY_NAME)
