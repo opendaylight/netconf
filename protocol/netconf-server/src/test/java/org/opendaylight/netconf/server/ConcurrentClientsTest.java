@@ -78,8 +78,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev240208.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev240208.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
@@ -141,7 +143,9 @@ class ConcurrentClientsTest {
 
         final var address = IetfInetUtil.ipAddressFor(serverAddress);
         final var port = new PortNumber(Uint16.valueOf(serverPort));
-        serverParams = new TcpServerParametersBuilder().setLocalAddress(address).setLocalPort(port).build();
+        serverParams = new TcpServerParametersBuilder()
+            .setLocalBind(BindingMap.of(new LocalBindBuilder().setLocalAddress(address).setLocalPort(port).build()))
+            .build();
         clientParams =
             new TcpClientParametersBuilder().setRemoteAddress(new Host(address)).setRemotePort(port).build();
 

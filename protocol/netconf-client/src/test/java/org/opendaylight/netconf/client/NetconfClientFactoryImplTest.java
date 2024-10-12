@@ -83,8 +83,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.client.authentication.users.UserBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.server.identity.HostKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.server.identity.host.key.host.key.type.PublicKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev240208.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
@@ -134,7 +136,9 @@ class NetconfClientFactoryImplTest {
         final var address = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
         final var port = new PortNumber(Uint16.valueOf(localPort));
 
-        tcpServerParams = new TcpServerParametersBuilder().setLocalAddress(address).setLocalPort(port).build();
+        tcpServerParams = new TcpServerParametersBuilder()
+            .setLocalBind(BindingMap.of(new LocalBindBuilder().setLocalAddress(address).setLocalPort(port).build()))
+            .build();
         tcpClientParams = new TcpClientParametersBuilder()
             .setRemoteAddress(new Host(address))
             .setRemotePort(port)

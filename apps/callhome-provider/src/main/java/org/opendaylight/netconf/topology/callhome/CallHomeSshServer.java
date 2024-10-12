@@ -35,7 +35,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240208.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240208.netconf.client.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ssh.client.grouping.ClientIdentityBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,7 +219,12 @@ public final class CallHomeSshServer implements AutoCloseable {
         final var ipAddress = IetfInetUtil.ipAddressFor(
             address == null ? InetAddress.getLoopbackAddress() : address);
         final var portNumber = new PortNumber(Uint16.valueOf(port < 0 ? DEFAULT_PORT : port));
-        return new TcpServerParametersBuilder().setLocalAddress(ipAddress).setLocalPort(portNumber).build();
+        return new TcpServerParametersBuilder()
+            .setLocalBind(BindingMap.of(new LocalBindBuilder()
+                .setLocalAddress(ipAddress)
+                .setLocalPort(portNumber)
+                .build()))
+            .build();
     }
 
     private static SSHTransportStackFactory defaultTransportStackFactory() {

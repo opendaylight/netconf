@@ -245,7 +245,7 @@ module ietf-netconf-client {
               "TCP-level server parameters to listen for
                NETCONF over SSH Call Home connections.";
             uses tcps:tcp-server-grouping {
-              refine "local-port" {
+              refine "local-bind/local-port" {
                 default "4334";
                 description
                   "The NETCONF client will listen on the IANA-
@@ -279,7 +279,7 @@ module ietf-netconf-client {
               "TCP-level server parameters to listen for
                NETCONF over TLS Call Home connections.";
             uses tcps:tcp-server-grouping {
-              refine "local-port" {
+              refine "local-bind/local-port" {
                 default "4335";
                 description
                   "The NETCONF client will listen on the IANA-

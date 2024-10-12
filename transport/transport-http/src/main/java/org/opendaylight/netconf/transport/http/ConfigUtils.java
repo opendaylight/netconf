@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -28,16 +29,19 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.ClientAuthenticationBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.User;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.basic.basic.PasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.ServerAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.ServerAuthenticationBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.server.authentication.EeCertsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.tls.server.grouping.ServerIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.tls.server.grouping.ServerIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 /**
@@ -76,8 +80,11 @@ public final class ConfigUtils {
 
         final var tcpParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
             .http.server.stack.grouping.transport.tcp.tcp.TcpServerParametersBuilder()
-            .setLocalAddress(IetfInetUtil.ipAddressFor(requireNonNull(host)))
-            .setLocalPort(new PortNumber(Uint16.valueOf(port))).build();
+            .setLocalBind(BindingMap.of(new LocalBindBuilder()
+                .setLocalAddress(IetfInetUtil.ipAddressFor(requireNonNull(host)))
+                .setLocalPort(new PortNumber(Uint16.valueOf(port)))
+                .build()))
+            .build();
         final var httpParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
             .http.server.stack.grouping.transport.tcp.tcp.HttpServerParametersBuilder()
             .setClientAuthentication(clientAuthentication(userCryptHashMap)).build();
@@ -194,8 +201,11 @@ public final class ConfigUtils {
 
         final var tcpParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
             .http.server.stack.grouping.transport.tls.tls.TcpServerParametersBuilder()
-            .setLocalAddress(IetfInetUtil.ipAddressFor(requireNonNull(host)))
-            .setLocalPort(new PortNumber(Uint16.valueOf(port))).build();
+            .setLocalBind(BindingMap.of(new LocalBindBuilder()
+                .setLocalAddress(IetfInetUtil.ipAddressFor(requireNonNull(host)))
+                .setLocalPort(new PortNumber(Uint16.valueOf(port)))
+                .build()))
+            .build();
         final var tlsParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
             .http.server.stack.grouping.transport.tls.tls.TlsServerParametersBuilder()
             .setServerIdentity(serverIdentity(requireNonNull(certificate), requireNonNull(privateKey))).build();
@@ -315,7 +325,7 @@ public final class ConfigUtils {
                                 .setPassword(new PasswordBuilder()
                                     .setHashedPassword(new CryptHash(entry.getValue())).build()).build()
                     ).build()).build())
-            .collect(Collectors.toMap(user -> user.key(), user -> user));
+            .collect(Collectors.toMap(User::key, Function.identity()));
         return new ClientAuthenticationBuilder()
             .setUsers(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
                 .http.server.grouping.client.authentication.UsersBuilder().setUser(userMap).build()).build();

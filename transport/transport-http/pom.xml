@@ -88,6 +88,18 @@
             <artifactId>rfc9642</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-server</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-api</artifactId>
         </dependency>

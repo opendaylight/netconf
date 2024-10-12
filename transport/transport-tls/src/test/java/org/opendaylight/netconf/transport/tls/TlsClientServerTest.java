@@ -62,14 +62,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev240208.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.TlsClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.tls.client.grouping.ServerAuthenticationBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.TlsServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.tls.server.grouping.ClientAuthenticationBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.tls.server.grouping.ServerIdentityBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,10 +120,13 @@ class TlsClientServerTest {
         final var localPort = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
         socket.close();
 
-        when(tcpServerConfig.getLocalAddress()).thenReturn(localAddress);
-        when(tcpServerConfig.requireLocalAddress()).thenCallRealMethod();
-        when(tcpServerConfig.getLocalPort()).thenReturn(localPort);
-        when(tcpServerConfig.requireLocalPort()).thenCallRealMethod();
+        final var localBind = new LocalBindBuilder()
+            .setLocalAddress(localAddress)
+            .setLocalPort(localPort)
+            .build();
+
+        when(tcpServerConfig.getLocalBind()).thenReturn(BindingMap.of(localBind));
+        when(tcpServerConfig.nonnullLocalBind()).thenCallRealMethod();
 
         when(tcpClientConfig.getRemoteAddress()).thenReturn(new Host(localAddress));
         when(tcpClientConfig.requireRemoteAddress()).thenCallRealMethod();

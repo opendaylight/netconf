@@ -226,7 +226,7 @@ module ietf-restconf-server {
               "TCP-level server parameters to listen for
                RESTCONF over HTTP connections.";
             uses tcps:tcp-server-grouping {
-              refine "local-port" {
+              refine "local-bind/local-port" {
                 default "80";
                 description
                   "The RESTCONF server will listen on the IANA-
@@ -262,7 +262,7 @@ module ietf-restconf-server {
               "TCP-level server parameters to listen for
                RESTCONF over HTTPS connections.";
             uses tcps:tcp-server-grouping {
-              refine "local-port" {
+              refine "local-bind/local-port" {
                 default "443";
                 description
                   "The RESTCONF server will listen on the IANA-

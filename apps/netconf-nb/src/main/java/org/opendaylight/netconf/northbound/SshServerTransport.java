@@ -20,7 +20,9 @@ import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev240208.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -57,16 +59,15 @@ public final class SshServerTransport implements AutoCloseable {
             @Reference(target = "(type=netconf-auth-provider)") final AuthProvider authProvider,
             final Configuration configuration) {
         this(factoryHolder, backend.serverTransportInitializer(), authProvider, new TcpServerParametersBuilder()
-            .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
-            .setLocalPort(new PortNumber(Uint16.valueOf(configuration.portNumber())))
+            .setLocalBind(BindingMap.of(new LocalBindBuilder()
+                .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
+                .setLocalPort(new PortNumber(Uint16.valueOf(configuration.portNumber())))
+                .build()))
             .build());
     }
 
     public SshServerTransport(final TransportFactoryHolder factoryHolder, final ServerTransportInitializer initializer,
             final AuthProvider authProvider, final TcpServerGrouping listenParams) {
-        final var localAddr = listenParams.requireLocalAddress().stringValue();
-        final var localPort = listenParams.requireLocalPort().getValue();
-
         try {
             sshServer = factoryHolder.factory().listenServer(TransportConstants.SSH_SUBSYSTEM, initializer,
                 listenParams, null, factoryMgr -> {
@@ -77,11 +78,11 @@ public final class SshServerTransport implements AutoCloseable {
                 })
                 .get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
-            LOG.warn("Could not start SSH NETCONF server at {}:{}", localAddr, localPort, e);
+            LOG.warn("Could not start SSH NETCONF server at {}", listenParams.getLocalBind(), e);
             throw new IllegalStateException("Unable to start SSH netconf server", e);
         }
 
-        LOG.info("SSH NETCONF server at {}:{} started", localAddr, localPort);
+        LOG.info("SSH NETCONF server at {} started", listenParams.getLocalBind());
     }
 
     @Deactivate

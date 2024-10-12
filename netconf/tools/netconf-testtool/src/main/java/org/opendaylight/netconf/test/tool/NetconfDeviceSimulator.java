@@ -56,7 +56,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev240208.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev240208.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -339,8 +341,12 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private static TcpServerGrouping connectionParams(final IpAddress address, final int port) {
-        return new TcpServerParametersBuilder().setLocalAddress(address)
-            .setLocalPort(new PortNumber(Uint16.valueOf(port))).build();
+        return new TcpServerParametersBuilder()
+            .setLocalBind(BindingMap.of(new LocalBindBuilder()
+                .setLocalAddress(address)
+                .setLocalPort(new PortNumber(Uint16.valueOf(port)))
+                .build()))
+            .build();
     }
 
     @Override
