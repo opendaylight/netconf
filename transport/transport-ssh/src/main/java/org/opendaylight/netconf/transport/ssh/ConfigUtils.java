@@ -34,7 +34,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ssh.client.grouping.server.authentication.SshHostKeys;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev240208.transport.params.grouping.KeyExchange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.InlineOrTruststoreCertsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
@@ -147,7 +147,7 @@ final class ConfigUtils {
             return List.of();
         }
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
-                        .rev240208.inline.or.truststore.certs.grouping.inline.or.truststore.Inline.class,
+                        .rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.Inline.class,
                 input.getInlineOrTruststore());
         final var inlineDef = inline.getInlineDefinition();
         if (inlineDef == null) {
@@ -190,10 +190,10 @@ final class ConfigUtils {
     }
 
     static List<PublicKey> extractPublicKeys(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
                     .inline.or.truststore._public.keys.grouping.InlineOrTruststore input)
             throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
                 .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline.class, input);
         final var inlineDef = inline.getInlineDefinition();
         if (inlineDef == null) {
