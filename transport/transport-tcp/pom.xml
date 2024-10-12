@@ -52,8 +52,8 @@
             <artifactId>rfc6991-ietf-inet-types</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>draft-ietf-crypto-types</artifactId>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9640</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
