@@ -103,6 +103,24 @@
       "message": "Content-Type represented here as contentEncoding and Accept (what you are dealing with right now) can have different values",
       "revId": "f35d49a3ad85d834f3ad6ea8a389ce6e37d567b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45acd9c0_919d5786",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/PendingRequestWithBody.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-12T09:35:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65216302_d37d9959",
+      "revId": "f35d49a3ad85d834f3ad6ea8a389ce6e37d567b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
