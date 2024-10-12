@@ -163,13 +163,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- draft-ietf-netconf-crypto-types -->
-            <dependency>
-                <groupId>org.opendaylight.netconf.model</groupId>
-                <artifactId>draft-ietf-crypto-types</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- draft-ietf-netconf-restconf-client-server -->
             <dependency>
                 <groupId>org.opendaylight.netconf.model</groupId>
