@@ -8,5 +8,5 @@
 /**
  * NETCONF Secure Transport over SSH.
  */
-// FIXME: configuration needs to cover https://www.ietf.org/archive/id/draft-ietf-netconf-ssh-client-server-29.html
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.transport.ssh;

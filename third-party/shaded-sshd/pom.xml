@@ -103,6 +103,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Automatic-Module-Name>org.opendaylight.netconf.shaded.sshd</Automatic-Module-Name>
                         <Import-Package>
                             org.apache.tomcat.jni;resolution:=optional,
                             org.bouncycastle.crypto.prng;version="[1.61,2)";resolution:=optional,
