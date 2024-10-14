@@ -88,7 +88,12 @@ public final class NettyTransportSupport {
             .build());
     }
 
-    static boolean keepalivesSupported() {
+    /**
+     * Returns true when configuring keepalives is supported.
+     *
+     * @return true when configuring keepalives is supported
+     */
+    public static boolean keepalivesSupported() {
         return IMPL.supportsKeepalives();
     }
 
