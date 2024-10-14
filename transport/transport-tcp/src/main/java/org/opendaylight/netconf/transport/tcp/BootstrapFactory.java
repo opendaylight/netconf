@@ -22,6 +22,9 @@ import org.eclipse.jdt.annotation.NonNull;
  * methods, but is otherwise reuseable in other contexts as well.
  */
 public class BootstrapFactory implements AutoCloseable {
+    /**
+     * The {@link EventLoopGroup} servicing individual channels.
+     */
     protected final @NonNull EventLoopGroup group;
     private final EventLoopGroup parentGroup;
 

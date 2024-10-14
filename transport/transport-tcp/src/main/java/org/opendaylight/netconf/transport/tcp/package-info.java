@@ -8,8 +8,7 @@
 /**
  * TCP transport layer. This does not constitute a {@code NETCONF Secure Transport}, but rather captures common aspects
  * of TCP-based secure transports, such as SSH and TLS. Configuration follows
- * <a href="https://datatracker.ietf.org/doc/html/draft-ietf-netconf-tcp-client-server-13">
- * draft-ietf-netconf-tcp-client-server</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc9643">RFC9643</a>.
  *
  * <p>While this is strictly not a secure transport, it provides a TransportStack and thus can be used as is, for
  * example for testing purposes.
@@ -17,4 +16,5 @@
  * <p>The three primary entry points into this package are {@link NettyTransportSupport}, {@link TCPClient} and
  * {@link TCPServer}.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.transport.tcp;
