@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.transport.ssh;
 
 import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.Collection;
@@ -43,7 +42,72 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public abstract sealed class SSHTransportStack extends AbstractOverlayTransportStack<SSHTransportChannel>
-        implements SessionListener permits SSHClient, SSHServer {
+        permits SSHClient, SSHServer {
+    // SessionListener integration. Responsible for observing authentication-related events, orchestrating both client
+    // and server interactions.
+    //
+    // The state machine is responsible for driving TransportChannel
+    //
+    // At some point we should keep this in an encapsulated state object, but we have specializations, so we keep this
+    // here at the cost of not modeling the solution domain correctly.
+    private final class Listener implements SessionListener {
+        @Override
+        public void sessionCreated(final Session session) {
+            sessions.put(sessionId(session), session);
+        }
+
+        @Override
+        public void sessionException(final Session session, final Throwable throwable) {
+            final var sessionId = sessionId(session);
+            LOG.warn("Session {} encountered an error", sessionId, throwable);
+            deleteSession(sessionId);
+        }
+
+        @Override
+        public void sessionDisconnect(final Session session, final int reason, final String msg, final String language,
+                final boolean initiator) {
+            final var sessionId = sessionId(session);
+            LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
+            deleteSession(sessionId);
+        }
+
+        @Override
+        public void sessionClosed(final Session session) {
+            final var sessionId = sessionId(session);
+            LOG.debug("Session {} closed", sessionId);
+            deleteSession(sessionId);
+        }
+
+        @Override
+        public void sessionEvent(final Session session, final Event event) {
+            final var sessionId = sessionId(session);
+            switch (event) {
+                case null -> throw new NullPointerException();
+                case KeyEstablished -> {
+                    LOG.debug("New key established on session {}", sessionId);
+                    try {
+                        onKeyEstablished(session);
+                    } catch (IOException e) {
+                        LOG.error("Post-key step failed on session {}", sessionId, e);
+                        deleteSession(sessionId);
+                    }
+                }
+                case Authenticated -> {
+                    LOG.debug("Authentication on session {} successful", sessionId);
+                    try {
+                        onAuthenticated(session);
+                    } catch (IOException e) {
+                        LOG.error("Post-authentication step failed on session {}", sessionId, e);
+                        deleteSession(sessionId);
+                    }
+                }
+                case KexCompleted -> {
+                    LOG.debug("Key exchange completed on session {}", sessionId);
+                }
+            }
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(SSHTransportStack.class);
 
     // Underlay TransportChannels which do not have an open subsystem
@@ -51,14 +115,11 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     private final Map<Long, Session> sessions = new ConcurrentHashMap<>();
     private final TransportIoService ioService;
 
-    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = """
-        SessionListener has default implementations which we do not care about. We have all subclasses in this package
-        and neither of them has additional state""")
     SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
             final FactoryManager factoryManager, final IoHandler handler) {
         super(listener);
         ioService = new TransportIoService(factoryManager, handler);
-        factoryManager.addSessionListener(this);
+        factoryManager.addSessionListener(new Listener());
     }
 
     @Override
@@ -72,71 +133,6 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
         underlays.put(ioSession.getId(), underlayChannel);
-    }
-
-    // SessionListener integration. Responsible for observing authentication-related events, orchestrating both client
-    // and server interactions.
-    //
-    // The state machine is responsible for driving TransportChannel
-
-    //
-    // At some point we should keep this in an encapsulated state object, but we have specializations, so we keep this
-    // here at the cost of not modeling the solution domain correctly.
-
-    @Override
-    public final void sessionCreated(final Session session) {
-        sessions.put(sessionId(session), session);
-    }
-
-    @Override
-    public final void sessionException(final Session session, final Throwable throwable) {
-        final var sessionId = sessionId(session);
-        LOG.warn("Session {} encountered an error", sessionId, throwable);
-        deleteSession(sessionId);
-    }
-
-    @Override
-    public final void sessionDisconnect(final Session session, final int reason, final String msg,
-            final String language, final boolean initiator) {
-        final var sessionId = sessionId(session);
-        LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-        deleteSession(sessionId);
-    }
-
-    @Override
-    public final void sessionClosed(final Session session) {
-        final var sessionId = sessionId(session);
-        LOG.debug("Session {} closed", sessionId);
-        deleteSession(sessionId);
-    }
-
-    @Override
-    public final void sessionEvent(final Session session, final Event event) {
-        final var sessionId = sessionId(session);
-        switch (event) {
-            case null -> throw new NullPointerException();
-            case KeyEstablished -> {
-                LOG.debug("New key established on session {}", sessionId);
-                try {
-                    onKeyEstablished(session);
-                } catch (IOException e) {
-                    LOG.error("Post-key step failed on session {}", sessionId, e);
-                    deleteSession(sessionId);
-                }
-            }
-            case Authenticated -> {
-                LOG.debug("Authentication on session {} successful", sessionId);
-                try {
-                    onAuthenticated(session);
-                } catch (IOException e) {
-                    LOG.error("Post-authentication step failed on session {}", sessionId, e);
-                    deleteSession(sessionId);
-                }
-            }
-            case KexCompleted -> {
-                LOG.debug("Key exchange completed on session {}", sessionId);
-            }
-        }
     }
 
     abstract void onKeyEstablished(Session session) throws IOException;
