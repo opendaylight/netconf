@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.ssh;
+package org.opendaylight.netconf.transport.ssh.impl;
 
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
  */
 @MetaInfServices
 @NonNullByDefault
-public final class IetfSshClientProvider implements YangFeatureProvider<IetfSshClientData> {
+public final class IetfSshClientFeatureProvider implements YangFeatureProvider<IetfSshClientData> {
     @Override
     public Class<IetfSshClientData> boundModule() {
         return IetfSshClientData.class;
