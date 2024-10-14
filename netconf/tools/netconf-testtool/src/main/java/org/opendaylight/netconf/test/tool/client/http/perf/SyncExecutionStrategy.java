@@ -13,12 +13,14 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.List;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SyncExecutionStrategy implements ExecutionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(SyncExecutionStrategy.class);
+    private static final List<Integer> ACCEPTED_CODES = List.of(200, 201, 204);
 
     private final HttpClient httpClient;
     private final RestPerfClient.RequestData payloads;
@@ -43,7 +45,7 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
                 return;
             }
 
-            if (response.statusCode() != 200 && response.statusCode() != 204) {
+            if (!ACCEPTED_CODES.contains(response.statusCode())) {
                 LOG.warn("Status code: {}", response.statusCode());
                 LOG.warn("url: {}", response.uri());
                 LOG.warn("body: {}", response.body());
