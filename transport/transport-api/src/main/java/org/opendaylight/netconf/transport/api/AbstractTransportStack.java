@@ -28,6 +28,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
  *
  * @param <C> associated {@link TransportChannel} type
  */
+// FIXME: 9.0.0: move to transport.spi
 public abstract class AbstractTransportStack<C extends TransportChannel> implements TransportStack {
     private final @NonNull TransportChannelListener<? super C> listener;
 
