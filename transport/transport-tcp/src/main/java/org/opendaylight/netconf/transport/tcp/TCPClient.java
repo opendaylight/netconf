@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.transport.tcp;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
@@ -26,8 +25,6 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * A {@link TCPTransportStack} acting as a TCP client.
  */
 public final class TCPClient extends TCPTransportStack {
-    private static final @NonNull ListenableFuture<Empty> SHUTDOWN_FUTURE = Futures.immediateFuture(Empty.value());
-
     private TCPClient(final TransportChannelListener<? super TCPTransportChannel> listener) {
         super(listener);
     }
@@ -87,6 +84,6 @@ public final class TCPClient extends TCPTransportStack {
 
     @Override
     protected ListenableFuture<Empty> startShutdown() {
-        return SHUTDOWN_FUTURE;
+        return Empty.immediateFuture();
     }
 }
