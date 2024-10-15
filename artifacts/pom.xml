@@ -138,6 +138,11 @@
                 <artifactId>transport-tls</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-udp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- NETCONF Transport features -->
             <dependency>
