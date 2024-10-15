@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.transport.tcp;
 
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.ThreadFactory;
@@ -19,6 +20,8 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @NonNullByDefault
 abstract sealed class NettyImpl permits EpollNettyImpl, NioNettyImpl {
+
+    abstract Class<? extends DatagramChannel> datagramChannelClass();
 
     abstract Class<? extends SocketChannel> channelClass();
 
