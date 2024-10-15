@@ -15,6 +15,7 @@ import io.netty.channel.Channel;
 /**
  * Abstract base class for {@link TransportChannel}s overlaid on another {@link TransportChannel}.
  */
+// FIXME: 9.0.0: move to transport.spi
 public abstract class AbstractOverlayTransportChannel extends TransportChannel {
     private final TransportChannel underlay;
 
