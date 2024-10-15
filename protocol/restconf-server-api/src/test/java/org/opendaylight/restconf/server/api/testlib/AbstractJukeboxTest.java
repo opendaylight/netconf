@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.spi;
+package org.opendaylight.restconf.server.api.testlib;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -108,7 +108,7 @@ public abstract class AbstractJukeboxTest {
         .build();
 
     protected static final @NonNull EffectiveModelContext JUKEBOX_SCHEMA =
-        YangParserTestUtils.parseYangResources(AbstractInstanceIdentifierTest.class,
+        YangParserTestUtils.parseYangResources(AbstractJukeboxTest.class,
             "/jukebox-model/augmented-jukebox@2016-05-05.yang",
             "/jukebox-model/example-jukebox@2015-04-04.yang",
             "/jukebox-model/ietf-inet-types.yang",
