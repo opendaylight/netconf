@@ -18,7 +18,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.api.NettyTransportSupport;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
@@ -71,7 +73,15 @@ public final class TCPServer extends TCPTransportStack {
             default -> throw new UnsupportedConfigurationException("Multiple bind addresses provided");
         };
 
-        NettyTransportSupport.configureKeepalives(bootstrap, listenParams.getKeepalives());
+        final var keepalives = listenParams.getKeepalives();
+        if (keepalives != null) {
+            final var options = NettyTransportSupport.getTcpKeepaliveOptions();
+            bootstrap
+                .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
+                .childOption(options.tcpKeepIdle(), keepalives.requireIdleTime().toJava())
+                .childOption(options.tcpKeepCnt(), keepalives.requireMaxProbes().toJava())
+                .childOption(options.tcpKeepIntvl(), keepalives.requireProbeInterval().toJava());
+        }
 
         final var ret = SettableFuture.<TCPServer>create();
         final var stack = new TCPServer(listener);

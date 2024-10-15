@@ -14,7 +14,9 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelOption;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.api.NettyTransportSupport;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
@@ -43,7 +45,15 @@ public final class TCPClient extends TCPTransportStack {
     public static @NonNull ListenableFuture<TCPClient> connect(final TransportChannelListener listener,
             final Bootstrap bootstrap, final TcpClientGrouping connectParams)
                 throws UnsupportedConfigurationException {
-        NettyTransportSupport.configureKeepalives(bootstrap, connectParams.getKeepalives());
+        final var keepalives = connectParams.getKeepalives();
+        if (keepalives != null) {
+            final var options = NettyTransportSupport.getTcpKeepaliveOptions();
+            bootstrap
+                .option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
+                .option(options.tcpKeepIdle(), keepalives.requireIdleTime().toJava())
+                .option(options.tcpKeepCnt(), keepalives.requireMaxProbes().toJava())
+                .option(options.tcpKeepIntvl(), keepalives.requireProbeInterval().toJava());
+        }
 
         final var ret = SettableFuture.<TCPClient>create();
         bootstrap

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tcp;
+package org.opendaylight.netconf.transport.api;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
@@ -29,7 +29,7 @@ abstract sealed class NettyImpl permits EpollNettyImpl, NioNettyImpl {
 
     abstract EventLoopGroup newEventLoopGroup(int numThreads, ThreadFactory threadFactory);
 
-    abstract @Nullable TcpKeepaliveOptions keepaliveOptions();
+    abstract @Nullable NettyTcpKeepaliveOptions keepaliveOptions();
 
     @Override
     public abstract String toString();
