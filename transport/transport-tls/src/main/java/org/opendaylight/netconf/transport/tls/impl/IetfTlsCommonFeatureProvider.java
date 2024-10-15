@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tls;
+package org.opendaylight.netconf.transport.tls.impl;
 
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +42,7 @@ public final class IetfTlsCommonFeatureProvider implements YangFeatureProvider<I
         return Set.of(HelloParams.VALUE, Tls12$F.VALUE, Tls13$F.VALUE);
     }
 
-    static @Nullable String algorithmNameOf(final TlsVersionBase version) {
+    public static @Nullable String algorithmNameOf(final TlsVersionBase version) {
         return TLS_VERSIONS.get(version);
     }
 }

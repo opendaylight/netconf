@@ -7,7 +7,7 @@
  */
 /**
  * NETCONF Secure Transport over TLS, as detailed in <a href="https://www.rfc-editor.org/rfc/rfc7589">RFC7589</a>.
- * Configuration follows <a href="https://datatracker.ietf.org/doc/html/draft-ietf-netconf-tls-client-server-29">
- * draft-ietf-netconf-tls-client-server</a>.
+ * Configuration follows <a href="https://www.rfc-editor.org/rfc/rfc9645">RFC9645</a>.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.transport.tls;

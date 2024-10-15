@@ -12,19 +12,15 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>bnd-parent</artifactId>
         <version>8.0.3-SNAPSHOT</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../../bnd-parent</relativePath>
     </parent>
 
     <artifactId>transport-tls</artifactId>
     <name>${project.artifactId}</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>NETCONF TLS transport</description>
-
-    <properties>
-        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -107,6 +103,12 @@
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>binding-spec</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-common</artifactId>
+            <!-- yeah... not quite ... but this works -->
+            <scope>provided</scope>
+        </dependency>
 
         <!-- testing -->
         <dependency>
@@ -118,11 +120,6 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-epoll</artifactId>
             <classifier>linux-x86_64</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-common</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

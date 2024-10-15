@@ -89,8 +89,7 @@ final class KeyStoreUtils {
      * @throws CertificateException if certificate error occurs
      * @throws IOException if input read error occurs
      */
-    static Certificate buildX509Certificate(final byte[] bytes)
-            throws CertificateException, IOException {
+    static Certificate buildX509Certificate(final byte[] bytes) throws CertificateException, IOException {
         try (var in = new ByteArrayInputStream(bytes)) {
             return CertificateFactory.getInstance("X.509").generateCertificate(in);
         }
