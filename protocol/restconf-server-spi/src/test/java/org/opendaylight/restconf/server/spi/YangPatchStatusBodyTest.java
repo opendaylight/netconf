@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 

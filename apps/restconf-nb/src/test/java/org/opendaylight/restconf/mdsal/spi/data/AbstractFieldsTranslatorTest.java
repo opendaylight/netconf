@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.server.api.ServerException;
-import org.opendaylight.restconf.server.spi.AbstractJukeboxTest;
+import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
