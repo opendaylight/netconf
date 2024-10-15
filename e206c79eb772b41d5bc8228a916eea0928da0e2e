@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71ffecdb_6d39f23a",
+        "filename": "transport/transport-api/src/main/java/org/opendaylight/netconf/transport/api/AbstractOverlayTransportStack.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-15T15:08:57Z",
+      "side": 1,
+      "message": "Nope, this should be done via onTransportChannelEstablished() and attaching to channel.channel().closeFuture()",
+      "range": {
+        "startLine": 29,
+        "startChar": 20,
+        "endLine": 29,
+        "endChar": 44
+      },
+      "revId": "e206c79eb772b41d5bc8228a916eea0928da0e2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
