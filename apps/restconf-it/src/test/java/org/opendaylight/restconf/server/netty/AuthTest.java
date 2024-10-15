@@ -10,9 +10,10 @@ package org.opendaylight.restconf.server.netty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.io.InputStream;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.json.JSONObject;
@@ -76,8 +77,8 @@ class AuthTest extends AbstractE2ETest {
                     }
                 }
                 """);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        return extractStreamNameJson(response.content().toString(StandardCharsets.UTF_8));
+        assertEquals(200, response.statusCode());
+        return extractStreamNameJson(new String(response.body().readAllBytes(), StandardCharsets.UTF_8));
     }
 
     private static String extractStreamNameJson(final String content) {
@@ -85,8 +86,9 @@ class AuthTest extends AbstractE2ETest {
         return json.getJSONObject("sal-remote:output").getString("stream-name");
     }
 
-    private static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus) {
+    private static void assertResponse(final HttpResponse<InputStream> response,
+            final HttpResponseStatus expectedStatus) {
         assertNotNull(response);
-        assertEquals(expectedStatus, response.status());
+        assertEquals(expectedStatus.code(), response.statusCode());
     }
 }

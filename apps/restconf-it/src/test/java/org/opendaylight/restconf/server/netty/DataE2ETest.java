@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.netty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.Set;
@@ -56,7 +55,7 @@ class DataE2ETest extends AbstractE2ETest {
     void dataCRUDJsonTest() throws Exception {
         // create
         var response = invokeRequest(HttpMethod.POST, PARENT_URI, APPLICATION_JSON, INITIAL_NODE_JSON);
-        assertEquals(HttpResponseStatus.CREATED, response.status());
+        assertEquals(201, response.statusCode());
 
         // read (validate created)
         assertContentJson(ITEM_URI, INITIAL_NODE_JSON);
@@ -75,7 +74,7 @@ class DataE2ETest extends AbstractE2ETest {
                         }
                     ]
                 }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
 
         // validate updated
         assertContentJson(ITEM_URI, """
@@ -107,14 +106,14 @@ class DataE2ETest extends AbstractE2ETest {
                     ]
                 }""";
         response = invokeRequest(HttpMethod.PUT, ITEM_URI, APPLICATION_JSON, replaceNode);
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        assertEquals(204, response.statusCode());
 
         // validate replaced
         assertContentJson(ITEM_URI, replaceNode);
 
         // delete
         response = invokeRequest(HttpMethod.DELETE, ITEM_URI);
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        assertEquals(204, response.statusCode());
 
         // validate deleted
         response = invokeRequest(HttpMethod.GET, ITEM_URI);
@@ -125,7 +124,7 @@ class DataE2ETest extends AbstractE2ETest {
     void dataExistsErrorJsonTest() throws Exception {
         // insert data first time
         var response = invokeRequest(HttpMethod.POST, PARENT_URI, APPLICATION_JSON, INITIAL_NODE_JSON);
-        assertEquals(HttpResponseStatus.CREATED, response.status());
+        assertEquals(201, response.statusCode());
         // subsequent insert of same node
         response = invokeRequest(HttpMethod.POST, PARENT_URI, APPLICATION_JSON, INITIAL_NODE_JSON);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS);
@@ -164,8 +163,9 @@ class DataE2ETest extends AbstractE2ETest {
                     "wrong-data": "Some wrong data"
                 }
             }""");
-        assertSimpleErrorResponse(response,"Schema node with name wrong-data was not found under "
-            + "(example:action?revision=2024-09-19)input.", HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        assertSimpleErrorResponse(response,
+            "Schema node with name wrong-data was not found under (example:action?revision=2024-09-19)input.",
+            HttpResponseStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -229,7 +229,7 @@ class DataE2ETest extends AbstractE2ETest {
                     ]
                 }
             }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
 
         // read (validate result)
         assertContentJson(ITEM_URI, """
@@ -378,12 +378,12 @@ class DataE2ETest extends AbstractE2ETest {
         // root
         var response = invokeRequest(HttpMethod.OPTIONS, DATA_URI);
         assertOptionsResponse(response, Set.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD"));
-        assertHeaderValue(response, HttpHeaderNames.ACCEPT_PATCH, patchAcceptTypes);
+        assertHeaderValue(response, "accept-patch", patchAcceptTypes);
 
         // non-root also deletable
         response = invokeRequest(HttpMethod.OPTIONS, PARENT_URI);
         assertOptionsResponse(response, Set.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD", "DELETE"));
-        assertHeaderValue(response, HttpHeaderNames.ACCEPT_PATCH, patchAcceptTypes);
+        assertHeaderValue(response, "accept-patch", patchAcceptTypes);
     }
 
     @Test
@@ -402,7 +402,7 @@ class DataE2ETest extends AbstractE2ETest {
                         "library": {}
                     }
                 }""");
-        final var status = response.status().code();
-        assertTrue(status == HttpResponseStatus.OK.code() || status ==  HttpResponseStatus.CREATED.code());
+        final var status = response.statusCode();
+        assertTrue(status == 200 || status == 201);
     }
 }

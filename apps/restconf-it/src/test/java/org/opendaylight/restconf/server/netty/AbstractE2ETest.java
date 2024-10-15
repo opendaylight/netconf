@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server.netty;
 
-import static java.util.stream.Collectors.toSet;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
@@ -20,21 +19,23 @@ import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -234,89 +236,88 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         }
     }
 
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
+    protected HttpResponse<InputStream> invokeRequest(final HttpMethod method, final String uri) throws Exception {
         return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
     }
 
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType)
+    protected HttpResponse<InputStream> invokeRequest(final HttpMethod method, final String uri, final String mediaType)
             throws Exception {
         return invokeRequest(buildRequest(method, uri, mediaType, null, null));
     }
 
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
+    protected HttpResponse<InputStream> invokeRequest(final HttpMethod method, final String uri, final String mediaType,
             final String content) throws Exception {
         return invokeRequest(buildRequest(method, uri, mediaType, content, null));
     }
 
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
+    protected HttpResponse<InputStream> invokeRequest(final HttpMethod method, final String uri, final String mediaType,
         final String acceptType, final String content) throws Exception {
         return invokeRequest(buildRequest(method, uri, mediaType, content, acceptType));
     }
 
-    protected FullHttpResponse invokeRequest(final FullHttpRequest request) throws Exception {
+    protected HttpResponse<InputStream> invokeRequest(final HttpRequest request) throws Exception {
         return invokeRequest(request, clientStackGrouping);
     }
 
-    protected FullHttpResponse invokeRequest(final FullHttpRequest request, final HttpClientStackGrouping clientConf)
-            throws Exception {
-        final var channelListener = new TestTransportChannelListener(ignored -> {
-            // no-op
-        });
-        final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
-            clientConf, false).get(2, TimeUnit.SECONDS);
-        // await for connection
-        await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
-        final var callback = new TestRequestCallback();
-        client.invoke(request, callback);
-        // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
-        client.shutdown().get(2, TimeUnit.SECONDS);
-        final var response = callback.response();
-        assertNotNull(response);
-        return response;
+    protected HttpResponse<InputStream> invokeRequest(final HttpRequest request,
+            final HttpClientStackGrouping clientConf) throws Exception {
+        return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build().send(request,
+            BodyHandlers.ofInputStream());
     }
 
-    protected FullHttpRequest buildRequest(final HttpMethod method, final String uri, final String mediaType,
+    protected HttpRequest buildRequest(final HttpMethod method, final String uri, final String mediaType,
             final String content, final String acceptType) {
-        final var contentBuf = content == null ? Unpooled.EMPTY_BUFFER
-            : Unpooled.wrappedBuffer(content.getBytes(StandardCharsets.UTF_8));
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri, contentBuf);
-        request.headers()
-            .set(HttpHeaderNames.HOST, host)
-            .set(HttpHeaderNames.ACCEPT, acceptType != null ? acceptType : mediaType)
-            .set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
-        if (method != HttpMethod.GET) {
-            request.headers().set(HttpHeaderNames.CONTENT_TYPE, mediaType);
+        final var builder = HttpRequest.newBuilder(URI.create(uri)).version(Version.HTTP_1_1)
+            .header("host", host)
+            .header("accept", acceptType != null ? acceptType : mediaType);
+
+        if (content != null) {
+            final var bytes = content.getBytes(StandardCharsets.UTF_8);
+            builder
+                .header("content-length", String.valueOf(bytes.length))
+                .header("content-type", mediaType)
+                .method(method.name(), BodyPublishers.ofString(content));
         }
-        return request;
+
+        return builder.build();
     }
 
     protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, getRequestUri);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertContentJson(response, expectedContent);
+        assertContentJson(invokeRequest(HttpMethod.GET, getRequestUri), expectedContent);
     }
 
-    protected static void assertContentJson(final FullHttpResponse response, final String expectedContent) {
-        final var content = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
+    protected static void assertContentJson(final HttpResponse<InputStream> response, final String expectedContent) {
+        assertEquals(200, response.statusCode());
+        assertContentJson(response.body(), expectedContent);
+    }
+
+    protected static void assertContentJson(final InputStream content, final String expectedContent) {
+        try {
+            JSONAssert.assertEquals(expectedContent,
+                new String(content.readAllBytes(), StandardCharsets.UTF_8), JSONCompareMode.LENIENT);
+        } catch (JSONException | IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
     protected void assertContentXml(final String getRequestUri, final String expectedContent) throws Exception {
         final var response = invokeRequest(HttpMethod.GET, getRequestUri, APPLICATION_XML);
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
         assertContentXml(response, expectedContent);
     }
 
-    protected static void assertContentXml(final FullHttpResponse response, final String expectedContent) {
-        final var content = response.content().toString(StandardCharsets.UTF_8);
-        assertThat(content, isSimilarTo(expectedContent).ignoreComments().ignoreWhitespace()
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName)));
+    protected static void assertContentXml(final HttpResponse<InputStream> response, final String expectedContent)
+            throws Exception {
+        final var content = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
+        assertThat(content, isSimilarTo(expectedContent)
+            .ignoreComments()
+            .ignoreWhitespace()
+            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName)));
     }
 
-    protected static void assertErrorResponseJson(final FullHttpResponse response, final ErrorType expectedErrorType,
-            final ErrorTag expectedErrorTag) {
-        assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.status().code());
+    protected static void assertErrorResponseJson(final HttpResponse<InputStream> response,
+            final ErrorType expectedErrorType, final ErrorTag expectedErrorTag) {
+        assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.statusCode());
         // {
         //    errors": {
         //       "error": [{
@@ -326,7 +327,12 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         //         }]
         //    }
         // }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final JSONObject json;
+        try {
+            json = new JSONObject(new String(response.body().readAllBytes(), StandardCharsets.UTF_8));
+        } catch (JSONException | IOException e) {
+            throw new AssertionError(e);
+        }
         final var error = json.getJSONObject("errors").getJSONArray("error").getJSONObject(0);
         assertNotNull(error);
         assertEquals(expectedErrorType.elementBody(), error.getString("error-type"));
@@ -334,10 +340,15 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         assertNotNull(error.getString("error-message"));
     }
 
-    protected static void assertErrorResponseXml(final FullHttpResponse response, final ErrorType expectedErrorType,
-            final ErrorTag expectedErrorTag) {
-        final var content = response.content().toString(StandardCharsets.UTF_8);
-        assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.status().code());
+    protected static void assertErrorResponseXml(final HttpResponse<InputStream> response,
+            final ErrorType expectedErrorType, final ErrorTag expectedErrorTag) {
+        final String content;
+        try {
+            content = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.statusCode());
         assertThat(content, hasXPath("/r:errors/r:error/r:error-message",
             not(emptyOrNullString())).withNamespaceContext(NS_CONTEXT));
         assertThat(content, hasXPath("/r:errors/r:error/r:error-type",
@@ -347,27 +358,30 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     // FIXME: NETCONF-1411 : Must be replaced with assertErrorResponseXml or assertErrorResponseJson where it is in use.
-    protected static void assertSimpleErrorResponse(final FullHttpResponse response, final String expectedMessage,
-        final HttpResponseStatus expectedStatus) {
-        final var content = response.content().toString(StandardCharsets.UTF_8);
-        assertEquals(expectedStatus, response.status());
-        assertEquals(expectedMessage, content);
+    protected static void assertSimpleErrorResponse(final HttpResponse<InputStream> response,
+            final String expectedMessage, final HttpResponseStatus expectedStatus) {
+        assertEquals(expectedStatus.code(), response.statusCode());
+        final byte[] content;
+        try {
+            content = response.body().readAllBytes();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(expectedMessage, new String(content, StandardCharsets.UTF_8));
     }
 
     protected void assertOptions(final String uri, final Set<String> methods) throws Exception {
         assertOptionsResponse(invokeRequest(HttpMethod.OPTIONS, uri), methods);
     }
 
-    protected static void assertOptionsResponse(final FullHttpResponse response, final Set<String> methods) {
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertHeaderValue(response, HttpHeaderNames.ALLOW, methods);
+    protected static void assertOptionsResponse(final HttpResponse<InputStream> response, final Set<String> methods) {
+        assertEquals(200, response.statusCode());
+        assertHeaderValue(response, "allow", methods);
     }
 
-    protected static void assertHeaderValue(final FullHttpResponse response, final CharSequence headerName,
+    protected static void assertHeaderValue(final HttpResponse<InputStream> response, final String headerName,
             final Set<String> expectedValues) {
-        final var headerValue = response.headers().get(headerName);
-        assertNotNull(headerValue);
-        assertEquals(expectedValues, COMMA_SPLITTER.splitToStream(headerValue).collect(toSet()));
+        assertEquals(expectedValues, Set.copyOf(response.headers().allValues(headerName)));
     }
 
     protected void assertHead(final String uri) throws Exception {
@@ -377,24 +391,24 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     protected void assertHead(final String uri, final String mediaType) throws Exception {
         final var getResponse = invokeRequest(HttpMethod.GET, uri, mediaType);
-        assertEquals(HttpResponseStatus.OK, getResponse.status());
-        assertTrue(getResponse.content().readableBytes() > 0);
+        assertEquals(200, getResponse.statusCode());
+        assertTrue(getResponse.body().readAllBytes().length > 0);
 
         // HEAD response contains same headers as GET but empty body
         final var headResponse = invokeRequest(HttpMethod.HEAD, uri, mediaType);
-        assertEquals(HttpResponseStatus.OK, headResponse.status());
-        getResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
-        headResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
-        assertEquals(getResponse.headers(), headResponse.headers());
-        assertEquals(0, headResponse.content().readableBytes());
+        assertEquals(200, headResponse.statusCode());
+
+        assertEquals(Maps.filterKeys(getResponse.headers().map(), key -> !key.equals("content-length")),
+            Maps.filterKeys(headResponse.headers().map(), key -> !key.equals("content-length")));
+        assertEquals(0, headResponse.body().readAllBytes().length);
     }
 
     protected URI getStreamUrlJson(final String streamName) throws Exception {
         // get stream URL from restconf-state
         final var response = invokeRequest(HttpMethod.GET,
             "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + streamName);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        return extractStreamUrlJson(response.content().toString(StandardCharsets.UTF_8));
+        assertEquals(200, response.statusCode());
+        return extractStreamUrlJson(new String(response.body().readAllBytes(), StandardCharsets.UTF_8));
     }
 
     private static URI extractStreamUrlJson(final String content) {

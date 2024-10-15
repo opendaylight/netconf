@@ -9,15 +9,13 @@ package org.opendaylight.restconf.server.netty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opendaylight.yangtools.yang.common.YangConstants.RFC6020_YANG_MEDIA_TYPE;
-import static org.opendaylight.yangtools.yang.common.YangConstants.RFC6020_YIN_MEDIA_TYPE;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 
 class ModulesE2ETest extends AbstractE2ETest {
     private static final String MODULE_URI = "/rests/modules/network-topology?revision=2013-10-21";
@@ -29,16 +27,16 @@ class ModulesE2ETest extends AbstractE2ETest {
 
     @Test
     void headTest() throws Exception {
-        assertHead(MODULE_URI, RFC6020_YIN_MEDIA_TYPE);
-        assertHead(MODULE_URI, RFC6020_YANG_MEDIA_TYPE);
+        assertHead(MODULE_URI, YangConstants.RFC6020_YIN_MEDIA_TYPE);
+        assertHead(MODULE_URI, YangConstants.RFC6020_YANG_MEDIA_TYPE);
     }
 
     @Test
     void readYinTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, RFC6020_YIN_MEDIA_TYPE);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertEquals(RFC6020_YIN_MEDIA_TYPE, response.headers().get(HttpHeaderNames.CONTENT_TYPE));
-        final var content = response.content().toString(StandardCharsets.UTF_8);
+        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, YangConstants.RFC6020_YIN_MEDIA_TYPE);
+        assertEquals(200, response.statusCode());
+        assertEquals(List.of(YangConstants.RFC6020_YIN_MEDIA_TYPE), response.headers().allValues("content-type"));
+        final var content = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
         // simplified content validation
         assertTrue(content.contains(
             "<module xmlns=\"urn:ietf:params:xml:ns:yang:yin:1\" name=\"network-topology\""));
@@ -46,10 +44,10 @@ class ModulesE2ETest extends AbstractE2ETest {
 
     @Test
     void readYangTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, RFC6020_YANG_MEDIA_TYPE);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertEquals(RFC6020_YANG_MEDIA_TYPE, response.headers().get(HttpHeaderNames.CONTENT_TYPE));
-        final var content = response.content().toString(StandardCharsets.UTF_8);
+        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, YangConstants.RFC6020_YANG_MEDIA_TYPE);
+        assertEquals(200, response.statusCode());
+        assertEquals(List.of(YangConstants.RFC6020_YANG_MEDIA_TYPE), response.headers().allValues("content-type"));
+        final var content = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
         // simplified content validation
         assertTrue(content.startsWith("module network-topology"));
     }

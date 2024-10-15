@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +24,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class StreamsE2ETest extends AbstractE2ETest {
 
+    @Override
     @AfterEach
     void afterEach() {
         if (clientStreamService != null) {
@@ -53,8 +53,8 @@ class StreamsE2ETest extends AbstractE2ETest {
                         }
                     }
                 }""");
-        final var status = response.status();
-        assertTrue(status == HttpResponseStatus.OK || status == HttpResponseStatus.CREATED);
+        final var status = response.statusCode();
+        assertTrue(status == 200 || status == 201);
 
         // Create data change notification stream for a node in configuration datastore
         response = invokeRequest(HttpMethod.POST,
@@ -69,13 +69,13 @@ class StreamsE2ETest extends AbstractE2ETest {
                     }
                 }
                 """);
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
         // {
         //      "sal-remote:output": {
         //          "stream-name":"urn:uuid:6413c077-5dfe-464c-b17f-20c5bbb456f4"
         //       }
         // }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(new String(response.body().readAllBytes(), StandardCharsets.UTF_8));
         final var streamName = json.getJSONObject("sal-remote:output").getString("stream-name");
         assertNotNull(streamName, "Stream name is undefined");
 
@@ -99,7 +99,7 @@ class StreamsE2ETest extends AbstractE2ETest {
                             "year": 2020
                         }]
                     }""");
-            assertEquals(HttpResponseStatus.CREATED, response.status());
+            assertEquals(201, response.statusCode());
             JSONAssert.assertEquals("""
                 {
                     "ietf-restconf:notification": {
@@ -128,7 +128,7 @@ class StreamsE2ETest extends AbstractE2ETest {
                         "year": 2024
                     }]
                 }""");
-            assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+            assertEquals(204, response.statusCode());
             JSONAssert.assertEquals("""
                 {
                     "ietf-restconf:notification": {
@@ -149,7 +149,7 @@ class StreamsE2ETest extends AbstractE2ETest {
 
             response = invokeRequest(HttpMethod.DELETE,
                 "/rests/data/example-jukebox:jukebox/library/artist=artist/album=album");
-            assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+            assertEquals(204, response.statusCode());
             JSONAssert.assertEquals("""
                 {
                     "ietf-restconf:notification": {
