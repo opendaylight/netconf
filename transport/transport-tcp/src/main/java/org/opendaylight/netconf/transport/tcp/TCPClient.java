@@ -53,12 +53,12 @@ public final class TCPClient extends TCPTransportStack {
         }
 
         final var ret = SettableFuture.<TCPClient>create();
+        final var stack = new TCPClient(listener);
         bootstrap
             .handler(new ChannelInboundHandlerAdapter() {
                 @Override
                 public void channelActive(final ChannelHandlerContext ctx) {
                     // Order of operations is important here: the stack should be visible before the underlying channel
-                    final var stack = new TCPClient(listener);
                     ret.set(stack);
                     final var channel = ctx.channel();
                     stack.addTransportChannel(new TCPTransportChannel(channel));
