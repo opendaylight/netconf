@@ -34,5 +34,6 @@
         <module>transport-ssh</module>
         <module>transport-tcp</module>
         <module>transport-tls</module>
+        <module>transport-udp</module>
     </modules>
 </project>
