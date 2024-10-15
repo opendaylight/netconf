@@ -7,20 +7,38 @@
  */
 package org.opendaylight.netconf.transport.tcp;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.bootstrap.ServerBootstrap;
+import static java.util.Objects.requireNonNull;
+
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.ThreadFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev241010.tcp.common.grouping.Keepalives;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Wrapper around a particular Netty transport implementation.
  */
 @NonNullByDefault
 abstract sealed class AbstractNettyImpl permits EpollNettyImpl, NioNettyImpl {
+    /**
+     * Channel options for TCP keepalives.
+     *
+     * @param tcpKeepCnt the option corresponding to {@code TCP_KEEPCNT}
+     * @param tcpKeepIdle the option corresponding to {@code TCP_KEEPIDLE}
+     * @param tcpKeepIntvl the option corresponding to {@code TCP_KEEPINTVL}
+     */
+    record TcpKeepaliveOptions(
+            ChannelOption<Integer> tcpKeepCnt,
+            ChannelOption<Integer> tcpKeepIdle,
+            ChannelOption<Integer> tcpKeepIntvl) {
+        TcpKeepaliveOptions {
+            requireNonNull(tcpKeepCnt);
+            requireNonNull(tcpKeepIdle);
+            requireNonNull(tcpKeepIntvl);
+        }
+    }
 
     abstract Class<? extends SocketChannel> channelClass();
 
@@ -28,11 +46,7 @@ abstract sealed class AbstractNettyImpl permits EpollNettyImpl, NioNettyImpl {
 
     abstract EventLoopGroup newEventLoopGroup(int numThreads, ThreadFactory threadFactory);
 
-    abstract boolean supportsKeepalives();
-
-    abstract void configureKeepalives(Bootstrap bootstrap, Keepalives keepalives);
-
-    abstract void configureKeepalives(ServerBootstrap bootstrap, Keepalives keepalives);
+    abstract @Nullable TcpKeepaliveOptions keepaliveOptions();
 
     @Override
     public abstract String toString();

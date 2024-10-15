@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.socket.ServerSocketChannel;
@@ -19,6 +20,7 @@ import io.netty.channel.socket.SocketChannel;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.tcp.AbstractNettyImpl.TcpKeepaliveOptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev241010.tcp.common.grouping.Keepalives;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,28 +96,38 @@ public final class NettyTransportSupport {
      * @return true when configuring keepalives is supported
      */
     public static boolean keepalivesSupported() {
-        return IMPL.supportsKeepalives();
+        return IMPL.keepaliveOptions() != null;
     }
 
     static void configureKeepalives(final Bootstrap bootstrap, final @Nullable Keepalives keepalives)
             throws UnsupportedConfigurationException {
         if (keepalives != null) {
-            checkKeepalivesSupported();
-            IMPL.configureKeepalives(bootstrap, keepalives);
+            final var options = checkKeepalivesSupported();
+            bootstrap
+                .option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
+                .option(options.tcpKeepIdle(), keepalives.requireIdleTime().toJava())
+                .option(options.tcpKeepCnt(), keepalives.requireMaxProbes().toJava())
+                .option(options.tcpKeepIntvl(), keepalives.requireProbeInterval().toJava());
         }
     }
 
     static void configureKeepalives(final ServerBootstrap bootstrap, final @Nullable Keepalives keepalives)
             throws UnsupportedConfigurationException {
         if (keepalives != null) {
-            checkKeepalivesSupported();
-            IMPL.configureKeepalives(bootstrap, keepalives);
+            final var options = checkKeepalivesSupported();
+            bootstrap
+                .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
+                .childOption(options.tcpKeepIdle(), keepalives.requireIdleTime().toJava())
+                .childOption(options.tcpKeepCnt(), keepalives.requireMaxProbes().toJava())
+                .childOption(options.tcpKeepIntvl(), keepalives.requireProbeInterval().toJava());
         }
     }
 
-    private static void checkKeepalivesSupported() throws UnsupportedConfigurationException {
-        if (!keepalivesSupported()) {
+    private static TcpKeepaliveOptions checkKeepalivesSupported() throws UnsupportedConfigurationException {
+        final var options = IMPL.keepaliveOptions();
+        if (options == null) {
             throw new UnsupportedConfigurationException("Keepalives are not supported");
         }
+        return options;
     }
 }
