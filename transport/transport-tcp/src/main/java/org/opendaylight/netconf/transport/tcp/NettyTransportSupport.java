@@ -51,13 +51,23 @@ public final class NettyTransportSupport {
     }
 
     /**
-     * Return a new {@link Bootstrap} instance. The bootstrap has its {@link ServerBootstrap#channel(Class)} already
-     * initialized to the backing implementation's {@link ServerSocketChannel} class.
+     * Return a new {@link ServerBootstrap} instance. The bootstrap has its {@link ServerBootstrap#channel(Class)}
+     * already initialized to the backing implementation's {@link ServerSocketChannel} class.
      *
      * @return A new ServerBootstrap
      */
     public static ServerBootstrap newServerBootstrap() {
         return new ServerBootstrap().channel(IMPL.serverChannelClass());
+    }
+
+    /**
+     * Return a new {@link Bootstrap} instance. The bootstrap has its {@link Bootstrap#channel(Class)} already
+     * initialized to the backing implementation's {@link DatagramChannel} class.
+     *
+     * @return A new Bootstrap
+     */
+    public static Bootstrap newDatagramBootstrap() {
+        return new Bootstrap().channel(IMPL.datagramChannelClass());
     }
 
     /**

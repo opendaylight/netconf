@@ -10,6 +10,7 @@ package org.opendaylight.netconf.transport.tcp;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.ThreadFactory;
@@ -21,6 +22,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.
  */
 @NonNullByDefault
 abstract sealed class AbstractNettyImpl permits EpollNettyImpl, NioNettyImpl {
+
+    abstract Class<? extends DatagramChannel> datagramChannelClass();
 
     abstract Class<? extends SocketChannel> channelClass();
 
