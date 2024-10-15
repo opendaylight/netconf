@@ -279,7 +279,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
         final var errors = assertThrows(ServerException.class, dataPostRequest::getResult).errors();
         assertEquals(1, errors.size());
-        assertThat(errors.get(0).info().elementBody(), containsString(domException.getMessage()));
+        assertThat(errors.getFirst().info().elementBody(), containsString(domException.getMessage()));
     }
 
     abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
