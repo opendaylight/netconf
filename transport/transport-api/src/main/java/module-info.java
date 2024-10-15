@@ -7,6 +7,7 @@
  */
 module org.opendaylight.netconf.transport.api {
     exports org.opendaylight.netconf.transport.api;
+    exports org.opendaylight.netconf.transport.spi;
 
     requires transitive com.google.common;
     requires transitive io.netty.common;
