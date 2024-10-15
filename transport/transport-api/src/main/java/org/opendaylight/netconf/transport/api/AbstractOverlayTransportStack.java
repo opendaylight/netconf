@@ -18,6 +18,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 /**
  * Abstract base class for {@link TransportStack}s overlaid on a different stack.
  */
+// FIXME: 9.0.0: move to transport.spi
 public abstract class AbstractOverlayTransportStack<C extends TransportChannel> extends AbstractTransportStack<C> {
     private final @NonNull TransportChannelListener<TransportChannel> asListener = new TransportChannelListener<>() {
         @Override

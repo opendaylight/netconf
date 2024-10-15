@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.api;
+package org.opendaylight.netconf.transport.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,6 +20,7 @@ import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.ThreadFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
