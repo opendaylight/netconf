@@ -12,6 +12,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollChannelOption;
+import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -21,6 +22,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.
 
 @NonNullByDefault
 final class EpollNettyImpl extends AbstractNettyImpl {
+    @Override
+    Class<EpollDatagramChannel> datagramChannelClass() {
+        return EpollDatagramChannel.class;
+    }
+
     @Override
     Class<EpollSocketChannel> channelClass() {
         return EpollSocketChannel.class;
