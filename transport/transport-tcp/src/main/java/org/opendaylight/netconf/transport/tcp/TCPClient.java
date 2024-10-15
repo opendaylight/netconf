@@ -11,10 +11,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOption;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.api.ClientStackInitializer;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.spi.NettyTransportSupport;
@@ -55,21 +54,7 @@ public final class TCPClient extends TCPTransportStack {
         final var ret = SettableFuture.<TCPClient>create();
         final var stack = new TCPClient(listener);
         bootstrap
-            .handler(new ChannelInboundHandlerAdapter() {
-                @Override
-                public void channelActive(final ChannelHandlerContext ctx) {
-                    // Order of operations is important here: the stack should be visible before the underlying channel
-                    ret.set(stack);
-                    final var channel = ctx.channel();
-                    stack.addTransportChannel(new TCPTransportChannel(channel));
-
-                    // forward activation to any added handlers
-                    ctx.fireChannelActive();
-
-                    // remove this handler from the picture
-                    channel.pipeline().remove(this);
-                }
-            })
+            .handler(new ClientStackInitializer<>(stack, TCPTransportChannel::new))
             .connect(
                 socketAddressOf(connectParams.requireRemoteAddress(), connectParams.requireRemotePort()),
                 socketAddressOf(connectParams.getLocalAddress(), connectParams.getLocalPort()))
