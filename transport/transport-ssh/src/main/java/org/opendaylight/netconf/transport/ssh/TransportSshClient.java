@@ -216,9 +216,7 @@ final class TransportSshClient extends SshClient {
             if (publicKey != null) {
                 final var keyPairs = ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore());
                 client.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPairs));
-                final var factory = new UserAuthPublicKeyFactory();
-                factory.setSignatureFactories(client.getSignatureFactories());
-                authFactoriesListBuilder.add(factory);
+                authFactoriesListBuilder.add(new UserAuthPublicKeyFactory(client.getSignatureFactories()));
             }
             // FIXME implement authentication using X509 certificate
 
