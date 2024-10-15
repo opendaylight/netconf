@@ -10,6 +10,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2024-10-15 {
+    description "Update description for max-backoff-millis and min-backoff-millis leaf to clarify their functionality.";
+  }
+
   revision 2024-06-11 {
     description "Update the YANG model to version 1.1 and modify the credentials
       choice within the credentials grouping to be mandatory";
@@ -229,15 +233,15 @@ module odl-netconf-device {
     }
 
     leaf min-backoff-millis {
-      description "Initial timeout in milliseconds to wait between connection attempts. Will be multiplied by
-                   backoff-multiplier with every additional attempt";
+      description "Initial minimum timeout in milliseconds randomized with backoff-jitter to wait between connection
+                   attempts. Will be multiplied by backoff-multiplier with every additional attempt";
       config true;
       type uint16;
       default 2000;
     }
 
     leaf max-backoff-millis {
-      description "Maximum timeout in milliseconds to wait between connection attempts.";
+      description "Maximum timeout in milliseconds randomized with backoff-jitter to wait between connection attempts.";
       config true;
       type uint32;
       default 1800000;
