@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tcp;
+package org.opendaylight.netconf.transport.api;
 
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
-final class NioNettyImpl extends AbstractNettyImpl {
+final class NioNettyImpl extends NettyImpl {
     private static final TcpKeepaliveOptions KEEPALIVE_OPTIONS = new TcpKeepaliveOptions(
         NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPCOUNT),
         NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPIDLE),
@@ -63,27 +63,27 @@ final class NioNettyImpl extends AbstractNettyImpl {
     }
 
     @Override
-    Class<NioDatagramChannel> datagramChannelClass() {
+    public Class<NioDatagramChannel> datagramChannelClass() {
         return NioDatagramChannel.class;
     }
 
     @Override
-    Class<NioSocketChannel> channelClass() {
+    public Class<NioSocketChannel> channelClass() {
         return NioSocketChannel.class;
     }
 
     @Override
-    Class<NioServerSocketChannel> serverChannelClass() {
+    public Class<NioServerSocketChannel> serverChannelClass() {
         return NioServerSocketChannel.class;
     }
 
     @Override
-    EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
+    public EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
         return new NioEventLoopGroup(numThreads, threadFactory);
     }
 
     @Override
-    @Nullable TcpKeepaliveOptions keepaliveOptions() {
+    public @Nullable TcpKeepaliveOptions keepaliveOptions() {
         return supportsKeepalives ? KEEPALIVE_OPTIONS : null;
     }
 

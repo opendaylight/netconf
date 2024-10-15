@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tcp;
+package org.opendaylight.netconf.transport.api;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollChannelOption;
@@ -18,32 +18,32 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
-final class EpollNettyImpl extends AbstractNettyImpl {
+final class EpollNettyImpl extends NettyImpl {
     private static final TcpKeepaliveOptions KEEPALIVE_OPTIONS = new TcpKeepaliveOptions(
         EpollChannelOption.TCP_KEEPCNT, EpollChannelOption.TCP_KEEPIDLE, EpollChannelOption.TCP_KEEPINTVL);
 
     @Override
-    Class<EpollDatagramChannel> datagramChannelClass() {
+    public Class<EpollDatagramChannel> datagramChannelClass() {
         return EpollDatagramChannel.class;
     }
 
     @Override
-    Class<EpollSocketChannel> channelClass() {
+    public Class<EpollSocketChannel> channelClass() {
         return EpollSocketChannel.class;
     }
 
     @Override
-    Class<EpollServerSocketChannel> serverChannelClass() {
+    public Class<EpollServerSocketChannel> serverChannelClass() {
         return EpollServerSocketChannel.class;
     }
 
     @Override
-    EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
+    public EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
         return new EpollEventLoopGroup(numThreads, threadFactory);
     }
 
     @Override
-    @NonNull TcpKeepaliveOptions keepaliveOptions() {
+    public @NonNull TcpKeepaliveOptions keepaliveOptions() {
         return KEEPALIVE_OPTIONS;
     }
 
