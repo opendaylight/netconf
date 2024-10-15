@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "869faacb_30859a3c",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-15T10:36:27Z",
+      "side": 1,
+      "message": "let\u0027s not do this just because of a clarification",
+      "range": {
+        "startLine": 13,
+        "startChar": 11,
+        "endLine": 13,
+        "endChar": 21
+      },
+      "revId": "4bdb3456cc33902027bf937dd7cdb868b4c89997",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
