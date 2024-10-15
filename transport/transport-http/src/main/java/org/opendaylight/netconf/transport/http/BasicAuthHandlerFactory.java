@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.Crypt;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.Basic;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240815.HttpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240815.http.server.grouping.client.authentication.users.user.auth.type.Basic;
 
 /**
  * {@link BasicAuthHandlerFactory} implementation for Basic Authorization.
