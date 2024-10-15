@@ -32,7 +32,6 @@ module org.opendaylight.netconf.transport.tcp {
     requires com.google.common;
     requires io.netty.buffer;
     requires io.netty.transport;
-    requires org.opendaylight.yang.gen.ietf.inet.types.rfc6991;
     requires org.opendaylight.yang.gen.ietf.tcp.common.rfc9643;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.common;

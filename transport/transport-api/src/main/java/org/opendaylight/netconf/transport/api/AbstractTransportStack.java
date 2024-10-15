@@ -16,10 +16,15 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -108,6 +113,20 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
 
     protected synchronized ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("listener", listener).add("state", state);
+    }
+
+    protected static final InetSocketAddress socketAddressOf(final Host host, final PortNumber port) {
+        final var addr = host.getIpAddress();
+        return addr != null ? socketAddressOf(addr, port)
+            : InetSocketAddress.createUnresolved(host.getDomainName().getValue(), port.getValue().toJava());
+    }
+
+    protected static final InetSocketAddress socketAddressOf(final IpAddress addr, final PortNumber port) {
+        final int portNum = port == null ? 0 : port.getValue().toJava();
+        if (addr == null) {
+            return port == null ? null : new InetSocketAddress(portNum);
+        }
+        return new InetSocketAddress(IetfInetUtil.inetAddressFor(addr), portNum);
     }
 
     protected static final @NonNull ListenableFuture<Empty> toListenableFuture(final Future<?> nettyFuture) {
