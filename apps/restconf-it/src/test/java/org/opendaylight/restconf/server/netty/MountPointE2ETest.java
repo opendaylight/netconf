@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.netty;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opendaylight.restconf.server.netty.TestUtils.freePort;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -39,7 +38,6 @@ import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.restconf.server.netty.TestUtils.TestEncryptionService;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -76,7 +74,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         // topology
         final var dataBroker = getDataBroker();
         final var netconfTimer = new DefaultNetconfTimer();
-        final var encryptionService = new TestEncryptionService();
+        final var encryptionService = new NullAAAEncryptionService();
         final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
             id -> null, sslContextFactoryProvider());
         final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
@@ -184,13 +182,13 @@ class MountPointE2ETest extends AbstractE2ETest {
         startDeviceSimulator(false);
         mountDeviceJson();
 
-        var response = invokeRequest(HttpMethod.POST, "/rests/operations"
-                + "/network-topology:network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount"
-                + "/notifications:create-subscription",
+        var response = invokeRequest(HttpMethod.POST, """
+            /rests/operations/network-topology:network-topology/topology=topology-netconf/node=device-sim\
+            /yang-ext:mount/notifications:create-subscription""",
             APPLICATION_JSON, """
-                  {
-                    "input": {
-                        "stream": "NETCONF"
+                {
+                   "input": {
+                       "stream": "NETCONF"
                    }
                 }""");
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
@@ -201,7 +199,8 @@ class MountPointE2ETest extends AbstractE2ETest {
             APPLICATION_JSON, """
                 {
                     "input": {
-                        "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']/node[node-id='device-sim']"
+                        "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']\
+                /node[node-id='device-sim']"
                     }
                 }""");
         assertEquals(HttpResponseStatus.OK, response.status());
@@ -317,7 +316,7 @@ class MountPointE2ETest extends AbstractE2ETest {
     private void startDeviceSimulator(final boolean mdsal) throws Exception {
         // mdsal = true --> settable mode, mdsal datastore
         // mdsal = false --> simulated mode, data is taken from conf files
-        devicePort = freePort();
+        devicePort = randomBindablePort();
         final var configBuilder = new ConfigurationBuilder()
             .setStartingPort(devicePort)
             .setDeviceCount(1)

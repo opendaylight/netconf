@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.impl.EOSClusterSingletonServiceProvider;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
-import org.opendaylight.restconf.server.netty.TestUtils.TestEncryptionService;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -37,7 +36,7 @@ class OperationsE2ETest extends AbstractE2ETest {
         super.beforeEach();
         final var cssService = new EOSClusterSingletonServiceProvider(new SimpleDOMEntityOwnershipService());
         netconfKeystoreService = new DefaultNetconfKeystoreService(getDataBroker(), rpcProviderService,
-            cssService, new TestEncryptionService());
+            cssService, new NullAAAEncryptionService());
     }
 
     @AfterEach

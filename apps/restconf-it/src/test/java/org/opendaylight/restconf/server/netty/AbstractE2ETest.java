@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opendaylight.restconf.server.netty.TestUtils.freePort;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
@@ -32,7 +31,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -69,6 +70,7 @@ import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptio
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
+import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -80,10 +82,6 @@ import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
-import org.opendaylight.restconf.server.netty.TestUtils.TestClientStackGrouping;
-import org.opendaylight.restconf.server.netty.TestUtils.TestEventListener;
-import org.opendaylight.restconf.server.netty.TestUtils.TestRequestCallback;
-import org.opendaylight.restconf.server.netty.TestUtils.TestTransportListener;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.Root;
@@ -145,7 +143,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @BeforeEach
     void beforeEach() throws Exception {
         // transport configuration
-        final var port = freePort();
+        final var port = randomBindablePort();
         host = localAddress + ":" + port;
         final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
         final var serverStackGrouping = new HttpServerStackGrouping() {
@@ -159,9 +157,9 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
                 return serverTransport;
             }
         };
-        clientStackGrouping = new TestClientStackGrouping(
+        clientStackGrouping = new HttpClientStackConfiguration(
             ConfigUtils.clientTransportTcp(localAddress, port, USERNAME, PASSWORD));
-        invalidClientStackGrouping = new TestClientStackGrouping(
+        invalidClientStackGrouping = new HttpClientStackConfiguration(
             ConfigUtils.clientTransportTcp(localAddress, port, USERNAME, "wrong-password"));
 
         // AAA services
@@ -169,8 +167,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             @Override
             protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
                 throws AuthenticationException {
-                final var principal = ((String) token.getPrincipal());
-                final var credentials = new String(((char[]) token.getCredentials()));
+                final var principal = (String) token.getPrincipal();
+                final var credentials = new String((char[]) token.getCredentials());
                 if (USERNAME.equals(principal) && PASSWORD.equals(credentials)) {
                     return new SimpleAuthenticationInfo(principal, credentials, "user");
                 }
@@ -223,6 +221,19 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         sshTransportStackFactory.close();
     }
 
+    /**
+     * Find a local port which has a good chance of not failing {@code bind()} due to a conflict.
+     *
+     * @return a local port
+     */
+    protected static final int randomBindablePort() {
+        try (var socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+    }
+
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
         return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
     }
@@ -248,7 +259,9 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     protected FullHttpResponse invokeRequest(final FullHttpRequest request, final HttpClientStackGrouping clientConf)
             throws Exception {
-        final var channelListener = new TestTransportListener();
+        final var channelListener = new TestTransportChannelListener(ignored -> {
+            // no-op
+        });
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
             clientConf, false).get(2, TimeUnit.SECONDS);
         // await for connection
@@ -407,7 +420,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     protected HTTPClient startStreamClient() throws Exception {
-        final var transportListener = new TestTransportListener(channel ->
+        final var transportListener = new TestTransportChannelListener(channel ->
             clientStreamService = SseUtils.enableClientSse(channel));
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
             clientStackGrouping, false).get(2, TimeUnit.SECONDS);
@@ -416,8 +429,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return streamClient;
     }
 
-    protected TestEventListener startStream(final String uri) {
-        final var eventListener = new TestEventListener();
+    protected TestEventStreamListener startStream(final String uri) {
+        final var eventListener = new TestEventStreamListener();
         clientStreamService.startEventStream(uri, eventListener,
             new EventStreamService.StartCallback() {
                 @Override
@@ -441,8 +454,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     static final class ExampleActionImpl implements ExampleAction {
         @Override
-        public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(DataObjectIdentifier<Root> path,
-                ExampleActionInput input) {
+        public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(final DataObjectIdentifier<Root> path,
+                final ExampleActionInput input) {
             return Futures.immediateFuture(RpcResultBuilder.success(
                 new ExampleActionOutputBuilder().setResponse("Action was invoked").build()).build());
         }
