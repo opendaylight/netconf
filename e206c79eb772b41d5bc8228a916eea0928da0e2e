@@ -22,6 +22,29 @@
       },
       "revId": "e206c79eb772b41d5bc8228a916eea0928da0e2e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37721b25_86a392e6",
+        "filename": "transport/transport-api/src/main/java/org/opendaylight/netconf/transport/api/TransportChannelListener.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-15T15:13:33Z",
+      "side": 1,
+      "message": "this is a very bare-bones explanation -- for example it says nothing about how it relates to onTransportChannelEstablished().\n\nas noted in the other comment, this method is completely unneeded, as the only user can just attach itself to the channel.",
+      "range": {
+        "startLine": 35,
+        "startChar": 7,
+        "endLine": 35,
+        "endChar": 57
+      },
+      "revId": "e206c79eb772b41d5bc8228a916eea0928da0e2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
