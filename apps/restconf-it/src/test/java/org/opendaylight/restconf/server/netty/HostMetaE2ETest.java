@@ -9,9 +9,8 @@ package org.opendaylight.restconf.server.netty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.MediaTypes;
@@ -48,8 +47,8 @@ class HostMetaE2ETest extends AbstractE2ETest {
     @Test
     void readXmlTest() throws Exception {
         final var response = invokeRequest(HttpMethod.GET, XRD_URI);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertEquals(MediaTypes.APPLICATION_XRD_XML, response.headers().get(HttpHeaderNames.CONTENT_TYPE));
+        assertEquals(200, response.statusCode());
+        assertEquals(List.of(MediaTypes.APPLICATION_XRD_XML), response.headers().allValues("content-type"));
         assertContentXml(response, """
             <?xml version="1.0" encoding="UTF-8"?>
             <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
