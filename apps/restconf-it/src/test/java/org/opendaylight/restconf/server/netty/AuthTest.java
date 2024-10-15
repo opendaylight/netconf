@@ -9,10 +9,13 @@ package org.opendaylight.restconf.server.netty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.json.JSONObject;
@@ -42,8 +45,9 @@ class AuthTest extends AbstractE2ETest {
     @MethodSource("targets")
     void unauthorized(final String uri) throws Exception {
         final var request = buildRequest(HttpMethod.GET, uri, APPLICATION_JSON, null, null);
-        final var response = invokeRequest(request, invalidClientStackGrouping);
-        assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
+
+        final var ex = assertThrows(IOException.class, () -> invokeRequest(BAD_HTTP_CLIENT, request));
+        assertEquals("too many authentication attempts. Limit: 3", ex.getMessage());
     }
 
     @Test
@@ -59,8 +63,9 @@ class AuthTest extends AbstractE2ETest {
         final var request = buildRequest(HttpMethod.GET,
             "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + stream,
             APPLICATION_JSON, null, null);
-        final var response = invokeRequest(request, invalidClientStackGrouping);
-        assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
+
+        final var ex = assertThrows(IOException.class, () -> invokeRequest(BAD_HTTP_CLIENT, request));
+        assertEquals("too many authentication attempts. Limit: 3", ex.getMessage());
     }
 
     private String createStream() throws Exception {
@@ -76,8 +81,8 @@ class AuthTest extends AbstractE2ETest {
                     }
                 }
                 """);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        return extractStreamNameJson(response.content().toString(StandardCharsets.UTF_8));
+        assertEquals(200, response.statusCode());
+        return extractStreamNameJson(response.body().toString(StandardCharsets.UTF_8));
     }
 
     private static String extractStreamNameJson(final String content) {
@@ -85,8 +90,8 @@ class AuthTest extends AbstractE2ETest {
         return json.getJSONObject("sal-remote:output").getString("stream-name");
     }
 
-    private static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus) {
+    private static void assertResponse(final HttpResponse<ByteBuf> response, final HttpResponseStatus expectedStatus) {
         assertNotNull(response);
-        assertEquals(expectedStatus, response.status());
+        assertEquals(expectedStatus.code(), response.statusCode());
     }
 }

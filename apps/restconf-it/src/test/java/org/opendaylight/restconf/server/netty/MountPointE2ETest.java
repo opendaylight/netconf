@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.ssl.SslContextBuilder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -127,7 +126,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                 }
             }""";
         var response = invokeRequest(HttpMethod.POST, DEVICE_MOUNT_URI, APPLICATION_JSON, initialData);
-        assertEquals(HttpResponseStatus.CREATED, response.status());
+        assertEquals(201, response.statusCode());
         assertContentJson(DEVICE_DATA_ROOT_URI, initialData);
 
         // update (merge)
@@ -140,7 +139,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
         assertContentJson(DEVICE_DATA_ROOT_URI, """
             {
                 "device-sim:data-root": {
@@ -165,12 +164,12 @@ class MountPointE2ETest extends AbstractE2ETest {
                 }
             }""";
         response = invokeRequest(HttpMethod.PUT, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, replaceData);
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        assertEquals(204, response.statusCode());
         assertContentJson(DEVICE_DATA_ROOT_URI, replaceData);
 
         // delete
         response = invokeRequest(HttpMethod.DELETE, DEVICE_DATA_ROOT_URI);
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        assertEquals(204, response.statusCode());
         // validate deleted
         response = invokeRequest(HttpMethod.GET, DEVICE_DATA_ROOT_URI);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
@@ -191,7 +190,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                        "stream": "NETCONF"
                    }
                 }""");
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        assertEquals(204, response.statusCode());
 
         // create notification stream
         response = invokeRequest(HttpMethod.POST,
@@ -203,13 +202,13 @@ class MountPointE2ETest extends AbstractE2ETest {
                 /node[node-id='device-sim']"
                     }
                 }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
         //  {
         //      "odl-device-notification:output": {
         //          "stream-name": "urn:uuid:01a56682-f2ab-419f-8a77-9cf995a52220"
         //      }
         //  }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(response.body().toString(StandardCharsets.UTF_8));
         final var streamName = json.getJSONObject("odl-device-notification:output").getString("stream-name");
         assertNotNull(streamName, "Stream name is undefined");
 
@@ -295,7 +294,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                     ]
                 }
             }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+        assertEquals(200, response.statusCode());
 
         // read (validate result)
         assertContentJson(DEVICE_DATA_ROOT_URI, """
@@ -360,7 +359,7 @@ class MountPointE2ETest extends AbstractE2ETest {
             }
             """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
         final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
-        assertEquals(HttpResponseStatus.CREATED, response.status());
+        assertEquals(201, response.statusCode());
         // wait till connected
         await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(500))
             .until(this::deviceConnectedJson);
@@ -368,8 +367,8 @@ class MountPointE2ETest extends AbstractE2ETest {
 
     private boolean deviceConnectedJson() throws Exception {
         final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        assertEquals(200, response.statusCode());
+        final var json = new JSONObject(response.body().toString(StandardCharsets.UTF_8));
         //{
         //  "netconf-node-topology:netconf-node": {
         //    "connection-status": "connected"
