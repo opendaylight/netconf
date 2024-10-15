@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tcp;
+package org.opendaylight.netconf.transport.api;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollChannelOption;
@@ -19,7 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
 final class EpollNettyImpl extends NettyImpl {
-    private static final TcpKeepaliveOptions KEEPALIVE_OPTIONS = new TcpKeepaliveOptions(
+    private static final NettyTcpKeepaliveOptions KEEPALIVE_OPTIONS = new NettyTcpKeepaliveOptions(
         EpollChannelOption.TCP_KEEPCNT, EpollChannelOption.TCP_KEEPIDLE, EpollChannelOption.TCP_KEEPINTVL);
 
     @Override
@@ -43,7 +43,7 @@ final class EpollNettyImpl extends NettyImpl {
     }
 
     @Override
-    @NonNull TcpKeepaliveOptions keepaliveOptions() {
+    @NonNull NettyTcpKeepaliveOptions keepaliveOptions() {
         return KEEPALIVE_OPTIONS;
     }
 

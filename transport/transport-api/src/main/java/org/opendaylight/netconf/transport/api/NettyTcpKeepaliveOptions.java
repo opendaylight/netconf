@@ -5,24 +5,26 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tcp;
+package org.opendaylight.netconf.transport.api;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelOption;
 
 /**
- * Channel options for TCP keepalives.
+ * Channel options for configuring TCP keepalive parameters.
  *
  * @param tcpKeepCnt the option corresponding to {@code TCP_KEEPCNT}
  * @param tcpKeepIdle the option corresponding to {@code TCP_KEEPIDLE}
  * @param tcpKeepIntvl the option corresponding to {@code TCP_KEEPINTVL}
  */
-record TcpKeepaliveOptions(
+@Beta
+public record NettyTcpKeepaliveOptions(
         ChannelOption<Integer> tcpKeepCnt,
         ChannelOption<Integer> tcpKeepIdle,
         ChannelOption<Integer> tcpKeepIntvl) {
-    TcpKeepaliveOptions {
+    public NettyTcpKeepaliveOptions {
         requireNonNull(tcpKeepCnt);
         requireNonNull(tcpKeepIdle);
         requireNonNull(tcpKeepIntvl);

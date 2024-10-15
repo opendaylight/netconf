@@ -10,7 +10,7 @@ package org.opendaylight.netconf.transport.tcp.impl;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
+import org.opendaylight.netconf.transport.api.NettyTransportSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.IetfTcpServerData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerKeepalives;
 import org.opendaylight.yangtools.binding.YangFeature;
@@ -29,6 +29,6 @@ public final class IetfTcpServerFeatureProvider implements YangFeatureProvider<I
 
     @Override
     public Set<? extends YangFeature<?, IetfTcpServerData>> supportedFeatures() {
-        return NettyTransportSupport.keepalivesSupported() ? Set.of(TcpServerKeepalives.VALUE) : Set.of();
+        return NettyTransportSupport.tcpKeepaliveOptions() != null ? Set.of(TcpServerKeepalives.VALUE) : Set.of();
     }
 }

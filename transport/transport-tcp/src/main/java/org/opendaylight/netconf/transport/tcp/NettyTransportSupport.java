@@ -12,16 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev241010.tcp.common.grouping.Keepalives;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +26,6 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public final class NettyTransportSupport {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransportSupport.class);
-    private static final NettyImpl IMPL = Epoll.isAvailable() ? new EpollNettyImpl() : NioNettyImpl.INSTANCE;
-
-    static {
-        LOG.info("Netty transport backed by {}", IMPL);
-    }
 
     private NettyTransportSupport() {
         // Hidden on purpose
@@ -47,9 +36,11 @@ public final class NettyTransportSupport {
      * initialized to the backing implementation's {@link SocketChannel} class.
      *
      * @return A new Bootstrap
+     * @deprecated Use {@link org.opendaylight.netconf.transport.api.NettyTransportSupport#newBootstrap()} instead.
      */
+    @Deprecated(since = "8.0.3", forRemoval = true)
     public static Bootstrap newBootstrap() {
-        return new Bootstrap().channel(IMPL.channelClass());
+        return org.opendaylight.netconf.transport.api.NettyTransportSupport.newBootstrap();
     }
 
     /**
@@ -57,19 +48,12 @@ public final class NettyTransportSupport {
      * already initialized to the backing implementation's {@link ServerSocketChannel} class.
      *
      * @return A new ServerBootstrap
+     * @deprecated Use {@link org.opendaylight.netconf.transport.api.NettyTransportSupport#newServerBootstrap()}
+     *             instead.
      */
+    @Deprecated(since = "8.0.3", forRemoval = true)
     public static ServerBootstrap newServerBootstrap() {
-        return new ServerBootstrap().channel(IMPL.serverChannelClass());
-    }
-
-    /**
-     * Return a new {@link Bootstrap} instance. The bootstrap has its {@link Bootstrap#channel(Class)} already
-     * initialized to the backing implementation's {@link DatagramChannel} class.
-     *
-     * @return A new Bootstrap
-     */
-    public static Bootstrap newDatagramBootstrap() {
-        return new Bootstrap().channel(IMPL.datagramChannelClass());
+        return org.opendaylight.netconf.transport.api.NettyTransportSupport.newServerBootstrap();
     }
 
     /**
@@ -93,51 +77,11 @@ public final class NettyTransportSupport {
      * @return An EventLoopGroup
      */
     public static EventLoopGroup newEventLoopGroup(final String name, final int numThreads) {
-        return IMPL.newEventLoopGroup(numThreads, new ThreadFactoryBuilder()
-            .setNameFormat(requireNonNull(name) + "-%d")
-            .setUncaughtExceptionHandler(
-                (thread, ex) -> LOG.error("Thread terminated due to uncaught exception: {}", thread.getName(), ex))
-            .build());
-    }
-
-    /**
-     * Returns true when configuring keepalives is supported.
-     *
-     * @return true when configuring keepalives is supported
-     */
-    public static boolean keepalivesSupported() {
-        return IMPL.keepaliveOptions() != null;
-    }
-
-    static void configureKeepalives(final Bootstrap bootstrap, final @Nullable Keepalives keepalives)
-            throws UnsupportedConfigurationException {
-        if (keepalives != null) {
-            final var options = checkKeepalivesSupported();
-            bootstrap
-                .option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
-                .option(options.tcpKeepIdle(), keepalives.requireIdleTime().toJava())
-                .option(options.tcpKeepCnt(), keepalives.requireMaxProbes().toJava())
-                .option(options.tcpKeepIntvl(), keepalives.requireProbeInterval().toJava());
-        }
-    }
-
-    static void configureKeepalives(final ServerBootstrap bootstrap, final @Nullable Keepalives keepalives)
-            throws UnsupportedConfigurationException {
-        if (keepalives != null) {
-            final var options = checkKeepalivesSupported();
-            bootstrap
-                .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
-                .childOption(options.tcpKeepIdle(), keepalives.requireIdleTime().toJava())
-                .childOption(options.tcpKeepCnt(), keepalives.requireMaxProbes().toJava())
-                .childOption(options.tcpKeepIntvl(), keepalives.requireProbeInterval().toJava());
-        }
-    }
-
-    private static TcpKeepaliveOptions checkKeepalivesSupported() throws UnsupportedConfigurationException {
-        final var options = IMPL.keepaliveOptions();
-        if (options == null) {
-            throw new UnsupportedConfigurationException("Keepalives are not supported");
-        }
-        return options;
+        return org.opendaylight.netconf.transport.api.NettyTransportSupport.newEventLoopGroup(numThreads,
+            new ThreadFactoryBuilder()
+                .setNameFormat(requireNonNull(name) + "-%d")
+                .setUncaughtExceptionHandler(
+                    (thread, ex) -> LOG.error("Thread terminated due to uncaught exception: {}", thread.getName(), ex))
+                .build());
     }
 }
