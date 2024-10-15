@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.tcp;
+package org.opendaylight.netconf.transport.udp;
 
 import io.netty.channel.Channel;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -16,8 +16,8 @@ import org.opendaylight.netconf.transport.spi.AbstractUnderlayTransportChannel;
  * A TCP {@link TransportChannel}.
  */
 @NonNullByDefault
-public final class TCPTransportChannel extends AbstractUnderlayTransportChannel {
-    TCPTransportChannel(final Channel channel) {
+public final class UDPTransportChannel extends AbstractUnderlayTransportChannel {
+    UDPTransportChannel(final Channel channel) {
         super(channel);
     }
 }
