@@ -36,11 +36,11 @@ public final class NettyTransportSupport {
      * initialized to the backing implementation's {@link SocketChannel} class.
      *
      * @return A new Bootstrap
-     * @deprecated Use {@link org.opendaylight.netconf.transport.api.NettyTransportSupport#newBootstrap()} instead.
+     * @deprecated Use {@link org.opendaylight.netconf.transport.spi.NettyTransportSupport#newBootstrap()} instead.
      */
     @Deprecated(since = "8.0.3", forRemoval = true)
     public static Bootstrap newBootstrap() {
-        return org.opendaylight.netconf.transport.api.NettyTransportSupport.newBootstrap();
+        return org.opendaylight.netconf.transport.spi.NettyTransportSupport.newBootstrap();
     }
 
     /**
@@ -48,12 +48,12 @@ public final class NettyTransportSupport {
      * already initialized to the backing implementation's {@link ServerSocketChannel} class.
      *
      * @return A new ServerBootstrap
-     * @deprecated Use {@link org.opendaylight.netconf.transport.api.NettyTransportSupport#newServerBootstrap()}
+     * @deprecated Use {@link org.opendaylight.netconf.transport.spi.NettyTransportSupport#newServerBootstrap()}
      *             instead.
      */
     @Deprecated(since = "8.0.3", forRemoval = true)
     public static ServerBootstrap newServerBootstrap() {
-        return org.opendaylight.netconf.transport.api.NettyTransportSupport.newServerBootstrap();
+        return org.opendaylight.netconf.transport.spi.NettyTransportSupport.newServerBootstrap();
     }
 
     /**
@@ -77,7 +77,7 @@ public final class NettyTransportSupport {
      * @return An EventLoopGroup
      */
     public static EventLoopGroup newEventLoopGroup(final String name, final int numThreads) {
-        return org.opendaylight.netconf.transport.api.NettyTransportSupport.newEventLoopGroup(numThreads,
+        return org.opendaylight.netconf.transport.spi.NettyTransportSupport.newEventLoopGroup(numThreads,
             new ThreadFactoryBuilder()
                 .setNameFormat(requireNonNull(name) + "-%d")
                 .setUncaughtExceptionHandler(
