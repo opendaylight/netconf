@@ -216,15 +216,15 @@ module odl-netconf-device {
     }
 
     leaf min-backoff-millis {
-      description "Initial timeout in milliseconds to wait between connection attempts. Will be multiplied by
-                   backoff-multiplier with every additional attempt";
+      description "Initial minimum timeout in milliseconds randomized with backoff-jitter to wait between connection
+                   attempts. Will be multiplied by backoff-multiplier with every additional attempt";
       config true;
       type uint16;
       default 2000;
     }
 
     leaf max-backoff-millis {
-      description "Maximum timeout in milliseconds to wait between connection attempts.";
+      description "Maximum timeout in milliseconds randomized with backoff-jitter to wait between connection attempts.";
       config true;
       type uint32;
       default 1800000;
