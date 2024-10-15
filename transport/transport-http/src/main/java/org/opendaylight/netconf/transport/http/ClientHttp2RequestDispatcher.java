@@ -55,11 +55,11 @@ final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
             .setInt(STREAM_ID.text(), streamId)
             .set(SCHEME.text(), ssl ? HttpScheme.HTTPS.name() : HttpScheme.HTTP.name());
 
+        // Map has to be populated first, simply because a response may arrive sooner than the successful callback
+        map.put(streamId, callback);
         channel.writeAndFlush(request).addListener(sent -> {
             final var cause = sent.cause();
-            if (cause == null) {
-                map.put(streamId, callback);
-            } else {
+            if (cause != null && map.remove(streamId, callback)) {
                 callback.onFailure(cause);
             }
         });
