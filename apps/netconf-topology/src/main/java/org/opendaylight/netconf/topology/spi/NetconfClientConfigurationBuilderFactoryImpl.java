@@ -22,7 +22,6 @@ import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
@@ -119,20 +118,22 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                 new String(plainBytes, StandardCharsets.UTF_8)));
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
+            final var keyId = keyBased.getKeyId();
+            final var keyPair = credentialProvider.credentialForId(keyId);
+            if (keyPair == null) {
+                throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
+            }
+
+            // FIXME: NETCONF-1190: this should work via
+            // keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinition
+            // representation of keypair
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
             confBuilder.withSshConfigurator(new ClientFactoryManagerConfigurator() {
                 @Override
-                protected void configureClientFactoryManager(final ClientFactoryManager factoryManager)
-                        throws UnsupportedConfigurationException {
-                    final var keyId = keyBased.getKeyId();
-                    final var keyPair = credentialProvider.credentialForId(keyId);
-                    if (keyPair == null) {
-                        throw new UnsupportedConfigurationException("No keypair found with keyId=" + keyId);
-                    }
+                protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
                     factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
-                    final var factory = new UserAuthPublicKeyFactory();
-                    factory.setSignatureFactories(factoryManager.getSignatureFactories());
-                    factoryManager.setUserAuthFactories(List.of(factory));
+                    factoryManager.setUserAuthFactories(
+                        List.of(new UserAuthPublicKeyFactory(factoryManager.getSignatureFactories())));
                 }
             });
         } else {
