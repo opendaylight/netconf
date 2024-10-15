@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.tcp;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollChannelOption;
+import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -20,6 +21,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 final class EpollNettyImpl extends AbstractNettyImpl {
     private static final TcpKeepaliveOptions KEEPALIVE_OPTIONS = new TcpKeepaliveOptions(
         EpollChannelOption.TCP_KEEPCNT, EpollChannelOption.TCP_KEEPIDLE, EpollChannelOption.TCP_KEEPINTVL);
+
+    @Override
+    Class<EpollDatagramChannel> datagramChannelClass() {
+        return EpollDatagramChannel.class;
+    }
 
     @Override
     Class<EpollSocketChannel> channelClass() {

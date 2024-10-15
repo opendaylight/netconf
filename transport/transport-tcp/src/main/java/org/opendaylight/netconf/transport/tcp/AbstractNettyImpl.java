@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.ThreadFactory;
@@ -39,6 +40,8 @@ abstract sealed class AbstractNettyImpl permits EpollNettyImpl, NioNettyImpl {
             requireNonNull(tcpKeepIntvl);
         }
     }
+
+    abstract Class<? extends DatagramChannel> datagramChannelClass();
 
     abstract Class<? extends SocketChannel> channelClass();
 

@@ -11,6 +11,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.util.Map;
@@ -59,6 +60,11 @@ final class NioNettyImpl extends AbstractNettyImpl {
 
     private NioNettyImpl(final boolean supportsKeepalives) {
         this.supportsKeepalives = supportsKeepalives;
+    }
+
+    @Override
+    Class<NioDatagramChannel> datagramChannelClass() {
+        return NioDatagramChannel.class;
     }
 
     @Override
