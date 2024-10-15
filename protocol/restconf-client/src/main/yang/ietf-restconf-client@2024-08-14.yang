@@ -9,22 +9,10 @@ module ietf-restconf-client {
       "RFC 6991: Common YANG Data Types";
   }
 
-  import ietf-tcp-client {
-    prefix tcpc;
-    reference
-      "RFC DDDD: YANG Groupings for TCP Clients and TCP Servers";
-  }
-
   import ietf-tcp-server {
     prefix tcps;
     reference
       "RFC DDDD: YANG Groupings for TCP Clients and TCP Servers";
-  }
-
-  import ietf-tls-client {
-    prefix tlsc;
-    reference
-      "RFC FFFF: YANG Groupings for TLS Clients and TLS Servers";
   }
 
   import ietf-http-client {
@@ -66,7 +54,7 @@ module ietf-restconf-client {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-08-14 {
     description
       "Initial version";
     reference
@@ -121,69 +109,15 @@ module ietf-restconf-client {
 
   // Groupings
 
-  grouping restconf-client-grouping {
-    description
-      "A reusable grouping for configuring a RESTCONF client
-       without any consideration for how underlying transport
-       sessions are established.
-
-       This grouping currently does not define any nodes. It
-       exists only so the model can be consistent with other
-       'client-server' models.";
-  }
-
   grouping restconf-client-initiate-stack-grouping {
     description
       "A reusable grouping for configuring a RESTCONF client
        'initiate' protocol stack for a single outbound connection.";
-
-    choice transport {
-      mandatory true;
+    container http-client-parameters {
       description
-        "Selects between available transports.";
-      case https {
-        if-feature "https-initiate";
-        container https {
-          must 'tls-client-parameters/client-identity
-                or http-client-parameters/client-identity';
-          description
-            "TCP, TLS, HTTP, and RESTCONF configuration to
-             initiate a RESTCONF over HTTPS connection.";
-          container tcp-client-parameters {
-            description
-              "TCP-level client parameters to initiate
-               a RESTCONF over HTTPS connection.";
-            uses tcpc:tcp-client-grouping {
-              refine "remote-port" {
-                default "443";
-                description
-                  "The RESTCONF client will attempt to
-                   connect to the IANA-assigned well-known
-                   port value for 'https' (443) if no value
-                   is specified.";
-              }
-            }
-          }
-          container tls-client-parameters {
-            description
-              "TLS-level client parameters to initiate
-               a RESTCONF over HTTPS connection.";
-            uses tlsc:tls-client-grouping;
-          }
-          container http-client-parameters {
-            description
-              "HTTP-level client parameters to initiate
-               a RESTCONF over HTTPS connection.";
-            uses httpc:http-client-grouping;
-          }
-          container restconf-client-parameters {
-            description
-              "RESTCONF-level client parameters to initiate
-               a RESTCONF over HTTPS connection.";
-            uses rcc:restconf-client-grouping;
-          }
-        }
-      }
+        "HTTP-level client parameters to listen
+         for RESTCONF over HTTPS connections.";
+      uses httpc:http-client-grouping;
     }
   } // restconf-client-initiate-stack-grouping
 
@@ -230,19 +164,11 @@ module ietf-restconf-client {
                RESTCONF over HTTP connections.";
             uses httpc:http-client-grouping;
           }
-          container restconf-client-parameters {
-            description
-              "RESTCONF-level client parameters to listen
-               for RESTCONF over HTTP connections.";
-            uses rcc:restconf-client-grouping;
-          }
         }
       }
       case https {
         if-feature "https-listen";
         container https {
-          must 'tls-client-parameters/client-identity
-                or http-client-parameters/client-identity';
           description
             "TCP, TLS, HTTP, and RESTCONF configuration to
              listen for RESTCONF over HTTPS connections.";
@@ -260,23 +186,11 @@ module ietf-restconf-client {
               }
             }
           }
-          container tls-client-parameters {
-            description
-              "TLS-level client parameters to listen
-               for RESTCONF over HTTPS connections.";
-            uses tlsc:tls-client-grouping;
-          }
           container http-client-parameters {
             description
               "HTTP-level client parameters to listen
                for RESTCONF over HTTPS connections.";
             uses httpc:http-client-grouping;
-          }
-          container restconf-client-parameters {
-            description
-              "RESTCONF-level client parameters to listen
-               for RESTCONF over HTTPS connections.";
-            uses rcc:restconf-client-grouping;
           }
         }
       }
@@ -442,13 +356,10 @@ module ietf-restconf-client {
               }
               enum last-connected {
                 description
-                  "Indicates that reconnections should start
-                   with the endpoint last connected to.  If
-                   no previous connection has ever been
-                   established, then the first endpoint
-                   configured is used.   RESTCONF clients
-                   SHOULD be able to remember the last
-                   endpoint connected to across reboots.";
+                  "Indicates that reconnections should start with
+                   the endpoint last connected to, if known.  If
+                   no previous connection is known, then the
+                   first endpoint configured is used.";
               }
               enum random-selection {
                 description
