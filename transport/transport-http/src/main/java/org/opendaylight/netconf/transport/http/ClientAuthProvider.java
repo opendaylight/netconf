@@ -14,12 +14,13 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPassword;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.client.identity.auth.type.Basic;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240815.HttpClientGrouping;
 
 /**
  * A client-side channel handler adding HTTP headers.
@@ -28,9 +29,9 @@ abstract sealed class ClientAuthProvider extends ChannelOutboundHandlerAdapter {
     private static final class ClientBasicAuthProvider extends ClientAuthProvider {
         private final String authHeader;
 
-        ClientBasicAuthProvider(final String username, final String password) {
-            authHeader = BASIC_AUTH_PREFIX + Base64.getEncoder().encodeToString(
-                (username + ":" + password).getBytes(StandardCharsets.UTF_8));
+        ClientBasicAuthProvider(final String userInfo) {
+            authHeader = BASIC_AUTH_PREFIX
+                + Base64.getEncoder().encodeToString(userInfo.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override
@@ -47,22 +48,27 @@ abstract sealed class ClientAuthProvider extends ChannelOutboundHandlerAdapter {
         // Hidden on purpose
     }
 
-    static @Nullable ClientAuthProvider ofNullable(final HttpClientGrouping httpParams) {
+    static @Nullable ClientAuthProvider ofNullable(final HttpClientGrouping httpParams)
+            throws UnsupportedConfigurationException{
         if (httpParams == null) {
             return null;
         }
-        final var clientIdentity = httpParams.getClientIdentity();
-        if (clientIdentity == null) {
+
+        final var uri = httpParams.getUri();
+        if (uri == null) {
             return null;
         }
-        final var authType = clientIdentity.getAuthType();
-        if (authType instanceof Basic basicAuth) {
-            // Basic authorization handler, sets authorization header on outgoing requests
-            final var basic = basicAuth.nonnullBasic();
-            return new ClientBasicAuthProvider(basic.getUserId(),
-                basic.getPasswordType() instanceof CleartextPassword clearText ? clearText.requireCleartextPassword()
-                    : "");
+
+        final URI parsed;
+        try {
+            parsed = new URI(uri.getValue());
+        } catch (URISyntaxException e) {
+            throw new UnsupportedConfigurationException("Invalid URI", e);
         }
-        return null;
+
+        // https://www.rfc-editor.org/rfc/rfc9110#name-deprecation-of-userinfo-in-
+        final var userInfo = parsed.getUserInfo();
+        return userInfo == null || userInfo.indexOf(':') == -1 ? null
+            : new ClientBasicAuthProvider(userInfo);
     }
 }
