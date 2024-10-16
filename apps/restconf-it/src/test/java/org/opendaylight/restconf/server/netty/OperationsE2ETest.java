@@ -188,8 +188,7 @@ class OperationsE2ETest extends AbstractE2ETest {
 
     @Test
     void operationsOptionsTest() throws Exception {
-        // FIXME to be fixed via https://lf-opendaylight.atlassian.net/browse/NETCONF-1210
-        // assertOptions(OPERATIONS_URI, Set.of("GET", "HEAD", "OPTIONS"));
+        assertOptions(OPERATIONS_URI, Set.of("GET", "HEAD", "OPTIONS"));
         assertOptions(SUBSCRIBE_DEVICE_NOTIFICATIONS_URI, Set.of("GET", "HEAD", "OPTIONS", "POST"));
     }
 
