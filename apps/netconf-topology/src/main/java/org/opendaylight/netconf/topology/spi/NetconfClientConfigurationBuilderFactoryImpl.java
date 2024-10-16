@@ -17,8 +17,8 @@ import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
@@ -49,16 +49,15 @@ import org.osgi.service.component.annotations.Reference;
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
     private final SslContextFactoryProvider sslContextFactoryProvider;
     private final AAAEncryptionService encryptionService;
-    private final CredentialProvider credentialProvider;
+    private final KeystoreAccess keystoreAccess;
 
     @Inject
     @Activate
-    public NetconfClientConfigurationBuilderFactoryImpl(
-            @Reference final AAAEncryptionService encryptionService,
-            @Reference final CredentialProvider credentialProvider,
+    public NetconfClientConfigurationBuilderFactoryImpl(@Reference final AAAEncryptionService encryptionService,
+            @Reference final KeystoreAccess keystoreAccess,
             @Reference final SslContextFactoryProvider sslHandlerContextProvider) {
         this.encryptionService = requireNonNull(encryptionService);
-        this.credentialProvider = requireNonNull(credentialProvider);
+        this.keystoreAccess = requireNonNull(keystoreAccess);
         sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
     }
 
@@ -119,7 +118,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
             final var keyId = keyBased.getKeyId();
-            final var keyPair = credentialProvider.credentialForId(keyId);
+            final var keyPair = keystoreAccess.lookupAsymmetric(keyId);
             if (keyPair == null) {
                 throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
             }
