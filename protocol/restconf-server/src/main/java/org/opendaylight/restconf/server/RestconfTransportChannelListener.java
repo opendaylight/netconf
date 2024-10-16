@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+import org.opendaylight.netconf.SubscriptionTracker;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
@@ -30,12 +31,13 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final NettyEndpointConfiguration configuration;
     private final EndpointRoot root;
     private final String restconf;
+    private final SubscriptionTracker subscriptionTracker;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
         this.configuration = requireNonNull(configuration);
-
+        this.subscriptionTracker = new SubscriptionTracker();
         // Reconstruct root API path in encoded form
         final var apiRootPath = configuration.apiRootPath();
         final var sb = new StringBuilder();
@@ -60,7 +62,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         final var pipeline = channel.channel().pipeline();
-        final var session = new RestconfSession(channel.scheme(), root);
+        final var session = new RestconfSession(channel.scheme(), root, subscriptionTracker);
         pipeline.addLast(
             new ServerSseHandler(
                 new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),

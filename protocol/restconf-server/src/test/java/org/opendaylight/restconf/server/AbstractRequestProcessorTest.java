@@ -26,6 +26,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.SubscriptionTracker;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
@@ -77,7 +78,8 @@ class AbstractRequestProcessorTest {
     void beforeEach() {
         session = new RestconfSession(HttpScheme.HTTP,
             new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
-                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT)));
+                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT)),
+            new SubscriptionTracker());
         doReturn(null).when(principalService).acquirePrincipal(any());
     }
 
