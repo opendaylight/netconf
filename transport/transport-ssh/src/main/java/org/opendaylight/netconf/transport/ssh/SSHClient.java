@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -62,7 +63,8 @@ public final class SSHClient extends SSHTransportStack {
             final ScheduledExecutorService executorService, final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final SshClientGrouping clientParams,
-            final ClientFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+            final ClientFactoryManagerConfigurator configurator, final KeystoreAccess keystoreAccess)
+            throws UnsupportedConfigurationException {
         return new SSHClient(subsystem, listener, algListener,
             new TransportSshClient.Builder(ioServiceFactory, executorService)
                 .transportParams(clientParams.getTransportParams())
@@ -70,15 +72,17 @@ public final class SSHClient extends SSHTransportStack {
                 .clientIdentity(clientParams.getClientIdentity())
                 .serverAuthentication(clientParams.getServerAuthentication())
                 .configurator(configurator)
+                .keystoreAccess(keystoreAccess)
                 .buildChecked());
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
             final ScheduledExecutorService executorService, final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener,
-            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
-            throws UnsupportedConfigurationException {
-        return of(ioServiceFactory, executorService, subsystem, listener, NOOP, clientParams, configurator);
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator,
+            final KeystoreAccess keystoreAccess) throws UnsupportedConfigurationException {
+        return of(ioServiceFactory, executorService, subsystem, listener, NOOP, clientParams, configurator,
+            keystoreAccess);
     }
 
     @VisibleForTesting

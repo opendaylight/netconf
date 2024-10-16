@@ -15,6 +15,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.auth.UserAuthFactory;
@@ -75,6 +76,7 @@ final class TransportSshClient extends SshClient {
         private final ScheduledExecutorService executorService;
 
         private ClientFactoryManagerConfigurator configurator;
+        private KeystoreAccess keystoreAccess = KeystoreAccess.empty();
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
@@ -130,6 +132,11 @@ final class TransportSshClient extends SshClient {
             return this;
         }
 
+        Builder keystoreAccess(final KeystoreAccess newKeystoreAccess) {
+            keystoreAccess = requireNonNull(newKeystoreAccess);
+            return this;
+        }
+
         TransportSshClient buildChecked() throws UnsupportedConfigurationException {
             final var ret = (TransportSshClient) super.build(true);
             if (keepAlives != null) {
@@ -146,7 +153,7 @@ final class TransportSshClient extends SshClient {
             }
 
             if (clientIdentity != null && clientIdentity.getNone() == null) {
-                setClientIdentity(ret, clientIdentity, configurator == null);
+                setClientIdentity(ret, clientIdentity, keystoreAccess, configurator == null);
             }
             if (configurator != null) {
                 configurator.configureClientFactoryManager(ret);
@@ -197,7 +204,8 @@ final class TransportSshClient extends SshClient {
         }
 
         private static void setClientIdentity(final TransportSshClient client, final ClientIdentity clientIdentity,
-                final boolean throwExceptionIfNoAuthMethodDefined) throws UnsupportedConfigurationException {
+                final KeystoreAccess keystoreAccess, final boolean throwExceptionIfNoAuthMethodDefined)
+                throws UnsupportedConfigurationException {
             final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
             final var password = clientIdentity.getPassword();
             if (password != null) {
@@ -210,7 +218,7 @@ final class TransportSshClient extends SshClient {
             }
             final var hostBased = clientIdentity.getHostbased();
             if (hostBased != null) {
-                var keyPair = ConfigUtils.extractKeyPair(hostBased.getInlineOrKeystore());
+                var keyPair = ConfigUtils.extractKeyPair(keystoreAccess, hostBased.getInlineOrKeystore());
                 var factory = new UserAuthHostBasedFactory();
                 factory.setClientHostKeys(HostKeyIdentityProvider.wrap(keyPair));
                 factory.setClientUsername(clientIdentity.getUsername());
@@ -221,7 +229,7 @@ final class TransportSshClient extends SshClient {
             }
             final var publicKey = clientIdentity.getPublicKey();
             if (publicKey != null) {
-                final var keyPairs = ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore());
+                final var keyPairs = ConfigUtils.extractKeyPair(keystoreAccess, publicKey.getInlineOrKeystore());
                 client.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPairs));
                 authFactoriesListBuilder.add(new UserAuthPublicKeyFactory(client.getSignatureFactories()));
             }

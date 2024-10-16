@@ -13,6 +13,7 @@ module org.opendaylight.netconf.transport.ssh {
         org.opendaylight.netconf.transport.ssh.impl.IetfSshCommonFeatureProvider,
         org.opendaylight.netconf.transport.ssh.impl.IetfSshServerFeatureProvider;
 
+    requires transitive org.opendaylight.netconf.keystore.api;
     requires transitive org.opendaylight.netconf.transport.api;
     requires transitive org.opendaylight.netconf.transport.tcp;
     requires transitive org.opendaylight.yang.gen.ietf.ssh.client.rfc9644;
