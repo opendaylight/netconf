@@ -26,6 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
+import org.opendaylight.restconf.openapi.model.MountPointsEntity;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -68,14 +69,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
     }
 
-    public Map<String, Long> getInstanceIdentifiers() {
+    public MountPointsEntity getInstanceIdentifiers() {
         final Map<String, Long> urlToId = new HashMap<>();
         final EffectiveModelContext modelContext = globalSchema.getGlobalContext();
         for (final Entry<YangInstanceIdentifier, Long> entry : instanceIdToLongId.entrySet()) {
             final String modName = findModuleName(entry.getKey(), modelContext);
             urlToId.put(generateUrlPrefixFromInstanceID(entry.getKey(), modName), entry.getValue());
         }
-        return urlToId;
+        return new MountPointsEntity(urlToId);
     }
 
     private static String findModuleName(final YangInstanceIdentifier id, final EffectiveModelContext modelContext) {
