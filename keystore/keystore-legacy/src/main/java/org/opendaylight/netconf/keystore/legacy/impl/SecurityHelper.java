@@ -65,26 +65,24 @@ public final class SecurityHelper {
             bcProv = prov != null ? prov : new BouncyCastleProvider();
         }
 
+        final PEMKeyPair keyPair;
+
         try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
             final var obj = keyReader.readObject();
 
-            final PEMKeyPair keyPair;
-            if (obj instanceof PEMEncryptedKeyPair encrypted) {
-                keyPair = encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
+            keyPair = switch (obj) {
+                case PEMEncryptedKeyPair encrypted -> encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
                     .setProvider(bcProv)
                     .build(passphrase.toCharArray()));
-            } else if (obj instanceof PEMKeyPair plain) {
-                keyPair = plain;
-            } else if (obj == null) {
-                throw new IOException("No private key present");
-            } else {
-                throw new IOException("Unhandled private key " + obj.getClass());
-            }
-
-            return new JcaPEMKeyConverter().getKeyPair(keyPair);
+                case PEMKeyPair plain -> plain;
+                case null -> throw new IOException("No private key present");
+                default -> throw new IOException("Unhandled private key " + obj.getClass());
+            };
         } catch (DecoderException e) {
             throw new IOException("Invalid input.", e);
         }
+
+        return new JcaPEMKeyConverter().getKeyPair(keyPair);
     }
 
     @VisibleForTesting
