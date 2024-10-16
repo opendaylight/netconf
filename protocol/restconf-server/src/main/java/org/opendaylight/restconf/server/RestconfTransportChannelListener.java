@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+import org.opendaylight.netconf.SubscriptionTracker;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
@@ -60,7 +61,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         final var pipeline = channel.channel().pipeline();
-        final var session = new RestconfSession(channel.scheme(), root);
+        final var session = new RestconfSession(channel.scheme(), root, new SubscriptionTracker());
         pipeline.addLast(
             new ServerSseHandler(
                 new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
