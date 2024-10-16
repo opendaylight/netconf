@@ -540,6 +540,11 @@
                 <artifactId>restconf-wadl-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-subscription</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- restconf features -->
             <dependency>
