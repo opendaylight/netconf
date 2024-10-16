@@ -143,8 +143,7 @@ class OperationsE2ETest extends AbstractE2ETest {
                         <passphrase></passphrase>
                     </key-credential>
                 </input>""");
-        assertSimpleErrorResponse(response, "Cannot invoke \"String.replace(java.lang.CharSequence,"
-            + " java.lang.CharSequence)\" because \"privateKey\" is null", HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        assertErrorResponseXml(response, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     @Test
@@ -160,8 +159,7 @@ class OperationsE2ETest extends AbstractE2ETest {
                         <passphrase></passphrase>
                     </key-credential>
                 </input>""");
-        assertSimpleErrorResponse(response, "Cannot invoke \"Object.getClass()\" because \"obj\" is null",
-            HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        assertErrorResponseXml(response, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     @Test
