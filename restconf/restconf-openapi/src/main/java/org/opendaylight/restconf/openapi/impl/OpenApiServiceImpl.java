@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
@@ -21,7 +20,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
-import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.osgi.service.component.annotations.Activate;
@@ -99,10 +97,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getListOfMounts(final UriInfo uriInfo) {
-        final var entity = mountPointOpenApiRFC8040
-            .getInstanceIdentifiers().entrySet().stream()
-            .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
-            .collect(Collectors.toList());
+        final var entity = mountPointOpenApiRFC8040.getInstanceIdentifiers();
         return Response.ok(entity).build();
     }
 
