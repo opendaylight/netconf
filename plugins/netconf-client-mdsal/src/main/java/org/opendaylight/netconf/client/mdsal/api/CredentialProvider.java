@@ -9,7 +9,15 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import java.security.KeyPair;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 
+/**
+ * Access to a credential pair.
+ *
+ * @deprecated This interface is rather under-defined. Use {@link KeystoreAccess} instead.
+ *
+ */
+@Deprecated(since = "8.0.3", forRemoval = true)
 public interface CredentialProvider {
     /**
      * Get the a {@link KeyPair} for a particular id.
@@ -17,6 +25,8 @@ public interface CredentialProvider {
      * @param id Credential id
      * @return A {@link KeyPair} object, {@code null} if not found
      * @throws NullPointerException if {@code id} is {@code null}
+     * @deprecated Use {@link KeystoreAccess#lookupAsymmetric(String)} instead.
      */
+    @Deprecated(since = "8.0.3", forRemoval = true)
     @Nullable KeyPair credentialForId(String id);
 }

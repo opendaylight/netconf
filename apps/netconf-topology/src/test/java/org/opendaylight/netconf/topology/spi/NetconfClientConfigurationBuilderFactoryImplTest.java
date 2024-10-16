@@ -28,8 +28,8 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -56,7 +56,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
-    private CredentialProvider credentialProvider;
+    private KeystoreAccess keystoreAccess;
     @Mock
     private SslContextFactoryProvider sslContextFactoryProvider;
     @Mock
@@ -84,7 +84,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             .setMaxConnectionAttempts(Uint32.ZERO)
             .setBackoffMultiplier(Decimal64.valueOf("1.5"))
             .setConnectionTimeoutMillis(Uint32.valueOf(20000));
-        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, keystoreAccess,
             sslContextFactoryProvider);
     }
 

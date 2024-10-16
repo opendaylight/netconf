@@ -34,7 +34,6 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -42,6 +41,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -77,7 +77,7 @@ class AbstractNetconfTopologyTest {
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
-    private CredentialProvider credentialProvider;
+    private KeystoreAccess keystoreAccess;
     @Mock
     private NetconfClientFactory clientFactory;
     @Mock
@@ -150,7 +150,7 @@ class AbstractNetconfTopologyTest {
         final var schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
         final var topology = new TestingNetconfTopologyImpl("id", clientFactory, timer, schemaAssembler,
             schemaManager, dataBroker, mountPointService,
-            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, keystoreAccess,
                 sslContextFactoryProvider), deviceActionFactory,
             new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory()));
 
@@ -223,7 +223,7 @@ class AbstractNetconfTopologyTest {
 
         @Override
         protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final Credentials credentials,
-                boolean lockDatastore) {
+                final boolean lockDatastore) {
             return delegate;
         }
     }

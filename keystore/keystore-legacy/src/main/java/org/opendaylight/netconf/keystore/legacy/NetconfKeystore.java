@@ -11,6 +11,7 @@ import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.keystore.api.CertifiedPrivateKey;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 @NonNullByDefault

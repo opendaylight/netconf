@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import javax.annotation.PreDestroy;
+import javax.crypto.SecretKey;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -28,23 +29,23 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
-import org.opendaylight.netconf.keystore.legacy.CertifiedPrivateKey;
+import org.opendaylight.netconf.keystore.api.CertifiedPrivateKey;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -56,8 +57,8 @@ import org.slf4j.LoggerFactory;
  * Abstract substrate for implementing security services based on the contents of {@link Keystore}.
  */
 @Singleton
-@Component(service = NetconfKeystoreService.class)
-public final class DefaultNetconfKeystoreService implements NetconfKeystoreService, AutoCloseable {
+@Component(service = { KeystoreAccess.class, NetconfKeystoreService.class })
+public final class DefaultNetconfKeystoreService implements NetconfKeystoreService, KeystoreAccess, AutoCloseable {
     @NonNullByDefault
     private record ConfigState(
             Map<String, PrivateKey> privateKeys,
@@ -101,9 +102,8 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             @Reference final ClusterSingletonServiceProvider cssProvider,
             @Reference final AAAEncryptionService encryptionService) {
         this.encryptionService = requireNonNull(encryptionService);
-        configListener = dataBroker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
-            new ConfigListener(this));
+        configListener = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            DataObjectIdentifier.builder(Keystore.class).build(), new ConfigListener(this));
         rpcSingleton = cssProvider.registerClusterSingletonService(
             new RpcSingleton(dataBroker, rpcProvider, encryptionService));
 
@@ -119,6 +119,17 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         rpcSingleton.close();
         configListener.close();
         LOG.info("NETCONF keystore service stopped");
+    }
+
+    @Override
+    public KeyPair lookupAsymmetric(final String name) {
+        return keystore.get().credentials().get(requireNonNull(name));
+    }
+
+    @Override
+    public SecretKey lookupSymmetric(final String name) {
+        // TODO: implement this
+        return null;
     }
 
     @Override
