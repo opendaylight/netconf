@@ -75,6 +75,8 @@ public final class SecurityHelper {
                     .build(passphrase.toCharArray()));
             } else if (obj instanceof PEMKeyPair plain) {
                 keyPair = plain;
+            } else if (obj == null) {
+                throw new IOException("No private key present");
             } else {
                 throw new IOException("Unhandled private key " + obj.getClass());
             }
