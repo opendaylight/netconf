@@ -15,6 +15,7 @@ import com.google.errorprone.annotations.DoNotCall;
 import java.security.KeyPair;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -79,6 +80,7 @@ final class TransportSshServer extends SshServer {
         private final ScheduledExecutorService executorService;
 
         private ServerFactoryManagerConfigurator configurator;
+        private KeystoreAccess keystoreAccess = KeystoreAccess.empty();
         private ClientAuthentication clientAuthentication;
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
@@ -108,6 +110,11 @@ final class TransportSshServer extends SshServer {
 
         Builder configurator(final ServerFactoryManagerConfigurator newConfigurator) {
             configurator = newConfigurator;
+            return this;
+        }
+
+        Builder keystoreAccess(final KeystoreAccess newKeystoreAccess) {
+            keystoreAccess = requireNonNull(newKeystoreAccess);
             return this;
         }
 
@@ -143,7 +150,7 @@ final class TransportSshServer extends SshServer {
                 ConfigUtils.setKeepAlives(ret, null, null);
             }
             if (serverIdentity != null) {
-                setServerIdentity(ret, serverIdentity);
+                setServerIdentity(ret, serverIdentity, keystoreAccess);
             }
             if (clientAuthentication != null) {
                 setClientAuthentication(ret, clientAuthentication);
@@ -176,8 +183,8 @@ final class TransportSshServer extends SshServer {
             return super.fillWithDefaultValues();
         }
 
-        private static void setServerIdentity(final TransportSshServer server, final ServerIdentity serverIdentity)
-                throws UnsupportedConfigurationException {
+        private static void setServerIdentity(final TransportSshServer server, final ServerIdentity serverIdentity,
+                final KeystoreAccess keystoreAccess) throws UnsupportedConfigurationException {
             final var hostKeys = serverIdentity.getHostKey();
             if (hostKeys == null || hostKeys.isEmpty()) {
                 throw new UnsupportedConfigurationException("Host keys is missing in server identity configuration");
@@ -190,7 +197,8 @@ final class TransportSshServer extends SshServer {
                     case PublicKey publicKeyType -> {
                         final var publicKey = publicKeyType.getPublicKey();
                         if (publicKey != null) {
-                            keyPairsBuilder.add(ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore()));
+                            keyPairsBuilder.add(
+                                ConfigUtils.extractKeyPair(keystoreAccess, publicKey.getInlineOrKeystore()));
                         }
                     }
                     case Certificate certificateType -> {

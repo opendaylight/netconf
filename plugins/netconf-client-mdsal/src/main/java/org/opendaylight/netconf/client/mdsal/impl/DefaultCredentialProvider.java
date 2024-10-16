@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Reference;
 
 @Singleton
 @Component(service = CredentialProvider.class)
+@Deprecated(since = "8.0.3", forRemoval = true)
 public final class DefaultCredentialProvider implements CredentialProvider, AutoCloseable {
     private final @NonNull Registration reg;
 
@@ -46,6 +47,7 @@ public final class DefaultCredentialProvider implements CredentialProvider, Auto
     }
 
     @Override
+    @Deprecated
     public KeyPair credentialForId(final String id) {
         return credentials.get(requireNonNull(id));
     }

@@ -21,16 +21,15 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.mdsal.DeviceActionFactoryImpl;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.impl.DefaultCredentialProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSslContextFactoryProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
 import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
@@ -60,7 +59,7 @@ public interface NetconfTopologyModule {
 
     @Provides
     @Singleton
-    static NetconfKeystoreService netconfKeystoreService(final DataBroker dataBroker,
+    static DefaultNetconfKeystoreService defaultNetconfKeystoreService(final DataBroker dataBroker,
             final RpcProviderService rpcProvider, final ClusterSingletonServiceProvider cssProvider,
             final AAAEncryptionService encryptionService, final ResourceSupport resourceSupport) {
         final var defaultNetconfKeystoreService = new DefaultNetconfKeystoreService(dataBroker, rpcProvider,
@@ -71,11 +70,14 @@ public interface NetconfTopologyModule {
 
     @Provides
     @Singleton
-    static CredentialProvider credentialProvider(final NetconfKeystoreService keystoreService,
-            final ResourceSupport resourceSupport) {
-        final var defaultCredentialProvider = new DefaultCredentialProvider(keystoreService);
-        resourceSupport.register(defaultCredentialProvider);
-        return defaultCredentialProvider;
+    static NetconfKeystoreService netconfKeystoreService(final DefaultNetconfKeystoreService keystoreService) {
+        return keystoreService;
+    }
+
+    @Provides
+    @Singleton
+    static KeystoreAccess keystoreAccess(final DefaultNetconfKeystoreService keystoreService) {
+        return keystoreService;
     }
 
     @Provides
@@ -90,9 +92,8 @@ public interface NetconfTopologyModule {
     @Provides
     @Singleton
     static NetconfClientConfigurationBuilderFactory netconfClientConfigurationBuilderFactory(
-            final AAAEncryptionService encryptionService, final CredentialProvider credentialProvider,
-            final SslContextFactoryProvider factoryProvider) {
-        return new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider, factoryProvider);
+            final AAAEncryptionService encryptionService, final SslContextFactoryProvider factoryProvider) {
+        return new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, factoryProvider);
     }
 
     @Provides
@@ -120,8 +121,9 @@ public interface NetconfTopologyModule {
 
     @Provides
     @Singleton
-    static NetconfClientFactory netconfClientFactory(final NetconfTimer timer, final ResourceSupport resourceSupport) {
-        final var netconfClientFactory = new NetconfClientFactoryImpl(timer);
+    static NetconfClientFactory netconfClientFactory(final NetconfTimer timer, final KeystoreAccess keystoreAccess,
+            final ResourceSupport resourceSupport) {
+        final var netconfClientFactory = new NetconfClientFactoryImpl(timer, keystoreAccess);
         resourceSupport.register(netconfClientFactory);
         return netconfClientFactory;
     }

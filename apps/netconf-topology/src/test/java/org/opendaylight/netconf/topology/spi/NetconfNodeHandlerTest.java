@@ -47,7 +47,6 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -59,6 +58,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -101,7 +101,7 @@ class NetconfNodeHandlerTest {
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
-    private CredentialProvider credentialProvider;
+    private KeystoreAccess keystoreAccess;
 
     // Mock client dispatcher-related things
     @Mock
@@ -146,8 +146,7 @@ class NetconfNodeHandlerTest {
 
         // Instantiate the handler
         handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, schemaAssembler,
-            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-                sslContextFactoryProvider),
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
@@ -327,12 +326,11 @@ class NetconfNodeHandlerTest {
 
     @Test
     void failToConnectOnUnsupportedConfiguration() {
-        final var factory = new NetconfClientFactoryImpl(netconfTimer);
+        final var factory = new NetconfClientFactoryImpl(netconfTimer, keystoreAccess);
 
         final var keyId = "keyId";
-        var keyAuthHandler = new NetconfNodeHandler(factory, netconfTimer, BASE_SCHEMAS, schemaManager, schemaAssembler,
-            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-                    sslContextFactoryProvider),
+        final var keyAuthHandler = new NetconfNodeHandler(factory, netconfTimer, BASE_SCHEMAS, schemaManager, schemaAssembler,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
@@ -360,15 +358,15 @@ class NetconfNodeHandlerTest {
                 null, AbstractNetconfTopology.defaultSshParams(), null);
 
         // return null when attempt to load credentials fot key id
-        doReturn(null).when(credentialProvider).credentialForId(any());
+        doReturn(null).when(keystoreAccess).lookupAsymmetric(any());
         doNothing().when(delegate).onDeviceFailed(any());
         keyAuthHandler.connect();
-        verify(credentialProvider).credentialForId(eq(keyId));
-        // attempt to connect fails due to unsupported configuration, and there is attempt to reconnect
+        verify(keystoreAccess).lookupAsymmetric(eq(keyId));
+        // the key cannot be resolved, so the attempt to connect fails and the only allowed attempt is used up
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
-        final var deviceException = assertInstanceOf(IllegalArgumentException.class, captor.getValue());
-        assertEquals("No keypair found with keyId=keyId", deviceException.getMessage());
+        final var deviceException = assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts", deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
 
@@ -377,7 +375,7 @@ class NetconfNodeHandlerTest {
         // Prepare environment.
         final var minBackoffMillis = 20000L;
         final var netconfNodeHandler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager,
-            schemaAssembler, new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            schemaAssembler, new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
             sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
             .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
