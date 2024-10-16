@@ -885,26 +885,6 @@ previous step.
    OPERATION: GET
    URI: http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171
 
-The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
-
--  `filter <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4>`__
-
--  `start-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.7>`__
-
--  `end-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.8>`__
-
-In addition, the following ODL extension query parameter is supported:
-
-:odl-leaf-nodes-only:
-  If this parameter is set to "true", create and update notifications will only
-  contain the leaf nodes modified instead of the entire subscription subtree.
-  This can help in reducing the size of the notifications.
-
-:odl-skip-notification-data:
-  If this parameter is set to "true", create and update notifications will only
-  contain modified leaf nodes without data.
-  This can help in reducing the size of the notifications.
-
 The response should look something like this:
 
 .. code-block:: json
@@ -944,6 +924,26 @@ The request should look something like this:
 ::
 
     curl -v -X GET  http://localhost:8181/rests/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
+
+The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
+
+-  `filter <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4>`__
+
+-  `start-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.7>`__
+
+-  `end-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.8>`__
+
+In addition, the following ODL extension query parameter is supported:
+
+:odl-leaf-nodes-only:
+  If this parameter is set to "true", create and update notifications will only
+  contain the leaf nodes modified instead of the entire subscription subtree.
+  This can help in reducing the size of the notifications.
+
+:odl-skip-notification-data:
+  If this parameter is set to "true", create and update notifications will only
+  contain modified leaf nodes without data.
+  This can help in reducing the size of the notifications.
 
 Netconf-keystore configuration
 ------------------------------
