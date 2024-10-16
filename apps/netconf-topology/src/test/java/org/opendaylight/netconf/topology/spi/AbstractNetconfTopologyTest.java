@@ -39,7 +39,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -48,6 +47,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.test.util.CustomTreeModification;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -88,7 +88,7 @@ class AbstractNetconfTopologyTest {
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
-    private CredentialProvider credentialProvider;
+    private KeystoreAccess keystoreAccess;
     @Mock
     private NetconfClientFactory clientFactory;
     @Mock
@@ -160,7 +160,7 @@ class AbstractNetconfTopologyTest {
         final var schemaAssembler = new NetconfTopologySchemaAssembler(1);
         final var topology = new TestingNetconfTopologyImpl("id", clientFactory, timer, schemaAssembler,
             schemaManager, dataBroker, mountPointService,
-            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, keystoreAccess,
                 sslContextFactoryProvider), deviceActionFactory,
             new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory()));
 

@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -47,14 +48,34 @@ final class ConfigUtils {
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
     }
 
-    static KeyPair extractKeyPair(final InlineOrKeystore input) throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+    static KeyPair extractKeyPair(final @Nullable KeystoreAccess keystoreAccess, final InlineOrKeystore input)
+            throws UnsupportedConfigurationException {
+        return switch (input) {
+            case org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore
+                    .asymmetric.key.grouping.inline.or.keystore.CentralKeystore central ->
+                extractKeyPair(keystoreAccess, central.requireCentralKeystoreReference());
+            case org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore
+                    .asymmetric.key.grouping.inline.or.keystore.Inline inline -> {
+                final var inlineDef = inline.getInlineDefinition();
+                if (inlineDef == null) {
+                    throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+                }
+                yield KeyPairParser.parseKeyPair(inlineDef);
+            }
+            default -> throw new UnsupportedConfigurationException("Unhandled definition in " + input);
+        };
+    }
+
+    private static KeyPair extractKeyPair(final KeystoreAccess keystoreAccess, final String keyName)
+            throws UnsupportedConfigurationException{
+        if (keystoreAccess == null) {
+            throw new UnsupportedConfigurationException("No central keystore available to resolve key " + keyName);
         }
-        return KeyPairParser.parseKeyPair(inlineDef);
+        final var key = keystoreAccess.lookupAsymmetric(keyName);
+        if (key == null) {
+            throw new UnsupportedConfigurationException("Cannot resolve key " + keyName);
+        }
+        return key;
     }
 
     static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)

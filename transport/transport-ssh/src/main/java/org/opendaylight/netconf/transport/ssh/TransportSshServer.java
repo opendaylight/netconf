@@ -190,7 +190,8 @@ final class TransportSshServer extends SshServer {
                     case PublicKey publicKeyType -> {
                         final var publicKey = publicKeyType.getPublicKey();
                         if (publicKey != null) {
-                            keyPairsBuilder.add(ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore()));
+                            // FIXME: we need a KeystoreAccess
+                            keyPairsBuilder.add(ConfigUtils.extractKeyPair(null, publicKey.getInlineOrKeystore()));
                         }
                     }
                     case Certificate certificateType -> {

@@ -17,7 +17,9 @@ import java.net.ServerSocket;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -35,23 +38,34 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 @ExtendWith(MockitoExtension.class)
 class NC1252Test {
     private static DefaultNetconfTimer TIMER;
-    private static NetconfClientFactoryImpl FACTORY;
 
+    @Mock
+    private KeystoreAccess keystoreAccess;
     @Mock
     private NetconfClientSessionListener sessionListener;
     @Mock
     private SSHNegotiatedAlgListener algListener;
 
+    private NetconfClientFactoryImpl factory;
+
     @BeforeAll
     static void beforeAll() {
         TIMER = new DefaultNetconfTimer();
-        FACTORY = new NetconfClientFactoryImpl(TIMER);
     }
 
     @AfterAll
     static void afterAll() {
-        FACTORY.close();
         TIMER.close();
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        factory = new NetconfClientFactoryImpl(TIMER, keystoreAccess);
+    }
+
+    @AfterEach
+    void afterEach() {
+        factory.close();
     }
 
     @Test
@@ -70,7 +84,7 @@ class NC1252Test {
                 .build())
             .withSessionListener(sessionListener)
             .build();
-        final var future = FACTORY.createClient(clientConfig, algListener);
+        final var future = factory.createClient(clientConfig, algListener);
 
         final var ex = assertThrows(ExecutionException.class, () -> future.get(1, TimeUnit.SECONDS)).getCause();
         assertInstanceOf(ConnectException.class, ex);
