@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.opendaylight.netconf.SubscriptionTracker;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -29,10 +30,12 @@ import org.opendaylight.yangtools.concepts.Registration;
 final class RestconfSession extends HTTPServerSession implements TransportSession {
     private final EndpointRoot root;
     private final List<Registration> resources = new ArrayList<>();
+    private final SubscriptionTracker subscriptionTracker;
 
-    RestconfSession(final HttpScheme scheme, final EndpointRoot root) {
+    RestconfSession(final HttpScheme scheme, final EndpointRoot root, final SubscriptionTracker subscriptionTracker) {
         super(scheme);
         this.root = requireNonNull(root);
+        this.subscriptionTracker = requireNonNull(subscriptionTracker);
     }
 
     @Override
@@ -44,11 +47,13 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     @Override
     public void registerResource(final Registration registration) {
         resources.add(registration);
+        subscriptionTracker.addSubscription(this);
     }
 
     void close() {
         for (var resource : resources) {
             resource.close();
         }
+        subscriptionTracker.removeSession(this);
     }
 }
