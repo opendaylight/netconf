@@ -862,26 +862,6 @@ previous step.
    OPERATION: GET
    URI: http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE
 
-The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
-
--  `filter <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4>`__
-
--  `start-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.7>`__
-
--  `end-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.8>`__
-
-In addition, the following ODL extension query parameter is supported:
-
-:odl-leaf-nodes-only:
-  If this parameter is set to "true", create and update notifications will only
-  contain the leaf nodes modified instead of the entire subscription subtree.
-  This can help in reducing the size of the notifications.
-
-:odl-skip-notification-data:
-  If this parameter is set to "true", create and update notifications will only
-  contain modified leaf nodes without data.
-  This can help in reducing the size of the notifications.
-
 The response should look something like this:
 
 .. code-block:: json
@@ -1114,6 +1094,26 @@ RESTCONF.
     for more information about WebSockets in JavaScript visit `Writing
     WebSocket client
     applications <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications>`__
+
+The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
+
+-  `filter <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4>`__
+
+-  `start-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.7>`__
+
+-  `end-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.8>`__
+
+In addition, the following ODL extension query parameter is supported:
+
+:odl-leaf-nodes-only:
+  If this parameter is set to "true", create and update notifications will only
+  contain the leaf nodes modified instead of the entire subscription subtree.
+  This can help in reducing the size of the notifications.
+
+:odl-skip-notification-data:
+  If this parameter is set to "true", create and update notifications will only
+  contain modified leaf nodes without data.
+  This can help in reducing the size of the notifications.
 
 Netconf-keystore configuration
 ------------------------------
