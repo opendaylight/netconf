@@ -87,7 +87,6 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -96,6 +95,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -196,7 +196,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private DeviceActionFactory deviceActionFactory;
     @Mock
-    private CredentialProvider credentialProvider;
+    private KeystoreAccess keystoreAccess;
     @Mock
     private SslContextFactoryProvider sslHandlerFactoryProvider;
     @Mock
@@ -275,7 +275,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             }
         };
 
-        builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
+        builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, keystoreAccess,
             sslHandlerFactoryProvider);
 
         doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any(Rpc[].class));

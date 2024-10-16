@@ -17,19 +17,17 @@ import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
-import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
-import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
-import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.CentralKeystoreBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PublicKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.credentials.credentials.KeyAuth;
@@ -41,6 +39,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+
 /**
  * Default implementation of NetconfClientConfigurationBuildFactory.
  */
@@ -49,16 +48,15 @@ import org.osgi.service.component.annotations.Reference;
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
     private final SslContextFactoryProvider sslContextFactoryProvider;
     private final AAAEncryptionService encryptionService;
-    private final CredentialProvider credentialProvider;
+    private final KeystoreAccess keystoreAccess;
 
     @Inject
     @Activate
-    public NetconfClientConfigurationBuilderFactoryImpl(
-            @Reference final AAAEncryptionService encryptionService,
-            @Reference final CredentialProvider credentialProvider,
+    public NetconfClientConfigurationBuilderFactoryImpl(@Reference final AAAEncryptionService encryptionService,
+            @Reference final KeystoreAccess keystoreAccess,
             @Reference final SslContextFactoryProvider sslHandlerContextProvider) {
         this.encryptionService = requireNonNull(encryptionService);
-        this.credentialProvider = requireNonNull(credentialProvider);
+        this.keystoreAccess = requireNonNull(keystoreAccess);
         sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
     }
 
@@ -119,23 +117,15 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
             final var keyId = keyBased.getKeyId();
-            final var keyPair = credentialProvider.credentialForId(keyId);
-            if (keyPair == null) {
-                throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
-            }
 
-            // FIXME: NETCONF-1190: this should work via
-            // keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinition
-            // representation of keypair
-            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
-            confBuilder.withSshConfigurator(new ClientFactoryManagerConfigurator() {
-                @Override
-                protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
-                    factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
-                    factoryManager.setUserAuthFactories(
-                        List.of(new UserAuthPublicKeyFactory(factoryManager.getSignatureFactories())));
-                }
-            });
+            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder()
+                .setUsername(keyBased.getUsername())
+                .setPublicKey(new PublicKeyBuilder()
+                    .setInlineOrKeystore(new CentralKeystoreBuilder()
+                        .setCentralKeystoreReference(keyId)
+                        .build())
+                    .build())
+                .build());
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }

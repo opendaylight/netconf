@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
@@ -76,7 +77,8 @@ final class ConfigUtils {
                     instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
                     .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey publicKey
                     && publicKey.getPublicKey() != null) {
-                listBuilder.add(extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
+                // FIXME: we need a KeystoreAccess
+                listBuilder.add(extractKeyPair(null, publicKey.getPublicKey().getInlineOrKeystore()));
             } else if (hostKey.getHostKeyType()
                     instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
                     .ssh.server.grouping.server.identity.host.key.host.key.type.Certificate certificate
@@ -87,17 +89,30 @@ final class ConfigUtils {
         return listBuilder.build();
     }
 
-    static KeyPair extractKeyPair(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                    .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore input)
-            throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+    static KeyPair extractKeyPair(final @Nullable KeystoreAccess keystoreAccess,
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore
+                .asymmetric.key.grouping.InlineOrKeystore input) throws UnsupportedConfigurationException {
+        return switch (input) {
+            case org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore
+                    .asymmetric.key.grouping.inline.or.keystore.CentralKeystore central ->
+                extractKeyPair(keystoreAccess, central.requireCentralKeystoreReference());
+            case org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore
+                    .asymmetric.key.grouping.inline.or.keystore.Inline inline ->
+                extractKeyPair(inline.getInlineDefinition());
+            default -> throw new UnsupportedConfigurationException("Unhandled definition in " + input);
+        };
+    }
+
+    private static KeyPair extractKeyPair(final KeystoreAccess keystoreAccess, final String keyName)
+            throws UnsupportedConfigurationException{
+        if (keystoreAccess == null) {
+            throw new UnsupportedConfigurationException("No central keystore available to resolve key " + keyName);
         }
-        return extractKeyPair(inlineDef);
+        final var key = keystoreAccess.lookupAsymmetric(keyName);
+        if (key == null) {
+            throw new UnsupportedConfigurationException("Cannot resolve key " + keyName);
+        }
+        return key;
     }
 
     private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)

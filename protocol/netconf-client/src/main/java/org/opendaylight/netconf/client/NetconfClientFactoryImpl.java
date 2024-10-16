@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
@@ -35,18 +36,22 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = NetconfClientFactory.class)
 public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     private final SSHTransportStackFactory factory;
+    private final KeystoreAccess keystoreAccess;
     private final NetconfTimer timer;
 
-    public NetconfClientFactoryImpl(final NetconfTimer timer, final SSHTransportStackFactory factory) {
+    public NetconfClientFactoryImpl(final NetconfTimer timer, final KeystoreAccess keystoreAccess,
+            final SSHTransportStackFactory factory) {
         this.timer = requireNonNull(timer);
+        this.keystoreAccess = requireNonNull(keystoreAccess);
         this.factory = requireNonNull(factory);
     }
 
     @Inject
     @Activate
-    public NetconfClientFactoryImpl(@Reference final NetconfTimer timer) {
+    public NetconfClientFactoryImpl(@Reference final NetconfTimer timer,
+            @Reference final KeystoreAccess keystoreAccess) {
         // FIXME: make factory component configurable for OSGi
-        this(timer, new SSHTransportStackFactory("odl-netconf-client", 0));
+        this(timer, keystoreAccess, new SSHTransportStackFactory("odl-netconf-client", 0));
     }
 
     @PreDestroy
