@@ -346,7 +346,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             equalTo(expectedErrorTag.elementBody())).withNamespaceContext(NS_CONTEXT));
     }
 
-    // FIXME: NETCONF-1411 : Must be replaced with assertErrorResponseXml or assertErrorResponseJson where it is in use.
+    // FIXME: Must be eliminated, usage must be replaced with assertErrorResponseJson once
+    //  DataE2ETest#invokeActionWithBadInputsTest will return properly formatted response.
     protected static void assertSimpleErrorResponse(final FullHttpResponse response, final String expectedMessage,
         final HttpResponseStatus expectedStatus) {
         final var content = response.content().toString(StandardCharsets.UTF_8);

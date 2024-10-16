@@ -64,6 +64,9 @@ public final class SecurityHelper {
             final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
             bcProv = prov != null ? prov : new BouncyCastleProvider();
         }
+        if (privateKey == null) {
+            throw new IOException("No private key present");
+        }
 
         try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
             final var obj = keyReader.readObject();
@@ -75,6 +78,8 @@ public final class SecurityHelper {
                     .build(passphrase.toCharArray()));
             } else if (obj instanceof PEMKeyPair plain) {
                 keyPair = plain;
+            } else if (obj == null) {
+                throw new IOException("Invalid private key");
             } else {
                 throw new IOException("Unhandled private key " + obj.getClass());
             }
