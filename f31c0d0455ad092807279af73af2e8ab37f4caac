@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba7930ee_0a4d8e0c",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/TransportSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-10-17T13:00:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6dc3865a_594014b9",
+      "range": {
+        "startLine": 21,
+        "startChar": 34,
+        "endLine": 21,
+        "endChar": 54
+      },
+      "revId": "f31c0d0455ad092807279af73af2e8ab37f4caac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98fe139e_6e8763e5",
@@ -60,6 +84,54 @@
       "writtenOn": "2024-10-16T14:16:11Z",
       "side": 1,
       "message": "missing javadoc",
+      "range": {
+        "startLine": 22,
+        "startChar": 9,
+        "endLine": 22,
+        "endChar": 25
+      },
+      "revId": "f31c0d0455ad092807279af73af2e8ab37f4caac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cf5dd43_d8a28b62",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/TransportSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-10-17T13:00:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98fe139e_6e8763e5",
+      "range": {
+        "startLine": 22,
+        "startChar": 26,
+        "endLine": 22,
+        "endChar": 34
+      },
+      "revId": "f31c0d0455ad092807279af73af2e8ab37f4caac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2f0452e_ec5e15c6",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/TransportSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-10-17T13:00:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f2a6063_b464b3de",
       "range": {
         "startLine": 22,
         "startChar": 9,
