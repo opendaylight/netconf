@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.api;
+package org.opendaylight.netconf.transport.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -13,13 +13,16 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.api.TransportChannel;
+import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
  * Abstract base class for {@link TransportStack}s overlaid on a different stack.
  */
-// FIXME: 9.0.0: move to transport.spi
-public abstract class AbstractOverlayTransportStack<C extends TransportChannel> extends AbstractTransportStack<C> {
+public abstract non-sealed class OverlayTransportStack<C extends OverlayTransportChannel>
+        extends AbstractTransportStack<C> {
     private final @NonNull TransportChannelListener<TransportChannel> asListener = new TransportChannelListener<>() {
         @Override
         public void onTransportChannelFailed(final Throwable cause) {
@@ -34,7 +37,7 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
 
     private volatile TransportStack underlay = null;
 
-    protected AbstractOverlayTransportStack(final TransportChannelListener listener) {
+    protected OverlayTransportStack(final TransportChannelListener listener) {
         super(listener);
     }
 
@@ -53,7 +56,7 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
         this.underlay = requireNonNull(underlay);
     }
 
-    protected static final <T extends AbstractOverlayTransportStack<?>> @NonNull ListenableFuture<T> transformUnderlay(
+    protected static final <T extends OverlayTransportStack<?>> @NonNull ListenableFuture<T> transformUnderlay(
             final T stack, final ListenableFuture<? extends TransportStack> tcpFuture) {
         return Futures.transform(tcpFuture, tcpStack -> {
             stack.setUnderlay(tcpStack);

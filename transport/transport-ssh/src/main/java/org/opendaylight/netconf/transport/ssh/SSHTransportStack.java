@@ -20,10 +20,10 @@ import org.opendaylight.netconf.shaded.sshd.common.SshConstants;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
-import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
+import org.opendaylight.netconf.transport.spi.OverlayTransportStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *   <li>OutboundChannelHandler pumps bytes outbound from the tail of channel pipeline into the subsystem</li>
  * </ul>
  */
-public abstract sealed class SSHTransportStack extends AbstractOverlayTransportStack<SSHTransportChannel>
+public abstract sealed class SSHTransportStack extends OverlayTransportStack<SSHTransportChannel>
         permits SSHClient, SSHServer {
     // SessionListener integration. Responsible for observing authentication-related events, orchestrating both client
     // and server interactions.

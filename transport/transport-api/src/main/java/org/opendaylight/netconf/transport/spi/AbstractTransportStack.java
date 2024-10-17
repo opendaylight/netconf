@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.transport.api;
+package org.opendaylight.netconf.transport.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.api.TransportChannel;
+import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -28,8 +31,8 @@ import org.opendaylight.yangtools.yang.common.Empty;
  *
  * @param <C> associated {@link TransportChannel} type
  */
-// FIXME: 9.0.0: move to transport.spi
-public abstract class AbstractTransportStack<C extends TransportChannel> implements TransportStack {
+public abstract sealed class AbstractTransportStack<C extends TransportChannel> implements TransportStack
+        permits OverlayTransportStack, UnderlayTransportStack {
     private final @NonNull TransportChannelListener<? super C> listener;
 
     /**

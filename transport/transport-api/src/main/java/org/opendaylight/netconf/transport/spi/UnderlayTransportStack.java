@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.transport.spi;
 
 import java.net.InetSocketAddress;
-import org.opendaylight.netconf.transport.api.AbstractTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -19,7 +18,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 /**
  * Abstract base class for {@link TransportStack}s communicating directly with the Netty channel.
  */
-public abstract class UnderlayTransportStack<C extends UnderlayTransportChannel> extends AbstractTransportStack<C> {
+public non-sealed abstract class UnderlayTransportStack<C extends UnderlayTransportChannel>
+        extends AbstractTransportStack<C> {
     protected UnderlayTransportStack(final TransportChannelListener<? super C> listener) {
         super(listener);
     }

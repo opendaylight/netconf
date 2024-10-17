@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpScheme;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.api.AbstractOverlayTransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannel;
+import org.opendaylight.netconf.transport.spi.OverlayTransportChannel;
 
 @NonNullByDefault
-public final class HTTPTransportChannel extends AbstractOverlayTransportChannel {
+public final class HTTPTransportChannel extends OverlayTransportChannel {
     private final HttpScheme scheme;
 
     HTTPTransportChannel(final TransportChannel underlay, final HttpScheme scheme) {

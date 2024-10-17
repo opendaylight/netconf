@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import org.opendaylight.netconf.transport.api.AbstractOverlayTransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannel;
+import org.opendaylight.netconf.transport.spi.OverlayTransportChannel;
 
-public final class TLSTransportChannel extends AbstractOverlayTransportChannel {
+public final class TLSTransportChannel extends OverlayTransportChannel {
     TLSTransportChannel(final TransportChannel tcp) {
         super(tcp);
     }

@@ -11,10 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpScheme;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.spi.OverlayTransportStack;
 
-public abstract sealed class HTTPTransportStack extends AbstractOverlayTransportStack<HTTPTransportChannel>
+public abstract sealed class HTTPTransportStack extends OverlayTransportStack<HTTPTransportChannel>
         permits HTTPClient, HTTPServer {
     static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
 

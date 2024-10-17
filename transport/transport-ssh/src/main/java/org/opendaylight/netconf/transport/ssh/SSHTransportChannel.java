@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import org.opendaylight.netconf.transport.api.AbstractOverlayTransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannel;
+import org.opendaylight.netconf.transport.spi.OverlayTransportChannel;
 
-public final class SSHTransportChannel extends AbstractOverlayTransportChannel {
+public final class SSHTransportChannel extends OverlayTransportChannel {
     SSHTransportChannel(final TransportChannel tcp) {
         super(tcp);
     }

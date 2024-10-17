@@ -10,14 +10,14 @@ package org.opendaylight.netconf.transport.tls;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.ssl.SslContext;
-import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.spi.OverlayTransportStack;
 
 /**
  * Base class for TLS TransportStacks.
  */
-public abstract sealed class TLSTransportStack extends AbstractOverlayTransportStack<TLSTransportChannel>
+public abstract sealed class TLSTransportStack extends OverlayTransportStack<TLSTransportChannel>
         permits TLSClient, TLSServer {
     private final SslHandlerFactory factory;
 
