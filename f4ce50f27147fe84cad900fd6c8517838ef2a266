@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cef3262_575b003d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionTracker.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-17T07:31:04Z",
+      "side": 1,
+      "message": "We are going to be attached to a particular session - not tracking them",
+      "revId": "f4ce50f27147fe84cad900fd6c8517838ef2a266",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
