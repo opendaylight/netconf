@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3adeeb8f_dbe1cc1e",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-17T11:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4fe311d_574cca6b",
+      "revId": "cf4d98e7156f6758b5e0d2d7e35e326c87a1551e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d522157_a3ce1722",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-17T10:57:48Z",
       "side": 1,
       "message": "I guess we want allowedDeviceReg to be null again?",
+      "revId": "cf4d98e7156f6758b5e0d2d7e35e326c87a1551e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e967994_e063c384",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-17T11:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d522157_a3ce1722",
       "revId": "cf4d98e7156f6758b5e0d2d7e35e326c87a1551e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
