@@ -9,7 +9,9 @@ package org.opendaylight.netconf.test.tool;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.MoreObjects;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -42,8 +44,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.util.concurrent.EqualityQueuedNotificationManager;
+import org.opendaylight.yangtools.util.concurrent.NotificationManager;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -56,6 +61,7 @@ import org.slf4j.LoggerFactory;
 class MdsalOperationProvider implements NetconfOperationServiceFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalOperationProvider.class);
 
+    private final EqualityQueuedNotificationManager<DeviceKey, Runnable> manager;
     private final Set<Capability> caps;
     private final YangTextSourceExtension sourceProvider;
     private final DOMSchemaService schemaService;
@@ -67,6 +73,13 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         this.caps = caps;
         schemaService = new FixedDOMSchemaService(schemaContext);
         this.sourceProvider = sourceProvider;
+        // FIXME: select a better executor?
+        // FIXME: close on shutdown?
+        final var executor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16, "CommitFutures",
+            MdsalOperationProvider.class);
+
+        manager = new EqualityQueuedNotificationManager<>("simulator-commits", executor, 100,
+            (unused, list) -> list.forEach(Runnable::run));
     }
 
     @Override
@@ -82,7 +95,21 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     @Override
     public NetconfOperationService createService(final SessionIdType sessionId) {
-        return new MdsalOperationService(sessionId, schemaService, caps, sourceProvider);
+        return new MdsalOperationService(sessionId, schemaService, caps, sourceProvider, manager);
+    }
+
+    // Note: required to have identity-based equals
+    private static final class DeviceKey {
+        final Uint32 sessionId;
+
+        DeviceKey(final SessionIdType sessionId) {
+            this.sessionId = sessionId.getValue();
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this).add("sessionId", sessionId).toString();
+        }
     }
 
     static class MdsalOperationService implements NetconfOperationService {
@@ -91,15 +118,27 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final Set<Capability> caps;
         private final DOMDataBroker dataBroker;
         private final YangTextSourceExtension sourceProvider;
+        private final List<Registration> toClose;
 
         MdsalOperationService(final SessionIdType currentSessionId, final DOMSchemaService schemaService,
-                              final Set<Capability> caps, final YangTextSourceExtension sourceProvider) {
+                              final Set<Capability> caps, final YangTextSourceExtension sourceProvider,
+                              final NotificationManager<DeviceKey, Runnable> manager) {
             this.currentSessionId = requireNonNull(currentSessionId);
             this.schemaService = requireNonNull(schemaService);
             this.caps = caps;
             this.sourceProvider = sourceProvider;
 
-            dataBroker = createDataStore(schemaService, currentSessionId);
+            LOG.debug("Session {}: Creating data stores for simulated device", currentSessionId.getValue());
+            final var key = new DeviceKey(currentSessionId);
+            final var configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
+            final var operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
+
+            final var db = new SerializedDOMDataBroker(Map.of(
+                LogicalDatastoreType.CONFIGURATION, configStore,
+                LogicalDatastoreType.OPERATIONAL, operStore), command -> manager.submitNotification(key, command));
+
+            dataBroker = db;
+            toClose = List.of(db::close, operStore::close, configStore::close);
         }
 
         @Override
@@ -132,7 +171,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
         @Override
         public void close() {
-            // No-op
+            toClose.forEach(Registration::close);
         }
 
         private ContainerNode createNetconfState() {
@@ -173,34 +212,6 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                     .withChild(schemaMapEntryNodeMapNodeCollectionNodeBuilder.build())
                     .build())
                 .build();
-        }
-
-        private static DOMDataBroker createDataStore(final DOMSchemaService schemaService,
-                final SessionIdType sessionId) {
-            LOG.debug("Session {}: Creating data stores for simulated device", sessionId.getValue());
-
-            // FIXME: NETCONF-1414: Multiple problems from day one:
-            //          - the executor is never cleaned up
-            //          - the datastores are not closed
-            //          - the executor has potentially multiple threads, leading to IMDS sequencing bugs
-            //        We do not want to spawn a single-threaded executor for each client, so we need need something
-            //        a tad smarter:
-            //          - create a global EqualityQueuedNotificationManager with a flexible thread pool
-            //          - the listener class is identity-based something
-            //          - the notification class is Runnable
-            //        And the here we perform:
-            //          - allocate a listener instance
-            //          - pass down 'runnable -> manager.submitNotification(listener, runnable)
-            //        That way we get thread sharing across all devices, while still guaranteeing single-threaded
-            //        view of things.
-            final var configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
-            final var operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
-            final var listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16,
-                "CommitFutures", MdsalOperationProvider.class);
-
-            return new SerializedDOMDataBroker(Map.of(
-                LogicalDatastoreType.CONFIGURATION, configStore,
-                LogicalDatastoreType.OPERATIONAL, operStore), listenableFutureExecutor);
         }
     }
 }
