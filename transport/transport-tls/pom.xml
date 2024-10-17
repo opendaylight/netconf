@@ -103,12 +103,6 @@
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>binding-spec</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-common</artifactId>
-            <!-- yeah... not quite ... but this works -->
-            <scope>provided</scope>
-        </dependency>
 
         <!-- testing -->
         <dependency>
@@ -125,7 +119,12 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6991-ietf-inet-types</artifactId>
-            <scope>test</scope>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-common</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

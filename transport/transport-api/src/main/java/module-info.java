@@ -13,9 +13,11 @@ module org.opendaylight.netconf.transport.api {
     requires transitive io.netty.common;
     requires transitive io.netty.transport;
     requires transitive org.opendaylight.yangtools.yang.common;
+    requires transitive org.opendaylight.yang.gen.ietf.inet.types.rfc6991;
     requires io.netty.buffer;
     requires io.netty.transport.classes.epoll;
     requires jdk.net;
+    requires org.opendaylight.yangtools.binding.spec;
     requires org.slf4j;
 
     // Annotation-only dependencies
