@@ -9,11 +9,10 @@ package org.opendaylight.netconf.test.tool;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -21,7 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
-import org.opendaylight.mdsal.dom.spi.store.DOMStore;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -182,17 +180,29 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private static DOMDataBroker createDataStore(final DOMSchemaService schemaService,
                 final SessionIdType sessionId) {
             LOG.debug("Session {}: Creating data stores for simulated device", sessionId.getValue());
-            final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
-            final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
-            ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16,
+            // FIXME: NETCONF-1414: Multiple problems from day one:
+            //          - the executor is never cleaned up
+            //          - the datastores are not closed
+            //          - the executor has potentially multiple threads, leading to IMDS sequencing bugs
+            //        We do not want to spawn a single-threaded executor for each client, so we need need something
+            //        a tad smarter:
+            //          - create a global EqualityQueuedNotificationManager with a flexible thread pool
+            //          - the listener class is identity-based something
+            //          - the notification class is Runnable
+            //        And the here we perform:
+            //          - allocate a listener instance
+            //          - pass down 'runnable -> manager.submitNotification(listener, runnable)
+            //        That way we get thread sharing across all devices, while still guaranteeing single-threaded
+            //        view of things.
+            final var configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
+            final var operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
+            final var listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16,
                 "CommitFutures", MdsalOperationProvider.class);
 
-            final var datastores = new EnumMap<LogicalDatastoreType, DOMStore>(LogicalDatastoreType.class);
-            datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
-            datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
-
-            return new SerializedDOMDataBroker(datastores, listenableFutureExecutor);
+            return new SerializedDOMDataBroker(Map.of(
+                LogicalDatastoreType.CONFIGURATION, configStore,
+                LogicalDatastoreType.OPERATIONAL, operStore), listenableFutureExecutor);
         }
 
         private DOMSchemaService createSchemaService() {
