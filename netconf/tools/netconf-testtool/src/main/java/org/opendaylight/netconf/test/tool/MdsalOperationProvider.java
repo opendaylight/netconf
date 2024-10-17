@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -57,15 +57,15 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalOperationProvider.class);
 
     private final Set<Capability> caps;
-    private final EffectiveModelContext schemaContext;
     private final YangTextSourceExtension sourceProvider;
+    private final DOMSchemaService schemaService;
 
     MdsalOperationProvider(final SessionIdProvider idProvider,
                            final Set<Capability> caps,
                            final EffectiveModelContext schemaContext,
                            final YangTextSourceExtension sourceProvider) {
         this.caps = caps;
-        this.schemaContext = schemaContext;
+        schemaService = new FixedDOMSchemaService(schemaContext);
         this.sourceProvider = sourceProvider;
     }
 
@@ -82,24 +82,22 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     @Override
     public NetconfOperationService createService(final SessionIdType sessionId) {
-        return new MdsalOperationService(sessionId, schemaContext, caps, sourceProvider);
+        return new MdsalOperationService(sessionId, schemaService, caps, sourceProvider);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
         private final SessionIdType currentSessionId;
-        private final EffectiveModelContext schemaContext;
-        private final Set<Capability> caps;
         private final DOMSchemaService schemaService;
+        private final Set<Capability> caps;
         private final DOMDataBroker dataBroker;
         private final YangTextSourceExtension sourceProvider;
 
-        MdsalOperationService(final SessionIdType currentSessionId, final EffectiveModelContext schemaContext,
+        MdsalOperationService(final SessionIdType currentSessionId, final DOMSchemaService schemaService,
                               final Set<Capability> caps, final YangTextSourceExtension sourceProvider) {
             this.currentSessionId = requireNonNull(currentSessionId);
-            this.schemaContext = schemaContext;
+            this.schemaService = requireNonNull(schemaService);
             this.caps = caps;
             this.sourceProvider = sourceProvider;
-            schemaService = createSchemaService();
 
             dataBroker = createDataStore(schemaService, currentSessionId);
         }
@@ -203,23 +201,6 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             return new SerializedDOMDataBroker(Map.of(
                 LogicalDatastoreType.CONFIGURATION, configStore,
                 LogicalDatastoreType.OPERATIONAL, operStore), listenableFutureExecutor);
-        }
-
-        private DOMSchemaService createSchemaService() {
-            return new DOMSchemaService() {
-                @Override
-                public EffectiveModelContext getGlobalContext() {
-                    return schemaContext;
-                }
-
-                @Override
-                public Registration registerSchemaContextListener(final Consumer<EffectiveModelContext> listener) {
-                    listener.accept(getGlobalContext());
-                    return () -> {
-                        // No-op
-                    };
-                }
-            };
         }
     }
 }
