@@ -7,25 +7,17 @@
  */
 package org.opendaylight.netconf.transport.tcp;
 
-import static java.util.Objects.requireNonNull;
-
 import io.netty.channel.Channel;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannel;
+import org.opendaylight.netconf.transport.spi.UnderlayTransportChannel;
 
 /**
  * A TCP {@link TransportChannel}.
  */
 @NonNullByDefault
-public final class TCPTransportChannel extends TransportChannel {
-    private final Channel channel;
-
+public final class TCPTransportChannel extends UnderlayTransportChannel {
     TCPTransportChannel(final Channel channel) {
-        this.channel = requireNonNull(channel);
-    }
-
-    @Override
-    public Channel channel() {
-        return channel;
+        super(channel);
     }
 }
