@@ -39,7 +39,7 @@ public final class JaxRsYangLib implements AutoCloseable {
             @Reference final ServletSupport servletSupport, @Reference final YangLibService yangLibService)
                 throws ServletException {
         final var webContextBuilder = WebContext.builder()
-            .name("RFC8525 YANG Library")
+            .name("YangLibrary")
             .contextPath("/yanglib")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
