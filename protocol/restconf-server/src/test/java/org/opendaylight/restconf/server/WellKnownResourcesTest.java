@@ -51,7 +51,7 @@ class WellKnownResourcesTest {
             Arguments.of(XRD_SUFFIX, HostMeta.MEDIA_TYPE, """
                 <?xml version="1.0" ?>
                 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-                  <Link rel="restconf" href="testRestconf"></Link>
+                  <Link rel="restconf" href="testRestconf"/>
                 </XRD>"""),
             Arguments.of(JRD_SUFFIX, HttpHeaderValues.APPLICATION_JSON, """
                 {

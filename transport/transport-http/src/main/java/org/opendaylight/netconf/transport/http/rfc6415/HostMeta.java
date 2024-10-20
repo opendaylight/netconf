@@ -66,13 +66,12 @@ public final class HostMeta extends AbstractHostMeta {
 
                 for (var link : links) {
                     writer.writeCharacters("  ");
-                    writer.writeStartElement("Link");
+                    writer.writeEmptyElement("Link");
                     writer.writeAttribute("rel", link.rel().toString());
                     switch (link) {
                         case TargetUri targetUri -> writer.writeAttribute("href", targetUri.href().toString());
                         case Template template -> writer.writeAttribute("href", template.template());
                     }
-                    writer.writeEndElement();
                     writer.writeCharacters("\n");
                 }
             }
