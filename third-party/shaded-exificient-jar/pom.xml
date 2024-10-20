@@ -12,14 +12,14 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent</artifactId>
-        <version>13.1.3</version>
+        <version>13.1.5</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>shaded-exificient-jar</artifactId>
     <packaging>jar</packaging>
-    <version>6.0.9-SNAPSHOT</version>
+    <version>6.0.11-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <properties>

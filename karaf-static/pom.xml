@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>karaf-dist-static</artifactId>
-        <version>13.1.3</version>
+        <version>13.1.5</version>
         <relativePath/>
     </parent>
 
@@ -19,7 +19,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-karaf-static</artifactId>
     <description>Apache Karaf static distribution with integrated NETCONF and RESTCONF</description>
-    <version>6.0.9-SNAPSHOT</version>
+    <version>6.0.11-SNAPSHOT</version>
     <packaging>karaf-assembly</packaging>
 
     <properties>
