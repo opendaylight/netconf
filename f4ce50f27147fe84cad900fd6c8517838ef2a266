@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d9c67f3c_87b9f9c2",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionTracker.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-21T12:23:51Z",
+      "side": 1,
+      "message": "See: https://git.opendaylight.org/gerrit/c/netconf/+/113611/comment/6dc3865a_594014b9/",
+      "revId": "f4ce50f27147fe84cad900fd6c8517838ef2a266",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6cef3262_575b003d",
         "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionTracker.java",
         "patchSetId": 3
