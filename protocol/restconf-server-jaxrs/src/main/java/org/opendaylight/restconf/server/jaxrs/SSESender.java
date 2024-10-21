@@ -112,7 +112,7 @@ final class SSESender implements Sender {
      * message exceeds this value, message is manually fragmented to multiple message fragments which are send
      * individually. Previous fragmentation is removed.
      *
-     * @param message Message data to be send over web-socket session.
+     * @param message Message data to be sent over SSE session.
      */
     @Override
     public synchronized void sendDataMessage(final String message) {
