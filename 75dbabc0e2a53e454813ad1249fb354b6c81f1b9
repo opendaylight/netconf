@@ -22,6 +22,29 @@
       },
       "revId": "75dbabc0e2a53e454813ad1249fb354b6c81f1b9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b66e4cc_a109f822",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-21T14:29:45Z",
+      "side": 1,
+      "message": "so this method is package-protected and *NOT* specified by TransportSession.",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 50,
+        "endChar": 22
+      },
+      "revId": "75dbabc0e2a53e454813ad1249fb354b6c81f1b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
