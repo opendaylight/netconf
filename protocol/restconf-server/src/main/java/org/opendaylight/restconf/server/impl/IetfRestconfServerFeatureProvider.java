@@ -10,6 +10,10 @@ package org.opendaylight.restconf.server.impl;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev240814.CentralRestconfServerSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev240814.HttpListen;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev240814.HttpsCallHome;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev240814.HttpsListen;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev240814.IetfRestconfServerData;
 import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
@@ -27,7 +31,6 @@ public final class IetfRestconfServerFeatureProvider implements YangFeatureProvi
 
     @Override
     public Set<? extends YangFeature<?, IetfRestconfServerData>> supportedFeatures() {
-        // FIXME: support some features
-        return Set.of();
+        return Set.of(HttpListen.VALUE, HttpsListen.VALUE, HttpsCallHome.VALUE, CentralRestconfServerSupported.VALUE);
     }
 }
