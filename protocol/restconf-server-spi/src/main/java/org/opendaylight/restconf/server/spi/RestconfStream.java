@@ -242,7 +242,7 @@ public final class RestconfStream<T> {
     /**
      * Registers {@link Sender} subscriber.
      *
-     * @param handler SSE or WS session handler.
+     * @param handler SSE session handler.
      * @param encoding Requested event stream encoding
      * @param params Reception parameters
      * @return A new {@link Registration}, or {@code null} if the subscriber cannot be added
