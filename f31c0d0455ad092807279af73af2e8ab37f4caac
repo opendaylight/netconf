@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1017fc52_817e26e8",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/TransportSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-21T12:22:35Z",
+      "side": 1,
+      "message": "Consider using org.opendaylight.yangtools.concepts.AbstractObjectRegistration#removeRegistration instead of using close().",
+      "parentUuid": "ba7930ee_0a4d8e0c",
+      "range": {
+        "startLine": 21,
+        "startChar": 34,
+        "endLine": 21,
+        "endChar": 54
+      },
+      "revId": "f31c0d0455ad092807279af73af2e8ab37f4caac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "98fe139e_6e8763e5",
         "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/TransportSession.java",
         "patchSetId": 8
