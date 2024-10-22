@@ -14,7 +14,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 
 /**
- * A single subscriber to an {@link AbstractStream}.
+ * A single subscriber to an {@link RestconfStream}.
  */
 final class Subscriber<T> extends AbstractRegistration {
     private final @NonNull RestconfStream<T> stream;
