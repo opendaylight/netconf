@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Service for managing subscription state notifications.
  */
-@Component
 @Singleton
+@Component(service = SubscriptionStateService.class)
 public class SubscriptionStateService {
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionStateService.class);
 
