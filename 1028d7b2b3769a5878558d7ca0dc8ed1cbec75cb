@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77cfa87c_f80963c3",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/Subscription.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-22T08:34:50Z",
+      "side": 1,
+      "message": "We can use generated Subscription from RFC 8639 model.",
+      "revId": "1028d7b2b3769a5878558d7ca0dc8ed1cbec75cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
