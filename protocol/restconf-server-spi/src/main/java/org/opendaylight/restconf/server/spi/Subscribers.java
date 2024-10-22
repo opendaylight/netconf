@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A set of subscribers attached to an {@link AbstractStream}. This is an immutable structure, which can be updated
+ * A set of subscribers attached to an {@link RestconfStream}. This is an immutable structure, which can be updated
  * through a copy-on-writer process driven by {@link #add(Subscriber)} and {@link #remove(Subscriber)}.
  *
  * @param <T> event type
@@ -137,7 +137,7 @@ abstract sealed class Subscribers<T> {
     }
 
     /**
-     * Return an An empty set of subscribers. This is the initial state of {@link RestconfStream}, waiting for the first
+     * Return an empty set of subscribers. This is the initial state of {@link RestconfStream}, waiting for the first
      * subscriber to appear.
      *
      * @param <T> event type
