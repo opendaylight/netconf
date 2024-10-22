@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpScheme;
-import io.netty.handler.codec.http.HttpVersion;
 import java.net.URI;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
@@ -33,7 +32,7 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
 
     @Override
     protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
-            final HttpVersion version, final HttpHeaders headers) {
+            final HttpHeaders headers) {
         return root.prepare(this, method, targetUri, headers);
     }
 }

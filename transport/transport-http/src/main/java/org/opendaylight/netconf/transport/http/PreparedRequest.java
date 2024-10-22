@@ -10,9 +10,9 @@ package org.opendaylight.netconf.transport.http;
 import com.google.common.annotations.Beta;
 
 /**
- * The result of {@link HTTPServerSession#prepareRequest(ImplementedMethod, java.net.URI,
- * io.netty.handler.codec.http.HttpVersion, io.netty.handler.codec.http.HttpHeaders)}. This can either be a
- * {@link CompletedRequest} or a {@link PendingRequest}.
+ * The result of
+ * {@link HTTPServerSession#prepareRequest(ImplementedMethod, java.net.URI, io.netty.handler.codec.http.HttpHeaders)}.
+ * This can either be a {@link CompletedRequest} or a {@link PendingRequest}.
  */
 @Beta
 public sealed interface PreparedRequest permits CompletedRequest, PendingRequest {
