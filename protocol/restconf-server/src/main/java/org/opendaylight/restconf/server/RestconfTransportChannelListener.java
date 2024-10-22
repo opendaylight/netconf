@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.netconf.transport.http.ServerSseHandler;
@@ -26,11 +28,12 @@ import org.slf4j.LoggerFactory;
 final class RestconfTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
-    private final RestconfStream.Registry streamRegistry;
-    private final NettyEndpointConfiguration configuration;
-    private final EndpointRoot root;
-    private final String restconf;
+    private final RestconfStream.@NonNull Registry streamRegistry;
+    private final @NonNull NettyEndpointConfiguration configuration;
+    private final @NonNull EndpointRoot root;
+    private final @NonNull String restconf;
 
+    @NonNullByDefault
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
@@ -55,6 +58,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
             configuration.defaultEncoding(), configuration.prettyPrint().value());
+    }
+
+    @NonNullByDefault
+    EndpointRoot root() {
+        return root;
     }
 
     @Override

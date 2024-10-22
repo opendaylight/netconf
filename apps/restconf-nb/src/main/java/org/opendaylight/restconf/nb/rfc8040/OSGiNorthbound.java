@@ -18,6 +18,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpoint;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
+import org.opendaylight.restconf.server.OSGiNettyEndpoint;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
@@ -136,7 +137,7 @@ public final class OSGiNorthbound {
     public OSGiNorthbound(
             @Reference(target = "(component.factory=" + JaxRsEndpoint.FACTORY_NAME + ")")
             final ComponentFactory<JaxRsEndpoint> jaxrsFactory,
-            @Reference(target = "(component.factory=" + NettyEndpoint.FACTORY_NAME + ")")
+            @Reference(target = "(component.factory=" + OSGiNettyEndpoint.FACTORY_NAME + ")")
             final ComponentFactory<NettyEndpoint> nettyEndpointFactory,
             final Configuration configuration) {
         this.jaxrsFactory = requireNonNull(jaxrsFactory);
@@ -224,7 +225,7 @@ public final class OSGiNorthbound {
                 tlsCertKey.certificate(), tlsCertKey.privateKey())
             : ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
 
-        return NettyEndpoint.props(bootstrapFactory, new NettyEndpointConfiguration(
+        return OSGiNettyEndpoint.props(bootstrapFactory, new NettyEndpointConfiguration(
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),

@@ -91,7 +91,7 @@ class MountPointE2ETest extends AbstractE2ETest {
 
     @AfterEach
     @Override
-    void afterEach() {
+    void afterEach() throws Exception {
         if (deviceSimulator != null) {
             deviceSimulator.close();
             deviceSimulator = null;

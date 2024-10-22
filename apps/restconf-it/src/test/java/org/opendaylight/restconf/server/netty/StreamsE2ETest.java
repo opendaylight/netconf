@@ -25,8 +25,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class StreamsE2ETest extends AbstractE2ETest {
 
+    @Override
     @AfterEach
-    void afterEach() {
+    void afterEach() throws Exception {
         if (clientStreamService != null) {
             clientStreamService = null;
         }
