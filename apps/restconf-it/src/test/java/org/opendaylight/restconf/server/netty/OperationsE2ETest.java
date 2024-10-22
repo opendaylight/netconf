@@ -41,7 +41,7 @@ class OperationsE2ETest extends AbstractE2ETest {
 
     @AfterEach
     @Override
-    void afterEach() {
+    void afterEach() throws Exception {
         netconfKeystoreService.close();
         netconfKeystoreService = null;
         super.afterEach();
