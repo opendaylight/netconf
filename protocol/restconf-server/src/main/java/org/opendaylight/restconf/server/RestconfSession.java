@@ -9,10 +9,12 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpScheme;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -42,6 +44,11 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     @Override
     public void registerResource(final Registration registration) {
         resources.add(requireNonNull(registration));
+    }
+
+    @Override
+    public List<Registration> getResources() {
+        return ImmutableList.copyOf(resources);
     }
 
     void close() {
