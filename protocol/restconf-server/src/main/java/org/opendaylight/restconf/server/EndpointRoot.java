@@ -11,24 +11,60 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
+import org.opendaylight.netconf.transport.http.rfc6415.WebHostResource;
+import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
+import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The root of resource hierarchy exposed from a particular endpoint.
  */
-@NonNullByDefault
 final class EndpointRoot {
+    // split out to minimized retained fields
+    private static final class ResourceReg extends AbstractObjectRegistration<WebHostResourceInstance> {
+        private final ConcurrentHashMap<String, WebHostResource> map;
+
+        @NonNullByDefault
+        ResourceReg(final WebHostResourceInstance instance, final ConcurrentHashMap<String, WebHostResource> map) {
+            super(instance);
+            this.map = requireNonNull(map);
+        }
+
+        @Override
+        protected void removeRegistration() {
+            final var res = getInstance();
+            final var path = res.path();
+            if (map.remove(path, res)) {
+                LOG.info("unregistered {} -> {}", path, res);
+            } else {
+                LOG.warn("unregister non existing {} -> {}, weird but harmless?", path, res);
+            }
+        }
+    }
+
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointRoot.class);
+
+    private final ConcurrentHashMap<String, WebHostResource> resources = new ConcurrentHashMap<>();
     private final PrincipalService principalService;
+    // FIXME: at some point this should just be 'XRD xrd'
     private final WellKnownResources wellKnown;
+    // FIXME: at some point these two fields should be integrated into 'providers' Map with a coherent resource access
+    //        API across the three classes of resources we have today
     private final APIResource apiResource;
     private final String apiSegment;
 
-    // FIXME: at some point we should just receive a Map of resources with coherent API
+    @NonNullByDefault
     EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown,
             final String apiSegment, final APIResource apiResource) {
         this.principalService = requireNonNull(principalService);
@@ -37,6 +73,23 @@ final class EndpointRoot {
         this.apiResource = requireNonNull(apiResource);
     }
 
+    @NonNullByDefault
+    Registration registerProvider(final WebHostResourceProvider provider) {
+        for (var path = provider.defaultPath(); ; path = provider.defaultPath() + "-" + UUID.randomUUID().toString()) {
+            @SuppressWarnings("resource")
+            final var resource = provider.createInstance(path);
+            final var prev = resources.putIfAbsent(path, resource);
+            if (prev == null) {
+                LOG.info("registered {} -> {}", path, resource);
+                return new ResourceReg(resource, resources);
+            }
+
+            LOG.warn("{} -> {} conficts with registered {}, retrying mapping", path, resource, prev);
+            resource.close();
+        }
+    }
+
+    @NonNullByDefault
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers) {
         final var peeler = new SegmentPeeler(targetUri);
@@ -52,8 +105,10 @@ final class EndpointRoot {
         } else if (segment.equals(apiSegment)) {
             return apiResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
-        } else {
-            return EmptyRequestResponse.NOT_FOUND;
         }
+
+        final var resource = resources.get(segment);
+        return resource == null ? EmptyRequestResponse.NOT_FOUND
+            : resource.prepare(method, targetUri, headers, peeler, wellKnown);
     }
 }
