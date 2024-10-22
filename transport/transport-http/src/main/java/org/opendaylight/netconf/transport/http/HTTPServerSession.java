@@ -192,7 +192,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        switch (prepareRequest(method, targetUri, version, msg.headers())) {
+        switch (prepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
                 respond(ctx, streamId, formatResponse(completed.asResponse(), version));
@@ -247,8 +247,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      * @param headers request {@link HttpHeaders}
      */
     @NonNullByDefault
-    protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpVersion version,
-        HttpHeaders headers);
+    protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpHeaders headers);
 
     private void executeRequest(final RequestContext context, final PendingRequest<?> pending, final ByteBuf content) {
         // We are invoked with content's reference and need to make sure it gets released.
