@@ -17,6 +17,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 
 /**
@@ -54,7 +55,7 @@ public abstract class RpcImplementation {
         return MoreObjects.toStringHelper(this).add("qname", qname).toString();
     }
 
-    protected static final <T> @Nullable T leaf(final ContainerNode parent, final NodeIdentifier arg,
+    protected static final <T> @Nullable T leaf(final DataContainerNode parent, final NodeIdentifier arg,
             final Class<T> type) {
         final var child = parent.childByArg(arg);
         if (child instanceof LeafNode<?> leafNode) {
