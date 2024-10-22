@@ -7,9 +7,12 @@
  */
 package org.opendaylight.netconf;
 
-public record Subscription(long id) {
+import org.opendaylight.yangtools.concepts.Registration;
 
-    public void terminate() {
+public record Subscription(long id) implements Registration {
+
+    @Override
+    public void close() {
         // Logic to terminate the subscription
     }
 }

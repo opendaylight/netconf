@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 
 public class SubscriptionTracker {
     private final Map<TransportSession, List<Subscription>> sessionSubscriptions = new HashMap<>();
@@ -22,15 +23,26 @@ public class SubscriptionTracker {
     private final AtomicLong subscriptionIdCounter = new AtomicLong(INITIAL_SUBSCRIPTION_ID);
 
     public boolean addSubscription(final TransportSession session) {
+        if (sessionSubscriptions.containsKey(session)) {
+            sessionSubscriptions.get(session).add(new Subscription(generateSubscriptionId()));
+            return true; // probably ID?
+        } else {
+            sessionSubscriptions.put(session, new ArrayList<>()).add(new Subscription(generateSubscriptionId()));
+
+            session.registerResource(new AbstractRegistration() {
+                @Override
+                protected void removeRegistration() {
+                    removeSession(session);
+                }
+            });
+        }
+
         return sessionSubscriptions.computeIfAbsent(session, s -> new ArrayList<>())
             .add(new Subscription(generateSubscriptionId()));
     }
 
     public void removeSession(final TransportSession session) {
-        final var subscriptions = sessionSubscriptions.remove(session);
-        if (subscriptions != null) {
-            subscriptions.forEach(Subscription::terminate);
-        }
+        sessionSubscriptions.remove(session);
     }
 
     public List<Subscription> getSubscriptions(final TransportSession session) {
