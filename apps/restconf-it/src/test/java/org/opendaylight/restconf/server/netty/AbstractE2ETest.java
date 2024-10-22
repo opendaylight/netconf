@@ -77,8 +77,8 @@ import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
-import org.opendaylight.restconf.server.NettyEndpoint;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
+import org.opendaylight.restconf.server.SimpleNettyEndpoint;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
@@ -130,7 +130,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
 
-    private NettyEndpoint endpoint;
+    private SimpleNettyEndpoint endpoint;
     private String host;
 
     @BeforeAll
@@ -207,12 +207,12 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
             "rests", MessageEncoding.JSON, serverStackGrouping);
-        endpoint = new NettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
+        endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
     }
 
     @AfterEach
-    void afterEach() {
-        endpoint.deactivate();
+    void afterEach() throws Exception {
+        endpoint.close();
     }
 
     @AfterAll
