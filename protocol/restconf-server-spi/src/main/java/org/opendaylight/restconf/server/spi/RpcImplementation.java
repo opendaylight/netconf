@@ -7,17 +7,19 @@
  */
 package org.opendaylight.restconf.server.spi;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.base.MoreObjects;
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+
+import java.net.URI;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * An implementation of a YANG-defined RPC.
@@ -54,8 +56,8 @@ public abstract class RpcImplementation {
         return MoreObjects.toStringHelper(this).add("qname", qname).toString();
     }
 
-    protected static final <T> @Nullable T leaf(final ContainerNode parent, final NodeIdentifier arg,
-            final Class<T> type) {
+    protected static final <T> @Nullable T leaf(final DataContainerNode parent, final NodeIdentifier arg,
+                                                final Class<T> type) {
         final var child = parent.childByArg(arg);
         if (child instanceof LeafNode<?> leafNode) {
             final var body = leafNode.body();
