@@ -9,6 +9,7 @@ package org.opendaylight.restconf.notifications.mdsal;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Service for managing subscription state notifications.
  */
-@Component
+@Singleton
+@Component(service = SubscriptionStateService.class)
 public class SubscriptionStateService {
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionStateService.class);
 
