@@ -23,6 +23,15 @@
     <description>RESTCONF Subscription application</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc8639</artifactId>
+            <version>7.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-dom-broker</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
