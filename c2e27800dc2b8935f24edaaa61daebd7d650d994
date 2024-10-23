@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0f5128fd_79701b81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-10-23T17:10:12Z",
+      "side": 1,
+      "message": "reopened for tracking.",
+      "parentUuid": "064690b4_b59d4dc8",
+      "revId": "c2e27800dc2b8935f24edaaa61daebd7d650d994",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf2c7b6a_4f5f71ce",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
         "patchSetId": 12
