@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "159cfdb3_34a8ea29",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionTracker.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-23T08:44:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9c67f3c_87b9f9c2",
+      "revId": "f4ce50f27147fe84cad900fd6c8517838ef2a266",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cef3262_575b003d",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-17T07:31:04Z",
       "side": 1,
       "message": "We are going to be attached to a particular session - not tracking them",
+      "revId": "f4ce50f27147fe84cad900fd6c8517838ef2a266",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06a90687_dcb6cf79",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionTracker.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-23T08:44:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cef3262_575b003d",
       "revId": "f4ce50f27147fe84cad900fd6c8517838ef2a266",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

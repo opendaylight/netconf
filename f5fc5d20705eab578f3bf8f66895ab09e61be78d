@@ -16,6 +16,24 @@
       "message": "missing artifacts update\nmissing packaging update",
       "revId": "f5fc5d20705eab578f3bf8f66895ab09e61be78d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3907c9b5_840ccdb5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-10-23T08:44:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "635b9d01_a492eaa9",
+      "revId": "f5fc5d20705eab578f3bf8f66895ab09e61be78d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
