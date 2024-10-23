@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -52,7 +53,7 @@ final class EndpointRoot {
             return apiResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
         } else {
-            return AbstractResource.NOT_FOUND;
+            return EmptyRequestResponse.NOT_FOUND;
         }
     }
 }

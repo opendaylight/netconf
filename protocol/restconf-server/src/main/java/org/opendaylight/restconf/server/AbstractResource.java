@@ -66,7 +66,6 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
 
     static final EmptyRequestResponse METHOD_NOT_ALLOWED_READ_ONLY =
         new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
-    static final CompletedRequest NOT_FOUND = new EmptyRequestResponse(HttpResponseStatus.NOT_FOUND);
 
     static final EmptyRequestResponse NOT_ACCEPTABLE_DATA;
     static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_DATA;

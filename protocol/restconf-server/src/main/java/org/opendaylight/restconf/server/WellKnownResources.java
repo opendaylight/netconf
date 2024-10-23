@@ -81,7 +81,7 @@ final class WellKnownResources implements XRD {
             case "/host-meta.json" -> requestJRD(method);
             default -> {
                 LOG.debug("Suffix '{}' not recognized", suffix);
-                yield AbstractResource.NOT_FOUND;
+                yield EmptyRequestResponse.NOT_FOUND;
             }
         };
     }

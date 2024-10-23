@@ -22,6 +22,9 @@ import org.eclipse.jdt.annotation.Nullable;
 @Beta
 @NonNullByDefault
 public final class EmptyRequestResponse extends AbstractRequestResponse implements ReadyResponse {
+    public static final EmptyRequestResponse NO_CONTENT = new EmptyRequestResponse(HttpResponseStatus.NO_CONTENT);
+    public static final EmptyRequestResponse NOT_FOUND = new EmptyRequestResponse(HttpResponseStatus.NOT_FOUND);
+
     public EmptyRequestResponse(final HttpResponseStatus status, final @Nullable HttpHeaders headers) {
         super(status, headers);
     }
