@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d1f10be_04bd8978",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/TransportSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-10-23T08:35:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac7deb35_df9d240c",
+      "range": {
+        "startLine": 32,
+        "startChar": 4,
+        "endLine": 32,
+        "endChar": 17
+      },
+      "revId": "75dbabc0e2a53e454813ad1249fb354b6c81f1b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b66e4cc_a109f822",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-10-21T14:29:45Z",
       "side": 1,
       "message": "so this method is package-protected and *NOT* specified by TransportSession.",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 50,
+        "endChar": 22
+      },
+      "revId": "75dbabc0e2a53e454813ad1249fb354b6c81f1b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8ce9c95_584c0304",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-10-23T08:35:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b66e4cc_a109f822",
       "range": {
         "startLine": 50,
         "startChar": 4,
