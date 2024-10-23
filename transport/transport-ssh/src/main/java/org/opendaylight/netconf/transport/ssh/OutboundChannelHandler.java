@@ -59,19 +59,19 @@ final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
     public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) {
         // redirect channel outgoing packets to output stream linked to transport
         if (msg instanceof ByteBuf buf) {
-            write(buf, promise);
+            write(ctx, buf, promise);
         } else {
             LOG.trace("Ignoring unrecognized {}", msg == null ? null : msg.getClass());
         }
     }
 
-    private void write(final ByteBuf buf, final ChannelPromise promise) {
+    private void write(final ChannelHandlerContext ctx, final ByteBuf buf, final ChannelPromise promise) {
         if (writePending) {
             LOG.trace("A write is already pending, delaying write");
             delayWrite(buf, promise);
         } else {
             LOG.trace("Issuing immediate write");
-            startWrite(buf, promise);
+            startWrite(ctx, buf, promise);
         }
     }
 
@@ -83,7 +83,7 @@ final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
         pending.addLast(new Write(buf, promise));
     }
 
-    private void startWrite(final ByteBuf buf, final ChannelPromise promise) {
+    private void startWrite(final ChannelHandlerContext ctx, final ByteBuf buf, final ChannelPromise promise) {
         final var sshBuf = toSshBuffer(buf);
 
         final IoWriteFuture writeFuture;
@@ -99,10 +99,11 @@ final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
         }
 
         writePending = true;
-        writeFuture.addListener(future -> finishWrite(future, promise));
+        writeFuture.addListener(future -> ctx.executor().execute(() -> finishWrite(ctx, future, promise)));
     }
 
-    private void finishWrite(final IoWriteFuture future, final ChannelPromise promise) {
+    private void finishWrite(final ChannelHandlerContext ctx, final IoWriteFuture future,
+            final ChannelPromise promise) {
         writePending = false;
 
         if (future.isWritten()) {
@@ -114,7 +115,7 @@ final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
                 final var next = pending.pollFirst();
                 if (next != null) {
                     LOG.trace("Issuing next write");
-                    startWrite(next.buf, next.promise);
+                    startWrite(ctx, next.buf, next.promise);
                 }
             }
             return;
