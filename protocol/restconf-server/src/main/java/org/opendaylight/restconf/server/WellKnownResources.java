@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URI;
@@ -68,7 +69,7 @@ final class WellKnownResources implements XRD {
     }
 
     // Well-known resources are immediately available
-    CompletedRequest request(final SegmentPeeler peeler, final ImplementedMethod method) {
+    CompletedRequest request(final SegmentPeeler peeler, final ImplementedMethod method, final HttpHeaders headers) {
         if (!peeler.hasNext()) {
             // We only support OPTIONS
             return method == ImplementedMethod.OPTIONS ? AbstractResource.OPTIONS_ONLY_OK
@@ -77,7 +78,7 @@ final class WellKnownResources implements XRD {
 
         final var suffix = QueryStringDecoder.decodeComponent(peeler.remaining());
         return switch (suffix) {
-            case "/host-meta" -> requestXRD(method);
+            case "/host-meta" -> requestXRD(method, headers);
             case "/host-meta.json" -> requestJRD(method);
             default -> {
                 LOG.debug("Suffix '{}' not recognized", suffix);
@@ -87,7 +88,7 @@ final class WellKnownResources implements XRD {
     }
 
     // https://www.rfc-editor.org/rfc/rfc6415#section-6.1
-    private CompletedRequest requestXRD(final ImplementedMethod method) {
+    private CompletedRequest requestXRD(final ImplementedMethod method, final HttpHeaders headers) {
         // FIXME: https://www.rfc-editor.org/rfc/rfc6415#appendix-A paragraph 2 says:
         //
         //           The client MAY request a JRD representation using the HTTP "Accept"

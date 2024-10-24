@@ -48,7 +48,7 @@ final class EndpointRoot {
 
         final var segment = peeler.next();
         if (segment.equals(".well-known")) {
-            return wellKnown.request(peeler, method);
+            return wellKnown.request(peeler, method, headers);
         } else if (segment.equals(apiSegment)) {
             return apiResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
