@@ -48,6 +48,7 @@
 
         <module>keystore</module>
         <module>truststore</module>
+        <module>plugins/restconf-notifications-mdsal</module>
     </modules>
 
     <profiles>
