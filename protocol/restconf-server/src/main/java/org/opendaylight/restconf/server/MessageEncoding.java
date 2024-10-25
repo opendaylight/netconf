@@ -86,7 +86,7 @@ public enum MessageEncoding {
      *
      * @return A stream {@link EncodingName}
      */
-    EncodingName streamEncodingName() {
+    public EncodingName streamEncodingName() {
         return streamEncodingName;
     }
 
