@@ -23,6 +23,15 @@
     <description>RESTCONF Subscription application</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
