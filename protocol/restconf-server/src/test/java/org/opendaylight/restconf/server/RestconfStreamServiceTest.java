@@ -90,7 +90,7 @@ class RestconfStreamServiceTest {
     @BeforeEach
     void beforeEach() {
         streamService = new RestconfStreamService(registry, BASE_PATH, ERROR_TAG_MAPPING, MessageEncoding.JSON,
-            PrettyPrintParam.FALSE);
+            PrettyPrintParam.FALSE, null);
     }
 
     @ParameterizedTest

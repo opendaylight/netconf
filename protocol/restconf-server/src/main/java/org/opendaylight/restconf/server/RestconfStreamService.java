@@ -53,7 +53,7 @@ public final class RestconfStreamService implements EventStreamService {
 
     public RestconfStreamService(final RestconfStream.Registry registry, final String restconf,
             final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
-            final PrettyPrintParam defaultPrettyPrint) {
+            final PrettyPrintParam defaultPrettyPrint, RestconfSession session) {
         streamRegistry = requireNonNull(registry);
         basePath = requireNonNull(restconf);
         this.defaultEncoding = defaultEncoding.streamEncodingName();
@@ -68,10 +68,11 @@ public final class RestconfStreamService implements EventStreamService {
         // pattern /basePath/streams/streamEncoding/streamName
         final var decoder = new QueryStringDecoder(requestUri);
         final var pathParams = PathParameters.from(decoder.path(), basePath);
-        if (!PathParameters.STREAMS.equals(pathParams.apiResource())) {
+        if (!PathParameters.SSE_RESOURCES.contains(pathParams.apiResource())) {
             callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, INVALID_STREAM_URI_ERROR, defaultEncoding));
             return;
         }
+        // After this logic for streams and subscriptions can be split here as a workaround for testing
         final var args = pathParams.childIdentifier().split("/", 2);
         final var streamEncoding = encoding(args[0]);
         final var streamName = args.length > 1 ? args[1] : null;
