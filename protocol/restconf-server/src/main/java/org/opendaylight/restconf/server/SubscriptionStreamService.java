@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech s.r.o. and others. All rights reserved.
+ * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -9,14 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.ErrorResponseException;
 import org.opendaylight.netconf.transport.http.EventStreamListener;
@@ -28,33 +21,39 @@ import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
-public final class RestconfStreamService implements EventStreamService {
+public final class SubscriptionStreamService implements EventStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamService.class);
 
-    @VisibleForTesting
-    static final String INVALID_STREAM_URI_ERROR = "Invalid stream URI";
-    @VisibleForTesting
-    static final String MISSING_PARAMS_ERROR = "Both stream encoding and stream name are required.";
-    @VisibleForTesting
-    static final String UNKNOWN_STREAM_ERROR = "Requested stream does not exist";
+    static final String INVALID_SUBSCRIPTION_URI_ERROR = "Invalid subscription URI";
+    static final String MISSING_PARAMS_ERROR = "Subscription id is required.";
+    static final String UNKNOWN_SUBSCRIPTION_ERROR = "Requested subscription does not exist";
 
     private static final int ERROR_BUF_SIZE = 2048;
 
-    private final RestconfStream.Registry streamRegistry;
+    private final RestconfSession session;
     private final String basePath;
     private final ErrorTagMapping errorTagMapping;
     private final RestconfStream.EncodingName defaultEncoding;
     private final PrettyPrintParam defaultPrettyPrint;
 
-    public RestconfStreamService(final RestconfStream.Registry registry, final String restconf,
+    public SubscriptionStreamService(final RestconfSession session, final String restconf,
             final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
             final PrettyPrintParam defaultPrettyPrint) {
-        streamRegistry = requireNonNull(registry);
+        this.session = requireNonNull(session);
         basePath = requireNonNull(restconf);
         this.defaultEncoding = defaultEncoding.streamEncodingName();
         this.errorTagMapping = errorTagMapping;
@@ -65,31 +64,33 @@ public final class RestconfStreamService implements EventStreamService {
     public void startEventStream(final @NonNull String requestUri, final @NonNull EventStreamListener listener,
             final @NonNull StartCallback callback) {
         // parse URI.
-        // pattern /basePath/streams/streamEncoding/streamName
+        // pattern /basePath/subscriptions/subscriptionId
         final var decoder = new QueryStringDecoder(requestUri);
         final var pathParams = PathParameters.from(decoder.path(), basePath);
-        if (!PathParameters.SSE_RESOURCES.contains(pathParams.apiResource())) {
-            callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, INVALID_STREAM_URI_ERROR, defaultEncoding));
+        // TODO encodings
+        if (!PathParameters.SUBSCRIPTIONS.equals(pathParams.apiResource())) {
+            callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, INVALID_SUBSCRIPTION_URI_ERROR,
+                defaultEncoding));
             return;
         }
-        // After this logic for streams and subscriptions can be split here as a workaround for testing
-        final var args = pathParams.childIdentifier().split("/", 2);
-        final var streamEncoding = encoding(args[0]);
-        final var streamName = args.length > 1 ? args[1] : null;
-        if (streamEncoding == null || streamName == null || streamName.isEmpty()) {
-            callback.onStartFailure(errorResponse(ErrorTag.BAD_ATTRIBUTE, MISSING_PARAMS_ERROR,
-                streamEncoding == null ? defaultEncoding : streamEncoding));
-            return;
-        }
-
-        // find stream by name
-        final var stream = streamRegistry.lookupStream(streamName);
-        if (stream == null) {
-            callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, UNKNOWN_STREAM_ERROR, streamEncoding));
+        final var subscriptionId = pathParams.childIdentifier();
+        if (subscriptionId == null || subscriptionId.isEmpty()) {
+            callback.onStartFailure(errorResponse(ErrorTag.BAD_ATTRIBUTE, MISSING_PARAMS_ERROR, defaultEncoding));
             return;
         }
 
-        // Try starting stream via registry stream subscriber
+        // TODO verify subscription exist and get it
+        // find subscription by id
+//        final var subscription = session.getResources();
+//        if (subscription == null) {
+//            callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, UNKNOWN_SUBSCRIPTION_ERROR, defaultEncoding));
+//            return;
+//        }
+        final var subscription = new SubscriptionBuilder()
+            .setId(new SubscriptionId(Uint32.valueOf(0)))
+            .build();
+
+        // Try starting subscription via registry stream subscriber
         final var sender = new RestconfStream.Sender() {
             @Override
             public void sendDataMessage(final String data) {
@@ -102,25 +103,18 @@ public final class RestconfStreamService implements EventStreamService {
             }
         };
         final var streamParams = EventStreamGetParams.of(QueryParameters.ofMultiValue(decoder.parameters()));
-        try {
-            final var registration = stream.addSubscriber(sender, streamEncoding, streamParams);
-            if (registration != null) {
-                callback.onStreamStarted(registration::close);
-            } else {
-                callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, UNKNOWN_STREAM_ERROR, streamEncoding));
-            }
-        } catch (UnsupportedEncodingException | XPathExpressionException | IllegalArgumentException e) {
-            callback.onStartFailure(errorResponse(ErrorTag.BAD_ATTRIBUTE, e.getMessage(), streamEncoding));
-        }
-    }
-
-    private static RestconfStream.EncodingName encoding(final String encodingName) {
-        try {
-            return new RestconfStream.EncodingName(encodingName);
-        } catch (IllegalArgumentException e) {
-            LOG.warn("Stream encoding name '{}' is invalid: {}. Ignored.", encodingName, e.getMessage());
-            return null;
-        }
+        // TODO Start stream
+//        try {
+//            final var registration = stream.addSubscriber(sender, defaultEncoding, streamParams);
+//            if (registration != null) {
+//                callback.onStreamStarted(registration::close);
+//            } else {
+//                callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, UNKNOWN_SUBSCRIPTION_ERROR,
+//                    defaultEncoding));
+//            }
+//        } catch (UnsupportedEncodingException | XPathExpressionException | IllegalArgumentException e) {
+//            callback.onStartFailure(errorResponse(ErrorTag.BAD_ATTRIBUTE, e.getMessage(), defaultEncoding));
+//        }
     }
 
     private Exception errorResponse(final ErrorTag errorTag, final String errorMessage,
