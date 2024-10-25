@@ -16,11 +16,15 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceSalFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link NetconfDeviceSalFacade} specialization for netconf topology.
  */
 public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyDeviceSalFacade.class);
+
     private final NetconfDeviceTopologyAdapter datastoreAdapter;
 
     public NetconfTopologyDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
@@ -32,18 +36,30 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+        if (closed()) {
+            LOG.warn("{}: Device adapter was closed before device connected setup finished.", id);
+            return;
+        }
         super.onDeviceConnected(deviceSchema, sessionPreferences, services);
         datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities(), sessionPreferences.sessionId());
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
+        if (closed()) {
+            LOG.warn("{}: Device adapter was closed before device disconnected setup finished.", id);
+            return;
+        }
         datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null);
         super.onDeviceDisconnected();
     }
 
     @Override
     public synchronized void onDeviceFailed(final Throwable throwable) {
+        if (closed()) {
+            LOG.warn("{}: Device adapter was closed before device failure setup finished.", id, throwable);
+            return;
+        }
         datastoreAdapter.setDeviceAsFailed(throwable);
         super.onDeviceFailed(throwable);
     }

@@ -72,6 +72,29 @@ public class NetconfDeviceSalFacadeTest {
     }
 
     @Test
+    void testAfterDeviceClose() {
+        deviceFacade.close();
+        final var schemaContext = mock(EffectiveModelContext.class);
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
+        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
+
+        // Verify that onDeviceConnected is not called after close.
+        deviceFacade.onDeviceConnected(
+            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
+            netconfSessionPreferences, deviceServices);
+        verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
+            any(DOMDataBroker.class), any(NetconfDataTreeService.class));
+
+        // Verify that onDeviceDisconnected is not called after close.
+        deviceFacade.onDeviceDisconnected();
+        verify(mountInstance, times(0)).onDeviceDisconnected();
+
+        // Verify that onDeviceDisconnected is not called after close.
+        deviceFacade.onDeviceFailed(new Throwable());
+        verify(mountInstance, times(0)).onDeviceDisconnected();
+    }
+
+    @Test
     public void testOnDeviceConnected() {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
