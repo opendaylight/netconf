@@ -70,10 +70,15 @@ record PathParameters(String apiResource, String childIdentifier) {
     /**
      * API resource equivalent for streams requests.
      */
-
     static final String STREAMS = "/streams";
 
-    private static final Set<String> API_RESOURCES = Set.of(DATA, OPERATIONS, YANG_LIBRARY_VERSION, MODULES, STREAMS);
+    /**
+     * API resource equivalent for subscriptions requests.
+     */
+    public static final String SUBSCRIPTIONS = "/subscriptions";
+
+    private static final Set<String> API_RESOURCES = Set.of(DATA, OPERATIONS, YANG_LIBRARY_VERSION, MODULES, STREAMS,
+        SUBSCRIPTIONS);
     private static final PathParameters EMPTY = new PathParameters("", "");
 
     PathParameters {
