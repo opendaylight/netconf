@@ -32,4 +32,12 @@ public interface RemoteDeviceHandler extends AutoCloseable {
 
     @Override
     void close();
+
+    /**
+     * Return true if closed method was called. If this method was not implemented return false as default.
+     * @return boolean
+     */
+    default boolean isClosed() {
+        return false;
+    }
 }

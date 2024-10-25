@@ -18,11 +18,16 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseable {
-    private final RemoteDeviceId id;
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSalFacade.class);
     private final NetconfDeviceMount mount;
     private final boolean lockDatastore;
+
+    protected final RemoteDeviceId id;
+    protected boolean isClosed;
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
             final YangInstanceIdentifier mountPath, final boolean lockDatastore) {
@@ -34,6 +39,7 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
         this.id = requireNonNull(id);
         this.mount = requireNonNull(mount);
         this.lockDatastore = lockDatastore;
+        isClosed = false;
     }
 
     @Override
@@ -42,8 +48,17 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     }
 
     @Override
+    public synchronized boolean isClosed() {
+        return isClosed;
+    }
+
+    @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+        if (isClosed) {
+            LOG.warn("{}: Device mount was closed before device connected setup finished.", id);
+            return;
+        }
         final var mountContext = deviceSchema.mountContext();
         final var modelContext = mountContext.modelContext();
 
@@ -59,16 +74,25 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
 
     @Override
     public synchronized void onDeviceDisconnected() {
+        if (isClosed) {
+            LOG.warn("{}: Device mount was closed before device disconnected setup finished.", id);
+            return;
+        }
         mount.onDeviceDisconnected();
     }
 
     @Override
     public synchronized void onDeviceFailed(final Throwable throwable) {
+        if (isClosed) {
+            LOG.warn("{}: Device mount was closed before device failed setup finished.", id, throwable);
+            return;
+        }
         mount.onDeviceDisconnected();
     }
 
     @Override
     public synchronized void close() {
         mount.close();
+        isClosed = true;
     }
 }

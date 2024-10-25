@@ -198,9 +198,12 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
             new RemoteDeviceServices(deviceRpc, deviceActionFactory == null ? null
                 : deviceActionFactory.createDeviceAction(messageTransformer, listener)));
-        notificationHandler.onRemoteSchemaUp(messageTransformer);
 
-        LOG.info("{}: Netconf connector initialized successfully", id);
+        // Verify that salFacade was not closed during connection process.
+        if (!salFacade.isClosed()) {
+            notificationHandler.onRemoteSchemaUp(messageTransformer);
+            LOG.info("{}: Netconf connector initialized successfully", id);
+        }
     }
 
     private void handleSalInitializationFailure(final RemoteDeviceCommunicator listener, final Throwable cause) {
