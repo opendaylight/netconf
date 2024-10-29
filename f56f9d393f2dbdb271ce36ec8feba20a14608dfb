@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f69203ef_14c97ce1",
+        "filename": "plugins/restconf-notifications-mdsal/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-29T09:46:32Z",
+      "side": 1,
+      "message": "Its in mdsal.",
+      "revId": "f56f9d393f2dbdb271ce36ec8feba20a14608dfb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
