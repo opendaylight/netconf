@@ -61,6 +61,7 @@
         <module>odl-restconf-nb</module>
         <module>odl-restconf-openapi</module>
         <module>odl-restconf-server-api</module>
+        <module>odl-restconf-notification</module>
         <module>odl-yanglib-mdsal-writer</module>
     </modules>
 </project>
