@@ -23,6 +23,18 @@
     <description>RESTCONF notifications implemented on top of MD-SAL </description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-dom-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-dom-broker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-spi</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
