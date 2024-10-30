@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufHolder;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -50,7 +49,7 @@ public final class BytebufRequestResponse extends AbstractRequestResponse implem
     }
 
     @Override
-    public FullHttpResponse toHttpResponse(final ByteBufAllocator alloc, final HttpVersion version) {
+    public FullHttpResponse toHttpResponse(final HttpVersion version) {
         return toHttpResponse(version, status, headers, content.retainedSlice());
     }
 

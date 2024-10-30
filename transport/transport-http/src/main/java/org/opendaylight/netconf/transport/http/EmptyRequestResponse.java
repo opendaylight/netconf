@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.transport.http;
 
 import com.google.common.annotations.Beta;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -34,7 +33,7 @@ public final class EmptyRequestResponse extends AbstractRequestResponse implemen
     }
 
     @Override
-    public FullHttpResponse toHttpResponse(final ByteBufAllocator alloc, final HttpVersion version) {
+    public FullHttpResponse toHttpResponse(final HttpVersion version) {
         return toHttpResponse(version, status, headers);
     }
 }
