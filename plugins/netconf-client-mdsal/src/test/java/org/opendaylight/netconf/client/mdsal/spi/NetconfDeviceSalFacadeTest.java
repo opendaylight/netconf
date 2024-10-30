@@ -72,7 +72,7 @@ public class NetconfDeviceSalFacadeTest {
     }
 
     @Test
-    void testAfterDeviceClose() {
+    public void testAfterDeviceClose() {
         deviceFacade.close();
         final var schemaContext = mock(EffectiveModelContext.class);
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
