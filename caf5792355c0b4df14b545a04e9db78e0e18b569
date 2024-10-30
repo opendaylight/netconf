@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c0429c9_2ff34c6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-30T07:54:20Z",
+      "side": 1,
+      "message": "I have not found `Device mount ...` messages in log after fix is applied. Is change in `NetconfDeviceSalFacade` necessary?",
+      "revId": "caf5792355c0b4df14b545a04e9db78e0e18b569",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
