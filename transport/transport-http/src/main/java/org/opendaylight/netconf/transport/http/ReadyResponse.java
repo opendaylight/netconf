@@ -14,7 +14,8 @@ import io.netty.handler.codec.http.HttpVersion;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * A marker interface for {@link Response}s which are readily available.
+ * A marker interface for {@link Response}s which are readily available. Examples include {@link EmptyRequestResponse},
+ * {@link BytebufRequestResponse}, and similar.
  */
 @Beta
 @NonNullByDefault
