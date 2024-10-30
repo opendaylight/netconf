@@ -60,14 +60,10 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      * @param version HTTP version of the request
      */
     @NonNullByDefault
-    public record RequestContext(ChannelHandlerContext ctx, HttpVersion version, @Nullable Integer streamId) {
-        public RequestContext {
+    private record RequestContext(ChannelHandlerContext ctx, HttpVersion version, @Nullable Integer streamId) {
+        RequestContext {
             requireNonNull(ctx);
             requireNonNull(version);
-        }
-
-        public void respond(final FullHttpResponse response) {
-            HTTPServerSession.respond(ctx, streamId, response);
         }
     }
 
@@ -195,7 +191,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         switch (prepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
-                respond(ctx, streamId, formatResponse(completed.asResponse(), version));
+                respond(ctx, streamId, version, completed.asResponse());
             }
             case PendingRequest<?> pending -> {
                 LOG.debug("Dispatching {} {}", method, targetUri);
@@ -266,9 +262,9 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
     @Override
     public void requestComplete(final PendingRequest<?> request, final Response response) {
-        final var context = executingRequests.remove(request);
-        if (context != null) {
-            context.respond(formatResponse(response, context.version()));
+        final var req = executingRequests.remove(request);
+        if (req != null) {
+            respond(req.ctx, req.streamId, req.version, response);
         } else {
             LOG.warn("Cannot pair request {}, not sending response {}", request, response, new Throwable());
         }
@@ -277,12 +273,31 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     @Override
     public void requestFailed(final PendingRequest<?> request, final Exception cause) {
         LOG.warn("Internal error while processing {}", request, cause);
-        final var context = executingRequests.remove(request);
-        if (context != null) {
-            context.respond(formatException(cause, context.version()));
+        final var req = executingRequests.remove(request);
+        if (req != null) {
+            respond(req.ctx, req.streamId, formatException(cause, req.version()));
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
         }
+    }
+
+    @NonNullByDefault
+    private static void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final HttpVersion version, final Response response) {
+        respond(ctx, streamId, switch (response) {
+            case ReadyResponse ready -> ready.toHttpResponse(version);
+            default -> formatResponse(response, ctx, version);
+        });
+    }
+
+    @NonNullByDefault
+    private static void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final FullHttpResponse response) {
+        requireNonNull(response);
+        if (streamId != null) {
+            response.headers().setInt(STREAM_ID, streamId);
+        }
+        ctx.writeAndFlush(response);
     }
 
     // FIXME: below payloads use a synchronous dump of data into the socket. We cannot safely do that on the event loop,
@@ -293,7 +308,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     //        thing, talking to a short queue (SPSC?) of HttpObjects.
     //
     //        the event loop of each channel would be the consumer of that queue, picking them off as quickly as
-    //        possible, but execting backpressure if the amount of pending stuff goes up.
+    //        possible, but expecting backpressure if the amount of pending stuff goes up.
     //
     //        as for the HttpObjects: this effectively means that the OutputStreams used in the below code should be
     //        replaced with entities which perform chunking:
@@ -304,10 +319,10 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     //        - finish up with a LastHttpContent
 
     @NonNullByDefault
-    private static FullHttpResponse formatResponse(final Response response, final HttpVersion version) {
+    private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
+            final HttpVersion version) {
         try {
-            // FIXME: require ChannelHandlerContext and use its allocator
-            return response.toHttpResponse(version);
+            return response.toHttpResponse(ctx.alloc(), version);
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
             return formatException(e, version);
@@ -323,15 +338,5 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         ByteBufUtil.writeUtf8(content, cause.getMessage());
         HttpUtil.setContentLength(response, content.readableBytes());
         return response;
-    }
-
-    @NonNullByDefault
-    protected static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
-            final FullHttpResponse response) {
-        requireNonNull(response);
-        if (streamId != null) {
-            response.headers().setInt(STREAM_ID, streamId);
-        }
-        ctx.writeAndFlush(response);
     }
 }

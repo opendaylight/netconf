@@ -70,7 +70,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answerCompleteWith(result)).when(server).yangLibraryVersionGET(any());
 
         final var request = buildRequest(HttpMethod.GET, YANG_LIBRARY_VERSION_URI, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
     }
 
@@ -87,7 +87,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
 
         final var uri = MODULE_URI + (hasRevision ? REVISION_PARAM : "");
         final var request = buildRequest(HttpMethod.GET, uri, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
     }
 
@@ -105,7 +105,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         }
         final var uri = MODULE_URI_WITH_MOUNT + (hasRevision ? REVISION_PARAM : "");
         final var request = buildRequest(HttpMethod.GET, uri, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
     }
 
@@ -142,7 +142,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         }
 
         final var request = buildRequest(HttpMethod.GET, MODULE_URI, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
         assertEquals("source-read-failure", response.content().toString(StandardCharsets.UTF_8));
     }
