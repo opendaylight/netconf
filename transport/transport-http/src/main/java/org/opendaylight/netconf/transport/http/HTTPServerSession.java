@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -91,6 +93,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     //        reconsider the design
 
     private final ConcurrentMap<PendingRequest<?>, RequestContext> executingRequests = new ConcurrentHashMap<>();
+    private final ExecutorService taskExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final HttpScheme scheme;
 
     protected HTTPServerSession(final HttpScheme scheme) {
@@ -257,7 +260,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
         // Remember metadata about the request and then execute it
         executingRequests.put(pending, context);
-        pending.execute(this, body);
+        taskExecutor.execute(() -> pending.execute(this, body));
     }
 
     @Override
@@ -282,12 +285,13 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     }
 
     @NonNullByDefault
-    private static void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
-            final HttpVersion version, final Response response) {
-        respond(ctx, streamId, switch (response) {
-            case ReadyResponse ready -> ready.toHttpResponse(version);
-            default -> formatResponse(response, ctx, version);
-        });
+    private void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
+            final Response response) {
+        if (response instanceof ReadyResponse ready) {
+            respond(ctx, streamId, ready.toHttpResponse(version));
+        } else {
+            taskExecutor.execute(() -> respond(ctx, streamId, formatResponse(response, ctx, version)));
+        }
     }
 
     @NonNullByDefault
