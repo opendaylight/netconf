@@ -16,6 +16,24 @@
       "message": "I have not found `Device mount ...` messages in log after fix is applied. Is change in `NetconfDeviceSalFacade` necessary?",
       "revId": "caf5792355c0b4df14b545a04e9db78e0e18b569",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c20c4b3_d2095625",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-10-30T08:27:09Z",
+      "side": 1,
+      "message": "Since these classes are related and can both encounter similar issues, I have decided to fix both classes to prevent related problems with the NetconfDeviceSalFacade. In karaf.log before this fix, you can see an error caused by calling onDeviceConnected on the NetconfDeviceSalFacade after it was closed.\n\n```\n2024-10-23T14:03:58,877 | ERROR | topology-schema-assembler-1 | AbstractFuture                   | 96 - com.google.guava - 33.3.1.jre | RuntimeException while executing runnable CallbackListener{org.opendaylight.netconf.client.mdsal.NetconfDevice$1@73f2259} with executor MoreExecutors.directExecutor()\njava.lang.IllegalStateException: Mount point /(urn:TBD:params:xml:ns:yang:network-topology?revision\u003d2013-10-21)network-topology/topology/topology[{(urn:TBD:params:xml:ns:yang:network-topology?revision\u003d2013-10-21)topology-id\u003dtopology-netconf}]/node/node[{(urn:TBD:params:xml:ns:yang:network-topology?revision\u003d2013-10-21)node-id\u003dnode-178}] already exists as org.opendaylight.mdsal.dom.spi.SimpleDOMMountPoint@3a71ec15\n\tat org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl.checkNotExists(DOMMountPointServiceImpl.java:108) ~[bundleFile:?]\n\tat org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl.createMountPoint(DOMMountPointServiceImpl.java:57) ~[bundleFile:?]\n\tat org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount.onDeviceConnected(NetconfDeviceMount.java:66) ~[bundleFile:?]\n\tat org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount.onDeviceConnected(NetconfDeviceMount.java:57) ~[bundleFile:?]\n\tat org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceSalFacade.onDeviceConnected(NetconfDeviceSalFacade.java:57) ~[bundleFile:?]\n\tat org.opendaylight.netconf.topology.spi.NetconfTopologyDeviceSalFacade.onDeviceConnected(NetconfTopologyDeviceSalFacade.java:48) ~[bundleFile:?]\n```",
+      "parentUuid": "3c0429c9_2ff34c6e",
+      "revId": "caf5792355c0b4df14b545a04e9db78e0e18b569",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
