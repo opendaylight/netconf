@@ -68,7 +68,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answerCompleteWith(result)).when(server).operationsGET(any());
 
         final var request = buildRequest(HttpMethod.GET, OPERATIONS_PATH, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
     }
 
@@ -79,7 +79,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answerCompleteWith(result)).when(server).operationsGET(any(), any(ApiPath.class));
 
         final var request = buildRequest(HttpMethod.GET, OPERATIONS_PATH_WITH_ID, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         verify(server).operationsGET(any(), apiPathCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());

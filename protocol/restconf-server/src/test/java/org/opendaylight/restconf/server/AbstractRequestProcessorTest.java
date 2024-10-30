@@ -12,6 +12,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -90,6 +91,11 @@ class AbstractRequestProcessorTest {
         }
         verify(ctx).writeAndFlush(responseCaptor.capture());
         return responseCaptor.getValue();
+    }
+
+    protected final FullHttpResponse dispatchWithAlloc(final FullHttpRequest request) {
+        doReturn(UnpooledByteBufAllocator.DEFAULT).when(ctx).alloc();
+        return dispatch(request);
     }
 
     protected static final List<Arguments> encodings() {
