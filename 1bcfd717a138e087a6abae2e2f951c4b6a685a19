@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c18500bb_abc48f8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-30T12:15:49Z",
+      "side": 1,
+      "message": "See: https://jenkins.opendaylight.org/releng/job/netconf-maven-verify-7.0.x-mvn38-openjdk17/95/consoleFull#-853622487db85ee0b-83ce-4606-9c91-00fd56eff5c2",
+      "revId": "1bcfd717a138e087a6abae2e2f951c4b6a685a19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
