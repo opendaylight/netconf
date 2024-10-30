@@ -195,7 +195,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         switch (prepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
-                respond(ctx, streamId, formatResponse(completed.asResponse(), version));
+                respond(ctx, streamId, version, completed.asResponse());
             }
             case PendingRequest<?> pending -> {
                 LOG.debug("Dispatching {} {}", method, targetUri);
@@ -293,7 +293,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     //        thing, talking to a short queue (SPSC?) of HttpObjects.
     //
     //        the event loop of each channel would be the consumer of that queue, picking them off as quickly as
-    //        possible, but execting backpressure if the amount of pending stuff goes up.
+    //        possible, but expecting backpressure if the amount of pending stuff goes up.
     //
     //        as for the HttpObjects: this effectively means that the OutputStreams used in the below code should be
     //        replaced with entities which perform chunking:
@@ -304,10 +304,10 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     //        - finish up with a LastHttpContent
 
     @NonNullByDefault
-    private static FullHttpResponse formatResponse(final Response response, final HttpVersion version) {
+    private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
+            final HttpVersion version) {
         try {
-            // FIXME: require ChannelHandlerContext and use its allocator
-            return response.toHttpResponse(version);
+            return response.toHttpResponse(ctx.alloc(), version);
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
             return formatException(e, version);

@@ -41,6 +41,9 @@ public abstract class ByteStreamRequestResponse extends AbstractRequestResponse 
         final var content = alloc.buffer();
         try (var out = new ByteBufOutputStream(content)) {
             writeBody(out);
+        } catch (IOException e) {
+            content.release();
+            throw e;
         }
         return toHttpResponse(version, content);
     }
