@@ -12,6 +12,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -83,6 +84,8 @@ class AbstractRequestProcessorTest {
 
     @SuppressWarnings("checkstyle:illegalCatch")
     protected final FullHttpResponse dispatch(final FullHttpRequest request) {
+        doReturn(UnpooledByteBufAllocator.DEFAULT).when(ctx).alloc();
+
         try {
             session.channelRead(ctx, request);
         } catch (Exception e) {
