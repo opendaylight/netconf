@@ -63,6 +63,30 @@
       },
       "revId": "67e126df27a971f54ceb3f8ae851b37f1d2e841a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5e1daf5_1e078813",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceSalFacade.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-10-30T07:52:57Z",
+      "side": 1,
+      "message": "IMO switching to `AtomicBoolean` does not solve the issue. Now we have close state encapsulated in class in accessed from outside via `closed()`.",
+      "parentUuid": "b04bd070_22e2651b",
+      "range": {
+        "startLine": 32,
+        "startChar": 4,
+        "endLine": 32,
+        "endChar": 31
+      },
+      "revId": "67e126df27a971f54ceb3f8ae851b37f1d2e841a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
