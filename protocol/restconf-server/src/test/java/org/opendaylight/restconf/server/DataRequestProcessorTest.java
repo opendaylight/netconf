@@ -169,7 +169,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answerCompleteWith(result)).when(server).dataGET(any());
 
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
 
         assertResponse(response, HttpResponseStatus.OK, encoding.responseType, content);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE));
@@ -183,7 +183,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answerCompleteWith(result)).when(server).dataGET(any(), any(ApiPath.class));
 
         final var request = buildRequest(HttpMethod.GET, DATA_PATH_WITH_ID, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         verify(server).dataGET(any(), apiPathCaptor.capture());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
@@ -237,7 +237,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answer).when(server).dataPOST(any(), any(ApiPath.class), any(DataPostBody.class));
 
         final var request = buildRequest(HttpMethod.POST, DATA_PATH_WITH_ID, encoding, content);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         verify(server).dataPOST(any(), apiPathCaptor.capture(), any());
 
         assertEquals(API_PATH, apiPathCaptor.getValue());
@@ -323,7 +323,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         doAnswer(answer).when(server).dataPATCH(any(), any(PatchBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, input);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         answer.assertContent(input);
 
         final var expectedStatus = expectedErrorTag == null ? HttpResponseStatus.OK
