@@ -35,6 +35,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -48,6 +51,19 @@ import org.slf4j.LoggerFactory;
  * Abstract base class for handling HTTP events on a {@link HTTPServer}'s channel pipeline. Users will typically add
  * a subclass onto the corresponding {@link HTTPTransportChannel} when notified through
  * {@link TransportChannelListener}.
+ *
+ * <p>Incoming requests are processed in four distinct stages:
+ * <ol>
+ *   <li>request method binding, performed on the Netty thread via {@link #implementationOf(HttpMethod)}</li>
+ *   <li>request path and header binding, performed on the Netty thread via
+ *       {@link #prepareRequest(ImplementedMethod, URI, HttpHeaders)}</li>
+ *   <li>request execution, performed in a dedicated thread, via
+ *       {@link PendingRequest#execute(PendingRequestListener, java.io.InputStream)}</li>
+ *   <li>response execution, performed in another dedicated thread</li>
+ * </ol>
+ * This split is done to off-load request and response body construction, so that it can result in a number of messages
+ * being sent down the Netty pipeline. That aspect is important when producing chunked-encoded response from a state
+ * snapshot -- which is the typical use case.
  */
 @Beta
 public abstract class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest>
@@ -93,9 +109,39 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     private final ConcurrentMap<PendingRequest<?>, RequestContext> executingRequests = new ConcurrentHashMap<>();
     private final HttpScheme scheme;
 
+    // Only valid when the session is attached to a Channel
+    private ExecutorService reqExecutor;
+    private ExecutorService respExecutor;
+
     protected HTTPServerSession(final HttpScheme scheme) {
         super(FullHttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
+    }
+
+    @Override
+    public final void handlerAdded(final ChannelHandlerContext ctx) {
+        final var channel = ctx.channel();
+        final var remoteAddress = channel.remoteAddress().toString();
+        reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
+            .name(remoteAddress + "-http-server-req-", 0)
+            .inheritInheritableThreadLocals(false)
+            .uncaughtExceptionHandler(
+                (thread, exception) -> LOG.warn("Unhandled request-phase failure", exception))
+            .factory());
+        respExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
+            .name(remoteAddress + "-http-server-resp-", 0)
+            .inheritInheritableThreadLocals(false)
+            .uncaughtExceptionHandler(
+                (thread, exception) -> LOG.warn("Unhandled response-phase failure", exception))
+            .factory());
+        LOG.debug("Threadpools for {} started", channel);
+    }
+
+    @Override
+    public final void handlerRemoved(final ChannelHandlerContext ctx) {
+        reqExecutor.shutdown();
+        respExecutor.shutdown();
+        LOG.debug("Threadpools for {} shut down", ctx.channel());
     }
 
     @Override
@@ -191,10 +237,11 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         switch (prepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
+                LOG.debug("Immediate response to {} {}", method, targetUri);
                 respond(ctx, streamId, version, completed.asResponse());
             }
             case PendingRequest<?> pending -> {
-                LOG.debug("Dispatching {} {}", method, targetUri);
+                LOG.debug("Scheduling execution of {} {}", method, targetUri);
                 executeRequest(new RequestContext(ctx, version, streamId), pending, msg.content());
             }
         }
@@ -247,17 +294,19 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
     private void executeRequest(final RequestContext context, final PendingRequest<?> pending, final ByteBuf content) {
         // We are invoked with content's reference and need to make sure it gets released.
-        final ByteBufInputStream body;
         if (content.isReadable()) {
-            body = new ByteBufInputStream(content, true);
+            executeRequest(context, pending, new ByteBufInputStream(content, true));
         } else {
             content.release();
-            body = null;
+            executeRequest(context, pending, (ByteBufInputStream) null);
         }
+    }
 
+    private void executeRequest(final RequestContext context, final PendingRequest<?> pending,
+            final ByteBufInputStream body) {
         // Remember metadata about the request and then execute it
         executingRequests.put(pending, context);
-        pending.execute(this, body);
+        reqExecutor.execute(() -> pending.execute(this, body));
     }
 
     @Override
@@ -282,12 +331,17 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     }
 
     @NonNullByDefault
-    private static void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
-            final HttpVersion version, final Response response) {
-        respond(ctx, streamId, switch (response) {
-            case ReadyResponse ready -> ready.toHttpResponse(version);
-            default -> formatResponse(response, ctx, version);
-        });
+    private void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
+            final Response response) {
+        if (response instanceof ReadyResponse ready) {
+            respond(ctx, streamId, ready.toHttpResponse(version));
+            return;
+        }
+        try {
+            respExecutor.execute(() -> respond(ctx, streamId, formatResponse(response, ctx, version)));
+        } catch (RejectedExecutionException e) {
+            LOG.trace("Session shut down, dropping response {}", response, e);
+        }
     }
 
     @NonNullByDefault
@@ -300,35 +354,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         ctx.writeAndFlush(response);
     }
 
-    // FIXME: below payloads use a synchronous dump of data into the socket. We cannot safely do that on the event loop,
-    //        because a slow client would end up throttling our IO threads simply because of TCP window and similar
-    //        queuing/backpressure things.
-    //
-    //        we really want to kick off a virtual thread to take care of that, i.e. doing its own synchronous write
-    //        thing, talking to a short queue (SPSC?) of HttpObjects.
-    //
-    //        the event loop of each channel would be the consumer of that queue, picking them off as quickly as
-    //        possible, but expecting backpressure if the amount of pending stuff goes up.
-    //
-    //        as for the HttpObjects: this effectively means that the OutputStreams used in the below code should be
-    //        replaced with entities which perform chunking:
-    //        - buffer initial stuff, so that we produce a FullHttpResponse if the payload is below
-    //          256KiB (or so), i.e. producing Content-Length header and dumping the thing in one go
-    //        - otherwise emit just HttpResponse with Transfer-Enconding: chunked and continue sending
-    //          out chunks (of reasonable size).
-    //        - finish up with a LastHttpContent
-
-    @NonNullByDefault
-    private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
-            final HttpVersion version) {
-        try {
-            return response.toHttpResponse(ctx.alloc(), version);
-        } catch (IOException e) {
-            LOG.warn("IO error while converting formatting response", e);
-            return formatException(e, version);
-        }
-    }
-
+    // Hand-coded, as simple as possible
     @NonNullByDefault
     private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
         final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
@@ -338,5 +364,34 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         ByteBufUtil.writeUtf8(content, cause.getMessage());
         HttpUtil.setContentLength(response, content.readableBytes());
         return response;
+    }
+
+    // Executed on respExecutor, so it is okay to block
+    @NonNullByDefault
+    private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
+            final HttpVersion version) {
+        // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
+        //
+        //        We want to be emitting a series of write() requests into the queue, each of which is subject
+        //        to channel's flow control -- i.e. it effectively is a MPSC outbound queue.
+        //
+        //        We are using OutputStream below as the synchrous interface, but we really want our own, such that we
+        //        get the headers first and we invoke body streaming (if applicable and indicated by return).
+        //
+        //        In the streaming phase, we start with a HttpObjectSender initialized to the HttpResponse, as indicated
+        //        in previous step. It also implements OutputStream, which is the fasade we show to the user. As they
+        //        pump body data, we check for body size and events and:
+        //        - buffer initial stuff, so that we produce a FullHttpResponse if the payload is below
+        //          256KiB (or so), i.e. producing Content-Length header and dumping the thing in one go
+        //        - otherwise emit just HttpResponse with Transfer-Enconding: chunked and continue sending
+        //          out chunks (of reasonable size).
+        //        - finish up with a LastHttpContent when OutputStream.close() is called ... which might be problematic
+        //          w.r.t. failure cases, so it needs some figuring out
+        try {
+            return response.toHttpResponse(ctx.alloc(), version);
+        } catch (IOException e) {
+            LOG.warn("IO error while converting formatting response", e);
+            return formatException(e, version);
+        }
     }
 }
