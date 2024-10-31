@@ -120,7 +120,7 @@ def queued_send(session, queue_messages):
         )
         stop = time.time()
         status = int(response.status_code)
-        content = repr(response.content)
+        content = repr(response.content.decode("utf-8"))
         runtime = stop - start
         request.set_response((start, stop, runtime), status, content)
 
@@ -195,7 +195,7 @@ while request_count > 0:
             print("ERROR|" + result[1] + "|")
             break
         runtime = "%5.3f|%5.3f|%5.3f" % result[1]
-        print("%03d|%s|%s|" % ((result[0], runtime, result[2])))
+        print("%03d|%s|%s|" % (result[0], runtime, result[2]))
         request_count -= 1
         continue
     time.sleep(args.refresh)
