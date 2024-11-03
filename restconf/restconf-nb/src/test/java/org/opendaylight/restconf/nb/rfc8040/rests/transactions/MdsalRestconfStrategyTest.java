@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,7 +22,9 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,11 +47,11 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -473,12 +474,18 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         final var strategy = jukeboxStrategy();
         final var mountPath = ApiPath.parse("yang-ext:mount");
 
-        final var error = assertThrows(ServerException.class, () -> strategy.resolveStrategy(mountPath)).error();
-        assertEquals(ErrorType.APPLICATION, error.type());
-        assertEquals(ErrorTag.OPERATION_FAILED, error.tag());
-        assertEquals(new ErrorMessage("Could not find a supported access interface in mount point"), error.message());
-        final var path = error.path();
-        assertNotNull(path);
-        assertEquals(JUKEBOX_IID, path.path());
+        final var result = strategy.resolveStrategy(mountPath);
+        assertEquals(ApiPath.empty(), result.tail());
+        final var nodata = assertInstanceOf(NoDataRestconfStrategy.class, result.strategy());
+
+        final var exists = nodata.exists(YangInstanceIdentifier.of(CONT_QNAME));
+        final var rde = assertInstanceOf(RestconfDocumentedException.class,
+            assertThrows(ExecutionException.class, () -> Futures.getDone(exists)).getCause());
+        final var errors = rde.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.getErrorTag());
+        assertEquals("Data request not supported", error.getErrorMessage());
     }
 }

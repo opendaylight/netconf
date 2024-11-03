@@ -265,10 +265,8 @@ public abstract class RestconfStrategy implements DatabindAware {
             return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), ImmutableMap.of(), rpcService,
                 actionService, sourceProvider, mountPointService);
         }
-        LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
-        throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-            new ServerErrorPath(databind, mountPoint.getIdentifier()),
-            "Could not find a supported access interface in mount point");
+        return new NoDataRestconfStrategy(mountDatabind, ImmutableMap.of(), rpcService, actionService, sourceProvider,
+            mountPointService);
     }
 
     @Override
