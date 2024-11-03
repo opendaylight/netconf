@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56bd599d_df999326",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-03T10:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74d4c754_600ee71a",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57ab26f8_d461a234",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-09-24T13:27:05Z",
       "side": 1,
       "message": "This is configured by NettyEndpoint configuration. IMO let\u0027s reuse it.",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb208283_21b66ef5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-03T10:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57ab26f8_d461a234",
       "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -76,6 +112,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80e5eb03_6f45e0a8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-03T10:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6db6c81_326f5339",
+      "range": {
+        "startLine": 51,
+        "startChar": 34,
+        "endLine": 51,
+        "endChar": 38
+      },
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db95da30_ef321245",
@@ -89,6 +149,24 @@
       "writtenOn": "2024-09-24T13:10:20Z",
       "side": 1,
       "message": "Use URI constructor instead: https://git.opendaylight.org/gerrit/c/netconf/+/113649",
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8be20ec_7530076e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiNettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-03T10:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db95da30_ef321245",
       "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
