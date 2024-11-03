@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
+    private static final AsciiString ANY_TYPE = AsciiString.cached("*/*");
 
     /**
      * A {@link EmptyRequestResponse} reporting {@code 405 Method Not Allowed} and indicating support only for
@@ -175,7 +176,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
     //        furthermore it completely ignores https://www.rfc-editor.org/rfc/rfc9110#name-quality-values, i.e.
     //        it does not consider client-supplied weights during media type selection AND it treats q=0 as an
     //        inclusion of a media type rather than its exclusion
-    private static @Nullable MessageEncoding matchEncoding(final String acceptValue) {
+    private @Nullable MessageEncoding matchEncoding(final String acceptValue) {
         final var mimeType = HttpUtil.getMimeType(acceptValue);
         if (mimeType != null) {
             final var mediaType = AsciiString.of(mimeType);
@@ -183,6 +184,10 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
                 if (encoding.producesDataCompatibleWith(mediaType)) {
                     return encoding;
                 }
+            }
+            // Workaround for */*, far from satisfactory, but works for now
+            if (ANY_TYPE.equals(mediaType)) {
+                return invariants.defaultEncoding();
             }
         }
         return null;
