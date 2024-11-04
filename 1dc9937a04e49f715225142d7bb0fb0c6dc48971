@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e6497e2_e72b19c6",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-04T15:13:31Z",
+      "side": 1,
+      "message": "TODO: check if we can just start SSE handler registered in restconf-server",
+      "revId": "1dc9937a04e49f715225142d7bb0fb0c6dc48971",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
