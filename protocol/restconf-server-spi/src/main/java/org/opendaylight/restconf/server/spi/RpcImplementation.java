@@ -55,7 +55,7 @@ public abstract class RpcImplementation {
         return MoreObjects.toStringHelper(this).add("qname", qname).toString();
     }
 
-    protected static final <T> @Nullable T leaf(final DataContainerNode parent, final NodeIdentifier arg,
+    public static final <T> @Nullable T leaf(final DataContainerNode parent, final NodeIdentifier arg,
             final Class<T> type) {
         final var child = parent.childByArg(arg);
         if (child instanceof LeafNode<?> leafNode) {
