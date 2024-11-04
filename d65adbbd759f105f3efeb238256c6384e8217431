@@ -16,6 +16,23 @@
       "message": "Try to add `features.xml`",
       "revId": "d65adbbd759f105f3efeb238256c6384e8217431",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30f079fd_143ba37f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-04T09:28:15Z",
+      "side": 1,
+      "message": "Consider to add our feature to `odl-restconf-all`",
+      "revId": "d65adbbd759f105f3efeb238256c6384e8217431",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
