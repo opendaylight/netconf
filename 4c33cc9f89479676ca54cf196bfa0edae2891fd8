@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29280290_e762fc75",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/SubscriptionStreamService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-04T11:59:42Z",
+      "side": 1,
+      "message": "Configure your IDE to do not add this line - or remove it manually",
+      "revId": "4c33cc9f89479676ca54cf196bfa0edae2891fd8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
