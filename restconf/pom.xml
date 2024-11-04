@@ -29,6 +29,7 @@
 
     <modules>
         <module>restconf-openapi</module>
+        <module>restconf-notifications</module>
         <module>wadl-generator</module>
     </modules>
 </project>
