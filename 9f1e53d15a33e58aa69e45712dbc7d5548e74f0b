@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63d37f54_466728bb",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notification/mdsal/MdsalNotificationaService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-04T08:41:18Z",
+      "side": 1,
+      "message": "Notificationa? 😄",
+      "revId": "9f1e53d15a33e58aa69e45712dbc7d5548e74f0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
