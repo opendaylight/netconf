@@ -115,6 +115,6 @@ final class EndpointRoot {
 
         final var resource = resources.get(segment);
         return resource == null ? EmptyResponse.NOT_FOUND
-            : resource.prepare(method, targetUri, headers, peeler, wellKnown);
+            : resource.prepare(channelHandler, method, targetUri, headers, peeler, wellKnown);
     }
 }

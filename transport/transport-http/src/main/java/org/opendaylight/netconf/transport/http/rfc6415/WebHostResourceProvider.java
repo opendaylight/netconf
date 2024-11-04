@@ -17,8 +17,9 @@ import org.opendaylight.yangtools.concepts.Immutable;
  * {@link WebHostResource} injection mechanism. Instances of this interface are expected to be injected into
  * {@link HTTPServerSession} implementations, which are expected to invoke {@link #createInstance(String)} with a unique
  * path and wire invocations of {@code HTTPServerSession.prepareRequest()} to
- * {@link WebHostResource#prepare(org.opendaylight.netconf.transport.http.ImplementedMethod, java.net.URI,
- * io.netty.handler.codec.http.HttpHeaders, org.opendaylight.netconf.transport.http.SegmentPeeler, XRD)}.
+ * {@link WebHostResource#prepare(io.netty.channel.ChannelHandler,
+ * org.opendaylight.netconf.transport.http.ImplementedMethod, java.net.URI, io.netty.handler.codec.http.HttpHeaders,
+ * org.opendaylight.netconf.transport.http.SegmentPeeler, XRD)}.
  *
  * <p>This maps directly to <a href="https://en.wikipedia.org/wiki/Whiteboard_Pattern">the whiteboard pattern</a>, with
  * this interface being the registered {@code Service}. Each instance maps to an individual {code Event listener}.

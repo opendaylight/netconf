@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.transport.http.rfc6415;
 
 import com.google.common.annotations.Beta;
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -32,6 +33,7 @@ public interface WebHostResource {
     /**
      * Prepare an HTTP request for execution.
      *
+     * @param channelHandler the {@link ChannelHandler} handling this request
      * @param method the method being invoked
      * @param targetUri the target resource
      * @param headers request headers
@@ -40,6 +42,6 @@ public interface WebHostResource {
      * @return a {@link PreparedRequest}
      * @throws IllegalStateException if this resource has been destroyed
      */
-    PreparedRequest prepare(ImplementedMethod method, URI targetUri, HttpHeaders headers, SegmentPeeler peeler,
-        XRD xrd);
+    PreparedRequest prepare(ChannelHandler channelHandler, ImplementedMethod method, URI targetUri, HttpHeaders headers,
+        SegmentPeeler peeler, XRD xrd);
 }
