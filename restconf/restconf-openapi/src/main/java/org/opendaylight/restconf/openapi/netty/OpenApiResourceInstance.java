@@ -9,6 +9,7 @@ package org.opendaylight.restconf.openapi.netty;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -67,8 +68,8 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
     }
 
     @Override
-    public Response prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
-            final SegmentPeeler peeler, final XRD xrd) {
+    public Response prepare(ChannelHandler channelHandler, final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
+                            final SegmentPeeler peeler, final XRD xrd) {
         if (!peeler.hasNext()) {
             return optionsOnlyResponse(method);
         }
