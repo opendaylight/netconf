@@ -40,6 +40,6 @@ public interface WebHostResource {
      * @return a {@link PreparedRequest}
      * @throws IllegalStateException if this resource has been destroyed
      */
-    PreparedRequest prepare(ImplementedMethod method, URI targetUri, HttpHeaders headers, SegmentPeeler peeler,
-        XRD xrd);
+    PreparedRequest prepare(ImplementedMethod method, URI targetUri, HttpHeaders headers,
+        SegmentPeeler peeler, XRD xrd);
 }
