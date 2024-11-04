@@ -16,6 +16,24 @@
       "message": "Try to add `package-info.java` and `module-info.java`",
       "revId": "f3947666aaf3813906fbee4ab3dd9e3cc9987311",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8596b012_8a9530ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-04T12:43:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ceb85b3d_3913b1c5",
+      "revId": "f3947666aaf3813906fbee4ab3dd9e3cc9987311",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
