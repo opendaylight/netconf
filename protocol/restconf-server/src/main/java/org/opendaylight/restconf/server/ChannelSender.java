@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.concepts.Registration;
  * <p>Hence what this does is drop any request we receive and terminate the connection when the stream ends. That way we
  * are fully compliant with the HTTP specification.
  */
-final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> implements Sender {
+public final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> implements Sender {
     private static final ByteBuf EMPTY_LINE = Unpooled.wrappedBuffer(new byte[] { '\r', '\n' }).asReadOnly();
 
     private final int sseMaximumFragmentLength;
@@ -40,13 +40,13 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
     private Registration registration;
     private ChannelHandlerContext context;
 
-    ChannelSender(final int sseMaximumFragmentLength) {
+    public ChannelSender(final int sseMaximumFragmentLength) {
         super(FullHttpRequest.class);
         this.sseMaximumFragmentLength = sseMaximumFragmentLength;
         context = null;
     }
 
-    void enable(final Registration reg) {
+    public void enable(final Registration reg) {
         registration = requireNonNull(reg);
     }
 
