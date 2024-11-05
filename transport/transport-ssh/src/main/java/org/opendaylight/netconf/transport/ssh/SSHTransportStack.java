@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.SshConstants;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
@@ -60,7 +61,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionException(final Session session, final Throwable throwable) {
             final var sessionId = sessionId(session);
             LOG.warn("Session {} encountered an error", sessionId, throwable);
-            deleteSession(sessionId);
+            onSessionClosed(sessionId, throwable);
         }
 
         @Override
@@ -68,14 +69,13 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                 final boolean initiator) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-            deleteSession(sessionId);
+            onSessionClosed(sessionId);
         }
 
         @Override
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
-            LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            onSessionClosed(sessionId);
         }
 
         @Override
@@ -89,7 +89,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onKeyEstablished(session);
                     } catch (IOException e) {
                         LOG.error("Post-key step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        onSessionClosed(sessionId, e);
                     }
                 }
                 case Authenticated -> {
@@ -98,7 +98,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onAuthenticated(session);
                     } catch (IOException e) {
                         LOG.error("Post-authentication step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        onSessionClosed(sessionId, e);
                     }
                 }
                 case KexCompleted -> {
@@ -139,18 +139,36 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     abstract void onAuthenticated(Session session) throws IOException;
 
+    /**
+     * Called when the session needs to be closed.
+     *
+     * @param throwable optional reason for closing the session.
+     * @param sessionId session id.
+     */
+    final void onSessionClosed(final Long sessionId, @Nullable final Throwable throwable) {
+        sessions.remove(sessionId);
+        // auth failure, close underlay if any
+        completeUnderlay(sessionId, underlay -> underlay.channel().close());
+
+        // Set the exception in the listener only if it is not already finished.
+        if (!isTransportChannelDone()) {
+            LOG.warn("Session {} is closed.", sessionId);
+            // Propagate the reason for closing the session.
+            notifyTransportChannelFailed(throwable != null ? throwable
+                : new IllegalStateException("Session " + sessionId + " closed"));
+        }
+    }
+
+    final void onSessionClosed(final Long sessionId) {
+        onSessionClosed(sessionId, null);
+    }
+
     final @NonNull TransportChannel getUnderlayOf(final Long sessionId) throws IOException {
         final var ret = underlays.get(sessionId);
         if (ret == null) {
             throw new IOException("Cannot find underlay for " + sessionId);
         }
         return ret;
-    }
-
-    final void deleteSession(final Long sessionId) {
-        sessions.remove(sessionId);
-        // auth failure, close underlay if any
-        completeUnderlay(sessionId, underlay -> underlay.channel().close());
     }
 
     // FIXME: this should be an assertion, the channel should just be there
