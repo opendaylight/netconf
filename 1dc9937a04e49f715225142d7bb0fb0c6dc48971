@@ -16,6 +16,24 @@
       "message": "TODO: check if we can just start SSE handler registered in restconf-server",
       "revId": "1dc9937a04e49f715225142d7bb0fb0c6dc48971",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77586390_44a6d2ab",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-05T10:42:49Z",
+      "side": 1,
+      "message": "This would be best way if we can add it alongside handler for streams in RestconfTransportChannelListener#onTransportChannelEstablished. Then we can also pass custom EventStreamService that also can get session from RestconfTransportChannelListener. After that adding logic for subscriptions and everything should work.\nSadly there is one issue here - having two SSE handlers intercepting GET requests with text/event-stream headers will lead to race condition (if we take ServerSseHandler the way it is written now as example). May be it is something that will be fixed in NETCONF-1419 I\u0027m not sure.",
+      "parentUuid": "7e6497e2_e72b19c6",
+      "revId": "1dc9937a04e49f715225142d7bb0fb0c6dc48971",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
