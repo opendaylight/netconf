@@ -32,31 +32,18 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import org.apache.commons.codec.digest.Crypt;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
@@ -65,92 +52,25 @@ import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ServerAuthentication;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentity;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
-import org.opendaylight.yangtools.binding.util.BindingMap;
-import org.opendaylight.yangtools.yang.common.Uint16;
 
-@ExtendWith(MockitoExtension.class)
-class SshClientServerTest {
+class SshClientServerTest extends AbstractClientServerTest {
     // Utility to bridge connectClient()/listenServer()
     @FunctionalInterface
     private interface Builder<T extends SSHTransportStack> {
         ListenableFuture<T> build() throws UnsupportedConfigurationException;
     }
 
-    private static final String RSA = "RSA";
     private static final String EC = "EC";
-    private static final String USER = "user";
-    private static final String PASSWORD = "pa$$w0rd";
-    private static final String SUBSYSTEM = "subsystem";
-    private static final AtomicInteger COUNTER = new AtomicInteger(0);
-    private static final AtomicReference<String> USERNAME = new AtomicReference<>(USER);
-
-    private static SSHTransportStackFactory FACTORY;
-
-    @Mock
-    private TcpClientGrouping tcpClientConfig;
-    @Mock
-    private SshClientGrouping sshClientConfig;
-    @Mock
-    private TransportChannelListener<TransportChannel> clientListener;
-    @Mock
-    private TcpServerGrouping tcpServerConfig;
-    @Mock
-    private SshServerGrouping sshServerConfig;
-    @Mock
-    private TransportChannelListener<TransportChannel> serverListener;
 
     @Captor
     private ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
     @Captor
     private ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
-
-    private ServerSocket socket;
-
-    @BeforeAll
-    static void beforeAll() {
-        FACTORY = new SSHTransportStackFactory("IntegrationTest", 0);
-    }
-
-    @AfterAll
-    static void afterAll() {
-        FACTORY.close();
-    }
-
-    @BeforeEach
-    void beforeEach() throws IOException {
-
-        // create temp socket to get available port for test
-        socket = new ServerSocket(0);
-        final var localAddress = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
-        final var localPort = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
-        socket.close();
-
-        final var localBind = new LocalBindBuilder()
-            .setLocalAddress(localAddress)
-            .setLocalPort(localPort)
-            .build();
-
-        when(tcpServerConfig.getLocalBind()).thenReturn(BindingMap.of(localBind));
-        when(tcpServerConfig.nonnullLocalBind()).thenCallRealMethod();
-
-        when(tcpClientConfig.getRemoteAddress()).thenReturn(new Host(localAddress));
-        when(tcpClientConfig.requireRemoteAddress()).thenCallRealMethod();
-        when(tcpClientConfig.getRemotePort()).thenReturn(localPort);
-        when(tcpClientConfig.requireRemotePort()).thenCallRealMethod();
-    }
 
     @ParameterizedTest(name = "SSH Server Host Key Verification -- {0}")
     @MethodSource("itServerKeyVerifyArgs")
@@ -227,17 +147,6 @@ class SshClientServerTest {
                         buildClientIdentityWithPublicKey(getUsername(), ecKeyData),
                         buildClientAuthWithPublicKey(getUsernameAndUpdate(), ecKeyData))
         );
-    }
-
-    private static String getUsername() {
-        return USERNAME.get();
-    }
-
-    /**
-     * Update username for next test.
-     */
-    private static String getUsernameAndUpdate() {
-        return USERNAME.getAndSet(USER + COUNTER.incrementAndGet());
     }
 
     private void integrationTest(final Builder<SSHServer> serverBuilder,
@@ -346,18 +255,6 @@ class SshClientServerTest {
             factoryManager.setPasswordAuthenticator(
                 (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
             factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-        };
-    }
-
-    private static ClientFactoryManagerConfigurator clientConfigurator(final String username) {
-        return new ClientFactoryManagerConfigurator() {
-            @Override
-            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager)
-                    throws UnsupportedConfigurationException {
-                factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
-                factoryManager.setUserAuthFactories(List.of(
-                    new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
-            }
         };
     }
 

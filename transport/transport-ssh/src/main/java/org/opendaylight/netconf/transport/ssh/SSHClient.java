@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -60,6 +61,12 @@ public final class SSHClient extends SSHTransportStack {
             .serverAuthentication(clientParams.getServerAuthentication())
             .configurator(configurator)
             .buildChecked());
+    }
+
+    @VisibleForTesting
+    static SSHClient of(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
+        final TransportSshClient transportSshClient) throws UnsupportedConfigurationException {
+        return new SSHClient(subsystem, listener, transportSshClient);
     }
 
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
