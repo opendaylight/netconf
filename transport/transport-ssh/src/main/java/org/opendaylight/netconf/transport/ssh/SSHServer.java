@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.ssh;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -21,6 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -59,7 +61,13 @@ public final class SSHServer extends SSHTransportStack {
 
     @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
             throws UnsupportedConfigurationException {
-        return transformUnderlay(this, TCPClient.connect(asListener(), bootstrap, connectParams));
+        return connect(bootstrap, connectParams, asListener());
+    }
+
+    @VisibleForTesting
+    @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams,
+            TransportChannelListener<TransportChannel> listen) throws UnsupportedConfigurationException {
+        return transformUnderlay(this, TCPClient.connect(listen, bootstrap, connectParams));
     }
 
     @NonNull ListenableFuture<SSHServer> listen(final ServerBootstrap bootstrap, final TcpServerGrouping connectParams)

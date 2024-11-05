@@ -68,15 +68,17 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionDisconnect(final Session session, final int reason, final String msg, final String language,
                 final boolean initiator) {
             final var sessionId = sessionId(session);
-            LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-            deleteSession(sessionId);
+            final var disconnectReasonName = SshConstants.getDisconnectReasonName(reason);
+            LOG.debug("Session {} disconnected: {}", sessionId, disconnectReasonName);
+            transportFailed(sessionId,
+                new IllegalStateException("Session " + sessionId + " disconnected: " + disconnectReasonName));
         }
 
         @Override
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            transportFailed(sessionId, new IllegalStateException("Session " + sessionId + " closed"));
         }
 
         @Override
@@ -165,13 +167,6 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
             underlay.channel().close();
             notifyTransportChannelFailed(cause);
         });
-    }
-
-    @NonNullByDefault
-    private void deleteSession(final Long sessionId) {
-        sessions.remove(sessionId);
-        // auth failure, close underlay if any
-        completeUnderlay(sessionId, underlay -> underlay.channel().close());
     }
 
     @NonNullByDefault
