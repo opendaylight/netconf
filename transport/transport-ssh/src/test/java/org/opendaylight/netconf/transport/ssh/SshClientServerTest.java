@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,13 +60,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.SshException;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -316,6 +321,101 @@ class SshClientServerTest {
             }
         } finally {
             client.shutdown().get(2, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
+    void testAuthenticationFailure() throws Exception {
+        // Prepare environment with wrong password on client side.
+        final var clientIdentity = buildClientIdentityWithPassword(getUsername(), "WRONG");
+        final var clientAuth = buildClientAuthWithPassword(getUsernameAndUpdate(), "$0$" + PASSWORD);
+        final var serverIdentity = buildServerIdentityWithKeyPair(generateKeyPairWithCertificate(RSA));
+        when(sshClientConfig.getClientIdentity()).thenReturn(clientIdentity);
+        when(sshClientConfig.getServerAuthentication()).thenReturn(null);
+        when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
+        when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
+
+        // Create connection with client and server.
+        final var group = NettyTransportSupport.newEventLoopGroup("AuthFailure", 0);
+        final var serviceFactory = new NettyIoServiceFactoryFactory(group);
+        final var sshClient = SSHClient.of(serviceFactory, group, SUBSYSTEM, clientListener, sshClientConfig, null);
+        final var server = FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig)
+            .get(2, TimeUnit.SECONDS);
+        try {
+            final var bootstrap = NettyTransportSupport.newBootstrap().group(group);
+            final var clientConnect = sshClient.connect(bootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+            assertNotNull(clientConnect);
+
+            // Verify thrown SshException exception.
+            final var exceptionCapture = ArgumentCaptor.forClass(SshException.class);
+            verify(clientListener, timeout(2000)).onTransportChannelFailed(exceptionCapture.capture());
+            final var execException = exceptionCapture.getValue();
+
+            // Verify correct exception message.
+            assertEquals("No more authentication methods available", execException.getMessage());
+        } finally {
+            // Close resources after test.
+            server.shutdown().get(2, TimeUnit.SECONDS);
+            sshClient.shutdown().get(2, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
+    void testSessionCloseFailure() throws Exception {
+        // Prepare environment.
+        final var clientIdentity = buildClientIdentityWithPassword(getUsername(), PASSWORD);
+        final var clientAuth = buildClientAuthWithPassword(getUsernameAndUpdate(), "$0$" + PASSWORD);
+        final var serverIdentity = buildServerIdentityWithKeyPair(generateKeyPairWithCertificate(RSA));
+        when(sshClientConfig.getClientIdentity()).thenReturn(clientIdentity);
+        when(sshClientConfig.getServerAuthentication()).thenReturn(null);
+        when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
+        when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
+
+        final var group = NettyTransportSupport.newEventLoopGroup("SessionFailure", 0);
+        final var serviceFactory = new NettyIoServiceFactoryFactory(group);
+        final var sshClient = SSHClient.of(serviceFactory, group, SUBSYSTEM, clientListener, sshClientConfig, null);
+        final var spyClient = spy(sshClient);
+
+        // Set up the behaviour with spied TransportChannelListener which automatically close session before calling
+        // onTransportChannelEstablished method.
+        doAnswer(clientInvocation -> {
+            final var channelListener = (TransportChannelListener<TransportChannel>) clientInvocation.getArgument(2);
+            // Create a spy of the original listener.
+            final var spiedListener = spy(channelListener);
+            doAnswer(listenerInvocation -> {
+                final var argumentChannel = (TransportChannel) listenerInvocation.getArgument(0);
+
+                // Call the close method on the channel parameter.
+                argumentChannel.channel().close();
+
+                // Call the real method afterward.
+                return listenerInvocation.callRealMethod();
+            }).when(spiedListener).onTransportChannelEstablished(any(TransportChannel.class));
+
+            // Call the real method using the spied listener.
+            return sshClient.connect(clientInvocation.getArgument(0), clientInvocation.getArgument(1),
+                spiedListener);
+        }).when(spyClient).connect(any(), any(), any());
+
+        final var sshServerFuture = FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig);
+        final var server = sshServerFuture.get(2, TimeUnit.SECONDS);
+        try {
+            // Execute connect on prepared spyClient.
+            final var bootstrap = NettyTransportSupport.newBootstrap().group(group);
+            final var clientConnect = spyClient.connect(bootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+            assertNotNull(clientConnect);
+
+            // Verify that IllegalStateException is thrown.
+            final var exceptionCapture = ArgumentCaptor.forClass(IllegalStateException.class);
+            verify(clientListener, timeout(2000)).onTransportChannelFailed(exceptionCapture.capture());
+            final var execException = exceptionCapture.getValue();
+
+            // Verify correct exception message.
+            assertEquals("Session 1 closed", execException.getMessage());
+        } finally {
+            // Close resources after test.
+            server.shutdown().get(2, TimeUnit.SECONDS);
+            sshClient.shutdown().get(2, TimeUnit.SECONDS);
         }
     }
 
