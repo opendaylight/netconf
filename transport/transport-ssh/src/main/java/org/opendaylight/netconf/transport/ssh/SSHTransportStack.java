@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.SshConstants;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
@@ -76,7 +77,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            transportFailed(sessionId);
         }
 
         @Override
@@ -159,11 +160,21 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     }
 
     @NonNullByDefault
-    final void transportFailed(final Long sessionId, final Throwable cause) {
+    final void transportFailed(final Long sessionId) {
+        transportFailed(sessionId, null);
+    }
+
+    @NonNullByDefault
+    final void transportFailed(final Long sessionId, @Nullable final Throwable cause) {
         sessions.remove(sessionId);
         completeUnderlay(sessionId, underlay -> {
             underlay.channel().close();
-            notifyTransportChannelFailed(cause);
+            // Notify TransportChannel if the underlay listener has not finished yet.
+            if (cause != null) {
+                notifyTransportChannelFailed(cause);
+            } else {
+                notifyTransportChannelFailed(new IllegalStateException("Session " + sessionId + " closed"));
+            }
         });
     }
 
