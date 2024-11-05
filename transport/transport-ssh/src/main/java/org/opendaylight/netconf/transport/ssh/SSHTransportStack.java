@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.ssh;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelHandlerContext;
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -76,7 +77,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            transportFailed(sessionId, new EOFException("Session " + sessionId + " closed"));
         }
 
         @Override
