@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
  * {@link TransportChannelListener}.
  */
 @Beta
+// FIXME: rename to HttpServerSession to hint we bind to Http{Message,Request,Response}
 public abstract class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest>
         implements PendingRequestListener {
     /**
@@ -100,6 +101,13 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     protected HTTPServerSession(final HttpScheme scheme) {
         super(FullHttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
+    }
+
+    // FIXME: remove this method once we can operate on non-aggregated requests
+    @Deprecated
+    @SuppressWarnings("static-method")
+    final boolean needsAggregator() {
+        return true;
     }
 
     @Override
