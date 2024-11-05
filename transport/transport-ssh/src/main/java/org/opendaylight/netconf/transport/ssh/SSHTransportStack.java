@@ -76,7 +76,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            transportFailed(sessionId, new IllegalStateException("Session " + sessionId + " closed"));
         }
 
         @Override
