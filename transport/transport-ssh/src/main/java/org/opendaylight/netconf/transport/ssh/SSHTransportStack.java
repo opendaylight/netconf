@@ -60,7 +60,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionException(final Session session, final Throwable throwable) {
             final var sessionId = sessionId(session);
             LOG.warn("Session {} encountered an error", sessionId, throwable);
-            deleteSession(sessionId);
+            onSessionClose(throwable, sessionId);
         }
 
         @Override
@@ -68,14 +68,13 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                 final boolean initiator) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-            deleteSession(sessionId);
+            onSessionClose(new IllegalStateException("Session " + sessionId + " disconnected"), sessionId);
         }
 
         @Override
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
-            LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            onSessionClose(new IllegalStateException("Session " + sessionId + " closed"), sessionId);
         }
 
         @Override
@@ -89,7 +88,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onKeyEstablished(session);
                     } catch (IOException e) {
                         LOG.error("Post-key step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        onSessionClose(e, sessionId);
                     }
                 }
                 case Authenticated -> {
@@ -98,7 +97,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onAuthenticated(session);
                     } catch (IOException e) {
                         LOG.error("Post-authentication step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        onSessionClose(e, sessionId);
                     }
                 }
                 case KexCompleted -> {
@@ -139,18 +138,28 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     abstract void onAuthenticated(Session session) throws IOException;
 
+    /**
+     * Called when the session needs to be closed.
+     *
+     * @param throwable reason for closing session.
+     * @param sessionId session id.
+     */
+    void onSessionClose(final Throwable throwable, final Long sessionId) {
+        sessions.remove(sessionId);
+        // auth failure, close underlay if any
+        completeUnderlay(sessionId, underlay -> underlay.channel().close());
+
+        LOG.info("Session {} is closed.", sessionId);
+        // Propagate the reason for closing the session.
+        notifyTransportChannelFailed(throwable);
+    }
+
     final @NonNull TransportChannel getUnderlayOf(final Long sessionId) throws IOException {
         final var ret = underlays.get(sessionId);
         if (ret == null) {
             throw new IOException("Cannot find underlay for " + sessionId);
         }
         return ret;
-    }
-
-    final void deleteSession(final Long sessionId) {
-        sessions.remove(sessionId);
-        // auth failure, close underlay if any
-        completeUnderlay(sessionId, underlay -> underlay.channel().close());
     }
 
     // FIXME: this should be an assertion, the channel should just be there
