@@ -114,21 +114,31 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
     @Override
     protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var pipeline = underlayChannel.channel().pipeline();
+        final var connection = new DefaultHttp2Connection(true);
+
+        // FIXME: Except not quite: this results in HTTP/1.1 headers and an aggregated message being presented
+        //        That is not want we want: we want the ability to instantiate Http2StreamChannels and pass them
+        //        on to Http2ServerSession (which would then attach an inbound handler to the stream's events.
+        //        We can then play this 2-to-1 transaction on those channels, but not here.
+        //        This should
 
         // External HTTP 2 to internal HTTP 1.1 adapter handler
-        final var connection = new DefaultHttp2Connection(true);
-        final var frameListener = new InboundHttp2ToHttpAdapterBuilder(connection)
-            .maxContentLength(MAX_HTTP_CONTENT_LENGTH)
-            .propagateSettings(true)
-            .build();
-
+        // There are two components:
+        // - the outer, HttpToHttp2ConnectionHandler, deals with outbound HTTP/1.1 -> HTTP/2 conversion
+        // - the inner, InboundHttp2ToHttpAdapter, deals with inbound HTTP/2 -> HTTP/1.1 conversion
         initializePipeline(pipeline, new HttpToHttp2ConnectionHandlerBuilder()
-            .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
+            .frameListener(new DelegatingDecompressorFrameListener(connection,
+                new InboundHttp2ToHttpAdapterBuilder(connection)
+                    .maxContentLength(MAX_HTTP_CONTENT_LENGTH)
+                    .propagateSettings(true)
+                    .build()))
             .connection(connection)
             .frameLogger(FRAME_LOGGER)
             .gracefulShutdownTimeoutMillis(0L)
             .build());
 
+        // FIXME: really live somewhere else -- HTTPServerSessionBootstrap, which knows which object model we are
+        //        implementing -- perhaps as far as down in HTTPServerSession.
         if (authHandlerFactory != null) {
             pipeline.addLast(authHandlerFactory.create());
         }
