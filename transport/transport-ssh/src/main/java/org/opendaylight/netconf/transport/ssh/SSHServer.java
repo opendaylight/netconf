@@ -89,9 +89,15 @@ public final class SSHServer extends SSHTransportStack {
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.debug("Binding to \"{}\" subsystem on session {} failed", subsystem, sessionId, cause);
-                deleteSession(sessionId);
+                onSessionClosed(cause, sessionId);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    void onSessionClosed(final Throwable throwable, final Long sessionId) {
+        LOG.warn("SSHServer session {} is closed. Reason: {}", sessionId, throwable.getMessage());
+        deleteSession(sessionId);
     }
 
     private static TransportServerSession cast(final Session session) throws IOException {

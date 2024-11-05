@@ -60,7 +60,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionException(final Session session, final Throwable throwable) {
             final var sessionId = sessionId(session);
             LOG.warn("Session {} encountered an error", sessionId, throwable);
-            deleteSession(sessionId);
+            onSessionClosed(new IllegalStateException("Session " + sessionId + " encountered an error"), sessionId);
         }
 
         @Override
@@ -68,14 +68,13 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                 final boolean initiator) {
             final var sessionId = sessionId(session);
             LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-            deleteSession(sessionId);
+            onSessionClosed(new IllegalStateException("Session " + sessionId + " disconnected"), sessionId);
         }
 
         @Override
         public void sessionClosed(final Session session) {
             final var sessionId = sessionId(session);
-            LOG.debug("Session {} closed", sessionId);
-            deleteSession(sessionId);
+            onSessionClosed(new IllegalStateException("Session " + sessionId + " closed"), sessionId);
         }
 
         @Override
@@ -89,7 +88,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onKeyEstablished(session);
                     } catch (IOException e) {
                         LOG.error("Post-key step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        onSessionClosed(e, sessionId);
                     }
                 }
                 case Authenticated -> {
@@ -98,7 +97,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onAuthenticated(session);
                     } catch (IOException e) {
                         LOG.error("Post-authentication step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        onSessionClosed(e, sessionId);
                     }
                 }
                 case KexCompleted -> {
@@ -138,6 +137,8 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     abstract void onKeyEstablished(Session session) throws IOException;
 
     abstract void onAuthenticated(Session session) throws IOException;
+
+    abstract void onSessionClosed(Throwable throwable, Long sessionId);
 
     final @NonNull TransportChannel getUnderlayOf(final Long sessionId) throws IOException {
         final var ret = underlays.get(sessionId);
