@@ -58,7 +58,7 @@ class RestconfSessionTest {
     @Mock
     private ChannelHandlerContext ctx;
     @Captor
-    private ArgumentCaptor<RestconfSession> sessionCaptor;
+    private ArgumentCaptor<RestconfSessionBootstrap> bootstrapCaptor;
 
     @Test
     void closeRestconfSessionResourcesTest() throws Exception {
@@ -75,10 +75,11 @@ class RestconfSessionTest {
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
         listener.onTransportChannelEstablished(transportChannel);
-        // capture created session
-        verify(pipeline).addLast(any(ChannelHandler.class), sessionCaptor.capture());
+        // capture bootstrap
+        verify(pipeline).addLast(any(ChannelHandler.class), bootstrapCaptor.capture());
 
-        final var session = sessionCaptor.getValue();
+        // create a session
+        final var session = bootstrapCaptor.getValue().createHttp1Session(HttpScheme.HTTP);
         // register resource
         session.registerResource(registration);
         // bring the channel down
