@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -37,6 +40,8 @@ import org.slf4j.LoggerFactory;
 public final class SSHClient extends SSHTransportStack {
     private static final Logger LOG = LoggerFactory.getLogger(SSHClient.class);
 
+    // Successful only after authentication is finalized.
+    private final SettableFuture<Boolean> sshClientFinalizeFuture = SettableFuture.create();
     private final String subsystem;
 
     private SSHClient(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
@@ -64,7 +69,17 @@ public final class SSHClient extends SSHTransportStack {
 
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
             throws UnsupportedConfigurationException {
-        return transformUnderlay(this, TCPClient.connect(asListener(), bootstrap, connectParams));
+        return connect(bootstrap, connectParams, asListener());
+    }
+
+    @VisibleForTesting
+    @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams,
+            final TransportChannelListener<TransportChannel> listener) throws UnsupportedConfigurationException {
+        final var tcpUnderlayFeature = transformUnderlay(this, TCPClient.connect(listener, bootstrap,
+            connectParams));
+        // Merged feature to wait until authorization is successful and track any issues during the process.
+        return Futures.whenAllSucceed(sshClientFinalizeFuture, tcpUnderlayFeature)
+            .call(tcpUnderlayFeature::get, MoreExecutors.directExecutor());
     }
 
     @NonNull ListenableFuture<SSHClient> listen(final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
@@ -89,9 +104,10 @@ public final class SSHClient extends SSHTransportStack {
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
         if (!future.isSuccess()) {
             LOG.info("Session {} authentication failed", sessionId);
-            deleteSession(sessionId);
+            onSessionClose(future.getException(), sessionId);
         } else {
             LOG.debug("Session {} authenticated", sessionId);
+            sshClientFinalizeFuture.set(true);
         }
     }
 
@@ -114,9 +130,21 @@ public final class SSHClient extends SSHTransportStack {
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.error("Failed to open \"{}\" subsystem on session {}", subsystem, sessionId, cause);
-                deleteSession(sessionId);
+                onSessionClose(cause, sessionId);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    void onSessionClose(final Throwable throwable, final Long sessionId) {
+        deleteSession(sessionId);
+        if (sshClientFinalizeFuture.isDone()) {
+            LOG.warn("SSHClient session {} already closed. Reason: {}", sessionId, throwable.getMessage());
+            return;
+        }
+        LOG.warn("SSHClient session {} is closed.", sessionId, throwable);
+        // Propagate the reason for closing the session.
+        sshClientFinalizeFuture.setException(throwable);
     }
 
     private static TransportClientSession cast(final Session session) throws IOException {
