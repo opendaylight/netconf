@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import com.google.common.annotations.Beta;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -25,4 +26,7 @@ public interface TransportSession {
      * @param registration resource to be registered
      */
     void registerResource(Registration registration);
+
+    //FIXME: this should be only temporary solution and should not be included in final version of NETCONF-714
+    List<Registration> getResources();
 }
