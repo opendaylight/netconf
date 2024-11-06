@@ -94,7 +94,8 @@ public final class SSHClient extends SSHTransportStack {
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
         if (!future.isSuccess()) {
             LOG.info("Session {} authentication failed", sessionId);
-            onSessionClosed(future.getException(), sessionId);
+            final var message = future.getException() != null ? future.getException().getMessage() : "";
+            onSessionClosed(new AuthenticationException("Authentication failed. " + message), sessionId);
         } else {
             LOG.debug("Session {} authenticated", sessionId);
             sshClientFinalizeFuture.set(true);
