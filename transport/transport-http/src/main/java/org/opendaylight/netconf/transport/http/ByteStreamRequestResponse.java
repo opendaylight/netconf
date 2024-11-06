@@ -31,7 +31,7 @@ public abstract class ByteStreamRequestResponse extends AbstractRequestResponse 
         super(status, headers);
     }
 
-    protected ByteStreamRequestResponse(final BytebufRequestResponse prev) {
+    protected ByteStreamRequestResponse(final ByteBufRequestResponse prev) {
         super(prev);
     }
 

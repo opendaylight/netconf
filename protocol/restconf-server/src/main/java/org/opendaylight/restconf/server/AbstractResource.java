@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.BytebufRequestResponse;
+import org.opendaylight.netconf.transport.http.ByteBufRequestResponse;
 import org.opendaylight.netconf.transport.http.CompletedRequest;
 import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
@@ -127,7 +127,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
 
     static final CompletedRequest badApiPath(final String path, final ParseException cause) {
         LOG.debug("Failed to parse API path", cause);
-        return new BytebufRequestResponse(HttpResponseStatus.BAD_REQUEST,
+        return new ByteBufRequestResponse(HttpResponseStatus.BAD_REQUEST,
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT,
                 "Bad request path '%s': '%s'".formatted(path, cause.getMessage())));
     }
