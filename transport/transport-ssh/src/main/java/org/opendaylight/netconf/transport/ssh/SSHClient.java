@@ -17,7 +17,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.naming.AuthenticationException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -95,7 +94,8 @@ public final class SSHClient extends SSHTransportStack {
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
         if (!future.isSuccess()) {
             LOG.info("Session {} authentication failed", sessionId);
-            onSessionClosed(future.getException(), sessionId);
+            final var message = future.getException() != null ? future.getException().getMessage() : "";
+            onSessionClosed(new AuthenticationException("Authentication failed. " + message), sessionId);
         } else {
             LOG.debug("Session {} authenticated", sessionId);
             sshClientFinalizeFuture.set(true);

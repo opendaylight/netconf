@@ -44,6 +44,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.ssh.AuthenticationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
@@ -249,7 +250,11 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             }
             LOG.debug("Connection attempt {} to {} failed", attempts, deviceId, cause);
         }
-
+        // Authentication issue, reconnection will not resolve it.
+        if (cause instanceof AuthenticationException) {
+            delegate.onDeviceFailed(cause);
+            return;
+        }
         // We are invoking callbacks, do not hold locks
         reconnectOrFail();
     }
