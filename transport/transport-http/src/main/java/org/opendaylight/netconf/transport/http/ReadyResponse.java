@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * A marker interface for {@link Response}s which are readily available. Examples include {@link EmptyRequestResponse},
- * {@link BytebufRequestResponse}, and similar.
+ * {@link ByteBufRequestResponse}, and similar.
  */
 @Beta
 @NonNullByDefault

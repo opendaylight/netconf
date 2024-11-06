@@ -25,26 +25,26 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @Beta
 @NonNullByDefault
-public final class BytebufRequestResponse extends AbstractRequestResponse implements ByteBufHolder, ReadyResponse {
+public final class ByteBufRequestResponse extends AbstractRequestResponse implements ByteBufHolder, ReadyResponse {
     private final ByteBuf content;
 
-    private BytebufRequestResponse(final HttpResponseStatus status, final @Nullable HttpHeaders headers,
+    private ByteBufRequestResponse(final HttpResponseStatus status, final @Nullable HttpHeaders headers,
             final ByteBuf content) {
         super(status, headers);
         this.content = requireNonNull(content);
     }
 
-    private BytebufRequestResponse(final BytebufRequestResponse prev, final ByteBuf content) {
+    private ByteBufRequestResponse(final ByteBufRequestResponse prev, final ByteBuf content) {
         super(prev);
         this.content = requireNonNull(content);
     }
 
-    public BytebufRequestResponse(final HttpResponseStatus status, final ByteBuf content, final HttpHeaders headers) {
+    public ByteBufRequestResponse(final HttpResponseStatus status, final ByteBuf content, final HttpHeaders headers) {
         this(status, requireNonNull(headers), content);
     }
 
     // TODO: we really should require "content-type" at the very least. reconsider the design of this class?
-    public BytebufRequestResponse(final HttpResponseStatus status, final ByteBuf content) {
+    public ByteBufRequestResponse(final HttpResponseStatus status, final ByteBuf content) {
         this(status, null, content);
     }
 
@@ -64,23 +64,23 @@ public final class BytebufRequestResponse extends AbstractRequestResponse implem
     }
 
     @Override
-    public BytebufRequestResponse copy() {
+    public ByteBufRequestResponse copy() {
         return replace(content.copy());
     }
 
     @Override
-    public BytebufRequestResponse duplicate() {
+    public ByteBufRequestResponse duplicate() {
         return replace(content.duplicate());
     }
 
     @Override
-    public BytebufRequestResponse retainedDuplicate() {
+    public ByteBufRequestResponse retainedDuplicate() {
         return replace(content.retainedDuplicate());
     }
 
     @Override
-    public BytebufRequestResponse replace(final @Nullable ByteBuf newContent) {
-        return new BytebufRequestResponse(this, requireNonNull(newContent));
+    public ByteBufRequestResponse replace(final @Nullable ByteBuf newContent) {
+        return new ByteBufRequestResponse(this, requireNonNull(newContent));
     }
 
     @Override
@@ -89,25 +89,25 @@ public final class BytebufRequestResponse extends AbstractRequestResponse implem
     }
 
     @Override
-    public BytebufRequestResponse retain() {
+    public ByteBufRequestResponse retain() {
         content.retain();
         return this;
     }
 
     @Override
-    public BytebufRequestResponse retain(final int increment) {
+    public ByteBufRequestResponse retain(final int increment) {
         content.retain(increment);
         return this;
     }
 
     @Override
-    public BytebufRequestResponse touch() {
+    public ByteBufRequestResponse touch() {
         content.touch();
         return this;
     }
 
     @Override
-    public BytebufRequestResponse touch(final @Nullable Object hint) {
+    public ByteBufRequestResponse touch(final @Nullable Object hint) {
         content.touch(hint);
         return this;
     }
