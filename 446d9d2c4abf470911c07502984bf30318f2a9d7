@@ -192,6 +192,30 @@
       },
       "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7330b5da_4a43d3c8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiRequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-06T09:04:32Z",
+      "side": 1,
+      "message": "The updated patches pushes that down to transport-http, where we\u0027ll deal with all users in one go.",
+      "parentUuid": "8f2f7230_242a1969",
+      "range": {
+        "startLine": 140,
+        "startChar": 31,
+        "endLine": 140,
+        "endChar": 78
+      },
+      "revId": "446d9d2c4abf470911c07502984bf30318f2a9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
