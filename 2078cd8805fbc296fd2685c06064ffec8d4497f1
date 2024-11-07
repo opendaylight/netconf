@@ -16,6 +16,24 @@
       "message": "we need tests for presence container, when:\n\n- its parent of node we are writing\n- its parent of parent of parent of node we are writing",
       "revId": "2078cd8805fbc296fd2685c06064ffec8d4497f1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04589853_9de9b4b6",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-07T07:55:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "80d393fb_83a9b40f",
+      "revId": "2078cd8805fbc296fd2685c06064ffec8d4497f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
