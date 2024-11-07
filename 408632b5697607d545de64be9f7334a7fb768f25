@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8da7fdfe_789184cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-07T14:20:35Z",
+      "side": 1,
+      "message": "Aside from incompleteness, I do not believe this is right: we do not know if *our* or *remote* configuration is the problem.\n\nTherefore we should be retrying as usual and let the operator resolve the problem as appropriate.",
+      "revId": "408632b5697607d545de64be9f7334a7fb768f25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "37c5e314_1321a306",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
         "patchSetId": 4
