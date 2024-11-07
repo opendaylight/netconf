@@ -33,6 +33,24 @@
       "message": "Can you try `delegate.onDeviceFailed(e);` instead of `onDeviceFailed(e);`?",
       "revId": "408632b5697607d545de64be9f7334a7fb768f25",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11558ef7_fed4352c",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-07T13:26:05Z",
+      "side": 1,
+      "message": "Seems like an unrelated issue to me. I have prepared a separate task for it.\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1425",
+      "parentUuid": "37c5e314_1321a306",
+      "revId": "408632b5697607d545de64be9f7334a7fb768f25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
