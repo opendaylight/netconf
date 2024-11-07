@@ -33,6 +33,29 @@
       "message": "Try to add some unit test",
       "revId": "70c5401563f78de51c6398be3a626fc445f04bb3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45a49f1e_7ee98d60",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-07T14:07:16Z",
+      "side": 1,
+      "message": "why do we even need this?",
+      "range": {
+        "startLine": 41,
+        "startChar": 42,
+        "endLine": 41,
+        "endChar": 65
+      },
+      "revId": "70c5401563f78de51c6398be3a626fc445f04bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
