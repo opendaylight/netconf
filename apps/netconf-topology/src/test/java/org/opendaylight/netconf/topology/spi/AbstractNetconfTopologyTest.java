@@ -192,9 +192,9 @@ class AbstractNetconfTopologyTest {
 
         topology.onDataTreeChanged(testNode, ModificationType.WRITE);
         verify(encryptionService).decrypt(any());
-        verify(delegate).onDeviceFailed(any(ConnectGivenUpException.class));
+        verify(delegate).onDeviceFailed(any(IllegalStateException.class));
 
-        assertEquals("Given up connecting RemoteDeviceId[name=nodeId, address=/127.0.0.1:9999] after 1 attempts",
+        assertEquals("Failed to decrypt password",
             exceptionCaptor.getValue().getMessage());
 
         topology.onDataTreeChanged(testNode, ModificationType.DELETE);
