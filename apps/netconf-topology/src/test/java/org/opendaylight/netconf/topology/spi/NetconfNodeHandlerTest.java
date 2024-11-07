@@ -308,7 +308,9 @@ class NetconfNodeHandlerTest {
         // attempt to connect fails due to unsupported configuration, and there is attempt to reconnect
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
-        assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
+        final var deviceException = captor.getValue();
+        assertInstanceOf(IllegalArgumentException.class, deviceException);
+        assertEquals("No keypair found with keyId=keyId", deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
 
