@@ -75,7 +75,6 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                     configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
             session);
-        nettyChannel.closeFuture().addListener(ignored -> session.close());
     }
 
     @Override

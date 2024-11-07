@@ -14,9 +14,9 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpScheme;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -55,8 +55,8 @@ class RestconfSessionTest {
     private Registration registration;
     @Mock
     private HttpScheme schema;
-    @Captor
-    private ArgumentCaptor<GenericFutureListener<? extends ChannelFuture>> featureListenerCaptor;
+    @Mock
+    private ChannelHandlerContext ctx;
     @Captor
     private ArgumentCaptor<RestconfSession> sessionCaptor;
 
@@ -65,7 +65,6 @@ class RestconfSessionTest {
         // setup
         doReturn(channel).when(transportChannel).channel();
         doReturn(pipeline).when(channel).pipeline();
-        doReturn(future).when(channel).closeFuture();
         doReturn(pipeline).when(pipeline).addLast(any(ChannelHandler.class), any());
         doReturn(schema).when(transportChannel).scheme();
         // default config just for testing purposes
@@ -78,13 +77,12 @@ class RestconfSessionTest {
         listener.onTransportChannelEstablished(transportChannel);
         // capture created session
         verify(pipeline).addLast(any(ChannelHandler.class), sessionCaptor.capture());
-        // verify close future listener was added and capture it
-        verify(future).addListener(featureListenerCaptor.capture());
 
+        final var session = sessionCaptor.getValue();
         // register resource
-        sessionCaptor.getValue().registerResource(registration);
-        // invoke on channel close listener
-        featureListenerCaptor.getValue().operationComplete(null);
+        session.registerResource(registration);
+        // bring the channel down
+        session.channelInactive(ctx);
         // verify resource was closed on channel close
         verify(registration).close();
     }
