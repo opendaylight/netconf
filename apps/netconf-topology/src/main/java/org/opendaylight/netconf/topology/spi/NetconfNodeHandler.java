@@ -218,7 +218,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                     .build();
             } catch (IllegalArgumentException | IllegalStateException e) {
                 LOG.warn("RemoteDevice{{}} failed to connect", nodeId, e);
-                onDeviceFailed(e);
+                delegate.onDeviceFailed(e);
                 return;
             }
         }
