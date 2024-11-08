@@ -44,6 +44,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugmentBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -273,6 +274,7 @@ public final class CallHomeMountService implements AutoCloseable {
                     .setConcurrentRpcLimit(Uint16.valueOf(config.concurrent$_$rpc$_$limit()))
                     .setActorResponseWaitTime(Uint16.valueOf(config.actor$_$response$_$wait$_$time()))
                     .setLockDatastore(config.lock$_$datastore())
+                    .setCredentials(new LoginPwUnencryptedBuilder().build())
                     .build())
                 .build())
             .build();
