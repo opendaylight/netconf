@@ -38,7 +38,7 @@ public final class ByteSourceResponse extends ByteStreamRequestResponse {
     }
 
     @Override
-    protected void writeBody(final OutputStream out) throws IOException {
+    public void writeBody(final OutputStream out) throws IOException {
         source.copyTo(out);
     }
 

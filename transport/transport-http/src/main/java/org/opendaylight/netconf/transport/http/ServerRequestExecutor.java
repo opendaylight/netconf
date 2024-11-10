@@ -14,11 +14,13 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -144,6 +146,19 @@ final class ServerRequestExecutor implements PendingRequestListener {
     @NonNullByDefault
     private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
             final HttpVersion version) {
+        final var status = response.status();
+        final var headers = DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders();
+        response.fillHeaders(headers);
+
+
+
+
+
+
+
+
+
+
         // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
         //
         //        We want to be emitting a series of write() requests into the queue, each of which is subject
@@ -161,8 +176,14 @@ final class ServerRequestExecutor implements PendingRequestListener {
         //          out chunks (of reasonable size).
         //        - finish up with a LastHttpContent when OutputStream.close() is called ... which might be problematic
         //          w.r.t. failure cases, so it needs some figuring out
+
         try {
-            return response.toHttpResponse(ctx.alloc(), version);
+            response.writeBody(new OutputStream() {
+                @Override
+                public void write(final int b) throws IOException {
+                    // TODO Auto-generated method stub
+                }
+            });
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
             return formatException(e, version);
