@@ -17,7 +17,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
 import java.io.IOException;
-import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -56,6 +55,4 @@ public abstract class ByteStreamRequestResponse extends AbstractRequestResponse 
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
         return response;
     }
-
-    protected abstract void writeBody(OutputStream out) throws IOException;
 }

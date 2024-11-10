@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.transport.http;
 
 import com.google.common.annotations.Beta;
-import io.netty.buffer.ByteBufAllocator;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -20,11 +20,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @Beta
 @NonNullByDefault
 public interface ReadyResponse extends Response {
-    @Override
-    FullHttpResponse toHttpResponse(HttpVersion version);
 
-    @Override
-    default FullHttpResponse toHttpResponse(final ByteBufAllocator alloc, final HttpVersion version) {
-        return toHttpResponse(version);
+    default FullHttpResponse toHttpResponse(final HttpVersion version) {
+        final var response = new DefaultFullHttpResponse(version, status());
+        fillHeaders(response.headers());
+        // FIXME: body?
+        return response;
     }
 }

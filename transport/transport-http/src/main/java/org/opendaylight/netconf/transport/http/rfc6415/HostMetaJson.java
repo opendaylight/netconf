@@ -83,7 +83,7 @@ public final class HostMetaJson extends AbstractHostMeta {
     }
 
     @Override
-    protected void writeBody(final OutputStream out) throws IOException {
+    public void writeBody(final OutputStream out) throws IOException {
         try (var writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             writer.append("{\n");
 
