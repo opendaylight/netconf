@@ -138,7 +138,17 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     }
 
     @Override
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+        shutdownTreadpools(ctx);
+        super.channelInactive(ctx);
+    }
+
+    @Override
     public final void handlerRemoved(final ChannelHandlerContext ctx) {
+        shutdownTreadpools(ctx);
+    }
+
+    private void shutdownTreadpools(final ChannelHandlerContext ctx) {
         reqExecutor.shutdown();
         respExecutor.shutdown();
         LOG.debug("Threadpools for {} shut down", ctx.channel());

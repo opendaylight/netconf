@@ -17,6 +17,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpScheme;
+import java.net.InetSocketAddress;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -64,6 +65,8 @@ class RestconfSessionTest {
     void closeRestconfSessionResourcesTest() throws Exception {
         // setup
         doReturn(channel).when(transportChannel).channel();
+        doReturn(channel).when(ctx).channel();
+        doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         doReturn(pipeline).when(channel).pipeline();
         doReturn(pipeline).when(pipeline).addLast(any(ChannelHandler.class), any());
         doReturn(schema).when(transportChannel).scheme();
@@ -77,8 +80,9 @@ class RestconfSessionTest {
         listener.onTransportChannelEstablished(transportChannel);
         // capture created session
         verify(pipeline).addLast(any(ChannelHandler.class), sessionCaptor.capture());
-
         final var session = sessionCaptor.getValue();
+        session.handlerAdded(ctx);
+
         // register resource
         session.registerResource(registration);
         // bring the channel down
