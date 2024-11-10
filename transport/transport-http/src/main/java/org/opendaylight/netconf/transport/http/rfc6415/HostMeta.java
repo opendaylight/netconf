@@ -52,7 +52,7 @@ public final class HostMeta extends AbstractHostMeta {
     }
 
     @Override
-    protected void writeBody(final OutputStream out) throws IOException {
+    public void writeBody(final OutputStream out) throws IOException {
         try {
             final var writer = XML_FACTORY.createXMLStreamWriter(out, StandardCharsets.UTF_8.name());
             writer.writeStartDocument();
