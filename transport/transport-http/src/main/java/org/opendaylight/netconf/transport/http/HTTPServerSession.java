@@ -21,7 +21,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
@@ -82,13 +81,12 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     // FIXME: this heavily depends on the object model and is tied to HTTPServer using aggregators, so perhaps we should
     //        reconsider the design
 
-    private final HttpScheme scheme;
-
+    private final HTTPScheme scheme;
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
 
-    protected HTTPServerSession(final HttpScheme scheme) {
+    protected HTTPServerSession(final HTTPScheme scheme) {
         super(FullHttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
     }
@@ -146,7 +144,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         }
         final URI hostUri;
         try {
-            hostUri = hostUriOf(scheme, host);
+            hostUri = scheme.hostUriOf(host);
         } catch (URISyntaxException e) {
             LOG.debug("Invalid Host header value '{}'", host, e);
             msg.release();
@@ -228,15 +226,6 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         }
         LOG.debug("Invalid use of '*' with method {}", method);
         return new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST);
-    }
-
-    @VisibleForTesting
-    static final @NonNull URI hostUriOf(final HttpScheme scheme, final String host) throws URISyntaxException {
-        final var ret = new URI(scheme.toString(), host, null, null, null).parseServerAuthority();
-        if (ret.getUserInfo() != null) {
-            throw new URISyntaxException(host, "Illegal Host header");
-        }
-        return ret;
     }
 
     /**
