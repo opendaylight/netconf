@@ -48,6 +48,7 @@
 
         <module>keystore</module>
         <module>truststore</module>
+        <module>apps/central-restconf-server</module>
     </modules>
 
     <profiles>
