@@ -17,7 +17,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
 import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
@@ -48,7 +47,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
     private final ClientAuthProvider authProvider;
     private final boolean http2;
 
-    HTTPClient(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme,
+    HTTPClient(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme,
             final ClientAuthProvider authProvider, final boolean http2) {
         super(listener, scheme);
         this.authProvider = authProvider;

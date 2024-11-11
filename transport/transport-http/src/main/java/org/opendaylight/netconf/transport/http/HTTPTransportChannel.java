@@ -16,9 +16,9 @@ import org.opendaylight.netconf.transport.api.TransportChannel;
 
 @NonNullByDefault
 public final class HTTPTransportChannel extends AbstractOverlayTransportChannel {
-    private final HttpScheme scheme;
+    private final HTTPScheme scheme;
 
-    HTTPTransportChannel(final TransportChannel underlay, final HttpScheme scheme) {
+    HTTPTransportChannel(final TransportChannel underlay, final HTTPScheme scheme) {
         super(underlay);
         this.scheme = requireNonNull(scheme);
     }
@@ -28,7 +28,7 @@ public final class HTTPTransportChannel extends AbstractOverlayTransportChannel 
      *
      * @return the {@link HttpScheme} underlying this channel
      */
-    public HttpScheme scheme() {
+    public HTTPScheme scheme() {
         return scheme;
     }
 }
