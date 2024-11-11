@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -33,8 +32,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.DeviceKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -49,8 +49,8 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountStatusReporter.class);
-    private static final InstanceIdentifier<AllowedDevices> ALL_DEVICES_II =
-        InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class);
+    private static final DataObjectIdentifier<AllowedDevices> ALL_DEVICES_II =
+        DataObjectIdentifier.builder(NetconfCallhomeServer.class).child(AllowedDevices.class).build();
 
     private final DataBroker dataBroker;
     private final Registration syncReg;
@@ -59,9 +59,11 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
     @Inject
     public CallHomeMountStatusReporter(final @Reference DataBroker broker) {
         dataBroker = broker;
-        syncReg = dataBroker.registerLegacyTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES_II.child(Device.class)),
-            this::onConfigurationDataTreeChanged);
+        syncReg = dataBroker.registerLegacyTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            DataObjectReference.builder(NetconfCallhomeServer.class)
+                .child(AllowedDevices.class)
+                .child(Device.class)
+                .build(), this::onConfigurationDataTreeChanged);
     }
 
     @Deactivate
@@ -152,7 +154,7 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
             .build();
     }
 
-    private @Nullable Device readDevice(final InstanceIdentifier<Device> instanceIdentifier) {
+    private @Nullable Device readDevice(final DataObjectIdentifier<Device> instanceIdentifier) {
         try (var readTx = dataBroker.newReadOnlyTransaction()) {
             return readTx.read(LogicalDatastoreType.OPERATIONAL, instanceIdentifier).get().orElse(null);
         } catch (InterruptedException | ExecutionException e) {
@@ -160,7 +162,7 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
         }
     }
 
-    private void writeDevice(final InstanceIdentifier<Device> instanceIdentifier, final Device device) {
+    private void writeDevice(final DataObjectIdentifier<Device> instanceIdentifier, final Device device) {
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.merge(LogicalDatastoreType.OPERATIONAL, instanceIdentifier, device);
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
@@ -176,14 +178,14 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
         }, MoreExecutors.directExecutor());
     }
 
-    private static InstanceIdentifier<Device> buildInstanceIdentifier(final String id) {
-        return ALL_DEVICES_II.child(Device.class, new DeviceKey(id));
+    private static DataObjectIdentifier.WithKey<Device, DeviceKey> buildInstanceIdentifier(final String id) {
+        return ALL_DEVICES_II.toBuilder().child(Device.class, new DeviceKey(id)).build();
     }
 
     // DataTreeChangeListener dedicated to call-home device data synchronization
     // from CONFIGURATION to OPERATIONAL datastore (excluding device status)
     private void onConfigurationDataTreeChanged(final List<DataTreeModification<Device>> changes) {
-        final var deleted = ImmutableList.<InstanceIdentifier<Device>>builder();
+        final var deleted = ImmutableList.<DataObjectIdentifier<Device>>builder();
         final var modified = ImmutableList.<Device>builder();
         for (var change : changes) {
             var changeRootNode = change.getRootNode();
@@ -193,7 +195,7 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
                     modified.add(changeRootNode.dataAfter());
                     break;
                 case DELETE:
-                    deleted.add(change.getRootPath().path());
+                    deleted.add(change.path());
                     break;
                 default:
                     break;
@@ -216,7 +218,7 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
         }
     }
 
-    private void syncDeletedDevices(final List<InstanceIdentifier<Device>> deletedDeviceIdentifiers) {
+    private void syncDeletedDevices(final List<DataObjectIdentifier<Device>> deletedDeviceIdentifiers) {
         if (deletedDeviceIdentifiers.isEmpty()) {
             return;
         }
