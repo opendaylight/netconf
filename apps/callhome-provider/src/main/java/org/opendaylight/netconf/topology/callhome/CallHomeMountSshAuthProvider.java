@@ -21,7 +21,6 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
@@ -32,8 +31,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.Global.MountPointNamingStrategy;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.device.transport.Ssh;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,19 +58,17 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
     @Inject
     public CallHomeMountSshAuthProvider(final @Reference DataBroker broker,
             final @Reference CallHomeMountStatusReporter statusReporter) {
-        configReg = broker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
-                InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class)),
-            globalConfig);
+        configReg = broker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            DataObjectIdentifier.builder(NetconfCallhomeServer.class).child(Global.class).build(), globalConfig);
 
-        final var allowedDeviceWildcard =
-            InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
+        final var allowedDeviceWildcard = DataObjectReference.builder(NetconfCallhomeServer.class)
+            .child(AllowedDevices.class)
+            .child(Device.class)
+            .build();
 
-        deviceReg = broker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, allowedDeviceWildcard),
+        deviceReg = broker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION, allowedDeviceWildcard,
             deviceConfig);
-        deviceOpReg = broker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard),
+        deviceOpReg = broker.registerTreeChangeListener(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard,
             deviceOp);
 
         this.statusReporter = statusReporter;
