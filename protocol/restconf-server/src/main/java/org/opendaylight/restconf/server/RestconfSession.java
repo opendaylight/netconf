@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpScheme;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
@@ -21,6 +20,7 @@ import java.util.List;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -72,7 +72,7 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
         justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile Resources resources;
 
-    RestconfSession(final HttpScheme scheme, final EndpointRoot root) {
+    RestconfSession(final HTTPScheme scheme, final EndpointRoot root) {
         super(scheme);
         this.root = requireNonNull(root);
     }

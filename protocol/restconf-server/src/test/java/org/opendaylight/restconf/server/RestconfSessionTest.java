@@ -16,7 +16,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.HttpScheme;
 import java.net.InetSocketAddress;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -55,8 +55,6 @@ class RestconfSessionTest {
     @Mock
     private Registration registration;
     @Mock
-    private HttpScheme schema;
-    @Mock
     private ChannelHandlerContext ctx;
     @Captor
     private ArgumentCaptor<RestconfSession> sessionCaptor;
@@ -69,7 +67,7 @@ class RestconfSessionTest {
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         doReturn(pipeline).when(channel).pipeline();
         doReturn(pipeline).when(pipeline).addLast(any(ChannelHandler.class), any());
-        doReturn(schema).when(transportChannel).scheme();
+        doReturn(HTTPScheme.HTTP).when(transportChannel).scheme();
         // default config just for testing purposes
         final var configuration = new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE,
             Uint16.ZERO, Uint32.valueOf(10_000), "restconf",

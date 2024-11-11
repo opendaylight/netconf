@@ -9,7 +9,6 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.handler.codec.http.HttpScheme;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -18,14 +17,14 @@ public abstract sealed class HTTPTransportStack extends AbstractOverlayTransport
         permits HTTPClient, HTTPServer {
     static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
 
-    private final @NonNull HttpScheme scheme;
+    private final @NonNull HTTPScheme scheme;
 
-    HTTPTransportStack(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme) {
+    HTTPTransportStack(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme) {
         super(listener);
         this.scheme = requireNonNull(scheme);
     }
 
-    final @NonNull HttpScheme scheme() {
+    final @NonNull HTTPScheme scheme() {
         return scheme;
     }
 }
