@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec1b4e1f_c856f58d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-11T15:39:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f16ef187_91f341f2",
+      "revId": "70c5401563f78de51c6398be3a626fc445f04bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45a49f1e_7ee98d60",
@@ -48,6 +66,30 @@
       "writtenOn": "2024-11-07T14:07:16Z",
       "side": 1,
       "message": "why do we even need this?",
+      "range": {
+        "startLine": 41,
+        "startChar": 42,
+        "endLine": 41,
+        "endChar": 65
+      },
+      "revId": "70c5401563f78de51c6398be3a626fc445f04bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40264c77_675c127c",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-11T15:39:20Z",
+      "side": 1,
+      "message": "To track any issues that may occur from the creation of the channel to the successful authentication of the device.\n\nIf a channel is closed for any reason after the TCPClient.connect method was successful, the NetconfDeviceHandler will wait because of the successful TCPClient.connect. However, the session will already be closed, and no attempt will be made to restore it.\n\nTo resolve this, I have added sshClientFinalizeFuture, which will inform the NetconfDeviceHandler about any issues during the connection process",
+      "parentUuid": "45a49f1e_7ee98d60",
       "range": {
         "startLine": 41,
         "startChar": 42,
