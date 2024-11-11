@@ -45,6 +45,54 @@
       },
       "revId": "de7050f55f95a32aa3572abd7a21d868f80b1601",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d1a2852_c6df5ba6",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/IetfRestconfServerFeatureProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-11T14:19:25Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1428",
+      "parentUuid": "54423fa0_baff7c09",
+      "range": {
+        "startLine": 34,
+        "startChar": 22,
+        "endLine": 34,
+        "endChar": 58
+      },
+      "revId": "de7050f55f95a32aa3572abd7a21d868f80b1601",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0805c9b8_04aeae3f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/impl/IetfRestconfServerFeatureProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-11T14:19:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e27d4c25_b6a3418e",
+      "range": {
+        "startLine": 34,
+        "startChar": 78,
+        "endLine": 34,
+        "endChar": 91
+      },
+      "revId": "de7050f55f95a32aa3572abd7a21d868f80b1601",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
