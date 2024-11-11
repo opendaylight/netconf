@@ -945,6 +945,230 @@ In addition, the following ODL extension query parameter is supported:
   contain modified leaf nodes without data.
   This can help in reducing the size of the notifications.
 
+Subscription to YANG Notifications tutorial
+-------------------------------------------
+
+OpenDaylight's NETCONF implementation enables dynamic subscription management to receive notifications
+about specific events or changes in the data tree. `RFC 8639 <https://www.rfc-editor.org/rfc/rfc8639>`__ provides
+a standardized method for establishing, modifying, and terminating these subscriptions,
+ensuring interoperability between different NETCONF clients and servers.
+
+Establishing a Subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To establish a new subscription, use the establish-subscription RPC as defined
+in `RFC-8650 <https://www.rfc-editor.org/rfc/rfc8650#section-a.1.1-1>`__.
+
+POST request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:establish-subscription
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+          <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+            <stream>NETCONF</stream>
+            <encoding>xml</encoding>
+            <stream-subtree-filter></ietf-vrrp:vrrp-protocol-error-event></stream-subtree-filter>
+          </input>
+
+   .. tab:: JSON
+
+       **Content-type:** ``application/json``
+
+       **Accept:** ``application/json``
+
+       **Authentication:** ``admin:admin``
+
+       .. code-block:: json
+
+           {
+              "ietf-subscribed-notifications:input": {
+                  "stream": "NETCONF",
+                  "encoding": "json",
+                  "stream-subtree-filter": {
+                      "/ietf-vrrp:vrrp-protocol-error-event" : {}
+                  },
+              }
+           }
+
+Upon successful establishment, the server returns a subscription ID:
+
+.. code-block:: json
+
+    {
+      "output": {
+        "subscription-id": "2147483648"
+      }
+    }
+
+Listening to Notifications
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once a subscription is established, you can start listening to the stream of notifications.
+To listen to the notifications for an established subscription, use the following RESTCONF URL format:
+
+.. code-block::
+    GET
+    http://localhost:8182/restconf/subscriptions/{subscription-id}
+    Accept: text/event-stream
+
+Replace {subscription-id} with the ID returned in the establish-subscription RPC response.
+
+Modifying a Subscription
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Modify an existing subscription to adjust parameters such as filtering XPath or encoding.
+
+Use the modify-subscription RPC to change parameters on an active subscription:
+
+POST request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:modify-subscription
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+          <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+            <subscription-id>2147483648</subscription-id>
+            <stream-subtree-filter></ietf-vrrp:vrrp-protocol-error-event></stream-subtree-filter>
+            <encoding>json</encoding>
+          </input>
+
+   .. tab:: JSON
+
+       **Content-type:** ``application/json``
+
+       **Accept:** ``application/json``
+
+       **Authentication:** ``admin:admin``
+
+       .. code-block:: json
+
+           {
+               "input": {
+                 "subscription-id": "2147483648",
+                 "stream-subtree-filter": {
+                     "/ietf-vrrp:vrrp-protocol-error-event" : {}
+                 },
+                 "encoding": "xml"
+               }
+           }
+
+Terminating a Subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+To terminate a subscription, you can either delete it (delete-subscription) or forcibly kill it (kill-subscription).
+
+Using delete-subscription
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This RPC allows a subscriber to delete a subscription that was previously created by the same subscriber who used the
+'establish-subscription' RPC.
+
+POST request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:modify-subscription
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+          <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+            <subscription-id>2147483648</subscription-id>
+          </input>
+
+   .. tab:: JSON
+
+       **Content-type:** ``application/json``
+
+       **Accept:** ``application/json``
+
+       **Authentication:** ``admin:admin``
+
+       .. code-block:: json
+
+           {
+               "input": {
+                 "subscription-id": "2147483648"
+               }
+           }
+
+Using kill-subscription
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The kill-subscription RPC forcibly removes a subscription, which is useful if
+the subscription encounters persistent issues.
+
+POST request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:kill-subscription
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+          <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+            <subscription-id>2147483648</subscription-id>
+          </input>
+
+   .. tab:: JSON
+
+       **Content-type:** ``application/json``
+
+       **Accept:** ``application/json``
+
+       **Authentication:** ``admin:admin``
+
+       .. code-block:: json
+
+           {
+               "input": {
+                 "subscription-id": "2147483648"
+               }
+           }
+
 Netconf-keystore configuration
 ------------------------------
 
