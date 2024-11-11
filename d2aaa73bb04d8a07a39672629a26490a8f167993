@@ -16,6 +16,24 @@
       "message": "Please create a JIRA ticket which describes the problem",
       "revId": "d2aaa73bb04d8a07a39672629a26490a8f167993",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e51d1f3_1324f9ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-11T13:04:51Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1427",
+      "parentUuid": "a0e0e413_35abf1d7",
+      "revId": "d2aaa73bb04d8a07a39672629a26490a8f167993",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
