@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
 import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
@@ -42,7 +41,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
 
     private final AuthHandlerFactory authHandlerFactory;
 
-    HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HttpScheme scheme,
+    HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme,
             final AuthHandlerFactory authHandlerFactory) {
         super(listener, scheme);
         this.authHandlerFactory = authHandlerFactory;
