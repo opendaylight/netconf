@@ -128,6 +128,7 @@ public final class RestconfStream<T> {
     /**
      * Interface for session handler that is responsible for sending of data over established session.
      */
+    @NonNullByDefault
     public interface Sender {
         /**
          * Interface for sending String message through one of implementation.
