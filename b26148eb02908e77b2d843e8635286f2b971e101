@@ -16,6 +16,24 @@
       "message": "The UI on 8182 does not load.",
       "revId": "b26148eb02908e77b2d843e8635286f2b971e101",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7e5403e_32080da8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-12T09:01:34Z",
+      "side": 1,
+      "message": "Fixed by flushing generator and https://git.opendaylight.org/gerrit/c/netconf/+/114457.",
+      "parentUuid": "48895e48_d45ff75d",
+      "revId": "b26148eb02908e77b2d843e8635286f2b971e101",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
