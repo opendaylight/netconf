@@ -34,7 +34,7 @@ public abstract class NettyEndpoint {
             configuration);
         try {
             httpServer = HTTPServer.listen(listener, bootstrapFactory.newServerBootstrap(),
-                configuration.transportConfiguration(), principalService).get();
+                configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             throw new IllegalStateException("Could not start RESTCONF server", e);
         }

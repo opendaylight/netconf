@@ -10,8 +10,8 @@ package org.opendaylight.netconf.transport.http;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpScheme;
@@ -49,12 +49,12 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Clear2To1");
 
         @Override
-        void initializeServerPipeline(final ChannelPipeline pipeline) {
+        void initializeServerPipeline(final ChannelHandlerContext ctx) {
             // Cleartext upgrade flow
             final var sourceCodec = new HttpServerCodec();
             final var twoToOne = http2toHttp1(FRAME_LOGGER);
-            pipeline
-                .addLast(new CleartextHttp2ServerUpgradeHandler(
+            ctx.pipeline()
+                .addBefore(ctx.name(), null, new CleartextHttp2ServerUpgradeHandler(
                     sourceCodec,
                     new HttpServerUpgradeHandler(
                         sourceCodec,
@@ -62,7 +62,7 @@ public enum HTTPScheme {
                             ? new Http2ServerUpgradeCodec(twoToOne) : null,
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     twoToOne))
-                .addLast(new CleartextUpgradeHandler());
+                .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
         }
     },
     /**
@@ -70,8 +70,8 @@ public enum HTTPScheme {
      */
     HTTPS(HttpScheme.HTTPS) {
         @Override
-        void initializeServerPipeline(final ChannelPipeline pipeline) {
-            pipeline.addLast(new AlpnUpgradeHandler());
+        void initializeServerPipeline(final ChannelHandlerContext ctx) {
+            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler());
         }
     };
 
@@ -179,7 +179,12 @@ public enum HTTPScheme {
         return ret;
     }
 
-    abstract void initializeServerPipeline(ChannelPipeline pipeline);
+    /**
+     * Initialize a pipeline so that specified {@link ChannelHandlerContext} observes {@link FullHttpMessage}s.
+     *
+     * @param ctx reference {@link ChannelHandlerContext}
+     */
+    abstract void initializeServerPipeline(ChannelHandlerContext ctx);
 
     @Override
     public String toString() {
