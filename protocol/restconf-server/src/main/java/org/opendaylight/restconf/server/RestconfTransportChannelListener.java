@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import static java.util.Objects.requireNonNull;
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
@@ -28,17 +26,12 @@ import org.slf4j.LoggerFactory;
 final class RestconfTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
-    private final RestconfStream.@NonNull Registry streamRegistry;
-    private final @NonNull NettyEndpointConfiguration configuration;
     private final @NonNull EndpointRoot root;
     private final @NonNull String restconf;
 
     @NonNullByDefault
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
-        this.streamRegistry = requireNonNull(streamRegistry);
-        this.configuration = requireNonNull(configuration);
-
         // Reconstruct root API path in encoded form
         final var apiRootPath = configuration.apiRootPath();
         final var sb = new StringBuilder();
@@ -50,6 +43,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         // Split apiRootPath into first segment and the rest
         final var firstSegment = apiRootPath.getFirst();
         final var otherSegments = apiRootPath.stream().skip(1).collect(Collectors.toUnmodifiableList());
+
+        final var sseHandler = new ServerSseHandler(
+            new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
+                configuration.defaultEncoding(), configuration.prettyPrint()),
+            configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava());
 
         root = new EndpointRoot(principalService, new WellKnownResources(restconf), firstSegment,
             new APIResource(server, otherSegments, sb.append('/').toString(), configuration.errorTagMapping(),
@@ -67,14 +65,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        final var session = new RestconfSession(channel.scheme(), root);
-        final var nettyChannel = channel.channel();
-        nettyChannel.pipeline().addLast(
-            new ServerSseHandler(
-                new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
-                    configuration.defaultEncoding(), configuration.prettyPrint()),
-                configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            session);
+        channel.channel().pipeline().addLast(new RestconfSession(channel.scheme(), root));
     }
 
     @Override
