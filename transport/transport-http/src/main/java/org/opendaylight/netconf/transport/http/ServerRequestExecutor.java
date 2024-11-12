@@ -11,12 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,7 +103,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
         LOG.warn("Internal error while processing {}", request, cause);
         final var req = pendingRequests.remove(request);
         if (req != null) {
-            HTTPServerSession.respond(req.ctx, req.streamId, formatException(cause, req.version()));
+            HTTPServerSession.respond(req.ctx, req.streamId, req.version(), cause);
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
         }
@@ -126,18 +122,6 @@ final class ServerRequestExecutor implements PendingRequestListener {
         } catch (RejectedExecutionException e) {
             LOG.trace("Session shut down, dropping response {}", response, e);
         }
-    }
-
-    // Hand-coded, as simple as possible
-    @NonNullByDefault
-    private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
-        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        final var content = response.content();
-        // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
-        //       so we do not want to be too revealing -- hence a message is all the user gets.
-        ByteBufUtil.writeUtf8(content, cause.getMessage());
-        HttpUtil.setContentLength(response, content.readableBytes());
-        return response;
     }
 
     // Executed on respExecutor, so it is okay to block
@@ -165,7 +149,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
             return response.toHttpResponse(ctx.alloc(), version);
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
-            return formatException(e, version);
+            return HTTPServerSession.formatException(e, version);
         }
     }
 }
