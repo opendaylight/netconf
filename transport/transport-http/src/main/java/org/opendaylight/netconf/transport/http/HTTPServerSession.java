@@ -92,10 +92,11 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
     }
 
     @Override
-    public final void handlerAdded(final ChannelHandlerContext ctx) {
+    public void handlerAdded(final ChannelHandlerContext ctx) {
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
+        scheme.initializeServerPipeline(ctx);
     }
 
     @Override

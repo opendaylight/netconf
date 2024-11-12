@@ -29,12 +29,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
  * last handler. Doing so will provide a predictable API surface as to how the pipeline is set up.
  */
 public final class HTTPServer extends HTTPTransportStack {
-    private final AuthHandlerFactory authHandlerFactory;
-
-    HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme,
-            final AuthHandlerFactory authHandlerFactory) {
+    HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme) {
         super(listener, scheme);
-        this.authHandlerFactory = authHandlerFactory;
     }
 
     /**
@@ -71,30 +67,26 @@ public final class HTTPServer extends HTTPTransportStack {
                 throws UnsupportedConfigurationException {
         final var transport = requireNonNull(listenParams).getTransport();
         return switch (transport) {
-            case Tcp tcpCase -> listen(listener, bootstrap, tcpCase, authHandlerFactory);
-            case Tls tlsCase -> listen(listener, bootstrap, tlsCase, authHandlerFactory);
+            case Tcp tcpCase -> listen(listener, bootstrap, tcpCase);
+            case Tls tlsCase -> listen(listener, bootstrap, tlsCase);
             default -> throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         };
     }
 
     private static @NonNull ListenableFuture<HTTPServer> listen(
             final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
-            final Tcp tcpCase, final @Nullable AuthHandlerFactory authHandlerFactory)
-                throws UnsupportedConfigurationException {
+            final Tcp tcpCase) throws UnsupportedConfigurationException {
         final var tcp = tcpCase.getTcp();
-        final var server = new HTTPServer(listener, HTTPScheme.HTTP, authHandlerFactory != null ? authHandlerFactory
-            : BasicAuthHandlerFactory.ofNullable(tcp.getHttpServerParameters()));
+        final var server = new HTTPServer(listener, HTTPScheme.HTTP);
         return transformUnderlay(server,
             TCPServer.listen(server.asListener(), bootstrap, tcp.nonnullTcpServerParameters()));
     }
 
     private static @NonNull ListenableFuture<HTTPServer> listen(
             final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
-            final Tls tlsCase, final @Nullable AuthHandlerFactory authHandlerFactory)
-                throws UnsupportedConfigurationException {
+            final Tls tlsCase) throws UnsupportedConfigurationException {
         final var tls = tlsCase.getTls();
-        final var server = new HTTPServer(listener, HTTPScheme.HTTPS, authHandlerFactory != null ? authHandlerFactory
-            : BasicAuthHandlerFactory.ofNullable(tls.getHttpServerParameters()));
+        final var server = new HTTPServer(listener, HTTPScheme.HTTPS);
         return transformUnderlay(server,
             TLSServer.listen(server.asListener(), bootstrap, tls.nonnullTcpServerParameters(),
                 new HttpSslHandlerFactory(tls.nonnullTlsServerParameters())));
@@ -102,12 +94,6 @@ public final class HTTPServer extends HTTPTransportStack {
 
     @Override
     protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
-        final var pipeline = underlayChannel.channel().pipeline();
-        final var scheme = scheme();
-        scheme.initializeServerPipeline(pipeline);
-        if (authHandlerFactory != null) {
-            pipeline.addLast(authHandlerFactory.create());
-        }
-        addTransportChannel(new HTTPTransportChannel(underlayChannel, scheme));
+        addTransportChannel(new HTTPTransportChannel(underlayChannel, scheme()));
     }
 }
