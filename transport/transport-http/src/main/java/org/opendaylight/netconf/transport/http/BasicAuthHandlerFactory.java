@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
  *
  * <p>Uses predefined (configured) collection of usernames with password hashes to authenticate/authorize users.
  */
-final class BasicAuthHandlerFactory implements AuthHandlerFactory {
+public final class BasicAuthHandlerFactory implements AuthHandlerFactory {
     @NonNullByDefault
     private record CryptHash(String salt, String hash) {
         CryptHash {
@@ -44,7 +44,7 @@ final class BasicAuthHandlerFactory implements AuthHandlerFactory {
         this.knownHashes = requireNonNull(knownHashes);
     }
 
-    static @Nullable BasicAuthHandlerFactory ofNullable(final HttpServerGrouping httpParams) {
+    public static @Nullable BasicAuthHandlerFactory ofNullable(final HttpServerGrouping httpParams) {
         if (httpParams == null) {
             return null;
         }

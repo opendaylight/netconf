@@ -14,7 +14,9 @@ import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.AuthHandlerFactory;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -57,7 +59,7 @@ final class EndpointRoot {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRoot.class);
 
     private final ConcurrentHashMap<String, WebHostResource> resources = new ConcurrentHashMap<>();
-    private final PrincipalService principalService;
+    private final @NonNull PrincipalService principalService;
     // FIXME: at some point this should just be 'XRD xrd'
     private final WellKnownResources wellKnown;
     // FIXME: at some point this should be integrated into 'providers' Map with a coherent resource access
@@ -70,6 +72,10 @@ final class EndpointRoot {
         this.principalService = requireNonNull(principalService);
         this.wellKnown = requireNonNull(wellKnown);
         this.fixedResources = requireNonNull(fixedResources);
+    }
+
+    @NonNull AuthHandlerFactory authHandlerFactory() {
+        return principalService;
     }
 
     @NonNullByDefault

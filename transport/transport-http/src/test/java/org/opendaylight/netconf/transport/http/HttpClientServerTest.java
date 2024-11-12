@@ -240,7 +240,7 @@ class HttpClientServerTest {
 
     private void integrationTest(final boolean http2, final AuthHandlerFactory authHandlerFactory) throws Exception {
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
-            serverConfig, authHandlerFactory).get(2, TimeUnit.SECONDS);
+            serverConfig).get(2, TimeUnit.SECONDS);
         try {
             final var client = HTTPClient.connect(clientTransportListener, bootstrapFactory.newBootstrap(),
                     clientConfig, http2).get(2, TimeUnit.SECONDS);
