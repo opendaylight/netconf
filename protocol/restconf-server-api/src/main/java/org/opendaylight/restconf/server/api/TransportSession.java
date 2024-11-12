@@ -9,6 +9,8 @@ package org.opendaylight.restconf.server.api;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 
 /**
@@ -22,7 +24,10 @@ public interface TransportSession {
      * Register resource to be closed on session end. Implementation should guarantee all registration are closed
      * when session ends.
      *
-     * @param registration resource to be registered
+     * @param <T> resource type
+     * @param resource resource to be registered
+     * @return An {@link ObjectRegistration} or the resource, unregistered via {@link ObjectRegistration#close()}, or
+     *         {@code null} on registration failure.
      */
-    void registerResource(Registration registration);
+    <T extends Registration> @Nullable ObjectRegistration<T> registerResource(T resource);
 }

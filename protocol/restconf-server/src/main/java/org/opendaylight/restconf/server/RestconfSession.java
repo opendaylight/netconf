@@ -19,13 +19,17 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.lock.qual.Holding;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
+import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>. It acts
@@ -33,6 +37,18 @@ import org.opendaylight.yangtools.concepts.Registration;
  * connections.
  */
 final class RestconfSession extends HTTPServerSession implements TransportSession {
+    @NonNullByDefault
+    private final class ResourceReg<T extends Registration> extends AbstractObjectRegistration<T> {
+        ResourceReg(final T instance) {
+            super(instance);
+        }
+
+        @Override
+        protected void removeRegistration() {
+            unregister(this);
+        }
+    }
+
     /**
      * Our resources state.
      */
@@ -50,7 +66,7 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     /**
      * We have some resources that need to be cleaned up.
      */
-    private record SomeResources(ArrayList<Registration> registrations) implements Resources {
+    private record SomeResources(ArrayList<ResourceReg<?>> registrations) implements Resources {
         SomeResources {
             requireNonNull(registrations);
         }
@@ -65,6 +81,8 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
             throw new ExceptionInInitializerError(e);
         }
     }
+
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfSession.class);
 
     private final EndpointRoot root;
 
@@ -91,17 +109,17 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
         final var prev = (Resources) RESOURCES.compareAndExchange(this, null, InactiveResources.INSTANCE);
         final var toRelease = switch (prev) {
             case SomeResources some -> {
-                // synchronize with registerResource()
+                // synchronize with doRegister() and unregister()
                 synchronized (this) {
                     yield some.registrations;
                 }
             }
             // nothing to release
-            case null, default -> List.<Registration>of();
+            case null, default -> List.<ResourceReg<?>>of();
         };
 
         // callbacks without holding the lock
-        toRelease.forEach(Registration::close);
+        toRelease.forEach(reg -> reg.getInstance().close());
     }
 
     @Override
@@ -111,41 +129,47 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     }
 
     @Override
-    public void registerResource(final Registration registration) {
-        final var reg = requireNonNull(registration);
+    @NonNullByDefault
+    public synchronized <T extends Registration> @Nullable ObjectRegistration<T> registerResource(final T resource) {
+        final var reg = new ResourceReg<>(resource);
 
         // complicated because we want need to hold the lock during the entire inflate operation
-        final boolean release;
-        synchronized (this) {
-            release = switch (resources) {
-                case null -> registerFirst(reg);
-                case InactiveResources inactive -> true;
-                case SomeResources some -> doRegister(some, reg);
-            };
-        }
-
-        // Cannot register: close the registration without holding lock
-        if (release) {
-            reg.close();
-        }
-    }
-
-    @Holding("this")
-    private boolean registerFirst(final @NonNull Registration reg) {
-        // Start off small, grow as needed
-        final var created = new SomeResources(new ArrayList<>(2));
-        final var witness = (Resources) RESOURCES.compareAndExchange(this, null, created);
-        return switch (witness) {
-            case null -> doRegister(created, reg);
-            case InactiveResources inactive -> true;
+        return switch (resources) {
+            case null -> registerFirst(reg);
+            case InactiveResources inactive -> null;
             case SomeResources some -> doRegister(some, reg);
         };
     }
 
     @Holding("this")
     @NonNullByDefault
-    private static boolean doRegister(final SomeResources some, final Registration reg) {
+    private <T extends Registration> @Nullable ResourceReg<T> registerFirst(final ResourceReg<T> reg) {
+        // Start off small, grow as needed
+        final var created = new SomeResources(new ArrayList<>(2));
+        final var witness = (Resources) RESOURCES.compareAndExchange(this, null, created);
+        return switch (witness) {
+            case null -> doRegister(created, reg);
+            case InactiveResources inactive -> null;
+            case SomeResources some -> doRegister(some, reg);
+        };
+    }
+
+    @Holding("this")
+    @NonNullByDefault
+    private static <T extends Registration> ResourceReg<T> doRegister(final SomeResources some,
+            final ResourceReg<T> reg) {
         some.registrations.add(reg);
-        return false;
+        return reg;
+    }
+
+    private synchronized void unregister(final ResourceReg<?> reg) {
+        final var local = (Resources) RESOURCES.getAcquire(this);
+        if (local instanceof SomeResources some) {
+            if (!some.registrations.remove(reg)) {
+                LOG.debug("Did not find registration {} in {}", reg, some);
+            }
+        } else {
+            LOG.warn("Uregistering on resources {}, should never happen", local, new Throwable());
+        }
     }
 }
