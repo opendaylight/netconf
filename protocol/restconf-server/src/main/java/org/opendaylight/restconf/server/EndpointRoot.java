@@ -14,10 +14,12 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.AuthHandlerFactory;
 import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
+import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResource;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
@@ -73,6 +75,10 @@ final class EndpointRoot {
         this.apiResource = requireNonNull(apiResource);
     }
 
+    AuthHandlerFactory authHandlerFactory() {
+        return principalService;
+    }
+
     @NonNullByDefault
     Registration registerProvider(final WebHostResourceProvider provider) {
         for (var path = provider.defaultPath(); ; path = provider.defaultPath() + "-" + UUID.randomUUID().toString()) {
@@ -110,5 +116,12 @@ final class EndpointRoot {
         final var resource = resources.get(segment);
         return resource == null ? EmptyRequestResponse.NOT_FOUND
             : resource.prepare(method, targetUri, headers, peeler, wellKnown);
+    }
+
+    private ServerSseHandler newServerSseHandler() {
+        return new ServerSseHandler(
+            new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
+                configuration.defaultEncoding(), configuration.prettyPrint()),
+            configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava());
     }
 }

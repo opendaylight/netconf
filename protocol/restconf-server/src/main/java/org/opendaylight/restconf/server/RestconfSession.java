@@ -78,6 +78,15 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     }
 
     @Override
+    public void handlerAdded(final ChannelHandlerContext ctx) {
+        super.handlerAdded(ctx);
+        final var authHandlerFactory = root.authHandlerFactory();
+        if (authHandlerFactory != null) {
+            ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
+        }
+    }
+
+    @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         try {
             super.channelInactive(ctx);

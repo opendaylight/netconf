@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -62,11 +63,11 @@ class RestconfSessionTest {
     @Test
     void closeRestconfSessionResourcesTest() throws Exception {
         // setup
+        doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         doReturn(channel).when(transportChannel).channel();
         doReturn(channel).when(ctx).channel();
-        doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
-        doReturn(pipeline).when(channel).pipeline();
-        doReturn(pipeline).when(pipeline).addLast(any(ChannelHandler.class), any());
+        doReturn(pipeline).when(ctx).pipeline();
+        doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
         doReturn(HTTPScheme.HTTP).when(transportChannel).scheme();
         // default config just for testing purposes
         final var configuration = new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE,
@@ -80,7 +81,6 @@ class RestconfSessionTest {
         verify(pipeline).addLast(any(ChannelHandler.class), sessionCaptor.capture());
         final var session = sessionCaptor.getValue();
         session.handlerAdded(ctx);
-
         // register resource
         session.registerResource(registration);
         // bring the channel down
