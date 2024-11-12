@@ -13,14 +13,14 @@ window.onload = function () {
   xmlHttp.open('GET', document.URL.split('/openapi')[0] + `/openapi/api/v3/mounts/`, false);
   xmlHttp.send(null);
 
-  var base_url_rfc = document.URL.split('/openapi')[0] + `/openapi/api/v3/mounts/`;
+  var base_url_rfc = document.URL.split('/openapi')[0] + `/openapi/api/v3/mounts`;
   var swagger_urls = [{ url: document.URL.split('/openapi')[0] + `/openapi/api/v3/single${queryParams}`, name: 'Controller resources - RestConf RFC 8040' }];
   var devices = JSON.parse(xmlHttp.responseText);
   for (var i = 0; i < devices.length; i++) {
     var device_name = devices[i]['instance'].split('=')[2].replace('/', '');
     var device_id = devices[i]['id'];
     var dict = {
-      url: base_url_rfc + device_id + queryParams,
+      url: base_url_rfc + '/' + device_id + queryParams,
       name: device_name + ' resources - RestConf RFC 8040',
     };
     swagger_urls.push(dict);
