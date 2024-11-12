@@ -15,6 +15,6 @@ import com.google.common.annotations.Beta;
  * This can either be a {@link CompletedRequest} or a {@link PendingRequest}.
  */
 @Beta
-public sealed interface PreparedRequest permits CompletedRequest, PendingRequest {
+public sealed interface PreparedRequest permits CompletedRequest, EventStreamResult, PendingRequest {
     // Nothing else
 }
