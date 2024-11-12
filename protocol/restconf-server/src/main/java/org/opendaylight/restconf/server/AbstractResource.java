@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * point in the past.
  */
 @NonNullByDefault
-abstract sealed class AbstractResource permits AbstractLeafResource, APIResource {
+abstract sealed class AbstractResource permits AbstractLeafResource, APIResource, StreamsResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractResource.class);
     private static final AsciiString ANY_TYPE = AsciiString.cached("*/*");
 
