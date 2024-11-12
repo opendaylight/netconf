@@ -13,7 +13,9 @@ import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.AuthHandlerFactory;
 import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -56,7 +58,7 @@ final class EndpointRoot {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRoot.class);
 
     private final ConcurrentHashMap<String, WebHostResource> resources = new ConcurrentHashMap<>();
-    private final PrincipalService principalService;
+    private final @NonNull PrincipalService principalService;
     // FIXME: at some point this should just be 'XRD xrd'
     private final WellKnownResources wellKnown;
     // FIXME: at some point these two fields should be integrated into 'providers' Map with a coherent resource access
@@ -65,12 +67,16 @@ final class EndpointRoot {
     private final String apiSegment;
 
     @NonNullByDefault
-    EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown,
-            final String apiSegment, final APIResource apiResource) {
+    EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown, final String apiSegment,
+            final APIResource apiResource) {
         this.principalService = requireNonNull(principalService);
         this.wellKnown = requireNonNull(wellKnown);
         this.apiSegment = requireNonNull(apiSegment);
         this.apiResource = requireNonNull(apiResource);
+    }
+
+    @NonNull AuthHandlerFactory authHandlerFactory() {
+        return principalService;
     }
 
     @NonNullByDefault
