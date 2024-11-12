@@ -12,7 +12,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -26,6 +28,7 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -212,6 +215,19 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
                 LOG.debug("Immediate response to {} {}", method, targetUri);
                 executor.respond(ctx, streamId, version, completed.asResponse());
             }
+            case EventStreamResult eventStream -> {
+                msg.release();
+                LOG.debug("Event stream response to {} {}", method, targetUri);
+
+                final ChannelInboundHandler handler;
+                try {
+                    handler = eventStream.toHandler(version, streamId);
+                } catch (IOException e) {
+                    respond(ctx, streamId, version, e);
+                    return;
+                }
+                ctx.pipeline().replace(this, null, handler);
+            }
             case PendingRequest<?> pending -> {
                 LOG.debug("Scheduling execution of {} {}", method, targetUri);
                 executor.executeRequest(ctx, version, streamId, pending, msg.content());
@@ -263,6 +279,24 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      */
     @NonNullByDefault
     protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpHeaders headers);
+
+    // Hand-coded, as simple as possible
+    @NonNullByDefault
+    static final FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
+        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        final var content = response.content();
+        // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
+        //       so we do not want to be too revealing -- hence a message is all the user gets.
+        ByteBufUtil.writeUtf8(content, cause.getMessage());
+        HttpUtil.setContentLength(response, content.readableBytes());
+        return response;
+    }
+
+    @NonNullByDefault
+    static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final HttpVersion version, final Exception cause) {
+        respond(ctx, streamId, formatException(cause, version));
+    }
 
     @NonNullByDefault
     static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,

@@ -15,6 +15,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 
 /**
  * Invariant setup of a particular endpoint. This DTO exists only to make method signatures less verbose.
@@ -25,12 +26,14 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 @NonNullByDefault
 public record EndpointInvariants(
         RestconfServer server,
+        RestconfStream.Registry streamRegistry,
         PrettyPrintParam defaultPrettyPrint,
         ErrorTagMapping errorTagMapping,
         MessageEncoding defaultEncoding,
         URI restconfPath) {
     public EndpointInvariants {
         requireNonNull(server);
+        requireNonNull(streamRegistry);
         requireNonNull(defaultPrettyPrint);
         requireNonNull(errorTagMapping);
         requireNonNull(defaultEncoding);
