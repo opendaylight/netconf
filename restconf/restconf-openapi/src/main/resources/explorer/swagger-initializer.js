@@ -10,7 +10,7 @@ window.onload = function () {
   }
   const queryParams = getQueryParams(params);
   var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open('GET', document.URL.split('/openapi')[0] + `/openapi/api/v3/mounts/`, false);
+  xmlHttp.open('GET', document.URL.split('/openapi')[0] + `/openapi/api/v3/mounts`, false);
   xmlHttp.send(null);
 
   var base_url_rfc = document.URL.split('/openapi')[0] + `/openapi/api/v3/mounts/`;
