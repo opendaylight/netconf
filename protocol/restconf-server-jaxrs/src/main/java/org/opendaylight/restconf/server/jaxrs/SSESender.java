@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.sse.Sse;
@@ -116,7 +115,7 @@ final class SSESender implements Sender {
      */
     @Override
     public synchronized void sendDataMessage(final String message) {
-        if (Strings.isNullOrEmpty(message)) {
+        if (message.isEmpty()) {
             // FIXME: should this be tolerated?
             return;
         }
