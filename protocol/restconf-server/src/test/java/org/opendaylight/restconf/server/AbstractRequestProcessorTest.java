@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,7 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import java.net.InetSocketAddress;
@@ -74,6 +76,8 @@ class AbstractRequestProcessorTest {
     private ChannelHandlerContext ctx;
     @Mock
     private Channel channel;
+    @Mock
+    private ChannelPipeline pipeline;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
 
@@ -85,6 +89,8 @@ class AbstractRequestProcessorTest {
             new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
                 new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT)));
         doReturn(channel).when(ctx).channel();
+        doReturn(pipeline).when(ctx).pipeline();
+        doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         session.handlerAdded(ctx);
         doReturn(null).when(principalService).acquirePrincipal(any());
