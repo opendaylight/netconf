@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11b7db83_32e9ef12",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-13T15:37:20Z",
+      "side": 1,
+      "message": "IMHO its overcomplicated - what about just to add `notifyTransportChannelFailed(cause);` to both client and server `onAuthenticated#onFailure`?",
+      "revId": "b2aae5df9cf937da3daa05ac4d15d123bfa21c4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
