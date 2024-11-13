@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6205e4b_a78d869a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-13T08:47:45Z",
+      "side": 1,
+      "message": "Removed, not required anymore.",
+      "parentUuid": "bc6fed37_2830584b",
+      "range": {
+        "startLine": 45,
+        "startChar": 33,
+        "endLine": 45,
+        "endChar": 40
+      },
+      "revId": "67f894516c78e690f471b4e6f529a4f80a09c49a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "907001d7_f1b272c2",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-11-12T00:45:53Z",
       "side": 1,
       "message": "so we are awaiting for result of authentication, right?\n\nfor TLS we do something similar, but quite differently, I think. Can we reuse that?",
+      "range": {
+        "startLine": 82,
+        "startChar": 15,
+        "endLine": 82,
+        "endChar": 82
+      },
+      "revId": "67f894516c78e690f471b4e6f529a4f80a09c49a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "793609b8_fc493b9a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-13T08:47:45Z",
+      "side": 1,
+      "message": "Yes, thanks. TLS correctly invokes reconnection. The main difference between TLS and SSH is that TLS uses the notifyTransportChannelFailed() method after an unsuccessful handshake.\nhttps://github.com/opendaylight/netconf/blob/master/transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/TLSTransportStack.java#L44\n\nThis re-invokes the reconnect in NetconfNodeHandler. I have reworked the code to use it as well.",
+      "parentUuid": "907001d7_f1b272c2",
       "range": {
         "startLine": 82,
         "startChar": 15,
