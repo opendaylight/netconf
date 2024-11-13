@@ -16,6 +16,24 @@
       "message": "Maybe this was better:\n```\n        return peeler.hasNext() ? EmptyRequestResponse.NOT_FOUND : switch (next) {\n            case \"meta\" -\u003e prepareMountsInstanceMeta(method, targetUri, headers, instance);\n            default -\u003e prepareMountsInstanceModule(method, targetUri, headers, instance, next);\n        };\n```",
       "revId": "575408a0eb10814ebd72be2801224cf262688c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1a4dfca_eb0252f5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiResourceInstance.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-13T09:42:23Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "470b481a_daeaa2f3",
+      "revId": "575408a0eb10814ebd72be2801224cf262688c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
