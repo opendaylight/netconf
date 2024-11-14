@@ -22,15 +22,82 @@ In particular, it implements:
 
 Your immediate interests may be:
 * Documentation is in [docs](https://docs.opendaylight.org/projects/netconf/en/latest/index.html)
-* Ready-to-applications are in [apps](apps/README.md)
+* Ready-to-use applications are in [apps](apps/README.md)
 
-Other than that, you may delve into gory details:
+# NETCONF/RESTCONF protocol layer assumptions
+
+The code in this repository is organized roughly along the lines of
+[NETCONF Protocol Layers](https://www.rfc-editor.org/rfc/rfc6241#page-9). For the purposes of this implementation, we are
+making three distinct assuptions:
+* RFC6241 Figure 1 looks like this:
+  ```
+            Layer                 Example
+       +-------------+      +-----------------+      +----------------+
+   (4) |   Content   |      |  Configuration  |      |  Notification  |
+       |             |      |      data       |      |      data      |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------+              |
+   (3) | Operations  |      |  <edit-config>  |              |
+       |             |      |                 |              |
+       +-------------+      +-----------------+              |
+              |                       |                      |
+       +-------------+      +-----------------+      +----------------+
+   (2) |  Messages   |      |     <rpc>,      |      | <notification> |
+       |             |      |   <rpc-reply>   |      |                |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------------------------------+
+   (1) |   Secure    |      |  SSH, TLS, *TCP*                        |
+       |  Transport  |      |                                         |
+       +-------------+      +-----------------------------------------+
+  ```
+  We provide TCP for completeness and logical Netty pipeline structure: a Channel corresponds to the TCP transport
+  and SSH and TLS are built on top of it by adding the corresponding ChannelHandlers.
+* lacking standardization, we define the corresponding RFC8040 Figure 1 to look like this:
+  ```
+            Layer                 Example
+       +-------------+      +-----------------+      +----------------+
+   (4) |   Content   |      |  Configuration  |      |  Notification  |
+       |             |      |      data       |      |      data      |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------+      +----------------+
+   (3) | Operations  |      | PUT             |      |  Server-Sent   |
+       |             |      |  /restconf/data |      |    Events      |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------------------------------+
+   (2) |  Messages   |      |  HTTP Message                           |
+       |             |      |                                         |
+       +-------------+      +-----------------------------------------+
+              |                       |                      |
+       +-------------+      +-----------------------------------------+
+   (1) |   Secure    |      |  HTTP Connection                        |
+       |  Transport  |      |                                         |
+       +-------------+      +-----------------------------------------+
+  ```
+  Every HTTP Connection is tied to its underlying transport as per RFC9110 specification of the two HTTP URI schemes:
+  * [http://](https://www.rfc-editor.org/rfc/rfc9110#section-4.2.1) connections are built on top of TCP transport
+  * [https://](https://www.rfc-editor.org/rfc/rfc9110#section-4.2.2) connections are built on top of TLS transport
+  The object model for HTTP Message comes from Netty and is catered for by the channel pipeline, including any upgrades
+  from HTTP/1 in a manner similar to how NETCONF negotiates its
+  [framing mechanism](https://www.rfc-editor.org/rfc/rfc6242#section-4.1) over both SSH and TLS.
+  An HTTP client does not imply TCP connect, an HTTP server does not imply TCP listen -- we want to include the
+  support call-home, where a network element (a RESTCONF server) is the first one to initiate the contact
+  to its a network controller (a RESTCONF client).
+* the two protocol implementations share:
+  * the Content layer
+  * the Secure Transport layer configuration object model
+
+# The gory details
+There are sorts of things here:
 * basic project infrastructure, including [the BOM](artifacts), [Karaf features](features),
 [Dynamic Karaf distribution](karaf), [Static Karaf distribution](karaf-static) and the [Common Maven Parent](parent)
 * [YANG models](model) relating to this project
-* [Transport layer](transport) implementation
-* [Low-level](protocol) protocol implementations
-* [High-level](plugins) protocol integrations
-* [NETCONF Key store](keystore) implementation
-* [NETCONF Trust store](truststore) implementation
-* [applications](apps/README.md) for both end users and integrators
+* [IETF Key Store](keystore) implementation
+* [IETF Trust Store](truststore) implementation
+* [Secure Transport layer](transport) implementation
+* [Low-level](protocol/README.md) protocol implementations
+* [High-level](plugins) protocol integrations, notably with MD-SAL
+* a handful of unsorted things, both [NETCONF-related](netconf) and [RESTCONF-related](restconf)
