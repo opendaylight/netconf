@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2d8ec75_5dd368be",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/netconf/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-14T10:43:13Z",
+      "side": 1,
+      "message": "move to BeforeEach",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 67
+      },
+      "revId": "e5d71f8ef8226b12d1be83d8aaca815a94d03767",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
