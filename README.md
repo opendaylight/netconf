@@ -22,15 +22,72 @@ In particular, it implements:
 
 Your immediate interests may be:
 * Documentation is in [docs](https://docs.opendaylight.org/projects/netconf/en/latest/index.html)
-* Ready-to-applications are in [apps](apps/README.md)
+* Ready-to-use applications are in [apps](apps/README.md)
 
-Other than that, you may delve into gory details:
+In terms of IETF standardization done as part of [NETCONF WG](https://datatracker.ietf.org/wg/netconf/), we are roughly
+organized based on [NETCONF Protocol Layers](https://www.rfc-editor.org/rfc/rfc6241#page-9). For our implementation
+purposes:
+* NETCONF Figure 1 looks like this:
+  ```
+            Layer                 Example
+       +-------------+      +-----------------+      +----------------+
+   (4) |   Content   |      |  Configuration  |      |  Notification  |
+       |             |      |      data       |      |      data      |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------+              |
+   (3) | Operations  |      |  <edit-config>  |              |
+       |             |      |                 |              |
+       +-------------+      +-----------------+              |
+              |                       |                      |
+       +-------------+      +-----------------+      +----------------+
+   (2) |  Messages   |      |     <rpc>,      |      | <notification> |
+       |             |      |   <rpc-reply>   |      |                |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------------------------------+
+   (1) |   Secure    |      |  SSH, TLS, *TCP*                        |
+       |  Transport  |      |                                         |
+       +-------------+      +-----------------------------------------+
+  ```
+  We provide TCP for completeness and logical Netty pipeline structure: a Channel corresponds to the TCP transport
+  and SSH and TLS are built on top of it by adding the corresponding ChannelHandlers.
+* lacking standardization, we define the corresponding RFC8040 Figure 1 to look like this:
+  ```
+            Layer                 Example
+       +-------------+      +-----------------+      +----------------+
+   (4) |   Content   |      |  Configuration  |      |  Notification  |
+       |             |      |      data       |      |      data      |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------+      +----------------+
+   (3) | Operations  |      | PUT             |      |  Server-Sent   |
+       |             |      |  /restconf/data |      |     Events     |
+       +-------------+      +-----------------+      +----------------+
+              |                       |                      |
+       +-------------+      +-----------------------------------------+
+   (2) |  Messages   |      |  HTTP Message                           |
+       |             |      |                                         |
+       +-------------+      +-----------------------------------------+
+              |                       |                      |
+       +-------------+      +-----------------------------------------+
+   (1) |   Secure    |      |  HTTP Connection                        |
+       |  Transport  |      |                                         |
+       +-------------+      +-----------------------------------------+
+  ```
+  HTTP connections are built on top of TCP transport, HTTPS connections are built on top of TLS transport, mirroring
+  how things are laid out in the Netty pipeline.
+* the two implementations share:
+  * the Content layer
+  * transport layer configuration
+
+Other than that, you may delve into the gory details:
 * basic project infrastructure, including [the BOM](artifacts), [Karaf features](features),
 [Dynamic Karaf distribution](karaf), [Static Karaf distribution](karaf-static) and the [Common Maven Parent](parent)
 * [YANG models](model) relating to this project
-* [Transport layer](transport) implementation
-* [Low-level](protocol) protocol implementations
-* [High-level](plugins) protocol integrations
-* [NETCONF Key store](keystore) implementation
-* [NETCONF Trust store](truststore) implementation
-* [applications](apps/README.md) for both end users and integrators
+* [IETF Key Store](keystore) implementation
+* [IETF Trust Store](truststore) implementation
+* [Secure Transport layer](transport) implementation
+* [Low-level](protocol/README.md) protocol implementations
+* [High-level](plugins) protocol integrations, notably with MD-SAL
+* a handful of unsorted things, both [NETCONF-related](netconf) and [RESTCONF-related](restconf)
