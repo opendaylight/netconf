@@ -23,6 +23,19 @@
     <description>RESTCONF Subscription application</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
