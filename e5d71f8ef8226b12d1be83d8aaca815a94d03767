@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2551ee6b_964c04c3",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/netconf/DeleteSubscriptionRpcTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-15T16:34:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14babb92_b0fea875",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 90
+      },
+      "revId": "e5d71f8ef8226b12d1be83d8aaca815a94d03767",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2d8ec75_5dd368be",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4677aa43_6a2ece53",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/netconf/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-15T16:34:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2d8ec75_5dd368be",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 67
+      },
+      "revId": "e5d71f8ef8226b12d1be83d8aaca815a94d03767",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bac5e59_e4905f6e",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-11-14T10:45:06Z",
       "side": 1,
       "message": "move to BeforeEach",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 90
+      },
+      "revId": "e5d71f8ef8226b12d1be83d8aaca815a94d03767",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6998d93_de30caab",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/netconf/ModifySubscriptionRpcTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-15T16:34:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bac5e59_e4905f6e",
       "range": {
         "startLine": 70,
         "startChar": 0,
