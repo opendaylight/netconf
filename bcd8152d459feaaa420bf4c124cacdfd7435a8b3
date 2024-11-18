@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "bcd8152d459feaaa420bf4c124cacdfd7435a8b3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0219e2b_7b2dd870",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionStateMachine.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T16:52:05Z",
+      "side": 1,
+      "message": "imo this have similar problem as my comment for moveTo()",
+      "revId": "bcd8152d459feaaa420bf4c124cacdfd7435a8b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75d4359c_8a185753",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionStateMachine.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T16:52:05Z",
+      "side": 1,
+      "message": "session can have multiple subscriptions, this way you would loose them\nimo should be something like: subscriptionStateMap.get(session).replace(subscriptionId, toType);",
+      "revId": "bcd8152d459feaaa420bf4c124cacdfd7435a8b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
