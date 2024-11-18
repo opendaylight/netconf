@@ -1,0 +1,163 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f963281_db309ee9",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfNotification.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "requireNonNull()",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21871978_0fb5fe18",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfNotification.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "why is this here?",
+      "range": {
+        "startLine": 24,
+        "startChar": 11,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95df5202_6dd3d2d6",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "can be @Singleton?",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc44f42c_6cd7989b",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "These parameters are not exactly correct:\nfor example filter should be optional parameter. but double check pls",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d195f1_11af0bb9",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "final parameters",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f125c57_6593b887",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "also Stream name doesn\u0027t have to be \"NETCONF\"",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b9e38ff_de0def34",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "encoding should be here too?",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbca6fb6_ba714b78",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "you can use @Captor\nsimilar to @Mock",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc584b29_55d604d0",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-18T15:51:56Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
