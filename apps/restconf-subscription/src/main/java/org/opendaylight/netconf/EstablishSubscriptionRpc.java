@@ -65,8 +65,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter").intern());
-    //private static final NodeIdentifier SUBSCRIPTION_STREAM_SUBTREE_FILTER =
-    //    NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-subtree-filter").intern());
+    private static final NodeIdentifier SUBSCRIPTION_STREAM_SUBTREE_FILTER =
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-subtree-filter").intern());
     private static final NodeIdentifier SUBSCRIPTION_STOP_TIME =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
     private static final NodeIdentifier SUBSCRIPTION_ENCODING =
@@ -167,11 +167,12 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                     streamFilterName));
                 nodeTargetBuilder.withChild(nodeFilterBuilder.build());
             }
-            //final var streamSubtree = leaf(streamFilter, SUBSCRIPTION_STREAM_SUBTREE_FILTER, String.class);
-            //if (streamSubtree != null) {
+
+            final var streamSubtree = leaf(streamFilter, SUBSCRIPTION_STREAM_SUBTREE_FILTER, String.class);
+            if (streamSubtree != null) {
             //TODO: parse anydata filter, rfc6241? https://www.rfc-editor.org/rfc/rfc8650#name-filter-example
             // {@link StreamSubtreeFilter}.
-            //}
+            }
         }
         nodeBuilder.withChild(nodeTargetBuilder.build());
 
