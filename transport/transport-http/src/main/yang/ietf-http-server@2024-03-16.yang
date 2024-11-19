@@ -33,6 +33,12 @@ module ietf-http-server {
       "RFC FFFF: YANG Groupings for TLS Clients and TLS Servers";
   }
 
+  import ietf-udp-server {
+    prefix udps;
+    reference
+      "RFC JJJJ: YANG Groupings for UDP Clients and UDP Servers";
+  }
+
   organization
     "IETF NETCONF (Network Configuration) Working Group";
 
@@ -66,7 +72,7 @@ module ietf-http-server {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-03-16 {
     description
       "Initial version";
     reference
@@ -115,6 +121,14 @@ module ietf-http-server {
        servers to listen for HTTP 1.1/2.0 connections over TLS.";
     reference
       "RFC 9110: HTTP Semantics";
+  }
+
+  feature quic-supported {
+    description
+      "Indicates that the server supports configuring HTTP
+       servers to listen for HTTP/3 connections over QUIC.";
+    reference
+      "RFC 9114: HTTP/3";
   }
 
   // Groupings
@@ -229,7 +243,15 @@ module ietf-http-server {
             description
               "TCP-level server parameters to
                listen for HTTP connections.";
-            uses tcps:tcp-server-grouping;
+            uses tcps:tcp-server-grouping {
+              refine "local-bind/local-port" {
+                default "80";
+                description
+                  "The HTTP client will attempt to connect
+                   to the IANA-assigned well-known port for
+                   'http' (80) if no value is specified.";
+              }
+            }
           }
           container http-server-parameters {
             description
@@ -248,7 +270,15 @@ module ietf-http-server {
             description
               "TCP-level server parameters to
                listen for HTTPS connections.";
-            uses tcps:tcp-server-grouping;
+            uses tcps:tcp-server-grouping {
+              refine "local-bind/local-port" {
+                default "443";
+                description
+                  "The HTTP client will attempt to connect
+                   to the IANA-assigned well-known port for
+                   'https' (443) if no value is specified.";
+              }
+            }
           }
           container tls-server-parameters {
             description
@@ -260,6 +290,28 @@ module ietf-http-server {
             description
               "HTTP-level server parameters to
                listen for HTTPS connections.";
+            uses http-server-grouping;
+          }
+        }
+      }
+      case quic {
+        if-feature "quic-supported";
+        container quic {
+          description
+            "Container for the QUIC-based HTTP/3 protocol.";
+          container udp-server-parameters {
+            description
+              "UDP-level server parameters.";
+            uses udps:udp-server-grouping;
+          }
+          container tls-server-parameters {
+            description
+              "TLS-level server parameters.";
+            uses tlss:tls-server-grouping;
+          }
+          container http-server-parameters {
+            description
+              "HTTP-level server parameters.";
             uses http-server-grouping;
           }
         }
