@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55e34c85_c0b95338",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-19T09:04:10Z",
+      "side": 1,
+      "message": "IMO: We can use just: `allowedDevicesReg.close();` and can be final",
+      "revId": "1c6fab012c7007c457d23292a817471fa35387bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
