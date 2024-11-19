@@ -16,6 +16,24 @@
       "message": "IMHO its overcomplicated - what about just to add `notifyTransportChannelFailed(cause);` to both client and server `onAuthenticated#onFailure`?",
       "revId": "b2aae5df9cf937da3daa05ac4d15d123bfa21c4e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40db6fc5_eec0e710",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-19T17:07:36Z",
+      "side": 1,
+      "message": "1)\nCalling notifyTransportChannelFailed only within onAuthenticated#onFailure is insufficient. This method must be invoked whenever the session is closed. For example:\n\na) Netty invokes channel inactive (Stack-trace: https://lf-opendaylight.atlassian.net/browse/NETCONF-1423?focusedCommentId\u003d45233)\nb) This trigger SSHTransportStack#sessionClosed method.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/114354/8/transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java#7\n\nIf the session is deleted without calling notifyTransportChannelFailed in this example, NetconfNodeHandler will not start the reconnect process.\n\n2)\nAdd notifyTransportChannelFailed to both client and server. I have added notifyTransportChannelFailed to the SshServer#onSessionClose method and implemented CallHome session close test.",
+      "parentUuid": "11b7db83_32e9ef12",
+      "revId": "b2aae5df9cf937da3daa05ac4d15d123bfa21c4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
