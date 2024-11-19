@@ -240,6 +240,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dd467c7_c7457576",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:55:39Z",
+      "side": 1,
+      "message": "This is done according to https://www.rfc-editor.org/rfc/rfc8650#section-a.2.1\nwhere is no encoding, but if it is really needed, it can be easily added",
+      "parentUuid": "2b9e38ff_de0def34",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbca6fb6_ba714b78",
