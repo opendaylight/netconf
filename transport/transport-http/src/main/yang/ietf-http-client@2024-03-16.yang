@@ -354,7 +354,7 @@ module ietf-http-client {
           container udp-client-parameters {
             description
               "UDP client parameters.";
-            uses udpc:udp-client-grouping;
+            uses udpc:udp-client;
           }
           container tls-client-parameters {
             description

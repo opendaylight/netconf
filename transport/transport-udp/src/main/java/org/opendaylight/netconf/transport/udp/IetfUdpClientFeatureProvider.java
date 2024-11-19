@@ -10,8 +10,8 @@ package org.opendaylight.netconf.transport.udp;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.client.rev241004.IetfUdpClientData;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.client.rev241004.LocalBindingSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.client.rev241015.IetfUdpClientData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.client.rev241015.LocalBinding;
 import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
@@ -28,6 +28,6 @@ public final class IetfUdpClientFeatureProvider implements YangFeatureProvider<I
 
     @Override
     public Set<? extends YangFeature<?, IetfUdpClientData>> supportedFeatures() {
-        return Set.of(LocalBindingSupported.VALUE);
+        return Set.of(LocalBinding.VALUE);
     }
 }

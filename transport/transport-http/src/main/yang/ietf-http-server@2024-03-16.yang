@@ -302,7 +302,7 @@ module ietf-http-server {
           container udp-server-parameters {
             description
               "UDP-level server parameters.";
-            uses udps:udp-server-grouping;
+            uses udps:udp-server;
           }
           container tls-server-parameters {
             description
