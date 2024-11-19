@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67b17d05_54b06163",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-19T11:19:53Z",
+      "side": 1,
+      "message": "Is this needed?",
+      "revId": "7515182631ab333b813f591e7b1f89394510a277",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f10183b_e8ac44e5",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-19T11:19:53Z",
+      "side": 1,
+      "message": "What if null?",
+      "revId": "7515182631ab333b813f591e7b1f89394510a277",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
