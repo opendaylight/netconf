@@ -998,7 +998,7 @@ POST request to:
                   "stream": "NETCONF",
                   "encoding": "json",
                   "stream-subtree-filter": {
-                      "/ietf-vrrp:vrrp-protocol-error-event" : {}
+                      "ietf-vrrp:vrrp-protocol-error-event" : {}
                   },
               }
            }
@@ -1012,6 +1012,118 @@ Upon successful establishment, the server returns a subscription ID:
         "subscription-id": "2147483648"
       }
     }
+
+Subtree Filtering in Subscriptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Subscriptions can include filtering capabilities such as subtree filters to ensure that only
+relevant notifications are sent to the client.
+This filtering mechanism follows the subtree filter specification from `RFC-6241 <https://www.rfc-editor.org/rfc/rfc6241#section-6.4>`__.,
+which provides flexibility in selecting specific subtrees or elements.
+A subtree filter operates on the data structure of the event records within the stream.
+By specifying containment nodes and selection nodes, you can fine-tune the notifications to include only the desired information.
+The examples of filtering provided in this section are illustrative only and are not implemented by OpenDaylight.
+
+Examples of Subtree Filtering
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select the Entire <users> Subtree
+'''''''''''''''''''''''''''''''''
+
+This filter selects all data under the <users> subtree.
+Use this when you want to include everything within a specific subtree in the notifications.
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+          <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+            <stream>NETCONF</stream>
+            <encoding>xml</encoding>
+            <stream-subtree-filter>
+                <users/>
+            </stream-subtree-filter>
+          </input>
+
+   .. tab:: JSON
+
+       **Content-type:** ``application/json``
+
+       **Accept:** ``application/json``
+
+       **Authentication:** ``admin:admin``
+
+       .. code-block:: json
+
+           {
+              "ietf-subscribed-notifications:input": {
+                  "stream": "NETCONF",
+                  "encoding": "json",
+                  "stream-subtree-filter": {
+                      "users" : {}
+                  },
+              }
+           }
+
+Select Specific Elements within the <users> Subtree
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+This filter retrieves only the <name> elements from each <user> within the <users> subtree.
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+          <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+            <stream>NETCONF</stream>
+            <encoding>xml</encoding>
+            <stream-subtree-filter>
+              <users>
+                <user>
+                  <name/>
+                </user>
+              </users>
+            </stream-subtree-filter>
+          </input>
+
+   .. tab:: JSON
+
+       **Content-type:** ``application/json``
+
+       **Accept:** ``application/json``
+
+       **Authentication:** ``admin:admin``
+
+       .. code-block:: json
+
+           {
+             "ietf-subscribed-notifications:input": {
+               "stream": "NETCONF",
+               "encoding": "json",
+               "stream-subtree-filter": {
+                 "users": {
+                   "user": {
+                     "name": {}
+                   }
+                 }
+               }
+             }
+           }
 
 Listening to Notifications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
