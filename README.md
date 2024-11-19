@@ -100,9 +100,9 @@ There are sorts of things here:
 * basic project infrastructure, including [the BOM](artifacts), [Karaf features](features),
 [Dynamic Karaf distribution](karaf), [Static Karaf distribution](karaf-static) and the [Common Maven Parent](parent)
 * [YANG models](model) relating to this project
-* [IETF Key Store](keystore) implementation
-* [IETF Trust Store](truststore) implementation
-* [Secure Transport layer](transport) implementation
+* [IETF Key Store](keystore/README.md) implementation
+* [IETF Trust Store](truststore/README.md) implementation
+* [Secure Transport layer](transport/README.md) implementation
 * [Low-level](protocol/README.md) protocol implementations
 * [High-level](plugins) protocol integrations, notably with MD-SAL
 * a handful of unsorted things, both [NETCONF-related](netconf) and [RESTCONF-related](restconf)
