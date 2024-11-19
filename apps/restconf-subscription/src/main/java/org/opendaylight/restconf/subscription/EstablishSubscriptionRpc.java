@@ -65,6 +65,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter").intern());
+/*    public static final NodeIdentifier SUBSCRIPTION_STREAM_SUBTREE_FILTER =
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-subtree-filter").intern());*/
     private static final NodeIdentifier SUBSCRIPTION_STOP_TIME =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
     private static final NodeIdentifier SUBSCRIPTION_ENCODING =
