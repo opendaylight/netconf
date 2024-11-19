@@ -24,6 +24,7 @@ import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.SubtreeFilterRestconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
@@ -65,6 +66,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter").intern());
+    private static final NodeIdentifier SUBSCRIPTION_STREAM_SUBTREE_FILTER =
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-subtree-filter").intern());
     private static final NodeIdentifier SUBSCRIPTION_STOP_TIME =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
     private static final NodeIdentifier SUBSCRIPTION_ENCODING =
@@ -172,8 +175,11 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                     streamFilterName));
                 nodeTargetBuilder.withChild(nodeFilterBuilder.build());
             }
-            //  TODO: parse anydata filter, rfc6241? https://www.rfc-editor.org/rfc/rfc8650#name-filter-example
-            //    {@link StreamSubtreeFilter}.
+
+            final var streamSubtree = leaf(streamFilter, SUBSCRIPTION_STREAM_SUBTREE_FILTER, String.class);
+            if (streamSubtree != null) {
+                //SubtreeFilterRestconf.applyFilter(streamFilter.getChildByArg(SUBSCRIPTION_STREAM_SUBTREE_FILTER),);
+            }
         }
         nodeBuilder.withChild(nodeTargetBuilder.build());
 
