@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcae2295_99b0b82e",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfNotification.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f963281_db309ee9",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21871978_0fb5fe18",
@@ -41,6 +59,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f40e8bf_76d3cf63",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfNotification.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21871978_0fb5fe18",
+      "range": {
+        "startLine": 24,
+        "startChar": 11,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95df5202_6dd3d2d6",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-11-18T15:51:56Z",
       "side": 1,
       "message": "can be @Singleton?",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa3247d7_082d7b74",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95df5202_6dd3d2d6",
       "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -92,6 +152,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fe64b89_887954ba",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26d195f1_11af0bb9",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4295fc4b_19d7cc36",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Now filter can be null",
+      "parentUuid": "cc44f42c_6cd7989b",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f125c57_6593b887",
@@ -105,6 +201,24 @@
       "writtenOn": "2024-11-18T15:51:56Z",
       "side": 1,
       "message": "also Stream name doesn\u0027t have to be \"NETCONF\"",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88a71e87_2fb029f8",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f125c57_6593b887",
       "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -143,6 +257,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24b63dbd_540ba062",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbca6fb6_ba714b78",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc584b29_55d604d0",
@@ -156,6 +288,24 @@
       "writtenOn": "2024-11-18T15:51:56Z",
       "side": 1,
       "message": "final var",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77f3d64f_4507ca70",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-11-19T11:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc584b29_55d604d0",
       "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
