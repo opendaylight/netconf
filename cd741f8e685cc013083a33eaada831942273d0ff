@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d0f58000_100db6e4",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-19T08:31:57Z",
+      "side": 1,
+      "message": "cannot be null because of:\nallowedDeviceReg \u003d null;",
+      "parentUuid": "678838dd_a65ba700",
+      "revId": "cd741f8e685cc013083a33eaada831942273d0ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "31b9192f_dc5c63aa",
         "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
         "patchSetId": 31
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-19T07:16:40Z",
       "side": 1,
       "message": "..devices.. make sure form name that its listener for all devices",
+      "revId": "cd741f8e685cc013083a33eaada831942273d0ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eab1cee2_78815177",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-19T08:31:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31b9192f_dc5c63aa",
       "revId": "cd741f8e685cc013083a33eaada831942273d0ff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
