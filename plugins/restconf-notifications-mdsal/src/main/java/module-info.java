@@ -15,4 +15,6 @@ module org.opendaylight.restconf.notofications.mdsal {
     requires static transitive javax.inject;
     requires static org.osgi.service.component.annotations;
     requires org.opendaylight.mdsal.dom.api;
+    requires org.opendaylight.restconf.server.spi;
+    requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
 }
