@@ -27,6 +27,12 @@ module ietf-http-client {
       "RFC FFFF: YANG Groupings for TLS Clients and TLS Servers";
   }
 
+  import ietf-udp-client {
+    prefix udpc;
+    reference
+      "RFC JJJJ: YANG Groupings for UDP Clients and UDP Servers";
+  }
+
   organization
     "IETF NETCONF (Network Configuration) Working Group";
 
@@ -60,7 +66,7 @@ module ietf-http-client {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2024-03-16 {
     description
       "Initial version";
     reference
@@ -68,13 +74,6 @@ module ietf-http-client {
   }
 
   // Features
-
-  feature proxy-connect {
-    description
-      "Indicates that the server supports configuring HTTP
-       clients to connect to a remote HTTP server via an
-       HTTP proxy.";
-  }
 
   feature basic-auth {
     description
@@ -99,6 +98,41 @@ module ietf-http-client {
       "Indicates that the server supports configuring
        HTTP 1.1/2.0 clients to initiate HTTP 1.1/2.0
        connections over TLS.";
+    reference
+      "RFC 9110: HTTP Semantics";
+  }
+
+  feature quic-supported {
+    description
+      "Indicates that the server supports configuring
+       HTTP/3 clients to initiate connections over QUIC.";
+    reference
+      "RFC 9114: HTTP/3";
+  }
+
+  feature proxy-connect {
+    description
+      "Indicates that the server supports configuring HTTP
+       clients to connect to a remote HTTP server via a
+       proxy.";
+  }
+
+  feature http-connect-proxy {
+    if-feature proxy-connect;
+    description
+      "Indicates that the server supports configuring
+       HTTP clients to proxy clients through an HTTP
+       connect proxy, , per Section 9.3.6 of RFC 9110.";
+    reference
+      "RFC 9110: HTTP Semantics";
+  }
+
+  feature https-connect-proxy {
+    if-feature proxy-connect;
+    description
+      "Indicates that the server supports configuring
+       HTTP clients to proxy clients through an HTTPS
+       connect proxy, , per Section 9.3.6 of RFC 9110.";
     reference
       "RFC 9110: HTTP Semantics";
   }
@@ -181,14 +215,26 @@ module ietf-http-client {
         description
           "Choice amongst proxy server types.";
         case http {
-          container http-proxy {
+          if-feature http-connect-proxy;
+          container http-connect {
             description
               "Container for HTTP Proxy (Web Proxy) server
-               configuration parameters.";
+               configuration parameters, per Section 9.3.6
+               of RFC 9110.";
+            reference
+              "RFC 9110: HTTP Semantics";
             container tcp-client-parameters {
               description
                 "TCP client parameters.";
-              uses tcpc:tcp-client-grouping;
+              uses tcpc:tcp-client-grouping {
+                refine "remote-port" {
+                  default "80";
+                  description
+                    "The HTTP client will attempt to connect
+                     to the IANA-assigned well-known port for
+                     'http' (80) if no value is specified.";
+                }
+              }
             }
             container http-client-parameters {
               description
@@ -198,14 +244,26 @@ module ietf-http-client {
           }
         }
         case https {
-          container https-proxy {
+          if-feature https-connect-proxy;
+          container https-connect {
             description
-              "Container for HTTPS Proxy (Secure Web Proxy) server
-               configuration parameters.";
+              "Container for HTTPS Proxy (Secure Web Proxy)
+               server configuration parameters, per Section
+               9.3.6 of RFC 9110.";
+            reference
+              "RFC 9110: HTTP Semantics";
             container tcp-client-parameters {
               description
                 "TCP client parameters.";
-              uses tcpc:tcp-client-grouping;
+              uses tcpc:tcp-client-grouping {
+                refine "remote-port" {
+                  default "443";
+                  description
+                    "The HTTP client will attempt to connect
+                     to the IANA-assigned well-known port for
+                     'https' (443) if no value is specified.";
+                }
+              }
             }
             container tls-client-parameters {
               description
@@ -241,7 +299,15 @@ module ietf-http-client {
           container tcp-client-parameters {
             description
               "TCP client parameters.";
-            uses tcpc:tcp-client-grouping;
+            uses tcpc:tcp-client-grouping {
+              refine "remote-port" {
+                default "80";
+                description
+                  "The HTTP client will attempt to connect
+                   to the IANA-assigned well-known port for
+                   'http' (80) if no value is specified.";
+              }
+            }
           }
           container http-client-parameters {
             description
@@ -258,7 +324,37 @@ module ietf-http-client {
           container tcp-client-parameters {
             description
               "TCP client parameters.";
-            uses tcpc:tcp-client-grouping;
+            uses tcpc:tcp-client-grouping {
+              refine "remote-port" {
+                default "443";
+                description
+                  "The HTTP client will attempt to connect
+                   to the IANA-assigned well-known port for
+                   'https' (443) if no value is specified.";
+              }
+            }
+          }
+          container tls-client-parameters {
+            description
+              "TLS client parameters.";
+            uses tlsc:tls-client-grouping;
+          }
+          container http-client-parameters {
+            description
+              "HTTP client parameters.";
+            uses http-client-grouping;
+          }
+        }
+      }
+      case quic {
+        if-feature "quic-supported";
+        container quic {
+          description
+            "Container for the QUIC-based HTTP/3 protocols.";
+          container udp-client-parameters {
+            description
+              "UDP client parameters.";
+            uses udpc:udp-client-grouping;
           }
           container tls-client-parameters {
             description
