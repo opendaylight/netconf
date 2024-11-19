@@ -102,8 +102,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         return stream;
     }
 
-    protected abstract @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
-
     /**
      * Remove a particular stream and remove its entry from operational datastore.
      *
