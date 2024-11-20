@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
-import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
@@ -67,14 +66,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        final var session = new RestconfSession(channel.scheme(), root);
-        final var nettyChannel = channel.channel();
-        nettyChannel.pipeline().addLast(
-            new ServerSseHandler(
-                new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
-                    configuration.defaultEncoding(), configuration.prettyPrint()),
-                configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            session);
+        // no-op
     }
 
     @Override

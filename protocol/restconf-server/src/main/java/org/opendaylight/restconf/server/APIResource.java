@@ -50,7 +50,8 @@ final class APIResource extends AbstractResource {
             "data", new DataResource(invariants),
             "operations", new OperationsResource(invariants),
             "yang-library-version", new YLVResource(invariants),
-            "modules", new ModulesResource(invariants));
+            "modules", new ModulesResource(invariants),
+            "streams", new StreamsResource(invariants));
     }
 
     @Override
