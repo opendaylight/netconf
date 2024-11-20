@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import java.security.Principal;
@@ -23,18 +24,18 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
  */
 @NonNullByDefault
 abstract sealed class AbstractLeafResource extends AbstractResource
-        permits DataResource, OperationsResource, YLVResource, ModulesResource {
+        permits DataResource, OperationsResource, StreamsResource, YLVResource, ModulesResource {
     AbstractLeafResource(final EndpointInvariants invariants) {
         super(invariants);
     }
 
     @Override
-    final PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session,
-            final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal) {
-        return prepare(session, method, targetUri, headers, principal, peeler.remaining());
+    final PreparedRequest prepare(final ChannelHandler channelHandler, final SegmentPeeler peeler,
+            final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final @Nullable Principal principal) {
+        return prepare(channelHandler, session, method, targetUri, headers, principal, peeler.remaining());
     }
 
-    abstract PreparedRequest prepare(TransportSession session, ImplementedMethod method, URI targetUri,
-        HttpHeaders headers, @Nullable Principal principal, String path);
+    abstract PreparedRequest prepare(ChannelHandler channelHandler, TransportSession session,
+        ImplementedMethod method, URI targetUri, HttpHeaders headers, @Nullable Principal principal, String path);
 }
