@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import java.security.Principal;
@@ -29,8 +30,9 @@ final class YLVResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
+    PreparedRequest prepare(final ChannelHandler channelHandler, final TransportSession session,
+            final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
+            final @Nullable Principal principal, final String path) {
         return !path.isEmpty() ? EmptyResponse.NOT_FOUND : switch (method) {
             case GET -> prepareGet(session, targetUri, headers, principal, true);
             case HEAD -> prepareGet(session, targetUri, headers, principal, false);

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.URI;
@@ -33,8 +34,9 @@ final class OperationsResource extends AbstractLeafResource {
     }
 
     @Override
-    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
+    PreparedRequest prepare(final ChannelHandler channelHandler, final TransportSession session,
+            final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
+            final @Nullable Principal principal, final String path) {
         return switch (method) {
             case GET -> prepareGet(session, targetUri, headers, principal, path, true);
             case HEAD -> prepareGet(session, targetUri, headers, principal, path, false);
