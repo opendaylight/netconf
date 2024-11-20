@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec0f559c_32f9d05e",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 966,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-20T09:44:09Z",
+      "side": 1,
+      "message": "this is usable only with netty\nso should be 8182/restconf\nand maybe add some note that this does not work with 8181/rests",
+      "revId": "47e5eb60c18457db89b192d62e13678e9e88d5d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2157cb57_6de85908",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-20T09:44:09Z",
+      "side": 1,
+      "message": "extra space?",
+      "range": {
+        "startLine": 1059,
+        "startChar": 12,
+        "endLine": 1059,
+        "endChar": 13
+      },
+      "revId": "47e5eb60c18457db89b192d62e13678e9e88d5d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
