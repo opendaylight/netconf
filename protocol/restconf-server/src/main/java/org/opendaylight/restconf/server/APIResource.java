@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -25,6 +26,7 @@ import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +43,7 @@ final class APIResource extends AbstractResource {
     @NonNullByDefault
     APIResource(final RestconfServer server, final List<String> otherSegments, final String restconfPath,
             final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
-            final PrettyPrintParam defaultPrettyPrint) {
+            final PrettyPrintParam defaultPrettyPrint, final RestconfStream.Registry streamRegistry) {
         super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
             URI.create(requireNonNull(restconfPath))));
         this.otherSegments = requireNonNull(otherSegments);
@@ -50,7 +52,8 @@ final class APIResource extends AbstractResource {
             "data", new DataResource(invariants),
             "operations", new OperationsResource(invariants),
             "yang-library-version", new YLVResource(invariants),
-            "modules", new ModulesResource(invariants));
+            "modules", new ModulesResource(invariants),
+            "streams", new StreamsResource(invariants, streamRegistry));
     }
 
     @Override

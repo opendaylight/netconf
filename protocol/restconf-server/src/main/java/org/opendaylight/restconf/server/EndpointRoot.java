@@ -81,7 +81,6 @@ final class EndpointRoot {
     //        API across the three classes of resources we have today
     private final APIResource apiResource;
     private final String apiSegment;
-    private final Map<Integer, Registration> senders = new HashMap<>();
     private final RestconfStream.Registry streamRegistry;
 
     @NonNullByDefault
@@ -123,8 +122,8 @@ final class EndpointRoot {
         final var segment = peeler.next();
         if (segment.equals(".well-known")) {
             return wellKnown.request(peeler, method, headers);
-        } else if (segment.equals("streams")) {
-            return streamsRequest(peeler, channelHandler, method, headers, new QueryStringDecoder(targetUri));
+/*        } else if (segment.equals("streams")) {
+            return streamsRequest(peeler, channelHandler, method, headers, new QueryStringDecoder(targetUri));*/
         } else if (segment.equals(apiSegment)) {
             return apiResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
