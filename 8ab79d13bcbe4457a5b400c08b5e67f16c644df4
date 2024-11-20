@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bace91c2_74160823",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-20T09:46:03Z",
+      "side": 1,
+      "message": "onSessionClose is client and server seems to be duplicate code",
+      "revId": "8ab79d13bcbe4457a5b400c08b5e67f16c644df4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d6105d8_17dc0d1d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-20T09:46:03Z",
+      "side": 1,
+      "message": "Is this really error state? Why do we throw exception here?",
+      "revId": "8ab79d13bcbe4457a5b400c08b5e67f16c644df4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
