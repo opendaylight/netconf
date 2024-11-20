@@ -51,6 +51,24 @@
       "message": "Is this really error state? Why do we throw exception here?",
       "revId": "8ab79d13bcbe4457a5b400c08b5e67f16c644df4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed05cc93_db0d45a0",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-20T13:37:54Z",
+      "side": 1,
+      "message": "We are throwing an exception here to set the settable feature into a failure state:\nhttps://github.com/opendaylight/netconf/blob/master/protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/ClientTransportChannelListener.java#L50\n\nThe reason for this is that the NetconfClientSession will not be created if the session was closed. So `operationComplete(final Future\u003cNetconfClientSession\u003e future)` method will not be invoked, which leads to an exceptional state.\n\n\nAn alternative solution I have in mind is to add timeout for `ListenableFuture\u003cNetconfClientSession\u003e connectFuture`\n\nhttps://github.com/opendaylight/netconf/blob/master/apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java#L226C15-L226C67\n\nSomething like:\n```\n        TimeoutTask timeoutTask \u003d new TimeoutTask(connectFuture);\n        timer.newTimeout(timeoutTask, clientConfig.getConnectionTimeoutMillis(), TimeUnit.MILLISECONDS);\n```",
+      "parentUuid": "6d6105d8_17dc0d1d",
+      "revId": "8ab79d13bcbe4457a5b400c08b5e67f16c644df4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
