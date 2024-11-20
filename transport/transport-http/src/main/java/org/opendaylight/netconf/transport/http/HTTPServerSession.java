@@ -205,7 +205,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        switch (prepareRequest(this, method, targetUri, msg.headers())) {
+        switch (prepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
                 LOG.debug("Immediate response to {} {}", method, targetUri);
@@ -252,8 +252,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      * @param headers request {@link HttpHeaders}
      */
     @NonNullByDefault
-    protected abstract PreparedRequest prepareRequest(ChannelHandler channelHandler, ImplementedMethod method,
-            URI targetUri, HttpHeaders headers);
+    protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpHeaders headers);
 
     @NonNullByDefault
     static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
