@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29ea38d7_fb2cc74d",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-20T07:33:57Z",
+      "side": 1,
+      "message": "identifier can be used as class constant",
+      "revId": "44f59c8d6f588dcd0b22ab4efa27adddf7da49e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b58def98_e49e6c9a",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-20T07:33:57Z",
+      "side": 1,
+      "message": "InstanceIdentifier is deprecated, use new classes accordingly",
+      "revId": "44f59c8d6f588dcd0b22ab4efa27adddf7da49e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f0fdd6b_63755a9a",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-11-20T07:33:57Z",
+      "side": 1,
+      "message": "this can be a record",
+      "revId": "44f59c8d6f588dcd0b22ab4efa27adddf7da49e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
