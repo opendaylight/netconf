@@ -258,6 +258,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "742d4fe6_73c9b7ef",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-20T09:05:15Z",
+      "side": 1,
+      "message": "not sure if it\u0027s needed, but it\u0027s defined in YANG model\nbased on rfc8639:\nhttps://www.rfc-editor.org/rfc/rfc8639.html#page-28",
+      "parentUuid": "5dd467c7_c7457576",
+      "revId": "84062f395b61080aeb8b8f5d135e5d7ec8861702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbca6fb6_ba714b78",
