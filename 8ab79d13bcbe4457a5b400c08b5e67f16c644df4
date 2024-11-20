@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be9b6d5b_4ce42609",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-20T12:03:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bace91c2_74160823",
+      "revId": "8ab79d13bcbe4457a5b400c08b5e67f16c644df4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d6105d8_17dc0d1d",
