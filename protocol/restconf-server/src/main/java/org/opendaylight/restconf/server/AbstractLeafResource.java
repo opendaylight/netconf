@@ -23,7 +23,7 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
  */
 @NonNullByDefault
 abstract sealed class AbstractLeafResource extends AbstractResource
-        permits DataResource, OperationsResource, YLVResource, ModulesResource {
+        permits DataResource, OperationsResource, StreamsResource, YLVResource, ModulesResource {
     AbstractLeafResource(final EndpointInvariants invariants) {
         super(invariants);
     }
@@ -36,5 +36,5 @@ abstract sealed class AbstractLeafResource extends AbstractResource
     }
 
     abstract PreparedRequest prepare(TransportSession session, ImplementedMethod method, URI targetUri,
-        HttpHeaders headers, @Nullable Principal principal, String path);
+            HttpHeaders headers, @Nullable Principal principal, String path);
 }

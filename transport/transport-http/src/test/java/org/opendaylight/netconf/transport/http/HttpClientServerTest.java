@@ -38,7 +38,6 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -161,8 +160,8 @@ class HttpClientServerTest {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
             channel.channel().pipeline().addLast(new HTTPServerSession(channel.scheme()) {
                 @Override
-                protected TestRequest prepareRequest(final ChannelHandler httpServerSession,
-                        final ImplementedMethod method, final URI targetUri, final HttpHeaders headers) {
+                protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+                        final HttpHeaders headers) {
                     return new TestRequest(method, targetUri);
                 }
             });
