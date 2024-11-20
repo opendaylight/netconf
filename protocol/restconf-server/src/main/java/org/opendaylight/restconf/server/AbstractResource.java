@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -93,8 +94,9 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
      * @param principal the {@link Principal} making this request, {@code null} if not known
      * @return A {@link PreparedRequest}
      */
-    abstract PreparedRequest prepare(SegmentPeeler peeler, TransportSession session, ImplementedMethod method,
-        URI targetUri, HttpHeaders headers, @Nullable Principal principal);
+    abstract PreparedRequest prepare(ChannelHandler channelHandler, SegmentPeeler peeler,
+            TransportSession session, ImplementedMethod method, URI targetUri, HttpHeaders headers,
+            @Nullable Principal principal);
 
     static final PreparedRequest optionalApiPath(final String path, final Function<ApiPath, PreparedRequest> func) {
         return path.isEmpty() ? func.apply(ApiPath.empty()) : requiredApiPath(path, func);

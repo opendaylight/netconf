@@ -81,10 +81,8 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (cause instanceof Http2Exception.StreamException se) {
-            if (root.exceptionCaught(se)) {
-                return;
-            }
+        if (cause instanceof Http2Exception.StreamException) {
+            return;
         }
         super.exceptionCaught(ctx, cause);
     }

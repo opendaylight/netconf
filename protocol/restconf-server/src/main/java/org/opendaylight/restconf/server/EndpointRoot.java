@@ -81,7 +81,6 @@ final class EndpointRoot {
     //        API across the three classes of resources we have today
     private final APIResource apiResource;
     private final String apiSegment;
-    private final Map<Integer, Registration> senders = new HashMap<>();
     private final RestconfStream.Registry streamRegistry;
 
     @NonNullByDefault
@@ -123,114 +122,13 @@ final class EndpointRoot {
         final var segment = peeler.next();
         if (segment.equals(".well-known")) {
             return wellKnown.request(peeler, method, headers);
-        } else if (segment.equals("streams")) {
-            return streamsRequest(peeler, channelHandler, method, headers, new QueryStringDecoder(targetUri));
         } else if (segment.equals(apiSegment)) {
-            return apiResource.prepare(peeler, session, method, targetUri, headers,
+            return apiResource.prepare(channelHandler, peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
         }
 
         final var resource = resources.get(segment);
         return resource == null ? EmptyResponse.NOT_FOUND
             : resource.prepare(method, targetUri, headers, peeler, wellKnown);
-    }
-
-    private PreparedRequest streamsRequest(final SegmentPeeler peeler, final ChannelHandler handler,
-            final ImplementedMethod method, final HttpHeaders headers, final QueryStringDecoder decoder) {
-        if (!peeler.hasNext()) {
-            return EmptyResponse.NOT_FOUND;
-        }
-        final var encodingName = peeler.next();
-        final EncodingName encoding;
-        try {
-            encoding = new EncodingName(encodingName);
-        } catch (IllegalArgumentException e) {
-            LOG.debug("Stream encoding name '{}' is invalid", encodingName, e);
-            return EmptyResponse.NOT_FOUND;
-        }
-
-        if (!peeler.hasNext()) {
-            return EmptyResponse.NOT_FOUND;
-        }
-        final var streamName = peeler.next();
-        final var stream = streamRegistry.lookupStream(streamName);
-        if (stream == null) {
-            LOG.debug("Stream '{}' not found", streamName);
-            return EmptyResponse.NOT_FOUND;
-        }
-        if (!method.equals(ImplementedMethod.GET)) {
-            return new EmptyResponse(HttpResponseStatus.NOT_IMPLEMENTED);
-        }
-
-        if (headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
-            return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
-        }
-
-        final EventStreamGetParams streamParams;
-        try {
-            streamParams = EventStreamGetParams.of(QueryParameters.ofMultiValue(decoder.parameters()));
-        } catch (IllegalArgumentException e) {
-            return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
-        }
-
-        Integer streamId = headers.getInt(STREAM_ID);
-        if (streamId != null) {
-            return addEventStream(streamId, stream, encoding, streamParams);
-        } else {
-            return switchToEventStream(handler, stream, encoding, streamParams);
-        }
-
-    }
-
-    // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
-    // not be servicing any other requests.
-    private PreparedRequest switchToEventStream(final ChannelHandler handler, final RestconfStream<?> stream,
-            final EncodingName encoding, final EventStreamGetParams params) {
-        final var sender = new ChannelSender();
-        final Registration registration = registerSender(stream, encoding, params, sender);
-
-        if (registration == null) {
-            return EmptyResponse.NOT_FOUND;
-        }
-
-        // Replace ourselves with the sender and enable it wil the registration
-        sender.getCtx().channel().pipeline().replace(handler, null, sender);
-        sender.enable(registration);
-        return EmptyResponse.OK;
-    }
-
-    // HTTP/2 event stream start.
-    private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
-            final EncodingName encoding, final EventStreamGetParams params) {
-        final var sender = new StreamSender(streamId);
-        final var registration = registerSender(stream, encoding, params, sender);
-        if (registration == null) {
-            return EmptyResponse.NOT_FOUND;
-        }
-        // Attach the
-        senders.put(streamId, registration);
-        // FIXME: add the sender to our a hashmap so we can respond to it being reset
-        return EmptyResponse.OK;
-    }
-
-    private static @Nullable Registration registerSender(final RestconfStream<?> stream, final EncodingName encoding,
-        final EventStreamGetParams params, final RestconfStream.Sender sender) {
-        final Registration reg;
-        try {
-            reg = stream.addSubscriber(sender, encoding, params);
-        } catch (UnsupportedEncodingException | XPathExpressionException e) {
-            // FIXME: report an error
-            return null;
-        }
-        return reg;
-    }
-
-    public Boolean exceptionCaught(Http2Exception.StreamException se) {
-        final var sender = senders.remove(se.streamId());
-        if (sender != null) {
-            sender.close();
-            return true;
-        }
-        return false;
     }
 }
