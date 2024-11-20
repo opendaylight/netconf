@@ -253,7 +253,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      */
     @NonNullByDefault
     protected abstract PreparedRequest prepareRequest(ChannelHandler channelHandler, ImplementedMethod method,
-            URI targetUri, HttpHeaders headers);
+        URI targetUri, HttpHeaders headers);
 
     @NonNullByDefault
     static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
