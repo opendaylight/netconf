@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import java.security.Principal;
@@ -25,6 +26,7 @@ import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +43,7 @@ final class APIResource extends AbstractResource {
     @NonNullByDefault
     APIResource(final RestconfServer server, final List<String> otherSegments, final String restconfPath,
             final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
-            final PrettyPrintParam defaultPrettyPrint) {
+            final PrettyPrintParam defaultPrettyPrint, final RestconfStream.Registry streamRegistry) {
         super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
             URI.create(requireNonNull(restconfPath))));
         this.otherSegments = requireNonNull(otherSegments);
@@ -50,12 +52,14 @@ final class APIResource extends AbstractResource {
             "data", new DataResource(invariants),
             "operations", new OperationsResource(invariants),
             "yang-library-version", new YLVResource(invariants),
-            "modules", new ModulesResource(invariants));
+            "modules", new ModulesResource(invariants),
+            "streams", new StreamsResource(invariants, streamRegistry));
     }
 
     @Override
-    PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
-            final URI targetUri, final HttpHeaders headers, final Principal principal) {
+    PreparedRequest prepare(final ChannelHandler channelHandler, final SegmentPeeler peeler,
+            final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers, final Principal principal) {
         LOG.debug("Preparing {} {}", method, targetUri);
 
         // peel all other segments out
@@ -72,7 +76,7 @@ final class APIResource extends AbstractResource {
         final var segment = peeler.next();
         final var resource = resources.get(segment);
         if (resource != null) {
-            return resource.prepare(peeler, session, method, targetUri, headers, principal);
+            return resource.prepare(channelHandler, peeler, session, method, targetUri, headers, principal);
         }
 
         LOG.debug("Resource for '{}' not found", segment);
