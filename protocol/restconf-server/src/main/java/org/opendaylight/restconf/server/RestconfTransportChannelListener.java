@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
-import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
@@ -28,16 +27,16 @@ import org.slf4j.LoggerFactory;
 final class RestconfTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
-    private final RestconfStream.@NonNull Registry streamRegistry;
-    private final @NonNull NettyEndpointConfiguration configuration;
     private final @NonNull EndpointRoot root;
     private final @NonNull String restconf;
 
     @NonNullByDefault
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
-        this.streamRegistry = requireNonNull(streamRegistry);
-        this.configuration = requireNonNull(configuration);
+        requireNonNull(server);
+        requireNonNull(streamRegistry);
+        requireNonNull(principalService);
+        requireNonNull(configuration);
 
         // Reconstruct root API path in encoded form
         final var apiRootPath = configuration.apiRootPath();
@@ -51,9 +50,12 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         final var firstSegment = apiRootPath.getFirst();
         final var otherSegments = apiRootPath.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
+        final var streamService = new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
+            configuration.defaultEncoding(), configuration.prettyPrint());
+
         root = new EndpointRoot(principalService, new WellKnownResources(restconf), firstSegment,
             new APIResource(server, otherSegments, sb.append('/').toString(), configuration.errorTagMapping(),
-                configuration.defaultEncoding(), configuration.prettyPrint()));
+                configuration.defaultEncoding(), configuration.prettyPrint(), streamService));
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
@@ -69,12 +71,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         final var session = new RestconfSession(channel.scheme(), root);
         final var nettyChannel = channel.channel();
-        nettyChannel.pipeline().addLast(
-            new ServerSseHandler(
-                new RestconfStreamService(streamRegistry, restconf, configuration.errorTagMapping(),
-                    configuration.defaultEncoding(), configuration.prettyPrint()),
-                configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
-            session);
+        nettyChannel.pipeline().addLast(session);
     }
 
     @Override
