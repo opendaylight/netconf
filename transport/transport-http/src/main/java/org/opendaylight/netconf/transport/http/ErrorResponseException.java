@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * <p>Serves cases when exception handler builds the HTTP response with mandatory response body
  * which requires content-type header as well (i.e. RESTCONF server).
  *
- * @see ServerSseHandler
  * @see <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-7.1">RFC-8040: 7.1 Error Response Message</a>
  */
 public final class ErrorResponseException extends RuntimeException {
