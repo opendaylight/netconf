@@ -96,6 +96,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     private final @NonNull ServerActionOperations action;
     private final @NonNull ServerRpcOperations rpc;
     private final @NonNull DOMDataBroker dataBroker;
+    // FIXME add SSE service?
 
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile MdsalServerStrategy localStrategy;
