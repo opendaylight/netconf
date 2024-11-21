@@ -101,6 +101,10 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
         listener.onTransportChannelFailed(cause);
     }
 
+    protected final boolean transportChannelIsDone() {
+        return listener.transportChannelIsDone();
+    }
+
     @Override
     public final String toString() {
         return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();

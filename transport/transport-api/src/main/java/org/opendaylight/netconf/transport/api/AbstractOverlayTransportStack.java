@@ -30,6 +30,11 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
         public void onTransportChannelEstablished(final TransportChannel channel) {
             onUnderlayChannelEstablished(channel);
         }
+
+        @Override
+        public boolean transportChannelIsDone() {
+            return transportChannelIsDone();
+        }
     };
 
     private volatile TransportStack underlay = null;

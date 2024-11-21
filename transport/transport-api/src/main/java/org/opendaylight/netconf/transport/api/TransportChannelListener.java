@@ -30,4 +30,11 @@ public interface TransportChannelListener<T extends TransportChannel> {
      * @param cause Failure cause
      */
     void onTransportChannelFailed(@NonNull Throwable cause);
+
+    /**
+     * Indicates whether the TransportChannel has completed its operation.
+     *
+     * @return true if the channel has successfully completed or failed, otherwise false.
+     */
+    boolean transportChannelIsDone();
 }
