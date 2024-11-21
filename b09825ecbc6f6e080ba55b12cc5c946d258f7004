@@ -16,6 +16,24 @@
       "message": "package org.opendaylight.netconf.restconf.subscription",
       "revId": "b09825ecbc6f6e080ba55b12cc5c946d258f7004",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4763f1de_1a68ffaa",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/SubscriptionUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-21T12:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e661903c_6e57189c",
+      "revId": "b09825ecbc6f6e080ba55b12cc5c946d258f7004",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
