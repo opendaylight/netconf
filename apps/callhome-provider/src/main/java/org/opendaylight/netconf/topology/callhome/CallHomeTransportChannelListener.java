@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.callhome;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.ssl.SslHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.ClientChannelInitializer;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -25,6 +26,7 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
     private final @NonNull NetconfClientSessionNegotiatorFactory negotiationFactory;
     private final CallHomeSessionContextManager<?> contextManager;
     private final CallHomeStatusRecorder statusRecorder;
+    private final AtomicBoolean isDone = new AtomicBoolean();
 
     public CallHomeTransportChannelListener(final NetconfClientSessionNegotiatorFactory negotiationFactory,
             final CallHomeSessionContextManager<?> contextManager, final CallHomeStatusRecorder statusRecorder) {
@@ -62,6 +64,7 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
                 context.settableFuture().set(promise.getNow());
                 LOG.info("Netconf session established for context: {}", context);
             }
+            isDone.set(true);
         });
         new ClientChannelInitializer(negotiationFactory, context.netconfSessionListener())
             .initialize(channel, promise);
@@ -74,6 +77,12 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
 
     @Override
     public void onTransportChannelFailed(final Throwable cause) {
+        isDone.set(true);
         statusRecorder.onTransportChannelFailure(cause);
+    }
+
+    @Override
+    public boolean transportChannelIsDone() {
+        return isDone.get();
     }
 }

@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -32,6 +33,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final @NonNull NettyEndpointConfiguration configuration;
     private final @NonNull EndpointRoot root;
     private final @NonNull String restconf;
+    private final AtomicBoolean isDone = new AtomicBoolean();
 
     @NonNullByDefault
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
@@ -75,10 +77,17 @@ final class RestconfTransportChannelListener implements TransportChannelListener
                     configuration.defaultEncoding(), configuration.prettyPrint()),
                 configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava()),
             session);
+        isDone.set(true);
     }
 
     @Override
     public void onTransportChannelFailed(final Throwable cause) {
+        isDone.set(true);
         LOG.warn("Connection failed", cause);
+    }
+
+    @Override
+    public boolean transportChannelIsDone() {
+        return isDone.get();
     }
 }
