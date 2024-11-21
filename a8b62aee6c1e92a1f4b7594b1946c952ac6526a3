@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9acedcfd_faa180e0",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-21T12:22:47Z",
+      "side": 1,
+      "message": "delete or uncomment?",
+      "revId": "a8b62aee6c1e92a1f4b7594b1946c952ac6526a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "658de2ef_fe0a22fa",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-21T12:22:47Z",
+      "side": 1,
+      "message": "why not return here?",
+      "revId": "a8b62aee6c1e92a1f4b7594b1946c952ac6526a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
