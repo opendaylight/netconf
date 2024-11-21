@@ -22,6 +22,52 @@
       },
       "revId": "2452144ee90a61dccb96d0dd3cb9f08edc2e8893",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "356ae712_44cbf9a4",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-21T09:37:57Z",
+      "side": 1,
+      "message": "\u0027inv\u0027 to keep things concise",
+      "range": {
+        "startLine": 440,
+        "startChar": 17,
+        "endLine": 440,
+        "endChar": 33
+      },
+      "revId": "2452144ee90a61dccb96d0dd3cb9f08edc2e8893",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0823c981_6c23d621",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-21T09:37:57Z",
+      "side": 1,
+      "message": "clientInvocation.\u003cTransportChannelListener\u003cTransportChannel\u003e\u003egetArgument()\n\nhere and in other places",
+      "range": {
+        "startLine": 441,
+        "startChar": 40,
+        "endLine": 441,
+        "endChar": 101
+      },
+      "revId": "2452144ee90a61dccb96d0dd3cb9f08edc2e8893",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
