@@ -394,6 +394,11 @@ class SshClientServerTest {
             public void onTransportChannelFailed(final Throwable cause) {
                 // not used
             }
+
+            @Override
+            public boolean transportChannelIsDone() {
+                return false;
+            }
         };
 
         final var server = FACTORY.listenServer(SUBSYSTEM, serverTransportListener, tcpServerConfig, null,

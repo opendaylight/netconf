@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -26,6 +27,7 @@ public final class ServerTransportInitializer implements TransportChannelListene
     private static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
 
     private final NetconfServerSessionNegotiatorFactory negotiatorFactory;
+    private final AtomicBoolean isDone = new AtomicBoolean();
 
     public ServerTransportInitializer(final NetconfServerSessionNegotiatorFactory negotiatorFactory) {
         this.negotiatorFactory = requireNonNull(negotiatorFactory);
@@ -51,10 +53,17 @@ public final class ServerTransportInitializer implements TransportChannelListene
                     negotiatorFactory.getSessionNegotiator(ch, promise));
             }
         }.initialize(nettyChannel, nettyChannel.eventLoop().newPromise());
+        isDone.set(true);
     }
 
     @Override
     public void onTransportChannelFailed(final Throwable cause) {
+        isDone.set(true);
         LOG.error("Transport channel failed", cause);
+    }
+
+    @Override
+    public boolean transportChannelIsDone() {
+        return isDone.get();
     }
 }

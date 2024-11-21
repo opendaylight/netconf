@@ -297,5 +297,10 @@ class CallHomeTlsServerTest {
         public void onTransportChannelFailed(final Throwable cause) {
             LOG.error("Call-Home client's transport channel failed", cause);
         }
+
+        @Override
+        public boolean transportChannelIsDone() {
+            return false;
+        }
     }
 }

@@ -51,6 +51,11 @@ final class ClientTransportChannelListener implements TransportChannelListener<T
     }
 
     @Override
+    public boolean transportChannelIsDone() {
+        return sessionFuture.isDone();
+    }
+
+    @Override
     public void operationComplete(final Future<NetconfClientSession> future) throws Exception {
         final var cause = future.cause();
         if (cause != null) {
