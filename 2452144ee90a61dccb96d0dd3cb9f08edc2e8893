@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b44d12e2_157af8a5",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-21T17:20:42Z",
+      "side": 1,
+      "message": "Renamed.\nFixed.\nI have prepared a patch to add a method for checking the state of the TransportChannel. Now, we can ensure that method notifyTransportChannelFailed with an error is called only if the TransportChannel is not finished.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/114501/3",
+      "parentUuid": "26f037ff_0065775c",
+      "range": {
+        "startLine": 147,
+        "startChar": 9,
+        "endLine": 147,
+        "endChar": 23
+      },
+      "revId": "2452144ee90a61dccb96d0dd3cb9f08edc2e8893",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "356ae712_44cbf9a4",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3958d528_1936bf01",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-21T17:20:42Z",
+      "side": 1,
+      "message": "Renamed to `clientInv` and `listenerInv` because both can not be named `inv`.\n```\ndoAnswer(clientInv -\u003e {\n  ...\n  doAnswer(listenerInv -\u003e {\n```",
+      "parentUuid": "356ae712_44cbf9a4",
+      "range": {
+        "startLine": 440,
+        "startChar": 17,
+        "endLine": 440,
+        "endChar": 33
+      },
+      "revId": "2452144ee90a61dccb96d0dd3cb9f08edc2e8893",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0823c981_6c23d621",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-11-21T09:37:57Z",
       "side": 1,
       "message": "clientInvocation.\u003cTransportChannelListener\u003cTransportChannel\u003e\u003egetArgument()\n\nhere and in other places",
+      "range": {
+        "startLine": 441,
+        "startChar": 40,
+        "endLine": 441,
+        "endChar": 101
+      },
+      "revId": "2452144ee90a61dccb96d0dd3cb9f08edc2e8893",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "def8e288_f2b817d4",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-21T17:20:42Z",
+      "side": 1,
+      "message": "Thanks fixed.",
+      "parentUuid": "0823c981_6c23d621",
       "range": {
         "startLine": 441,
         "startChar": 40,
