@@ -170,7 +170,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         }
     }
 
-    static final Long sessionId(final Session session) {
+    static final @NonNull Long sessionId(final Session session) {
         return session.getIoSession().getId();
     }
 
