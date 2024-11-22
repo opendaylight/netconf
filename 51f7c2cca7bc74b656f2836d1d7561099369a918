@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cc137e1_970bce2a",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-22T21:34:30Z",
+      "side": 1,
+      "message": "please create a separate suite. replicate/reuse the wiring bits you need in a NC1423Test.java.\n\nReasoning is:\nThis suite covers the initial code drop, separate suites test the bugs therein. If you need and abstract base class to share setup, create one.",
+      "range": {
+        "startLine": 328,
+        "startChar": 4,
+        "endLine": 328,
+        "endChar": 55
+      },
+      "revId": "51f7c2cca7bc74b656f2836d1d7561099369a918",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
