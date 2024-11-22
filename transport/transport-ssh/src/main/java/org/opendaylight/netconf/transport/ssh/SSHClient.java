@@ -114,7 +114,7 @@ public final class SSHClient extends SSHTransportStack {
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.error("Failed to open \"{}\" subsystem on session {}", subsystem, sessionId, cause);
-                deleteSession(sessionId);
+                transportFailed(sessionId, cause);
             }
         }, MoreExecutors.directExecutor());
     }
