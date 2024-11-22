@@ -168,7 +168,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     }
 
     @NonNullByDefault
-    final void deleteSession(final Long sessionId) {
+    private void deleteSession(final Long sessionId) {
         sessions.remove(sessionId);
         // auth failure, close underlay if any
         completeUnderlay(sessionId, underlay -> underlay.channel().close());
