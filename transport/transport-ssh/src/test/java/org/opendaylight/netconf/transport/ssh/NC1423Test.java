@@ -31,6 +31,63 @@ import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 public class NC1423Test extends AbstractClientServerTest {
 
     @Test
+    void testSessionException() throws Exception {
+        // Prepare environment.
+        final var clientIdentity = buildClientIdentityWithPassword(getUsername(), PASSWORD);
+        final var clientAuth = buildClientAuthWithPassword(getUsernameAndUpdate(), "$0$" + PASSWORD);
+        final var serverIdentity = buildServerIdentityWithKeyPair(generateKeyPairWithCertificate(RSA));
+        when(sshClientConfig.getClientIdentity()).thenReturn(clientIdentity);
+        when(sshClientConfig.getServerAuthentication()).thenReturn(null);
+        when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
+        when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
+
+        final var group = NettyTransportSupport.newEventLoopGroup("SessionFailure", 0);
+        final var serviceFactory = new NettyIoServiceFactoryFactory(group);
+        final var sshClient = SSHClient.of(serviceFactory, group, SUBSYSTEM, clientListener, sshClientConfig, null);
+        final var spyClient = spy(sshClient);
+
+        // Set up the behaviour with spied TransportChannelListener which automatically close session before calling
+        // onTransportChannelEstablished method.
+        doAnswer(clientInv -> {
+            final var channelListener = clientInv.<TransportChannelListener<TransportChannel>>getArgument(2);
+            // Create a spy of the original listener.
+            final var spiedListener = spy(channelListener);
+            doAnswer(listenerInv -> {
+                final var argumentChannel = listenerInv.<TransportChannel>getArgument(0);
+
+                // Call the close method on the channel parameter.
+                clientListener.onTransportChannelFailed(new RuntimeException("Exception in the session"));
+                // Call the real method afterward.
+                return listenerInv.callRealMethod();
+            }).when(spiedListener).onTransportChannelEstablished(any(TransportChannel.class));
+
+            // Call the real method using the spied listener.
+            return sshClient.connect(clientInv.getArgument(0), clientInv.getArgument(1), spiedListener);
+        }).when(spyClient).connect(any(), any(), any());
+
+        final var sshServerFuture = FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig);
+        final var server = sshServerFuture.get(2, TimeUnit.SECONDS);
+        try {
+            // Execute connect on prepared spyClient.
+            final var bootstrap = NettyTransportSupport.newBootstrap().group(group);
+            final var clientConnect = spyClient.connect(bootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+            assertNotNull(clientConnect);
+
+            // Verify that IllegalStateException is thrown.
+            final var exceptionCapture = ArgumentCaptor.forClass(RuntimeException.class);
+            verify(clientListener, timeout(2000)).onTransportChannelFailed(exceptionCapture.capture());
+            final var exception = exceptionCapture.getValue();
+
+            // Verify correct exception message.
+            assertEquals("Exception in the session", exception.getMessage());
+        } finally {
+            // Close resources after test.
+            server.shutdown().get(2, TimeUnit.SECONDS);
+            sshClient.shutdown().get(2, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
     void testSessionCloseFailure() throws Exception {
         // Prepare environment.
         final var clientIdentity = buildClientIdentityWithPassword(getUsername(), PASSWORD);
