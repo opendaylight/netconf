@@ -96,7 +96,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     public final void sessionException(final Session session, final Throwable throwable) {
         final var sessionId = sessionId(session);
         LOG.warn("Session {} encountered an error", sessionId, throwable);
-        deleteSession(sessionId);
+        transportFailed(sessionId, throwable);
     }
 
     @Override
