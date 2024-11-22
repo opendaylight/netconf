@@ -81,6 +81,41 @@ class NC1423Test extends AbstractClientServerTest {
     }
 
     @Test
+    void testSessionExceptionWhileClientProcessingConnect() throws Exception {
+        // Prepares a use case where sessionException is invoked when sessionEvent is processed.
+        final var testException = new RuntimeException("Test session exception");
+        doAnswer(sessionListenerInv -> {
+            final var sessionListenerSpy = spy(sessionListenerInv.<SessionListener>getArgument(0));
+            // Capture sessionEvent on spy SessionListener and invoke sessionException.
+            doAnswer(sessionEventInv -> {
+                sessionListenerSpy.sessionException(sessionEventInv.getArgument(0), testException);
+                return null;
+            }).when(sessionListenerSpy).sessionEvent(any(), any());
+
+            // Replace original arguments with prepared spy SessionListener.
+            final var arguments = sessionListenerInv.getArguments();
+            arguments[0] = sessionListenerSpy;
+            // Invoke real addSessionListener method with modified parameters.
+            return sessionListenerInv.callRealMethod();
+        }).when(transportSshSpy).addSessionListener(any());
+
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+
+        // Execute connect.
+        sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
+        sshClient.connect(clientBootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+
+        // Verify that RuntimeException is thrown.
+        final var exceptionCapture = ArgumentCaptor.forClass(RuntimeException.class);
+        verify(clientListener, timeout(4000)).onTransportChannelFailed(exceptionCapture.capture());
+        final var exception = exceptionCapture.getValue();
+
+        // Verify correct exception.
+        assertEquals(testException, exception);
+    }
+
+    @Test
     void testSessionCloseWhileClientProcessingConnect() throws Exception {
         // Prepares a use case where sessionClosed is invoked when sessionEvent is processed.
         doAnswer(sessionListenerInv -> {
