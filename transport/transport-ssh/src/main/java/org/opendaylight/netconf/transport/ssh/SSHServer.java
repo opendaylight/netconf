@@ -89,7 +89,7 @@ public final class SSHServer extends SSHTransportStack {
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.debug("Binding to \"{}\" subsystem on session {} failed", subsystem, sessionId, cause);
-                deleteSession(sessionId);
+                transportFailed(sessionId, cause);
             }
         }, MoreExecutors.directExecutor());
     }
