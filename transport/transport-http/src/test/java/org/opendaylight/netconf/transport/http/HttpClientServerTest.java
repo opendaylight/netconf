@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -206,7 +207,9 @@ class HttpClientServerTest {
     private void integrationTest(final boolean http2, final AuthHandlerFactory authHandlerFactory) throws Exception {
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
             serverConfig, authHandlerFactory).get(2, TimeUnit.SECONDS);
+
         try {
+            doNothing().when(clientTransportListener).onTransportChannelEstablished(any());
             final var client = HTTPClient.connect(clientTransportListener, bootstrapFactory.newBootstrap(),
                     clientConfig, http2).get(2, TimeUnit.SECONDS);
             try {

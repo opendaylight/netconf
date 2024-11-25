@@ -18,6 +18,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -185,6 +186,7 @@ class SseClientServerTest {
                 assertGetRequest(client);
 
                 // request SSE with invalid URI
+                doNothing().when(startCallback).onStartFailure(any());
                 clientEventStreamService.startEventStream(DATA_URI, eventStreamListener, startCallback);
                 verify(startCallback, timeout(1000)).onStartFailure(exceptionCaptor.capture());
                 final var exception = exceptionCaptor.getValue();
@@ -192,6 +194,7 @@ class SseClientServerTest {
                 assertEquals(DECLINE_MESSAGE, exception.getMessage());
 
                 // start SSE stream with proper URI
+                doNothing().when(startCallback).onStreamStarted(any());
                 clientEventStreamService.startEventStream(STREAM_URI, eventStreamListener, startCallback);
                 verify(startCallback, timeout(1000)).onStreamStarted(any());
                 verify(eventStreamListener).onStreamStart();
@@ -199,11 +202,13 @@ class SseClientServerTest {
                 // send series of event fields (name:value pairs)
                 assertNotNull(serverEventStreamService.listener);
                 for (var value : DATA_VALUES) {
+                    doNothing().when(eventStreamListener).onEventField(DATA, value);
                     serverEventStreamService.listener.onEventField(DATA, value);
                     verify(eventStreamListener, timeout(1000)).onEventField(DATA, value);
                 }
 
                 // end stream while keeping connection alive
+                doNothing().when(eventStreamListener).onStreamEnd();
                 serverEventStreamService.listener.onStreamEnd();
                 verify(eventStreamListener, timeout(1000)).onStreamEnd();
 
