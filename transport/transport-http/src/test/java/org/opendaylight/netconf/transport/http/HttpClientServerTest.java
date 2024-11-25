@@ -11,6 +11,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.HOST;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
 import static io.netty.handler.codec.http.HttpHeaderValues.TEXT_PLAIN;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -30,11 +31,7 @@ import static org.opendaylight.netconf.transport.http.TestUtils.freePort;
 import static org.opendaylight.netconf.transport.http.TestUtils.generateX509CertData;
 import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import java.net.Authenticator;
 import java.net.InetAddress;
@@ -45,13 +42,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -70,7 +66,6 @@ class HttpClientServerTest {
     private static final Map<String, String> USER_HASHES_MAP = Map.of(USERNAME, "$0$" + PASSWORD);
     private static final AtomicInteger COUNTER = new AtomicInteger(0);
     private static final String[] METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE"};
-    private static final String RESPONSE_TEMPLATE = "Method: %s URI: %s Payload: %s";
 
     private static final AuthHandlerFactory CUSTOM_AUTH_HANDLER_FACTORY =
         () -> new AbstractBasicAuthHandler<String>() {
@@ -80,7 +75,6 @@ class HttpClientServerTest {
             }
         };
 
-    private static ScheduledExecutorService scheduledExecutor;
     private static BootstrapFactory bootstrapFactory;
     private static String localAddress;
 
@@ -97,39 +91,19 @@ class HttpClientServerTest {
     static void beforeAll() {
         bootstrapFactory = new BootstrapFactory("IntegrationTest", 0);
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
-        scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
     }
 
     @AfterAll
     static void afterAll() {
         bootstrapFactory.close();
-        scheduledExecutor.shutdown();
     }
 
     @BeforeEach
     void beforeEach() {
+        // TODO: this looks like a spy() on a real implementation
         doAnswer(inv -> {
-            inv.<TransportChannel>getArgument(0).channel().pipeline()
-                .addLast(new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
-                    @Override
-                    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-                        // return 200 response with a content built from request parameters
-                        final var method = msg.method().name();
-                        final var uri = msg.uri();
-                        final var payload = msg.content().readableBytes() > 0
-                            ? msg.content().toString(StandardCharsets.UTF_8) : "";
-                        final var responseMessage = RESPONSE_TEMPLATE.formatted(method, uri, payload);
-                        final var response = new DefaultFullHttpResponse(msg.protocolVersion(), OK,
-                            wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8)));
-                        response.headers()
-                            .set(CONTENT_TYPE, TEXT_PLAIN)
-                            .setInt(CONTENT_LENGTH, response.content().readableBytes());
-                        ServerSseHandler.copyStreamId(msg, response);
-
-                        // emulate asynchronous server request processing - run in separate thread with 100 millis delay
-                        scheduledExecutor.schedule(() -> ctx.writeAndFlush(response), 100, TimeUnit.MILLISECONDS);
-                    }
-                });
+            final var channel = inv.<HTTPTransportChannel>getArgument(0);
+            channel.channel().pipeline().addLast(new TestHTTPServerSession(channel.scheme()));
             return null;
         }).when(serverTransportListener).onTransportChannelEstablished(any());
     }
@@ -214,11 +188,12 @@ class HttpClientServerTest {
                 verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
 
                 for (var method : METHODS) {
-                    final var uri = nextValue("URI");
+                    final var uri = nextValue("/URI");
                     final var payload = nextValue("PAYLOAD");
                     final var request = new DefaultFullHttpRequest(HTTP_1_1, HttpMethod.valueOf(method),
                         uri, wrappedBuffer(payload.getBytes(StandardCharsets.UTF_8)));
                     request.headers()
+                        .set(HOST, "example.com")
                         .set(CONTENT_TYPE, TEXT_PLAIN)
                         .setInt(CONTENT_LENGTH, request.content().readableBytes())
                         // allow multiple requests on same connections
@@ -227,8 +202,8 @@ class HttpClientServerTest {
                     final var response = invoke(client, request).get(2, TimeUnit.SECONDS);
                     assertNotNull(response);
                     assertEquals(OK, response.status());
-                    final var expected = RESPONSE_TEMPLATE.formatted(method, uri, payload);
-                    assertEquals(expected, response.content().toString(StandardCharsets.UTF_8));
+                    assertEquals("Method: " + method + " URI: " + uri + " Payload: " + payload,
+                        response.content().toString(StandardCharsets.UTF_8));
                 }
             } finally {
                 client.shutdown().get(2, TimeUnit.SECONDS);
@@ -240,6 +215,7 @@ class HttpClientServerTest {
 
     @ParameterizedTest(name = "Java HttpClient compatibility check, Basic Auth: {0}")
     @ValueSource(booleans = {false, true})
+    @Timeout(20)
     void cleartextUpgradeFlowCompatibility(final boolean withAuth) throws Exception {
         // validate server cleartext protocol upgrade flow being compatible with java.net.HttpClient
         final var localPort = freePort();
@@ -274,8 +250,7 @@ class HttpClientServerTest {
                     .toCompletableFuture().get(2, TimeUnit.SECONDS);
                 assertNotNull(response);
                 assertEquals(200, response.statusCode());
-                final var expected = RESPONSE_TEMPLATE.formatted("PATCH", "/" + uri, payload);
-                assertEquals(expected, response.body());
+                assertEquals("Method: PATCH URI: /" + uri + " Payload: " + payload, response.body());
             }
         } finally {
             server.shutdown().get(2, TimeUnit.SECONDS);
