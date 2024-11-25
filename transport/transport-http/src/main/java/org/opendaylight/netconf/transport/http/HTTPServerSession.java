@@ -132,14 +132,14 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         //   - the value is invalid
         final var hostItr = headers.valueStringIterator(HttpHeaderNames.HOST);
         if (!hostItr.hasNext()) {
-            LOG.debug("No Host header in request {}", msg);
+            LOG.info("No Host header in request {}", msg);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
         }
         final var host = hostItr.next();
         if (hostItr.hasNext()) {
-            LOG.debug("Multiple Host header values in request {}", msg);
+            LOG.info("Multiple Host header values in request {}", msg);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
@@ -148,7 +148,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         try {
             hostUri = scheme.hostUriOf(host);
         } catch (URISyntaxException e) {
-            LOG.debug("Invalid Host header value '{}'", host, e);
+            LOG.info("Invalid Host header value '{}'", host, e);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
@@ -160,7 +160,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         final var nettyMethod = msg.method();
         final var method = implementationOf(nettyMethod);
         if (method == null) {
-            LOG.debug("Method {} not implemented", nettyMethod);
+            LOG.info("Method {} not implemented", nettyMethod);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED));
             return;
@@ -185,7 +185,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         try {
             requestUri = new URI(uri);
         } catch (URISyntaxException e) {
-            LOG.debug("Invalid request-target '{}'", uri, e);
+            LOG.info("Invalid request-target '{}'", uri, e);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
@@ -200,7 +200,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             // origin-form needs to be combined with Host header
             targetUri = hostUri.resolve(requestUri);
         } else {
-            LOG.debug("Unsupported request-target '{}'", requestUri);
+            LOG.info("Unsupported request-target '{}'", requestUri);
             msg.release();
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;

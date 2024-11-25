@@ -96,6 +96,7 @@ final class ClientHttp2SseService extends ChannelInboundHandlerAdapter
         request.headers()
             .set(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM)
             .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
+            .set(HttpHeaderNames.HOST, "example.com")
             .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED)
             .setInt(ExtensionHeaderNames.STREAM_ID.text(), streamId)
             .set(ExtensionHeaderNames.SCHEME.text(), scheme);
