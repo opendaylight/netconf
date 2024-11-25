@@ -52,7 +52,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         super(listener, scheme);
         this.authProvider = authProvider;
         this.http2 = http2;
-        dispatcher = http2 ? new ClientHttp2RequestDispatcher() : new ClientHttp1RequestDispatcher();
+        dispatcher = http2 ? new ClientHttp2RequestDispatcher(scheme) : new ClientHttp1RequestDispatcher();
     }
 
     /**

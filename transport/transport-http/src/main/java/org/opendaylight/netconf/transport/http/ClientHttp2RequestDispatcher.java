@@ -7,16 +7,15 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.SCHEME;
-import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.STREAM_ID;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpScheme;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
+import io.netty.util.AsciiString;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,19 +30,18 @@ import org.slf4j.LoggerFactory;
  */
 final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp2RequestDispatcher.class);
+    private static final AsciiString SCHEME = ExtensionHeaderNames.SCHEME.text();
+    private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
 
     // TODO: we access the queue only from Netty callbacks: can we use a plain HashMap?
     private final Map<Integer, FutureCallback<FullHttpResponse>> map = new ConcurrentHashMap<>();
     // identifier for streams initiated from client require to be odd-numbered, 1 is reserved
     // see https://datatracker.ietf.org/doc/html/rfc7540#section-5.1.1
     private final AtomicInteger streamIdCounter = new AtomicInteger(3);
+    private final HTTPScheme scheme;
 
-    private boolean ssl = false;
-
-    @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
-        ssl = ctx.pipeline().get(SslHandler.class) != null;
-        super.handlerAdded(ctx);
+    ClientHttp2RequestDispatcher(final HTTPScheme scheme) {
+        this.scheme = requireNonNull(scheme);
     }
 
     @Override
@@ -51,8 +49,8 @@ final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
             final FutureCallback<FullHttpResponse> callback) {
         final var streamId = nextStreamId();
         request.headers()
-            .setInt(STREAM_ID.text(), streamId)
-            .set(SCHEME.text(), ssl ? HttpScheme.HTTPS.name() : HttpScheme.HTTP.name());
+            .setInt(STREAM_ID, streamId)
+            .set(SCHEME, scheme);
 
         // Map has to be populated first, simply because a response may arrive sooner than the successful callback
         map.put(streamId, callback);
@@ -70,7 +68,7 @@ final class ClientHttp2RequestDispatcher extends ClientRequestDispatcher {
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpResponse response) {
-        final var streamId = response.headers().getInt(STREAM_ID.text());
+        final var streamId = response.headers().getInt(STREAM_ID);
         if (streamId == null) {
             LOG.warn("Unexpected response with no stream ID -- Dropping response object {}", response);
             return;
