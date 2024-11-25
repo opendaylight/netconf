@@ -11,14 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http2.DefaultHttp2Connection;
-import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
-import io.netty.handler.codec.http2.Http2ConnectionHandler;
-import io.netty.handler.codec.http2.Http2FrameLogger;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
-import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
-import io.netty.handler.logging.LogLevel;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -36,9 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
  * setup are subject to change and users are advised to attach their own subclass of {@link HTTPServerSession} as the
  * last handler. Doing so will provide a predictable API surface as to how the pipeline is set up.
  */
-public abstract sealed class HTTPServer extends HTTPTransportStack permits PlainHTTPServer, TlsHTTPServer {
-    private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Server");
-
+public final class HTTPServer extends HTTPTransportStack {
     private final AuthHandlerFactory authHandlerFactory;
 
     HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme,
@@ -57,7 +47,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+    public static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
             final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams)
                 throws UnsupportedConfigurationException {
         return listen(listener, bootstrap, listenParams, null);
@@ -75,7 +65,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
      * @throws UnsupportedConfigurationException when {@code listenParams} contains an unsupported options
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static final @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
+    public static @NonNull ListenableFuture<HTTPServer> listen(final TransportChannelListener listener,
             final ServerBootstrap bootstrap, final HttpServerStackGrouping listenParams,
             final @Nullable AuthHandlerFactory authHandlerFactory) throws UnsupportedConfigurationException {
         final var transport = requireNonNull(listenParams).getTransport();
@@ -91,7 +81,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
             final Tcp tcpCase, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var tcp = tcpCase.getTcp();
-        final var server = new PlainHTTPServer(listener, authHandlerFactory != null ? authHandlerFactory
+        final var server = new HTTPServer(listener, HTTPScheme.HTTP, authHandlerFactory != null ? authHandlerFactory
             : BasicAuthHandlerFactory.ofNullable(tcp.getHttpServerParameters()));
         return transformUnderlay(server,
             TCPServer.listen(server.asListener(), bootstrap, tcp.nonnullTcpServerParameters()));
@@ -102,7 +92,7 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
             final Tls tlsCase, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var tls = tlsCase.getTls();
-        final var server = new TlsHTTPServer(listener, authHandlerFactory != null ? authHandlerFactory
+        final var server = new HTTPServer(listener, HTTPScheme.HTTPS, authHandlerFactory != null ? authHandlerFactory
             : BasicAuthHandlerFactory.ofNullable(tls.getHttpServerParameters()));
         return transformUnderlay(server,
             TLSServer.listen(server.asListener(), bootstrap, tls.nonnullTcpServerParameters(),
@@ -110,29 +100,13 @@ public abstract sealed class HTTPServer extends HTTPTransportStack permits Plain
     }
 
     @Override
-    protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
+    protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var pipeline = underlayChannel.channel().pipeline();
-
-        // External HTTP 2 to internal HTTP 1.1 adapter handler
-        final var connection = new DefaultHttp2Connection(true);
-        final var frameListener = new InboundHttp2ToHttpAdapterBuilder(connection)
-            .maxContentLength(MAX_HTTP_CONTENT_LENGTH)
-            .propagateSettings(true)
-            .build();
-
-        initializePipeline(pipeline, new HttpToHttp2ConnectionHandlerBuilder()
-            .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
-            .connection(connection)
-            .frameLogger(FRAME_LOGGER)
-            .gracefulShutdownTimeoutMillis(0L)
-            .build());
-
+        final var scheme = scheme();
+        scheme.initializeServerPipeline(pipeline);
         if (authHandlerFactory != null) {
             pipeline.addLast(authHandlerFactory.create());
         }
-
-        addTransportChannel(new HTTPTransportChannel(underlayChannel, scheme()));
+        addTransportChannel(new HTTPTransportChannel(underlayChannel, scheme));
     }
-
-    abstract void initializePipeline(ChannelPipeline pipeline, Http2ConnectionHandler connectionHandler);
 }
