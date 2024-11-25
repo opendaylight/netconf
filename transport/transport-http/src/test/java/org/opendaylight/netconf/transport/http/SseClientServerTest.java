@@ -8,10 +8,9 @@
 package org.opendaylight.netconf.transport.http;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
+import static io.netty.handler.codec.http.HttpHeaderNames.HOST;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static org.awaitility.Awaitility.await;
@@ -31,12 +30,13 @@ import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.InetAddress;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -111,15 +111,15 @@ class SseClientServerTest {
         serverTransportListener = new TestTransportListener(channel -> {
             channel.channel().pipeline().addLast(
                 new ServerSseHandler(serverEventStreamService, 0, 0),
-                new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
+                new HTTPServerSession(channel.scheme()) {
                     @Override
-                    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-                        final var response = DATA_URI.equals(msg.uri())
-                            ? new DefaultFullHttpResponse(msg.protocolVersion(), OK, OK_CONTENT.copy())
-                            : new DefaultFullHttpResponse(msg.protocolVersion(), NOT_FOUND, Unpooled.EMPTY_BUFFER);
-                        response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
-                        ServerSseHandler.copyStreamId(msg, response);
-                        ctx.writeAndFlush(response);
+                    protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+                            final HttpHeaders headers) {
+                        return DATA_URI.equals(targetUri.getPath())
+                            ? new ByteBufRequestResponse(HttpResponseStatus.OK, OK_CONTENT.copy(),
+                                DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
+                                    .set(HttpHeaderNames.CONTENT_LENGTH, OK_CONTENT.readableBytes()))
+                            :  EmptyRequestResponse.NOT_FOUND;
                     }
                 });
         });
@@ -220,7 +220,7 @@ class SseClientServerTest {
 
     private static void assertGetRequest(final HTTPClient client) throws Exception {
         final var request = new DefaultFullHttpRequest(HTTP_1_1, GET, DATA_URI);
-        request.headers().set(CONNECTION, KEEP_ALIVE);
+        request.headers().set(HOST, "example.com").set(CONNECTION, KEEP_ALIVE);
         final var response = invoke(client, request).get(2, TimeUnit.SECONDS);
         assertNotNull(response);
         assertEquals(OK, response.status());
