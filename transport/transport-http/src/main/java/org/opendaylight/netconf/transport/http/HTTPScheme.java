@@ -32,10 +32,11 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 import io.netty.util.AsciiString;
-import io.netty.util.ReferenceCountUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Supported HTTP URI schemes.
@@ -61,35 +62,7 @@ public enum HTTPScheme {
                             ? new Http2ServerUpgradeCodec(twoToOne) : null,
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     twoToOne))
-                .addLast(new SimpleChannelInboundHandler<HttpMessage>() {
-                    @Override
-                    protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
-                        // if there was no upgrade to HTTP/2, the incoming message is accepted via channelRead();
-                        // configure HTTP 1.1 flow, pass the message further the pipeline, remove self as no longer
-                        // required
-                        ctx.pipeline()
-                            .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
-                            .replace(this, null, new HttpServerKeepAliveHandler());
-                        ctx.fireChannelRead(ReferenceCountUtil.retain(request));
-                    }
-
-                    @Override
-                    public void userEventTriggered(final ChannelHandlerContext ctx, final Object event)
-                            throws Exception {
-                        // if there was an upgrade to HTTP/2, the incoming message is propagated as an UpgradeEvent;
-                        // just pass the request down on the dedicated HTTP/2 stream. Since we are restoring that magic,
-                        // there is no need for downstream handlers to see this event.
-                        if (event instanceof HttpServerUpgradeHandler.UpgradeEvent upgrade) {
-                            ctx.pipeline().remove(this);
-                            final var request = upgrade.upgradeRequest();
-                            request.headers().setInt(ExtensionHeaderNames.STREAM_ID.text(),
-                                Http2CodecUtil.HTTP_UPGRADE_STREAM_ID);
-                            ctx.fireChannelRead(request.retain());
-                        } else {
-                            super.userEventTriggered(ctx, event);
-                        }
-                    }
-                });
+                .addLast(new CleartextUpgradeHandler());
         }
     },
     /**
@@ -98,17 +71,18 @@ public enum HTTPScheme {
     HTTPS(HttpScheme.HTTPS) {
         @Override
         void initializeServerPipeline(final ChannelPipeline pipeline) {
-            pipeline.addLast(new AlpnHandler());
+            pipeline.addLast(new AlpnUpgradeHandler());
         }
     };
 
     /**
      * Application-Level Protocol Negotiation-based channel pipeline configurator.
      */
-    private static final class AlpnHandler extends ApplicationProtocolNegotiationHandler {
+    private static final class AlpnUpgradeHandler extends ApplicationProtocolNegotiationHandler {
+        private static final Logger LOG = LoggerFactory.getLogger(AlpnUpgradeHandler.class);
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
 
-        AlpnHandler() {
+        AlpnUpgradeHandler() {
             super(ApplicationProtocolNames.HTTP_1_1);
         }
 
@@ -123,6 +97,7 @@ public enum HTTPScheme {
         }
 
         private void configureHttp1(final ChannelHandlerContext ctx) {
+            LOG.debug("{}: using HTTP/1.1", ctx.channel());
             ctx.pipeline()
                 .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
                 .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
@@ -130,7 +105,46 @@ public enum HTTPScheme {
         }
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
+            LOG.debug("{}: using HTTP/2", ctx.channel());
             ctx.pipeline().replace(this, null, http2toHttp1(FRAME_LOGGER));
+        }
+    }
+
+    /**
+     * Cleartext-based channel pipeline configurator.
+     */
+    private static final class CleartextUpgradeHandler extends SimpleChannelInboundHandler<HttpMessage> {
+        private static final Logger LOG = LoggerFactory.getLogger(CleartextUpgradeHandler.class);
+
+        CleartextUpgradeHandler() {
+            super(HttpMessage.class, false);
+        }
+
+        @Override
+        protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
+            // if there was no upgrade to HTTP/2, the incoming message is accepted via channelRead();
+            // configure HTTP/1.1 flow, pass the message further the pipeline, remove self as no longer required
+            LOG.debug("{}: continuing with HTTP/1.1", ctx.channel());
+            ctx.pipeline()
+                .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
+                .replace(this, null, new HttpServerKeepAliveHandler());
+            ctx.fireChannelRead(request);
+        }
+
+        @Override
+        public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
+            // if there was an upgrade to HTTP/2, the incoming message is propagated as an UpgradeEvent;
+            // just pass the request down on the dedicated HTTP/2 stream. Since we are restoring that magic, there is no
+            // need for downstream handlers to see this event.
+            if (event instanceof HttpServerUpgradeHandler.UpgradeEvent upgrade) {
+                LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
+                ctx.pipeline().remove(this);
+                final var request = upgrade.upgradeRequest();
+                request.headers().setInt(ExtensionHeaderNames.STREAM_ID.text(), Http2CodecUtil.HTTP_UPGRADE_STREAM_ID);
+                ctx.fireChannelRead(request.retain());
+            } else {
+                super.userEventTriggered(ctx, event);
+            }
         }
     }
 
