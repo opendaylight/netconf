@@ -9,18 +9,17 @@ package org.opendaylight.restconf.server.netty;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.channel.Channel;
 import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 
-final class TestTransportChannelListener implements TransportChannelListener<TransportChannel> {
-    private final Consumer<Channel> initializer;
+final class TestTransportChannelListener implements TransportChannelListener<HTTPTransportChannel> {
+    private final Consumer<HTTPTransportChannel> initializer;
 
     private volatile boolean initialized;
 
-    TestTransportChannelListener(final Consumer<Channel> initializer) {
+    TestTransportChannelListener(final Consumer<HTTPTransportChannel> initializer) {
         this.initializer = requireNonNull(initializer);
     }
 
@@ -29,8 +28,8 @@ final class TestTransportChannelListener implements TransportChannelListener<Tra
     }
 
     @Override
-    public void onTransportChannelEstablished(final TransportChannel channel) {
-        initializer.accept(channel.channel());
+    public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
+        initializer.accept(channel);
         initialized = true;
     }
 
