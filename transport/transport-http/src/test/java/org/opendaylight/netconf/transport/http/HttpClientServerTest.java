@@ -11,6 +11,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.HOST;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
 import static io.netty.handler.codec.http.HttpHeaderValues.TEXT_PLAIN;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -30,12 +31,13 @@ import static org.opendaylight.netconf.transport.http.TestUtils.freePort;
 import static org.opendaylight.netconf.transport.http.TestUtils.generateX509CertData;
 import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.InetAddress;
 import java.net.PasswordAuthentication;
@@ -52,6 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -109,25 +112,48 @@ class HttpClientServerTest {
     @BeforeEach
     void beforeEach() {
         doAnswer(inv -> {
-            inv.<TransportChannel>getArgument(0).channel().pipeline()
-                .addLast(new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
-                    @Override
-                    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-                        // return 200 response with a content built from request parameters
-                        final var method = msg.method().name();
-                        final var uri = msg.uri();
-                        final var payload = msg.content().readableBytes() > 0
-                            ? msg.content().toString(StandardCharsets.UTF_8) : "";
-                        final var responseMessage = RESPONSE_TEMPLATE.formatted(method, uri, payload);
-                        final var response = new DefaultFullHttpResponse(msg.protocolVersion(), OK,
-                            wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8)));
-                        response.headers()
-                            .set(CONTENT_TYPE, TEXT_PLAIN)
-                            .setInt(CONTENT_LENGTH, response.content().readableBytes());
-                        ServerSseHandler.copyStreamId(msg, response);
+            final var channel = inv.<HTTPTransportChannel>getArgument(0);
 
-                        // emulate asynchronous server request processing - run in separate thread with 100 millis delay
-                        scheduledExecutor.schedule(() -> ctx.writeAndFlush(response), 100, TimeUnit.MILLISECONDS);
+            channel.channel().pipeline()
+                .addLast(new HTTPServerSession(channel.scheme()) {
+                    @Override
+                    protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+                            final HttpHeaders headers) {
+                        return new PendingRequest<>() {
+                            @Override
+                            public void execute(final PendingRequestListener listener, final InputStream body) {
+                                // return 200 response with a content built from request parameters
+                                final String payload;
+                                if (body != null) {
+                                    try {
+                                        payload = new String(body.readAllBytes(), StandardCharsets.UTF_8);
+                                    } catch (IOException e) {
+                                        listener.requestFailed(this, e);
+                                        return;
+                                    }
+                                } else {
+                                    payload = "";
+                                }
+
+                                final var responseMessage = RESPONSE_TEMPLATE.formatted(method, targetUri.getPath(),
+                                    payload);
+                                final var content = wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8));
+                                final var response = new ByteBufRequestResponse(OK, content,
+                                    DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
+                                        .set(CONTENT_TYPE, TEXT_PLAIN)
+                                        .setInt(CONTENT_LENGTH, content.readableBytes()));
+
+                                // emulate asynchronous server request processing - run in separate thread with a delay
+                                // of 100 milliseconds
+                                scheduledExecutor.schedule(() -> listener.requestComplete(this, response),
+                                    100, TimeUnit.MILLISECONDS);
+                            }
+
+                            @Override
+                            protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+                                return helper;
+                            }
+                        };
                     }
                 });
             return null;
@@ -214,11 +240,12 @@ class HttpClientServerTest {
                 verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
 
                 for (var method : METHODS) {
-                    final var uri = nextValue("URI");
+                    final var uri = nextValue("/URI");
                     final var payload = nextValue("PAYLOAD");
                     final var request = new DefaultFullHttpRequest(HTTP_1_1, HttpMethod.valueOf(method),
                         uri, wrappedBuffer(payload.getBytes(StandardCharsets.UTF_8)));
                     request.headers()
+                        .set(HOST, "example.com")
                         .set(CONTENT_TYPE, TEXT_PLAIN)
                         .setInt(CONTENT_LENGTH, request.content().readableBytes())
                         // allow multiple requests on same connections
@@ -240,6 +267,7 @@ class HttpClientServerTest {
 
     @ParameterizedTest(name = "Java HttpClient compatibility check, Basic Auth: {0}")
     @ValueSource(booleans = {false, true})
+    @Timeout(20)
     void cleartextUpgradeFlowCompatibility(final boolean withAuth) throws Exception {
         // validate server cleartext protocol upgrade flow being compatible with java.net.HttpClient
         final var localPort = freePort();
