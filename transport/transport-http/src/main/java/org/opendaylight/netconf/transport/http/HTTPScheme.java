@@ -22,9 +22,9 @@ import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
 import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2CodecUtil;
-import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
+import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
 import io.netty.handler.logging.LogLevel;
@@ -45,15 +45,17 @@ public enum HTTPScheme {
      */
     HTTP(HttpScheme.HTTP) {
         @Override
-        void initializeServerPipeline(final ChannelPipeline pipeline, final Http2ConnectionHandler connectionHandler) {
+        void initializeServerPipeline(final ChannelPipeline pipeline) {
             // Cleartext upgrade flow
             final var sourceCodec = new HttpServerCodec();
+            final var twoToOne = http2toHttp1();
             pipeline
                 .addLast(new CleartextHttp2ServerUpgradeHandler(
                     sourceCodec,
                     new HttpServerUpgradeHandler(sourceCodec,
                         protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                            ? new Http2ServerUpgradeCodec(connectionHandler) : null), connectionHandler))
+                            ? new Http2ServerUpgradeCodec(twoToOne) : null),
+                    twoToOne))
                 .addLast(new SimpleChannelInboundHandler<HttpMessage>() {
                     @Override
                     protected void channelRead0(final ChannelHandlerContext ctx, final HttpMessage request) {
@@ -85,24 +87,38 @@ public enum HTTPScheme {
      */
     HTTPS(HttpScheme.HTTPS) {
         @Override
-        void initializeServerPipeline(final ChannelPipeline pipeline, final Http2ConnectionHandler connectionHandler) {
-            // Application protocol negotiator over TLS
-            pipeline.addLast(new ApplicationProtocolNegotiationHandler(ApplicationProtocolNames.HTTP_1_1) {
-                @Override
-                protected void configurePipeline(final ChannelHandlerContext ctx, final String protocol) {
-                    switch (protocol) {
-                        case null -> throw new NullPointerException();
-                        case ApplicationProtocolNames.HTTP_1_1 -> ctx.pipeline()
-                            .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
-                            .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
-                            .replace(this, null, new HttpServerCodec());
-                        case ApplicationProtocolNames.HTTP_2 -> ctx.pipeline().replace(this, null, connectionHandler);
-                        default -> throw new IllegalStateException("unknown protocol: " + protocol);
-                    }
-                }
-            });
+        void initializeServerPipeline(final ChannelPipeline pipeline) {
+            pipeline.addLast(new AlpnHandler());
         }
     };
+
+    // Application protocol negotiator over TLS
+    private static final class AlpnHandler extends ApplicationProtocolNegotiationHandler {
+        AlpnHandler() {
+            super(ApplicationProtocolNames.HTTP_1_1);
+        }
+
+        @Override
+        protected void configurePipeline(final ChannelHandlerContext ctx, final String protocol) {
+            switch (protocol) {
+                case null -> throw new NullPointerException();
+                case ApplicationProtocolNames.HTTP_1_1 -> configureHttp1(ctx);
+                case ApplicationProtocolNames.HTTP_2 -> configureHttp2(ctx);
+                default -> throw new IllegalStateException("unknown protocol: " + protocol);
+            }
+        }
+
+        private void configureHttp1(final ChannelHandlerContext ctx) {
+            ctx.pipeline()
+                .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
+                .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
+                .replace(this, null, new HttpServerCodec());
+        }
+
+        private void configureHttp2(final ChannelHandlerContext ctx) {
+            ctx.pipeline().replace(this, null, http2toHttp1());
+        }
+    }
 
     private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Server");
 
@@ -137,26 +153,25 @@ public enum HTTPScheme {
         return ret;
     }
 
-    final void initializeServerPipeline(final ChannelPipeline pipeline) {
-        // External HTTP 2 to internal HTTP 1.1 adapter handler
-        final var connection = new DefaultHttp2Connection(true);
-        final var frameListener = new InboundHttp2ToHttpAdapterBuilder(connection)
-            .maxContentLength(HTTPServer.MAX_HTTP_CONTENT_LENGTH)
-            .propagateSettings(true)
-            .build();
-
-        initializeServerPipeline(pipeline, new HttpToHttp2ConnectionHandlerBuilder()
-            .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
-            .connection(connection)
-            .frameLogger(FRAME_LOGGER)
-            .gracefulShutdownTimeoutMillis(0L)
-            .build());
-    }
-
-    abstract void initializeServerPipeline(ChannelPipeline pipeline, Http2ConnectionHandler connectionHandler);
+    abstract void initializeServerPipeline(final ChannelPipeline pipeline);
 
     @Override
     public String toString() {
         return netty.toString();
+    }
+
+    // External HTTP 2 to internal HTTP 1.1 adapter handler
+    private static HttpToHttp2ConnectionHandler http2toHttp1() {
+        final var connection = new DefaultHttp2Connection(true);
+        return new HttpToHttp2ConnectionHandlerBuilder()
+            .frameListener(new DelegatingDecompressorFrameListener(connection,
+                new InboundHttp2ToHttpAdapterBuilder(connection)
+                .maxContentLength(HTTPServer.MAX_HTTP_CONTENT_LENGTH)
+                .propagateSettings(true)
+                .build()))
+            .connection(connection)
+            .frameLogger(FRAME_LOGGER)
+            .gracefulShutdownTimeoutMillis(0L)
+            .build();
     }
 }
