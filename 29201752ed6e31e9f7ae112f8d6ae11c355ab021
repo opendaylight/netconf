@@ -22,6 +22,30 @@
       },
       "revId": "29201752ed6e31e9f7ae112f8d6ae11c355ab021",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e35ceb6e_2c256851",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-25T19:20:21Z",
+      "side": 1,
+      "message": "let\u0027s deal with that separately, as there is more work on top of this patch",
+      "parentUuid": "c9f517fa_29adf196",
+      "range": {
+        "startLine": 242,
+        "startChar": 9,
+        "endLine": 242,
+        "endChar": 42
+      },
+      "revId": "29201752ed6e31e9f7ae112f8d6ae11c355ab021",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
