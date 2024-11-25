@@ -31,7 +31,6 @@ import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
@@ -55,7 +54,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.EventStreamService.StartCallback;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -111,7 +109,7 @@ class SseClientServerTest {
         serverEventStreamService = new TestStreamService();
         // init SSE layer on top of HTTP layer using Transport channel listeners
         serverTransportListener = new TestTransportListener(channel -> {
-            channel.pipeline().addLast(
+            channel.channel().pipeline().addLast(
                 new ServerSseHandler(serverEventStreamService, 0, 0),
                 new SimpleChannelInboundHandler<>(FullHttpRequest.class) {
                     @Override
@@ -247,18 +245,18 @@ class SseClientServerTest {
         }
     }
 
-    private static class TestTransportListener implements TransportChannelListener<TransportChannel> {
-        private final Consumer<Channel> initializer;
+    private static class TestTransportListener implements TransportChannelListener<HTTPTransportChannel> {
+        private final Consumer<HTTPTransportChannel> initializer;
         private volatile boolean initialized;
 
-        TestTransportListener(final Consumer<Channel> initializer) {
+        TestTransportListener(final Consumer<HTTPTransportChannel> initializer) {
             this.initializer = initializer;
         }
 
         @Override
-        public void onTransportChannelEstablished(final TransportChannel channel) {
+        public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
             initialized = true;
-            initializer.accept(channel.channel());
+            initializer.accept(channel);
         }
 
         @Override

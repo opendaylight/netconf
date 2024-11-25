@@ -13,7 +13,6 @@ import com.google.common.base.CharMatcher;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.Channel;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -37,20 +36,23 @@ public final class SseUtils {
     /**
      * Enable SSE functionality on top of client's HTTP transport layer channel.
      *
-     * @param channel netty channel with client-side HTTP layer initialized
+     * @param channel client-side {@link HTTPTransportChannel}
      * @return an instance of {@link EventStreamService} to be used to request SSE stream using current connection.
      */
-    public static EventStreamService enableClientSse(final Channel channel) {
-        final var http2Dispatcher = channel.pipeline().get(ClientHttp2RequestDispatcher.class);
-        final var http2AdapterContext = channel.pipeline().context(HttpToHttp2ConnectionHandler.class);
+    public static EventStreamService enableClientSse(final HTTPTransportChannel channel) {
+        final var nettyChannel = channel.channel();
+        final var pipeline = nettyChannel.pipeline();
+
+        final var http2Dispatcher = pipeline.get(ClientHttp2RequestDispatcher.class);
+        final var http2AdapterContext = pipeline.context(HttpToHttp2ConnectionHandler.class);
         if (http2Dispatcher != null && http2AdapterContext != null) {
             // http 2
             final var sseService = new ClientHttp2SseService(channel, http2Dispatcher::nextStreamId);
-            channel.pipeline().addAfter(http2AdapterContext.name(), SSE_SERVICE_HANDLER_NAME, sseService);
+            pipeline.addAfter(http2AdapterContext.name(), SSE_SERVICE_HANDLER_NAME, sseService);
             return sseService;
         }
         // http 1
-        return new ClientHttp1SseService(requireNonNull(channel));
+        return new ClientHttp1SseService(nettyChannel);
     }
 
     /**
