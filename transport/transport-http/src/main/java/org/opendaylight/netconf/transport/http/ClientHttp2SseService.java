@@ -8,8 +8,6 @@
 package org.opendaylight.netconf.transport.http;
 
 import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
-import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.SCHEME;
-import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.STREAM_ID;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.Channel;
@@ -19,10 +17,9 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.Http2FrameListener;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.IntSupplier;
@@ -64,14 +61,14 @@ final class ClientHttp2SseService extends ChannelInboundHandlerAdapter
     private final ConcurrentMap<Integer, FrameListener> frameListeners = new ConcurrentHashMap<>();
     private final @NonNull IntSupplier streamIdSupplier;
     private final @NonNull Channel channel;
-    private final @NonNull HttpScheme scheme;
+    private final @NonNull HTTPScheme scheme;
 
     @NonNullByDefault
-    ClientHttp2SseService(final Channel channel, final IntSupplier streamIdSupplier) {
+    ClientHttp2SseService(final HTTPTransportChannel channel, final IntSupplier streamIdSupplier) {
         this.streamIdSupplier = requireNonNull(streamIdSupplier);
-        this.channel = requireNonNull(channel);
-        scheme = channel.pipeline().get(SslHandler.class) != null ? HttpScheme.HTTPS : HttpScheme.HTTP;
-        channel.closeFuture().addListener(ignored -> onChannelClosed());
+        this.channel = channel.channel();
+        scheme = channel.scheme();
+        this.channel.closeFuture().addListener(ignored -> onChannelClosed());
     }
 
     @Override
@@ -100,8 +97,8 @@ final class ClientHttp2SseService extends ChannelInboundHandlerAdapter
             .set(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM)
             .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
             .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED)
-            .setInt(STREAM_ID.text(), streamId)
-            .set(SCHEME.text(), scheme.name());
+            .setInt(ExtensionHeaderNames.STREAM_ID.text(), streamId)
+            .set(ExtensionHeaderNames.SCHEME.text(), scheme);
         channel.writeAndFlush(request);
         LOG.debug("SSE request sent to {}", requestUri);
     }

@@ -23,7 +23,6 @@ import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -447,10 +446,6 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         await().atMost(Duration.ofSeconds(2)).until(eventListener::started);
         assertNotNull(streamControl);
         return eventListener;
-    }
-
-    private void accept(final Channel channel) {
-        clientStreamService = SseUtils.enableClientSse(channel);
     }
 
     static final class ExampleActionImpl implements ExampleAction {
