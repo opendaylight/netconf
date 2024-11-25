@@ -16,6 +16,24 @@
       "message": "Two occurrences left in:\nClientHttp2RequestDispatcher\nand\nClientHttp2SseService.",
       "revId": "9e6b6f3d67f32ff289796ac9c27289f3e20dbd83",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43bd4c3c_30de7dfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-11-25T14:44:02Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/114521 takes care of ClientHttp2RequestDispatcher",
+      "parentUuid": "a4e21c82_413f0567",
+      "revId": "9e6b6f3d67f32ff289796ac9c27289f3e20dbd83",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
