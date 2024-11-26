@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8222508_98b87e3f",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:18:42Z",
+      "side": 1,
+      "message": "Mmm.. May be use try catch here? getSubscriptionState can throw error if id not null but we don\u0027t have subscription with this id. In catch abort operation with proper error message.",
+      "range": {
+        "startLine": 84,
+        "startChar": 25,
+        "endLine": 84,
+        "endChar": 45
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fae3889_975eeaa8",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:18:42Z",
+      "side": 1,
+      "message": "IMO session check should be first for operations that require same session id. If sessions are different then just abort.",
+      "range": {
+        "startLine": 91,
+        "startChar": 12,
+        "endLine": 91,
+        "endChar": 72
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74c4f832_021e56dc",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:18:42Z",
+      "side": 1,
+      "message": "Ok, but can we delete suspended subscription? If yes then this part can be removed.",
+      "range": {
+        "startLine": 92,
+        "startChar": 19,
+        "endLine": 92,
+        "endChar": 84
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
