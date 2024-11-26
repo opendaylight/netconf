@@ -102,11 +102,13 @@ public enum HTTPScheme {
                 .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
                 .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
                 .replace(this, null, new HttpServerCodec());
+            ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
         }
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
             ctx.pipeline().replace(this, null, http2toHttp1(FRAME_LOGGER));
+            ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
 
@@ -128,6 +130,7 @@ public enum HTTPScheme {
             ctx.pipeline()
                 .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
                 .replace(this, null, new HttpServerKeepAliveHandler());
+            ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
             ctx.fireChannelRead(request);
         }
 
@@ -139,6 +142,7 @@ public enum HTTPScheme {
             if (event instanceof HttpServerUpgradeHandler.UpgradeEvent upgrade) {
                 LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
                 ctx.pipeline().remove(this);
+                ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
                 final var request = upgrade.upgradeRequest();
                 request.headers().setInt(ExtensionHeaderNames.STREAM_ID.text(), Http2CodecUtil.HTTP_UPGRADE_STREAM_ID);
                 ctx.fireChannelRead(request.retain());
