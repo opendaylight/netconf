@@ -108,6 +108,121 @@
       },
       "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b79d495a_afd863ba",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:43:11Z",
+      "side": 1,
+      "message": "IMO session check should be first",
+      "range": {
+        "startLine": 155,
+        "startChar": 12,
+        "endLine": 155,
+        "endChar": 72
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6859efc5_d5bc0eb0",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:43:11Z",
+      "side": 1,
+      "message": "A bit misleading - this tests case with session \u003d null, i.e. wrong session not ID.\nWe can have more negative tests here for all cases.",
+      "range": {
+        "startLine": 99,
+        "startChar": 9,
+        "endLine": 99,
+        "endChar": 38
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d1e54f6_1f2b02b9",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/KillSubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:43:11Z",
+      "side": 1,
+      "message": "killSubscriptionTest",
+      "range": {
+        "startLine": 55,
+        "startChar": 9,
+        "endLine": 55,
+        "endChar": 15
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29760252_dc0a1290",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/KillSubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:43:11Z",
+      "side": 1,
+      "message": "No negative tests?",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 1
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fb3c570_0a210f99",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:43:11Z",
+      "side": 1,
+      "message": "Again wrong session - not ID. +more negative tests for ID and state transitions.",
+      "range": {
+        "startLine": 103,
+        "startChar": 9,
+        "endLine": 103,
+        "endChar": 41
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
