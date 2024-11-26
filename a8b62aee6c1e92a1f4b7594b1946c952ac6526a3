@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1d774a1_9cabdfb7",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-26T22:46:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9acedcfd_faa180e0",
+      "revId": "a8b62aee6c1e92a1f4b7594b1946c952ac6526a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "658de2ef_fe0a22fa",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-21T12:22:47Z",
       "side": 1,
       "message": "why not return here?",
+      "revId": "a8b62aee6c1e92a1f4b7594b1946c952ac6526a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7d3a448_415a015c",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-26T22:46:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "658de2ef_fe0a22fa",
       "revId": "a8b62aee6c1e92a1f4b7594b1946c952ac6526a3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
