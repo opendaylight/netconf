@@ -22,6 +22,30 @@
       },
       "revId": "51f7c2cca7bc74b656f2836d1d7561099369a918",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a772f22e_2d18e245",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-26T17:37:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cc137e1_970bce2a",
+      "range": {
+        "startLine": 328,
+        "startChar": 4,
+        "endLine": 328,
+        "endChar": 55
+      },
+      "revId": "51f7c2cca7bc74b656f2836d1d7561099369a918",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
