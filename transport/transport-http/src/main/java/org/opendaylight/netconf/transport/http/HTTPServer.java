@@ -24,9 +24,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 
 /**
  * A {@link HTTPTransportStack} acting as a server. When this stack is set up, {@link HTTPTransportChannel}s reported
- * to the {@link TransportChannelListener} are set up such they support both HTTP/1.1 and HTTP/2. The details of the
- * setup are subject to change and users are advised to attach their own subclass of {@link HTTPServerSession} as the
- * last handler. Doing so will provide a predictable API surface as to how the pipeline is set up.
+ * to the {@link TransportChannelListener} have on their transport, but not their definite object and execution models,
+ * set up. Downstream handler should watch for {@link HTTPServerPipelineSetup} user event and attach the appropriate
+ * handler to handle the setup. {@link HTTPServerSessionBootstrap} provides a baseline class, and reference
+ * implementation, for the appropriate handler.
  */
 public final class HTTPServer extends HTTPTransportStack {
     HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme) {
