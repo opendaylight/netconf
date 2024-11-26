@@ -72,7 +72,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        channel.channel().pipeline().addLast(new RestconfSession(channel.scheme(), root, sseHandlerFactory));
+        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root,
+            sseHandlerFactory.get()));
     }
 
     @Override
