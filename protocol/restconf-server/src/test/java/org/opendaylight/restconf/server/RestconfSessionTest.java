@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -23,6 +24,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerPipelineSetup;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -54,6 +56,8 @@ class RestconfSessionTest {
     @Mock
     private ChannelHandlerContext ctx;
     @Captor
+    private ArgumentCaptor<RestconfSessionBootstrap> bootstrapCaptor;
+    @Captor
     private ArgumentCaptor<RestconfSession> sessionCaptor;
 
     @Test
@@ -76,8 +80,14 @@ class RestconfSessionTest {
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
         listener.onTransportChannelEstablished(transportChannel);
+
+        // capture created bootstrap
+        verify(pipeline).addLast(bootstrapCaptor.capture());
+        final var bootstrap = bootstrapCaptor.getValue();
+        bootstrap.userEventTriggered(ctx, HTTPServerPipelineSetup.HTTP_11);
+
         // capture created session
-        verify(pipeline).addLast(sessionCaptor.capture());
+        verify(pipeline).replace(eq(bootstrap), eq(null), sessionCaptor.capture());
         final var session = sessionCaptor.getValue();
         session.handlerAdded(ctx);
 
