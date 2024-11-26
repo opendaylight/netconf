@@ -43,9 +43,8 @@ final class RestconfSession extends HTTPServerSession {
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) {
         super.handlerAdded(ctx);
-        final var pipeline = ctx.pipeline();
         final var authHandlerFactory = root.authHandlerFactory();
-        pipeline.addBefore(ctx.name(), null, authHandlerFactory.create());
+        ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
     }
 
     @Override
