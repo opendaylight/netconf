@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec21fc46_d6f3308f",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-26T22:42:06Z",
+      "side": 1,
+      "message": "default will be enough since we need to test this method",
+      "parentUuid": "f8457348_89226113",
+      "range": {
+        "startLine": 339,
+        "startChar": 4,
+        "endLine": 339,
+        "endChar": 11
+      },
+      "revId": "8925feb0a894e31c7501caaa7e7e15a8d34bbac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d94788e5_f70b8206",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-11-21T14:13:53Z",
       "side": 1,
       "message": "this switch seem suspicious to me\n- seem pointless? for every type we do same thing and default should not occur\n- do we really want to do same thing for every type?",
+      "revId": "8925feb0a894e31c7501caaa7e7e15a8d34bbac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4a30797_c84c9778",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-26T22:42:06Z",
+      "side": 1,
+      "message": "yes this logic is intended",
+      "parentUuid": "d94788e5_f70b8206",
       "revId": "8925feb0a894e31c7501caaa7e7e15a8d34bbac5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -58,6 +100,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27840a84_d841e3ab",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-26T22:42:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c7702e3_a53836b0",
+      "revId": "8925feb0a894e31c7501caaa7e7e15a8d34bbac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d39d9bb_3d5525f1",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-11-21T14:13:53Z",
       "side": 1,
       "message": "should not be needed registerTreeChangeListener() is @NonNull",
+      "revId": "8925feb0a894e31c7501caaa7e7e15a8d34bbac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f827d735_c48ad734",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-11-26T22:42:06Z",
+      "side": 1,
+      "message": "but annotation guarantees it only in compile-time",
+      "parentUuid": "1d39d9bb_3d5525f1",
       "revId": "8925feb0a894e31c7501caaa7e7e15a8d34bbac5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
