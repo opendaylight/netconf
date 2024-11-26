@@ -68,6 +68,46 @@
       },
       "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86a20eb5_39a1cff7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:23:43Z",
+      "side": 1,
+      "message": "remove empty line pls",
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5df72460_9626b567",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-11-26T12:23:43Z",
+      "side": 1,
+      "message": "This should be after line 206. It adds subscription into map with START state. It means onSuccess should use moveTo(SubscriptionState.ACTIVE) to activate subscription.",
+      "range": {
+        "startLine": 213,
+        "startChar": 20,
+        "endLine": 213,
+        "endChar": 67
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
