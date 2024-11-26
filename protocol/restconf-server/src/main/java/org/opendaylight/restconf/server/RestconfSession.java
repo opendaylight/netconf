@@ -17,7 +17,6 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -25,7 +24,6 @@ import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
-import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -69,29 +67,23 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     }
 
     private final EndpointRoot root;
-    private final Supplier<ServerSseHandler> sseHandlerFactory;
 
     @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
         justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile Resources resources;
 
-
-    RestconfSession(final HTTPScheme scheme, final EndpointRoot root,
-            final Supplier<ServerSseHandler> sseHandlerFactory) {
+    RestconfSession(final HTTPScheme scheme, final EndpointRoot root) {
         super(scheme);
         this.root = requireNonNull(root);
-        this.sseHandlerFactory = requireNonNull(sseHandlerFactory);
     }
 
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) {
         super.handlerAdded(ctx);
-        final var pipeline = ctx.pipeline();
         final var authHandlerFactory = root.authHandlerFactory();
         if (authHandlerFactory != null) {
-            pipeline.addBefore(ctx.name(), null, authHandlerFactory.create());
+            ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
         }
-        pipeline.addBefore(ctx.name(), null, sseHandlerFactory.get());
     }
 
     @Override

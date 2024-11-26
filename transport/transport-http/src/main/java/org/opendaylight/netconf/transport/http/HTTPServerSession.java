@@ -96,7 +96,6 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
-        scheme.initializeServerPipeline(ctx);
     }
 
     @Override

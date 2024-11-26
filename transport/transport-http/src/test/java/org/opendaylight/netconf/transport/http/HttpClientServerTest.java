@@ -38,6 +38,8 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -164,11 +166,16 @@ class HttpClientServerTest {
         // TODO: this looks like a spy() on a real implementation
         doAnswer(inv -> {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
-            channel.channel().pipeline().addLast(new HTTPServerSession(channel.scheme()) {
+            channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
                 @Override
-                protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
-                        final HttpHeaders headers) {
-                    return new TestRequest(method, targetUri);
+                protected ChannelInboundHandler configureHttp1(final ChannelHandlerContext ctx) {
+                    return new HTTPServerSession(scheme) {
+                        @Override
+                        protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+                                final HttpHeaders headers) {
+                            return new TestRequest(method, targetUri);
+                        }
+                    };
                 }
             });
             return null;

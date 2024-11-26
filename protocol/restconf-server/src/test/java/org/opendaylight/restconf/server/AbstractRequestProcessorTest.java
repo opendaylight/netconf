@@ -24,7 +24,6 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
@@ -33,7 +32,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
-import org.opendaylight.netconf.transport.http.ServerSseHandler;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
@@ -80,8 +78,6 @@ class AbstractRequestProcessorTest {
     private Channel channel;
     @Mock
     private ChannelPipeline pipeline;
-    @Mock
-    private Supplier<ServerSseHandler> sseHandlerFactory;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
 
@@ -91,8 +87,7 @@ class AbstractRequestProcessorTest {
     void beforeEach() {
         session = new RestconfSession(HTTPScheme.HTTP,
             new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
-                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT)),
-            sseHandlerFactory);
+                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT)));
         doReturn(channel).when(ctx).channel();
         doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
