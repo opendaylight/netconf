@@ -161,8 +161,19 @@ class HttpClientServerTest {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
                 @Override
-                protected HTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-                    return new HTTPServerSession(scheme) {
+                protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
+                    return new PipelinedHTTPServerSession(scheme) {
+                        @Override
+                        protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+                                final HttpHeaders headers) {
+                            return new TestRequest(method, targetUri);
+                        }
+                    };
+                }
+
+                @Override
+                protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
+                    return new ConcurrentHTTPServerSession(scheme) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
