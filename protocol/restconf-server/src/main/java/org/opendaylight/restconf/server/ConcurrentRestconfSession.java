@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -17,9 +17,9 @@ import java.net.SocketAddress;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
-import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.DefaultTransportSession;
@@ -29,12 +29,12 @@ import org.opendaylight.restconf.server.spi.DefaultTransportSession;
  * as glue between a Netty channel and a RESTCONF server and may be servicing one (HTTP/1.1) or more (HTTP/2) logical
  * connections.
  */
-final class RestconfSession extends PipelinedHTTPServerSession {
+final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
 
     @NonNullByDefault
-    RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
+    ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
         super(scheme);
         this.root = requireNonNull(root);
         transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));

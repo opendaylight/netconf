@@ -54,7 +54,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      * @return replacement {@link ChannelInboundHandler}
      */
     @NonNullByDefault
-    protected abstract ChannelInboundHandler configureHttp1(ChannelHandlerContext ctx);
+    protected abstract PipelinedHTTPServerSession configureHttp1(ChannelHandlerContext ctx);
 
     /**
      * Configure the pipeline to receive HTTP/2 concurrent traffic and return the replacement handler.
@@ -63,8 +63,5 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      * @return replacement {@link ChannelInboundHandler}
      */
     @NonNullByDefault
-    protected ChannelInboundHandler configureHttp2(final ChannelHandlerContext ctx) {
-        // TODO: NETCONF-1419: do not delegate here
-        return configureHttp1(ctx);
-    }
+    protected abstract ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) ;
 }
