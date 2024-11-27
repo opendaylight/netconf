@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import static io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames.STREAM_ID;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -15,6 +16,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -83,7 +85,20 @@ public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHa
 
     protected HttpResponse errorResponse(final HttpRequest request, final HttpResponseStatus status) {
         final var response = new DefaultFullHttpResponse(request.protocolVersion(), status, Unpooled.EMPTY_BUFFER);
-        ServerSseHandler.copyStreamId(request, response);
+        copyStreamId(request, response);
         return response;
+    }
+
+    /**
+     * Copies HTTP/2 associated stream id value (if exists) from one HTTP 1.1 message to another.
+     *
+     * @param from the message object to copy value from
+     * @param to the message object to copy value to
+     */
+    private static void copyStreamId(final HttpMessage from, final HttpMessage to) {
+        final var streamId = from.headers().getInt(STREAM_ID.text());
+        if (streamId != null) {
+            to.headers().setInt(STREAM_ID.text(), streamId);
+        }
     }
 }
