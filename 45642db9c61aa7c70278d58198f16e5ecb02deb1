@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "640a12bf_8837f4a1",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Yeah you are correct.\n\nBut maybe create some method to check if id exist would be better than catching exceptions.",
+      "parentUuid": "e8222508_98b87e3f",
+      "range": {
+        "startLine": 84,
+        "startChar": 25,
+        "endLine": 84,
+        "endChar": 45
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6fae3889_975eeaa8",
         "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
         "patchSetId": 23
@@ -37,6 +61,30 @@
       "writtenOn": "2024-11-26T12:18:42Z",
       "side": 1,
       "message": "IMO session check should be first for operations that require same session id. If sessions are different then just abort.",
+      "range": {
+        "startLine": 91,
+        "startChar": 12,
+        "endLine": 91,
+        "endChar": 72
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "685758fc_47bc76ee",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Don\u0027t really see a reason to check this before checking correct state.",
+      "parentUuid": "6fae3889_975eeaa8",
       "range": {
         "startLine": 91,
         "startChar": 12,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d4b22f6_72dde61e",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74c4f832_021e56dc",
+      "range": {
+        "startLine": 92,
+        "startChar": 19,
+        "endLine": 92,
+        "endChar": 84
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86a20eb5_39a1cff7",
@@ -87,6 +159,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01d53eb3_b1a12626",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86a20eb5_39a1cff7",
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5df72460_9626b567",
@@ -100,6 +190,30 @@
       "writtenOn": "2024-11-26T12:23:43Z",
       "side": 1,
       "message": "This should be after line 206. It adds subscription into map with START state. It means onSuccess should use moveTo(SubscriptionState.ACTIVE) to activate subscription.",
+      "range": {
+        "startLine": 213,
+        "startChar": 20,
+        "endLine": 213,
+        "endChar": 67
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a9caa7b_4b7ce48d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5df72460_9626b567",
       "range": {
         "startLine": 213,
         "startChar": 20,
@@ -133,6 +247,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f6dc713_d36fe38a",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Don\u0027t really see a reason to check this before checking correct state.\nBut I moved these check up so we abort before parsing input.",
+      "parentUuid": "b79d495a_afd863ba",
+      "range": {
+        "startLine": 155,
+        "startChar": 12,
+        "endLine": 155,
+        "endChar": 72
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6859efc5_d5bc0eb0",
@@ -146,6 +284,30 @@
       "writtenOn": "2024-11-26T12:43:11Z",
       "side": 1,
       "message": "A bit misleading - this tests case with session \u003d null, i.e. wrong session not ID.\nWe can have more negative tests here for all cases.",
+      "range": {
+        "startLine": 99,
+        "startChar": 9,
+        "endLine": 99,
+        "endChar": 38
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b3b973e_718c0330",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6859efc5_d5bc0eb0",
       "range": {
         "startLine": 99,
         "startChar": 9,
@@ -179,6 +341,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88c6bbb2_93adc1c1",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/KillSubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d1e54f6_1f2b02b9",
+      "range": {
+        "startLine": 55,
+        "startChar": 9,
+        "endLine": 55,
+        "endChar": 15
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29760252_dc0a1290",
@@ -202,6 +388,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "639db141_8d2f2ee4",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/KillSubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29760252_dc0a1290",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 1
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fb3c570_0a210f99",
@@ -215,6 +425,30 @@
       "writtenOn": "2024-11-26T12:43:11Z",
       "side": 1,
       "message": "Again wrong session - not ID. +more negative tests for ID and state transitions.",
+      "range": {
+        "startLine": 103,
+        "startChar": 9,
+        "endLine": 103,
+        "endChar": 41
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fa2d1c6_575e2ab8",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpcTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-11-27T13:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2fb3c570_0a210f99",
       "range": {
         "startLine": 103,
         "startChar": 9,
