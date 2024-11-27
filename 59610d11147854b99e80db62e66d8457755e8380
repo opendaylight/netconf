@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77bc017b_e47af34f",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-27T16:34:26Z",
+      "side": 1,
+      "message": "I am using this to obtain a TransportChannelListener and invoke TransportChannel.channel().close() before the onTransportChannelEstablished method is executed for the TransportChannelListener\u003cTransportChannel\u003e listener. This setup reproduces the use case where the channel is closed before the onTransportChannelEstablished method is invoked.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/114354/19/transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java#88",
+      "parentUuid": "7b65e54a_44914dbe",
+      "range": {
+        "startLine": 73,
+        "startChar": 41,
+        "endLine": 73,
+        "endChar": 48
+      },
+      "revId": "59610d11147854b99e80db62e66d8457755e8380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "698a2202_98ad2723",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-11-27T00:11:55Z",
       "side": 1,
       "message": "right, this is defensive \"what if\", but can sessionDisconnect() really occur before we signal the stack completion? If so, when?",
+      "range": {
+        "startLine": 72,
+        "startChar": 12,
+        "endLine": 72,
+        "endChar": 27
+      },
+      "revId": "59610d11147854b99e80db62e66d8457755e8380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71170eb6_db77cddf",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-11-27T16:34:26Z",
+      "side": 1,
+      "message": "Correct, I have removed it. I have not found a scenario where it would be executed before we signal stack completion. I had only assumed that this might happen.\n\nhttps://tools.ietf.org/html/rfc4253#section-11.1",
+      "parentUuid": "698a2202_98ad2723",
       "range": {
         "startLine": 72,
         "startChar": 12,
