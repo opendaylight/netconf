@@ -45,7 +45,11 @@ import org.slf4j.LoggerFactory;
  * <p>If request is not accepted then error response will be returned with error message as response body.
  * If decline exception is an instance of {@link ErrorResponseException} then explicitly defined
  * {@code content-type} value and response status code will be used in error response header.
+ *
+ * <p>@deprecated This class will be removed in next release and replaced by dedicated {@code AbstractResource}
+ * handling RFC 8040 streams endpoint.
  */
+@Deprecated(forRemoval = true)
 public final class ServerSseHandler extends ChannelInboundHandlerAdapter implements EventStreamListener {
     private static final Logger LOG = LoggerFactory.getLogger(ServerSseHandler.class);
     private static final ByteBuf PING_MESSAGE =
