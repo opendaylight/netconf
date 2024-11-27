@@ -21,8 +21,8 @@ import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
-import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
+import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.concepts.Registration;
  * as glue between a Netty channel and a RESTCONF server and may be servicing one (HTTP/1.1) or more (HTTP/2) logical
  * connections.
  */
-final class RestconfSession extends HTTPServerSession implements TransportSession {
+final class RestconfSession extends PipelinedHTTPServerSession implements TransportSession {
     /**
      * Our resources state.
      */

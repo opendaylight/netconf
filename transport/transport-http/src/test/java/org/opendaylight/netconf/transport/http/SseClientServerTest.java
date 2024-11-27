@@ -111,7 +111,7 @@ class SseClientServerTest {
         serverTransportListener = new TestTransportListener(channel -> {
             channel.channel().pipeline().addLast(
                 new ServerSseHandler(serverEventStreamService, 0, 0),
-                new HTTPServerSession(channel.scheme()) {
+                new PipelinedHTTPServerSession(channel.scheme()) {
                     @Override
                     protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                             final HttpHeaders headers) {
