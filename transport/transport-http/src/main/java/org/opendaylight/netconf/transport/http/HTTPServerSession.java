@@ -58,7 +58,8 @@ import org.slf4j.LoggerFactory;
  * snapshot -- which is the typical use case.
  */
 @Beta
-public abstract class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest> {
+public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest>
+        permits ConcurrentHTTPServerSession, PipelinedHTTPServerSession{
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
     private static final Map<HttpMethod, ImplementedMethod> ALL_METHODS = Arrays.stream(ImplementedMethod.values())
