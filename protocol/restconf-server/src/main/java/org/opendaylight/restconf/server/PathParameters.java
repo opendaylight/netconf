@@ -36,9 +36,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *     like {@code "/rests/unknown"} will result both apiResource and childIdentifier being empty</li>
  * </ul>
  *
- * <p>Discovery requests with URI path starting with {@value DISCOVERY_BASE} are also supported. Eligible API resource
- * equivalents are {@value HOST_META} and {@value HOST_META_JSON}.
- *
+
  * <p>See <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.1">RFC 8040: Root Resource Discovery</a>
  * and <a href="https://datatracker.ietf.org/doc/html/rfc6415#appendix-A">RFC 6415: JRD Document Format</a>.
  *
