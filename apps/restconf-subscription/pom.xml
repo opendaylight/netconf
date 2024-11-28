@@ -62,6 +62,10 @@
             <artifactId>restconf-server-api</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-http</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
