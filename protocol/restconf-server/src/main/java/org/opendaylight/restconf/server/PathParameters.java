@@ -46,7 +46,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * @param childIdentifier optional resource child identifier
  */
 @NonNullByDefault
-record PathParameters(String apiResource, String childIdentifier) {
+public record PathParameters(String apiResource, String childIdentifier) {
     /**
      * API resource for datastore.
      */
@@ -71,17 +71,17 @@ record PathParameters(String apiResource, String childIdentifier) {
      * API resource equivalent for streams requests.
      */
 
-    static final String STREAMS = "/streams";
+    public static final String STREAMS = "/streams";
 
     private static final Set<String> API_RESOURCES = Set.of(DATA, OPERATIONS, YANG_LIBRARY_VERSION, MODULES, STREAMS);
     private static final PathParameters EMPTY = new PathParameters("", "");
 
-    PathParameters {
+    public PathParameters {
         requireNonNull(apiResource);
         requireNonNull(childIdentifier);
     }
 
-    static PathParameters from(final String fullPath, final String basePath) {
+    public static PathParameters from(final String fullPath, final String basePath) {
         if (!fullPath.startsWith(basePath)) {
             return EMPTY;
         }
