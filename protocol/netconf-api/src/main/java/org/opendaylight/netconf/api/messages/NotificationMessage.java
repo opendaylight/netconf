@@ -60,16 +60,12 @@ public final class NotificationMessage extends NetconfMessage {
             DATE_TIME_FORMATTER.format(date.atOffset(ZoneOffset.UTC));
 
     /**
-     * Parse a {@link String} object into a {@link Instant} using the time-zone
-     * offset for UTC, {@code ZoneOffset.UTC}, and the system default time-zone,
-     * {@code ZoneId.systemDefault()}.
-     * <p>
-     *     While parsing, if an exception occurs, we try to handle it as if it is due
-     *     to a leap second. If that's the case, a simple conversion is applied, replacing
-     *     the second-of-minute of 60 with 59.
-     *     If that's not the case, we propagate the {@link DateTimeParseException} to the
-     *     caller.
-     * </p>
+     * Parse a {@link String} object into a {@link Instant} using the time-zone offset for UTC, {@code ZoneOffset.UTC},
+     * and the system default time-zone, {@code ZoneId.systemDefault()}.
+     *
+     * <p>While parsing, if an exception occurs, we try to handle it as if it is due to a leap second. If that is
+     * the case, a simple conversion is applied, replacing the second-of-minute of 60 with 59. If that is not the case,
+     * we propagate the {@link DateTimeParseException} to the caller.
      */
     public static final Function<String, Instant> RFC3339_DATE_PARSER = time -> {
         try {
