@@ -198,17 +198,18 @@ class RestconfStreamServiceTest {
         // verify sender object passed is linked to listener
         final var sender = senderCaptor.getValue();
         assertNotNull(sender);
+        verify(listener, times(1)).onStreamStart(controlCaptor.capture());
+        final var control = controlCaptor.getValue();
+        assertNotNull(control);
+        control.close();
         sender.sendDataMessage("test");
         verify(listener, times(1)).onEventField("data", "test");
         sender.endOfStream();
         verify(listener, times(1)).onStreamEnd();
+        verify(registration, times(1)).close();
 
         // verify returned control object terminates subscription registration
-        verify(callback).onStreamStarted(controlCaptor.capture());
-        final var control = controlCaptor.getValue();
-        assertNotNull(control);
-        control.close();
-        verify(registration, times(1)).close();
+        verify(callback).onStreamStarted();
     }
 
     private static Stream<Arguments> subscribeSuccess() {

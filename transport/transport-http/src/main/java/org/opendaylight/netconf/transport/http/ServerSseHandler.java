@@ -107,8 +107,8 @@ public final class ServerSseHandler extends ChannelInboundHandlerAdapter impleme
 
             service.startEventStream(request.retain().uri(), this, new StartCallback() {
                 @Override
-                public void onStreamStarted(final StreamControl streamControl) {
-                    confirmEventStreamRequest(request, streamControl);
+                public void onStreamStarted() {
+                    confirmEventStreamRequest(request);
                     request.release();
                 }
 
@@ -125,8 +125,7 @@ public final class ServerSseHandler extends ChannelInboundHandlerAdapter impleme
         ctx.fireChannelRead(request);
     }
 
-    private void confirmEventStreamRequest(final FullHttpRequest request, final StreamControl startedStream) {
-        eventStream = startedStream;
+    private void confirmEventStreamRequest(final FullHttpRequest request) {
         streaming = true;
         // response OK with headers only, body chunks will be an event stream
         final var response = new DefaultHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
@@ -173,13 +172,16 @@ public final class ServerSseHandler extends ChannelInboundHandlerAdapter impleme
     }
 
     @Override
-    public void onStreamStart() {
-        // noop
+    public void onStreamStart(EventStreamService.StreamControl control) {
+        eventStream = control;
     }
 
     @Override
     public void onStreamEnd() {
         onStreamEnd(new DefaultLastHttpContent());
+        if (eventStream != null) {
+            eventStream.close();
+        }
     }
 
     private void onStreamEnd(final LastHttpContent lastContent) {

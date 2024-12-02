@@ -90,15 +90,15 @@ abstract sealed class ClientHttp1SseHandler extends ChannelInboundHandlerAdapter
             && response.headers().contains(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_EVENT_STREAM, true)) {
             // stream request accepted
             state = AWAITING_EVENTS;
-            listener.onStreamStart();
-            // notify SSE request succeeded with Registration (Closable)
-            startCallback.onStreamStarted(() -> {
+            listener.onStreamStart(() -> {
                 if (!ctx.isRemoved() && ctx.channel().isActive()) {
                     // terminate connection if current handler is attached to active connection
                     // so the server is notified the stream no longer consumed
                     ctx.channel().close();
                 }
             });
+            // notify SSE request succeeded with Registration (Closable)
+            startCallback.onStreamStarted();
             return;
         }
 
