@@ -104,7 +104,8 @@ public final class RestconfStreamService implements EventStreamService {
         try {
             final var registration = stream.addSubscriber(sender, streamEncoding, streamParams);
             if (registration != null) {
-                callback.onStreamStarted(registration::close);
+                listener.onStreamStart(registration::close);
+                callback.onStreamStarted();
             } else {
                 callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, UNKNOWN_STREAM_ERROR, streamEncoding));
             }
