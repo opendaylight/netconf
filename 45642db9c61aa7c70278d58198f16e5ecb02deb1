@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b624c51_6f604d53",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-02T17:58:50Z",
+      "side": 1,
+      "message": "May be you can add one here if you want but it is not necessary",
+      "parentUuid": "640a12bf_8837f4a1",
+      "range": {
+        "startLine": 84,
+        "startChar": 25,
+        "endLine": 84,
+        "endChar": 45
+      },
+      "revId": "45642db9c61aa7c70278d58198f16e5ecb02deb1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6fae3889_975eeaa8",
         "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
         "patchSetId": 23

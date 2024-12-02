@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e72a14c_26450cc8",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-02T17:58:50Z",
+      "side": 1,
+      "message": "Don\u0027t call getSubscriptionState twice. Get it into var and then check.\n final var state \u003d stateMachine.getSubscriptionState(id);\n if (state !\u003d SubscriptionState.ACTIVE\n    \u0026\u0026 state !\u003d SubscriptionState.SUSPENDED)",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 90
+      },
+      "revId": "ef40623ab1ec41653e5c541a7c7b3e7fef70deb5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
