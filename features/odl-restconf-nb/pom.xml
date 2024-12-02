@@ -75,6 +75,12 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
