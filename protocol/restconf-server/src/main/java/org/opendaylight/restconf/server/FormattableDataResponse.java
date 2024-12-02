@@ -11,15 +11,17 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.ByteBufResponse;
 import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
+import org.opendaylight.netconf.transport.http.ReadyResponse;
 import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -32,28 +34,33 @@ final class FormattableDataResponse extends ByteStreamRequestResponse {
     private final FormattableBody body;
     private final MessageEncoding encoding;
     private final PrettyPrintParam prettyPrint;
+    private final ReadOnlyHttpHeaders headers;
 
-    FormattableDataResponse(final HttpResponseStatus status, final @Nullable HttpHeaders headers,
-            final FormattableBody body, final MessageEncoding encoding, final PrettyPrintParam prettyPrint) {
-        super(status, headers);
+    FormattableDataResponse(final HttpResponseStatus status, final FormattableBody body, final MessageEncoding encoding,
+            final PrettyPrintParam prettyPrint, final List<CharSequence> headers) {
+        super(status);
         this.body = requireNonNull(body);
         this.encoding = requireNonNull(encoding);
         this.prettyPrint = requireNonNull(prettyPrint);
+
+        headers.add(HttpHeaderNames.CONTENT_TYPE);
+        headers.add(encoding.dataMediaType());
+        this.headers = new ReadOnlyHttpHeaders(false, headers.toArray(CharSequence[]::new));
     }
 
-    FormattableDataResponse(final HttpHeaders headers, final FormattableBody body, final MessageEncoding encoding,
+    FormattableDataResponse(final HttpResponseStatus status, final FormattableBody body, final MessageEncoding encoding,
             final PrettyPrintParam prettyPrint) {
-        this(HttpResponseStatus.OK, requireNonNull(headers), body, encoding, prettyPrint);
+        this(status, body, encoding, prettyPrint, new ArrayList<>(2));
     }
 
     FormattableDataResponse(final FormattableBody body, final MessageEncoding encoding,
             final PrettyPrintParam prettyPrint) {
-        this(HttpResponseStatus.OK, null, body, encoding, prettyPrint);
+        this(HttpResponseStatus.OK, body, encoding, prettyPrint);
     }
 
     @Override
-    protected FullHttpResponse toHttpResponse(final HttpVersion version, final ByteBuf content) {
-        return toHttpResponse(version, status, headers, content, encoding.dataMediaType());
+    protected ReadyResponse toReadyResponse(final ByteBuf content) {
+        return new ByteBufResponse(status, content, headers);
     }
 
     @Override
@@ -64,7 +71,8 @@ final class FormattableDataResponse extends ByteStreamRequestResponse {
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper)
-            .add("contentType", encoding.dataMediaType())
+            .add("headers", headers)
+            .add("encoding", encoding)
             .add("prettyPrint", prettyPrint)
             .add("body", body);
     }

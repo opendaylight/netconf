@@ -7,10 +7,6 @@
  */
 package org.opendaylight.netconf.transport.http.rfc6415;
 
-import com.google.common.annotations.Beta;
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,7 +21,6 @@ import org.opendaylight.netconf.transport.http.WellKnownURI;
  * The contents of the {@code host-meta} document, as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc6415.html#section-3">RFC6415, section 3</a>.
  */
-@Beta
 @NonNullByDefault
 public final class HostMeta extends AbstractHostMeta {
     private static final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
@@ -47,8 +42,8 @@ public final class HostMeta extends AbstractHostMeta {
     }
 
     @Override
-    protected FullHttpResponse toHttpResponse(final HttpVersion version, final ByteBuf content) {
-        return toHttpResponse(version, status, headers, content, MEDIA_TYPE);
+    protected AsciiString mediaType() {
+        return MEDIA_TYPE;
     }
 
     @Override

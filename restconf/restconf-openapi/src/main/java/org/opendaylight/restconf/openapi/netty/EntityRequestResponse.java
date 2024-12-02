@@ -11,15 +11,12 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.transport.http.ByteBufResponse;
 import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 
@@ -30,17 +27,13 @@ final class EntityRequestResponse extends ByteStreamRequestResponse {
     private final OpenApiEntity entity;
 
     EntityRequestResponse(final OpenApiEntity entity) {
-        super(HttpResponseStatus.OK, null);
+        super(HttpResponseStatus.OK);
         this.entity = requireNonNull(entity);
     }
 
     @Override
-    protected FullHttpResponse toHttpResponse(final HttpVersion version, final ByteBuf content) {
-        final var response = new DefaultFullHttpResponse(version, status, content);
-        response.headers()
-            .add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-            .add(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-        return response;
+    protected ByteBufResponse toReadyResponse(final ByteBuf content) {
+        return new ByteBufResponse(status, content, HttpHeaderValues.APPLICATION_JSON);
     }
 
     @Override

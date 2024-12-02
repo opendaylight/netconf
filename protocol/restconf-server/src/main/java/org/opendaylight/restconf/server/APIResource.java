@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -61,7 +61,7 @@ final class APIResource extends AbstractResource {
         // peel all other segments out
         for (var segment : otherSegments) {
             if (!peeler.hasNext() || !segment.equals(peeler.next())) {
-                return EmptyRequestResponse.NOT_FOUND;
+                return EmptyResponse.NOT_FOUND;
             }
         }
 
@@ -76,7 +76,7 @@ final class APIResource extends AbstractResource {
         }
 
         LOG.debug("Resource for '{}' not found", segment);
-        return EmptyRequestResponse.NOT_FOUND;
+        return EmptyResponse.NOT_FOUND;
     }
 
     // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not correct:
@@ -86,6 +86,6 @@ final class APIResource extends AbstractResource {
     private static PreparedRequest prepare(final TransportSession session, final ImplementedMethod method,
             final URI targetUri, final HttpHeaders headers, final @Nullable Principal principal) {
         LOG.debug("Not servicing root request");
-        return EmptyRequestResponse.NOT_FOUND;
+        return EmptyResponse.NOT_FOUND;
     }
 }
