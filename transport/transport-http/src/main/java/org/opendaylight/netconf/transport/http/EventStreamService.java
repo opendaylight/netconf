@@ -19,7 +19,7 @@ public interface EventStreamService {
      * Accepts SSE stream request using request URI as stream descriptor. Stream request result is delivered through
      * invocation of corresponding method on callback object.
      *
-     * <p>If request is accepted then {@link StartCallback#onStreamStarted(StreamControl)} method invoked with
+     * <p>If request is accepted then {@link StartCallback#onStreamStarted()} method invoked with
      * a {@link Registration} instance, to be used for stream termination. Stream event to be applied on
      * {@link EventStreamListener} instance provided.
      *
@@ -37,11 +37,9 @@ public interface EventStreamService {
      */
     interface StartCallback {
         /**
-         * Invoked when the stream has been started. Are responsible for ownership of provided {@link StreamControl}.
-         *
-         * @param streamControl a {@link StreamControl}
+         * Invoked when the stream has been started.
          */
-        void onStreamStarted(StreamControl streamControl);
+        void onStreamStarted();
 
         /**
          * Invoked when a stream fails to start.
