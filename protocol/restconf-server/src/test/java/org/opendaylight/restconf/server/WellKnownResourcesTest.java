@@ -7,10 +7,12 @@
  */
 package org.opendaylight.restconf.server;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.opendaylight.restconf.server.TestUtils.assertOptionsResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -25,6 +27,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opendaylight.netconf.transport.http.FiniteResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.netconf.transport.http.rfc6415.HostMeta;
@@ -38,17 +42,21 @@ class WellKnownResourcesTest {
     @ParameterizedTest
     @ValueSource(strings = { XRD_SUFFIX, JRD_SUFFIX })
     void options(final String uri) throws Exception {
-        assertOptionsResponse(RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.OPTIONS, EMPTY_HEADERS)
-            .asResponse()
-            .toHttpResponse(HttpVersion.HTTP_1_1), "GET, HEAD, OPTIONS");
+        final var response = RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.OPTIONS, EMPTY_HEADERS)
+            .asResponse();
+
+        assertOptionsResponse(assertInstanceOf(HeadersResponse.class, response).toHttpResponse(HttpVersion.HTTP_1_1),
+            "GET, HEAD, OPTIONS");
     }
 
     @ParameterizedTest
     @MethodSource
     void getHostMeta(final String uri, final AsciiString contentType, final String content) throws Exception {
-        assertResponse(RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET, EMPTY_HEADERS)
-            .asResponse()
-            .toHttpResponse(HttpVersion.HTTP_1_1), HttpResponseStatus.OK, contentType, content);
+        final var response = RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET, EMPTY_HEADERS)
+            .asResponse();
+        assertResponse(assertInstanceOf(FiniteResponse.class, response)
+            .toReadyResponse(UnpooledByteBufAllocator.DEFAULT).toHttpResponse(HttpVersion.HTTP_1_1),
+            HttpResponseStatus.OK, contentType, content);
     }
 
     private static Stream<Arguments> getHostMeta() {
@@ -72,9 +80,9 @@ class WellKnownResourcesTest {
 
     @Test
     void putHostMeta() throws Exception {
-        final var response = RESOURCES.request(new SegmentPeeler(JRD_SUFFIX), ImplementedMethod.POST, EMPTY_HEADERS)
-            .asResponse()
-            .toHttpResponse(HttpVersion.HTTP_1_1)       ;
+        final var response = assertInstanceOf(HeadersResponse.class,
+            RESOURCES.request(new SegmentPeeler(JRD_SUFFIX), ImplementedMethod.POST, EMPTY_HEADERS).asResponse())
+            .toHttpResponse(HttpVersion.HTTP_1_1);
         assertResponse(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
         assertResponseHeaders(response, Map.of(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS"));
     }

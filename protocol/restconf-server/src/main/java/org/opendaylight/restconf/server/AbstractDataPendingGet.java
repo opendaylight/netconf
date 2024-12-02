@@ -10,9 +10,9 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.Response;
@@ -49,7 +49,7 @@ abstract sealed class AbstractDataPendingGet extends AbstractPendingGet<Formatta
     }
 
     @Override
-    final void fillHeaders(final FormattableBody result, final HttpHeaders headers) {
-        headers.set(HttpHeaderNames.CONTENT_TYPE, encoding.dataMediaType());
+    final List<CharSequence> extractHeaders(final FormattableBody result) {
+        return List.of(HttpHeaderNames.CONTENT_TYPE, encoding.dataMediaType());
     }
 }
