@@ -15,7 +15,7 @@ import java.security.Principal;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.api.ApiPath;
@@ -45,7 +45,7 @@ final class ModulesResource extends AbstractLeafResource {
     private PreparedRequest prepareGet(final TransportSession session, final URI targetUri, final HttpHeaders headers,
             final @Nullable Principal principal, final String path, final boolean withContent) {
         if (path.isEmpty()) {
-            return EmptyRequestResponse.NOT_FOUND;
+            return EmptyResponse.NOT_FOUND;
         }
 
         // optional mountPath followed by file name separated by slash
@@ -67,7 +67,7 @@ final class ModulesResource extends AbstractLeafResource {
         }
 
         if (fileName.isEmpty()) {
-            return EmptyRequestResponse.NOT_FOUND;
+            return EmptyResponse.NOT_FOUND;
         }
 
         // YIN if explicitly requested

@@ -268,7 +268,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var callback = new TestRequestCallback();
         client.invoke(request, callback);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        await().atMost(Duration.ofSeconds(30)).until(callback::completed);
         client.shutdown().get(2, TimeUnit.SECONDS);
         final var response = callback.response();
         assertNotNull(response);

@@ -7,24 +7,20 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import com.google.common.annotations.Beta;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * A marker interface for {@link Response}s which are readily available. Examples include {@link EmptyRequestResponse},
- * {@link ByteBufRequestResponse}, and similar.
+ * A ready {@link Response} that can be immediately sent out.
  */
-@Beta
 @NonNullByDefault
-public interface ReadyResponse extends Response {
-    @Override
+public non-sealed interface ReadyResponse extends Response {
+    /**
+     * Format this response to a {@link FullHttpResponse}.
+     *
+     * @param version {@link HttpVersion} of the response
+     * @return a {@link FullHttpResponse}
+     */
     FullHttpResponse toHttpResponse(HttpVersion version);
-
-    @Override
-    default FullHttpResponse toHttpResponse(final ByteBufAllocator alloc, final HttpVersion version) {
-        return toHttpResponse(version);
-    }
 }
