@@ -11,7 +11,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
@@ -33,7 +33,7 @@ final class PendingDataDelete extends PendingRequestWithApiPath<Empty> {
     }
 
     @Override
-    EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final Empty result) {
-        return EmptyRequestResponse.NO_CONTENT;
+    EmptyResponse transformResult(final NettyServerRequest<?> request, final Empty result) {
+        return EmptyResponse.NO_CONTENT;
     }
 }

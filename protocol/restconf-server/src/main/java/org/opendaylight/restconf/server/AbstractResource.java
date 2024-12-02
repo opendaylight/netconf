@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -25,9 +24,8 @@ import java.util.List;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.ByteBufRequestResponse;
-import org.opendaylight.netconf.transport.http.CompletedRequest;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.ByteBufResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -49,45 +47,33 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
     private static final AsciiString ANY_TYPE = AsciiString.cached("*/*");
 
     /**
-     * A {@link EmptyRequestResponse} reporting {@code 405 Method Not Allowed} and indicating support only for
+     * A {@link HeadersResponse} reporting {@code 405 Method Not Allowed} and indicating support only for
      * {@code OPTIONS} method.
      */
-    static final EmptyRequestResponse OPTIONS_ONLY_METHOD_NOT_ALLOWED;
+    static final HeadersResponse OPTIONS_ONLY_METHOD_NOT_ALLOWED = HeadersResponse.of(
+        HttpResponseStatus.METHOD_NOT_ALLOWED, HttpHeaderNames.ALLOW, AsciiString.cached("OPTIONS"));
     /**
-     * A {@link CompletedRequest} reporting {@code 200 OK} and containing only {@code Allow: OPTIONS} header.
+     * A {@link HeadersResponse} reporting {@code 200 OK} and containing only {@code Allow: OPTIONS} header.
      */
-    static final EmptyRequestResponse OPTIONS_ONLY_OK;
+    static final HeadersResponse OPTIONS_ONLY_OK =
+        new HeadersResponse(HttpResponseStatus.OK, OPTIONS_ONLY_METHOD_NOT_ALLOWED.headers());
 
-    static {
-        final var headers = DefaultHttpHeadersFactory.headersFactory().newHeaders()
-            .set(HttpHeaderNames.ALLOW, "OPTIONS");
-        OPTIONS_ONLY_METHOD_NOT_ALLOWED = new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
-        OPTIONS_ONLY_OK = new EmptyRequestResponse(HttpResponseStatus.OK, headers);
-    }
+    static final HeadersResponse METHOD_NOT_ALLOWED_READ_ONLY =
+        new HeadersResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
 
-    static final EmptyRequestResponse METHOD_NOT_ALLOWED_READ_ONLY =
-        new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, AbstractPendingOptions.HEADERS_READ_ONLY);
-
-    static final EmptyRequestResponse NOT_ACCEPTABLE_DATA;
-    static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_DATA;
-    static final EmptyRequestResponse UNSUPPORTED_MEDIA_TYPE_PATCH;
-
-    static {
-        final var factory = DefaultHttpHeadersFactory.headersFactory();
-
-        final var headers = factory.newEmptyHeaders().set(HttpHeaderNames.ACCEPT, String.join(", ", List.of(
+    static final HeadersResponse NOT_ACCEPTABLE_DATA = HeadersResponse.of(HttpResponseStatus.NOT_ACCEPTABLE,
+        HttpHeaderNames.ACCEPT, String.join(", ", List.of(
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             MediaTypes.APPLICATION_YANG_DATA_XML,
             // FIXME: do not advertize these types
             HttpHeaderValues.APPLICATION_JSON.toString(),
             HttpHeaderValues.APPLICATION_XML.toString(),
             NettyMediaTypes.TEXT_XML.toString())));
-
-        NOT_ACCEPTABLE_DATA = new EmptyRequestResponse(HttpResponseStatus.NOT_ACCEPTABLE, headers);
-        UNSUPPORTED_MEDIA_TYPE_DATA = new EmptyRequestResponse(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, headers);
-        UNSUPPORTED_MEDIA_TYPE_PATCH = new EmptyRequestResponse(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE,
-            factory.newEmptyHeaders().set(HttpHeaderNames.ACCEPT, AbstractPendingOptions.ACCEPTED_PATCH_MEDIA_TYPES));
-    }
+    static final HeadersResponse UNSUPPORTED_MEDIA_TYPE_DATA =
+        new HeadersResponse(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, NOT_ACCEPTABLE_DATA.headers());
+    static final HeadersResponse UNSUPPORTED_MEDIA_TYPE_PATCH =
+        HeadersResponse.of(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE,
+            HttpHeaderNames.ACCEPT, AbstractPendingOptions.ACCEPTED_PATCH_MEDIA_TYPES);
 
     final EndpointInvariants invariants;
 
@@ -125,9 +111,9 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
         return func.apply(apiPath);
     }
 
-    static final CompletedRequest badApiPath(final String path, final ParseException cause) {
+    static final ByteBufResponse badApiPath(final String path, final ParseException cause) {
         LOG.debug("Failed to parse API path", cause);
-        return new ByteBufRequestResponse(HttpResponseStatus.BAD_REQUEST,
+        return new ByteBufResponse(HttpResponseStatus.BAD_REQUEST,
             ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT,
                 "Bad request path '%s': '%s'".formatted(path, cause.getMessage())));
     }

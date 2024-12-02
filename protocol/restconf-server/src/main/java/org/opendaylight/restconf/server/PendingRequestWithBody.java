@@ -16,7 +16,8 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
@@ -72,15 +73,17 @@ abstract non-sealed class PendingRequestWithBody<T, B extends ConsumableBody> ex
      */
     abstract B wrapBody(InputStream body);
 
-    final EmptyRequestResponse transformCreateResource(final CreateResourceResult result) {
-        return new EmptyRequestResponse(HttpResponseStatus.CREATED,
-            metadataHeaders(result).set(HttpHeaderNames.LOCATION, restconfURI() + "data/" + result.createdPath()));
+    final HeadersResponse transformCreateResource(final CreateResourceResult result) {
+        final var headers = metadataHeaders(result);
+        headers.add(HttpHeaderNames.LOCATION);
+        headers.add(restconfURI() + "data/" + result.createdPath());
+        return HeadersResponse.of(HttpResponseStatus.CREATED, headers);
     }
 
     static final Response transformInvoke(final NettyServerRequest<?> request, final InvokeResult result,
             final MessageEncoding acceptEncoding) {
         final var output = result.output();
-        return output == null ? EmptyRequestResponse.NO_CONTENT
+        return output == null ? EmptyResponse.NO_CONTENT
             : new FormattableDataResponse(output, acceptEncoding, request.prettyPrint());
     }
 }

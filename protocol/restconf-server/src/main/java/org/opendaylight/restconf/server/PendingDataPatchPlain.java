@@ -12,7 +12,9 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
+import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
@@ -39,7 +41,8 @@ final class PendingDataPatchPlain extends PendingRequestWithResource<DataPatchRe
     }
 
     @Override
-    EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final DataPatchResult result) {
-        return new EmptyRequestResponse(HttpResponseStatus.OK, metadataHeaders(result));
+    Response transformResult(final NettyServerRequest<?> request, final DataPatchResult result) {
+        final var headers = metadataHeaders(result);
+        return headers.isEmpty() ? EmptyResponse.OK : HeadersResponse.of(HttpResponseStatus.OK, headers);
     }
 }

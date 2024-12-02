@@ -12,30 +12,20 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.HttpVersion;
+import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * A {@link RequestResponse} which has a {@link #cause()}.
+ * A {@link FiniteResponse} which has a {@link #cause()}.
  */
 @NonNullByDefault
-public final class ExceptionRequestResponse extends AbstractRequestResponse {
+public final class ExceptionRequestResponse extends AbstractFiniteResponse {
     private final Throwable cause;
 
-    public ExceptionRequestResponse(final HttpResponseStatus status, final Throwable cause,
-            final @Nullable HttpHeaders headers) {
-        super(HttpResponseStatus.INTERNAL_SERVER_ERROR, headers);
-        this.cause = requireNonNull(cause);
-    }
-
     public ExceptionRequestResponse(final HttpResponseStatus status, final Throwable cause) {
-        this(HttpResponseStatus.INTERNAL_SERVER_ERROR, cause, null);
+        super(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        this.cause = requireNonNull(cause);
     }
 
     public ExceptionRequestResponse(final Throwable cause) {
@@ -47,11 +37,8 @@ public final class ExceptionRequestResponse extends AbstractRequestResponse {
     }
 
     @Override
-    public FullHttpResponse toHttpResponse(final ByteBufAllocator alloc, final HttpVersion version) {
-        final var buf = ByteBufUtil.writeUtf8(alloc, cause.toString());
-        final var ret = new DefaultFullHttpResponse(version, status, buf);
-        HttpUtil.setContentLength(ret, buf.readableBytes());
-        return ret;
+    public ByteBufResponse toReadyResponse(final ByteBufAllocator alloc) throws IOException {
+        return new ByteBufResponse(status(), ByteBufUtil.writeUtf8(alloc, cause.toString()));
     }
 
     @Override
