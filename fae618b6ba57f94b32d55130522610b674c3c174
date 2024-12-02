@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "acafe360_5b599c55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-02T09:34:47Z",
+      "side": 1,
+      "message": "We would like to move to something like in https://git.opendaylight.org/gerrit/c/netconf/+/114496",
+      "revId": "fae618b6ba57f94b32d55130522610b674c3c174",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
