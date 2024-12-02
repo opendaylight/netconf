@@ -116,10 +116,15 @@ final class ServerRequestExecutor implements PendingRequestListener {
     @NonNullByDefault
     void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
             final Response response) {
-        if (response instanceof ReadyResponse ready) {
-            HTTPServerSession.respond(ctx, streamId, ready.toHttpResponse(version));
-            return;
+        switch (response) {
+            case ReadyResponse resp -> HTTPServerSession.respond(ctx, streamId, resp.toHttpResponse(version));
+            case FiniteResponse resp -> respond(ctx, streamId, version, resp);
         }
+    }
+
+    @NonNullByDefault
+    private void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
+            final FiniteResponse response) {
         try {
             respExecutor.execute(
                 () -> HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version)));
@@ -131,25 +136,25 @@ final class ServerRequestExecutor implements PendingRequestListener {
     // Hand-coded, as simple as possible
     @NonNullByDefault
     private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
-        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        final var content = response.content();
+        final var message = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        final var content = message.content();
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
         ByteBufUtil.writeUtf8(content, cause.getMessage());
-        HttpUtil.setContentLength(response, content.readableBytes());
-        return response;
+        HttpUtil.setContentLength(message, content.readableBytes());
+        return message;
     }
 
     // Executed on respExecutor, so it is okay to block
     @NonNullByDefault
-    private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
+    private static FullHttpResponse formatResponse(final FiniteResponse response, final ChannelHandlerContext ctx,
             final HttpVersion version) {
         // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
         //
         //        We want to be emitting a series of write() requests into the queue, each of which is subject
         //        to channel's flow control -- i.e. it effectively is a MPSC outbound queue.
         //
-        //        We are using OutputStream below as the synchrous interface, but we really want our own, such that we
+        //        We are using OutputStream below as the synchronous interface, but we really want our own, such that we
         //        get the headers first and we invoke body streaming (if applicable and indicated by return).
         //
         //        In the streaming phase, we start with a HttpObjectSender initialized to the HttpResponse, as indicated
@@ -161,11 +166,13 @@ final class ServerRequestExecutor implements PendingRequestListener {
         //          out chunks (of reasonable size).
         //        - finish up with a LastHttpContent when OutputStream.close() is called ... which might be problematic
         //          w.r.t. failure cases, so it needs some figuring out
+        final ReadyResponse ready;
         try {
-            return response.toHttpResponse(ctx.alloc(), version);
+            ready = response.toReadyResponse(ctx.alloc());
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
             return formatException(e, version);
         }
+        return ready.toHttpResponse(version);
     }
 }
