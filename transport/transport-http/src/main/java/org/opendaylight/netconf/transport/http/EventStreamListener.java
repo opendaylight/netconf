@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
  */
 public interface EventStreamListener {
 
-    void onStreamStart();
+    void onStreamStart(EventStreamService.StreamControl control);
 
     void onEventField(@NonNull String fieldName, @NonNull String fieldValue);
 

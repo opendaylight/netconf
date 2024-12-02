@@ -37,11 +37,9 @@ public interface EventStreamService {
      */
     interface StartCallback {
         /**
-         * Invoked when the stream has been started. Are responsible for ownership of provided {@link StreamControl}.
-         *
-         * @param streamControl a {@link StreamControl}
+         * Invoked when the stream has been started.
          */
-        void onStreamStarted(StreamControl streamControl);
+        void onStreamStarted();
 
         /**
          * Invoked when a stream fails to start.

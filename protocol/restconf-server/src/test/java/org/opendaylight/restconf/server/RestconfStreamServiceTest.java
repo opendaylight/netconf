@@ -79,8 +79,6 @@ class RestconfStreamServiceTest {
     @Captor
     private ArgumentCaptor<Exception> exceptionCaptor;
     @Captor
-    private ArgumentCaptor<EventStreamService.StreamControl> controlCaptor;
-    @Captor
     private ArgumentCaptor<EventStreamGetParams> getParamsCaptor;
     @Captor
     private ArgumentCaptor<RestconfStream.Sender> senderCaptor;
@@ -204,10 +202,7 @@ class RestconfStreamServiceTest {
         verify(listener, times(1)).onStreamEnd();
 
         // verify returned control object terminates subscription registration
-        verify(callback).onStreamStarted(controlCaptor.capture());
-        final var control = controlCaptor.getValue();
-        assertNotNull(control);
-        control.close();
+        verify(callback).onStreamStarted();
         verify(registration, times(1)).close();
     }
 

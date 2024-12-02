@@ -88,10 +88,10 @@ abstract sealed class ClientHttp2SseFrameListener extends Http2FrameAdapter
             && headers.contains(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_EVENT_STREAM, true)) {
             // stream request accepted
             state = AWAITING_EVENTS;
-            listener.onStreamStart();
+            listener.onStreamStart(ClientHttp2SseFrameListener.this::onClose);
             // notify SSE request succeeded with Registration (Closable)
             // TODO: notify server to close stream (require server side frame listener)
-            startCallback.onStreamStarted(ClientHttp2SseFrameListener.this::onClose);
+            startCallback.onStreamStarted();
             return;
         }
 
