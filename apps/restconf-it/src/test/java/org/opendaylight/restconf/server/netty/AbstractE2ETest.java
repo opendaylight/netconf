@@ -434,8 +434,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         clientStreamService.startEventStream(uri, eventListener,
             new EventStreamService.StartCallback() {
                 @Override
-                public void onStreamStarted(final EventStreamService.StreamControl control) {
-                    streamControl = control;
+                public void onStreamStarted() {
+                    streamControl = eventListener.control();
                 }
 
                 @Override

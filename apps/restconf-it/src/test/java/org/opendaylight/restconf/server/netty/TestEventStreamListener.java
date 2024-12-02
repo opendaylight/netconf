@@ -12,15 +12,18 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.EventStreamListener;
+import org.opendaylight.netconf.transport.http.EventStreamService;
 
 final class TestEventStreamListener implements EventStreamListener {
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(5);
 
     private volatile boolean started = false;
     private volatile boolean ended = false;
+    private EventStreamService.StreamControl control;
 
     @Override
-    public void onStreamStart() {
+    public void onStreamStart(final EventStreamService.StreamControl streamControl) {
+        this.control = streamControl;
         started = true;
     }
 
@@ -41,10 +44,17 @@ final class TestEventStreamListener implements EventStreamListener {
 
     @Override
     public void onStreamEnd() {
+        if (control != null) {
+            control.close();
+        }
         ended = true;
     }
 
     boolean ended() {
         return ended;
+    }
+
+    EventStreamService.StreamControl control() {
+        return control;
     }
 }

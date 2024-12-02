@@ -193,8 +193,8 @@ class SseClientServerTest {
 
                 // start SSE stream with proper URI
                 clientEventStreamService.startEventStream(STREAM_URI, eventStreamListener, startCallback);
-                verify(startCallback, timeout(1000)).onStreamStarted(any());
-                verify(eventStreamListener).onStreamStart();
+                verify(startCallback, timeout(1000)).onStreamStarted();
+                verify(eventStreamListener).onStreamStart(any());
 
                 // send series of event fields (name:value pairs)
                 assertNotNull(serverEventStreamService.listener);
@@ -235,9 +235,7 @@ class SseClientServerTest {
             if (STREAM_URI.equals(requestUri)) {
                 // accept stream request
                 listener = eventListener;
-                callback.onStreamStarted(() -> {
-                    // no-op
-                });
+                callback.onStreamStarted();
             } else {
                 // decline stream request
                 callback.onStartFailure(new IllegalStateException(DECLINE_MESSAGE));
