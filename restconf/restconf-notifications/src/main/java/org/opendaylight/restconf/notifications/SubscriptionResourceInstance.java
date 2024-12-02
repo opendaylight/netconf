@@ -81,9 +81,12 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
     }
 
     private static final class StreamListener implements EventStreamListener {
-        public void onStreamStart() {
+        private EventStreamService.StreamControl control;
+        @Override
+        public void onStreamStart(final EventStreamService.StreamControl control) {
             // this is called when we initially return 200 by prepareGet
             LOG.info("On stream start emitted.");
+            this.control = control;
         }
 
         @Override
@@ -96,7 +99,9 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         public void onStreamEnd() {
             // FIXME add logic to emit LAST HTTP response, see: ServerSseHandler for inspiration
             LOG.info("On stream end emitted.");
-            // FIXME close control
+            if (control != null) {
+                control.close();
+            }
         }
     }
 
@@ -108,9 +113,8 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         }
 
         @Override
-        public void onStreamStarted(final EventStreamService.StreamControl streamControl) {
+        public void onStreamStarted() {
             LOG.info("Stream for {} started.", targetUri);
-            listener.onStreamStart();
         }
 
         @Override

@@ -34,6 +34,6 @@ public class SubscribedEventStreamService implements EventStreamService {
         // if (machine.getSubscriptionSession(Uint32.valueOf(requestUri)) != null) {
         //     callback.onStartFailure();
         // }
-        callback.onStreamStarted(() -> { });
+        callback.onStreamStarted();
     }
 }
