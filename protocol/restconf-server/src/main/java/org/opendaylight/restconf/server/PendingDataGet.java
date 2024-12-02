@@ -11,9 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.Response;
@@ -54,15 +55,21 @@ final class PendingDataGet extends AbstractPendingGet<DataGetResult> {
 
     @Override
     Response transformResultImpl(final NettyServerRequest<?> request, final DataGetResult result) {
-        return new FormattableDataResponse(
-            metadataHeaders(result).set(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE), result.body(),
-            encoding, request.prettyPrint());
+        final var headers = metadataHeaders(result);
+        headers.add(HttpHeaderNames.CACHE_CONTROL);
+        headers.add(HttpHeaderValues.NO_CACHE);
+
+        return new FormattableDataResponse(new ReadOnlyHttpHeaders(false, headers.toArray(CharSequence[]::new)),
+            result.body(), encoding, request.prettyPrint());
     }
 
     @Override
-    void fillHeaders(final DataGetResult result, final HttpHeaders headers) {
-        setMetadataHeaders(headers, result)
-            .set(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE)
-            .set(HttpHeaderNames.CONTENT_TYPE, encoding.dataMediaType());
+    List<CharSequence> extractHeaders(final DataGetResult result) {
+        final var headers = metadataHeaders(result);
+        headers.add(HttpHeaderNames.CACHE_CONTROL);
+        headers.add(HttpHeaderValues.NO_CACHE);
+        headers.add(HttpHeaderNames.CONTENT_TYPE);
+        headers.add(encoding.dataMediaType());
+        return headers;
     }
 }

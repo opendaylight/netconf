@@ -9,14 +9,15 @@ package org.opendaylight.restconf.server;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
+import io.netty.util.AsciiString;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.PendingRequest;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
@@ -47,17 +48,17 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
         HttpHeaderValues.APPLICATION_XML.toString(),
         NettyMediaTypes.TEXT_XML.toString()));
 
-    static final HttpHeaders HEADERS_ACTION = headers("OPTIONS, POST");
-    static final HttpHeaders HEADERS_DATASTORE = patchHeaders("GET, HEAD, OPTIONS, PATCH, POST, PUT");
-    static final HttpHeaders HEADERS_READ_ONLY = headers("GET, HEAD, OPTIONS");
-    static final HttpHeaders HEADERS_RESOURCE = patchHeaders("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
-    static final HttpHeaders HEADERS_RPC = headers("GET, HEAD, OPTIONS, POST");
+    static final ReadOnlyHttpHeaders HEADERS_ACTION = headers("OPTIONS, POST");
+    static final ReadOnlyHttpHeaders HEADERS_DATASTORE = patchHeaders("GET, HEAD, OPTIONS, PATCH, POST, PUT");
+    static final ReadOnlyHttpHeaders HEADERS_READ_ONLY = headers("GET, HEAD, OPTIONS");
+    static final ReadOnlyHttpHeaders HEADERS_RESOURCE = patchHeaders("DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
+    static final ReadOnlyHttpHeaders HEADERS_RPC = headers("GET, HEAD, OPTIONS, POST");
 
-    static final EmptyRequestResponse ACTION = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_ACTION);
-    static final EmptyRequestResponse DATASTORE = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_DATASTORE);
-    static final EmptyRequestResponse READ_ONLY = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_READ_ONLY);
-    static final EmptyRequestResponse RESOURCE = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RESOURCE);
-    static final EmptyRequestResponse RPC = new EmptyRequestResponse(HttpResponseStatus.OK, HEADERS_RPC);
+    static final HeadersResponse ACTION = new HeadersResponse(HttpResponseStatus.OK, HEADERS_ACTION);
+    static final HeadersResponse DATASTORE = new HeadersResponse(HttpResponseStatus.OK, HEADERS_DATASTORE);
+    static final HeadersResponse READ_ONLY = new HeadersResponse(HttpResponseStatus.OK, HEADERS_READ_ONLY);
+    static final HeadersResponse RESOURCE = new HeadersResponse(HttpResponseStatus.OK, HEADERS_RESOURCE);
+    static final HeadersResponse RPC = new HeadersResponse(HttpResponseStatus.OK, HEADERS_RPC);
 
     AbstractPendingOptions(final EndpointInvariants invariants, final TransportSession session, final URI targetUri,
             final @Nullable Principal principal, final ApiPath apiPath) {
@@ -65,7 +66,7 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
     }
 
     @Override
-    final EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final OptionsResult result) {
+    final HeadersResponse transformResult(final NettyServerRequest<?> request, final OptionsResult result) {
         return switch (result) {
             case ACTION -> ACTION;
             case DATASTORE -> DATASTORE;
@@ -75,11 +76,13 @@ abstract class AbstractPendingOptions extends PendingRequestWithApiPath<OptionsR
         };
     }
 
-    private static HttpHeaders headers(final String allowValue) {
-        return HEADERS_FACTORY.newEmptyHeaders().set(HttpHeaderNames.ALLOW, allowValue);
+    private static ReadOnlyHttpHeaders headers(final String allowValue) {
+        return new ReadOnlyHttpHeaders(false, HttpHeaderNames.ALLOW, AsciiString.cached(allowValue));
     }
 
-    private static HttpHeaders patchHeaders(final String allowValue) {
-        return headers(allowValue).set(HttpHeaderNames.ACCEPT_PATCH, ACCEPTED_PATCH_MEDIA_TYPES);
+    private static ReadOnlyHttpHeaders patchHeaders(final String allowValue) {
+        return new ReadOnlyHttpHeaders(false,
+            HttpHeaderNames.ALLOW, AsciiString.cached(allowValue),
+            HttpHeaderNames.ACCEPT_PATCH, ACCEPTED_PATCH_MEDIA_TYPES);
     }
 }

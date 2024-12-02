@@ -13,12 +13,13 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.handler.codec.DateFormatter;
 import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -135,20 +136,22 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     }
 
     @NonNullByDefault
-    static final HttpHeaders metadataHeaders(final ConfigurationMetadata metadata) {
-        return setMetadataHeaders(HEADERS_FACTORY.newEmptyHeaders(), metadata);
-    }
+    static final List<CharSequence> metadataHeaders(final ConfigurationMetadata metadata) {
+        final var headers = new ArrayList<CharSequence>();
 
-    static final HttpHeaders setMetadataHeaders(final HttpHeaders headers, final ConfigurationMetadata metadata) {
         final var etag = metadata.entityTag();
         if (etag != null) {
-            headers.set(HttpHeaderNames.ETAG, etag.value());
+            headers.add(HttpHeaderNames.ETAG);
+            headers.add(etag.value());
         }
+
         final var lastModified = metadata.lastModified();
         if (lastModified != null) {
+            headers.add(HttpHeaderNames.LAST_MODIFIED);
             // FIXME: uses a thread local: we should be able to do better!
-            headers.set(HttpHeaderNames.LAST_MODIFIED, DateFormatter.format(Date.from(lastModified)));
+            headers.add(DateFormatter.format(Date.from(lastModified)));
         }
+
         return headers;
     }
 }

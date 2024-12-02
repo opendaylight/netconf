@@ -13,33 +13,45 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * An abstract baseline class promising co-implementation of {@link CompletedRequest} and {@link Response}.
+ * An abstract baseline class promising co-implementation of {@link Response}.
  */
 @Beta
 @NonNullByDefault
-public abstract class RequestResponse implements CompletedRequest, Response {
-    @Override
-    public final Response asResponse() {
-        return this;
-    }
+public abstract non-sealed class RequestResponse implements Response {
+    /**
+     * Return a {@link FullHttpResponse} representation of this object.
+     *
+     * @param alloc {@link ByteBufAllocator} to use for ByteBuf allocation
+     * @param version HTTP version to use
+     * @return a {@link FullHttpResponse}
+     * @throws IOException when an I/O error occurs
+     */
+    public abstract FullHttpResponse toHttpResponse(ByteBufAllocator alloc, HttpVersion version) throws IOException;
 
-    @Override
-    public final String toString() {
-        return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
+    /**
+     * Return a {@link FullHttpResponse} representation of this object.
+     *
+     * @param version HTTP version to use
+     * @return a {@link FullHttpResponse}
+     * @throws IOException when an I/O error occurs
+     */
+    public FullHttpResponse toHttpResponse(final HttpVersion version) throws IOException {
+        return toHttpResponse(UnpooledByteBufAllocator.DEFAULT, version);
     }
-
-    protected abstract ToStringHelper addToStringAttributes(ToStringHelper helper);
 
     protected static final FullHttpResponse toHttpResponse(final HttpVersion version, final HttpResponseStatus status,
             final @Nullable HttpHeaders headers) {
@@ -63,4 +75,11 @@ public abstract class RequestResponse implements CompletedRequest, Response {
         }
         return response;
     }
+
+    @Override
+    public final String toString() {
+        return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
+    }
+
+    protected abstract ToStringHelper addToStringAttributes(ToStringHelper helper);
 }

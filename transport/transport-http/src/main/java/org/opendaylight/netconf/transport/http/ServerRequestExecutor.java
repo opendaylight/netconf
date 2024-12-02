@@ -116,10 +116,23 @@ final class ServerRequestExecutor implements PendingRequestListener {
     @NonNullByDefault
     void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
             final Response response) {
-        if (response instanceof ReadyResponse ready) {
-            HTTPServerSession.respond(ctx, streamId, ready.toHttpResponse(version));
-            return;
+        final FullHttpResponse message;
+        switch (response) {
+            case ByteBufResponse resp -> message = resp.format(version);
+            case EmptyResponse resp -> message = resp.format(version);
+            case HeadersResponse resp -> message = resp.format(version);
+            case RequestResponse resp -> {
+                respond(ctx, streamId, version, resp);
+                return;
+            }
         }
+
+        HTTPServerSession.respond(ctx, streamId, message);
+    }
+
+    @NonNullByDefault
+    private void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
+            final RequestResponse response) {
         try {
             respExecutor.execute(
                 () -> HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version)));
@@ -131,18 +144,18 @@ final class ServerRequestExecutor implements PendingRequestListener {
     // Hand-coded, as simple as possible
     @NonNullByDefault
     private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
-        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        final var content = response.content();
+        final var message = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        final var content = message.content();
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
         ByteBufUtil.writeUtf8(content, cause.getMessage());
-        HttpUtil.setContentLength(response, content.readableBytes());
-        return response;
+        HttpUtil.setContentLength(message, content.readableBytes());
+        return message;
     }
 
     // Executed on respExecutor, so it is okay to block
     @NonNullByDefault
-    private static FullHttpResponse formatResponse(final Response response, final ChannelHandlerContext ctx,
+    private static FullHttpResponse formatResponse(final RequestResponse response, final ChannelHandlerContext ctx,
             final HttpVersion version) {
         // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
         //

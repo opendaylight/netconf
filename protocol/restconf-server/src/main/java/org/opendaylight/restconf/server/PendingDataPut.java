@@ -12,7 +12,7 @@ import java.net.URI;
 import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.ResourceBody;
@@ -39,8 +39,8 @@ final class PendingDataPut extends PendingRequestWithResource<DataPutResult> {
     }
 
     @Override
-    EmptyRequestResponse transformResult(final NettyServerRequest<?> request, final DataPutResult result) {
-        return new EmptyRequestResponse(
-            result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT, metadataHeaders(result));
+    HeadersResponse transformResult(final NettyServerRequest<?> request, final DataPutResult result) {
+        return HeadersResponse.ofTrusted(result.created() ? HttpResponseStatus.CREATED : HttpResponseStatus.NO_CONTENT,
+            metadataHeaders(result));
     }
 }

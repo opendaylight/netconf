@@ -39,12 +39,9 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -110,10 +107,7 @@ class HttpClientServerTest {
             final var content = ByteBufUtil.writeUtf8(UnpooledByteBufAllocator.DEFAULT,
                 "Method: %s URI: %s Payload: %s".formatted(method, targetUri.getPath(), payload));
 
-            listener.requestComplete(this, new ByteBufRequestResponse(HttpResponseStatus.OK, content,
-                DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
-                    .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
-                    .setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes())));
+            listener.requestComplete(this, ByteBufResponse.ok(content, HttpHeaderValues.TEXT_PLAIN));
         }
 
         @Override

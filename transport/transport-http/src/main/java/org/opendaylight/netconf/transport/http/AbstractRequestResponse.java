@@ -33,6 +33,11 @@ public abstract class AbstractRequestResponse extends RequestResponse {
     }
 
     @Override
+    public final @NonNull HttpResponseStatus status() {
+        return status;
+    }
+
+    @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("status", status).add("headers", headers);
     }
