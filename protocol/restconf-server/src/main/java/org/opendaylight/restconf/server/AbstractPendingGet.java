@@ -12,9 +12,11 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PendingRequest;
 import org.opendaylight.netconf.transport.http.Response;
@@ -49,14 +51,13 @@ abstract class AbstractPendingGet<T> extends PendingRequestWithoutBody<T> {
             return transformResultImpl(request, result);
         }
 
-        final var headers = HEADERS_FACTORY.newEmptyHeaders();
-        fillHeaders(result, headers);
-        return new EmptyRequestResponse(HttpResponseStatus.OK, headers);
+        final var headers = extractHeaders(result);
+        return headers.isEmpty() ? EmptyResponse.OK : HeadersResponse.of(HttpResponseStatus.OK, headers);
     }
 
     abstract Response transformResultImpl(NettyServerRequest<?> request, T result);
 
-    abstract void fillHeaders(T result, HttpHeaders headers);
+    abstract List<CharSequence> extractHeaders(T result);
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {

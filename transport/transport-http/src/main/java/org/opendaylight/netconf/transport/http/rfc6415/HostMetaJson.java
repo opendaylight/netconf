@@ -9,10 +9,8 @@ package org.opendaylight.netconf.transport.http.rfc6415;
 
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.AsciiString;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -78,8 +76,8 @@ public final class HostMetaJson extends AbstractHostMeta {
     }
 
     @Override
-    protected FullHttpResponse toHttpResponse(final HttpVersion version, final ByteBuf content) {
-        return toHttpResponse(version, status, headers, content, HttpHeaderValues.APPLICATION_JSON);
+    protected AsciiString mediaType() {
+        return HttpHeaderValues.APPLICATION_JSON;
     }
 
     @Override

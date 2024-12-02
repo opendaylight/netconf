@@ -10,11 +10,11 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ByteSourceResponse;
@@ -62,8 +62,8 @@ abstract sealed class AbstractPendingModulesGet extends AbstractPendingGet<Modul
     }
 
     @Override
-    final void fillHeaders(final ModulesGetResult result, final HttpHeaders headers) {
-        headers.set(HttpHeaderNames.CONTENT_TYPE, mediaType());
+    final List<CharSequence> extractHeaders(final ModulesGetResult result) {
+        return List.of(HttpHeaderNames.CONTENT_TYPE, mediaType());
     }
 
     abstract AsciiString mediaType();

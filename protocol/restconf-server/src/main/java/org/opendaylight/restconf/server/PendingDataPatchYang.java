@@ -48,8 +48,8 @@ final class PendingDataPatchYang extends PendingRequestWithOutput<DataYangPatchR
     @Override
     Response transformResult(final NettyServerRequest<?> request, final DataYangPatchResult result) {
         final var patchStatus = result.status();
-        return new FormattableDataResponse(patchResponseStatus(patchStatus), metadataHeaders(result),
-            new YangPatchStatusBody(patchStatus), acceptEncoding, request.prettyPrint());
+        return new FormattableDataResponse(patchResponseStatus(patchStatus), new YangPatchStatusBody(patchStatus),
+            acceptEncoding, request.prettyPrint(), metadataHeaders(result));
     }
 
     @Override

@@ -7,38 +7,19 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import com.google.common.annotations.Beta;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpVersion;
-import java.io.IOException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * A response to request. It can be turned into a response via {@link #toHttpResponse(HttpVersion)}.
+ * A response of a completed requests. It implements {@link CompletedRequest} by returning self from
+ * {@link #asResponse()}. It has a {@link #status()} and can be turned into (a series of) HTTP codec objects.
  */
-@Beta
 @NonNullByDefault
-public interface Response {
+public sealed interface Response extends CompletedRequest permits ReadyResponse, FiniteResponse {
     /**
-     * Return a {@link FullHttpResponse} representation of this object.
+     * Returns the response status.
      *
-     * @param alloc {@link ByteBufAllocator} to use for ByteBuf allocation
-     * @param version HTTP version to use
-     * @return a {@link FullHttpResponse}
-     * @throws IOException when an I/O error occurs
+     * @return the response status
      */
-    FullHttpResponse toHttpResponse(ByteBufAllocator alloc, HttpVersion version) throws IOException;
-
-    /**
-     * Return a {@link FullHttpResponse} representation of this object.
-     *
-     * @param version HTTP version to use
-     * @return a {@link FullHttpResponse}
-     * @throws IOException when an I/O error occurs
-     */
-    default FullHttpResponse toHttpResponse(final HttpVersion version) throws IOException {
-        return toHttpResponse(UnpooledByteBufAllocator.DEFAULT, version);
-    }
+    HttpResponseStatus status();
 }

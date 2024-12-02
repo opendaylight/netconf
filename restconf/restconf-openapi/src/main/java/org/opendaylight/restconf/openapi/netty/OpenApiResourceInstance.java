@@ -9,20 +9,22 @@ package org.opendaylight.restconf.openapi.netty;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.util.AsciiString;
 import java.io.IOException;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ExceptionRequestResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.LinkRelation;
-import org.opendaylight.netconf.transport.http.RequestResponse;
+import org.opendaylight.netconf.transport.http.Response;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
@@ -39,29 +41,18 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 final class OpenApiResourceInstance extends WebHostResourceInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenApiResourceInstance.class);
-    private static final EmptyRequestResponse OPTIONS_ONLY_METHOD_NOT_ALLOWED;
-    private static final EmptyRequestResponse OPTIONS_ONLY_OK;
-
-    static {
-        final var headers = DefaultHttpHeadersFactory.headersFactory().newHeaders()
-            .set(HttpHeaderNames.ALLOW, "OPTIONS");
-        OPTIONS_ONLY_METHOD_NOT_ALLOWED = new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
-        OPTIONS_ONLY_OK = new EmptyRequestResponse(HttpResponseStatus.OK, headers);
-    }
-
-    private static final EmptyRequestResponse GHO_METHOD_NOT_ALLOWED;
-    private static final EmptyRequestResponse GHO_OK;
-
-    static {
-        final var headers = DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
-            .set(HttpHeaderNames.ALLOW, "GET, HEAD, OPTIONS");
-        GHO_METHOD_NOT_ALLOWED = new EmptyRequestResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, headers);
-        GHO_OK = new EmptyRequestResponse(HttpResponseStatus.OK, headers);
-    }
-
-    private static final EmptyRequestResponse JSON_OK = new EmptyRequestResponse(HttpResponseStatus.OK,
-        DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
-            .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON));
+    private static final HeadersResponse OPTIONS_ONLY_METHOD_NOT_ALLOWED =
+        HeadersResponse.of(HttpResponseStatus.METHOD_NOT_ALLOWED,
+            HttpHeaderNames.ALLOW, HttpMethod.OPTIONS.asciiName());
+    private static final HeadersResponse OPTIONS_ONLY_OK =
+        new HeadersResponse(HttpResponseStatus.OK, OPTIONS_ONLY_METHOD_NOT_ALLOWED.headers());
+    private static final HeadersResponse GHO_METHOD_NOT_ALLOWED =
+        HeadersResponse.of(HttpResponseStatus.METHOD_NOT_ALLOWED,
+            HttpHeaderNames.ALLOW, AsciiString.cached("GET, HEAD, OPTIONS"));
+    private static final HeadersResponse GHO_OK =
+        new HeadersResponse(HttpResponseStatus.OK, GHO_METHOD_NOT_ALLOWED.headers());
+    private static final HeadersResponse JSON_OK = HeadersResponse.of(HttpResponseStatus.OK,
+        HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final OpenApiService service;
 
@@ -76,7 +67,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
     }
 
     @Override
-    public RequestResponse prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
+    public Response prepare(final ImplementedMethod method, final URI targetUri, final HttpHeaders headers,
             final SegmentPeeler peeler, final XRD xrd) {
         if (!peeler.hasNext()) {
             return optionsOnlyResponse(method);
@@ -86,16 +77,16 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return switch (segment) {
             case "api" -> api(method, targetUri, peeler, xrd);
             case "explorer" -> explorer(method, peeler);
-            default -> EmptyRequestResponse.NOT_FOUND;
+            default -> EmptyResponse.NOT_FOUND;
         };
     }
 
     // the /api resource
-    private RequestResponse api(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
+    private Response api(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
             final XRD xrd) {
         final var restconf = xrd.lookupLink(LinkRelation.RESTCONF);
         if (restconf == null) {
-            return EmptyRequestResponse.NOT_FOUND;
+            return EmptyResponse.NOT_FOUND;
         }
         if (!peeler.hasNext()) {
             return optionsOnlyResponse(method);
@@ -103,7 +94,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final var first = peeler.next();
         if (!first.equals("v3")) {
-            return EmptyRequestResponse.NOT_FOUND;
+            return EmptyResponse.NOT_FOUND;
         }
 
         if (!peeler.hasNext()) {
@@ -119,10 +110,9 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
                 default -> GHO_METHOD_NOT_ALLOWED;
             };
             case "single" -> single(method, targetUri, peeler);
-            case "ui" -> new EmptyRequestResponse(HttpResponseStatus.SEE_OTHER,
-                DefaultHttpHeadersFactory.headersFactory().newEmptyHeaders()
-                    .set(HttpHeaderNames.LOCATION, "/" + path() + "/explorer/index.html"));
-            default -> peeler.hasNext() ? EmptyRequestResponse.NOT_FOUND : switch (method) {
+            case "ui" -> HeadersResponse.of(HttpResponseStatus.SEE_OTHER,
+                HttpHeaderNames.LOCATION, "/" + path() + "/explorer/index.html");
+            default -> peeler.hasNext() ? EmptyResponse.NOT_FOUND : switch (method) {
                 case GET -> apiModule(targetUri, next, true);
                 case HEAD -> apiModule(targetUri, next, false);
                 case OPTIONS -> GHO_OK;
@@ -131,8 +121,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private RequestResponse apiModule(final URI targetUri, final String module,
-            final boolean withContent) {
+    private Response apiModule(final URI targetUri, final String module, final boolean withContent) {
         final var params = queryParams(targetUri);
         final var revision = params.lookup("revision");
         final var width = params.lookup("width", Integer::valueOf);
@@ -147,8 +136,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private RequestResponse apiMounts(final ImplementedMethod method, final URI targetUri,
-            final SegmentPeeler peeler) {
+    private Response apiMounts(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
         final var instanceStr = peeler.next();
         final long instance;
         try {
@@ -167,14 +155,13 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         }
 
         final var next = peeler.next();
-        return peeler.hasNext() ? EmptyRequestResponse.NOT_FOUND : switch (next) {
+        return peeler.hasNext() ? EmptyResponse.NOT_FOUND : switch (next) {
             case "meta" -> prepareMountsInstanceMeta(method, targetUri, instance);
             default -> prepareMountsInstanceModule(method, targetUri, instance, next);
         };
     }
 
-    private RequestResponse apiMount(final URI targetUri, final long instance,
-            final boolean withContent) {
+    private Response apiMount(final URI targetUri, final long instance, final boolean withContent) {
         final var params = queryParams(targetUri);
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
@@ -190,7 +177,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private RequestResponse prepareMountsInstanceMeta(final ImplementedMethod method, final URI targetUri,
+    private Response prepareMountsInstanceMeta(final ImplementedMethod method, final URI targetUri,
             final long instance) {
         return switch (method) {
             case GET -> prepareMountsInstanceMetaGet(targetUri, instance, true);
@@ -200,8 +187,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private RequestResponse prepareMountsInstanceMetaGet(final URI targetUri, final long instance,
-            final boolean withContent) {
+    private Response prepareMountsInstanceMetaGet(final URI targetUri, final long instance, final boolean withContent) {
         final var params = queryParams(targetUri);
         final var offset = params.lookup("offset", Integer::valueOf);
         final var limit = params.lookup("limit", Integer::valueOf);
@@ -215,7 +201,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private RequestResponse prepareMountsInstanceModule(final ImplementedMethod method, final URI targetUri,
+    private Response prepareMountsInstanceModule(final ImplementedMethod method, final URI targetUri,
             final long instance, final String module) {
         return switch (method) {
             case GET -> prepareMountsInstanceModuleGet(targetUri, instance, module, true);
@@ -225,8 +211,8 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private RequestResponse prepareMountsInstanceModuleGet(final URI targetUri, final long instance,
-            final String module, final boolean withContent) {
+    private Response prepareMountsInstanceModuleGet(final URI targetUri, final long instance, final String module,
+            final boolean withContent) {
         final var params = queryParams(targetUri);
         final var revision = params.lookup("revision");
         final var width = params.lookup("width", Integer::valueOf);
@@ -241,7 +227,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private RequestResponse single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
+    private Response single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
         if (!peeler.hasNext()) {
             return switch (method) {
                 case GET -> single(targetUri, true);
@@ -250,7 +236,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
                 default -> GHO_METHOD_NOT_ALLOWED;
             };
         }
-        return !peeler.next().equals("meta") || peeler.hasNext() ? EmptyRequestResponse.NOT_FOUND : switch (method) {
+        return !peeler.next().equals("meta") || peeler.hasNext() ? EmptyResponse.NOT_FOUND : switch (method) {
             case GET -> singleMeta(targetUri, true);
             case HEAD -> singleMeta(targetUri, false);
             case OPTIONS -> GHO_OK;
@@ -258,7 +244,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private RequestResponse single(final URI targetUri, final boolean withContent) {
+    private Response single(final URI targetUri, final boolean withContent) {
         final var params = queryParams(targetUri);
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
@@ -274,7 +260,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private RequestResponse singleMeta(final URI targetUri, final boolean withContent) {
+    private Response singleMeta(final URI targetUri, final boolean withContent) {
         final var params = queryParams(targetUri);
         final var offset = params.lookup("offset", Integer::valueOf);
         final var limit = params.lookup("limit", Integer::valueOf);
@@ -289,7 +275,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
     }
 
     // the /explorer resource
-    private static RequestResponse explorer(final ImplementedMethod method, final SegmentPeeler peeler) {
+    private static Response explorer(final ImplementedMethod method, final SegmentPeeler peeler) {
         var requested = QueryStringDecoder.decodeComponent(peeler.remaining());
         if (requested.isEmpty() || requested.equals("/")) {
             requested = "/index.html";
@@ -300,7 +286,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         final var resource = OpenApiResourceInstance.class.getResource(resourceName);
         if (resource == null) {
             LOG.debug("Resource '{}' not found", resourceName);
-            return EmptyRequestResponse.NOT_FOUND;
+            return EmptyResponse.NOT_FOUND;
         }
 
         LOG.debug("Found resource {} for requested {}", resource, requested);
@@ -312,7 +298,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private static EmptyRequestResponse optionsOnlyResponse(final ImplementedMethod method) {
+    private static HeadersResponse optionsOnlyResponse(final ImplementedMethod method) {
         return method == ImplementedMethod.OPTIONS ? OPTIONS_ONLY_OK :  OPTIONS_ONLY_METHOD_NOT_ALLOWED;
     }
 
