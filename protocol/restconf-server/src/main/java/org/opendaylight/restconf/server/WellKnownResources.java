@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.handler.codec.http.DefaultHttpHeadersFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -22,7 +21,8 @@ import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.CompletedRequest;
-import org.opendaylight.netconf.transport.http.EmptyRequestResponse;
+import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.LinkRelation;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -45,12 +45,10 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 final class WellKnownResources implements XRD {
     private static final Logger LOG = LoggerFactory.getLogger(WellKnownResources.class);
-    private static final EmptyRequestResponse XRD_HEAD = new EmptyRequestResponse(HttpResponseStatus.OK,
-        DefaultHttpHeadersFactory.headersFactory().newHeaders()
-            .set(HttpHeaderNames.CONTENT_TYPE, HostMeta.MEDIA_TYPE));
-    private static final EmptyRequestResponse JRD_HEAD = new EmptyRequestResponse(HttpResponseStatus.OK,
-        DefaultHttpHeadersFactory.headersFactory().newHeaders()
-            .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON));
+    private static final HeadersResponse XRD_HEAD = HeadersResponse.ofTrusted(HttpResponseStatus.OK,
+        HttpHeaderNames.CONTENT_TYPE, HostMeta.MEDIA_TYPE);
+    private static final HeadersResponse JRD_HEAD = HeadersResponse.ofTrusted(HttpResponseStatus.OK,
+        HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final Map<URI, TargetUri> links;
 
@@ -82,7 +80,7 @@ final class WellKnownResources implements XRD {
             case "/host-meta.json" -> requestJRD(method);
             default -> {
                 LOG.debug("Suffix '{}' not recognized", suffix);
-                yield EmptyRequestResponse.NOT_FOUND;
+                yield EmptyResponse.NOT_FOUND;
             }
         };
     }
