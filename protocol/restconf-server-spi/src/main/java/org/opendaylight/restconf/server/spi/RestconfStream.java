@@ -27,7 +27,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class RestconfStream<T> {
     /**
-     * An opinionated view on what values we can produce for {@link Access#getEncoding()}. The name can only be composed
+     * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
      * of one or more characters matching {@code [a-zA-Z]}.
      *
      * @param name Encoding name, as visible via the stream's {@code access} list
@@ -219,7 +218,7 @@ public final class RestconfStream<T> {
 
     private Registration registration;
 
-    RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {
+    public RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {
         this.registry = requireNonNull(registry);
         this.source = requireNonNull(source);
         this.name = requireNonNull(name);
@@ -241,7 +240,7 @@ public final class RestconfStream<T> {
      * @return Supported encodings.
      */
     @SuppressWarnings("null")
-    @NonNull Set<EncodingName> encodings() {
+    public @NonNull Set<EncodingName> encodings() {
         return source.encodings.keySet();
     }
 
