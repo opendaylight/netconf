@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "daabd18e_492ed103",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-03T13:03:37Z",
+      "side": 1,
+      "message": "not needed line",
+      "revId": "7feb8709daca9a3c0a9b32624775e64965d48383",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9c116d3_1b01dbec",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-03T13:03:37Z",
+      "side": 1,
+      "message": "FIXME with why we did this",
+      "revId": "7feb8709daca9a3c0a9b32624775e64965d48383",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
