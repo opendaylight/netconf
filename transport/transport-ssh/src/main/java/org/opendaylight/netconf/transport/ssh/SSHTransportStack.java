@@ -130,7 +130,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         // care of routing bytes between the underlay channel and SSHD's network-facing side.
         final var channel = underlayChannel.channel();
         final var ioSession = ioService.createSession(channel.localAddress());
-        channel.pipeline().addLast(ioSession.getHandler());
+        channel.pipeline().addLast(ioSession.handler());
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
         underlays.put(ioSession.getId(), underlayChannel);

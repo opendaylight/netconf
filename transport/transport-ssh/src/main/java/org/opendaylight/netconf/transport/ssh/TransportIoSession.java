@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoSession;
@@ -19,7 +19,7 @@ final class TransportIoSession extends NettyIoSession {
         super(service, handler, acceptanceAddress);
     }
 
-    ChannelHandler getHandler() {
+    ChannelInboundHandler handler() {
         return adapter;
     }
 
