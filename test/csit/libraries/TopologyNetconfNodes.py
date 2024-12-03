@@ -217,7 +217,9 @@ def get_encapsulated_payload(name, device_ipaddress, device_port):
     )
 
 
-def await_devices_connected(restconf_url, device_names, deadline_seconds):
+def await_devices_connected(
+    restconf_url, device_names, deadline_seconds, use_node_encapsulation
+):
     """Await all specified devices to become connected in NETCONF topology at specified RESTCONF URL."""
 
     info("Awaiting connection of %s", device_names)
@@ -244,7 +246,10 @@ def await_devices_connected(restconf_url, device_names, deadline_seconds):
         # Check all reported nodes
         for node in resp.json()["network-topology:topology"][0]["node"]:
             name = node["node-id"]
-            status = node["netconf-node-topology:connection-status"]
+            if use_node_encapsulation:
+                status = node["netconf-node-topology:netconf-node"]["connection-status"]
+            else:
+                status = node["netconf-node-topology:connection-status"]
             debug("Evaluating %s status %s", name, status)
 
             if name in names:
@@ -282,6 +287,7 @@ def main(args):
             restconf_url="http://127.0.0.1:8181/rests",
             deadline_seconds=5,
             device_names=args[1:],
+            use_node_encapsulation=True,
         )
     else:
         raise Exception("Unhandled argument %s" % args[0])
