@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fcd0712_2176cfdc",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-03T15:09:38Z",
+      "side": 1,
+      "message": "indentation",
+      "revId": "d64993bad7e4d263dd2ed0c853cc20026a6432da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
