@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "066e2795_29dfc435",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-03T09:27:22Z",
+      "side": 1,
+      "message": "We expect stream NETCON is available after controller start and subscribed notification feature installation.",
+      "revId": "b42b47b269408f3752525e2d82b53eb58473153e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
