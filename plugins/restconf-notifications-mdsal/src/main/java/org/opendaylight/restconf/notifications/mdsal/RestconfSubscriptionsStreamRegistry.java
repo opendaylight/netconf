@@ -10,11 +10,13 @@ package org.opendaylight.restconf.notifications.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
@@ -41,9 +43,7 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
 
     @Inject
     @Activate
-    public RestconfSubscriptionsStreamRegistry(@Reference final RestconfStream.LocationProvider locationProvider,
-            @Reference final DOMDataBroker dataBroker) {
-        super(locationProvider);
+    public RestconfSubscriptionsStreamRegistry(@Reference final DOMDataBroker dataBroker) {
         this.dataBroker = requireNonNull(dataBroker);
     }
 
@@ -61,5 +61,11 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, RFC8639_STREAMS.node(streamName));
         return tx.commit();
+    }
+
+    @Override
+    public <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final RestconfStream.Source<T> source, final String description) {
+        // TODO implement
     }
 }
