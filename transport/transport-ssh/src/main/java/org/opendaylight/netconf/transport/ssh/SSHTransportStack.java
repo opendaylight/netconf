@@ -111,9 +111,15 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     private static final Logger LOG = LoggerFactory.getLogger(SSHTransportStack.class);
 
-    // Underlay TransportChannels which do not have an open subsystem
+    // Underlay TransportChannels and their SSH Sessions. Maintained as two indices:
+    // - session ID -> TransportChannel
+    // - session ID -> Session
+    // The former is used to track transport establishment and we remove this mapping when we are about to notify
+    // user TransportChannelListener.
+    // The latter is used to track Session lifecycle as observed via above Listener
     private final Map<Long, TransportChannel> underlays = new ConcurrentHashMap<>();
     private final Map<Long, Session> sessions = new ConcurrentHashMap<>();
+
     private final TransportIoService ioService;
 
     SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
