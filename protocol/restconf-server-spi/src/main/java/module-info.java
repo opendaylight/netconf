@@ -15,7 +15,6 @@ module org.opendaylight.restconf.server.spi {
     requires transitive org.opendaylight.restconf.api;
     requires transitive org.opendaylight.restconf.server.api;
     requires org.opendaylight.netconf.api;
-    requires org.opendaylight.yang.gen.ietf.restconf.monitoring.rfc8040;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
     requires org.opendaylight.yangtools.yang.data.spi;
     requires org.opendaylight.yangtools.yang.model.export;
