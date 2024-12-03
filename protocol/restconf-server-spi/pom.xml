@@ -47,10 +47,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc8072</artifactId>
         </dependency>
         <dependency>
