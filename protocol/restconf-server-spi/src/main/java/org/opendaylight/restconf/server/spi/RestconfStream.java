@@ -214,7 +214,7 @@ public final class RestconfStream<T> {
 
     private Registration registration;
 
-    RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {
+    public RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {
         this.registry = requireNonNull(registry);
         this.source = requireNonNull(source);
         this.name = requireNonNull(name);
@@ -236,7 +236,7 @@ public final class RestconfStream<T> {
      * @return Supported encodings.
      */
     @SuppressWarnings("null")
-    @NonNull Set<EncodingName> encodings() {
+    public @NonNull Set<EncodingName> encodings() {
         return source.encodings.keySet();
     }
 
