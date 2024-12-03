@@ -16,6 +16,24 @@
       "message": "One of the tests fails because of HTTPClient maximum content length limitation that should be resolved in different patch.",
       "revId": "84105e31d1e5c051844c05e612740f7814063eb2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75393225_58ed1498",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-03T12:15:51Z",
+      "side": 1,
+      "message": "Add @Ignore with FIXME.",
+      "parentUuid": "1c11f8b4_500f65cd",
+      "revId": "84105e31d1e5c051844c05e612740f7814063eb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
