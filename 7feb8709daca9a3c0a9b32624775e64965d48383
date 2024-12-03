@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b9528f6_7c555002",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-03T13:20:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daabd18e_492ed103",
+      "revId": "7feb8709daca9a3c0a9b32624775e64965d48383",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9c116d3_1b01dbec",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-12-03T13:03:37Z",
       "side": 1,
       "message": "FIXME with why we did this",
+      "revId": "7feb8709daca9a3c0a9b32624775e64965d48383",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbc17ea7_20f99db3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-03T13:20:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9c116d3_1b01dbec",
       "revId": "7feb8709daca9a3c0a9b32624775e64965d48383",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
