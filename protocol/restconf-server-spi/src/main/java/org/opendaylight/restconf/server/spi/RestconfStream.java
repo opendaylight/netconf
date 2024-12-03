@@ -171,9 +171,6 @@ public final class RestconfStream<T> {
          */
         <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
-
-        //FIXME: Restore to be protected
-        @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
@@ -219,7 +216,7 @@ public final class RestconfStream<T> {
 
     private Registration registration;
 
-    RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {
+    public RestconfStream(final AbstractRestconfStreamRegistry registry, final Source<T> source, final String name) {
         this.registry = requireNonNull(registry);
         this.source = requireNonNull(source);
         this.name = requireNonNull(name);
@@ -241,7 +238,7 @@ public final class RestconfStream<T> {
      * @return Supported encodings.
      */
     @SuppressWarnings("null")
-    @NonNull Set<EncodingName> encodings() {
+    public @NonNull Set<EncodingName> encodings() {
         return source.encodings.keySet();
     }
 
