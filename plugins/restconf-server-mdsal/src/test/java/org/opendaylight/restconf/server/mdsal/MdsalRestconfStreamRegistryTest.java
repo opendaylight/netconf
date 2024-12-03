@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.spi;
+package org.opendaylight.restconf.server.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,9 +20,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 
 /**
- * Unit tests for {@link AbstractRestconfStreamRegistry}.
+ * Unit tests for {@link MdsalRestconfStreamRegistry}.
  */
-class AbstractRestconfStreamRegistryTest {
+class MdsalRestconfStreamRegistryTest {
     @Test
     void toStreamEntryNodeTest() throws Exception {
         final var outputType = "XML";
@@ -30,7 +30,7 @@ class AbstractRestconfStreamRegistryTest {
         final var streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         assertMappedData(prepareMap(streamName, uri, outputType),
-            AbstractRestconfStreamRegistry.streamEntry(streamName, "description", "location",
+            MdsalRestconfStreamRegistry.streamEntry(streamName, "description", "location",
                 Set.of(new EncodingName(outputType))));
     }
 
@@ -40,16 +40,16 @@ class AbstractRestconfStreamRegistryTest {
         final var uri = "uri";
 
         assertMappedData(prepareMap("notifi", uri, outputType),
-            AbstractRestconfStreamRegistry.streamEntry("notifi", "description", "location",
+            MdsalRestconfStreamRegistry.streamEntry("notifi", "description", "location",
                 Set.of(new EncodingName(outputType))));
     }
 
     private static Map<QName, Object> prepareMap(final String name, final String uri, final String outputType) {
         return Map.of(
-            AbstractRestconfStreamRegistry.NAME_QNAME, name,
-            AbstractRestconfStreamRegistry.LOCATION_QNAME, uri,
-            AbstractRestconfStreamRegistry.ENCODING_QNAME, outputType,
-            AbstractRestconfStreamRegistry.DESCRIPTION_QNAME, "description");
+            MdsalRestconfStreamRegistry.NAME_QNAME, name,
+            MdsalRestconfStreamRegistry.LOCATION_QNAME, uri,
+            MdsalRestconfStreamRegistry.ENCODING_QNAME, outputType,
+            MdsalRestconfStreamRegistry.DESCRIPTION_QNAME, "description");
     }
 
     private static void assertMappedData(final Map<QName, Object> map, final MapEntryNode mappedData) {
