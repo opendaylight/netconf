@@ -14,17 +14,12 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.net.URI;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.server.api.ServerException;
-import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
-import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -51,55 +46,21 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
 
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final RestconfStream.LocationProvider locationProvider;
-
-    protected AbstractRestconfStreamRegistry(final RestconfStream.LocationProvider locationProvider) {
-        this.locationProvider = requireNonNull(locationProvider);
-    }
 
     @Override
     public final @Nullable RestconfStream<?> lookupStream(final String name) {
         return streams.get(requireNonNull(name));
     }
 
-    @Override
-    public final <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
-            final Source<T> source, final String description) {
-        final var baseStreamLocation = locationProvider.baseStreamLocation(restconfURI);
-        final var stream = allocateStream(source);
-        final var name = stream.name();
-        if (description.isBlank()) {
-            throw new IllegalArgumentException("Description must be descriptive");
-        }
-
-        Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation.toString(),
-            stream.encodings())), new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(final Object result) {
-                    LOG.debug("Stream {} added", name);
-                    request.completeWith(stream);
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    LOG.debug("Failed to add stream {}", name, cause);
-                    streams.remove(name, stream);
-                    request.completeWith(new ServerException("Failed to allocate stream " + name, cause));
-                }
-            }, MoreExecutors.directExecutor());
+    protected RestconfStream<?> registerStream(final String name, final RestconfStream<?> stream) {
+        return streams.putIfAbsent(name, stream);
     }
 
-    private <T> RestconfStream<T> allocateStream(final Source<T> source) {
-        String name;
-        RestconfStream<T> stream;
-        do {
-            // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
-            // it into UUID URN namespace as defined by RFC4122
-            name = "urn:uuid:" + UUID.randomUUID().toString();
-            stream = new RestconfStream<>(this, source, name);
-        } while (streams.putIfAbsent(name, stream) != null);
+    // FIXME remake into protected
+    public abstract @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
 
-        return stream;
+    protected void unregisterStream(final String name, final RestconfStream<?> stream) {
+        streams.remove(name, stream);
     }
 
     /**
