@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7739b05_d710988a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-12-03T16:31:03Z",
+      "side": 1,
+      "message": "do we really need this? why isn\u0027t observing user-supplied listener not enough?",
+      "range": {
+        "startLine": 72,
+        "startChar": 5,
+        "endLine": 72,
+        "endChar": 22
+      },
+      "revId": "12bdb3a6cfd706bcc21f3966e3a5d9bfe68c5c4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f54f1c8_ffe02fec",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-12-03T16:31:03Z",
+      "side": 1,
+      "message": "nope, the caller has to always supply a reason -- it has more information...",
+      "range": {
+        "startLine": 168,
+        "startChar": 53,
+        "endLine": 168,
+        "endChar": 84
+      },
+      "revId": "12bdb3a6cfd706bcc21f3966e3a5d9bfe68c5c4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c527b7a_0296e1b5",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-12-03T16:31:03Z",
+      "side": 1,
+      "message": "... and therefore it can supply a proper explanation rather than this generic thing",
+      "range": {
+        "startLine": 176,
+        "startChar": 45,
+        "endLine": 176,
+        "endChar": 106
+      },
+      "revId": "12bdb3a6cfd706bcc21f3966e3a5d9bfe68c5c4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
