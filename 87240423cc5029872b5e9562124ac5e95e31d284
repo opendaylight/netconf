@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42b8f385_805a7495",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-04T16:10:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3aeb3849_6087e26e",
+      "revId": "87240423cc5029872b5e9562124ac5e95e31d284",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fb13307_0a752ca4",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca7d71c0_ecdf5b32",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-04T16:10:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fb13307_0a752ca4",
+      "revId": "87240423cc5029872b5e9562124ac5e95e31d284",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42c1a7a2_5510db6f",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-12-04T15:52:31Z",
       "side": 1,
       "message": "can be private",
+      "revId": "87240423cc5029872b5e9562124ac5e95e31d284",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "645c51b4_383ebecd",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/StateTransitionTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-04T16:10:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42c1a7a2_5510db6f",
       "revId": "87240423cc5029872b5e9562124ac5e95e31d284",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
