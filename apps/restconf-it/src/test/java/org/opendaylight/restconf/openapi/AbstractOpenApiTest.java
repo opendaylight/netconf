@@ -22,6 +22,8 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.ssl.SslContextBuilder;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -29,16 +31,19 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
@@ -49,6 +54,16 @@ import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
+import org.opendaylight.netconf.client.SslContextFactory;
+import org.opendaylight.netconf.client.mdsal.DeviceActionFactoryImpl;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
+import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
+import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
@@ -66,6 +81,7 @@ import org.opendaylight.restconf.server.SimpleNettyEndpoint;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
+import org.opendaylight.restconf.server.netty.NullAAAEncryptionService;
 import org.opendaylight.restconf.server.netty.TestRequestCallback;
 import org.opendaylight.restconf.server.netty.TestTransportChannelListener;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -75,15 +91,23 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "pa$$w0Rd";
+    private static final String TOPOLOGY_URI =
+        "/rests/data/network-topology:network-topology/topology=topology-netconf";
+    private static final String DEVICE_NODE_URI = TOPOLOGY_URI + "/node=device-sim";
+    private static final String DEVICE_STATUS_URI =
+        DEVICE_NODE_URI + "/netconf-node-topology:netconf-node?fields=connection-status";
 
+    protected static final String DEVICE_USERNAME = "device-username";
+    protected static final String DEVICE_PASSWORD = "device-password";
+    protected static final String USERNAME = "username";
+    protected static final String PASSWORD = "pa$$w0Rd";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String RESTS = "rests";
     protected static final String API_V3_PATH = "/openapi/api/v3";
@@ -103,9 +127,11 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     protected HttpClientStackGrouping clientStackGrouping;
     protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
+    protected String host;
     protected int port;
 
-    private String host;
+    @TempDir
+    private File tmpDir;
     private SimpleNettyEndpoint endpoint;
 
     @BeforeAll
@@ -250,11 +276,85 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         return request;
     }
 
+    protected void mountDeviceJson(final int devicePort) throws Exception {
+        // validate topology node is defined
+        assertContentJson(TOPOLOGY_URI,
+            """
+                {
+                    "network-topology:topology": [{
+                        "topology-id":"topology-netconf"
+                    }]
+                }""");
+        final var input = """
+            {
+               "network-topology:node": [{
+                   "node-id": "device-sim",
+                   "netconf-node-topology:netconf-node": {
+                       "host": "%s",
+                       "port": %d,
+                       "login-password-unencrypted": {
+                           "username": "%s",
+                           "password": "%s"
+                       },
+                       "tcp-only": false
+                   }
+               }]
+            }
+            """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
+        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
+        assertEquals(HttpResponseStatus.CREATED, response.status());
+        // wait till connected
+        await().atMost(Duration.ofSeconds(50)).pollInterval(Duration.ofMillis(500))
+            .until(this::deviceConnectedJson);
+    }
+
+    private boolean deviceConnectedJson() throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        //{
+        //  "netconf-node-topology:netconf-node": {
+        //    "connection-status": "connected"
+        //  }
+        //}
+        final var status = json.getJSONObject("netconf-node-topology:netconf-node").getString("connection-status");
+        return "connected".equals(status);
+    }
+
     protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
         final var response = invokeRequest(HttpMethod.GET, getRequestUri);
         assertEquals(HttpResponseStatus.OK, response.status());
         final var content = response.content().toString(StandardCharsets.UTF_8);
         JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
+    }
+
+    NetconfTopologyImpl setupTopology() {
+        final var dataBroker = getDataBroker();
+        final var netconfTimer = new DefaultNetconfTimer();
+        final var encryptionService = new NullAAAEncryptionService();
+        final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
+            id -> null, sslContextFactoryProvider());
+        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
+        final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(1, 4, 1L, TimeUnit.MINUTES);
+        final var yangParserFactory = new DefaultYangParserFactory();
+        final var schemaSourceMgr =
+            new DefaultSchemaResourceManager(yangParserFactory, tmpDir.getAbsolutePath(), "schema");
+        final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(yangParserFactory);
+
+        return new NetconfTopologyImpl(netconfClientFactory, netconfTimer, topologySchemaAssembler,
+            schemaSourceMgr, dataBroker, domMountPointService, encryptionService, netconfClientConfBuilderFactory,
+            rpcProviderService, baseSchemaProvider, new DeviceActionFactoryImpl());
+    }
+
+    private static SslContextFactoryProvider sslContextFactoryProvider() {
+        // no TLS used in test -- provide default non-empty
+        return specification -> (SslContextFactory) allowedKeys -> {
+            try {
+                return SslContextBuilder.forClient().build();
+            } catch (SSLException e) {
+                throw new IllegalStateException(e);
+            }
+        };
     }
 
     /**
