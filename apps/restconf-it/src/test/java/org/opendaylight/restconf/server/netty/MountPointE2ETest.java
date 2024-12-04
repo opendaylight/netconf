@@ -334,7 +334,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         deviceSimulator.start();
     }
 
-    private void mountDeviceJson() throws Exception {
+    void mountDeviceJson() throws Exception {
         // validate topology node is defined
         assertContentJson(TOPOLOGY_URI,
             """
