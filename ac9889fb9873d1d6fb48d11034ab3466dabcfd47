@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "321da646_95cbb3f3",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-12-04T11:02:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "995dccd2_05adad3f",
+      "revId": "ac9889fb9873d1d6fb48d11034ab3466dabcfd47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2386191a_748651fc",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33d311e7_6d941f7d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-12-04T11:02:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2386191a_748651fc",
+      "revId": "ac9889fb9873d1d6fb48d11034ab3466dabcfd47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b33a974_1506854f",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-12-04T08:08:18Z",
       "side": 1,
       "message": "We do not support replay",
+      "revId": "ac9889fb9873d1d6fb48d11034ab3466dabcfd47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8509f5b6_b6b84338",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-12-04T11:02:01Z",
+      "side": 1,
+      "message": "Without this we get \"Node stream is missing mandatory descendant replay-log-creation-time\" error",
+      "parentUuid": "0b33a974_1506854f",
       "revId": "ac9889fb9873d1d6fb48d11034ab3466dabcfd47",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
