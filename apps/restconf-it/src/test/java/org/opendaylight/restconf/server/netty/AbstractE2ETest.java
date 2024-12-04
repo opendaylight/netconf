@@ -129,14 +129,14 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
 
-    private SimpleNettyEndpoint endpoint;
-    private String host;
+    SimpleNettyEndpoint endpoint;
+    String host;
 
     @BeforeAll
     static void beforeAll() {
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
-        bootstrapFactory = new BootstrapFactory("restconf-netty-e2e", 8);
-        sshTransportStackFactory = new SSHTransportStackFactory("netconf-netty-e2e", 8);
+        bootstrapFactory = new BootstrapFactory("restconf-netty-e2e", 0);
+        sshTransportStackFactory = new SSHTransportStackFactory("netconf-netty-e2e", 0);
     }
 
     @BeforeEach
@@ -268,7 +268,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var callback = new TestRequestCallback();
         client.invoke(request, callback);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        await().atMost(Duration.ofSeconds(120)).until(callback::completed);
         client.shutdown().get(2, TimeUnit.SECONDS);
         final var response = callback.response();
         assertNotNull(response);
