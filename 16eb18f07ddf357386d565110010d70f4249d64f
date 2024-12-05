@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "16eb18f07ddf357386d565110010d70f4249d64f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edf65ec9_cf6fd2e7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T13:46:23Z",
+      "side": 1,
+      "message": "User has no option to get subscription without dealing with exceptions. This tends to managing application flow by exceptions - which is considered to be bad practice.",
+      "revId": "16eb18f07ddf357386d565110010d70f4249d64f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
