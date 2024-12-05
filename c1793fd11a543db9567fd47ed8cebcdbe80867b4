@@ -67,6 +67,23 @@
       "message": "IMO we are not going to parse filter here, just reference it.",
       "revId": "c1793fd11a543db9567fd47ed8cebcdbe80867b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2892605b_e839510e",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/KillSubscriptionRpc.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T15:31:50Z",
+      "side": 1,
+      "message": "IMO the correctness of state transition can be completely help by state machine.",
+      "revId": "c1793fd11a543db9567fd47ed8cebcdbe80867b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
