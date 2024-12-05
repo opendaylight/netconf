@@ -33,6 +33,23 @@
       "message": "..., missing final, I do not care, why do so?",
       "revId": "c1793fd11a543db9567fd47ed8cebcdbe80867b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d35de4e9_4837ae15",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T15:28:14Z",
+      "side": 1,
+      "message": "IIRC when there is no stream specified, default NETCONF stream is used.",
+      "revId": "c1793fd11a543db9567fd47ed8cebcdbe80867b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
