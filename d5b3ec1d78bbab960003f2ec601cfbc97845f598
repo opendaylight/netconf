@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0e820c5b_b8daf6c7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T15:36:29Z",
+      "side": 1,
+      "message": "{} is not correct convention for String#format, see docs",
+      "revId": "d5b3ec1d78bbab960003f2ec601cfbc97845f598",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d367cf85_fcc25c41",
         "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/StateTransitionTest.java",
         "patchSetId": 22
