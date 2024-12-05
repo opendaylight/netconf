@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e351b759_a305276e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T14:07:30Z",
+      "side": 1,
+      "message": "Yes, we have to deal with removeStream as well - not only with createStream. See build logs.",
+      "revId": "f39f916fba4d5a540ab418aa4a56def09608c476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
