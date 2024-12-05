@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fb7c3b6b_9af73ebf",
+        "filename": "apps/restconf-subscription/pom.xml",
+        "patchSetId": 30
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T15:20:43Z",
+      "side": 1,
+      "message": "Why we are using API as test dependency?",
+      "revId": "c1793fd11a543db9567fd47ed8cebcdbe80867b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "53671bfe_00dc5794",
         "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
         "patchSetId": 30
