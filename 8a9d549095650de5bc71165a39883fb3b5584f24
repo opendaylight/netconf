@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45b63aa7_0d34e6b5",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-05T15:12:14Z",
+      "side": 1,
+      "message": "I have found no error-id in RFC 8639. But, for example, subscription-terminated has an reason leaf.",
+      "revId": "8a9d549095650de5bc71165a39883fb3b5584f24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
