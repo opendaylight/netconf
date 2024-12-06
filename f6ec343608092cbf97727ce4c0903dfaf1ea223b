@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4390f9ac_4cae603d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/ContextListener.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ecc65396_2cc93d87",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72d500a2_f9e1adb0",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ac72b94_b63bfba3",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/ContextListener.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72d500a2_f9e1adb0",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f509fea8_7c532f80",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-12-06T14:11:42Z",
       "side": 1,
       "message": "Wrong package",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05cbf08d_99609e93",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f509fea8_7c532f80",
       "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +140,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc84b1b6_dd763ea2",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e2f3db5_430b6ec7",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fe1a145_f035f9b3",
@@ -99,6 +171,24 @@
       "writtenOn": "2024-12-06T14:11:42Z",
       "side": 1,
       "message": "Wrong package",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b97e91df_ea205453",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fe1a145_f035f9b3",
       "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -122,6 +212,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6570cb41_da5919b6",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "I have reworked it - but it does not work. Can you fix please?",
+      "parentUuid": "4b75ba78_68664945",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6974e653_4d0cee0d",
         "filename": "plugins/restconf-notifications-mdsal/pom.xml",
         "patchSetId": 20
@@ -133,6 +241,24 @@
       "writtenOn": "2024-12-06T14:11:42Z",
       "side": 1,
       "message": "Try to organize dependencies in alphabetical order",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a00f8b7e_6ec08753",
+        "filename": "plugins/restconf-notifications-mdsal/pom.xml",
+        "patchSetId": 20
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6974e653_4d0cee0d",
       "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
