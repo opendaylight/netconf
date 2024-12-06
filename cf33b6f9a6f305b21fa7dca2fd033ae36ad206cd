@@ -16,6 +16,24 @@
       "message": "You can create NETCONF stream when service starts, write it to mdsal.\nYou can even use DatabindProvider to populate first notifications registred as in NotificationSource class (if ContextListener in not yet active).\n\nThen try to update DefaultNotificationSource within stream on model context changes.\n\nIf needed you can even stop previous one using sink.endOfStream() in Registration start(final Sink\u003cDOMNotification\u003e sink) method.",
       "revId": "cf33b6f9a6f305b21fa7dca2fd033ae36ad206cd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2523af3_df359b66",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-12-06T08:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aac83bbb_7ad60526",
+      "revId": "cf33b6f9a6f305b21fa7dca2fd033ae36ad206cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
