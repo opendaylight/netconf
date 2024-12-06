@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecc65396_2cc93d87",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/ContextListener.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "Wrong package",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72d500a2_f9e1adb0",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/ContextListener.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "Not needed empty line",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f509fea8_7c532f80",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "Wrong package",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a482dfc_161252ae",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "This docs belongs to another class - NetconfStream?",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e2f3db5_430b6ec7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "final",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fe1a145_f035f9b3",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "Wrong package",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b75ba78_68664945",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "RestconfSubscriptionsStreamRegistry should be referenced by OSGI",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6974e653_4d0cee0d",
+        "filename": "plugins/restconf-notifications-mdsal/pom.xml",
+        "patchSetId": 20
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-06T14:11:42Z",
+      "side": 1,
+      "message": "Try to organize dependencies in alphabetical order",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
