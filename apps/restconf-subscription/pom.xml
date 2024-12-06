@@ -72,12 +72,6 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-notifications-mdsal</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-api</artifactId>
-            <type>test-jar</type>
-        </dependency>
     </dependencies>
 
     <build>
