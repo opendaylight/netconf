@@ -284,7 +284,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             .set(HttpHeaderNames.HOST, host)
             .set(HttpHeaderNames.ACCEPT, acceptType != null ? acceptType : mediaType)
             .set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
-        if (method != HttpMethod.GET) {
+        if (method != HttpMethod.GET && method != HttpMethod.HEAD) {
             request.headers().set(HttpHeaderNames.CONTENT_TYPE, mediaType);
         }
         return request;
