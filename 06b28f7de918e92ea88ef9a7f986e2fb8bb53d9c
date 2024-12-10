@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59f207d2_0fe8283f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractFiniteResponse.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-12-10T18:45:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa1a7ac9_3ee469dd",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 13
+      },
+      "revId": "06b28f7de918e92ea88ef9a7f986e2fb8bb53d9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f44a644b_e4f18110",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75ab02ce_7d6f3eb0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ByteStreamRequestResponse.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-12-10T18:45:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f44a644b_e4f18110",
+      "range": {
+        "startLine": 19,
+        "startChar": 3,
+        "endLine": 19,
+        "endChar": 4
+      },
+      "revId": "06b28f7de918e92ea88ef9a7f986e2fb8bb53d9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "637463a0_61e90253",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-12-10T18:35:37Z",
       "side": 1,
       "message": "do not override",
+      "range": {
+        "startLine": 20,
+        "startChar": 4,
+        "endLine": 20,
+        "endChar": 31
+      },
+      "revId": "06b28f7de918e92ea88ef9a7f986e2fb8bb53d9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34e83ee9_240fd5e4",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Response.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-12-10T18:45:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "637463a0_61e90253",
       "range": {
         "startLine": 20,
         "startChar": 4,
