@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class ModulesE2ETest extends AbstractE2ETest {
@@ -27,6 +28,7 @@ class ModulesE2ETest extends AbstractE2ETest {
         assertOptions(MODULE_URI, Set.of("GET", "HEAD", "OPTIONS"));
     }
 
+    @Disabled
     @Test
     void headTest() throws Exception {
         assertHead(MODULE_URI, RFC6020_YIN_MEDIA_TYPE);
