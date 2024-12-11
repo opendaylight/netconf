@@ -57,6 +57,7 @@ public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
         startDeviceSimulator();
         mountDeviceJson(devicePort);
         final var client = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
             .authenticator(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -74,8 +75,7 @@ public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
             .timeout(Duration.ofMinutes(5))
             .build(), HttpResponse.BodyHandlers.discarding());
         assertEquals(200, headers.statusCode());
-        // Mainly here to verify there is some large data in the response, the exact length is not that important
-        assertEquals("1357417988", headers.headers().firstValue("content-length").orElseThrow());
+        assertEquals("chunked", headers.headers().firstValue("Transfer-Encoding").orElseThrow());
 
         final var response = client.send(HttpRequest.newBuilder()
             .GET()

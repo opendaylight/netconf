@@ -76,7 +76,7 @@ public final class HostMetaJson extends AbstractHostMeta {
     }
 
     @Override
-    protected AsciiString mediaType() {
+    public AsciiString mediaType() {
         return HttpHeaderValues.APPLICATION_JSON;
     }
 
