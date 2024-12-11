@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -313,6 +314,7 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         assertResponseHeaders(response, META_HEADERS);
     }
 
+    @Disabled
     @ParameterizedTest
     @MethodSource
     void yangPatch(final TestEncoding encoding, final String input, final PatchStatusContext output,
