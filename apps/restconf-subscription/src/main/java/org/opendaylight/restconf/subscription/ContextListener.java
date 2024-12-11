@@ -9,9 +9,6 @@ package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -48,7 +45,7 @@ final class ContextListener implements Registration {
         this.streamRegistry = streamRegistry;
         notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
 
-        addStream();
+        streamRegistry.createStream(null, null, notificationSource, DESCRIPTION);
         registration = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
 
@@ -58,25 +55,7 @@ final class ContextListener implements Registration {
         }
         notificationSource = new DefaultNotificationSource(notificationService, context);
 
-        // FIXME after replace by #createStream use updated notificationSource for new stream
-        addStream();
-    }
-
-    public void addStream() {
-        // write NETCONF stream to datastore
-        // FIXME replace by correct override of #createStream
-        Futures.addCallback(streamRegistry.putStream(streamEntry()),
-            new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(final Object result) {
-                    LOG.debug("Stream {} added", NAME);
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    LOG.error("Failed to add stream {}", NAME, cause);
-                }
-            }, MoreExecutors.directExecutor());
+        streamRegistry.createStream(null, null, notificationSource, DESCRIPTION);
     }
 
     public static @NonNull MapEntryNode streamEntry() {
