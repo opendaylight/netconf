@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.UUID;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNull;
@@ -60,14 +61,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      *
      * @param stream Stream to remove
      */
-    final void removeStream(final RestconfStream<?> stream) {
+    public void removeStream(final RestconfStream<?> stream) {
         // Defensive check to see if we are still tracking the stream
         final var name = stream.name();
         if (streams.get(name) != stream) {
             LOG.warn("Stream {} does not match expected instance {}, skipping datastore update", name, stream);
             return;
         }
-
+        // FIXME: NAME_QNAME is wrong for RestconfSubscriptionsStreamRegistry
         Futures.addCallback(deleteStream(NodeIdentifierWithPredicates.of(streamQname, nameQname, name)),
             new FutureCallback<Object>() {
                 @Override
