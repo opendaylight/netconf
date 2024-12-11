@@ -8,15 +8,13 @@
 package org.opendaylight.restconf.subscription;
 
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.io.Closeable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -53,21 +51,11 @@ public final class NetconfStream implements Closeable {
     @Activate
     public NetconfStream(@Reference final DOMSchemaService schemaService,
             @Reference final DOMNotificationService notificationService,
+            @Reference final DatabindProvider databindProvider,
             @Reference final RestconfStream.Registry streamRegistry) {
         // write NETCONF stream to datastore
-        // FIXME replace by correct override of #createStream
-        Futures.addCallback(streamRegistry.putStream(streamEntry()),
-            new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(final Object result) {
-                    LOG.debug("Stream {} added", NAME);
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    LOG.error("Failed to add stream {}", NAME, cause);
-                }
-            }, MoreExecutors.directExecutor());
+        final var source = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
+        streamRegistry.createStream(null, null, source, DESCRIPTION);
 
         // start listener on model context change
         contextListenerReg = new ContextListener(notificationService, schemaService);
