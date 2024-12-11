@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3074b21f_fc37ed00",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Response.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-11T09:02:53Z",
+      "side": 1,
+      "message": "I would expect:\n    default ReadyResponse asResponse() {\n        return this;\n    }\n    \nto be here instead of being located in its subclasses.",
+      "revId": "bf3f601fbac169a267006d29443e50276b2dff90",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
