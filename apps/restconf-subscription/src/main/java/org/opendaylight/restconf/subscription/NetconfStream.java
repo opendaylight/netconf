@@ -56,6 +56,28 @@ public final class NetconfStream implements Closeable {
             @Reference final RestconfStream.Registry streamRegistry) {
         // write NETCONF stream to datastore
         // FIXME replace by correct override of #createStream
+//        streamRegistry.createStream(new AbstractServerRequest<RestconfStream<>>(QueryParameters.of(), PrettyPrintParam.TRUE) {
+//
+//            @Override
+//            protected void onFailure(@NonNull YangErrorsBody errors) {
+//
+//            }
+//
+//            @Override
+//            public @Nullable Principal principal() {
+//                return null;
+//            }
+//
+//            @Override
+//            public @Nullable TransportSession session() {
+//                return null;
+//            }
+//
+//            @Override
+//            public void completeWith(ErrorTag errorTag, FormattableBody body) {
+//
+//            }
+//        }, );
         Futures.addCallback(streamRegistry.putStream(streamEntry()),
             new FutureCallback<Object>() {
                 @Override
