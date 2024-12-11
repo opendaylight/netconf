@@ -10,19 +10,21 @@ package org.opendaylight.netconf.transport.http.rfc6415;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
+import java.io.IOException;
+import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.http.ByteBufResponse;
-import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
+import org.opendaylight.netconf.transport.http.AbstractFiniteResponse;
+import org.opendaylight.netconf.transport.http.ResponseOutput;
 import org.opendaylight.netconf.transport.http.WellKnownURI;
 
 /**
  * Abstract based class for {@link HostMeta} and {@link HostMetaJson}.
  */
 @NonNullByDefault
-public abstract sealed class AbstractHostMeta extends ByteStreamRequestResponse implements WellKnownURI.Suffix
+public abstract sealed class AbstractHostMeta extends AbstractFiniteResponse implements WellKnownURI.Suffix
         permits HostMeta, HostMetaJson {
     final XRD xrd;
 
@@ -32,11 +34,15 @@ public abstract sealed class AbstractHostMeta extends ByteStreamRequestResponse 
     }
 
     @Override
-    protected final ByteBufResponse toReadyResponse(final ByteBuf content) {
-        return new ByteBufResponse(status(), content, mediaType());
+    public final void writeTo(final ResponseOutput output) throws IOException {
+        try (var out = output.start(status(), HttpHeaderNames.CONTENT_TYPE, mediaType())) {
+            writeBody(out);
+        }
     }
 
-    protected abstract AsciiString mediaType();
+    abstract AsciiString mediaType();
+
+    abstract void writeBody(OutputStream out) throws IOException;
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
