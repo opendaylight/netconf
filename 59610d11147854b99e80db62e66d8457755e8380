@@ -93,6 +93,30 @@
       },
       "revId": "59610d11147854b99e80db62e66d8457755e8380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71ac1d16_23567c27",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-12-11T14:14:26Z",
+      "side": 1,
+      "message": "From last testing and provided LOG with enabled SSH DEBUG level. I found that sessionDisconnection is also possible and may cause connecting issues if TransportCahnnel is not ready.\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1423?focusedCommentId\u003d45290\n\n```\n2024-12-07T20:52:19,256 | DEBUG | odl-netconf-client-3 | SSHTransportStack                | 296 - org.opendaylight.netconf.transport-ssh - 9.0.0.202412071714 | Session 1 disconnected: SSH2_DISCONNECT_BY_APPLICATION\n```\n\nThat\u0027s why I have reverted this change.",
+      "parentUuid": "71170eb6_db77cddf",
+      "range": {
+        "startLine": 72,
+        "startChar": 12,
+        "endLine": 72,
+        "endChar": 27
+      },
+      "revId": "59610d11147854b99e80db62e66d8457755e8380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
