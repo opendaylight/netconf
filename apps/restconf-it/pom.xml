@@ -303,9 +303,8 @@
                 <configuration>
                     <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
                     <trimStackTrace>false</trimStackTrace>
-                    <!-- FIXME: should be -Xmx2g when NETCONF-1431 is fixed -->
                     <!-- Limits memory, so we can verify Junos can be loaded in 2GiB environments. -->
-                    <argLine>-Xmx3g</argLine>
+                    <argLine>-Xmx2g</argLine>
                 </configuration>
             </plugin>
         </plugins>
