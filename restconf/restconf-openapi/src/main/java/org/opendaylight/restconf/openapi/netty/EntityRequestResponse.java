@@ -10,19 +10,21 @@ package org.opendaylight.restconf.openapi.netty;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import java.io.IOException;
-import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.http.ByteBufResponse;
-import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
+import org.opendaylight.netconf.transport.http.AbstractFiniteResponse;
+import org.opendaylight.netconf.transport.http.ResponseOutput;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 
 @NonNullByDefault
-final class EntityRequestResponse extends ByteStreamRequestResponse {
+final class EntityRequestResponse extends AbstractFiniteResponse {
     private static final JsonFactory FACTORY = JsonFactory.builder().build();
+    private static final ReadOnlyHttpHeaders HEADERS =
+        new ReadOnlyHttpHeaders(false, HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final OpenApiEntity entity;
 
@@ -32,14 +34,11 @@ final class EntityRequestResponse extends ByteStreamRequestResponse {
     }
 
     @Override
-    protected ByteBufResponse toReadyResponse(final ByteBuf content) {
-        return new ByteBufResponse(status(), content, HttpHeaderValues.APPLICATION_JSON);
-    }
-
-    @Override
-    protected void writeBody(final OutputStream out) throws IOException {
-        final var generator = FACTORY.createGenerator(out);
-        entity.generate(generator);
-        generator.flush();
+    public void writeTo(final ResponseOutput output) throws IOException {
+        try (var out = output.start(status(), HEADERS)) {
+            final var generator = FACTORY.createGenerator(out);
+            entity.generate(generator);
+            generator.flush();
+        }
     }
 }

@@ -9,24 +9,19 @@ package org.opendaylight.restconf.openapi.netty;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.util.AsciiString;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.http.ByteBufResponse;
-import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
-import org.opendaylight.netconf.transport.http.HeadersResponse;
-import org.opendaylight.netconf.transport.http.ReadyResponse;
+import org.opendaylight.netconf.transport.http.AbstractFiniteResponse;
+import org.opendaylight.netconf.transport.http.ResponseOutput;
 
 @NonNullByDefault
-final class URLRequestResponse extends ByteStreamRequestResponse {
+final class URLRequestResponse extends AbstractFiniteResponse {
     private final URL url;
     private final boolean withContent;
 
@@ -37,21 +32,16 @@ final class URLRequestResponse extends ByteStreamRequestResponse {
     }
 
     @Override
-    protected ReadyResponse toReadyResponse(final ByteBuf content) {
+    public void writeTo(final ResponseOutput output) throws IOException {
         final var mediaType = URLConnection.guessContentTypeFromName(url.getFile());
         final var contentType = mediaType != null ? AsciiString.of(mediaType)
             : HttpHeaderValues.APPLICATION_OCTET_STREAM;
-        return withContent ? new ByteBufResponse(status(), content, contentType)
-            : new HeadersResponse(status(), new ReadOnlyHttpHeaders(false,
-                HttpHeaderNames.CONTENT_TYPE, contentType,
-                HttpHeaderNames.CONTENT_LENGTH, String.valueOf(content.readableBytes())));
-    }
 
-    @Override
-    protected void writeBody(final OutputStream out) throws IOException {
-        if (withContent) {
-            try (var in = url.openStream()) {
-                in.transferTo(out);
+        try (var out = output.start(status(), HttpHeaderNames.CONTENT_TYPE, contentType)) {
+            if (withContent) {
+                try (var in = url.openStream()) {
+                    in.transferTo(out);
+                }
             }
         }
     }
