@@ -12,18 +12,23 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -86,6 +91,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
+    private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme) {
         super(FullHttpRequest.class, false);
@@ -97,6 +103,13 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
+
+        if (ctx.pipeline().get(ResponseWriter.class) == null) {
+            responseWriter = new ResponseWriter();
+            ctx.pipeline().addBefore(ctx.name(), "responseWriter", responseWriter);
+        } else {
+            responseWriter = ctx.pipeline().get(ResponseWriter.class);
+        }
     }
 
     @Override
@@ -262,5 +275,22 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             response.headers().setInt(STREAM_ID, streamId);
         }
         ctx.writeAndFlush(response);
+    }
+
+    boolean sendResponseStart(final HttpResponseStatus status, final ReadOnlyHttpHeaders headers) {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            return true;
+        }
+        return responseWriter.sendResponseStart(status, headers);
+    }
+
+    boolean sendResponsePart(ByteBuf chunk) {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            chunk.release();
+            return true;
+        }
+        return responseWriter.sendResponsePart(chunk);
     }
 }
