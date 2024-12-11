@@ -34,6 +34,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
@@ -102,6 +103,10 @@ class AbstractRequestProcessorTest {
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         session.handlerAdded(ctx);
         doReturn(null).when(principalService).acquirePrincipal(any());
+    }
+
+    void mockSession() {
+        doReturn(session).when(pipeline).get(HTTPServerSession.class);
     }
 
     @SuppressWarnings("checkstyle:illegalCatch")
