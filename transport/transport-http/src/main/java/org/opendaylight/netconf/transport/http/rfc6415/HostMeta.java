@@ -42,7 +42,7 @@ public final class HostMeta extends AbstractHostMeta {
     }
 
     @Override
-    protected AsciiString mediaType() {
+    public AsciiString mediaType() {
         return MEDIA_TYPE;
     }
 

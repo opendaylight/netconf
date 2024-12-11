@@ -87,6 +87,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
+    private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme) {
         super(FullHttpRequest.class, false);
@@ -98,6 +99,9 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
+
+        responseWriter = new ResponseWriter();
+        ctx.pipeline().addLast("responseWriter", responseWriter);
     }
 
     @Override
@@ -276,4 +280,9 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         }
         ctx.writeAndFlush(response);
     }
+
+    public ResponseWriter responseWriter() {
+        return responseWriter;
+    }
+
 }
