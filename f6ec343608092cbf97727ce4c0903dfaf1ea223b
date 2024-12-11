@@ -123,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aec8dc73_a1bf7ae4",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/DefaultNotificationSource.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-12-11T11:36:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a482dfc_161252ae",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e2f3db5_430b6ec7",
@@ -224,6 +242,24 @@
       "side": 1,
       "message": "I have reworked it - but it does not work. Can you fix please?",
       "parentUuid": "4b75ba78_68664945",
+      "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c361a21d_4cffe8e7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/netconf/NetconfStream.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-12-11T11:36:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6570cb41_da5919b6",
       "revId": "f6ec343608092cbf97727ce4c0903dfaf1ea223b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
