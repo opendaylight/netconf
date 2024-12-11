@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
@@ -34,6 +35,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
@@ -100,6 +102,7 @@ class AbstractRequestProcessorTest {
         doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
+        lenient().doReturn(session).when(pipeline).get(HTTPServerSession.class);
         session.handlerAdded(ctx);
         doReturn(null).when(principalService).acquirePrincipal(any());
     }
