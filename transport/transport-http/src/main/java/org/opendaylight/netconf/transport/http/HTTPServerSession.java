@@ -15,6 +15,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -23,6 +24,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -252,6 +254,31 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      */
     @NonNullByDefault
     protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpHeaders headers);
+
+    /**
+     * Start sending the response to a request in chunked encoding,
+     *
+     * @param status the status to send
+     * @param headers the headers to send
+     */
+    @NonNullByDefault
+    final void sendResponseStart(final HttpResponseStatus status, final ReadOnlyHttpHeaders headers) {
+        // FIXME: version and stream ID as needed
+        // FIXME: DefaultHttpResponse, set Transfer-Encoding to chunked
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Send a part of a response started via {@link #sendResponseStart(HttpResponseStatus, ReadOnlyHttpHeaders)}.
+     *
+     * @param chunk response body chunk, formatted according to <a href="">chunked encoding</a>
+     */
+    @NonNullByDefault
+    final void sendResponsePart(final ByteBuf chunk) {
+        final var content = new DefaultHttpContent(chunk);
+        // FIXME: block if the channel is not writable, otherwise send the chunk as HttpContent
+        throw new UnsupportedOperationException();
+    }
 
     @NonNullByDefault
     static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
