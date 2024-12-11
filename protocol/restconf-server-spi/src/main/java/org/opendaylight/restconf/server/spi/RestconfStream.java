@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -28,7 +27,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,10 +168,6 @@ public final class RestconfStream<T> {
          */
         <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
-
-        //FIXME: Restore to be protected
-        @NonNull
-        ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
