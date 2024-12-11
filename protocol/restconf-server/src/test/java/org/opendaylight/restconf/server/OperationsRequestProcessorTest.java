@@ -64,6 +64,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource("encodings")
     void getOperationsRoot(final TestEncoding encoding, final String content) {
+        mockSession();
         final var result = formattableBody(encoding, content);
         doAnswer(answerCompleteWith(result)).when(server).operationsGET(any());
 
@@ -75,6 +76,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource("encodings")
     void getOperationsWithId(final TestEncoding encoding, final String content) {
+        mockSession();
         final var result = formattableBody(encoding, content);
         doAnswer(answerCompleteWith(result)).when(server).operationsGET(any(), any(ApiPath.class));
 
@@ -89,6 +91,9 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource
     void postOperations(final TestEncoding encoding, final String input, final String output) throws Exception {
+        if (output != null) {
+            mockSession();
+        }
         final var result = new InvokeResult(output == null ? null : formattableBody(encoding, output));
         final var answer = new FuglyRestconfServerAnswer(
             encoding.isJson() ? JsonOperationInputBody.class : XmlOperationInputBody.class, 3, result);
