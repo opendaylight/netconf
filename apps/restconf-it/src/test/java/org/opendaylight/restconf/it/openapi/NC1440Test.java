@@ -38,6 +38,7 @@ public class NC1440Test extends AbstractOpenApiTest {
         // topology
         topologyService = setupTopology();
         client = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
             .authenticator(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
