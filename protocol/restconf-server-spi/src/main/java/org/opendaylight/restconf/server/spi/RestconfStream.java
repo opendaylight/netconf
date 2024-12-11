@@ -171,10 +171,6 @@ public final class RestconfStream<T> {
          */
         <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
-
-        //FIXME: Restore to be protected
-        @NonNull
-        ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
