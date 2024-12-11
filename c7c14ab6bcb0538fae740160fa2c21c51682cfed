@@ -33,6 +33,91 @@
       "message": "recheck",
       "revId": "c7c14ab6bcb0538fae740160fa2c21c51682cfed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7b86e3c_3a23ddbc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-12-11T12:48:33Z",
+      "side": 1,
+      "message": "this is never used only in API_V3_PATH",
+      "revId": "c7c14ab6bcb0538fae740160fa2c21c51682cfed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68201d9b_54060a0f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/ControllerDocumentTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-12-11T12:48:33Z",
+      "side": 1,
+      "message": "final",
+      "revId": "c7c14ab6bcb0538fae740160fa2c21c51682cfed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5987f783_506a191d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-12-11T12:48:33Z",
+      "side": 1,
+      "message": "can potentially be in before each",
+      "revId": "c7c14ab6bcb0538fae740160fa2c21c51682cfed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ae6e220_31c4b1dd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-12-11T12:48:33Z",
+      "side": 1,
+      "message": "final",
+      "revId": "c7c14ab6bcb0538fae740160fa2c21c51682cfed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdac2273_5f616a40",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-12-11T12:48:33Z",
+      "side": 1,
+      "message": "maybe just include the assert in getMountDocTest()",
+      "revId": "c7c14ab6bcb0538fae740160fa2c21c51682cfed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
