@@ -24,8 +24,10 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -86,6 +88,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
+    private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme) {
         super(FullHttpRequest.class, false);
@@ -97,6 +100,13 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
+
+        if (ctx.pipeline().get(ResponseWriter.class) == null) {
+            responseWriter = new ResponseWriter();
+            ctx.pipeline().addLast("responseWriter", responseWriter);
+        } else {
+            responseWriter = ctx.pipeline().get(ResponseWriter.class);
+        }
     }
 
     @Override
@@ -262,5 +272,37 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             response.headers().setInt(STREAM_ID, streamId);
         }
         ctx.writeAndFlush(response);
+    }
+
+    void sendResponseStart(final HttpResponseStatus status, final ReadOnlyHttpHeaders headers,
+            final HttpVersion version) throws IOException {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            throw new IOException("ResponseWriter not set in session");
+        }
+        if (responseWriter.sendResponseStart(status, headers, version)) {
+            throw new IOException("Failed to send response start, writer inactive");
+        }
+    }
+
+    void sendResponsePart(ByteBuf chunk) throws IOException {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            chunk.release();
+            throw new IOException("ResponseWriter not set in session");
+        }
+        if (responseWriter.sendResponsePart(chunk)) {
+            throw new IOException("Failed to send response part, writer inactive");
+        }
+    }
+
+    void sendResponseEnd(final ReadOnlyHttpHeaders trailers) throws IOException {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            throw new IOException("ResponseWriter not set in session");
+        }
+        if (responseWriter.sendResponseEnd(trailers)) {
+            throw new IOException("Failed to send response end, writer inactive");
+        }
     }
 }
