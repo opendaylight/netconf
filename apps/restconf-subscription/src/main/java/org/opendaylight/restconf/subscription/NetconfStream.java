@@ -8,18 +8,31 @@
 package org.opendaylight.restconf.subscription;
 
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.collect.ImmutableSet;
 import java.io.Closeable;
+import java.security.Principal;
+import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.mdsal.spi.NotificationSource;
+import org.opendaylight.restconf.server.api.AbstractServerRequest;
+import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.api.YangErrorsBody;
+import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -48,29 +61,21 @@ public final class NetconfStream implements Closeable {
     private static final String DESCRIPTION = "Stream for subscription state change notifications";
 
     private final @NonNull Registration contextListenerReg;
+    private final DatabindProvider databindProvider;
 
     @Inject
     @Activate
     public NetconfStream(@Reference final DOMSchemaService schemaService,
             @Reference final DOMNotificationService notificationService,
+            @Reference final DatabindProvider databindProvider,
             @Reference final RestconfStream.Registry streamRegistry) {
         // write NETCONF stream to datastore
-        // FIXME replace by correct override of #createStream
-        Futures.addCallback(streamRegistry.putStream(streamEntry()),
-            new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(final Object result) {
-                    LOG.debug("Stream {} added", NAME);
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    LOG.error("Failed to add stream {}", NAME, cause);
-                }
-            }, MoreExecutors.directExecutor());
+        streamRegistry.createStream(new RestconfStreamServerRequest(), null, new NotificationSource(databindProvider,
+            notificationService, ImmutableSet.of(Stream.QNAME, NAME_QNAME)), DESCRIPTION);
 
         // start listener on model context change
         contextListenerReg = new ContextListener(notificationService, schemaService);
+        this.databindProvider = requireNonNull(databindProvider);
     }
 
     public static @NonNull MapEntryNode streamEntry() {
@@ -85,5 +90,39 @@ public final class NetconfStream implements Closeable {
     @Override
     public void close() {
         contextListenerReg.close();
+    }
+
+    private static class RestconfStreamServerRequest<T> extends AbstractServerRequest<T> {
+
+        private final CompletableFuture<T> future = new CompletableFuture<>();
+
+        RestconfStreamServerRequest() {
+            super(QueryParameters.of(), PrettyPrintParam.TRUE);
+        }
+
+        @Override
+        public @Nullable Principal principal() {
+            return null;
+        }
+
+        @Override
+        public @Nullable TransportSession session() {
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(@NonNull T result) {
+            future.complete(result);
+        }
+
+        @Override
+        protected void onFailure(@NonNull YangErrorsBody errors) {
+            future.completeExceptionally(new ServerException(errors.errors(), null, "Failed streams request"));
+        }
+
+        @Override
+        public void completeWith(ErrorTag errorTag, FormattableBody body) {
+
+        }
     }
 }

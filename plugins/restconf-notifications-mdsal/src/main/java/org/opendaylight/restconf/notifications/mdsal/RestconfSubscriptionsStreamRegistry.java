@@ -9,17 +9,23 @@ package org.opendaylight.restconf.notifications.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -28,6 +34,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This singleton class is responsible for creation, removal and searching for RFC 8639 {@link RestconfStream}s.
@@ -35,9 +43,11 @@ import org.osgi.service.component.annotations.Reference;
 @Singleton
 @Component(service = RestconfStream.Registry.class)
 public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfStreamRegistry {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfSubscriptionsStreamRegistry.class);
     private static final YangInstanceIdentifier RFC8639_STREAMS = YangInstanceIdentifier.of(
         NodeIdentifier.create(Streams.QNAME),
         NodeIdentifier.create(Stream.QNAME));
+    private static final String BASE_SUBSCRIPTION_LOCATION = Subscriptions.QNAME.toString();
 
     private final DOMDataBroker dataBroker;
 
@@ -66,6 +76,48 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
     @Override
     public <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
             final RestconfStream.Source<T> source, final String description) {
-        // FIXME implement
+        final var name = "urn:uuid:" + UUID.randomUUID();
+        final var stream = new RestconfStream<>(this, source, name);
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("Description must be descriptive");
+        }
+
+        Futures.addCallback(putStream(streamEntry(name, description, BASE_SUBSCRIPTION_LOCATION,
+                stream.encodings())), new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(final Object result) {
+                LOG.debug("Stream {} added", name);
+                request.completeWith(stream);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Failed to add stream {}", name, cause);
+                // FIXME remove stream from state machine
+                //  removeStream(name, stream);
+                request.completeWith(new ServerException("Failed to allocate stream " + name, cause));
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    // FIXME We need to wire state machine here and remove stream also from collection inside of it. Current
+    //  implementation removes only from datastore.
+    @Override
+    public void removeStream(final RestconfStream<?> stream) {
+        // FIXME Add defensive check to see if we are still tracking the stream in state machine
+        final var name = stream.name();
+
+        Futures.addCallback(deleteStream(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, name)),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(final Object result) {
+                    LOG.debug("Stream {} removed", name);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Failed to remove stream {}, operational datastore may be inconsistent", name, cause);
+                }
+            }, MoreExecutors.directExecutor());
     }
 }

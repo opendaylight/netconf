@@ -56,8 +56,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         return streams.putIfAbsent(name, stream);
     }
 
-    // FIXME remake into protected
-    public abstract @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
+    protected abstract @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
 
     protected void removeStream(final String name, final RestconfStream<?> stream) {
         streams.remove(name, stream);
@@ -68,7 +67,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      *
      * @param stream Stream to remove
      */
-    final void removeStream(final RestconfStream<?> stream) {
+    public void removeStream(final RestconfStream<?> stream) {
         // Defensive check to see if we are still tracking the stream
         final var name = stream.name();
         if (streams.get(name) != stream) {
