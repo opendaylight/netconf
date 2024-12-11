@@ -140,8 +140,8 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private void writeResponse(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
             final HttpVersion version, final FiniteResponse response) {
         try {
-            HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version));
-        } catch (RuntimeException e) {
+            response.writeTo(new ResponseOutput(ctx, version, streamId));
+        } catch (RuntimeException | IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
             HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
         }
@@ -163,36 +163,5 @@ final class ServerRequestExecutor implements PendingRequestListener {
         final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
         HttpUtil.setContentLength(response, content.readableBytes());
         return response;
-    }
-
-    // Executed on respExecutor, so it is okay to block
-    @NonNullByDefault
-    private static FullHttpResponse formatResponse(final FiniteResponse response, final ChannelHandlerContext ctx,
-            final HttpVersion version) {
-        // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
-        //
-        //        We want to be emitting a series of write() requests into the queue, each of which is subject
-        //        to channel's flow control -- i.e. it effectively is a MPSC outbound queue.
-        //
-        //        We are using OutputStream below as the synchronous interface, but we really want our own, such that we
-        //        get the headers first and we invoke body streaming (if applicable and indicated by return).
-        //
-        //        In the streaming phase, we start with a HttpObjectSender initialized to the HttpResponse, as indicated
-        //        in previous step. It also implements OutputStream, which is the fasade we show to the user. As they
-        //        pump body data, we check for body size and events and:
-        //        - buffer initial stuff, so that we produce a FullHttpResponse if the payload is below
-        //          256KiB (or so), i.e. producing Content-Length header and dumping the thing in one go
-        //        - otherwise emit just HttpResponse with Transfer-Enconding: chunked and continue sending
-        //          out chunks (of reasonable size).
-        //        - finish up with a LastHttpContent when OutputStream.close() is called ... which might be problematic
-        //          w.r.t. failure cases, so it needs some figuring out
-        final ReadyResponse ready;
-        try {
-            ready = response.toReadyResponse(ctx.alloc());
-        } catch (IOException e) {
-            LOG.warn("IO error while converting formatting response", e);
-            return formatException(e, ctx, version);
-        }
-        return ready.toHttpResponse(version);
     }
 }

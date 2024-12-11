@@ -12,18 +12,17 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import java.io.IOException;
-import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * A {@link FiniteResponse} containing a {@link CharSource} of a specified media type.
  */
 @NonNullByDefault
-public final class ByteSourceResponse extends ByteStreamRequestResponse {
+public final class ByteSourceResponse extends AbstractFiniteResponse {
     private final ByteSource source;
     private final AsciiString contentType;
 
@@ -34,13 +33,10 @@ public final class ByteSourceResponse extends ByteStreamRequestResponse {
     }
 
     @Override
-    protected ByteBufResponse toReadyResponse(final ByteBuf content) {
-        return new ByteBufResponse(status(), content, contentType);
-    }
-
-    @Override
-    protected void writeBody(final OutputStream out) throws IOException {
-        source.copyTo(out);
+    public void writeTo(final ResponseOutput output) throws IOException {
+        try (var out = output.start(status(), HttpHeaderNames.CONTENT_TYPE, contentType)) {
+            source.copyTo(out);
+        }
     }
 
     @Override
