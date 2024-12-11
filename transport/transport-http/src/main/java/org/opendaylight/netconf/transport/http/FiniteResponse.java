@@ -7,27 +7,24 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import io.netty.buffer.ByteBufAllocator;
 import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * A finite {@link Response}, whose formatting needs to be performed outside of the Netty event loop.
+ * A finite {@link Response}, whose formatting needs to be performed outside of the Netty event loop. The HTTP framework
+ * will arrange for {@link #writeTo(ResponseOutput)} to be executed on a separate thread.
  */
 @NonNullByDefault
 public abstract non-sealed class FiniteResponse implements Response {
     /**
-     * Convert this response to a {@link ReadyResponse}.
+     * Write this response into the provided {@link ResponseOutput}.
      *
-     * @param alloc {@link ByteBufAllocator} to use for body
-     * @return a {@link ReadyResponse}
+     * @param output the {@link ResponseOutput}
      * @throws IOException when an I/O error occurs
      */
-    @Beta
-    public abstract ReadyResponse toReadyResponse(ByteBufAllocator alloc) throws IOException;
+    public abstract void writeTo(ResponseOutput output) throws IOException;
 
     @Override
     public final String toString() {
