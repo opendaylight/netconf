@@ -18,7 +18,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -151,30 +150,14 @@ final class ServerRequestExecutor implements PendingRequestListener {
     @NonNullByDefault
     private static FullHttpResponse formatResponse(final FiniteResponse response, final ChannelHandlerContext ctx,
             final HttpVersion version) {
-        // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
-        //
-        //        We want to be emitting a series of write() requests into the queue, each of which is subject
-        //        to channel's flow control -- i.e. it effectively is a MPSC outbound queue.
-        //
-        //        We are using OutputStream below as the synchronous interface, but we really want our own, such that we
-        //        get the headers first and we invoke body streaming (if applicable and indicated by return).
-        //
-        //        In the streaming phase, we start with a HttpObjectSender initialized to the HttpResponse, as indicated
-        //        in previous step. It also implements OutputStream, which is the fasade we show to the user. As they
-        //        pump body data, we check for body size and events and:
-        //        - buffer initial stuff, so that we produce a FullHttpResponse if the payload is below
-        //          256KiB (or so), i.e. producing Content-Length header and dumping the thing in one go
-        //        - otherwise emit just HttpResponse with Transfer-Enconding: chunked and continue sending
-        //          out chunks (of reasonable size).
-        //        - finish up with a LastHttpContent when OutputStream.close() is called ... which might be problematic
-        //          w.r.t. failure cases, so it needs some figuring out
-        final ReadyResponse ready;
-        try {
-            ready = response.toReadyResponse(ctx.alloc());
-        } catch (IOException e) {
-            LOG.warn("IO error while converting formatting response", e);
-            return formatException(e, version);
-        }
-        return ready.toHttpResponse(version);
+        return null;
+//        final ReadyResponse ready;
+//        try {
+//            ready = response.toReadyResponse(ctx.alloc());
+//        } catch (IOException e) {
+//            LOG.warn("IO error while converting formatting response", e);
+//            return formatException(e, version);
+//        }
+//        return ready.toHttpResponse(version);
     }
 }

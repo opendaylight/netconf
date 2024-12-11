@@ -42,12 +42,12 @@ public final class HostMeta extends AbstractHostMeta {
     }
 
     @Override
-    protected AsciiString mediaType() {
+    AsciiString mediaType() {
         return MEDIA_TYPE;
     }
 
     @Override
-    protected void writeBody(final OutputStream out) throws IOException {
+    void writeBody(final OutputStream out) throws IOException {
         try {
             final var writer = XML_FACTORY.createXMLStreamWriter(out, StandardCharsets.UTF_8.name());
             writer.writeStartDocument();
