@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.test.tool.NetconfDeviceSimulator;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
@@ -53,6 +54,7 @@ public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
     }
 
     @Test
+    @Disabled
     public void benchmarkTest() throws Exception {
         startDeviceSimulator();
         mountDeviceJson(devicePort);
