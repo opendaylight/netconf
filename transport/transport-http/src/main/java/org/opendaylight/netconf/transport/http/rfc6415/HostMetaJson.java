@@ -76,12 +76,12 @@ public final class HostMetaJson extends AbstractHostMeta {
     }
 
     @Override
-    protected AsciiString mediaType() {
+    AsciiString mediaType() {
         return HttpHeaderValues.APPLICATION_JSON;
     }
 
     @Override
-    protected void writeBody(final OutputStream out) throws IOException {
+    void writeBody(final OutputStream out) throws IOException {
         try (var writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             writer.append("{\n");
 
