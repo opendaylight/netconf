@@ -10,19 +10,16 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.transport.http.ByteBufResponse;
-import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
-import org.opendaylight.netconf.transport.http.ReadyResponse;
+import org.opendaylight.netconf.transport.http.AbstractFiniteResponse;
 import org.opendaylight.netconf.transport.http.Response;
+import org.opendaylight.netconf.transport.http.ResponseOutput;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
@@ -30,7 +27,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
  * A {@link Response} containing a YANG Data as its content.
  */
 @NonNullByDefault
-final class FormattableDataResponse extends ByteStreamRequestResponse {
+final class FormattableDataResponse extends AbstractFiniteResponse {
     private final FormattableBody body;
     private final MessageEncoding encoding;
     private final PrettyPrintParam prettyPrint;
@@ -59,13 +56,10 @@ final class FormattableDataResponse extends ByteStreamRequestResponse {
     }
 
     @Override
-    protected ReadyResponse toReadyResponse(final ByteBuf content) {
-        return new ByteBufResponse(status(), content, headers);
-    }
-
-    @Override
-    protected void writeBody(final OutputStream out) throws IOException {
-        encoding.formatBody(body, prettyPrint, out);
+    public void writeTo(final ResponseOutput output) throws IOException {
+        try (var out = output.start(status(), headers)) {
+            encoding.formatBody(body, prettyPrint, out);
+        }
     }
 
     @Override

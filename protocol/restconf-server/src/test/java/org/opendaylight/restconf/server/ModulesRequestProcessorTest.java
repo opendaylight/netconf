@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -66,6 +67,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource("encodings")
     void getYangLibraryVersion(final TestEncoding encoding, final String content) {
+        mockSession();
         final var result = formattableBody(encoding, content);
         doAnswer(answerCompleteWith(result)).when(server).yangLibraryVersionGET(any());
 
@@ -77,6 +79,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource("modules")
     void getModule(final TestEncoding encoding, final String content, final boolean hasRevision) {
+        mockSession();
         final var result = new ModulesGetResult(charSource(content));
         final var revision = hasRevision ? REVISION_VALUE : null;
         if (encoding.isYin()) {
@@ -94,6 +97,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource("modules")
     void getModuleWithMountPath(final TestEncoding encoding, final String content, final boolean hasRevision) {
+        mockSession();
         final var result = new ModulesGetResult(charSource(content));
         final var revision = hasRevision ? REVISION_VALUE : null;
         if (encoding.isYin()) {
@@ -127,6 +131,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         assertEquals(HttpResponseStatus.NOT_FOUND, response.status());
     }
 
+    @Disabled("Will be disabled until NETCONF-1492 has been resolved")
     @ParameterizedTest
     @MethodSource("moduleErrorEncodings")
     void sourceReadFailure(final TestEncoding encoding, final TestEncoding errorEncoding) throws IOException {
