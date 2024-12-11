@@ -24,8 +24,10 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -87,6 +89,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
+    private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme) {
         super(FullHttpRequest.class, false);
@@ -98,6 +101,9 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
+
+        responseWriter = new ResponseWriter();
+        ctx.pipeline().addLast("responseWriter", responseWriter);
     }
 
     @Override
@@ -264,4 +270,9 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         }
         ctx.writeAndFlush(response);
     }
+
+    public ResponseWriter responseWriter() {
+        return responseWriter;
+    }
+
 }

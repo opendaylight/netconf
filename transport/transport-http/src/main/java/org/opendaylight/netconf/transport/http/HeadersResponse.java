@@ -26,8 +26,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public record HeadersResponse(HttpResponseStatus status, ReadOnlyHttpHeaders headers) implements ReadyResponse {
-    private static final boolean VALIDATE_HEADERS =
+    static final boolean VALIDATE_HEADERS =
         Boolean.getBoolean("org.opendaylight.netconf.transport.http.validate-headers");
+    static final ReadOnlyHttpHeaders EMPTY_HEADERS = new ReadOnlyHttpHeaders(VALIDATE_HEADERS);
 
     public HeadersResponse {
         requireNonNull(status);
