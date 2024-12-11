@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -100,18 +99,5 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     request.completeWith(new ServerException("Failed to allocate stream " + name, cause));
                 }
             }, MoreExecutors.directExecutor());
-    }
-
-    private <T> RestconfStream<T> allocateStream(final RestconfStream.Source<T> source) {
-        String name;
-        RestconfStream<T> stream;
-        do {
-            // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
-            // it into UUID URN namespace as defined by RFC4122
-            name = "urn:uuid:" + UUID.randomUUID().toString();
-            stream = new RestconfStream<>(this, source, name);
-        } while (registerStream(name, stream) != null);
-
-        return stream;
     }
 }

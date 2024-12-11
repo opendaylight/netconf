@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.NonNull;
@@ -56,8 +57,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         return streams.putIfAbsent(name, stream);
     }
 
-    // FIXME remake into protected
-    public abstract @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
+    protected abstract @NonNull ListenableFuture<?> putStream(@NonNull MapEntryNode stream);
 
     protected void unregisterStream(final String name, final RestconfStream<?> stream) {
         streams.remove(name, stream);
@@ -68,14 +68,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      *
      * @param stream Stream to remove
      */
-    final void removeStream(final RestconfStream<?> stream) {
+    public void removeStream(final RestconfStream<?> stream) {
         // Defensive check to see if we are still tracking the stream
         final var name = stream.name();
         if (streams.get(name) != stream) {
             LOG.warn("Stream {} does not match expected instance {}, skipping datastore update", name, stream);
             return;
         }
-
+        // FIXME: NAME_QNAME is wrong for RestconfSubscriptionsStreamRegistry
         Futures.addCallback(deleteStream(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, name)),
             new FutureCallback<Object>() {
                 @Override
@@ -93,6 +93,19 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     protected abstract @NonNull ListenableFuture<?> deleteStream(@NonNull NodeIdentifierWithPredicates streamName);
+
+    protected <T> RestconfStream<T> allocateStream(final RestconfStream.Source<T> source) {
+        String name;
+        RestconfStream<T> stream;
+        do {
+            // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
+            // it into UUID URN namespace as defined by RFC4122
+            name = "urn:uuid:" + UUID.randomUUID().toString();
+            stream = new RestconfStream<>(this, source, name);
+        } while (registerStream(name, stream) != null);
+
+        return stream;
+    }
 
     @VisibleForTesting
     public static final @NonNull MapEntryNode streamEntry(final String name, final String description,
