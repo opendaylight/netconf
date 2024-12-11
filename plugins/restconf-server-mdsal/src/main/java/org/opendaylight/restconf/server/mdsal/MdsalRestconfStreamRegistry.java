@@ -69,7 +69,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final RestconfStream.LocationProvider locationProvider,
             @Reference final DOMDataBroker dataBroker) {
-        this.locationProvider = requireNonNull(Stream.QNAME);
+        super(Stream.QNAME);
         this.locationProvider = requireNonNull(locationProvider);
         this.dataBroker = requireNonNull(dataBroker);
     }
