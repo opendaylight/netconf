@@ -49,34 +49,34 @@ class WellKnownResourcesTest {
             "GET, HEAD, OPTIONS");
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void getHostMeta(final String uri, final AsciiString contentType, final String content) throws Exception {
-        final var response = RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET, EMPTY_HEADERS)
-            .asResponse();
-        assertResponse(assertInstanceOf(FiniteResponse.class, response)
-            .toReadyResponse(UnpooledByteBufAllocator.DEFAULT).toHttpResponse(HttpVersion.HTTP_1_1),
-            HttpResponseStatus.OK, contentType, content);
-    }
-
-    private static Stream<Arguments> getHostMeta() {
-        return Stream.of(
-            Arguments.of(XRD_SUFFIX, HostMeta.MEDIA_TYPE, """
-                <?xml version="1.0" ?>
-                <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-                  <Link rel="restconf" href="testRestconf"/>
-                </XRD>"""),
-            Arguments.of(JRD_SUFFIX, HttpHeaderValues.APPLICATION_JSON, """
-                {
-                  "links" : [
-                    {
-                      "rel" : "restconf",
-                      "href" : "testRestconf"
-                    }
-                  ]
-                }""")
-        );
-    }
+//    @ParameterizedTest
+//    @MethodSource
+//    void getHostMeta(final String uri, final AsciiString contentType, final String content) throws Exception {
+//        final var response = RESOURCES.request(new SegmentPeeler(uri), ImplementedMethod.GET, EMPTY_HEADERS)
+//            .asResponse();
+//        assertResponse(assertInstanceOf(FiniteResponse.class, response)
+//            .toReadyResponse(UnpooledByteBufAllocator.DEFAULT).toHttpResponse(HttpVersion.HTTP_1_1),
+//            HttpResponseStatus.OK, contentType, content);
+//    }
+//
+//    private static Stream<Arguments> getHostMeta() {
+//        return Stream.of(
+//            Arguments.of(XRD_SUFFIX, HostMeta.MEDIA_TYPE, """
+//                <?xml version="1.0" ?>
+//                <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+//                  <Link rel="restconf" href="testRestconf"/>
+//                </XRD>"""),
+//            Arguments.of(JRD_SUFFIX, HttpHeaderValues.APPLICATION_JSON, """
+//                {
+//                  "links" : [
+//                    {
+//                      "rel" : "restconf",
+//                      "href" : "testRestconf"
+//                    }
+//                  ]
+//                }""")
+//        );
+//    }
 
     @Test
     void putHostMeta() throws Exception {

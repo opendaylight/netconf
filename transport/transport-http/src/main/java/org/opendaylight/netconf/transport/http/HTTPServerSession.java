@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -86,6 +87,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
+    private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme) {
         super(FullHttpRequest.class, false);
@@ -97,6 +99,13 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
         final var channel = ctx.channel();
         executor = new ServerRequestExecutor(channel.remoteAddress().toString());
         LOG.debug("Threadpools for {} started", channel);
+
+        if (ctx.pipeline().get(ResponseWriter.class) == null) {
+            responseWriter = new ResponseWriter();
+            ctx.pipeline().addLast("responseWriter", responseWriter);
+        } else {
+            responseWriter = ctx.pipeline().get(ResponseWriter.class);
+        }
     }
 
     @Override
@@ -262,5 +271,30 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             response.headers().setInt(STREAM_ID, streamId);
         }
         ctx.writeAndFlush(response);
+    }
+
+    boolean sendResponseStart(final HttpResponseStatus status, final ReadOnlyHttpHeaders headers) {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            return true;
+        }
+        return responseWriter.sendResponseStart(status, headers);
+    }
+
+    boolean sendResponsePart(ByteBuf chunk) {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            chunk.release();
+            return true;
+        }
+        return responseWriter.sendResponsePart(chunk);
+    }
+
+    boolean sendResponseEnd(final ReadOnlyHttpHeaders trailers) {
+        if (responseWriter == null) {
+            LOG.warn("ResponseWriter not set in session");
+            return true;
+        }
+        return responseWriter.sendResponseEnd(trailers);
     }
 }
