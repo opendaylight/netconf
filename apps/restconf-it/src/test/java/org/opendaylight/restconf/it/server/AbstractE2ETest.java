@@ -393,6 +393,10 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var headResponse = invokeRequest(HttpMethod.HEAD, uri, mediaType);
         assertEquals(HttpResponseStatus.OK, headResponse.status());
         getResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
+        if (getResponse.headers().contains(HttpHeaderNames.CONNECTION)) {
+            assertEquals("close", getResponse.headers().get(HttpHeaderNames.CONNECTION));
+            getResponse.headers().remove(HttpHeaderNames.CONNECTION);
+        }
         headResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
         assertEquals(getResponse.headers(), headResponse.headers());
         assertEquals(0, headResponse.content().readableBytes());
