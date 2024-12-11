@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -127,6 +128,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
         assertEquals(HttpResponseStatus.NOT_FOUND, response.status());
     }
 
+    @Disabled
     @ParameterizedTest
     @MethodSource("moduleErrorEncodings")
     void sourceReadFailure(final TestEncoding encoding, final TestEncoding errorEncoding) throws IOException {

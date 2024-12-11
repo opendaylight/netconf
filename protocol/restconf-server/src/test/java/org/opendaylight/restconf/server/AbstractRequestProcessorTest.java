@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
@@ -16,6 +17,7 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -32,6 +34,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerSession;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
@@ -77,6 +80,8 @@ class AbstractRequestProcessorTest {
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
+    private ChannelPipeline pipeline;
+    @Mock
     private Channel channel;
     @Mock
     private RestconfStream.Registry streamRegistry;
@@ -94,6 +99,8 @@ class AbstractRequestProcessorTest {
                 List.of(), 1000, Integer.MAX_VALUE, streamRegistry))));
         doReturn(channel).when(ctx).channel();
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
+        doReturn(pipeline).when(ctx).pipeline();
+        lenient().doReturn(session).when(pipeline).get(HTTPServerSession.class);
         session.handlerAdded(ctx);
         doReturn(null).when(principalService).acquirePrincipal(any());
     }

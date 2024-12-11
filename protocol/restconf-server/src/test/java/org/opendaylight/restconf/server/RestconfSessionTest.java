@@ -65,6 +65,7 @@ class RestconfSessionTest {
         doReturn(channel).when(transportChannel).channel();
         doReturn(channel).when(ctx).channel();
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
+        doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(channel).pipeline();
         doReturn(pipeline).when(pipeline).addLast(any(ChannelHandler.class));
         doReturn(HTTPScheme.HTTP).when(transportChannel).scheme();
