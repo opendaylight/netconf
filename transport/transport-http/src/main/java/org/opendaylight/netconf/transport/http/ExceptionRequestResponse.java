@@ -10,10 +10,9 @@ package org.opendaylight.netconf.transport.http;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
@@ -37,8 +36,10 @@ public final class ExceptionRequestResponse extends AbstractFiniteResponse {
     }
 
     @Override
-    public ByteBufResponse toReadyResponse(final ByteBufAllocator alloc) throws IOException {
-        return new ByteBufResponse(status(), ByteBufUtil.writeUtf8(alloc, cause.toString()));
+    public void writeTo(final ResponseOutput output) throws IOException {
+        try (var out = output.start(status())) {
+            out.write(cause.toString().getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     @Override
