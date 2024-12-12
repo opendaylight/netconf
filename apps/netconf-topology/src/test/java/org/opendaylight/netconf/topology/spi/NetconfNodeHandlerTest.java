@@ -363,4 +363,22 @@ class NetconfNodeHandlerTest {
         assertTrue(minValue >= minAcceptableBackoffValue,
             "Expected larger backoff value than " + minAcceptableBackoffValue  + ", current min value " + minValue);
     }
+
+    @Test
+    void verifyNoDisconnectionProcessWhenNodeHandlerClose() {
+        doNothing().when(delegate).close();
+
+        // Close NetconfNodeHandler to set closed attribute.
+        handler.close();
+        verify(delegate).close();
+
+        // invoke onDeviceDisconnected after AbstractRegistration close.
+        handler.onDeviceDisconnected();
+
+        // Verify that it is not continue in the disconnection process.
+        assertEquals(0, handler.attempts());
+        verify(delegate).close();
+        verify(delegate, times(0)).onDeviceDisconnected();
+    }
+
 }

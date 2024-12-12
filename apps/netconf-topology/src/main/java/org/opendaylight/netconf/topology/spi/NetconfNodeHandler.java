@@ -288,6 +288,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     @Override
     public void onDeviceDisconnected() {
+        if (isClosed()) {
+            return;
+        }
         delegate.onDeviceDisconnected();
         reconnectOrFail();
     }
