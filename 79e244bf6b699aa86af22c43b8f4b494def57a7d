@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "055002f2_9090b56b",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-13T18:05:40Z",
+      "side": 1,
+      "message": "IMO consider creating createStream with fewer parameters just for situations like this.",
+      "range": {
+        "startLine": 73,
+        "startChar": 23,
+        "endLine": 73,
+        "endChar": 35
+      },
+      "revId": "79e244bf6b699aa86af22c43b8f4b494def57a7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "134477fd_8d3e288c",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 5
