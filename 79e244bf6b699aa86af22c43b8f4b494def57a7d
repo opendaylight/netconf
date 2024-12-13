@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "134477fd_8d3e288c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-12-13T18:00:24Z",
+      "side": 1,
+      "message": "May be we should move out removeStream into MdsalRestconfStreamRegistry like createStream. But then it also tags streams tracking that is currently placed here.",
+      "range": {
+        "startLine": 70,
+        "startChar": 4,
+        "endLine": 70,
+        "endChar": 28
+      },
+      "revId": "79e244bf6b699aa86af22c43b8f4b494def57a7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
