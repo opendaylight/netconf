@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35b724ce_d77467e2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "do not hardcode port, use some free avialable",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4658bb45_db5a1975",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14d52f28_cd576593",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "IMO useless method - can be merged with previous one",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69357328_b752953c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/ControllerDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91f04638_039f8e43",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f77f186_f88df33e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d995d85_fc7ffae3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a8a460e_e9e8c88c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-16T15:52:04Z",
+      "side": 1,
+      "message": "use random port instead",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
