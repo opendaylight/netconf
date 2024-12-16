@@ -16,6 +16,24 @@
       "message": "Try to do what is written here - in case its not possible then it should be described.\n\nReally, eliminate ensureParentsByMerge/use it in mergeImp only, see what happens, document it. At worst case we would need to reanalyze what we want to do.",
       "revId": "2078cd8805fbc296fd2685c06064ffec8d4497f1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2b41b70_7ba007e4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 23
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-12-16T15:24:16Z",
+      "side": 1,
+      "message": "I had to save ensureParentsByMerge as a private method for places where we use put transactions after we checked the parents e.g. https://git.opendaylight.org/gerrit/c/netconf/+/112445/23/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java#121 and https://git.opendaylight.org/gerrit/c/netconf/+/112445/23/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java#74\n\nIf we replace ensureParentsByMerge with merge, it will be expensive and wrong to MERGE data before PUT the same data.\n\nAlso, I have got rid of Emptysubtree logic from MdsalRestconfTransaction bc it uses RestconfTransaction#merge and ensureParentsByMerge, which is useless due to the repetition of the same action(writing parents). \n\nAs you can see here https://git.opendaylight.org/gerrit/c/netconf/+/112445/23/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfTransaction.java#146 ensureParentsByMerge no more uses RestconfTransaction#merge and writes data by DOMDataTreeReadWriteTransaction#merge",
+      "parentUuid": "be010d34_a5416c04",
+      "revId": "2078cd8805fbc296fd2685c06064ffec8d4497f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
