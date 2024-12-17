@@ -107,10 +107,6 @@ MODULES_API = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
 AUTH_TOKEN_API = "/oauth2/token"
 REVOKE_TOKEN_API = "/oauth2/revoke"
 
-# Mininet Custom Topology Path and File for Path Policy
-CREATE_PATHPOLICY_TOPOLOGY_FILE = "topo-3sw-2host_multipath.py"
-CREATE_PATHPOLICY_TOPOLOGY_FILE_PATH = "MininetTopo/" + CREATE_PATHPOLICY_TOPOLOGY_FILE
-
 # LISP Flow Mapping variables
 LFM_RPC_API = "/rests/operations/odl-mappingservice"
 LFM_RPC_API_LI = "/rests/operations/lfm-mapping-database"
