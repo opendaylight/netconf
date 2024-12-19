@@ -26,6 +26,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "95cabb90_0dafdc92",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-19T08:57:17Z",
+      "side": 1,
+      "message": "no, our stream is called, for example NETCONF",
+      "revId": "79e244bf6b699aa86af22c43b8f4b494def57a7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "134477fd_8d3e288c",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 5
