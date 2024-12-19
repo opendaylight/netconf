@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64d28753_778915a6",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-19T09:14:27Z",
+      "side": 1,
+      "message": "All we need is to add default NETCONF stream, we need only little from parameters, can be null. This ahs been discussed.\n\nWe can make improvements, sure - what are you waiting for?",
+      "parentUuid": "055002f2_9090b56b",
+      "range": {
+        "startLine": 73,
+        "startChar": 23,
+        "endLine": 73,
+        "endChar": 35
+      },
+      "revId": "79e244bf6b699aa86af22c43b8f4b494def57a7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95cabb90_0dafdc92",
@@ -54,6 +78,30 @@
       "writtenOn": "2024-12-13T18:00:24Z",
       "side": 1,
       "message": "May be we should move out removeStream into MdsalRestconfStreamRegistry like createStream. But then it also tags streams tracking that is currently placed here.",
+      "range": {
+        "startLine": 70,
+        "startChar": 4,
+        "endLine": 70,
+        "endChar": 28
+      },
+      "revId": "79e244bf6b699aa86af22c43b8f4b494def57a7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa94b7bb_da21d3e5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-12-19T09:14:27Z",
+      "side": 1,
+      "message": "That has been already noted in a previous patch.",
+      "parentUuid": "134477fd_8d3e288c",
       "range": {
         "startLine": 70,
         "startChar": 4,
