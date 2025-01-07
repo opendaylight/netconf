@@ -10,11 +10,9 @@ package org.opendaylight.restconf.subscription;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,6 +87,7 @@ public class DeleteSubscriptionRpcTest {
         doReturn(session).when(request).session();
         doReturn(session).when(stateMachine).getSubscriptionSession(ID);
         doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
+        doReturn(true).when(stateMachine).isLegalTransition(SubscriptionState.ACTIVE, SubscriptionState.END);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL),
@@ -102,6 +101,7 @@ public class DeleteSubscriptionRpcTest {
         // return session different from request session
         doReturn(null).when(stateMachine).getSubscriptionSession(ID);
         doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
+        doReturn(true).when(stateMachine).isLegalTransition(SubscriptionState.ACTIVE, SubscriptionState.END);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -111,8 +111,7 @@ public class DeleteSubscriptionRpcTest {
 
     @Test
     void deleteSubscriptionWrongIDTest() {
-        doThrow(new NoSuchElementException("No such subscription was registered.")).when(stateMachine)
-            .getSubscriptionState(ID);
+        doReturn(null).when(stateMachine).getSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
