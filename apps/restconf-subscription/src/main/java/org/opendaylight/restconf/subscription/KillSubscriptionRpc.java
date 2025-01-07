@@ -82,15 +82,14 @@ public class KillSubscriptionRpc extends RpcImplementation {
             return;
         }
         try {
-            final var state = stateMachine.getSubscriptionState(id);
-            if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
-                    "There is no active or suspended subscription with given ID."));
-                return;
-            }
-        } catch (NoSuchElementException e) {
+            stateMachine.moveTo(id, SubscriptionState.END);
+        } catch (NoSuchElementException nse) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
+            return;
+        } catch (IllegalArgumentException iae) {
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+                "There is no active or suspended subscription with given ID."));
             return;
         }
 
@@ -102,7 +101,6 @@ public class KillSubscriptionRpc extends RpcImplementation {
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(KillSubscriptionOutput.QNAME))
                         .build());
-                    stateMachine.moveTo(id, SubscriptionState.END);
                     try {
                         subscriptionStateService.subscriptionTerminated(Instant.now().toString(),
                             id.longValue(), "subscription-kill");

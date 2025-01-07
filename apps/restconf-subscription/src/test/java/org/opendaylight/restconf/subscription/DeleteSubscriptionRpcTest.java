@@ -88,7 +88,6 @@ public class DeleteSubscriptionRpcTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
         doReturn(session).when(stateMachine).getSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL),
@@ -101,7 +100,6 @@ public class DeleteSubscriptionRpcTest {
         doReturn(session).when(request).session();
         // return session different from request session
         doReturn(null).when(stateMachine).getSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -111,8 +109,7 @@ public class DeleteSubscriptionRpcTest {
 
     @Test
     void deleteSubscriptionWrongIDTest() {
-        doThrow(new NoSuchElementException("No such subscription was registered.")).when(stateMachine)
-            .getSubscriptionState(ID);
+        doThrow(new NoSuchElementException()).when(stateMachine).moveTo(ID, SubscriptionState.END);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -121,7 +118,7 @@ public class DeleteSubscriptionRpcTest {
 
     @Test
     void deleteSubscriptionAlreadyEndedTest() {
-        doReturn(SubscriptionState.END).when(stateMachine).getSubscriptionState(ID);
+        doThrow(new IllegalArgumentException()).when(stateMachine).moveTo(ID, SubscriptionState.END);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
