@@ -10,7 +10,6 @@ package org.opendaylight.restconf.subscription;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,19 +51,23 @@ public class SubscriptionStateMachine {
     }
 
     /**
+     * Checks if transition to given state is legal.
+     *
+     * @param from current state
+     * @param toType new state
+     * @return true for legal transition and false for illegal
+     */
+    public boolean isLegalTransition(final SubscriptionState from, final SubscriptionState toType) {
+        return TRANSITIONS.get(from).contains(toType);
+    }
+
+    /**
      * Moves subscription from its current state to new one assuming this transition is legal.
      *
      * @param subscriptionId id of the subscription
      * @param toType new state assigned to subscription
-     * @throws IllegalStateException if transition to a new state is not legal
-     * @throws NoSuchElementException if subscription was not found in subscription map
      */
     public void moveTo(final Uint32 subscriptionId, final SubscriptionState toType) {
-        final var transition = TRANSITIONS.get(getSubscriptionState(subscriptionId)).contains(toType);
-        // Check if this state transition is allowed
-        if (!transition) {
-            throw new IllegalStateException(String.format("Illegal transition to {} state.", toType));
-        }
         subscriptionStateMap.replace(subscriptionId, new SessionStatePair(getSubscriptionSession(subscriptionId),
             toType));
     }
@@ -73,32 +76,30 @@ public class SubscriptionStateMachine {
      * Retrieves state of given subscription.
      *
      * @param subscriptionId id of the subscription
-     * @return current state of subscription
-     * @throws NoSuchElementException if subscription was not found in the subscription map
+     * @return current state of subscription or null if subscription does not exist
      */
     public SubscriptionState getSubscriptionState(final Uint32 subscriptionId) {
-        final var currentState = subscriptionStateMap.get(subscriptionId);
+        final var subscription = subscriptionStateMap.get(subscriptionId);
         // Check if subscription exist
-        if (currentState == null) {
-            throw new NoSuchElementException("No such subscription was registered.");
+        if (subscription == null) {
+            return null;
         }
-        return currentState.state();
+        return subscription.state();
     }
 
     /**
      * Retrieves session of given subscription.
      *
      * @param subscriptionId id of the subscription
-     * @return session tied to the subscription
-     * @throws NoSuchElementException if subscription was not found in the subscription map
+     * @return session tied to the subscription or null if subscription does not exist
      */
     public TransportSession getSubscriptionSession(final Uint32 subscriptionId) {
-        final var currentState = subscriptionStateMap.get(subscriptionId);
+        final var subscription = subscriptionStateMap.get(subscriptionId);
         // Check if subscription exist
-        if (currentState == null) {
-            throw new NoSuchElementException("No such subscription was registered.");
+        if (subscription == null) {
+            return null;
         }
-        return currentState.session();
+        return subscription.session();
     }
 
     /**
