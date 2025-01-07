@@ -10,6 +10,7 @@ package org.opendaylight.restconf.subscription;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -18,14 +19,14 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
-class StateTransitionTest {
+class StateMachineTest {
     @Mock
     private TransportSession session;
 
     private SubscriptionStateMachine subscriptionStateMachine;
 
     @Test
-    void transitionStateTest() {
+    void legalStateTransitionTest() {
         // initializing state machine
         subscriptionStateMachine = new SubscriptionStateMachine();
         subscriptionStateMachine.registerSubscription(session, Uint32.ONE);
@@ -34,13 +35,39 @@ class StateTransitionTest {
         var state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
         assertEquals(SubscriptionState.START, state);
 
-        // Checking legal state transition
+        // Moving state
         subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.ACTIVE);
         state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
         assertEquals(SubscriptionState.ACTIVE, state);
+    }
 
-        // Checking illegal state transition
-        assertThrows(IllegalStateException.class,
+    @Test
+    void illegalStateTransitionTest() {
+        // initializing state machine
+        subscriptionStateMachine = new SubscriptionStateMachine();
+        subscriptionStateMachine.registerSubscription(session, Uint32.ONE);
+
+        // Checking default stating state
+        var state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
+        assertEquals(SubscriptionState.START, state);
+
+        // Trying illegal state transition
+        assertThrows(IllegalArgumentException.class,
             () -> subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.START));
+    }
+
+    @Test
+    void subscriptionNotExistTest() {
+        // initializing state machine
+        subscriptionStateMachine = new SubscriptionStateMachine();
+        subscriptionStateMachine.registerSubscription(session, Uint32.ONE);
+
+        // Checking default stating state
+        var state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
+        assertEquals(SubscriptionState.START, state);
+
+        // Trying to move state transition of non-existent subscription
+        assertThrows(NoSuchElementException.class,
+            () -> subscriptionStateMachine.moveTo(Uint32.TWO, SubscriptionState.START));
     }
 }

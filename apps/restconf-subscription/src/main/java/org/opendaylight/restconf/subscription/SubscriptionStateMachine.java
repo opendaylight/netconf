@@ -52,53 +52,67 @@ public class SubscriptionStateMachine {
     }
 
     /**
+     * Checks if transition to given state is legal.
+     *
+     * @param from current state
+     * @param toType new state
+     * @return true for legal transition and false for illegal
+     */
+    public boolean isLegalTransition(final SubscriptionState from, final SubscriptionState toType) {
+        boolean ttt = TRANSITIONS.get(from).contains(toType);
+        return ttt;
+    }
+
+    /**
      * Moves subscription from its current state to new one assuming this transition is legal.
      *
      * @param subscriptionId id of the subscription
      * @param toType new state assigned to subscription
-     * @throws IllegalStateException if transition to a new state is not legal
+     * @throws IllegalArgumentException if transition to a new state is not legal
      * @throws NoSuchElementException if subscription was not found in subscription map
      */
-    public void moveTo(final Uint32 subscriptionId, final SubscriptionState toType) {
-        final var transition = TRANSITIONS.get(getSubscriptionState(subscriptionId)).contains(toType);
-        // Check if this state transition is allowed
-        if (!transition) {
-            throw new IllegalStateException(String.format("Illegal transition to {} state.", toType));
+    public void moveTo(final Uint32 subscriptionId, final SubscriptionState toType) throws NullPointerException,
+            IllegalArgumentException {
+        final var currentState = getSubscriptionState(subscriptionId);
+        if (currentState == null) {
+            throw new NoSuchElementException();
         }
-        subscriptionStateMap.replace(subscriptionId, new SessionStatePair(getSubscriptionSession(subscriptionId),
-            toType));
+        if (TRANSITIONS.get(currentState).contains(toType)) {
+            subscriptionStateMap.replace(subscriptionId, new SessionStatePair(getSubscriptionSession(subscriptionId),
+                toType));
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
      * Retrieves state of given subscription.
      *
      * @param subscriptionId id of the subscription
-     * @return current state of subscription
-     * @throws NoSuchElementException if subscription was not found in the subscription map
+     * @return current state of subscription or null if subscription does not exist
      */
     public SubscriptionState getSubscriptionState(final Uint32 subscriptionId) {
-        final var currentState = subscriptionStateMap.get(subscriptionId);
+        final var subscription = subscriptionStateMap.get(subscriptionId);
         // Check if subscription exist
-        if (currentState == null) {
-            throw new NoSuchElementException("No such subscription was registered.");
+        if (subscription == null) {
+            return null;
         }
-        return currentState.state();
+        return subscription.state();
     }
 
     /**
      * Retrieves session of given subscription.
      *
      * @param subscriptionId id of the subscription
-     * @return session tied to the subscription
-     * @throws NoSuchElementException if subscription was not found in the subscription map
+     * @return session tied to the subscription or null if subscription does not exist
      */
     public TransportSession getSubscriptionSession(final Uint32 subscriptionId) {
-        final var currentState = subscriptionStateMap.get(subscriptionId);
+        final var subscription = subscriptionStateMap.get(subscriptionId);
         // Check if subscription exist
-        if (currentState == null) {
-            throw new NoSuchElementException("No such subscription was registered.");
+        if (subscription == null) {
+            return null;
         }
-        return currentState.session();
+        return subscription.session();
     }
 
     /**
