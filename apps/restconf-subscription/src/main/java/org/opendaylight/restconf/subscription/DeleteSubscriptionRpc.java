@@ -82,22 +82,21 @@ public class DeleteSubscriptionRpc extends RpcImplementation {
                 "No ID specified."));
             return;
         }
-        try {
-            final var state = stateMachine.getSubscriptionState(id);
-            if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
-                    "There is no active or suspended subscription with given ID."));
-                return;
-            }
-        } catch (NoSuchElementException e) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No subscription with given ID."));
-            return;
-        }
 
         if (stateMachine.getSubscriptionSession(id) != request.session()) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
+            return;
+        }
+        try {
+            stateMachine.moveTo(id, SubscriptionState.END);
+        } catch (NoSuchElementException nse) {
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+                "No subscription with given ID."));
+            return;
+        } catch (IllegalArgumentException iae) {
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+                "There is no active or suspended subscription with given ID."));
             return;
         }
         mdsalService.deleteSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(YangInstanceIdentifier
@@ -108,7 +107,6 @@ public class DeleteSubscriptionRpc extends RpcImplementation {
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
                         .build());
-                    stateMachine.moveTo(id, SubscriptionState.END);
                     try {
                         subscriptionStateService.subscriptionTerminated(Instant.now().toString(),
                             id.longValue(), "subscription-delete");
