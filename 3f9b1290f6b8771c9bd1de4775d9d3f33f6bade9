@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6384f93_e4307dc1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35b724ce_d77467e2",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4658bb45_db5a1975",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-12-16T15:52:04Z",
       "side": 1,
       "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1f91cbf_a6b27f34",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4658bb45_db5a1975",
       "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40bba40f_44b18d38",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14d52f28_cd576593",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69357328_b752953c",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-12-16T15:52:04Z",
       "side": 1,
       "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf6e478a_4bf6db40",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/ControllerDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69357328_b752953c",
       "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a31222d9_91783a38",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91f04638_039f8e43",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f77f186_f88df33e",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-12-16T15:52:04Z",
       "side": 1,
       "message": "private",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62d98df6_a12d17b7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f77f186_f88df33e",
       "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fa1751d_19282e47",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d995d85_fc7ffae3",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a8a460e_e9e8c88c",
@@ -133,6 +259,24 @@
       "writtenOn": "2024-12-16T15:52:04Z",
       "side": 1,
       "message": "use random port instead",
+      "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1caa51c_8c517ea2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-07T09:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a8a460e_e9e8c88c",
       "revId": "3f9b1290f6b8771c9bd1de4775d9d3f33f6bade9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
