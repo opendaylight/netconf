@@ -14,7 +14,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,8 +92,7 @@ public class KillSubscriptionRpcTest {
 
     @Test
     void killSubscriptionWrongIDTest() {
-        doThrow(new NoSuchElementException("No such subscription was registered.")).when(stateMachine)
-            .getSubscriptionState(ID);
+        doReturn(null).when(stateMachine).getSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -104,6 +102,7 @@ public class KillSubscriptionRpcTest {
     @Test
     void killSubscriptionAlreadyEndedTest() {
         doReturn(SubscriptionState.END).when(stateMachine).getSubscriptionState(ID);
+        doThrow(new IllegalArgumentException()).when(stateMachine).moveTo(ID, SubscriptionState.END);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());

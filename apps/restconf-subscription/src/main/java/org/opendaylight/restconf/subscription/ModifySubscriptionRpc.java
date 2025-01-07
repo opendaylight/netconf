@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -98,16 +97,15 @@ public class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        try {
-            final var state = stateMachine.getSubscriptionState(id);
-            if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
-                    "There is no active or suspended subscription with given ID."));
-                return;
-            }
-        } catch (NoSuchElementException e) {
+        final var state = stateMachine.getSubscriptionState(id);
+        if (state == null) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
+            return;
+        }
+        if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+                "There is no active or suspended subscription with given ID."));
             return;
         }
 
