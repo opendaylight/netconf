@@ -16,6 +16,24 @@
       "message": "Not sure: this patch needs a deep look at when as session may be failing",
       "revId": "164955a7aae0b96061bacff93e035d56e2d3cd42",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30ce12f5_782c96df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-01-07T13:34:47Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1423?focusedCommentId\u003d45290\n\nBased on the current master logs, Session may be falling when:\n1) \"Connection reset by peer\". This Error invokes SSHTransportStack#sessionException method.\n```\n2024-12-07T20:53:40,790 | DEBUG | odl-netconf-client-15 | ClientConnectionService          | 291 - org.opendaylight.netconf.shaded-sshd - 9.0.0.SNAPSHOT | close(ClientConnectionService[TransportClientSession[netconf@127.0.0.1/127.0.0.1:830]])[Immediately] closed\n2024-12-07T20:53:40,790 | DEBUG | odl-netconf-client-15 | SequentialCloseable              | 291 - org.opendaylight.netconf.shaded-sshd - 9.0.0.SNAPSHOT | doClose(org.opendaylight.netconf.shaded.sshd.common.util.closeable.SequentialCloseable$1@5df30cb4) signal close complete immediately\u003dtrue\n2024-12-07T20:53:53,076 | WARN  | odl-netconf-client-15 | SSHTransportStack                | 296 - org.opendaylight.netconf.transport-ssh - 9.0.0.202412071714 | Session 1 encountered an error\nio.netty.channel.unix.Errors$NativeIoException: recvAddress(..) failed: Connection reset by peer\n```\n2) \"SSH2_DISCONNECT_BY_APPLICATION\" invokes SSHTransportStack#sessionDisconnect\n```\n2024-12-07T20:52:19,256 | DEBUG | odl-netconf-client-3 | SSHTransportStack                | 296 - org.opendaylight.netconf.transport-ssh - 9.0.0.202412071714 | Session 1 disconnected: SSH2_DISCONNECT_BY_APPLICATION\n```\n\n3) \"Session 1 closed\" Invoked by SSHTransportStack#sessionClosed. In the provided log, this is called 85 times. 20 of those calls are invoked after 1) case, One time after 2) case and 4 times after \"authentication failed\" which was resolved here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/114512\n\nOther 60 cases are direct call for session close. Related to call:\n\"org.opendaylight.netconf.shaded.sshd.netty.NettyIoSession$Adapter.channelInactive(NettyIoSession.java:364)\"\n\nShown in stacktrace.txt here:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1423?focusedCommentId\u003d45233 \n\n```\n2024-12-07T20:51:49,164 | DEBUG | odl-netconf-client-9 | SSHTransportStack                | 296 - org.opendaylight.netconf.transport-ssh - 9.0.0.202412071714 | Underlay establishing, attaching SSH to TCPTransportChannel{channel\u003d[id: 0x18dc83d1, L:/127.0.0.1:47988 - R:127.0.0.1/127.0.0.1:830]}\n2024-12-07T20:51:49,164 | DEBUG | odl-netconf-client-9 | ClientUserAuthService            | 291 - org.opendaylight.netconf.shaded-sshd - 9.0.0.SNAPSHOT | ClientUserAuthService(TransportClientSession[null@127.0.0.1/127.0.0.1:830]) client methods: [password]\n2024-12-07T20:51:49,171 | DEBUG | odl-netconf-client-9 | SSHTransportStack                | 296 - org.opendaylight.netconf.transport-ssh - 9.0.0.202412071714 | Session 1 closed\n```",
+      "parentUuid": "80672ebf_789c5c76",
+      "revId": "164955a7aae0b96061bacff93e035d56e2d3cd42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
