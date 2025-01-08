@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "87827319_bd08c959",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ChannelSender.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-08T13:01:48Z",
+      "side": 1,
+      "message": "consider overriding of `channelActive`, etc. method to get access to `ChannelHandlerContext ctx`",
+      "revId": "d2480542d88bfe27b41e27f0bb3f097f4db54468",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3c79e29a_947d0e92",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
         "patchSetId": 5
