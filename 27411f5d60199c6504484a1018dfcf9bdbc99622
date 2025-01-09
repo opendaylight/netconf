@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e40874a_2ef6508c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-09T06:50:10Z",
+      "side": 1,
+      "message": "we need an adaptation in code which uses this",
+      "revId": "27411f5d60199c6504484a1018dfcf9bdbc99622",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "638b0a9a_127bc0e6",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-09T06:50:10Z",
+      "side": 1,
+      "message": "not valid javadoc",
+      "revId": "27411f5d60199c6504484a1018dfcf9bdbc99622",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
