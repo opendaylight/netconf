@@ -55,7 +55,7 @@ public final class NetconfStream implements Closeable {
             @Reference final RestconfStream.Registry streamRegistry) {
         // write NETCONF stream to datastore
         final var source = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
-        streamRegistry.createStream(null, null, source, DESCRIPTION);
+        streamRegistry.createStream(NAME, source, DESCRIPTION);
 
         // start listener on model context change
         contextListenerReg = new ContextListener(notificationService, schemaService);
