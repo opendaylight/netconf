@@ -117,6 +117,25 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public <T> void createStream(final String name, final RestconfStream.Source<T> source, final String description) {
+        final var stream = new RestconfStream<>(this, source, name);
+
+        // FIXME: provide correct location
+        Futures.addCallback(putStream(streamEntry(name, description, "LOCATION", stream.encodings())),
+            new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(final Object result) {
+                registerStream(name, stream);
+                LOG.debug("Stream {} added", name);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Failed to add stream {}", name, cause);
+            }
+        }, MoreExecutors.directExecutor());
+    }
 
     @VisibleForTesting
     public static @NonNull MapEntryNode streamEntry(final String name, final String description,
