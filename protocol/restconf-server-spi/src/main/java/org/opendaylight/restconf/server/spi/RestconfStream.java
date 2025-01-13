@@ -168,6 +168,17 @@ public final class RestconfStream<T> {
          */
         <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
+
+        /**
+         * Create a {@link RestconfStream} with given name, create the corresponding instance and register it.
+         *
+         * @param <T> Stream type
+         * @param name Stream descriptiion
+         * @param source Stream instance
+         * @param description Stream descriptiion
+         * @throws NullPointerException if any argument is {@code null}
+         */
+        <T> void createStream(String name, Source<T> source, String description);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);

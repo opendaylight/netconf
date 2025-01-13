@@ -80,18 +80,11 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
     @Override
     public <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
             final RestconfStream.Source<T> source, final String description) {
-        if (request == null) {
-            // FIXME: refactor createStream method parameters so it also can be used without request or URI.
-            //  ideally with custom name.
-            //  or maybe something where we can register existing RestconfStream<> class?
-            createDefaultStream(source, "NETCONF", description);
-        }
         final var stream = allocateStream(source);
         final var name = stream.name();
         if (description.isBlank()) {
             throw new IllegalArgumentException("Description must be descriptive");
         }
-        registerStream(name, stream);
 
         Futures.addCallback(putStream(streamEntry(name, description)), new FutureCallback<Object>() {
             @Override
@@ -109,8 +102,8 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
         }, MoreExecutors.directExecutor());
     }
 
-    private  <T> void createDefaultStream(final RestconfStream.Source<T> source, final String name,
-            final String description) {
+    @Override
+    public <T> void createStream(final String name, final RestconfStream.Source<T> source, final String description) {
         final var stream = new RestconfStream<>(this, source, name);
 
         Futures.addCallback(putStream(streamEntry(name, description)), new FutureCallback<Object>() {
