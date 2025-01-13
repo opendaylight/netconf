@@ -56,7 +56,7 @@ public final class NetconfStream implements Closeable {
             @Reference final DatabindProvider databindProvider,
             @Reference final RestconfStream.Registry streamRegistry) {
         // write NETCONF stream to datastore
-        streamRegistry.createStream(null, null, new NotificationSource(databindProvider,
+        streamRegistry.createStream(NAME, new NotificationSource(databindProvider,
             notificationService, ImmutableSet.of(Stream.QNAME, NAME_QNAME)), DESCRIPTION);
 
         // start listener on model context change
