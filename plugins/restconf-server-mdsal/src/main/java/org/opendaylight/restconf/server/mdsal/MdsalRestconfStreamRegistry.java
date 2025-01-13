@@ -117,6 +117,27 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public <T> void createStream(final String name, final RestconfStream.Source<T> source, final String description) {
+        final var stream = new RestconfStream<>(this, source, name);
+
+        // FIXME: provide correct location for the stream without restconfURI parameter
+        //  the location currently pont to "/streams" but it's missing path root and is hardcoded here
+        //  somthing like it was proposed in NETCONF-1372 could solve this or investigate different solution
+        Futures.addCallback(putStream(streamEntry(name, description, "/streams", stream.encodings())),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(final Object result) {
+                    registerStream(name, stream);
+                    LOG.debug("Stream {} added", name);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.debug("Failed to add stream {}", name, cause);
+                }
+            }, MoreExecutors.directExecutor());
+    }
 
     @VisibleForTesting
     public static @NonNull MapEntryNode streamEntry(final String name, final String description,
