@@ -21,6 +21,7 @@ import org.opendaylight.netconf.transport.http.ErrorResponseException;
 import org.opendaylight.netconf.transport.http.EventStreamListener;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.notifications.mdsal.RestconfSubscriptionsStreamRegistry;
 import org.opendaylight.restconf.server.NettyMediaTypes;
 import org.opendaylight.restconf.server.PathParameters;
 import org.opendaylight.restconf.server.api.ServerError;
@@ -48,15 +49,17 @@ public class SubscribedEventStreamService implements EventStreamService {
     private final ErrorTagMapping errorTagMapping;
     private final RestconfStream.EncodingName defaultEncoding;
     private final PrettyPrintParam defaultPrettyPrint;
+    private final RestconfSubscriptionsStreamRegistry streamRegistry;
 
     public SubscribedEventStreamService(final SubscriptionStateMachine machine, final String basePath,
             final ErrorTagMapping errorTagMapping, final RestconfStream.EncodingName defaultEncoding,
-            final PrettyPrintParam defaultPrettyPrint) {
+            final PrettyPrintParam defaultPrettyPrint, final RestconfSubscriptionsStreamRegistry streamRegistry) {
         this.machine = requireNonNull(machine);
         this.basePath = basePath;
         this.errorTagMapping = errorTagMapping;
         this.defaultEncoding = defaultEncoding;
         this.defaultPrettyPrint = defaultPrettyPrint;
+        this.streamRegistry = requireNonNull(streamRegistry);
     }
 
     @Override
@@ -77,6 +80,12 @@ public class SubscribedEventStreamService implements EventStreamService {
         if (streamEncoding == null || streamName == null || streamName.isEmpty()) {
             callback.onStartFailure(errorResponse(ErrorTag.BAD_ATTRIBUTE, MISSING_PARAMS_ERROR,
                 streamEncoding == null ? defaultEncoding : streamEncoding));
+            return;
+        }
+
+        if (streamRegistry.lookupStream(streamName) == null) {
+            LOG.warn("Stream '{}' does not exist in the registry.", streamName);
+            callback.onStartFailure(errorResponse(ErrorTag.DATA_MISSING, UNKNOWN_STREAM_ERROR, streamEncoding));
             return;
         }
 
