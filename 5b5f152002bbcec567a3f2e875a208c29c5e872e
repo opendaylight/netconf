@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "395507dd_31d83017",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ContextListener.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-14T15:47:11Z",
+      "side": 1,
+      "message": "as mentioned in NetconfStream I think we could benefit from receiving existing DefaultNotificationSource here.",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1c44ae4_3a8b146b",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ContextListener.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-14T15:47:11Z",
+      "side": 1,
+      "message": "imo it would be better to reuse existing source by updating it then creating new one, so it can be used in RestconfStream",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ff89664_95bcb7e8",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-14T15:47:11Z",
+      "side": 1,
+      "message": "maybe bit confusing, I think it implies that NetconfStream extends RestconfStream.\nBut it\u0027s current role is just creating it.",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c833be98_dd953693",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-14T15:47:11Z",
+      "side": 1,
+      "message": "I would expect DefaultNotificationSource is created here and passed to createStream() \nand we would also used it to create ContextListener?",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
