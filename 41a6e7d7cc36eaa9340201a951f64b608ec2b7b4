@@ -16,6 +16,24 @@
       "message": "wrong name",
       "revId": "41a6e7d7cc36eaa9340201a951f64b608ec2b7b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3e75e52_62062c24",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-14T15:48:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11ec0f8c_a0aac3c3",
+      "revId": "41a6e7d7cc36eaa9340201a951f64b608ec2b7b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
