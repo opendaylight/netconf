@@ -16,6 +16,24 @@
       "message": "This should be preferably done before https://git.opendaylight.org/gerrit/c/netconf/+/114496",
       "revId": "d381d7ab6c9482ec04b7e8d2245c2645424dff5c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f78533c_110cdfc7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-14T09:29:06Z",
+      "side": 1,
+      "message": "wait please",
+      "parentUuid": "1bdaebaf_a45d8c2d",
+      "revId": "d381d7ab6c9482ec04b7e8d2245c2645424dff5c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
