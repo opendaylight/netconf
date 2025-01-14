@@ -27,6 +27,7 @@ import org.opendaylight.netconf.transport.http.ErrorResponseException;
 import org.opendaylight.netconf.transport.http.EventStreamListener;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.notifications.mdsal.RestconfSubscriptionsStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -47,6 +48,10 @@ public class SubscribedEventStreamServiceTest {
     private EventStreamListener listener;
     @Mock
     private EventStreamService.StartCallback callback;
+    @Mock
+    private RestconfSubscriptionsStreamRegistry streamRegistry;
+    @Mock
+    private RestconfStream restconfStream;
     @Captor
     private ArgumentCaptor<Exception> exceptionCaptor;
 
@@ -55,7 +60,7 @@ public class SubscribedEventStreamServiceTest {
     @BeforeEach
     void setUp() {
         service = new SubscribedEventStreamService(machine, BASE_PATH, ErrorTagMapping.RFC8040,
-            RestconfStream.EncodingName.RFC8040_JSON, PrettyPrintParam.FALSE);
+            RestconfStream.EncodingName.RFC8040_JSON, PrettyPrintParam.FALSE, streamRegistry);
     }
 
     @Test
@@ -82,8 +87,6 @@ public class SubscribedEventStreamServiceTest {
     void testStartEventStreamUnknownStream() {
         final var unknownStreamUri = REQUEST_URI + "/2147483648";
 
-        when(machine.getSubscriptionSession(Uint32.valueOf(2147483648L))).thenReturn(null);
-
         service.startEventStream(unknownStreamUri, listener, callback);
 
         verify(callback).onStartFailure(exceptionCaptor.capture());
@@ -92,8 +95,10 @@ public class SubscribedEventStreamServiceTest {
 
     @Test
     void testStartEventStreamSuccess() {
-        final var validUri = REQUEST_URI + "/2147483648";
+        final var streamName = "2147483648";
+        final var validUri = REQUEST_URI + "/" + streamName;
 
+        when(streamRegistry.lookupStream(streamName)).thenReturn(restconfStream);
         when(machine.getSubscriptionSession(Uint32.valueOf(2147483648L))).thenReturn(
             registration -> { });
         service.startEventStream(validUri, listener, callback);
