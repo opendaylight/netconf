@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56d76d54_2112d29a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1018,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-15T15:37:00Z",
+      "side": 1,
+      "message": "bit strange to start with a link\n\nand imo redundant as it\u0027s referenced below",
+      "revId": "30705aef172248a73e798f41668fcb71768dff31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5b7c1ca_322612b3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1026,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-15T15:37:00Z",
+      "side": 1,
+      "message": "So if i understand correctly these are just examples to show how the subtree filtering works, and not requests user can make.\n\nI think it would be good to point that out more.",
+      "revId": "30705aef172248a73e798f41668fcb71768dff31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
