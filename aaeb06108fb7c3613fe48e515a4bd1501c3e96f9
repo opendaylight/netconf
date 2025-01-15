@@ -33,6 +33,24 @@
       "message": "We don\u0027t have encoding in Subscription to YANG Notifications",
       "revId": "aaeb06108fb7c3613fe48e515a4bd1501c3e96f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b29de521_63e7038d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscribedEventStreamService.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-01-15T12:03:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b68d6397_c149ffa3",
+      "revId": "aaeb06108fb7c3613fe48e515a4bd1501c3e96f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
