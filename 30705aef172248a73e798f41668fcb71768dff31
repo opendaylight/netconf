@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9a71898_efe8c737",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1018,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-16T13:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56d76d54_2112d29a",
+      "revId": "30705aef172248a73e798f41668fcb71768dff31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5b7c1ca_322612b3",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a16f2357_a91b643e",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1026,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-16T13:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5b7c1ca_322612b3",
+      "revId": "30705aef172248a73e798f41668fcb71768dff31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97050e52_ef58a687",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-01-16T08:28:10Z",
       "side": 1,
       "message": "Also for example this is request to establish subscription I would expect.\n\nBut the below response is not a response to this, more like result of applying given filter to some data.",
+      "revId": "30705aef172248a73e798f41668fcb71768dff31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed5e6e00_a4cfba82",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1066,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-16T13:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97050e52_ef58a687",
       "revId": "30705aef172248a73e798f41668fcb71768dff31",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

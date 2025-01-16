@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9401a63_d7c23c8e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeFilterRestconf.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-16T13:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3d187e3_083386ae",
+      "range": {
+        "startLine": 36,
+        "startChar": 12,
+        "endLine": 36,
+        "endChar": 63
+      },
+      "revId": "21336001aca3402e6585706a509515fe6e0a6698",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "242ad932_70693517",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-01-16T09:03:49Z",
       "side": 1,
       "message": "LOG.warn()?",
+      "range": {
+        "startLine": 56,
+        "startChar": 8,
+        "endLine": 56,
+        "endChar": 58
+      },
+      "revId": "21336001aca3402e6585706a509515fe6e0a6698",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a615fc9b_57381b75",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeFilterRestconf.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-16T13:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "242ad932_70693517",
       "range": {
         "startLine": 56,
         "startChar": 8,
