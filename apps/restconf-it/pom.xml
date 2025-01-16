@@ -284,6 +284,16 @@
             <artifactId>restconf-openapi</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-subscription</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-notifications</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
