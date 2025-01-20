@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -102,6 +104,11 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
+
+    private static final String SUBSCRIPTION_ID_KEY = "\"subscription-id\":";
+
+    protected static final String APPLICATION_JSON = "application/json";
+    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
@@ -270,5 +277,30 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         } catch (IOException e) {
             throw new AssertionError(e);
         }
+    }
+
+    /**
+     * Utility method to extract subscription ID from response.
+     */
+    protected String extractSubscriptionId(final FullHttpResponse response) throws JsonProcessingException {
+        final var responseBody = response.content().toString(StandardCharsets.UTF_8);
+        final var jsonNode = OBJECT_MAPPER.readTree(responseBody);
+        return jsonNode.at("/ietf-subscribed-notifications:output/id").asText();
+    }
+
+    /**
+     * Utility method to establish a subscription.
+     */
+    protected FullHttpResponse establishSubscription(final String stream, final String encoding) throws Exception {
+        final var input = String.format("""
+            {
+              "input": {
+                "stream": "%s"
+              }
+            }""", stream, encoding);
+
+        return invokeRequest(HttpMethod.POST,
+            "/restconf/operations/ietf-subscribed-notifications:establish-subscription",
+            "application/json", input);
     }
 }
