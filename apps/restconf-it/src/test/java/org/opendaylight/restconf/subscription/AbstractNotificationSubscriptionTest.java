@@ -96,6 +96,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
+    private static final String SUBSCRIPTION_ID_KEY = "\"subscription-id\":";
 
     protected static final String APPLICATION_JSON = "application/json";
 
@@ -200,18 +201,14 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         sshTransportStackFactory.close();
     }
 
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
-        return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
+    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String acceptType)
+            throws Exception {
+        return invokeRequest(buildRequest(method, uri, null, null, acceptType));
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
             final String content) throws Exception {
         return invokeRequest(buildRequest(method, uri, mediaType, content, null));
-    }
-
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
-            final String acceptType, final String content) throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, content, acceptType));
     }
 
     protected FullHttpResponse invokeRequest(final FullHttpRequest request) throws Exception {
@@ -263,6 +260,33 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         } catch (IOException e) {
             throw new AssertionError(e);
         }
+    }
+
+    /**
+     * Utility method to extract subscription ID from response.
+     */
+    protected String extractSubscriptionId(final FullHttpResponse response) {
+        final var responseBody = response.content().toString(StandardCharsets.UTF_8);
+        final var startIndex = responseBody.indexOf(SUBSCRIPTION_ID_KEY) + SUBSCRIPTION_ID_KEY.length();
+        final var endIndex = responseBody.indexOf("}", startIndex);
+        return responseBody.substring(startIndex, endIndex).replaceAll("[^0-9]", "").trim();
+    }
+
+    /**
+     * Utility method to establish a subscription.
+     */
+    protected FullHttpResponse establishSubscription(final String stream, final String encoding) throws Exception {
+        final var input = String.format("""
+            {
+              "input": {
+                "stream": "%s",
+                "encoding": "%s"
+              }
+            }""", stream, encoding);
+
+        return invokeRequest(HttpMethod.POST,
+            "/restconf/operations/ietf-subscribed-notifications:establish-subscription",
+            APPLICATION_JSON, input);
     }
 
     private final class TestSubscriptionsStreamRegistry extends AbstractRestconfStreamRegistry {
