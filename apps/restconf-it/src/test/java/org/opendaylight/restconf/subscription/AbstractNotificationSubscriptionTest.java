@@ -222,8 +222,13 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         sshTransportStackFactory.close();
     }
 
-    FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
-        return invokeRequest(buildRequest(method, uri, "application/json", null, null));
+    FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String acceptType) throws Exception {
+        return invokeRequest(buildRequest(method, uri, null, null, acceptType));
+    }
+
+    FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String contentType,
+        final String content, final String acceptType) throws Exception {
+        return invokeRequest(buildRequest(method, uri, contentType, content, acceptType));
     }
 
     private FullHttpResponse invokeRequest(final FullHttpRequest request) throws Exception {
