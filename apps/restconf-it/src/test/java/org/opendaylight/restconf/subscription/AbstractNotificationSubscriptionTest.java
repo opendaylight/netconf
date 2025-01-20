@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.subscription;
 
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.common.cache.CacheBuilder;
@@ -19,6 +20,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -250,7 +252,33 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         return response;
     }
 
-    private FullHttpRequest buildRequest(final HttpMethod method, final String uri, final String mediaType,
+    protected FullHttpResponse invokeTwoRequests(final FullHttpRequest request1, final FullHttpRequest request2)
+            throws Exception {
+        final var channelListener = new TestTransportChannelListener(ignored -> {
+            // no-op
+        });
+        final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
+            clientStackGrouping, false).get(2, TimeUnit.SECONDS);
+        // await for connection
+        await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
+        final var callback = new TestRequestCallback();
+        client.invoke(request1, callback);
+        // await for response
+        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        final var response1 = callback.response();
+        assertNotNull(response1);
+        assertEquals(HttpResponseStatus.OK, response1.status());
+
+        client.invoke(request2, callback);
+        // await for response
+        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        final var response2 = callback.response();
+        assertNotNull(response2);
+        client.shutdown().get(2, TimeUnit.SECONDS);
+        return response2;
+    }
+
+    protected FullHttpRequest buildRequest(final HttpMethod method, final String uri, final String mediaType,
             final String content, final String acceptType) {
         final var contentBuf = content == null ? Unpooled.EMPTY_BUFFER
             : Unpooled.wrappedBuffer(content.getBytes(StandardCharsets.UTF_8));
