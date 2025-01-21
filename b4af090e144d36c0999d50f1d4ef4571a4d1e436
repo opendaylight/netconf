@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69ebf057_f57d235b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-01-21T11:15:03Z",
+      "side": 1,
+      "message": "why not use random port like in every other tests",
+      "range": {
+        "startLine": 127,
+        "startChar": 21,
+        "endLine": 127,
+        "endChar": 26
+      },
+      "revId": "b4af090e144d36c0999d50f1d4ef4571a4d1e436",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
