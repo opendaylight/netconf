@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dc31f348_1f8220a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-01-21T10:43:34Z",
+      "side": 1,
+      "message": "not resolved",
+      "parentUuid": "79176d45_bb093ba9",
+      "revId": "aaeb06108fb7c3613fe48e515a4bd1501c3e96f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b68d6397_c149ffa3",
         "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscribedEventStreamService.java",
         "patchSetId": 14
