@@ -16,6 +16,24 @@
       "message": "extra line",
       "revId": "6be75de8c4c6019a46b53fb6041e6fe7b1f48f2a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0f573e5_20af805e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-22T07:36:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "780663d9_a4379a62",
+      "revId": "6be75de8c4c6019a46b53fb6041e6fe7b1f48f2a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
