@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -49,17 +50,20 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
 
     @Override
     public void sendDataMessage(final String data) {
-        // FIXME: finish this up
+        if (!data.isEmpty()) {
+            context.writeAndFlush(ByteBufUtil.writeUtf8(context.alloc(), data));
+        }
     }
 
     @Override
     public void endOfStream() {
-        // FIXME: finish this up
+        registration.close();
+        context.close();
     }
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-        // FIXME: finish this up
+        context.close();
         super.channelInactive(ctx);
     }
 
