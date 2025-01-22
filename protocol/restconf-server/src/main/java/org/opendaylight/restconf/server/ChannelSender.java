@@ -9,7 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -30,7 +30,6 @@ import org.opendaylight.yangtools.concepts.Registration;
  * are fully compliant with the HTTP specification.
  */
 final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> implements Sender {
-    @SuppressFBWarnings("URF_UNREAD_FIELD") //FIXME: Just to pass check, remove when in use.
     private Registration registration;
     private ChannelHandlerContext context;
 
@@ -49,17 +48,26 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
 
     @Override
     public void sendDataMessage(final String data) {
-        // FIXME: finish this up
+        if (!data.isEmpty() && context != null) {
+            context.writeAndFlush(ByteBufUtil.writeUtf8(context.alloc(), data));
+        }
     }
 
     @Override
     public void endOfStream() {
-        // FIXME: finish this up
+        if (registration != null) {
+            registration.close();
+        }
+        if (context != null) {
+            context.close();
+        }
     }
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-        // FIXME: finish this up
+        if (context != null) {
+            context.close();
+        }
         super.channelInactive(ctx);
     }
 
