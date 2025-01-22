@@ -49,12 +49,16 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
 
     @Override
     public void sendDataMessage(final String data) {
-        // FIXME: finish this up
+        if (!data.isEmpty()) {
+            context.write(data);
+        }
+
     }
 
     @Override
     public void endOfStream() {
-        // FIXME: finish this up
+        registration.close();
+        context.close();
     }
 
     @Override
