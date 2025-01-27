@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
+import org.opendaylight.netconf.transport.http.SSEResponse;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResource;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
@@ -193,10 +194,8 @@ final class EndpointRoot {
             return EmptyResponse.NOT_FOUND;
         }
 
-        // Replace ourselves with the sender and enable it wil the registration
-        sender.getCtx().channel().pipeline().replace(handler, null, sender);
         sender.enable(registration);
-        return EmptyResponse.OK;
+        return new SSEResponse(sender, handler);
     }
 
     // HTTP/2 event stream start.
