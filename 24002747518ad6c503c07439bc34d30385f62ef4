@@ -16,6 +16,23 @@
       "message": "final",
       "revId": "24002747518ad6c503c07439bc34d30385f62ef4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d729e67_c4e4b877",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DefaultNotificationSource.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T08:35:17Z",
+      "side": 1,
+      "message": "Why two lines? Things like this shows the effort given to the task.",
+      "revId": "24002747518ad6c503c07439bc34d30385f62ef4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
