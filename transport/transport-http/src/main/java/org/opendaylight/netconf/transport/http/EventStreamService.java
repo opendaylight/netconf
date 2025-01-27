@@ -30,7 +30,7 @@ public interface EventStreamService {
      * @param listener SSE event consumer
      * @param callback SSE stream request callback
      */
-    void startEventStream(String requestUri, EventStreamListener listener, StartCallback callback);
+    void startEventStream(String host ,String requestUri, EventStreamListener listener, StartCallback callback);
 
     /**
      * Invoked when the request to attach to an event stream finishes.
