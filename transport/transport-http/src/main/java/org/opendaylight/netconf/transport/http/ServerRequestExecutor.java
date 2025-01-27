@@ -119,6 +119,8 @@ final class ServerRequestExecutor implements PendingRequestListener {
         switch (response) {
             case ReadyResponse resp -> HTTPServerSession.respond(ctx, streamId, resp.toHttpResponse(version));
             case FiniteResponse resp -> respond(ctx, streamId, version, resp);
+            case EventStreamResponse resp -> HTTPServerSession.respond(ctx, streamId,
+                resp.start(ctx, streamId, version));
         }
     }
 
