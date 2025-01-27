@@ -102,6 +102,24 @@
       "message": "I would expect DefaultNotificationSource is created here and passed to createStream() \nand we would also used it to create ContextListener?",
       "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5e186a1_fb7683c3",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:57:40Z",
+      "side": 1,
+      "message": "Instead of putStream() we are going to use createStream()",
+      "parentUuid": "c833be98_dd953693",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

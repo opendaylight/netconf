@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf54b249_5795e133",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ContextListener.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:57:40Z",
+      "side": 1,
+      "message": "final",
+      "revId": "24002747518ad6c503c07439bc34d30385f62ef4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
