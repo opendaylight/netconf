@@ -8,10 +8,13 @@
 package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.transport.http.SseUtils.chunksOf;
 
-import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -30,11 +33,21 @@ import org.opendaylight.yangtools.concepts.Registration;
  * are fully compliant with the HTTP specification.
  */
 final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> implements Sender {
+    private static final ByteBuf EMPTY_LINE = Unpooled.wrappedBuffer(new byte[] { '\r', '\n' }).asReadOnly();
+    private final int sseMaximumFragmentLength;
     private Registration registration;
     private ChannelHandlerContext context;
 
-    ChannelSender() {
+    ChannelSender(int sseMaximumFragmentLength) {
         super(FullHttpRequest.class);
+        this.sseMaximumFragmentLength = sseMaximumFragmentLength;
+        context = null;
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        context = ctx;
+        super.handlerAdded(ctx);
     }
 
     void enable(final Registration reg) {
@@ -49,7 +62,9 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
     @Override
     public void sendDataMessage(final String data) {
         if (!data.isEmpty() && context != null) {
-            context.writeAndFlush(ByteBufUtil.writeUtf8(context.alloc(), data));
+            chunksOf("data", data, sseMaximumFragmentLength, context.alloc())
+                .forEach(chunk -> context.writeAndFlush(new DefaultHttpContent(chunk)));
+            context.writeAndFlush(new DefaultHttpContent(EMPTY_LINE.retainedSlice()));
         }
     }
 

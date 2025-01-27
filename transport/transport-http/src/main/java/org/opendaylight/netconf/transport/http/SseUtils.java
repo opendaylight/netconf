@@ -64,7 +64,7 @@ public final class SseUtils {
      * @param allocator the {@link ByteBufAllocator} instance used to allocate space for binary data
      * @return list of {@link ByteBuf}
      */
-    static List<ByteBuf> chunksOf(final String fieldName, final String fieldValue, final int maxValueLength,
+    public static List<ByteBuf> chunksOf(final String fieldName, final String fieldValue, final int maxValueLength,
             final ByteBufAllocator allocator) {
         final var valueStr = CRLF_MATCHER.removeFrom(requireNonNull(fieldValue));
         final var valueLen = valueStr.length();
