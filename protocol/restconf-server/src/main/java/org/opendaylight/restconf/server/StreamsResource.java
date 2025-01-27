@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.EventStreamResponse;
 import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -50,11 +51,16 @@ final class StreamsResource extends AbstractLeafResource {
     private static final AsciiString STREAM_ID = HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text();
 
     private final RestconfStream.Registry streamRegistry;
+    private final int sseHeartbeatIntervalMillis;
+    private final int sseMaximumFragmentLength;
     private final Map<Integer, Registration> senders = new HashMap<>();
 
-    StreamsResource(final EndpointInvariants invariants, final RestconfStream.Registry streamRegistry) {
+    StreamsResource(final EndpointInvariants invariants, final RestconfStream.Registry streamRegistry,
+            final int sseHeartbeatIntervalMillis, final int sseMaximumFragmentLength) {
         super(invariants);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.sseHeartbeatIntervalMillis = sseHeartbeatIntervalMillis;
+        this.sseMaximumFragmentLength = sseMaximumFragmentLength;
     }
 
     @Override
@@ -98,7 +104,7 @@ final class StreamsResource extends AbstractLeafResource {
             return EmptyResponse.NOT_FOUND;
         }
 
-        if (headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
+        if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
 
@@ -122,23 +128,20 @@ final class StreamsResource extends AbstractLeafResource {
     // not be servicing any other requests.
     private PreparedRequest switchToEventStream(final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
-        final var sender = new ChannelSender();
+        final var sender = new ChannelSender(sseMaximumFragmentLength);
         final Registration registration = registerSender(stream, encoding, params, sender);
 
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;
         }
-        final var ctx = sender.getCtx();
 
-        // Replace ourselves with the sender and enable it wil the registration
-        ctx.channel().pipeline().replace(ctx.handler(), null, sender);
         sender.enable(registration);
-        return EmptyResponse.OK;
+        return new EventStreamResponse(HttpResponseStatus.OK, sender, sseHeartbeatIntervalMillis);
     }
 
     // HTTP/2 event stream start.
     private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
-        final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
+            final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
         final var sender = new StreamSender(streamId);
         final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {

@@ -26,11 +26,12 @@ public interface EventStreamService {
      * <p>If request is declined then {@link StartCallback#onStartFailure(Exception)} method invoked with
      * {@link Exception} describing the decline reason.
      *
+     * @param host host to be used in headers of stream request
      * @param requestUri stream request URI
      * @param listener SSE event consumer
      * @param callback SSE stream request callback
      */
-    void startEventStream(String requestUri, EventStreamListener listener, StartCallback callback);
+    void startEventStream(String host, String requestUri, EventStreamListener listener, StartCallback callback);
 
     /**
      * Invoked when the request to attach to an event stream finishes.
