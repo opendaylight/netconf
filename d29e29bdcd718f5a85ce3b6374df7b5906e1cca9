@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db03c9e9_3dd3fff7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscribedEventStreamService.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-01-27T11:39:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4dec2f1_28e29979",
+      "range": {
+        "startLine": 51,
+        "startChar": 51,
+        "endLine": 51,
+        "endChar": 100
+      },
+      "revId": "d29e29bdcd718f5a85ce3b6374df7b5906e1cca9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d0a74a1e_40e211fc",
