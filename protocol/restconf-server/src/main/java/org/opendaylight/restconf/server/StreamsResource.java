@@ -30,12 +30,14 @@ import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
+import org.opendaylight.netconf.transport.http.SSEResponse;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,15 +79,15 @@ final class StreamsResource extends AbstractLeafResource {
             return HeadersResponse.of(HttpResponseStatus.OK, HttpHeaderNames.CONTENT_TYPE,
                 HttpHeaderValues.TEXT_EVENT_STREAM);
         }
-        final var peeler = new SegmentPeeler(targetUri);
+        final var peeler = new SegmentPeeler(path);
 
         if (!peeler.hasNext()) {
             return EmptyResponse.NOT_FOUND;
         }
         final var encodingName = peeler.next();
-        final RestconfStream.EncodingName encoding;
+        final EncodingName encoding;
         try {
-            encoding = new RestconfStream.EncodingName(encodingName);
+            encoding = new EncodingName(encodingName);
         } catch (IllegalArgumentException e) {
             LOG.debug("Stream encoding name '{}' is invalid", encodingName, e);
             return EmptyResponse.NOT_FOUND;
@@ -124,7 +126,7 @@ final class StreamsResource extends AbstractLeafResource {
     // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
     // not be servicing any other requests.
     private PreparedRequest switchToEventStream(final ChannelHandler handler, final RestconfStream<?> stream,
-        final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
+        final EncodingName encoding, final EventStreamGetParams params) {
         final var sender = new ChannelSender();
         final Registration registration = registerSender(stream, encoding, params, sender);
 
@@ -132,15 +134,13 @@ final class StreamsResource extends AbstractLeafResource {
             return EmptyResponse.NOT_FOUND;
         }
 
-        // Replace ourselves with the sender and enable it wil the registration
-        sender.getCtx().channel().pipeline().replace(handler, null, sender);
         sender.enable(registration);
-        return EmptyResponse.OK;
+        return new SSEResponse(HttpResponseStatus.OK, sender, handler);
     }
 
     // HTTP/2 event stream start.
     private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
-        final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
+        final EncodingName encoding, final EventStreamGetParams params) {
         final var sender = new StreamSender(streamId);
         final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {
@@ -152,7 +152,7 @@ final class StreamsResource extends AbstractLeafResource {
         return EmptyResponse.OK;
     }
 
-    private static @Nullable Registration registerSender(final RestconfStream<?> stream, final RestconfStream.EncodingName encoding,
+    private static @Nullable Registration registerSender(final RestconfStream<?> stream, final EncodingName encoding,
         final EventStreamGetParams params, final RestconfStream.Sender sender) {
         final Registration reg;
         try {

@@ -10,23 +10,13 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.ChannelHandler;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http2.Http2Exception;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import io.netty.util.AsciiString;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
@@ -34,11 +24,8 @@ import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResource;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
-import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
@@ -130,14 +117,5 @@ final class EndpointRoot {
         final var resource = resources.get(segment);
         return resource == null ? EmptyResponse.NOT_FOUND
             : resource.prepare(method, targetUri, headers, peeler, wellKnown);
-    }
-
-    public Boolean exceptionCaught(Http2Exception.StreamException se) {
-        final var sender = senders.remove(se.streamId());
-        if (sender != null) {
-            sender.close();
-            return true;
-        }
-        return false;
     }
 }

@@ -13,7 +13,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http2.Http2Exception;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
@@ -77,16 +76,6 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
     RestconfSession(final HTTPScheme scheme, final EndpointRoot root) {
         super(scheme);
         this.root = requireNonNull(root);
-    }
-
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (cause instanceof Http2Exception.StreamException se) {
-            if (root.exceptionCaught(se)) {
-                return;
-            }
-        }
-        super.exceptionCaught(ctx, cause);
     }
 
     @Override

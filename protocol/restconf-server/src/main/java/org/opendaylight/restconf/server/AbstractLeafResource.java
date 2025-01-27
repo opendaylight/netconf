@@ -36,6 +36,6 @@ abstract sealed class AbstractLeafResource extends AbstractResource
         return prepare(channelHandler, session, method, targetUri, headers, principal, peeler.remaining());
     }
 
-    abstract PreparedRequest prepare(final ChannelHandler channelHandler, TransportSession session,
+    abstract PreparedRequest prepare(ChannelHandler channelHandler, TransportSession session,
         ImplementedMethod method, URI targetUri, HttpHeaders headers, @Nullable Principal principal, String path);
 }

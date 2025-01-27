@@ -37,6 +37,12 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
         super(FullHttpRequest.class);
     }
 
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        context = ctx;
+        super.handlerAdded(ctx);
+    }
+
     void enable(final Registration reg) {
         registration = requireNonNull(reg);
     }
