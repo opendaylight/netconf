@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0a74a1e_40e211fc",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/PathParameters.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T09:18:37Z",
+      "side": 1,
+      "message": "No, subscription are not located at /streams",
+      "revId": "d29e29bdcd718f5a85ce3b6374df7b5906e1cca9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
