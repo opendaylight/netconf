@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b4fa324_b964e68f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T09:16:35Z",
+      "side": 1,
+      "message": "Maybe more desired solution would be to eliminate createStream() method which requires request input because its used only to create data change streams (via REST request).\n\nCall new method from that place instead?",
+      "revId": "c4622f030fb7cc82a309df87d1eda79454af175f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "831def7c_42b8ece7",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T09:16:35Z",
+      "side": 1,
+      "message": "I would expect that this will call:\n\ncreateStream(null, null, source, description)",
+      "revId": "c4622f030fb7cc82a309df87d1eda79454af175f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
