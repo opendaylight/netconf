@@ -82,7 +82,7 @@ final class ClientHttp2SseService extends ChannelInboundHandlerAdapter
     }
 
     @Override
-    public void startEventStream(final String requestUri, final EventStreamListener listener,
+    public void startEventStream(final String host, final String requestUri, final EventStreamListener listener,
             final StartCallback callback) {
         if (!channel.isActive()) {
             callback.onStartFailure(new IllegalStateException("Connection is closed"));

@@ -59,7 +59,7 @@ final class ClientHttp1SseService implements EventStreamService {
     }
 
     @Override
-    public void startEventStream(final String requestUri, final EventStreamListener listener,
+    public void startEventStream(final String host, final String requestUri, final EventStreamListener listener,
             final StartCallback callback) {
         if (!channel.isActive()) {
             callback.onStartFailure(new IllegalStateException("Connection is closed"));
@@ -92,7 +92,8 @@ final class ClientHttp1SseService implements EventStreamService {
         request.headers()
             .set(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM)
             .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
-            .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+            .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED)
+            .set(HttpHeaderNames.HOST, host);
         channel.writeAndFlush(request);
         LOG.debug("SSE request sent to {}", requestUri);
     }
