@@ -16,6 +16,23 @@
       "message": "Based on WIP patch",
       "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb1423bf_df429d5d",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:48:50Z",
+      "side": 1,
+      "message": "Yes, please implement, that\u0027s your task..",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
