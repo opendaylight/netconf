@@ -21,6 +21,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
@@ -29,7 +30,6 @@ import io.netty.util.AsciiString;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * <ol>
  *   <li>request method binding, performed on the Netty thread via {@link #implementationOf(HttpMethod)}</li>
  *   <li>request path and header binding, performed on the Netty thread via
- *       {@link #prepareRequest(ImplementedMethod, URI, HttpHeaders)}</li>
+ *       {@link #prepareRequest(ChannelHandler, ImplementedMethod, URI, HttpHeaders)}</li>
  *   <li>request execution, performed in a dedicated thread, via
  *       {@link PendingRequest#execute(PendingRequestListener, java.io.InputStream)}</li>
  *   <li>response execution, performed in another dedicated thread</li>
@@ -258,7 +258,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
 
     @NonNullByDefault
     static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
-            final FullHttpResponse response) {
+            final HttpResponse response) {
         requireNonNull(response);
         if (streamId != null) {
             response.headers().setInt(STREAM_ID, streamId);

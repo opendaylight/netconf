@@ -19,20 +19,18 @@ import org.opendaylight.yangtools.concepts.Registration;
  * A {@link Sender} bound directly to the underlying transport channel. This is how event streams are delivered over
  * HTTP/1: there is no provision for executing other requests while the event stream is active.
  *
- * <p>
- * While it might be possible to service requests after the stream has ended (on our side), implementing that would be
- * quite complicated, as we essentially would have to shutdown channel reads while we are sending the stream -- except
- * we cannot do that, because TLS underlay needs bidirectional communication for rekeying. Hence we would have to buffer
- * all requests until the stream finishes -- i.e. exerting no backpressure on the client and accumulating state, which
- * is a recipe for a DoS.
+ * <p>While it might be possible to service requests after the stream has ended (on our side), implementing that would
+ * be quite complicated, as we essentially would have to shutdown channel reads while we are sending the
+ * stream -- except we cannot do that, because TLS underlay needs bidirectional communication for rekeying.
+ * Hence, we would have to buffer all requests until the stream finishes -- i.e. exerting no backpressure on the client
+ * and accumulating state, which is a recipe for a DoS.
  *
- * <p>
- * Hence what this does is drop any request we receive and terminate the connection when the stream ends. That way we
+ * <p>Hence what this does is drop any request we receive and terminate the connection when the stream ends. That way we
  * are fully compliant with the HTTP specification.
  */
 final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> implements Sender {
-    private Registration registration;
-    private ChannelHandlerContext context;
+    private Registration registration = null;
+    private ChannelHandlerContext context = null;
 
     ChannelSender() {
         super(FullHttpRequest.class);

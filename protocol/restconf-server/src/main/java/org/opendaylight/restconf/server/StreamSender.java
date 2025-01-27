@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import static java.util.Objects.requireNonNull;
-
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 
 /**
@@ -16,10 +14,11 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
  * be executed concurrently and the sender can be terminated when the stream is terminated.
  */
 final class StreamSender implements Sender {
-    private final Integer streamId;
+    //private final Integer streamId;
 
     StreamSender(final Integer streamId) {
-        this.streamId = requireNonNull(streamId);
+        //this.streamId = requireNonNull(streamId);
+        // FIXME: finish this up
     }
 
     @Override
