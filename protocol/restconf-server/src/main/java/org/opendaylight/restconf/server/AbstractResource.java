@@ -94,7 +94,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
      * @param principal the {@link Principal} making this request, {@code null} if not known
      * @return A {@link PreparedRequest}
      */
-    abstract PreparedRequest prepare(final ChannelHandler channelHandler, SegmentPeeler peeler,
+    abstract PreparedRequest prepare(ChannelHandler channelHandler, SegmentPeeler peeler,
             TransportSession session, ImplementedMethod method, URI targetUri, HttpHeaders headers,
             @Nullable Principal principal);
 

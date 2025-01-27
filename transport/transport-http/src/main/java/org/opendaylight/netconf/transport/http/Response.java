@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * {@link #asResponse()}. It has a {@link #status()} and can be turned into (a series of) HTTP codec objects.
  */
 @NonNullByDefault
-public sealed interface Response extends CompletedRequest permits ReadyResponse, FiniteResponse {
+public sealed interface Response extends CompletedRequest permits ReadyResponse, FiniteResponse, SSEResponse {
     @Override
     default Response asResponse() {
         return this;
