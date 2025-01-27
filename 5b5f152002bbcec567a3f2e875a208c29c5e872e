@@ -156,6 +156,24 @@
       "parentUuid": "c5e186a1_fb7683c3",
       "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f41a4e4_0e524391",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T10:02:28Z",
+      "side": 1,
+      "message": "SubscribedEventStreamService will the call start() on the provided stream source",
+      "parentUuid": "13f5b8cf_ea592d6f",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
