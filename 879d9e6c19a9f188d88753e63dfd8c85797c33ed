@@ -33,6 +33,74 @@
       "message": "Yes, please implement, that\u0027s your task..",
       "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af115597_3a666eb5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:53:24Z",
+      "side": 1,
+      "message": "What are we waiting for?",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc03cf55_777910db",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:53:24Z",
+      "side": 1,
+      "message": "IMHO: This is related to RFC8040 stream only",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87e8d498_9efb919b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:53:24Z",
+      "side": 1,
+      "message": "Be careful what you commit and review - this is not ODL codestyle",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de2315b8_533b0001",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T07:53:24Z",
+      "side": 1,
+      "message": "Do we really need to make this public?",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
