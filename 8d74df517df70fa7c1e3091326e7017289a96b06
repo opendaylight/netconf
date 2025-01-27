@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "8d74df517df70fa7c1e3091326e7017289a96b06",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3040142a_8ba8b71d",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/SubscribedEventStreamServiceTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-01-27T09:23:20Z",
+      "side": 1,
+      "message": "We are listening at:\n\n\u003cserver\u003e:\u003cport\u003e/subscriptions/\u003csubscription-id\u003e\n\nthe name of the stream is in establish RPC input.",
+      "revId": "8d74df517df70fa7c1e3091326e7017289a96b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
