@@ -87,6 +87,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d084a360_cfe0a868",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-01-27T09:54:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ff89664_95bcb7e8",
+      "revId": "5b5f152002bbcec567a3f2e875a208c29c5e872e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c833be98_dd953693",
