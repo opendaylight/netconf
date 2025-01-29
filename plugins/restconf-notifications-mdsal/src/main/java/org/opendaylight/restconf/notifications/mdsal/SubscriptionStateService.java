@@ -36,6 +36,7 @@ public class SubscriptionStateService {
     static final String MODIFIED = "subscription-modified";
     static final String TERMINATED = "subscription-terminated";
     static final String SUSPENDED = "subscription-suspended";
+    static final String REASON = "reason";
 
     // Notification types
     private static final QName RESTCONF_NOTIF_NODE_IDENTIFIER = QName.create("ietf-restconf", "notification");
@@ -116,12 +117,12 @@ public class SubscriptionStateService {
      *
      * @param eventTime the event timestamp
      * @param id        the subscription ID
-     * @param errorId   the error ID associated with termination
+     * @param errorReason   the error ID associated with termination
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionTerminated(final String eventTime, final Long id, final String errorId)
+    public ListenableFuture<?> subscriptionTerminated(final String eventTime, final Long id, final String errorReason)
             throws InterruptedException {
-        return sendErrorStateNotification(eventTime, id, errorId, TERMINATED);
+        return sendErrorStateNotification(eventTime, id, errorReason, TERMINATED);
     }
 
     /**
@@ -129,12 +130,12 @@ public class SubscriptionStateService {
      *
      * @param eventTime the event timestamp
      * @param id        the subscription ID
-     * @param errorId   the error ID associated with suspension
+     * @param errorReason   the error ID associated with suspension
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionSuspended(final String eventTime,final  Long id, final String errorId)
+    public ListenableFuture<?> subscriptionSuspended(final String eventTime,final  Long id, final String errorReason)
             throws InterruptedException {
-        return sendErrorStateNotification(eventTime, id, errorId, SUSPENDED);
+        return sendErrorStateNotification(eventTime, id, errorReason, SUSPENDED);
     }
 
     /**
@@ -157,16 +158,16 @@ public class SubscriptionStateService {
     /**
      * Builds and sends an error state notification.
      */
-    private ListenableFuture<?> sendErrorStateNotification(final String eventTime, final Long id, final String errorId,
-            final String state) throws InterruptedException {
-        LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorId);
+    private ListenableFuture<?> sendErrorStateNotification(final String eventTime, final Long id,
+            final String errorReason, final String state) throws InterruptedException {
+        LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorReason);
         final var node = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
             .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
             .withChild(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, state)))
                 .withChild(ImmutableNodes.leafNode(ID, id))
-                .withChild(ImmutableNodes.leafNode(QName.create(BASE_QNAME, "error-id"), errorId))
+                .withChild(ImmutableNodes.leafNode(QName.create(BASE_QNAME, REASON), errorReason))
                 .build())
             .build();
         return sendNotification(node);

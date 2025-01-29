@@ -44,6 +44,7 @@ class SubscriptionStateServiceTest {
     private static final String FILTER = "example-filter";
     private static final String STREAM_NAME = "NETCONF";
     private static final String ERROR_ID = "example-error";
+    private static final String REASON = "reason";
 
     private SubscriptionStateService notifications;
 
@@ -152,7 +153,7 @@ class SubscriptionStateServiceTest {
         assertEquals(ID, terminatedNode.getChildByArg(
             new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.ID)).body());
         assertEquals(ERROR_ID, terminatedNode.getChildByArg(
-            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, "error-id"))).body());
+            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, REASON))).body());
     }
 
     @Test
@@ -175,6 +176,6 @@ class SubscriptionStateServiceTest {
         assertEquals(ID, suspendedNode.getChildByArg(
             new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.ID)).body());
         assertEquals(ERROR_ID, suspendedNode.getChildByArg(
-            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, "error-id"))).body());
+            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, REASON))).body());
     }
 }
