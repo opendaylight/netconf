@@ -17,6 +17,7 @@ import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateSer
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.COMPLETED;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.MODIFIED;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.NETCONF_NOTIFICATION;
+import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.REASON;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.RESUMED;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.SUSPENDED;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.TERMINATED;
@@ -152,7 +153,7 @@ class SubscriptionStateServiceTest {
         assertEquals(ID, terminatedNode.getChildByArg(
             new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.ID)).body());
         assertEquals(ERROR_ID, terminatedNode.getChildByArg(
-            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, "error-id"))).body());
+            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, REASON))).body());
     }
 
     @Test
@@ -175,6 +176,6 @@ class SubscriptionStateServiceTest {
         assertEquals(ID, suspendedNode.getChildByArg(
             new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.ID)).body());
         assertEquals(ERROR_ID, suspendedNode.getChildByArg(
-            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, "error-id"))).body());
+            new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, REASON))).body());
     }
 }
