@@ -16,6 +16,24 @@
       "message": "why deleted?",
       "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f4490f9_cb637164",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-30T08:01:34Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "feecca0c_74e5d80a",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
