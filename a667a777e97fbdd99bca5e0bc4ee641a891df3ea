@@ -16,6 +16,24 @@
       "message": "Why?",
       "revId": "a667a777e97fbdd99bca5e0bc4ee641a891df3ea",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "960540b3_6a2acd7b",
+        "filename": "protocol/restconf-server-spi/src/main/java/module-info.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-30T12:32:28Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "30c8ddac_ec282500",
+      "revId": "a667a777e97fbdd99bca5e0bc4ee641a891df3ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
