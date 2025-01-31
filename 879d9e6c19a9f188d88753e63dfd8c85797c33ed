@@ -123,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "426a6735_6d12255f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-01-31T10:43:31Z",
+      "side": 1,
+      "message": "Done in next patch https://git.opendaylight.org/gerrit/c/netconf/+/114738/16/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java#54",
+      "parentUuid": "af115597_3a666eb5",
+      "revId": "879d9e6c19a9f188d88753e63dfd8c85797c33ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc03cf55_777910db",
