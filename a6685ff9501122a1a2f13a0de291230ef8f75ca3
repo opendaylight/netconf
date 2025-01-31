@@ -16,6 +16,23 @@
       "message": "This change address comments in https://git.opendaylight.org/gerrit/c/netconf/+/114135",
       "revId": "a6685ff9501122a1a2f13a0de291230ef8f75ca3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4e6fb3e_14f44860",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-01-31T11:56:32Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "a6685ff9501122a1a2f13a0de291230ef8f75ca3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
