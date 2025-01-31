@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36470573_56155c3c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ChannelSender.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-01-31T13:18:53Z",
+      "side": 1,
+      "message": "in the end we want to override handlerAdded() to get context\nas it is called on handler replace instead of channelActive()",
+      "revId": "cb7147340640531002da4e1e5396f952ad9e0bce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
