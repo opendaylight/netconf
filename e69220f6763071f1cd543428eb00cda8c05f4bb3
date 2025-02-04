@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98882e32_c3077222",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/EventStreamService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-04T09:07:52Z",
+      "side": 1,
+      "message": "Update javadoc",
+      "range": {
+        "startLine": 33,
+        "startChar": 26,
+        "endLine": 33,
+        "endChar": 37
+      },
+      "revId": "e69220f6763071f1cd543428eb00cda8c05f4bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
