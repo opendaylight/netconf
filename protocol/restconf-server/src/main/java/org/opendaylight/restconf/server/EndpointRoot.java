@@ -75,7 +75,7 @@ final class EndpointRoot {
 
     @NonNullByDefault
     Registration registerProvider(final WebHostResourceProvider provider) {
-        for (var path = provider.defaultPath(); ; path = provider.defaultPath() + "-" + UUID.randomUUID().toString()) {
+        for (var path = provider.defaultPath(); ; path = provider.defaultPath() + "-" + UUID.randomUUID()) {
             @SuppressWarnings("resource")
             final var resource = provider.createInstance(path);
             final var prev = resources.putIfAbsent(path, resource);
@@ -84,7 +84,7 @@ final class EndpointRoot {
                 return new ResourceReg(resource, resources);
             }
 
-            LOG.warn("{} -> {} conficts with registered {}, retrying mapping", path, resource, prev);
+            LOG.warn("{} -> {} conflicts with registered {}, retrying mapping", path, resource, prev);
             resource.close();
         }
     }
