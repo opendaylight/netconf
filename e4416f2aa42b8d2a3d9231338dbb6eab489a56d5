@@ -16,6 +16,24 @@
       "message": "Probably these test can be parametrized",
       "revId": "e4416f2aa42b8d2a3d9231338dbb6eab489a56d5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31ed534c_df47ac91",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-04T10:56:02Z",
+      "side": 1,
+      "message": "Addressed by:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115005",
+      "parentUuid": "98bddffa_9aa4b346",
+      "revId": "e4416f2aa42b8d2a3d9231338dbb6eab489a56d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [

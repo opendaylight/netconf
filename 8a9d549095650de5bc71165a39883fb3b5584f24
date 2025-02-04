@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48964e9d_e37f10c1",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateService.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-04T10:56:02Z",
+      "side": 1,
+      "message": "Addressed by:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115004",
+      "parentUuid": "45b63aa7_0d34e6b5",
+      "revId": "8a9d549095650de5bc71165a39883fb3b5584f24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "232e7a5f_310eac8f",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-12-05T16:13:04Z",
       "side": 1,
       "message": "We are not mocking Future(s).",
+      "revId": "8a9d549095650de5bc71165a39883fb3b5584f24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38a3a5fd_efcd6fd1",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-04T10:56:02Z",
+      "side": 1,
+      "message": "Addressed by:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115005",
+      "parentUuid": "232e7a5f_310eac8f",
       "revId": "8a9d549095650de5bc71165a39883fb3b5584f24",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
