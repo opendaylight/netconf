@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8744674e_6d2d0b15",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/BenchmarkIT.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-04T08:23:34Z",
+      "side": 1,
+      "message": "the *IT suffix is due to maven-failsafe-plugin name patters\nhttps://maven.apache.org/surefire/maven-failsafe-plugin/examples/inclusion-exclusion.html",
+      "parentUuid": "39fc44b7_606471dd",
+      "range": {
+        "startLine": 28,
+        "startChar": 13,
+        "endLine": 28,
+        "endChar": 25
+      },
+      "revId": "b4af090e144d36c0999d50f1d4ef4571a4d1e436",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69ebf057_f57d235b",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-01-21T11:15:03Z",
       "side": 1,
       "message": "why not use random port like in every other tests",
+      "range": {
+        "startLine": 127,
+        "startChar": 21,
+        "endLine": 127,
+        "endChar": 26
+      },
+      "revId": "b4af090e144d36c0999d50f1d4ef4571a4d1e436",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1959ff16_17414824",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/openapi/MountPointDocumentTest.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-04T08:23:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69ebf057_f57d235b",
       "range": {
         "startLine": 127,
         "startChar": 21,
