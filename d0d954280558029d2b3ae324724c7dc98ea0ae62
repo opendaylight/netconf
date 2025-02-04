@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e098841e_80357b42",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-04T08:58:21Z",
+      "side": 1,
+      "message": "due to the refactor we no longer need dependency on rfc8040-ietf-restconf-monitoring in restconf-server-spi\nso @link is no longer possible",
+      "parentUuid": "1939f65f_2ff59c34",
+      "revId": "d0d954280558029d2b3ae324724c7dc98ea0ae62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb77d4d9_b5f38685",
