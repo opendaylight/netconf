@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d3d9ac0_943159f2",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-02-04T08:41:57Z",
+      "side": 1,
+      "message": "MdsalRestconfStreamRegistry#allocateStream requires access to this constructor in another package",
+      "parentUuid": "eb77d4d9_b5f38685",
+      "revId": "d0d954280558029d2b3ae324724c7dc98ea0ae62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a30e685e_5b779c08",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-02-03T14:04:54Z",
       "side": 1,
       "message": "why?",
+      "revId": "d0d954280558029d2b3ae324724c7dc98ea0ae62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ae216ff_fce91bf6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-02-04T08:41:57Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/114642/30/plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java#105 is used here",
+      "parentUuid": "a30e685e_5b779c08",
       "revId": "d0d954280558029d2b3ae324724c7dc98ea0ae62",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
