@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f073129a_59f73187",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-05T13:29:46Z",
+      "side": 1,
+      "message": "this does not solve the issue 😊",
+      "revId": "eccf9a6da7aa97b708cad96762af32ea5b8d653f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
