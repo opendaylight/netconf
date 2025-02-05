@@ -22,6 +22,30 @@
       },
       "revId": "530b56bcc15d8385d3bdcf8e69afc2bc82a72c9f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b325661e_673b7ae2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AbstractResource.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-05T07:57:05Z",
+      "side": 1,
+      "message": "1. Done\n2. In the end it\u0027s needed in StreamsResource to replace current handler with created ChannelSender.\nAnother solution I can see is to pass the handler to Response once it\u0027s returned to HTTPServerSession, when we have https://git.opendaylight.org/gerrit/c/netconf/+/114952, but this would require further differentiate between handling returned responses.",
+      "parentUuid": "a4f25059_588c45b7",
+      "range": {
+        "startLine": 97,
+        "startChar": 37,
+        "endLine": 97,
+        "endChar": 66
+      },
+      "revId": "530b56bcc15d8385d3bdcf8e69afc2bc82a72c9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
