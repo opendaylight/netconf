@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7823a28_35e8156f",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-05T12:16:28Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "aa0d5d44843ebd73b3b7b75006bc2695ffbb5d09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c12eff26_c1cc4313",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-05T12:16:28Z",
+      "side": 1,
+      "message": "or maybe you can consider to join this switch wit the one on line 70\n\nas: \ncase MODIFIED -\u003e {\n    notifications.subscriptionModified(EVENT_TIME, ID, URI, STREAM_NAME, FILTER);\n    eventQName \u003d QName.create(NETCONF_NOTIFICATION, MODIFIED);\n}",
+      "revId": "aa0d5d44843ebd73b3b7b75006bc2695ffbb5d09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
