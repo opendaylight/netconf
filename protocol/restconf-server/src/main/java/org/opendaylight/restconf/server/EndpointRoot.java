@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -111,8 +110,8 @@ final class EndpointRoot {
     }
 
     @NonNullByDefault
-    PreparedRequest prepare(final ChannelHandler channelHandler, final TransportSession session,
-            final ImplementedMethod method, final URI targetUri, final HttpHeaders headers) {
+    PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers) {
         final var peeler = new SegmentPeeler(targetUri);
         if (!peeler.hasNext()) {
             // We only support OPTIONS
@@ -124,7 +123,7 @@ final class EndpointRoot {
         if (segment.equals(".well-known")) {
             return wellKnown.request(peeler, method, headers);
         } else if (segment.equals("streams")) {
-            return streamsRequest(peeler, channelHandler, method, headers, new QueryStringDecoder(targetUri));
+            return streamsRequest(peeler, method, headers, new QueryStringDecoder(targetUri));
         } else if (segment.equals(apiSegment)) {
             return apiResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
@@ -135,8 +134,8 @@ final class EndpointRoot {
             : resource.prepare(method, targetUri, headers, peeler, wellKnown);
     }
 
-    private PreparedRequest streamsRequest(final SegmentPeeler peeler, final ChannelHandler handler,
-            final ImplementedMethod method, final HttpHeaders headers, final QueryStringDecoder decoder) {
+    private PreparedRequest streamsRequest(final SegmentPeeler peeler, final ImplementedMethod method,
+            final HttpHeaders headers, final QueryStringDecoder decoder) {
         if (!peeler.hasNext()) {
             return EmptyResponse.NOT_FOUND;
         }
@@ -177,14 +176,13 @@ final class EndpointRoot {
         if (streamId != null) {
             return addEventStream(streamId, stream, encoding, streamParams);
         } else {
-            return switchToEventStream(handler, stream, encoding, streamParams);
+            return switchToEventStream(stream, encoding, streamParams);
         }
-
     }
 
     // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
     // not be servicing any other requests.
-    private PreparedRequest switchToEventStream(final ChannelHandler handler, final RestconfStream<?> stream,
+    private PreparedRequest switchToEventStream(final RestconfStream<?> stream,
             final EncodingName encoding, final EventStreamGetParams params) {
         final var sender = new ChannelSender();
         final Registration registration = registerSender(stream, encoding, params, sender);
@@ -194,7 +192,7 @@ final class EndpointRoot {
         }
 
         // Replace ourselves with the sender and enable it wil the registration
-        sender.getCtx().channel().pipeline().replace(handler, null, sender);
+        sender.getCtx().channel().pipeline().replace(sender.getCtx().handler(), null, sender);
         sender.enable(registration);
         return EmptyResponse.OK;
     }
