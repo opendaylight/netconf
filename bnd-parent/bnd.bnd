@@ -1,0 +1,3 @@
+-noextraheaders: true
+Bundle-DocURL: https://github.com/opendaylight/netconf/
+Bundle-SymbolicName: ${project.groupId}.${project.artifactId}
