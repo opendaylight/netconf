@@ -118,9 +118,9 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
 
     @Override
     @NonNullByDefault
-    protected PreparedRequest prepareRequest(final ChannelHandler channelHandler, final ImplementedMethod method,
-            final URI targetUri, final HttpHeaders headers) {
-        return root.prepare(channelHandler,this, method, targetUri, headers);
+    protected PreparedRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers) {
+        return root.prepare(this, method, targetUri, headers);
     }
 
     @Override

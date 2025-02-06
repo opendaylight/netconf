@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * <ol>
  *   <li>request method binding, performed on the Netty thread via {@link #implementationOf(HttpMethod)}</li>
  *   <li>request path and header binding, performed on the Netty thread via
- *       {@link #prepareRequest(ChannelHandler, ImplementedMethod, URI, HttpHeaders)}</li>
+ *       {@link #prepareRequest(ImplementedMethod, URI, HttpHeaders)}</li>
  *   <li>request execution, performed in a dedicated thread, via
  *       {@link PendingRequest#execute(PendingRequestListener, java.io.InputStream)}</li>
  *   <li>response execution, performed in another dedicated thread</li>
@@ -205,7 +205,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        switch (prepareRequest(this, method, targetUri, msg.headers())) {
+        switch (prepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
                 LOG.debug("Immediate response to {} {}", method, targetUri);
@@ -252,7 +252,7 @@ public abstract class HTTPServerSession extends SimpleChannelInboundHandler<Full
      * @param headers request {@link HttpHeaders}
      */
     @NonNullByDefault
-    protected abstract PreparedRequest prepareRequest(ChannelHandler channelHandler, ImplementedMethod method,
+    protected abstract PreparedRequest prepareRequest(ImplementedMethod method,
             URI targetUri, HttpHeaders headers);
 
     @NonNullByDefault

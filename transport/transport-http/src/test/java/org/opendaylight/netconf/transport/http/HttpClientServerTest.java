@@ -161,8 +161,8 @@ class HttpClientServerTest {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
             channel.channel().pipeline().addLast(new HTTPServerSession(channel.scheme()) {
                 @Override
-                protected TestRequest prepareRequest(final ChannelHandler httpServerSession,
-                        final ImplementedMethod method, final URI targetUri, final HttpHeaders headers) {
+                protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
+                        final HttpHeaders headers) {
                     return new TestRequest(method, targetUri);
                 }
             });
