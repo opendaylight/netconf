@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40d92090_0841daf4",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T14:00:34Z",
+      "side": 1,
+      "message": "Done in https://git.opendaylight.org/gerrit/c/netconf/+/115130",
+      "parentUuid": "991b09a0_9a533bba",
+      "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ceec278f_64ce4812",
@@ -69,6 +87,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "233a4709_46442d17",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T14:00:34Z",
+      "side": 1,
+      "message": "not needed in this case, we are not registering, we will register NETCONF stream multiple times on model context update",
+      "parentUuid": "ceec278f_64ce4812",
+      "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b9b7af1_34434a19",
@@ -82,6 +118,24 @@
       "writtenOn": "2025-02-06T13:42:18Z",
       "side": 1,
       "message": "private?",
+      "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cafd4e00_492f9633",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T14:00:34Z",
+      "side": 1,
+      "message": "Done in https://git.opendaylight.org/gerrit/c/netconf/+/115130",
+      "parentUuid": "6b9b7af1_34434a19",
       "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
