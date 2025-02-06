@@ -16,6 +16,24 @@
       "message": "rebase, make it build",
       "revId": "c16bf5fb36f782210af1e4f6f47b38f51d474c23",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a58cbe0_401c539a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-06T10:37:23Z",
+      "side": 1,
+      "message": "This is missing https://git.opendaylight.org/gerrit/c/netconf/+/114495\nso after chain is rebased on current master, it should build",
+      "parentUuid": "18b22afe_ccf7966f",
+      "revId": "c16bf5fb36f782210af1e4f6f47b38f51d474c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
