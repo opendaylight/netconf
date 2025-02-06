@@ -23,7 +23,6 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -43,14 +42,13 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Component(service = RestconfStream.Registry.class)
 public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfStreamRegistry {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfSubscriptionsStreamRegistry.class);
+
     private static final String DEFAULT_STREAM_NAME = "NETCONF";
     private static final QName STREAM_NAME_QNAME =  QName.create(Stream.QNAME, "name").intern();
     private static final QName STREAM_DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfSubscriptionsStreamRegistry.class);
     private static final YangInstanceIdentifier RFC8639_STREAMS = YangInstanceIdentifier.of(
-        NodeIdentifier.create(Streams.QNAME),
-        NodeIdentifier.create(Stream.QNAME));
-    private static final String BASE_SUBSCRIPTION_LOCATION = Subscriptions.QNAME.toString();
+        NodeIdentifier.create(Streams.QNAME), NodeIdentifier.create(Stream.QNAME));
 
     private final DOMDataBroker dataBroker;
 
@@ -85,7 +83,7 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
         //  As solution we are currently accepting request and uri being null which is not correct as per documentation.
         final var stream = new RestconfStream<>(this, source, DEFAULT_STREAM_NAME);
 
-        Futures.addCallback(putStream(streamEntry(DEFAULT_STREAM_NAME, description)), new FutureCallback<Object>() {
+        Futures.addCallback(putStream(streamEntry(description)), new FutureCallback<Object>() {
             @Override
             public void onSuccess(final Object result) {
                 registerStream(DEFAULT_STREAM_NAME, stream);
@@ -99,11 +97,11 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
         }, MoreExecutors.directExecutor());
     }
 
-    public static @NonNull MapEntryNode streamEntry(final String name, final String description) {
+    private static @NonNull MapEntryNode streamEntry(final String description) {
         return ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Stream.QNAME, STREAM_NAME_QNAME,
-                name))
-            .withChild(ImmutableNodes.leafNode(STREAM_NAME_QNAME, name))
+                DEFAULT_STREAM_NAME))
+            .withChild(ImmutableNodes.leafNode(STREAM_NAME_QNAME, DEFAULT_STREAM_NAME))
             .withChild(ImmutableNodes.leafNode(STREAM_DESCRIPTION_QNAME, description))
             .build();
     }
