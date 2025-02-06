@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dc98d4f_64ddbee5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T14:28:07Z",
+      "side": 1,
+      "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/115134",
+      "parentUuid": "48f7f371_eb98d1bc",
+      "revId": "9024c0b02fdd19e5d0ea96b71a0cfff9bd918391",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a823fc9a_191f7051",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3e407f9_9c83b818",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T14:28:07Z",
+      "side": 1,
+      "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/115134",
+      "parentUuid": "7a4d7751_cd31bc43",
+      "revId": "9024c0b02fdd19e5d0ea96b71a0cfff9bd918391",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14638f57_c46b5da7",
@@ -82,6 +118,24 @@
       "writtenOn": "2025-02-06T13:47:43Z",
       "side": 1,
       "message": "remove handler?",
+      "revId": "9024c0b02fdd19e5d0ea96b71a0cfff9bd918391",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bb26f1b_51001339",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T14:28:07Z",
+      "side": 1,
+      "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/115134",
+      "parentUuid": "9cf3d394_df9b9357",
       "revId": "9024c0b02fdd19e5d0ea96b71a0cfff9bd918391",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
