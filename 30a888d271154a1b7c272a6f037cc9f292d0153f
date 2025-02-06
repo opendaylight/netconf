@@ -33,6 +33,57 @@
       "message": "rerun-gha",
       "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "991b09a0_9a533bba",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T13:42:18Z",
+      "side": 1,
+      "message": "LOG is usually the first static field",
+      "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceec278f_64ce4812",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T13:42:18Z",
+      "side": 1,
+      "message": "unregister?",
+      "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b9b7af1_34434a19",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-06T13:42:18Z",
+      "side": 1,
+      "message": "private?",
+      "revId": "30a888d271154a1b7c272a6f037cc9f292d0153f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
