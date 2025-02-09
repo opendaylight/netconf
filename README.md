@@ -97,8 +97,8 @@ making three distinct assuptions:
 
 # The gory details
 There are sorts of things here:
-* basic project infrastructure, including [the BOM](artifacts), [Karaf features](features),
-[Dynamic Karaf distribution](karaf), [Static Karaf distribution](karaf-static) and the [Common Maven Parent](parent)
+* supported supported [usecases](usecases) and their integration tests
+* basic project infrastructure, including [the BOM](artifacts), [Karaf features](features) and the [Common Maven Parent](parent)
 * [YANG models](model) relating to this project
 * [IETF Key Store](keystore/README.md) implementation
 * [IETF Trust Store](truststore/README.md) implementation

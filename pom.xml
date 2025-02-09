@@ -33,14 +33,13 @@
         <module>bnd-parent</module>
         <module>parent</module>
         <module>features</module>
-        <module>karaf</module>
-        <module>karaf-static</module>
         <module>model</module>
         <module>transport</module>
         <module>protocol</module>
         <module>plugins</module>
         <module>apps</module>
         <module>third-party</module>
+        <module>usecase</module>
 
         <!-- Legacy layout -->
         <module>netconf</module>
