@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
 import java.util.List;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
@@ -89,7 +90,7 @@ public class Parameters {
 
         parser.addArgument("--edit-content")
                 .type(File.class)
-                .setDefault(new File("edit.txt"))
+                .setDefault(Path.of("edit.txt").toFile())
                 .dest("edit-content");
 
         parser.addArgument("--async-requests")

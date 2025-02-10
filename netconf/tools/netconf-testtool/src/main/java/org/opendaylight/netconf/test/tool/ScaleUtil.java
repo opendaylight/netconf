@@ -86,11 +86,16 @@ public final class ScaleUtil {
 
             root.warn(params.distroFolder.getAbsolutePath());
             try {
-                runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/start");
+                // FIXME: use ProcessBuilder and hold on to the process
+                runtime.exec(new String[] {
+                    params.distroFolder.getAbsolutePath() + "/bin/start"
+                });
                 String status;
                 do {
-                    final Process list = runtime.exec(params.distroFolder.getAbsolutePath()
-                        + "/bin/client feature:list");
+                    final var list = runtime.exec(new String[] {
+                        params.distroFolder.getAbsolutePath() + "/bin/client",
+                        "feature:list"
+                    });
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException e) {
@@ -101,8 +106,10 @@ public final class ScaleUtil {
                 } while (status.startsWith("Failed to get the session"));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
                     + "/bin/client feature:install odl-restconf-nb odl-netconf-topology");
-                final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client feature:install odl-restconf-nb odl-netconf-topology");
+                final Process featureInstall = runtime.exec(new String[] {
+                    params.distroFolder.getAbsolutePath() + "/bin/client",
+                    "feature:install", "odl-restconf-nb odl-netconf-topology"
+                });
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
@@ -149,32 +156,37 @@ public final class ScaleUtil {
     private static void cleanup(final Runtime runtime, final TesttoolParameters params) {
         try {
             stopKaraf(runtime, params);
-            deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
+            deleteFolder(params.distroFolder.getAbsoluteFile().toPath().resolve("data").toFile());
         } catch (IOException | InterruptedException e) {
             root.warn("Failed to stop karaf", e);
             System.exit(1);
         }
     }
 
+    // FIXME: use karaf/stop instead
     private static void stopKaraf(final Runtime runtime, final TesttoolParameters params)
             throws IOException, InterruptedException {
         root.info("Stopping karaf and sleeping for 10 sec..");
         String controllerPid = "";
         do {
-            final Process pgrep = runtime.exec("pgrep -f org.apache.karaf.main.Main");
+            final var pgrep = runtime.exec(new String[] {
+                "pgrep", "-f", "org.apache.karaf.main.Main"
+            });
 
             controllerPid = CharStreams.toString(new BufferedReader(new InputStreamReader(pgrep.getInputStream())));
             root.warn(controllerPid);
-            runtime.exec("kill -9 " + controllerPid);
+            runtime.exec(new String[] {
+                "kill", "-9", controllerPid
+            });
 
             Thread.sleep(10000L);
         } while (!controllerPid.isEmpty());
     }
 
     private static void deleteFolder(final File folder) {
-        File[] files = folder.listFiles();
+        final var files = folder.listFiles();
         if (files != null) { //some JVMs return null for empty dirs
-            for (File f : files) {
+            for (var f : files) {
                 if (f.isDirectory()) {
                     deleteFolder(f);
                 } else if (!f.delete()) {

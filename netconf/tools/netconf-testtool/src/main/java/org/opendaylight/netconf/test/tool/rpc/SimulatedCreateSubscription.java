@@ -7,12 +7,11 @@
  */
 package org.opendaylight.netconf.test.tool.rpc;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,11 +52,10 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
         }
 
         if (notifs.isPresent()) {
-            final List<Notification> toCopy = notifs.orElseThrow().getNotificationList();
-            final Map<Notification, NetconfMessage> preparedMessages = Maps.newHashMapWithExpectedSize(toCopy.size());
-            for (final Notification notification : toCopy) {
-                final NetconfMessage parsedNotification = parseNetconfNotification(notification.getContent());
-                preparedMessages.put(notification, parsedNotification);
+            final var toCopy = notifs.orElseThrow().getNotificationList();
+            final var preparedMessages = HashMap.<Notification, NetconfMessage>newHashMap(toCopy.size());
+            for (var notification : toCopy) {
+                preparedMessages.put(notification, parseNetconfNotification(notification.getContent()));
             }
             notifications = preparedMessages;
         } else {
@@ -95,7 +93,9 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
                 delayAggregator += notification.getKey().getDelayInSeconds();
 
                 scheduledExecutorService.schedule(() -> {
-                    Preconditions.checkState(session != null, "Session is not set, cannot process notifications");
+                    if (session == null) {
+                        throw new IllegalStateException("Session is not set, cannot process notifications");
+                    }
                     session.sendMessage(notification.getValue());
                 }, delayAggregator, TimeUnit.SECONDS);
             }

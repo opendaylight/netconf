@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -99,7 +100,7 @@ public class Parameters {
 
         parser.addArgument("--edit-content")
                 .type(File.class)
-                .setDefault(new File("edit.txt"))
+                .setDefault(Path.of("edit.txt").toFile())
                 .type(File.class)
                 .dest("edit-content");
 

@@ -23,7 +23,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
         <sonar.skip>true</sonar.skip>
     </properties>
 

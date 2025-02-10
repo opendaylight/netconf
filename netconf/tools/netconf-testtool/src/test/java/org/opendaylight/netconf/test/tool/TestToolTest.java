@@ -14,8 +14,8 @@ import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.Ne
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.File;
 import java.net.InetAddress;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +56,7 @@ public class TestToolTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$W0rd";
     private static final AuthProvider AUTH_PROVIDER = (user, passw) -> USERNAME.equals(user) && PASSWORD.equals(passw);
-    private static final File CUSTOM_RPC_CONFIG = new File("src/test/resources/customrpc.xml");
+    private static final Path CUSTOM_RPC_CONFIG = Path.of("src", "test", "resources", "customrpc.xml");
 
     private static final String RFC7950_4_2_9_REQUEST = """
         <rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -203,7 +203,7 @@ public class TestToolTest {
         return new ConfigurationBuilder()
             .setStartingPort(RANDOM_PORT)
             .setDeviceCount(1)
-            .setRpcConfigFile(CUSTOM_RPC_CONFIG)
+            .setRpcConfigFile(CUSTOM_RPC_CONFIG.toFile())
             .setSsh(SSH == protocol)
             .setAuthProvider(AUTH_PROVIDER)
             .build();
