@@ -21,6 +21,10 @@
     <packaging>bundle</packaging>
     <description>RESTCONF Northbound application</description>
 
+    <properties>
+        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
