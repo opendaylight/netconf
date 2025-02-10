@@ -20,10 +20,6 @@
   <packaging>bundle</packaging>
   <name>${project.artifactId}</name>
 
-  <properties>
-    <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
-  </properties>
-
   <dependencies>
     <!-- compile dependencies -->
     <dependency>
