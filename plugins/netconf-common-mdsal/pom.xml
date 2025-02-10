@@ -20,10 +20,6 @@
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 
-    <properties>
-        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>

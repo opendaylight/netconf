@@ -10,7 +10,6 @@ package org.opendaylight.netconf.common.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -79,7 +78,7 @@ final class PathNode implements Mutable {
      */
     PathNode copyWith(final Collection<PathArgument> childArguments) {
         final LinkedHashMap<PathArgument, PathNode> copy = children instanceof LinkedHashMap
-            ? new LinkedHashMap<>(children) : Maps.newLinkedHashMapWithExpectedSize(childArguments.size());
+            ? new LinkedHashMap<>(children) : LinkedHashMap.newLinkedHashMap(childArguments.size());
         for (PathArgument childArgument : childArguments) {
             ensureChild(copy, childArgument);
         }
