@@ -16,6 +16,24 @@
       "message": "this does not solve the issue 😊",
       "revId": "eccf9a6da7aa97b708cad96762af32ea5b8d653f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1954be3e_2e3f77f5",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-10T07:00:06Z",
+      "side": 1,
+      "message": "Yes. That one I\u0027d like to clarify. I need to get stream for EventStreamResponse like it is done for streams but it is not there. What am I missing here?",
+      "parentUuid": "f073129a_59f73187",
+      "revId": "eccf9a6da7aa97b708cad96762af32ea5b8d653f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
