@@ -11,10 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -244,15 +243,15 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
 
         // Load copy-config template and replace URL with the URI of target file:
         final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file.xml");
-        final File outFile = new File(tmpDir.toFile(),"test-copy-to-file.xml");
-        final String copyConfig = template.replaceFirst("URL", outFile.toURI().toString());
+        final Path outFile = tmpDir.resolve("test-copy-to-file.xml");
+        final String copyConfig = template.replaceFirst("URL", outFile.toUri().toString());
         final Document request = XmlUtil.readXmlToDocument(copyConfig);
 
         // Invoke copy-config RPC:
         verifyResponse(copyConfig(request), RPC_REPLY_OK);
 
         // Check if outFile was created with expected content:
-        verifyResponse(XmlUtil.readXmlToDocument(new FileInputStream(outFile)),
+        verifyResponse(XmlUtil.readXmlToDocument(Files.newInputStream(outFile)),
             XmlFileLoader.xmlFileToDocument("messages/mapping/copyConfigs/copyConfig_to_file_control.xml"));
     }
 
@@ -271,15 +270,15 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
         // Load copy-config template and replace URL with the URI of target file:
         final String template =
             XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file_from_running.xml");
-        final File outFile = new File(tmpDir.toFile(),"test-copy-to-file-from-running.xml");
-        final String copyConfig = template.replaceFirst("URL", outFile.toURI().toString());
+        final Path outFile = tmpDir.resolve("test-copy-to-file-from-running.xml");
+        final String copyConfig = template.replaceFirst("URL", outFile.toUri().toString());
         final Document request = XmlUtil.readXmlToDocument(copyConfig);
 
         // Invoke copy-config RPC:
         verifyResponse(copyConfig(request), RPC_REPLY_OK);
 
         // Check if outFile was created with expected content:
-        verifyResponse(XmlUtil.readXmlToDocument(new FileInputStream(outFile)),
+        verifyResponse(XmlUtil.readXmlToDocument(Files.newInputStream(outFile)),
             XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/copyConfigs/copyConfig_to_file_from_running_control.xml"));
 
