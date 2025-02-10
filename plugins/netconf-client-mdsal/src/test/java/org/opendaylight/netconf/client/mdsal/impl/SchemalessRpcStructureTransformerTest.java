@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -84,7 +84,7 @@ class SchemalessRpcStructureTransformerTest {
 
         final var anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE));
-        final var diff = DiffBuilder.compare(Files.readString(Paths.get(getClass()
+        final var diff = DiffBuilder.compare(Files.readString(Path.of(getClass()
                 .getResource("/schemaless/edit-config/" + testDataset).toURI())))
             .withTest(anyXmlNode.body().getNode())
             .ignoreWhitespace()
@@ -99,7 +99,7 @@ class SchemalessRpcStructureTransformerTest {
             final Class<? extends Throwable> expectedException) throws Exception {
         final var anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
         final var diff = DiffBuilder.compare(Files.readString(
-                Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())))
+                Path.of(getClass().getResource("/schemaless/filter/" + testDataset).toURI())))
             .withTest(anyXmlNode.body().getNode())
             .ignoreWhitespace()
             .checkForIdentical()
@@ -115,7 +115,7 @@ class SchemalessRpcStructureTransformerTest {
             .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
         final var data = ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
-                .withValue(new DOMSource(XmlUtil.readXmlToDocument(Files.readString(Paths.get(getClass()
+                .withValue(new DOMSource(XmlUtil.readXmlToDocument(Files.readString(Path.of(getClass()
                     .getResource("/schemaless/get-config/" + testDataset).toURI()))).getDocumentElement()))
                 .build();
         final var dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path).orElseThrow();

@@ -16,7 +16,6 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,7 +179,7 @@ public record NetconfSessionPreferences(
      * @return new instance of preferences with merged module-based capabilities
      */
     public NetconfSessionPreferences addModuleCaps(final NetconfSessionPreferences netconfSessionModuleCapabilities) {
-        final var mergedCaps = Maps.<QName, CapabilityOrigin>newHashMapWithExpectedSize(moduleBasedCaps.size()
+        final var mergedCaps = HashMap.<QName, CapabilityOrigin>newHashMap(moduleBasedCaps.size()
                 + netconfSessionModuleCapabilities.moduleBasedCaps.size());
         mergedCaps.putAll(moduleBasedCaps);
         mergedCaps.putAll(netconfSessionModuleCapabilities.moduleBasedCaps);
@@ -211,7 +210,7 @@ public record NetconfSessionPreferences(
      */
     public NetconfSessionPreferences addNonModuleCaps(
             final NetconfSessionPreferences netconfSessionNonModuleCapabilities) {
-        final var mergedCaps = Maps.<String, CapabilityOrigin>newHashMapWithExpectedSize(
+        final var mergedCaps = HashMap.<String, CapabilityOrigin>newHashMap(
                 nonModuleCaps.size() + netconfSessionNonModuleCapabilities.nonModuleCaps.size());
         mergedCaps.putAll(nonModuleCaps);
         mergedCaps.putAll(netconfSessionNonModuleCapabilities.nonModuleCaps);
