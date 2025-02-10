@@ -28,5 +28,6 @@
     <modules>
         <module>karaf</module>
         <module>karaf-static</module>
+        <module>it-userfeatures</module>
     </modules>
 </project>

@@ -23,8 +23,6 @@
     <packaging>karaf-assembly</packaging>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <maven.install.skip>true</maven.install.skip>
         <karaf.archiveTarGz>true</karaf.archiveTarGz>
         <karaf.archiveZip>true</karaf.archiveZip>
     </properties>
