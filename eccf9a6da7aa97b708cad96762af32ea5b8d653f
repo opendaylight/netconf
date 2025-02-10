@@ -52,6 +52,24 @@
       "parentUuid": "1954be3e_2e3f77f5",
       "revId": "eccf9a6da7aa97b708cad96762af32ea5b8d653f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36d9d144_e60229f3",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-10T08:24:17Z",
+      "side": 1,
+      "message": "No, that\u0027s not true, I am commenting on:\n`// FIXME do not hardcode stream name`\n\nYou have never mentioned you are solving:\nYes. That one I\u0027d like to clarify. I need to get stream for EventStreamResponse like it is done for streams but it is not there. What am I missing here?",
+      "parentUuid": "7cb0770b_d7d78dcc",
+      "revId": "eccf9a6da7aa97b708cad96762af32ea5b8d653f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
