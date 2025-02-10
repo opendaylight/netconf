@@ -15,19 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.TEST_ENTRIES;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.assertFileContains;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.assertStorageContains;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.prepareDataFile;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.preparePropertiesFile;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.prepareSecretFile;
-import static org.opendaylight.netconf.keystore.plaintext.localfile.TestUtils.secretFromFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +33,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.keystore.plaintext.api.MutablePlaintextStorage;
+import org.opendaylight.netconf.keystore.plaintext.api.PlaintextStorage;
 
 @ExtendWith(MockitoExtension.class)
 class PlaintextLocalFileStorageTest {
@@ -47,6 +46,9 @@ class PlaintextLocalFileStorageTest {
     private static final StorageEntry ENTRY_4 = new StorageEntry("key-4", "value-4");
     private static final Collection<StorageEntry> INITIAL_DATA = List.of(ENTRY_1, ENTRY_2, ENTRY_3);
     private static final Collection<StorageEntry> DEFAULT_DATA = List.of(new StorageEntry("admin", "admin"));
+    private static final List<StorageEntry> TEST_ENTRIES = IntStream.range(0, 10)
+        .mapToObj(index -> new StorageEntry("key-" + index, "value-" + index))
+        .toList();
 
     @Mock
     private PlaintextLocalFileStorage.Configuration config;
@@ -213,5 +215,67 @@ class PlaintextLocalFileStorageTest {
         final var link = Path.of(absPath.toString() + ".lnk");
         Files.createSymbolicLink(link, absPath);
         return link;
+    }
+
+    private static void prepareDataFile(final Path file, final byte[] secret, final Collection<StorageEntry> entries)
+            throws IOException {
+        try (var fos = Files.newOutputStream(file)) {
+            CipherUtils.toBase64Stream(entries, secret, fos);
+        }
+    }
+
+    private static void preparePropertiesFile(final Path file, final Collection<StorageEntry> entries)
+            throws IOException {
+        try (var fos = Files.newOutputStream(file)) {
+            fos.write("# comment\n".getBytes(StandardCharsets.UTF_8));
+            for (var entry : entries) {
+                fos.write(entry.key());
+                fos.write('=');
+                fos.write(entry.value());
+                fos.write('\n');
+            }
+        }
+    }
+
+    private static void prepareSecretFile(final Path file, final byte[] secret) throws IOException {
+        try (var out = Base64.getEncoder().wrap(Files.newOutputStream(file))) {
+            out.write(secret);
+        }
+    }
+
+    private static byte[] secretFromFile(final Path file) throws IOException {
+        assertTrue(Files.exists(file));
+        try (var in = Base64.getDecoder().wrap(Files.newInputStream(file))) {
+            return in.readAllBytes();
+        }
+    }
+
+    private static void assertFileContains(final Path file, final byte[] secret, final Collection<StorageEntry> entries)
+            throws IOException {
+        assertTrue(Files.exists(file));
+        try (var fis = Files.newInputStream(file)) {
+            final var fileEntries = CipherUtils.fromBase64Stream(secret, fis);
+            assertNotNull(fileEntries);
+            assertEquals(entries.size(), fileEntries.size());
+            assertTrue(fileEntries.containsAll(entries));
+        }
+    }
+
+    private static void assertStorageContains(final PlaintextStorage storage, final Collection<StorageEntry> entries) {
+        // ensure all expected entries can be extracted
+        assertNotNull(storage);
+        for (var entry : entries) {
+            assertArrayEquals(entry.value(), storage.lookup(entry.key()));
+        }
+        // validate iterator contain all the expected entries
+        final var fromIterator = new ArrayList<StorageEntry>(entries.size());
+        final var iterator = storage.iterator();
+        while (iterator.hasNext()) {
+            final var entry = iterator.next();
+            fromIterator.add(new StorageEntry(entry.getKey(), entry.getValue()));
+        }
+        assertThrows(NoSuchElementException.class, iterator::next);
+        assertEquals(entries.size(), fromIterator.size());
+        assertTrue(fromIterator.containsAll(entries));
     }
 }
