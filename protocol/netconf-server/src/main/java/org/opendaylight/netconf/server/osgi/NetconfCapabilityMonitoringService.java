@@ -143,10 +143,10 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
     }
 
     private static Schemas transformSchemas(final Set<Capability> caps) {
-        final Map<SchemaKey, Schema> schemas = Maps.newHashMapWithExpectedSize(caps.size());
-        for (final Capability cap : caps) {
+        final var schemas = HashMap.<SchemaKey, Schema>newHashMap(caps.size());
+        for (var cap : caps) {
             if (isValidModuleCapability(cap)) {
-                final SchemaKey key = new SchemaKey(Yang.VALUE, cap.getModuleName().orElseThrow(),
+                final var key = new SchemaKey(Yang.VALUE, cap.getModuleName().orElseThrow(),
                     cap.getRevision().orElse(""));
                 schemas.put(key, new SchemaBuilder()
                     .withKey(key)
