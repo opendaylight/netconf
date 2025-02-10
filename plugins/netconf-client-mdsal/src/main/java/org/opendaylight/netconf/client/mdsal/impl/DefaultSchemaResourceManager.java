@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Strings;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
@@ -116,7 +116,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that
         // directory will not be fetched from the device.
         repository.registerSchemaSourceListener(new FilesystemSchemaSourceCache<>(repository, YangTextSource.class,
-            new File(rootDirectory + File.separator + subdir)));
+            Path.of(rootDirectory).resolve(subdir).toFile()));
 
         return new DefaultDeviceNetconfSchemaProvider(repository);
     }
