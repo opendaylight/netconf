@@ -12,11 +12,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Objects.requireNonNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -63,25 +61,25 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlaintextLocalFileStorage.class);
 
-    private final File file;
+    private final Path file;
     private final byte[] secret;
     private final AtomicReference<Set<StorageEntry>> entriesRef = new AtomicReference<>();
 
     @Activate
     public PlaintextLocalFileStorage(final Configuration configuration) throws IOException {
         this(
-            secretFrom(new File(configuration.key$_$file())),
-            new File(configuration.data$_$file()),
-            new File(configuration.import$_$from$_$file())
+            secretFrom(Path.of(configuration.key$_$file())),
+            Path.of(configuration.data$_$file()),
+            Path.of(configuration.import$_$from$_$file())
         );
         LOG.info("Service activated");
     }
 
-    public PlaintextLocalFileStorage(final byte[] secret, final File file) throws IOException {
+    public PlaintextLocalFileStorage(final byte[] secret, final Path file) throws IOException {
         this(secret, file, null);
     }
 
-    public PlaintextLocalFileStorage(final byte[] secret, final File file, final  @Nullable File importFile)
+    public PlaintextLocalFileStorage(final byte[] secret, final Path file, final @Nullable Path importFile)
             throws IOException {
         this.file = validateFile(file);
         this.secret = validateSecret(secret);
@@ -187,24 +185,24 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
         final var list = new ArrayList<>(data);
         Collections.shuffle(list, new Random());
         // create temp file with new data-file value
-        final var tmpFile = File.createTempFile(file.getName(), ".temp", file.getParentFile());
-        try (var fos = new FileOutputStream(tmpFile)) {
+        final var tmpFile = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".temp");
+        try (var fos = Files.newOutputStream(tmpFile)) {
             CipherUtils.toBase64Stream(list, secret, fos);
         }
         // replace file with newly written
-        Files.move(tmpFile.toPath(), file.toPath(), ATOMIC_MOVE, REPLACE_EXISTING);
+        Files.move(tmpFile, file, ATOMIC_MOVE, REPLACE_EXISTING);
     }
 
-    private static byte[] secretFrom(final File file) throws IOException {
+    private static byte[] secretFrom(final Path file) throws IOException {
         validateFile(file);
-        if (file.exists()) {
-            try (var in = Base64.getDecoder().wrap(new FileInputStream(file))) {
+        if (Files.exists(file)) {
+            try (var in = Base64.getDecoder().wrap(Files.newInputStream(file))) {
                 return in.readAllBytes();
             }
         }
         LOG.warn("Key file {} does not exist. Using generated key.", file);
         final var secret = CipherUtils.generateSecret();
-        try (var out = Base64.getEncoder().wrap(new FileOutputStream(file))) {
+        try (var out = Base64.getEncoder().wrap(Files.newOutputStream(file))) {
             out.write(secret);
         }
         return secret;
@@ -218,25 +216,25 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
         return secret;
     }
 
-    private static File validateFile(final File file) {
-        if (file.exists() && Files.isSymbolicLink(file.toPath())) {
-            throw new IllegalArgumentException("Symbolic link detected in file path " + file.getPath());
+    private static Path validateFile(final Path file) {
+        if (Files.isSymbolicLink(file)) {
+            throw new IllegalArgumentException("Symbolic link detected in file path " + file);
         }
         return file;
     }
 
-    private static Collection<StorageEntry> readData(final byte[] secret, final File file,
-            final @Nullable File importFile) throws IOException {
-        if (file.exists()) {
-            try (var fis = new FileInputStream(file)) {
+    private static Collection<StorageEntry> readData(final byte[] secret, final Path file,
+            final @Nullable Path importFile) throws IOException {
+        if (Files.exists(file)) {
+            try (var fis = Files.newInputStream(file)) {
                 return CipherUtils.fromBase64Stream(secret, fis);
             }
         }
         LOG.warn("Data file {} does not exist.", file);
         final var props = new Properties();
-        if (importFile != null && importFile.exists()) {
+        if (importFile != null && Files.exists(importFile)) {
             LOG.info("Importing initial data from unencrypted properties file {}", importFile);
-            try (var fis = new FileInputStream(importFile)) {
+            try (var fis = Files.newInputStream(importFile)) {
                 props.load(fis);
             }
         } else {
@@ -252,10 +250,10 @@ public class PlaintextLocalFileStorage implements MutablePlaintextStorage {
                 data.add(new StorageEntry(name, value));
             }
         }
-        try (var fos = new FileOutputStream(file)) {
+        try (var fos = Files.newOutputStream(file)) {
             CipherUtils.toBase64Stream(data, secret, fos);
         }
-        if (importFile != null && importFile.delete()) {
+        if (importFile != null && Files.deleteIfExists(importFile)) {
             LOG.info("Data moved to encrypted storage, import data file {} removed as insecure.", importFile);
         }
         return data;
