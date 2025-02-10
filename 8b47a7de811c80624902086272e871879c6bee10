@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55bf4d8f_eb13a885",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-10T08:38:07Z",
+      "side": 1,
+      "message": "We are using `RestconfSubscriptionsStreamRegistry` to get know which streams are registered for subscriptions.\n\nWe are using `SubscriptionStateMachine` to get which subscriptions are established.\n\nIn case there is no possibility to get which stream belongs to a subscription - for this task is acceptable to just use default NETCONF stream.\n\nIn addition, a review for previous patches would be beneficial.",
+      "revId": "8b47a7de811c80624902086272e871879c6bee10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "31d1fe84_0117732e",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/EndpointRoot.java",
         "patchSetId": 33
