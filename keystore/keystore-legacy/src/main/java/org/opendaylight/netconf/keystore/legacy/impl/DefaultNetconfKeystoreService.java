@@ -9,7 +9,6 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.Maps;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
@@ -151,7 +150,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
         Throwable failure = null;
 
-        final var keys = Maps.<String, CertifiedPrivateKey>newHashMapWithExpectedSize(newState.privateKeys.size());
+        final var keys = HashMap.<String, CertifiedPrivateKey>newHashMap(newState.privateKeys.size());
         for (var key : newState.privateKeys.values()) {
             final var keyName = key.requireName();
 
@@ -207,7 +206,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             keys.put(keyName, new CertifiedPrivateKey(privateKey, certs));
         }
 
-        final var certs = Maps.<String, X509Certificate>newHashMapWithExpectedSize(newState.trustedCertificates.size());
+        final var certs = HashMap.<String, X509Certificate>newHashMap(newState.trustedCertificates.size());
         for (var cert : newState.trustedCertificates.values()) {
             final var certName = cert.requireName();
 
@@ -232,7 +231,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             certs.put(certName, x509cert);
         }
 
-        final var creds = Maps.<String, KeyPair>newHashMapWithExpectedSize(newState.credentials.size());
+        final var creds = HashMap.<String, KeyPair>newHashMap(newState.credentials.size());
         for (var cred : newState.credentials.values()) {
             final var keyId = cred.requireKeyId();
             final byte[] privateKey;
