@@ -87,7 +87,7 @@ class AbstractRequestProcessorTest {
         session = new RestconfSession(HTTPScheme.HTTP,
             new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
                 new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT,
-                    1000, Integer.MAX_VALUE, streamRegistry), streamRegistry));
+                    1000, Integer.MAX_VALUE, streamRegistry)));
         doReturn(channel).when(ctx).channel();
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         session.handlerAdded(ctx);

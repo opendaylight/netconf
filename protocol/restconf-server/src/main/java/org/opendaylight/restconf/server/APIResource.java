@@ -33,13 +33,13 @@ import org.slf4j.LoggerFactory;
  * RESTCONF API resource, as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3>RFC8040, section 3.3</a>.
  */
+@NonNullByDefault
 final class APIResource extends AbstractResource {
     private static final Logger LOG = LoggerFactory.getLogger(APIResource.class);
 
     private final Map<String, AbstractResource> resources;
     private final List<String> otherSegments;
 
-    @NonNullByDefault
     APIResource(final RestconfServer server, final List<String> otherSegments, final String restconfPath,
                 final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
                 final PrettyPrintParam defaultPrettyPrint, final int sseHeartbeatIntervalMillis,
@@ -59,7 +59,7 @@ final class APIResource extends AbstractResource {
 
     @Override
     PreparedRequest prepare(final SegmentPeeler peeler, final TransportSession session, final ImplementedMethod method,
-            final URI targetUri, final HttpHeaders headers, final Principal principal) {
+            final URI targetUri, final HttpHeaders headers, final @Nullable Principal principal) {
         LOG.debug("Preparing {} {}", method, targetUri);
 
         // peel all other segments out
