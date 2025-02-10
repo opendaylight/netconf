@@ -13,11 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -35,15 +34,15 @@ final class TestUtils {
         // utility class
     }
 
-    static void prepareDataFile(final File file, final byte[] secret, final Collection<StorageEntry> entries)
+    static void prepareDataFile(final Path file, final byte[] secret, final Collection<StorageEntry> entries)
             throws IOException {
-        try (var fos = new FileOutputStream(file)) {
+        try (var fos = Files.newOutputStream(file)) {
             CipherUtils.toBase64Stream(entries, secret, fos);
         }
     }
 
-    static void preparePropertiesFile(final File file, final Collection<StorageEntry> entries) throws IOException {
-        try (var fos = new FileOutputStream(file)) {
+    static void preparePropertiesFile(final Path file, final Collection<StorageEntry> entries) throws IOException {
+        try (var fos = Files.newOutputStream(file)) {
             fos.write("# comment\n".getBytes(StandardCharsets.UTF_8));
             for (var entry : entries) {
                 fos.write(entry.key());
@@ -54,23 +53,23 @@ final class TestUtils {
         }
     }
 
-    static void prepareSecretFile(final File file, final byte[] secret) throws IOException {
-        try (var out = Base64.getEncoder().wrap(new FileOutputStream(file))) {
+    static void prepareSecretFile(final Path file, final byte[] secret) throws IOException {
+        try (var out = Base64.getEncoder().wrap(Files.newOutputStream(file))) {
             out.write(secret);
         }
     }
 
-    static byte[] secretFromFile(final File file) throws IOException {
-        assertTrue(file.exists());
-        try (var in = Base64.getDecoder().wrap(new FileInputStream(file))) {
+    static byte[] secretFromFile(final Path file) throws IOException {
+        assertTrue(Files.exists(file));
+        try (var in = Base64.getDecoder().wrap(Files.newInputStream(file))) {
             return in.readAllBytes();
         }
     }
 
-    static void assertFileContains(final File file, final byte[] secret, final Collection<StorageEntry> entries)
+    static void assertFileContains(final Path file, final byte[] secret, final Collection<StorageEntry> entries)
             throws IOException {
-        assertTrue(file.exists());
-        try (var fis = new FileInputStream(file)) {
+        assertTrue(Files.exists(file));
+        try (var fis = Files.newInputStream(file)) {
             final var fileEntries = CipherUtils.fromBase64Stream(secret, fis);
             assertNotNull(fileEntries);
             assertEquals(entries.size(), fileEntries.size());
