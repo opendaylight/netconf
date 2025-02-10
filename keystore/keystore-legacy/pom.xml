@@ -21,10 +21,6 @@
     <name>${project.artifactId}</name>
     <description>Legacy NETCONF keystore</description>
 
-    <properties>
-        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.guicedee.services</groupId>
