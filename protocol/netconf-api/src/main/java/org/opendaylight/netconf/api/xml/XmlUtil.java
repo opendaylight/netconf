@@ -10,11 +10,12 @@ package org.opendaylight.netconf.api.xml;
 import com.google.common.io.Resources;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -174,7 +175,11 @@ public final class XmlUtil {
     }
 
     public static Element readXmlToElement(final File xmlFile) throws SAXException, IOException {
-        return readXmlToDocument(new FileInputStream(xmlFile)).getDocumentElement();
+        return readXmlToElement(xmlFile.toPath());
+    }
+
+    public static Element readXmlToElement(final Path xmlFile) throws SAXException, IOException {
+        return readXmlToDocument(Files.newInputStream(xmlFile)).getDocumentElement();
     }
 
     public static Element readXmlToElement(final String xmlContent) throws SAXException, IOException {
