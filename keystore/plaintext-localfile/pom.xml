@@ -21,6 +21,10 @@
     <packaging>bundle</packaging>
     <description>Netconf Plaintext Local File Keystore</description>
 
+    <properties>
+        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.spotbugs</groupId>
