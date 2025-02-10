@@ -31,7 +31,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -291,7 +291,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private static void deleteCacheDir() {
-        FileUtils.deleteQuietly(new File(TEST_ROOT_DIRECTORY));
+        FileUtils.deleteQuietly(Path.of(TEST_ROOT_DIRECTORY).toFile());
     }
 
     @AfterEach
