@@ -17,7 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ class FilterContentValidatorTest {
     static Stream<Arguments> data() throws Exception {
         final var result = new ArrayList<Arguments>();
         final var expected = Files.readAllLines(
-            Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI()));
+            Path.of(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI()));
         if (expected.size() != TEST_CASE_COUNT) {
             throw new IllegalArgumentException("Number of lines in results file must be same as test case count");
         }

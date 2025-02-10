@@ -13,7 +13,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -136,7 +135,7 @@ public final class CopyConfig extends AbstractEdit {
         // Save XML to file:
         final String xml = XmlUtil.toString((Element) node);
         try {
-            final Path file = Paths.get(new URI(url));
+            final var file = Path.of(new URI(url));
             Files.write(file, xml.getBytes(StandardCharsets.UTF_8));
         } catch (URISyntaxException | IllegalArgumentException e) {
             throw new DocumentedException("Invalid URI: " + url, e,
