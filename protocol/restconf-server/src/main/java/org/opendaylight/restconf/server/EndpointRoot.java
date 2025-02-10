@@ -24,7 +24,6 @@ import org.opendaylight.netconf.transport.http.rfc6415.WebHostResource;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
 import org.opendaylight.restconf.server.api.TransportSession;
-import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
@@ -67,16 +66,14 @@ final class EndpointRoot {
     //        API across the three classes of resources we have today
     private final APIResource apiResource;
     private final String apiSegment;
-    private final RestconfStream.Registry streamRegistry;
 
     @NonNullByDefault
     EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown,
-            final String apiSegment, final APIResource apiResource, final RestconfStream.Registry streamRegistry) {
+            final String apiSegment, final APIResource apiResource) {
         this.principalService = requireNonNull(principalService);
         this.wellKnown = requireNonNull(wellKnown);
         this.apiSegment = requireNonNull(apiSegment);
         this.apiResource = requireNonNull(apiResource);
-        this.streamRegistry = requireNonNull(streamRegistry);
     }
 
     @NonNullByDefault

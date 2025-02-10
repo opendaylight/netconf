@@ -94,7 +94,7 @@ abstract sealed class AbstractResource permits AbstractLeafResource, APIResource
      * @return A {@link PreparedRequest}
      */
     abstract PreparedRequest prepare(SegmentPeeler peeler, TransportSession session, ImplementedMethod method,
-            URI targetUri, HttpHeaders headers, @Nullable Principal principal);
+        URI targetUri, HttpHeaders headers, @Nullable Principal principal);
 
     static final PreparedRequest optionalApiPath(final String path, final Function<ApiPath, PreparedRequest> func) {
         return path.isEmpty() ? func.apply(ApiPath.empty()) : requiredApiPath(path, func);
