@@ -1,6 +1,0 @@
-{
-    "device": {
-        "unique-id": "{device_name}",
-        "ssh-host-key": "{hostkey}"
-    }
-}
