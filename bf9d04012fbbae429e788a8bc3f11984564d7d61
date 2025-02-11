@@ -16,6 +16,46 @@
       "message": "recheck",
       "revId": "bf9d04012fbbae429e788a8bc3f11984564d7d61",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35bbf3d5_c6cacbc1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-11T18:55:51Z",
+      "side": 1,
+      "message": "RPC tests should be working by this point. Move disabled annotation to individual tests like notification streaming.",
+      "revId": "bf9d04012fbbae429e788a8bc3f11984564d7d61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da9c561e_513f272e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-11T18:55:51Z",
+      "side": 1,
+      "message": "Hmm.. This one probably won\u0027t work - subscription encodings should match defined identity that declared in yang model. IIRC in this case they are defined as \"encode-json\" and \"encode-xml\".",
+      "range": {
+        "startLine": 57,
+        "startChar": 16,
+        "endLine": 57,
+        "endChar": 33
+      },
+      "revId": "bf9d04012fbbae429e788a8bc3f11984564d7d61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
