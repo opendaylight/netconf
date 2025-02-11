@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -43,6 +44,7 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.mdsal.spi.exception.TransactionEditConfigFailedException;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -526,12 +528,36 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                // if errors occurred during transaction commit then patch failed and global errors are reported
-                request.completeWith(new DataYangPatchResult(
-                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
-                        decodeException(cause, "PATCH", null).errors())));
+                if (cause instanceof TransactionEditConfigFailedException editConfigException) {
+                    // Update editCollection if an edit-config operation encounters an error.
+                    final var patchEntity = patch.entities().get(editConfigException.failedTransactionNumber());
+                    final var updatedEditCollection = updateEditCollection(editConfigException, editCollection,
+                        patchEntity.getDataPath());
+
+                    request.completeWith(new DataYangPatchResult(new PatchStatusContext(patch.patchId(),
+                        updatedEditCollection, false, null)));
+                } else {
+                    // if errors occurred during transaction commit then patch failed and global errors are reported
+                    request.completeWith(new DataYangPatchResult(
+                        new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
+                            decodeException(cause, "PATCH", path).errors())));
+                }
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private List<PatchStatusEntity> updateEditCollection(final TransactionEditConfigFailedException transactionError,
+            final List<PatchStatusEntity> editCollection, final Data path) {
+        final var failedIndex = transactionError.failedTransactionNumber();
+
+        // Copy the previous editCollections up to the PatchStatusEntity that failed.
+        final var result = new ArrayList<>(editCollection.subList(0, failedIndex));
+        // Update failed PatchStatusEntity and then skip all PatchStatusEntities afterward, as they were not executed.
+        final var failedEntityId = editCollection.get(failedIndex).getEditId();
+        final var requestException = decodeException(transactionError, "PATCH", path);
+        result.add(new PatchStatusEntity(failedEntityId, false, requestException.errors()));
+
+        return Collections.unmodifiableList(result);
     }
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
@@ -1046,20 +1072,20 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             for (var error : Throwables.getCausalChain(ex)) {
                 if (error instanceof NetconfDocumentedException netconfError) {
                     return new RequestException(netconfError.getErrorType(), netconfError.getErrorTag(),
-                        netconfError.getMessage(), dataPath != null ? dataPath.toErrorPath() : null, ex);
+                        netconfError.getMessage(), dataPath.toErrorPath(), ex);
                 }
                 if (error instanceof DocumentedException documentedError) {
                     final var errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists",
-                            dataPath != null ? dataPath.instance() : null);
+                            dataPath.instance());
                         return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
-                            dataPath != null ? dataPath.toErrorPath() : null, ex);
+                            dataPath.toErrorPath(), ex);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
-                            dataPath != null ? dataPath.instance() : null);
+                            dataPath.instance());
                         return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                            "Data does not exist", dataPath != null ? dataPath.toErrorPath() : null, ex);
+                            "Data does not exist", dataPath.toErrorPath(), ex);
                     }
                 }
             }

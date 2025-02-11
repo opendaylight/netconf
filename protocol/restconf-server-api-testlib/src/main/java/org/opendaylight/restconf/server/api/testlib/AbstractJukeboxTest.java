@@ -96,6 +96,15 @@ public abstract class AbstractJukeboxTest {
         .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
+    public static final MapEntryNode ARTIST_ENTRY = ImmutableNodes.newMapEntryBuilder()
+        .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+        .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+        .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
+        .build();
+    protected static final SystemMapNode BUILD_ARTIST_LIST = ImmutableNodes.newSystemMapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
+        .withChild(ARTIST_ENTRY)
+        .build();
     protected static final MapEntryNode SONG1 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
             Uint32.ONE))
