@@ -16,28 +16,45 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  */
 final class TransactionEditConfigFailedException extends OperationFailedException {
 
-    TransactionEditConfigFailedException(final String message, final Throwable cause) {
+    private final int failedTransactionNumber;
+
+    TransactionEditConfigFailedException(final String message, final Throwable cause,
+            final int failedTransactionNumber) {
         super(message, cause);
+        this.failedTransactionNumber = failedTransactionNumber;
     }
 
-    TransactionEditConfigFailedException(final String message, final RpcError error) {
+    TransactionEditConfigFailedException(final String message, final RpcError error,
+            final int failedTransactionNumber) {
         super(message, error);
+        this.failedTransactionNumber = failedTransactionNumber;
     }
 
     TransactionEditConfigFailedException(final String message, final Throwable cause,
-            final Collection<RpcError> errors) {
+            final Collection<RpcError> errors, final int failedTransactionNumber) {
         super(message, cause, errors);
+        this.failedTransactionNumber = failedTransactionNumber;
     }
 
-    TransactionEditConfigFailedException(final String message, final Collection<? extends RpcError> errors) {
+    TransactionEditConfigFailedException(final String message, Collection<? extends RpcError> errors,
+            final int failedTransactionNumber) {
         super(message, errors);
+        this.failedTransactionNumber = failedTransactionNumber;
     }
 
-    TransactionEditConfigFailedException(final String message, final RpcError... errors) {
+    TransactionEditConfigFailedException(final String message,
+            final int failedTransactionNumber, RpcError... errors) {
         super(message, errors);
+        this.failedTransactionNumber = failedTransactionNumber;
     }
 
-    TransactionEditConfigFailedException(final String message, final Throwable cause, final RpcError... errors) {
+    TransactionEditConfigFailedException(final String message, final Throwable cause,
+            final int failedTransactionNumber, RpcError... errors) {
         super(message, cause, errors);
+        this.failedTransactionNumber = failedTransactionNumber;
+    }
+
+    int failedTransactionNumber() {
+        return failedTransactionNumber;
     }
 }
