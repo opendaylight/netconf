@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "a9591b8cc8fe5fa8d45bb1ca5d52e7e15aaa222a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d668d90_40673431",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-11T16:22:46Z",
+      "side": 1,
+      "message": "Should work at this point. RPC in Postman creates it without issues. Seems like you need to create default NETCONF stream in abstract class.",
+      "revId": "a9591b8cc8fe5fa8d45bb1ca5d52e7e15aaa222a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
