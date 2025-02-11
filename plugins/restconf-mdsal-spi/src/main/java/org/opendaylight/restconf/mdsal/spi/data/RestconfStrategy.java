@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -38,6 +39,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.mdsal.spi.exception.TransactionEditConfigFailedException;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -526,12 +528,37 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                // if errors occurred during transaction commit then patch failed and global errors are reported
-                request.completeWith(new DataYangPatchResult(
-                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
-                        decodeException(cause, "PATCH", null).errors())));
+                if (cause instanceof TransactionEditConfigFailedException editConfigException) {
+                    // Update editCollection if an edit-config operation encounters an error.
+                    final var updatedEditCollection = updateEditCollection(editConfigException, editCollection);
+                    request.completeWith(new DataYangPatchResult(new PatchStatusContext(patch.patchId(),
+                        updatedEditCollection, false, null)));
+                } else {
+                    // if errors occurred during transaction commit then patch failed and global errors are reported
+                    request.completeWith(new DataYangPatchResult(
+                        new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
+                            decodeException(cause, "PATCH", null).errors())));
+                }
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private List<PatchStatusEntity> updateEditCollection(final TransactionEditConfigFailedException transactionError,
+            final List<PatchStatusEntity> editCollection) {
+        final var failedTransactionNumber = transactionError.failedTransactionNumber();
+        final var result = new ArrayList<PatchStatusEntity>(failedTransactionNumber);
+        // Copy the previous editCollections to the PatchStatusEntity that failed. Update failed PatchStatusEntity
+        // and then skip all PatchStatusEntities afterward, as they were not executed.
+        for (int i = 0; i < failedTransactionNumber; i++) {
+            final var statusEntity = editCollection.get(i);
+            if (failedTransactionNumber - 1 == i) {
+                ServerException serverException = decodeException(transactionError, "PATCH", null);
+                result.add(new PatchStatusEntity(statusEntity.getEditId(), false, serverException.errors()));
+            } else {
+                result.add(statusEntity);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
