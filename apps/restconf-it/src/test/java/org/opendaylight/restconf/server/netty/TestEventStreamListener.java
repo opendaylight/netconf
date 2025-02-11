@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.EventStreamListener;
 
-final class TestEventStreamListener implements EventStreamListener {
+public final class TestEventStreamListener implements EventStreamListener {
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(5);
 
     private volatile boolean started = false;
@@ -24,7 +24,7 @@ final class TestEventStreamListener implements EventStreamListener {
         started = true;
     }
 
-    boolean started() {
+    public boolean started() {
         return started;
     }
 
@@ -35,7 +35,7 @@ final class TestEventStreamListener implements EventStreamListener {
         }
     }
 
-    String readNext() throws InterruptedException {
+    public String readNext() throws InterruptedException {
         return queue.poll(5, TimeUnit.SECONDS);
     }
 
