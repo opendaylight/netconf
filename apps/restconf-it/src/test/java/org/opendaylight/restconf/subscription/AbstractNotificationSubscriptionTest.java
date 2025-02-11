@@ -49,8 +49,10 @@ import org.opendaylight.mdsal.dom.broker.RouterDOMPublishNotificationService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
+import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
+import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -65,6 +67,7 @@ import org.opendaylight.restconf.server.SimpleNettyEndpoint;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
+import org.opendaylight.restconf.server.netty.TestEventStreamListener;
 import org.opendaylight.restconf.server.netty.TestRequestCallback;
 import org.opendaylight.restconf.server.netty.TestTransportChannelListener;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -81,8 +84,11 @@ import org.opendaylight.yangtools.binding.runtime.spi.ModuleInfoSnapshotBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTest {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationSubscriptionTest.class);
     private static final YangParserFactory PARSER_FACTORY = ServiceLoader.load(YangParserFactory.class)
         .findFirst().orElseThrow(() -> new ExceptionInInitializerError("No YangParserFactory found"));
     private static final BindingRuntimeGenerator GENERATOR = ServiceLoader.load(BindingRuntimeGenerator.class)
@@ -111,6 +117,9 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private String host;
     private SimpleNettyEndpoint endpoint;
     private ContextListener contextListener;
+
+    private EventStreamService clientStreamService;
+    EventStreamService.StreamControl streamControl;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
@@ -211,6 +220,9 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
     @AfterEach
     void afterEach() throws Exception {
+        if (clientStreamService != null) {
+            clientStreamService = null;
+        }
         contextListener.close();
         endpoint.close();
     }
@@ -297,5 +309,34 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         } catch (IOException e) {
             throw new AssertionError(e);
         }
+    }
+
+    HTTPClient startStreamClient() throws Exception {
+        final var transportListener = new TestTransportChannelListener(channel ->
+            clientStreamService = SseUtils.enableClientSse(channel));
+        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
+            clientStackGrouping, false).get(2, TimeUnit.SECONDS);
+        await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
+        assertNotNull(clientStreamService);
+        return streamClient;
+    }
+
+    TestEventStreamListener startSubscriptionStream(final String subscriptionId) {
+        final var eventListener = new TestEventStreamListener();
+        clientStreamService.startEventStream("localhost", "/subscriptions/" + subscriptionId, eventListener,
+            new EventStreamService.StartCallback() {
+                @Override
+                public void onStreamStarted(final EventStreamService.StreamControl control) {
+                    streamControl = control;
+                }
+
+                @Override
+                public void onStartFailure(final Exception cause) {
+                    LOG.error("Stream was not started", cause);
+                }
+            });
+        await().atMost(Duration.ofSeconds(2)).until(eventListener::started);
+        assertNotNull(streamControl);
+        return eventListener;
     }
 }
