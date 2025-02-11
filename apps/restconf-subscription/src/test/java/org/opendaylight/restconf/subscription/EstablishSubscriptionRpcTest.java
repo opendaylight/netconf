@@ -26,16 +26,17 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
+import org.opendaylight.restconf.notifications.mdsal.RestconfSubscriptionsStreamRegistry;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -67,6 +68,10 @@ class EstablishSubscriptionRpcTest {
     private TransportSession session;
     @Mock
     private SubscriptionStateMachine stateMachine;
+    @Mock
+    private RestconfSubscriptionsStreamRegistry streamRegistry;
+    @Mock
+    private RestconfStream restconfStream;
     @Captor
     private ArgumentCaptor<ServerException> response;
 
@@ -75,7 +80,7 @@ class EstablishSubscriptionRpcTest {
     @BeforeEach
     void before() {
         final var mdsalService = new MdsalNotificationService(dataBroker);
-        rpc = new EstablishSubscriptionRpc(mdsalService, subscriptionStateService, stateMachine);
+        rpc = new EstablishSubscriptionRpc(mdsalService, subscriptionStateService, stateMachine, streamRegistry);
     }
 
     @Test
@@ -111,10 +116,7 @@ class EstablishSubscriptionRpcTest {
             .build();
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
-        doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
-        doReturn(FluentFutures.immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.OPERATIONAL,
-            SubscriptionUtil.STREAMS.node(NodeIdentifierWithPredicates.of(Stream.QNAME,
-            SubscriptionUtil.QNAME_STREAM_NAME, "NETCONF")));
+        doReturn(restconfStream).when(streamRegistry).lookupStream("NETCONF");
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
 
@@ -127,10 +129,7 @@ class EstablishSubscriptionRpcTest {
 
     @Test
     void establishSubscriptionWrongStreamTest() {
-        doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
-        doReturn(FluentFutures.immediateFalseFluentFuture()).when(readTx).exists(LogicalDatastoreType.OPERATIONAL,
-            SubscriptionUtil.STREAMS.node(NodeIdentifierWithPredicates.of(Stream.QNAME,
-                SubscriptionUtil.QNAME_STREAM_NAME, "NETCONF")));
+        doReturn(null).when(streamRegistry).lookupStream("NETCONF");
         doReturn(session).when(request).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput()));
@@ -164,9 +163,7 @@ class EstablishSubscriptionRpcTest {
                 .build())
             .build();
         doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
-        doReturn(FluentFutures.immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.OPERATIONAL,
-            SubscriptionUtil.STREAMS.node(NodeIdentifierWithPredicates.of(Stream.QNAME,
-                SubscriptionUtil.QNAME_STREAM_NAME, "NETCONF")));
+        doReturn(restconfStream).when(streamRegistry).lookupStream("NETCONF");
         doReturn(FluentFutures.immediateFalseFluentFuture()).when(readTx).exists(LogicalDatastoreType.OPERATIONAL,
             SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(StreamFilter.QNAME,
                 SubscriptionUtil.QNAME_STREAM_FILTER_NAME, "filter")));
