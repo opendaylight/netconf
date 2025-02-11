@@ -449,6 +449,22 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
+    RestconfStrategy testPatchWithDataExistExceptionStrategy() {
+        mockLockUnlock();
+        doReturn(Futures.immediateFuture(null)).when(netconfService).discardChanges();
+
+        final var rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL,
+            ErrorTag.DATA_EXISTS, "Data already exists", null, "", null);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
+            any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .replace(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
+        return jukeboxDataOperations();
+    }
+
+    @Override
     RestconfStrategy testPatchMergePutContainerStrategy() {
         mockLockUnlockCommit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),

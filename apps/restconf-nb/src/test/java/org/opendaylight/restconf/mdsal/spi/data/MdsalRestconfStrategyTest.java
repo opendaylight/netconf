@@ -266,6 +266,13 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
+    @NonNull RestconfStrategy testPatchWithDataExistExceptionStrategy() {
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
+        return jukeboxDataOperations();
+    }
+
+    @Override
     RestconfStrategy testPatchMergePutContainerStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();

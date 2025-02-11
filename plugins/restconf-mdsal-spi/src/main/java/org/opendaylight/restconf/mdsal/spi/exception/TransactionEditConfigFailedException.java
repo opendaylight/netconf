@@ -15,11 +15,21 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  */
 public final class TransactionEditConfigFailedException extends TransactionCommitFailedException {
 
-    public TransactionEditConfigFailedException(final String message, final RpcError... errors) {
+    private final int failedTransactionNumber;
+
+    public TransactionEditConfigFailedException(final String message, final int failedTransactionNumber,
+            final RpcError... errors) {
         super(message, errors);
+        this.failedTransactionNumber = failedTransactionNumber;
     }
 
-    public TransactionEditConfigFailedException(final String message, final Throwable cause, final RpcError... errors) {
+    public TransactionEditConfigFailedException(final String message, final Throwable cause,
+            final int failedTransactionNumber, final RpcError... errors) {
         super(message, cause, errors);
+        this.failedTransactionNumber = failedTransactionNumber;
+    }
+
+    public int failedTransactionNumber() {
+        return failedTransactionNumber;
     }
 }
