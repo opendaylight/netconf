@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -64,6 +65,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     private final NetconfDataTreeService netconfService;
     private final Map<YangInstanceIdentifier, Collection<? extends NormalizedNode>> readListCache =
         new ConcurrentHashMap<>();
+    private final AtomicInteger extraCallsCtr;
 
     private volatile boolean isLocked = false;
 
@@ -86,6 +88,8 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             }
         }, MoreExecutors.directExecutor());
         resultsFutures.add(lockResult);
+        // Create counter of additional features including lock feature.
+        extraCallsCtr = new AtomicInteger(1);
     }
 
     @Override
@@ -105,6 +109,8 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             } else {
                 items.forEach(item ->
                     enqueueOperation(() -> netconfService.delete(CONFIGURATION, path.node(item.name()))));
+                // If there is only one item, it is set to the same value, indicating no additional calls.
+                extraCallsCtr.set(items.size() - 1 + extraCallsCtr.get());
             }
         } else {
             enqueueOperation(() -> netconfService.delete(CONFIGURATION, path));
@@ -120,6 +126,8 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             } else {
                 items.forEach(item ->
                     enqueueOperation(() -> netconfService.remove(CONFIGURATION, path.node(item.name()))));
+                // If there is only one item, it is set to the same value, indicating no additional calls.
+                extraCallsCtr.set(items.size() - 1 + extraCallsCtr.get());
             }
         } else {
             enqueueOperation(() -> netconfService.remove(CONFIGURATION, path));
@@ -163,10 +171,13 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
-            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+            final var bodyCollection = ((NormalizedNodeContainer<?>) data).body();
+            for (var child : bodyCollection) {
                 final var childPath = path.node(child.name());
                 enqueueOperation(() -> netconfService.create(CONFIGURATION, childPath, child, Optional.empty()));
             }
+            // The enqueueOperation call for every child is an additional call to the first merge method.
+            extraCallsCtr.set(bodyCollection.size() + extraCallsCtr.get());
         } else {
             enqueueOperation(() -> netconfService.create(CONFIGURATION, path, data, Optional.empty()));
         }
@@ -177,11 +188,13 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
-
-            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+            final var bodyCollection = ((NormalizedNodeContainer<?>) data).body();
+            for (var child : bodyCollection) {
                 final var childPath = path.node(child.name());
                 enqueueOperation(() -> netconfService.replace(CONFIGURATION, childPath, child, Optional.empty()));
             }
+            // The enqueueOperation call for every child is an additional call to the first merge method.
+            extraCallsCtr.set(bodyCollection.size() + extraCallsCtr.get());
         } else {
             enqueueOperation(() -> netconfService.replace(CONFIGURATION, path, data, Optional.empty()));
         }
@@ -259,7 +272,8 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         final ListenableFuture<? extends DOMRpcResult> operationFuture;
         synchronized (resultsFutures) {
             // if we only have result for the lock operation ...
-            if (resultsFutures.size() == 1) {
+            final int currentSize = resultsFutures.size();
+            if (currentSize == 1) {
                 operationFuture = Futures.transformAsync(resultsFutures.get(0),
                     result -> {
                         // ... then add new operation to the chain if lock was successful
@@ -272,12 +286,14 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                     MoreExecutors.directExecutor());
             } else {
                 // ... otherwise just add operation to the execution chain
-                operationFuture = Futures.transformAsync(resultsFutures.get(resultsFutures.size() - 1),
+                operationFuture = Futures.transformAsync(resultsFutures.get(currentSize - 1),
                     result -> {
                         if (result != null && !allWarnings(result.errors())) {
                             // The edit-config operation failed. Stop execution and create a
-                            // TransactionEditConfigFailedException with a result error.
-                            final var editConfigFailedException = toEditConfigFailedException(result.errors());
+                            // TransactionEditConfigFailedException with the edit-config number and error.
+                            // Edit-config number subtracts extraCallsCtr to exclude additional created future.
+                            final var editConfigFailedException = toEditConfigFailedException(result.errors(),
+                                currentSize - extraCallsCtr.get());
                             return Futures.immediateFailedFuture(editConfigFailedException);
                         }
                         // If no errors continue in features execution.
@@ -297,10 +313,11 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     private static TransactionEditConfigFailedException toEditConfigFailedException(
-            final Collection<? extends RpcError> errors) {
+            final Collection<? extends RpcError> errors,
+            final int transactionNumber) {
         final var netconfDocumentedException = getNetconfDocumentedException(errors);
         return new TransactionEditConfigFailedException("Netconf transaction edit-config failed",
-            netconfDocumentedException);
+            netconfDocumentedException, transactionNumber);
     }
 
     private static TransactionLockFailedException toLockFailedException(
