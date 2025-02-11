@@ -59,7 +59,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.ser
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -294,8 +293,7 @@ public class NetconfDeviceSimulator implements Closeable {
                                             final ModuleLike module) {
         final var moduleNamespace = module.getNamespace().toString();
         final var moduleName = module.getName();
-        final var revision = module.getRevision().map(Revision::toString).orElse(null);
-        final var sourceId = new SourceIdentifier(moduleName, revision);
+        final var sourceId = new SourceIdentifier(moduleName);
 
         final String moduleContent;
         try {
@@ -305,7 +303,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 "Cannot retrieve schema source for module " + sourceId + " from schema repository", e);
         }
 
-        capabilities.add(new YangModuleCapability(moduleNamespace, moduleName, revision, moduleContent));
+        capabilities.add(new YangModuleCapability(moduleNamespace, moduleName, null, moduleContent));
     }
 
     private static void registerSource(final SharedSchemaRepository consumer, final String resource,
