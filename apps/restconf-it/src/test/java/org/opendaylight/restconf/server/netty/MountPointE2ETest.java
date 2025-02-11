@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.ssl.SslContextBuilder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -328,7 +329,8 @@ class MountPointE2ETest extends AbstractE2ETest {
         } else {
             configBuilder
                 .setModels(Set.of(DEVICE_YANG_MODEL, NOTIFICATION_MODEL))
-                .setNotificationFile(new File(getClass().getResource("/device-sim-notifications.xml").toURI()));
+                .setNotificationFile(Path.of(getClass().getResource("/device-sim-notifications.xml").toURI())
+                    .toFile());
         }
         deviceSimulator = new NetconfDeviceSimulator(configBuilder.build());
         deviceSimulator.start();

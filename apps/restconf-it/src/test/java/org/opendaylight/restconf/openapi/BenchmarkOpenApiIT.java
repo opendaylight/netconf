@@ -10,13 +10,13 @@ package org.opendaylight.restconf.openapi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,7 +97,7 @@ public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
             .setAuthProvider((usr, pwd) -> DEVICE_USERNAME.equals(usr) && DEVICE_PASSWORD.equals(pwd))
             .build();
 
-        configBuilder.setSchemasDir(new File("target/test-classes/juniper"));
+        configBuilder.setSchemasDir(Path.of("target/test-classes/juniper").toFile());
         deviceSimulator = new NetconfDeviceSimulator(configBuilder);
         deviceSimulator.start();
     }
