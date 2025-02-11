@@ -3,7 +3,7 @@ module netconf-node-optional {
     prefix "netnopt";
 
     import network-topology { prefix nt; revision-date 2013-10-21; }
-    import yang-ext { prefix ext; revision-date "2013-07-09";}
+    import odl-codegen-extensions { prefix oce; }
 
     revision 2022-12-25 {
         description "Datastore locking moved to odl-netconf-device.";
@@ -33,7 +33,7 @@ module netconf-node-optional {
 
     augment "/nt:network-topology/nt:topology/nt:node/" {
         when "../../nt:topology-types/topology-netconf";
-        ext:augment-identifier "netconf-node-augmented-optional";
+        oce:augment-identifier "netconf-node-augmented-optional";
         uses netconf-node-augmented-optional-fields;
     }
 }
