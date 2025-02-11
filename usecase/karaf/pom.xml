@@ -24,7 +24,7 @@
       <dependency>
         <groupId>org.opendaylight.infrautils</groupId>
         <artifactId>infrautils-artifacts</artifactId>
-        <version>7.1.0</version>
+        <version>7.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
