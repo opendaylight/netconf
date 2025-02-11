@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -337,6 +338,42 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
+
+    @Test
+    public final void testPatchWithDataExistException() throws Exception {
+        // Prepare patch request.
+        final var patchContext = new PatchContext("patchCD", List.of(
+            new PatchEntity("edit1", Operation.Delete, CREATE_AND_DELETE_TARGET),
+            new PatchEntity("edit2", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
+            new PatchEntity("edit3", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX)));
+        final var strategy = testPatchWithDataExistExceptionStrategy();
+        strategy.patchData(dataYangPatchRequest, new Data(strategy.databind), patchContext);
+
+        // Get patch result.
+        final var patchStatusContext = dataYangPatchRequest.getResult().status();
+
+        // Verify failure and confirm that edit3 operation was not executed.
+        assertFalse(patchStatusContext.ok());
+        assertNull(patchStatusContext.globalErrors());
+        assertEquals(2, patchStatusContext.editCollection().size());
+
+        // Verify that first request is without errors.
+        final var delete = patchStatusContext.editCollection().get(0);
+        assertTrue(delete.isOk());
+        assertEquals("edit1", delete.getEditId());
+        assertNull(delete.getEditErrors());
+
+        // Verify that second request failed on DATA_EXISTS.
+        final var firstCreate = patchStatusContext.editCollection().get(1);
+        assertFalse(firstCreate.isOk());
+        assertEquals("edit2", firstCreate.getEditId());
+        assertNotNull(firstCreate.getEditErrors());
+        final var serverError = firstCreate.getEditErrors().getFirst();
+        assertEquals(ErrorTag.DATA_EXISTS, serverError.tag());
+        assertEquals("Data already exists", serverError.message().elementBody());
+    }
+
+    abstract @NonNull RestconfStrategy testPatchWithDataExistExceptionStrategy();
 
     @Test
     final void testPatchMergePutContainer() {

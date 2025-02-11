@@ -275,8 +275,10 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                     result -> {
                         if (result != null && !allWarnings(result.errors())) {
                             // The edit-config operation failed. Stop execution and create a
-                            // TransactionEditConfigFailedException with a result error.
-                            final var editConfigFailedException = toEditConfigFailedException(result.errors());
+                            // TransactionEditConfigFailedException with the edit-config number and error.
+                            // Edit-config number subtracts -1 to exclude lock feature created in constructor.
+                            final var editConfigFailedException = toEditConfigFailedException(result.errors(),
+                                resultsFutures.size() - 1);
                             return Futures.immediateFailedFuture(editConfigFailedException);
                         }
                         // If no errors continue in features execution.
@@ -296,10 +298,11 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     private static TransactionEditConfigFailedException toEditConfigFailedException(
-            final Collection<? extends RpcError> errors) {
+            final Collection<? extends RpcError> errors,
+            final int transactionNumber) {
         final var netconfDocumentedException = getNetconfDocumentedException(errors);
         return new TransactionEditConfigFailedException("Netconf transaction edit-config failed",
-            netconfDocumentedException);
+            netconfDocumentedException, transactionNumber);
     }
 
     private static NetconfDocumentedException getNetconfDocumentedException(
