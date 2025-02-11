@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5aa6abd6_4381b4ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-11T13:44:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55bf4d8f_eb13a885",
+      "revId": "8b47a7de811c80624902086272e871879c6bee10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31d1fe84_0117732e",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-10T08:35:34Z",
       "side": 1,
       "message": "Here we do not expect `channelHandler`",
+      "revId": "8b47a7de811c80624902086272e871879c6bee10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce778ca0_f38270e0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/EndpointRoot.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-11T13:44:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31d1fe84_0117732e",
       "revId": "8b47a7de811c80624902086272e871879c6bee10",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

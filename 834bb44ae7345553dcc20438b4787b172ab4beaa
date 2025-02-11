@@ -16,6 +16,24 @@
       "message": "we will remove this",
       "revId": "834bb44ae7345553dcc20438b4787b172ab4beaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa2bfec1_41725af9",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-11T13:44:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97fa3f0a_caa34c61",
+      "revId": "834bb44ae7345553dcc20438b4787b172ab4beaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
