@@ -22,6 +22,7 @@ import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
@@ -29,7 +30,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.dynamic.Stream1Builder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.StreamBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.stream.filter.ByReferenceBuilder;
@@ -87,16 +87,19 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     private final MdsalNotificationService mdsalService;
     private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
+    private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
     public EstablishSubscriptionRpc(@Reference final MdsalNotificationService mdsalService,
             @Reference final SubscriptionStateService subscriptionStateService,
-            @Reference final SubscriptionStateMachine stateMachine) {
+            @Reference final SubscriptionStateMachine stateMachine,
+            @Reference final RestconfStream.Registry streamRegistry) {
         super(EstablishSubscription.QNAME);
         this.mdsalService = requireNonNull(mdsalService);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
+        this.streamRegistry = requireNonNull(streamRegistry);
     }
 
     @Override
@@ -139,17 +142,12 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
                 "No stream specified"));
             return;
         }
-        try {
-            if (!mdsalService.exist(SubscriptionUtil.STREAMS.node(NodeIdentifierWithPredicates.of(Stream.QNAME,
-                    SubscriptionUtil.QNAME_STREAM_NAME, streamName))).get()) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-                    "%s refers to an unknown stream", streamName));
-                return;
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+        if (streamRegistry.lookupStream(streamName) == null) {
+            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "%s refers to an unknown stream", streamName));
             return;
         }
+
         final var stream1Builder = new Stream1Builder();
         stream1Builder.setStream(streamName);
         streamBuilder.addAugmentation(stream1Builder.build());

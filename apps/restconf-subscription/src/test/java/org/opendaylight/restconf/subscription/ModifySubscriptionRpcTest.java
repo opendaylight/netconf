@@ -31,6 +31,7 @@ import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -62,6 +63,8 @@ class ModifySubscriptionRpcTest {
     private TransportSession session;
     @Mock
     private SubscriptionStateMachine stateMachine;
+    @Mock
+    private RestconfStream.Registry streamRegistry;
     @Captor
     private ArgumentCaptor<ServerException> responseCaptor;
 
@@ -71,7 +74,7 @@ class ModifySubscriptionRpcTest {
     @BeforeEach
     void before() {
         mdsalService = new MdsalNotificationService(dataBroker);
-        rpc = new ModifySubscriptionRpc(mdsalService, subscriptionStateService, stateMachine);
+        rpc = new ModifySubscriptionRpc(mdsalService, subscriptionStateService, stateMachine, streamRegistry);
     }
 
     @Test
