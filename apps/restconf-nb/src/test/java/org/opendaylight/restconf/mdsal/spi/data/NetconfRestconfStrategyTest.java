@@ -406,7 +406,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
 
         // Execute yang-patch with failing lock operation.
         final var patchContext = new PatchContext("patchCD", List.of(
-            new PatchEntity("edit1", Edit.Operation.Delete, CREATE_AND_DELETE_TARGET)));
+            new PatchEntity("edit1", Edit.Operation.Delete, CREATE_AND_DELETE_DATA)));
         final var databind = jukeboxDataOperations().databind;
         final var completingServerRequest = new CompletingServerRequest<DataYangPatchResult>();
 
@@ -445,6 +445,22 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
+        return jukeboxDataOperations();
+    }
+
+    @Override
+    RestconfStrategy testPatchWithDataExistExceptionStrategy() {
+        mockLockUnlock();
+        doReturn(Futures.immediateFuture(null)).when(netconfService).discardChanges();
+
+        final var rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL,
+            ErrorTag.DATA_EXISTS, "Data already exists", null, "", null);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
+            any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .replace(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
         return jukeboxDataOperations();
     }
 
