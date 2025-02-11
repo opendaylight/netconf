@@ -49,11 +49,6 @@ final class Execution implements Callable<Void> {
                                 params.controllerAuthPassword.toCharArray());
                     }
                 })
-                // disable http/2 upgrade (attempted by default)
-                // because netty based server is not supporting processing request
-                // and protocol upgrade all-together via cleartext flow
-                // FIXME https://lf-opendaylight.atlassian.net/browse/NETCONF-1378
-                .version(HttpClient.Version.HTTP_1_1)
                 .build();
         destination = String.format(Locale.ROOT, NETCONF_TOPOLOGY_DESTINATION,
                 params.controllerIp, params.controllerPort);
