@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,9 +22,12 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataPatchResult;
@@ -318,18 +322,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchDataReplaceMergeAndRemove() {
-        final var buildArtistList = ImmutableNodes.newSystemMapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
-            .withChild(ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
-                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
-                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
-                .build())
-            .build();
-
         patch(new PatchContext("patchRMRm",
-            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
-                new PatchEntity("edit2", Operation.Merge, ARTIST_DATA, buildArtistList),
+            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, BUILD_ARTIST_LIST),
+                new PatchEntity("edit2", Operation.Merge, ARTIST_DATA, BUILD_ARTIST_LIST),
                 new PatchEntity("edit3", Operation.Remove, ARTIST_DATA))),
             testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
@@ -345,6 +340,58 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
+
+    @MethodSource
+    static List<PatchContext> getPatchContext() {
+        return List.of(
+            new PatchContext("VerifyNotExecutingLastPatchEntity", List.of(
+                new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, BUILD_ARTIST_LIST),
+                new PatchEntity("edit2", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX),
+                new PatchEntity("edit3", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX))),
+            new PatchContext("VerifyExceptionOnLastPatchEntity", List.of(
+                new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, BUILD_ARTIST_LIST),
+                new PatchEntity("edit2", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX)))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getPatchContext")
+    public final void testPatchWithDataExistException(final PatchContext patchContext) throws Exception {
+        // Prepare patch request.
+        final var strategy = testPatchWithDataExistExceptionStrategy();
+        strategy.patchData(dataYangPatchRequest, new Data(strategy.databind), patchContext);
+
+        // Get patch result.
+        final var patchStatusContext = dataYangPatchRequest.getResult().status();
+
+        // Verify failure and confirm that edit3 operation was not executed.
+        assertFalse(patchStatusContext.ok());
+        assertNull(patchStatusContext.globalErrors());
+        assertEquals(2, patchStatusContext.editCollection().size());
+
+        // Verify that first request is without errors.
+        final var delete = patchStatusContext.editCollection().get(0);
+        assertTrue(delete.isOk());
+        assertEquals("edit1", delete.getEditId());
+        assertNull(delete.getEditErrors());
+
+        // Verify that second request failed on DATA_EXISTS.
+        final var firstCreate = patchStatusContext.editCollection().get(1);
+        assertFalse(firstCreate.isOk());
+        assertEquals("edit2", firstCreate.getEditId());
+        assertNotNull(firstCreate.getEditErrors());
+        final var serverError = firstCreate.getEditErrors().getFirst();
+        assertEquals(ErrorTag.DATA_EXISTS, serverError.tag());
+        assertEquals(new ErrorPath(PLAYER_DATA), serverError.path());
+        if (strategy instanceof NetconfRestconfStrategy) {
+            assertEquals("RPC during tx failed. Data already exists ", serverError.message().elementBody());
+            assertEquals("Netconf transaction edit-config failed", serverError.info().elementBody());
+        } else {
+            assertEquals("Data already exists", serverError.message().elementBody());
+        }
+    }
+
+    abstract @NonNull RestconfStrategy testPatchWithDataExistExceptionStrategy();
 
     @Test
     final void testPatchMergePutContainer() {
