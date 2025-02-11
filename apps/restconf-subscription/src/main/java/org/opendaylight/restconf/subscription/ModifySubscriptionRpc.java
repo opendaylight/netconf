@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
+import org.opendaylight.restconf.notifications.mdsal.RestconfSubscriptionsStreamRegistry;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -66,16 +67,19 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     private final MdsalNotificationService mdsalService;
     private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
+    private final RestconfSubscriptionsStreamRegistry streamRegistry;
 
     @Inject
     @Activate
     public ModifySubscriptionRpc(@Reference final MdsalNotificationService mdsalService,
             @Reference final SubscriptionStateService subscriptionStateService,
-            @Reference final SubscriptionStateMachine stateMachine) {
+            @Reference final SubscriptionStateMachine stateMachine,
+            @Reference RestconfSubscriptionsStreamRegistry streamRegistry) {
         super(ModifySubscription.QNAME);
         this.mdsalService = requireNonNull(mdsalService);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
+        this.streamRegistry = requireNonNull(streamRegistry);
     }
 
     @Override
@@ -168,18 +172,15 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                         .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
                         .build());
                     try {
-                        final var subscription = mdsalService.read(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()))
-                            .get();
-                        if (subscription.isEmpty()) {
+                        final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
+                            String.class);
+                        if (streamRegistry.lookupStream(streamName) == null) {
                             LOG.warn("Could not send subscription modify notification: could not read stream name");
                             return;
                         }
-                        final var target = (DataContainerNode) ((DataContainerNode) subscription.orElseThrow())
-                            .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
-                        final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
-                            String.class);
+
                         subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, "uri", null);
-                    } catch (InterruptedException | ExecutionException e) {
+                    } catch (InterruptedException e) {
                         LOG.warn("Could not send subscription modify notification", e);
                     }
                 }
