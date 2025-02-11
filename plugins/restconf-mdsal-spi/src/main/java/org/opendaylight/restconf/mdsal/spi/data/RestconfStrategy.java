@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -31,7 +32,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -62,6 +62,7 @@ import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -526,12 +527,38 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                // if errors occurred during transaction commit then patch failed and global errors are reported
-                request.completeWith(new DataYangPatchResult(
-                    new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
-                        decodeException(cause, "PATCH", null).errors())));
+                if (cause instanceof TransactionEditConfigFailedException editConfigException) {
+                    // If TransactionEditConfigFailedException occurs meaning that edit-config fails.
+                    // Update accordingly editCollections.
+                    final var updatedEditCollection = updateEditCollection(editConfigException, editCollection);
+                    request.completeWith(new DataYangPatchResult(new PatchStatusContext(patch.patchId(),
+                        updatedEditCollection, false, null)));
+                } else {
+                    // if errors occurred during transaction commit then patch failed and global errors are reported
+                    request.completeWith(new DataYangPatchResult(
+                        new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false,
+                            decodeException(cause, "PATCH", null).errors())));
+                }
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private List<PatchStatusEntity> updateEditCollection(final TransactionEditConfigFailedException transactionError,
+            final List<PatchStatusEntity> editCollection) {
+        final var failedTransactionNumber = transactionError.failedTransactionNumber();
+        final var result = new ArrayList<PatchStatusEntity>(failedTransactionNumber);
+        // Copy the previous editCollections to the PatchStatusEntity that failed. Update failed PatchStatusEntity
+        // and then skip all PatchStatusEntities afterward, as they were not executed.
+        for (int i = 0; i < failedTransactionNumber; i++) {
+            final var statusEntity = editCollection.get(i);
+            if (failedTransactionNumber - 1 == i) {
+                ServerException serverException = decodeException(transactionError, "PATCH", null);
+                result.add(new PatchStatusEntity(statusEntity.getEditId(), false, serverException.errors()));
+            } else {
+                result.add(statusEntity);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
@@ -1038,10 +1065,9 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
     }
 
-    // FIXME: require DatabindPath.Data here
     final @NonNull ServerException decodeException(final Throwable ex, final String txType,
-            final YangInstanceIdentifier path) {
-        if (ex instanceof TransactionCommitFailedException) {
+        final YangInstanceIdentifier path) {
+        if (ex instanceof OperationFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
             // netconfSB and we create RestconfDocumentedException accordingly.
