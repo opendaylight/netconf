@@ -37,6 +37,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -110,6 +111,13 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
+
+    static final String APPLICATION_JSON = "application/json";
+    static final String APPLICATION_XML = "application/xml";
+    static final String JSON_ENCODING = "encode-json";
+    static final String NETCONF_STREAM = "NETCONF";
+    static final String MODIFY_SUBSCRIPTION_URI =
+        "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
 
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
@@ -360,7 +368,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         return streamClient;
     }
 
-    TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
+    TestEventStreamListener startSubscriptionStream(final Long subscriptionId) throws Exception {
         subscriptionStreamClient = startStreamClient();
         final var eventListener = new TestEventStreamListener();
         clientStreamService.startEventStream("localhost", "/subscriptions/" + subscriptionId, eventListener,
@@ -382,5 +390,31 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
     DOMNotificationPublishService getPublishService() {
         return publishService;
+    }
+
+    /**
+     * Utility method to establish a subscription.
+     */
+    FullHttpResponse establishFilteredSubscription(final String stream, final String encoding,
+            final String filter, final HTTPClient streamHttpClient) {
+        final var input = String.format("""
+             <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+               <stream>%s</stream>
+               <encoding>%s</encoding>
+               <stream-subtree-filter>%s</stream-subtree-filter>
+             </establish-subscription>
+             """, stream, encoding, filter);
+
+        return invokeRequestKeepClient(streamHttpClient, HttpMethod.POST,
+            "/restconf/operations/ietf-subscribed-notifications:establish-subscription",
+            APPLICATION_XML, input, APPLICATION_JSON);
+    }
+
+    /**
+     * Utility method to extract subscription ID from response.
+     */
+    static long extractSubscriptionId(final FullHttpResponse response) {
+        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        return jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
     }
 }
