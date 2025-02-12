@@ -110,6 +110,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
+    static final String APPLICATION_JSON = "application/json";
 
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
