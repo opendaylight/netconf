@@ -26,8 +26,6 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     private static final String APPLICATION_JSON = "application/json";
     private static final String JSON_ENCODING = "encode-json";
     private static final String NETCONF_STREAM = "NETCONF";
-    private static final String MODIFY_SUBSCRIPTION_URI =
-        "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
     private static final String DELETE_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:delete-subscription";
     private static final String KILL_SUBSCRIPTION_URI =
