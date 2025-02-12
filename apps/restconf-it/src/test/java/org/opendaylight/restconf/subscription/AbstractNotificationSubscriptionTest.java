@@ -110,6 +110,13 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
 
+    static final String APPLICATION_JSON = "application/json";
+    static final String APPLICATION_XML = "application/xml";
+    static final String ENCODE_XML = "encode-xml";
+    static final String NETCONF_STREAM = "NETCONF";
+    static final String MODIFY_SUBSCRIPTION_URI =
+        "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
+
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
     private static SSHTransportStackFactory sshTransportStackFactory;
