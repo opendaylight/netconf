@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -32,7 +31,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.RequestException;
@@ -193,21 +191,20 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     ListenableFuture<? extends @NonNull CommitInfo> commit() {
         final SettableFuture<CommitInfo> commitResult = SettableFuture.create();
 
-        // First complete all resultsFutures and merge them ...
-        final ListenableFuture<DOMRpcResult> resultErrors = mergeFutures(resultsFutures);
+        // Add a no-op feature to ensure the execution chain fails if the last edit-config operation fails.
+        // This is necessary because the preceding operations Futures are already completed, preventing
+        // the error from propagating. The result of this feature is not used.
+        enqueueOperation(() -> Futures.immediateFuture(null));
+
+        // First complete all resultsFutures and merge them. The order of execution is defined in
+        // the *enqueueOperation* method. If the DOMRpcResult includes any non-warning error, this feature fails.
+        // Consequently, the chain of Feature executions will stop.
+        final var listListenableFuture = Futures.allAsList(resultsFutures);
 
         // ... then evaluate if there are any problems
-        Futures.addCallback(resultErrors, new FutureCallback<>() {
+        Futures.addCallback(listListenableFuture, new FutureCallback<>() {
             @Override
-            public void onSuccess(final DOMRpcResult result) {
-                final Collection<? extends RpcError> errors = result.errors();
-                if (!allWarnings(errors)) {
-                    Futures.whenAllComplete(discardAndUnlock()).run(
-                        () -> commitResult.setException(toEditConfigFailedException(errors)),
-                        MoreExecutors.directExecutor());
-                    return;
-                }
-
+            public void onSuccess(final List<DOMRpcResult> result) {
                 // ... no problems so far, initiate commit
                 Futures.addCallback(netconfService.commit(), new FutureCallback<DOMRpcResult>() {
                     @Override
@@ -280,29 +277,21 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             } else {
                 // ... otherwise just add operation to the execution chain
                 operationFuture = Futures.transformAsync(resultsFutures.get(resultsFutures.size() - 1),
-                    future -> operation.get(),
+                    result -> {
+                        if (result != null && !result.errors().isEmpty() && !allWarnings(result.errors())) {
+                            // The edit-config operation failed. Stop execution and create a
+                            // TransactionEditConfigFailedException with a result error.
+                            final var editConfigFailedException = toEditConfigFailedException(result.errors());
+                            return Futures.immediateFailedFuture(editConfigFailedException);
+                        }
+                        // If no errors continue in features execution.
+                        return operation.get();
+                    },
                     MoreExecutors.directExecutor());
             }
             // ... finally save operation related future to the list
             resultsFutures.add(operationFuture);
         }
-    }
-
-    // Transform list of futures related to RPC operation into a single Future
-    private static ListenableFuture<DOMRpcResult> mergeFutures(
-            final List<ListenableFuture<? extends DOMRpcResult>> futures) {
-        return Futures.whenAllComplete(futures).call(() -> {
-            if (futures.size() == 1) {
-                // Fast path
-                return Futures.getDone(futures.get(0));
-            }
-
-            final var builder = ImmutableList.<RpcError>builder();
-            for (ListenableFuture<? extends DOMRpcResult> future : futures) {
-                builder.addAll(Futures.getDone(future).errors());
-            }
-            return new DefaultDOMRpcResult(null, builder.build());
-        }, MoreExecutors.directExecutor());
     }
 
     private static TransactionCommitFailedException toCommitFailedException(
