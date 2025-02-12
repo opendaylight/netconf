@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e3c40e43_9b214122",
+        "filename": "pom.xml",
+        "patchSetId": 40
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-12T15:14:20Z",
+      "side": 1,
+      "message": "why added? can you see openapi here?",
+      "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3ab9e01_d66fbe07",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RpcImplementation.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-12T15:14:20Z",
+      "side": 1,
+      "message": "no, definitely not, what this has to do with `RpcImplementation`?",
+      "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be581577_19af7293",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-12T15:14:20Z",
+      "side": 1,
+      "message": "`requireNonNull` on all of them?",
+      "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "edad08c4_4355d374",
         "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
         "patchSetId": 40
@@ -44,6 +95,40 @@
         "endLine": 100,
         "endChar": 45
       },
+      "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "458536ec_fb659ed9",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-12T15:14:20Z",
+      "side": 1,
+      "message": "what are we decoding from URI?",
+      "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05909ec1_1e49910a",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-12T15:14:20Z",
+      "side": 1,
+      "message": "please check your formatting, can be online",
       "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
