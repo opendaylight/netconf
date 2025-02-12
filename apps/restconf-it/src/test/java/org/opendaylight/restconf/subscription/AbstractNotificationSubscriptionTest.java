@@ -42,6 +42,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
+import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
@@ -120,6 +121,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
     private EventStreamService clientStreamService;
     EventStreamService.StreamControl streamControl;
+    DOMNotificationPublishService publishService;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
@@ -181,7 +183,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
         // setup notifications service
         final var router = new DOMNotificationRouter(32);
-        final var publishService = new RouterDOMPublishNotificationService(router);
+        publishService = new RouterDOMPublishNotificationService(router);
         final var subscriptionStateService = new SubscriptionStateService(publishService);
         final var stateMachine = new SubscriptionStateMachine();
         final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
@@ -203,7 +205,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
             configuration);
 
         // setup context listener to enable default NETCONF stream
-        final var notificationService = new RouterDOMNotificationService(new DOMNotificationRouter(Integer.MAX_VALUE));
+        final var notificationService = new RouterDOMNotificationService(router);
         contextListener = new ContextListener(notificationService, schemaService, streamRegistry);
 
         // Register subscription web resource
