@@ -37,6 +37,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -58,6 +59,7 @@ import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
+import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.notifications.SubscriptionResourceProvider;
 import org.opendaylight.restconf.notifications.mdsal.ContextListener;
@@ -110,6 +112,11 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
+
+    static final String MODIFY_SUBSCRIPTION_URI =
+        "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
+    static final String ESTABLISH_SUBSCRIPTION_URI =
+        "/restconf/operations/ietf-subscribed-notifications:establish-subscription";
 
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
@@ -382,5 +389,29 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
     DOMNotificationPublishService publishService() {
         return publishService;
+    }
+
+    /**
+     * Utility method to establish a subscription.
+     */
+    FullHttpResponse establishFilteredSubscription(final String filter, final HTTPClient streamHttpClient) {
+        final var input = String.format("""
+             <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+               <stream>"NETCONF"</stream>
+               <encoding>encode-json</encoding>
+               <stream-subtree-filter>%s</stream-subtree-filter>
+             </establish-subscription>
+             """, filter);
+
+        return invokeRequestKeepClient(streamHttpClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+            MediaTypes.APPLICATION_YANG_DATA_XML, input, MediaTypes.APPLICATION_YANG_DATA_JSON);
+    }
+
+    /**
+     * Utility method to extract subscription ID from response.
+     */
+    static long extractSubscriptionId(final FullHttpResponse response) {
+        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        return jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
     }
 }

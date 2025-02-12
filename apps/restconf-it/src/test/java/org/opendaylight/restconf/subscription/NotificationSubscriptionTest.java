@@ -26,15 +26,11 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     private static final String APPLICATION_JSON = "application/json";
     private static final String JSON_ENCODING = "encode-json";
     private static final String NETCONF_STREAM = "NETCONF";
-    private static final String MODIFY_SUBSCRIPTION_URI =
-        "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
     private static final String DELETE_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:delete-subscription";
     private static final String KILL_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:kill-subscription";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String ESTABLISH_SUBSCRIPTION_URL =
-        "/restconf/operations/ietf-subscribed-notifications:establish-subscription";
 
     /**
      * Tests default NETCONF stream availability.
@@ -233,7 +229,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "encoding": "%s"
               }
             }""", stream, JSON_ENCODING);
-        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URL, APPLICATION_JSON, input, APPLICATION_JSON);
+        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, input, APPLICATION_JSON);
     }
 
     private FullHttpRequest prepareEstablishRPCRequest() {
@@ -244,6 +240,6 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "encoding": "%s"
               }
             }""", NETCONF_STREAM, JSON_ENCODING);
-        return buildRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URL, APPLICATION_JSON, input, APPLICATION_JSON);
+        return buildRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, input, APPLICATION_JSON);
     }
 }
