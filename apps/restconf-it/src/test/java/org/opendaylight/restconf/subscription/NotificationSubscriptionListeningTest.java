@@ -50,8 +50,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         streamClient = startStreamClient();
 
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:establish-subscription",
+        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
