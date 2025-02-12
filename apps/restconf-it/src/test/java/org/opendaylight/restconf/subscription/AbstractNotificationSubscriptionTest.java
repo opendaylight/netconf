@@ -35,6 +35,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
+import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
@@ -94,6 +95,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
     volatile EventStreamService clientStreamService;
     volatile EventStreamService.StreamControl streamControl;
+    DOMNotificationPublishService publishService;
 
     @BeforeAll
     static void beforeAll() {
@@ -151,7 +153,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         // setup notifications service
         final var mdsalNotificationService = new MdsalNotificationService(domDataBroker);
         final var router = new DOMNotificationRouter(32);
-        final var publishService = new RouterDOMPublishNotificationService(router);
+        publishService = new RouterDOMPublishNotificationService(router);
         final var subscriptionStateService = new SubscriptionStateService(publishService);
         final var stateMachine = new SubscriptionStateMachine();
         final var streamRegistry = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
