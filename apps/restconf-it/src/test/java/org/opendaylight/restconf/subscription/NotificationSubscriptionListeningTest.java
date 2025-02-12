@@ -67,7 +67,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         final var subscriptionId = jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
 
         // Start listening on notifications
-        eventListener = startSubscriptionStream(String.valueOf(subscriptionId));
+        eventListener = startSubscriptionStream(subscriptionId);
     }
 
     @AfterEach
