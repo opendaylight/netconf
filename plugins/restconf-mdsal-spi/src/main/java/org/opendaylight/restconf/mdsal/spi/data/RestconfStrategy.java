@@ -31,7 +31,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -62,6 +61,7 @@ import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -1041,7 +1041,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     // FIXME: require DatabindPath.Data here
     final @NonNull ServerException decodeException(final Throwable ex, final String txType,
             final YangInstanceIdentifier path) {
-        if (ex instanceof TransactionCommitFailedException) {
+        if (ex instanceof OperationFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
             // netconfSB and we create RestconfDocumentedException accordingly.
