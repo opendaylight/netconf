@@ -201,7 +201,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 final Collection<? extends RpcError> errors = result.errors();
                 if (!allWarnings(errors)) {
                     Futures.whenAllComplete(discardAndUnlock()).run(
-                        () -> commitResult.setException(toCommitFailedException(errors)),
+                        () -> commitResult.setException(toEditConfigFailedException(errors)),
                         MoreExecutors.directExecutor());
                     return;
                 }
@@ -307,6 +307,19 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     private static TransactionCommitFailedException toCommitFailedException(
             final Collection<? extends RpcError> errors) {
+        final var netconfDocumentedException = getNetconfDocumentedException(errors);
+        return new TransactionCommitFailedException("Netconf transaction commit failed", netconfDocumentedException);
+    }
+
+    private static TransactionEditConfigFailedException toEditConfigFailedException(
+            final Collection<? extends RpcError> errors) {
+        final var netconfDocumentedException = getNetconfDocumentedException(errors);
+        return new TransactionEditConfigFailedException("Netconf transaction edit-config failed",
+            netconfDocumentedException);
+    }
+
+    private static NetconfDocumentedException getNetconfDocumentedException(
+        final Collection<? extends RpcError> errors) {
         ErrorType errType = ErrorType.APPLICATION;
         ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringJoiner msgBuilder = new StringJoiner(" ");
@@ -318,10 +331,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             msgBuilder.add(error.getInfo());
             errorTag = error.getTag();
         }
-
-        return new TransactionCommitFailedException("Netconf transaction commit failed",
-            new NetconfDocumentedException("RPC during tx failed. " + msgBuilder.toString(), errType, errorTag,
-                errSeverity));
+        return new NetconfDocumentedException("RPC during tx failed. " + msgBuilder, errType, errorTag, errSeverity);
     }
 
     private static void executeWithLogging(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation) {
