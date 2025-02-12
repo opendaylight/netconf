@@ -124,6 +124,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private EventStreamService.StreamControl streamControl;
     private DOMNotificationPublishService publishService;
 
+    public static final String APPLICATION_JSON = "application/json";
+
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
         return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
