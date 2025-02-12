@@ -283,6 +283,10 @@
             <artifactId>restconf-notifications</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller.samples</groupId>
+            <artifactId>sample-toaster</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
