@@ -17,4 +17,5 @@ module org.opendaylight.restconf.notofications.mdsal {
     requires org.opendaylight.mdsal.dom.api;
     requires org.opendaylight.restconf.server.spi;
     requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
+    requires org.opendaylight.yang.gen.ietf.yang.types.rfc6991;
 }
