@@ -425,7 +425,8 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         mockLockUnlockDiscard();
         doReturn(Futures.immediateFailedFuture(
             new TransactionCommitFailedException("Commit of transaction deleteNonexistentData failed",
-                new NetconfDocumentedException("id", ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))))
+                new NetconfDocumentedException("Data missing", ErrorType.RPC, ErrorTag.DATA_MISSING,
+                    ErrorSeverity.ERROR))))
             .when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
@@ -439,7 +440,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
-        assertEquals(new ErrorMessage("Commit of transaction deleteNonexistentData failed"), globalError.message());
+        assertEquals(new ErrorMessage("Data missing"), globalError.message());
         assertEquals(ErrorType.RPC, globalError.type());
         assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
