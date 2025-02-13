@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.time.Instant;
+import java.util.NoSuchElementException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -25,6 +25,7 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -102,8 +103,8 @@ public class KillSubscriptionRpc extends RpcImplementation {
                         .build());
                     stateMachine.moveTo(id, SubscriptionState.END);
                     try {
-                        subscriptionStateService.subscriptionTerminated(Instant.now().toString(),
-                            id.longValue(), "subscription-kill");
+                        subscriptionStateService.subscriptionTerminated(id.longValue(),
+                            SubscriptionTerminatedReason.QNAME);
                     } catch (InterruptedException e) {
                         LOG.warn("Could not send subscription terminated notification: {}", e.getMessage());
                     }
