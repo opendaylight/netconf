@@ -1047,7 +1047,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             // netconfSB and we create RequestException accordingly.
             for (var error : Throwables.getCausalChain(ex)) {
                 if (error instanceof NetconfDocumentedException netconfError) {
-                    return new RequestException(netconfError.getErrorType(), netconfError.getErrorTag(), ex);
+                    return new RequestException(netconfError.getErrorType(), netconfError.getErrorTag(),
+                        netconfError.getMessage(), dataPath != null ? new ErrorPath(dataPath) : null, ex);
                 }
                 if (error instanceof DocumentedException documentedError) {
                     final var errorTag = documentedError.getErrorTag();
