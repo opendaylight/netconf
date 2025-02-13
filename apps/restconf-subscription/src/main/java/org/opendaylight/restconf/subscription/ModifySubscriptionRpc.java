@@ -178,7 +178,11 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                             .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
                         final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
                             String.class);
-                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, "uri", null);
+                        final var encoding = leaf((DataContainerNode) subscription.orElseThrow(),
+                            NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING), String.class);
+                        // TODO: pass correct filter once we extract if from input
+                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, encoding, null,
+                            stopTime, null);
                     } catch (InterruptedException | ExecutionException e) {
                         LOG.warn("Could not send subscription modify notification", e);
                     }
