@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.exception.TransactionEditConfigFailedException;
+import org.opendaylight.restconf.mdsal.spi.exception.TransactionLockFailedException;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -270,11 +271,10 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 operationFuture = Futures.transformAsync(resultsFutures.get(0),
                     result -> {
                         // ... then add new operation to the chain if lock was successful
-                        if (result != null && (result.errors().isEmpty() || allWarnings(result.errors()))) {
+                        if (result.errors().isEmpty() || allWarnings(result.errors())) {
                             return operation.get();
                         } else {
-                            return Futures.immediateFailedFuture(new NetconfDocumentedException("Lock operation failed",
-                                ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, ErrorSeverity.ERROR));
+                            return Futures.immediateFailedFuture(toLockFailedException(result.errors()));
                         }
                     },
                     MoreExecutors.directExecutor());
@@ -317,6 +317,12 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         final var netconfDocumentedException = getNetconfDocumentedException(errors);
         return new TransactionEditConfigFailedException("Netconf transaction edit-config failed",
             netconfDocumentedException);
+    }
+
+    private static TransactionLockFailedException toLockFailedException(
+        final Collection<? extends RpcError> errors) {
+        final var netconfDocumentedException = getNetconfDocumentedException(errors);
+        return new TransactionLockFailedException("Netconf transaction lock failed", netconfDocumentedException);
     }
 
     private static NetconfDocumentedException getNetconfDocumentedException(
