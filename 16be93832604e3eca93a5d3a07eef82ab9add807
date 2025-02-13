@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fb6e308_56e0f5b4",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-13T18:14:06Z",
+      "side": 1,
+      "message": "superfluous",
+      "range": {
+        "startLine": 1051,
+        "startChar": 17,
+        "endLine": 1051,
+        "endChar": 24
+      },
+      "revId": "16be93832604e3eca93a5d3a07eef82ab9add807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
