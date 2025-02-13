@@ -1044,9 +1044,11 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
-            // netconfSB and we create RestconfDocumentedException accordingly.
+            // netconfSB and we create ServerException accordingly.
             for (var error : Throwables.getCausalChain(ex)) {
-                if (error instanceof DocumentedException documentedError) {
+                if (error instanceof NetconfDocumentedException netconfError) {
+                    return new ServerException(netconfError.getErrorType(), netconfError.getErrorTag(), ex);
+                } else  if (error instanceof DocumentedException documentedError) {
                     final var errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
@@ -1057,8 +1059,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                             "Data does not exist", path != null ? new ServerErrorPath(databind, path) : null, ex);
                     }
-                } else if (error instanceof NetconfDocumentedException netconfError) {
-                    return new ServerException(netconfError.getErrorType(), netconfError.getErrorTag(), ex);
                 }
             }
 
