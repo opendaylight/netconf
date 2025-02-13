@@ -34,12 +34,23 @@ class StateTransitionTest {
         var state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
         assertEquals(SubscriptionState.START, state);
 
-        // Checking legal state transition
+        // Transition state
         subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.ACTIVE);
         state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
         assertEquals(SubscriptionState.ACTIVE, state);
+    }
 
-        // Checking illegal state transition
+    @Test
+    void illegalTransitionStateTest() {
+        // initializing state machine
+        subscriptionStateMachine = new SubscriptionStateMachine();
+        subscriptionStateMachine.registerSubscription(session, Uint32.ONE);
+
+        // Checking default stating state
+        var state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
+        assertEquals(SubscriptionState.START, state);
+
+        // Trying illegal state transition
         assertThrows(IllegalStateException.class,
             () -> subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.START));
     }
