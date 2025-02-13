@@ -12,14 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.BASE_QNAME;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.COMPLETED;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.MODIFIED;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.NETCONF_NOTIFICATION;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.REASON;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.RESUMED;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.SUSPENDED;
-import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.TERMINATED;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -36,29 +28,38 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.InsufficientResources;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SuspensionTimeout;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionCompleted;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionResumed;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspended;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminated;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionStateServiceTest {
+    private static final String STOP_TIME = "2024-10-30T12:34:56Z";
     private static final Instant EVENT_TIME =
         OffsetDateTime.of(LocalDateTime.of(2024, Month.OCTOBER, 30, 12, 34, 56), ZoneOffset.UTC).toInstant();
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
     private static final String URI = "http://example.com";
-    private static final String FILTER = "example-filter";
     private static final String STREAM_NAME = "NETCONF";
+    private static final QName ENCODING = EncodeXml$I.QNAME;
+    private static final QName ERROR_REASON = SubscriptionTerminatedReason.QNAME;
+    private static final NodeIdentifier URI_NODEID = NodeIdentifier.create(
+        org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117
+            .YangModuleInfoImpl.qnameOf("uri"));
+
+    private SubscriptionStateService notifications;
 
     @Mock
     private DOMNotificationPublishService mockPublishService;
     @Captor
     private ArgumentCaptor<DOMNotification> captor;
-
-    private SubscriptionStateService notifications;
 
     @BeforeEach
     void setUp() {
@@ -76,62 +77,46 @@ class SubscriptionStateServiceTest {
 
         final QName eventQName = switch (type) {
             case MODIFIED -> {
-                notifications.subscriptionModified(EVENT_TIME, ID, URI, STREAM_NAME, FILTER);
-                yield QName.create(NETCONF_NOTIFICATION, MODIFIED);
+                notifications.subscriptionModified(EVENT_TIME, ID, STREAM_NAME, ENCODING, null, STOP_TIME, URI);
+                yield SubscriptionModified.QNAME;
             }
             case COMPLETED -> {
                 notifications.subscriptionCompleted(EVENT_TIME, ID);
-                yield QName.create(NETCONF_NOTIFICATION, COMPLETED);
+                yield SubscriptionCompleted.QNAME;
             }
             case RESUMED -> {
                 notifications.subscriptionResumed(EVENT_TIME, ID);
-                yield QName.create(NETCONF_NOTIFICATION, RESUMED);
+                yield SubscriptionResumed.QNAME;
             }
             case TERMINATED -> {
-                notifications.subscriptionTerminated(EVENT_TIME, ID, SuspensionTimeout.QNAME);
-                yield QName.create(NETCONF_NOTIFICATION, TERMINATED);
+                notifications.subscriptionTerminated(EVENT_TIME, ID, ERROR_REASON);
+                yield SubscriptionTerminated.QNAME;
             }
             case SUSPENDED -> {
-                notifications.subscriptionSuspended(EVENT_TIME, ID, InsufficientResources.QNAME);
-                yield QName.create(NETCONF_NOTIFICATION, SUSPENDED);
+                notifications.subscriptionSuspended(EVENT_TIME, ID, ERROR_REASON);
+                yield SubscriptionSuspended.QNAME;
             }
         };
 
         verify(mockPublishService).putNotification(captor.capture());
-        final var notification = captor.getValue();
+        final var notification = captor.getValue().getBody();
         assertNotNull(notification);
-        assertEquals("2024-10-30T12:34:56Z", notification.getBody()
-            .getChildByArg(new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.EVENT_TIME)).body());
+        assertEquals(ID, notification.getChildByArg(
+            new NodeIdentifier(QName.create(eventQName, "id"))).body());
 
-        final var eventNode = (ContainerNode) notification.getBody()
-            .getChildByArg(new YangInstanceIdentifier.NodeIdentifier(eventQName));
+        if (SubscriptionType.MODIFIED == type) {
+            assertEquals(ENCODING, notification.getChildByArg(
+                new NodeIdentifier(QName.create(eventQName, "encoding"))).body());
+            assertEquals(STREAM_NAME, notification.getChildByArg(
+                new NodeIdentifier(QName.create(eventQName, "stream"))).body());
+            assertEquals(STOP_TIME, notification.getChildByArg(
+                new NodeIdentifier(QName.create(eventQName, "stop-time"))).body());
+            assertEquals(URI, notification.getChildByArg(URI_NODEID).body());
+        }
 
-        assertNotNull(eventNode);
-        assertEquals(ID, eventNode.getChildByArg(
-            new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.ID)).body());
-
-        switch (type) {
-            case null -> throw new NullPointerException();
-            case MODIFIED -> {
-                assertEquals(URI, eventNode.getChildByArg(
-                    new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.URI)).body());
-                assertEquals(FILTER, eventNode.getChildByArg(
-                    new YangInstanceIdentifier.NodeIdentifier(SubscriptionStateService.FILTER)).body());
-                final var streamNode = (ContainerNode) eventNode.getChildByArg(
-                    new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, "stream")));
-                assertNotNull(streamNode);
-                assertEquals(STREAM_NAME, streamNode.getChildByArg(new YangInstanceIdentifier.NodeIdentifier(
-                    QName.create(BASE_QNAME, "ietf-netconf-subscribed-notifications"))).body());
-            }
-            case SUSPENDED ->
-                assertEquals(InsufficientResources.QNAME, eventNode.getChildByArg(
-                    new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, REASON))).body());
-            case TERMINATED ->
-                assertEquals(SuspensionTimeout.QNAME, eventNode.getChildByArg(
-                    new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE_QNAME, REASON))).body());
-            case COMPLETED, RESUMED -> {
-                // Nothing else
-            }
+        if (SubscriptionType.TERMINATED == type || SubscriptionType.SUSPENDED == type) {
+            assertEquals(ERROR_REASON, notification.getChildByArg(
+                new NodeIdentifier(QName.create(eventQName, "reason"))).body());
         }
     }
 }
