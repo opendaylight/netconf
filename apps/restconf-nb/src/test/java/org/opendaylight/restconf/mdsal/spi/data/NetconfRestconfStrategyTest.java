@@ -33,6 +33,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
@@ -425,7 +426,8 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         mockLockUnlockDiscard();
         doReturn(Futures.immediateFailedFuture(
             new TransactionCommitFailedException("Commit of transaction deleteNonexistentData failed",
-                new NetconfDocumentedException("id", ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))))
+                new NetconfDocumentedException("Data missing", ErrorType.RPC, ErrorTag.DATA_MISSING,
+                    ErrorSeverity.ERROR))))
             .when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
@@ -439,7 +441,8 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
-        assertEquals(new ErrorMessage("Commit of transaction deleteNonexistentData failed"), globalError.message());
+        assertEquals(new ErrorMessage("Data missing"), globalError.message());
+        assertEquals(new ErrorInfo("Commit of transaction deleteNonexistentData failed"), globalError.info());
         assertEquals(ErrorType.RPC, globalError.type());
         assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
