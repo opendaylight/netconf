@@ -14,21 +14,28 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionCompleted;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionPolicy;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionPolicyModifiable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionResumed;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspended;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspendedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminated;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.dynamic.Stream1;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedAnydata;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -69,6 +76,29 @@ public class SubscriptionStateService {
     private static final NodeIdentifier ID_NODEID =
         NodeIdentifier.create(QName.create(SubscriptionCompleted.QNAME, "id").intern());
     /**
+     * {@link NodeIdentifier} of {@code leaf stream} in {@link SubscriptionModified}. Value domain is all of
+     * {@link String} as expressed in {@link Stream1#getStream()}.
+     */
+    private static final NodeIdentifier STREAM_NODEID =
+        NodeIdentifier.create(QName.create(SubscriptionModified.QNAME, "stream").intern());
+    /**
+     * {@link NodeIdentifier} of {@code encoding} as expressed in {@link SubscriptionPolicy#getEncoding()}.
+     */
+    private static final NodeIdentifier ENCODING_NODEID =
+        NodeIdentifier.create(Encoding.QNAME);
+    /**
+     * {@link NodeIdentifier} of {@code stream-subtree-filter} alternative in {@link FilterSpec} as expressed in
+     * {@link StreamSubtreeFilter#getStreamSubtreeFilter()}.
+     */
+    private static final NodeIdentifier SUBTREE_FILTER_NODEID =
+        NodeIdentifier.create(StreamSubtreeFilter.QNAME);
+    /**
+     * {@link NodeIdentifier} of {@code leaf stop-time} in {@link SubscriptionModified}. Value domain is
+     * {@link DateAndTime} as expressed in {@link SubscriptionPolicyModifiable#getStopTime()}.
+     */
+    private static final NodeIdentifier STOP_TIME_NODEID =
+        NodeIdentifier.create(QName.create(SubscriptionModified.QNAME, "stop-time").intern());
+    /**
      * {@link NodeIdentifier} of {@code leaf reason} in {@link SubscriptionSuspended} and
      * {@link SubscriptionTerminated}. Value domains are identities derived from {@link SubscriptionSuspendedReason} and
      * {@link SubscriptionTerminatedReason}.
@@ -76,35 +106,11 @@ public class SubscriptionStateService {
     private static final NodeIdentifier REASON_NODEID =
         NodeIdentifier.create(QName.create(SubscriptionSuspended.QNAME, "reason").intern());
     /**
-     * {@link NodeIdentifier} of {@code leaf stream-xpath-filter} alternative in {@link FilterSpec} as expressed in
-     * {@link StreamXpathFilter#getStreamXpathFilter()}.
-     */
-    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
-    /**
      * {@link NodeIdentifier} of {@link Subscription1#getUri()}.
      */
     private static final NodeIdentifier URI_NODEID = NodeIdentifier.create(
         org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117
             .YangModuleInfoImpl.qnameOf("uri"));
-
-    // FIXME: eliminate these in favor of State above
-    static final String COMPLETED = "subscription-completed";
-    static final String RESUMED = "subscription-resumed";
-    static final String MODIFIED = "subscription-modified";
-    static final String TERMINATED = "subscription-terminated";
-    static final String SUSPENDED = "subscription-suspended";
-    static final String REASON = "reason";
-
-    // FIXME: eliminate these in favor of State.nodeId, ID_NODEID, REASON_NODEID, URI_NODEID
-    //        and STREAM_XPATH_FILTER_NODEID
-    private static final QName RESTCONF_NOTIF_NODE_IDENTIFIER = QName.create("ietf-restconf", "notification");
-    static final QName BASE_QNAME = QName.create("urn:opendaylight:restconf:notifications",
-        "restconf-notifications").intern();
-    static final QName EVENT_TIME = QName.create(BASE_QNAME, "eventTime");
-    static final QName FILTER = QName.create(BASE_QNAME, "stream-xpath-filter");
-    static final QName ID = QName.create(BASE_QNAME, "id");
-    static final QName NETCONF_NOTIFICATION = QName.create(BASE_QNAME, "ietf-subscribed-notifications");
-    static final QName URI = QName.create(BASE_QNAME, "uri");
 
     private final DOMNotificationPublishService publishService;
 
@@ -117,142 +123,119 @@ public class SubscriptionStateService {
     /**
      * Sends a notification indicating the subscription was modified.
      *
-     * @param eventTime  the event timestamp
      * @param id         the subscription ID
-     * @param uri        the subscription URI
      * @param streamName the subscription stream name
+     * @param encoding   the optional subscription encoding
      * @param filter     the optional subscription filter
+     * @param stopTime   the optional subscription stop time
+     * @param uri        the optional subscription uri
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionModified(final Instant eventTime, final Uint32 id, final String uri,
-            final String streamName, final @Nullable String filter) throws InterruptedException {
-        LOG.info("Publishing subscription modified notification for ID: {}", id);
-        final var builder = ImmutableNodes.newContainerBuilder()
-            // FIXME: State.MODIFIED.nodeId
-            .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, MODIFIED)))
-            // FIXME: ID_NODEID
-            .withChild(ImmutableNodes.leafNode(ID, id))
-            // FIXME: URI_NODEID
-            .withChild(ImmutableNodes.leafNode(URI, uri))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(BASE_QNAME, "stream")))
-                .withChild(ImmutableNodes.leafNode(
-                    QName.create(BASE_QNAME, "ietf-netconf-subscribed-notifications"), streamName))
-                .build());
-        if (filter != null) {
-            // FIXME: STREAM_XPATH_FILTER_NODEID
-            builder.withChild(ImmutableNodes.leafNode(FILTER, filter));
+    public ListenableFuture<?> subscriptionModified(final Instant eventTime, final Uint32 id, final String streamName,
+            final @Nullable String encoding, final @Nullable NormalizedAnydata filter,
+            final @Nullable DateAndTime stopTime, final @Nullable String uri) throws InterruptedException {
+        LOG.debug("Publishing subscription modified notification for ID: {}", id);
+        var body = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(State.MODIFIED.nodeId)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+            .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName));
+        if (encoding != null) {
+            body.withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding));
         }
-
-        // FIXME: useless encapsulation, eventTime should be passed to sendNotification()
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime.toString()))
-            .withChild(builder.build())
-            .build();
-        return sendNotification(node);
+        if (filter != null) {
+            body.withChild(ImmutableNodes.newAnydataBuilder(NormalizedAnydata.class)
+                .withNodeIdentifier(SUBTREE_FILTER_NODEID)
+                .withValue(filter)
+                .build());
+        }
+        if (stopTime != null) {
+            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime));
+        }
+        if (uri != null) {
+            body.withChild(ImmutableNodes.leafNode(URI_NODEID, uri));
+        }
+        return sendNotification(eventTime, body.build());
     }
 
     /**
      * Sends a notification indicating the subscription was completed.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @return a listenable future outcome of the notification
      */
     public ListenableFuture<?> subscriptionCompleted(final Instant eventTime, final Uint32 id)
             throws InterruptedException {
-        return sendStateNotification(eventTime, id, COMPLETED);
+        return sendStateNotification(eventTime, id, State.COMPLETED);
     }
 
     /**
      * Sends a notification indicating the subscription was resumed.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @return a listenable future outcome of the notification
      */
     public ListenableFuture<?> subscriptionResumed(final Instant eventTime, final Uint32 id)
             throws InterruptedException {
-        return sendStateNotification(eventTime, id, RESUMED);
+        return sendStateNotification(eventTime, id, State.RESUMED);
     }
 
     /**
      * Sends a notification indicating the subscription was terminated.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
-     * @param reason    a concrete {@link SubscriptionTerminatedReason}
+     * @param errorReason   the error ID associated with termination
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionTerminated(final Instant eventTime, final Uint32 id,
-            final QName reason) throws InterruptedException {
-        if (reason.equals(SubscriptionTerminatedReason.QNAME)) {
-            throw new IllegalArgumentException("A concrete reason is required");
-        }
-        return sendErrorStateNotification(eventTime, id, reason, TERMINATED);
+    public ListenableFuture<?> subscriptionTerminated(final Instant eventTime, final Uint32 id, final QName errorReason)
+            throws InterruptedException {
+        return sendErrorStateNotification(eventTime, id, errorReason, State.TERMINATED);
     }
 
     /**
      * Sends a notification indicating the subscription was suspended.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
-     * @param reason    a concrete {@link SubscriptionSuspendedReason}
+     * @param errorReason   the error ID associated with suspension
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionSuspended(final Instant eventTime,final Uint32 id, final QName reason)
+    public ListenableFuture<?> subscriptionSuspended(final Instant eventTime, final Uint32 id, final QName errorReason)
             throws InterruptedException {
-        if (reason.equals(SubscriptionSuspendedReason.QNAME)) {
-            throw new IllegalArgumentException("A concrete reason is required");
-        }
-        return sendErrorStateNotification(eventTime, id, reason, SUSPENDED);
+        return sendErrorStateNotification(eventTime, id, errorReason, State.SUSPENDED);
     }
 
     /**
      * Builds and sends a generic state notification.
      */
-    private ListenableFuture<?> sendStateNotification(final Instant eventTime, final Uint32 id, final String state)
+    private ListenableFuture<?> sendStateNotification(final Instant eventTime, final Uint32 id, final State state)
             throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {}", state, id);
-        // FIXME: useless encapsulation, eventTime should be passed to sendNotification()
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime.toString()))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, state)))
-                .withChild(ImmutableNodes.leafNode(ID, id))
-                .build())
+        var node = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(state.nodeId)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
             .build();
-        return sendNotification(node);
+        return sendNotification(eventTime, node);
     }
 
     /**
      * Builds and sends an error state notification.
      */
     private ListenableFuture<?> sendErrorStateNotification(final Instant eventTime, final Uint32 id,
-            final QName reason, final String state) throws InterruptedException {
-        LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, reason);
-        // FIXME: useless encapsulation, eventTime should be passed to sendNotification()
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime.toString()))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, state)))
-                .withChild(ImmutableNodes.leafNode(ID, id))
-                .withChild(ImmutableNodes.leafNode(QName.create(BASE_QNAME, REASON), reason))
-                .build())
+            final QName errorReason, final State state) throws InterruptedException {
+        LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorReason);
+        var node = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(state.nodeId)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+            .withChild(ImmutableNodes.leafNode(REASON_NODEID, errorReason))
             .build();
-        return sendNotification(node);
+        return sendNotification(eventTime, node);
     }
 
     /**
      * Sends the notification through the publishing service.
      */
-    // FIXME: should receive eventTime
-    private ListenableFuture<?> sendNotification(final ContainerNode node) throws InterruptedException {
-        // FIXME: use DOMNotificationEvent.Rfc6020 with eventTime instead
-        final var notification = new RestconfNotification(node);
+    private ListenableFuture<?> sendNotification(final Instant eventTime, final ContainerNode node)
+            throws InterruptedException {
+        final var notification = new DOMNotificationEvent.Rfc6020(node, eventTime);
         return publishService.putNotification(notification);
     }
 }
