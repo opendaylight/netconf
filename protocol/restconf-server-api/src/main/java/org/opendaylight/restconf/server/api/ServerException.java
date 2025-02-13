@@ -88,7 +88,7 @@ public final class ServerException extends Exception {
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable ServerErrorPath path, final @Nullable Throwable cause) {
-        this(message, new ServerError(type, tag, new ErrorMessage(message), null, path, null), cause);
+        this(message, new ServerError(type, tag, new ErrorMessage(message), null, path, errorInfoOf(cause)), cause);
     }
 
     public ServerException(final List<ServerError> errors, final @Nullable Throwable cause, final String message) {
