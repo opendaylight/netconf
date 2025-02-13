@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.mdsal.spi.data;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +34,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -45,8 +47,11 @@ import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
+import org.opendaylight.restconf.server.api.PatchContext;
+import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -58,10 +63,12 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -388,6 +395,34 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
         assertNotNull(dataPutRequest.getResult());
+    }
+
+    @Test
+    void testLockOperationException() throws Exception {
+        // Prepare environment.
+        final var rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL, ErrorTag.OPERATION_FAILED,
+            "Requested resource already lockedUser callback failed.", null, "", null);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(netconfService).lock();
+
+        // Execute yang-patch with failing lock operation.
+        final var patchContext = new PatchContext("patchCD", List.of(
+            new PatchEntity("edit1", Edit.Operation.Delete, CREATE_AND_DELETE_TARGET)));
+        final var databind = jukeboxDataOperations().databind;
+        final var completingServerRequest = new CompletingServerRequest<DataYangPatchResult>();
+
+        jukeboxDataOperations().patchData(completingServerRequest, new DatabindPath.Data(databind), patchContext);
+        final var status = completingServerRequest.getResult().status();
+
+        // Verify correct exception output.
+        assertFalse(status.ok());
+        final var globalErrors = status.globalErrors();
+        assertNotNull(globalErrors);
+        final var serverError = globalErrors.getFirst();
+        assertNotNull(serverError);
+        assertEquals(ErrorTag.OPERATION_FAILED, serverError.tag());
+        assertEquals("Netconf transaction lock failed", serverError.info().elementBody());
+        assertEquals("RPC during tx failed. Requested resource already lockedUser callback failed. ",
+            serverError.message().elementBody());
     }
 
     @Override
