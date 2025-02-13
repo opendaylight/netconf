@@ -9,7 +9,6 @@ package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
 import java.util.NoSuchElementException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
@@ -44,7 +43,7 @@ final class SubscriptionHolder extends AbstractRegistration {
         final var id = subscription.getId().getValue();
         try {
             stateMachine.moveTo(id, SubscriptionState.END);
-            subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
+            subscriptionStateService.subscriptionTerminated(id, NoSuchSubscription.QNAME);
         } catch (InterruptedException e) {
             LOG.warn("Could not send subscription terminated notification", e);
         } catch (IllegalStateException | NoSuchElementException e) {
