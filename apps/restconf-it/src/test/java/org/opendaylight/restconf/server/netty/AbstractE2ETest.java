@@ -193,7 +193,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         actionProviderService.registerImplementation(
             ActionSpec.builder(Root.class).build(ExampleAction.class), new ExampleActionImpl());
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
+        final var = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
