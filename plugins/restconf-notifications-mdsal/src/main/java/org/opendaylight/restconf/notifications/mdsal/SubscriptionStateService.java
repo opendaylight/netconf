@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -39,14 +40,16 @@ public class SubscriptionStateService {
     static final String REASON = "reason";
 
     // Notification types
+    // FIXME: we should not add this this will be added by DOMNotificationPublishService
     private static final QName RESTCONF_NOTIF_NODE_IDENTIFIER = QName.create("ietf-restconf", "notification");
     static final QName BASE_QNAME = QName.create("urn:opendaylight:restconf:notifications",
         "restconf-notifications").intern();
+    // FIXME: we should not add this this will be added by DOMNotificationPublishService
     static final QName EVENT_TIME = QName.create(BASE_QNAME, "eventTime");
     static final QName FILTER = QName.create(BASE_QNAME, "stream-xpath-filter");
-    static final QName ID = QName.create(BASE_QNAME, "id");
+    static final QName ID = QName.create(SubscriptionModified.QNAME, "id").intern();
     static final QName NETCONF_NOTIFICATION = QName.create(BASE_QNAME, "ietf-subscribed-notifications");
-    static final QName URI = QName.create(BASE_QNAME, "uri");
+    static final QName URI = QName.create(SubscriptionModified.QNAME, "uri").intern();
 
     private final DOMNotificationPublishService publishService;
 
@@ -68,25 +71,15 @@ public class SubscriptionStateService {
      */
     public ListenableFuture<?> subscriptionModified(final String eventTime, final Long id, final String uri,
             final String streamName, final @Nullable String filter) throws InterruptedException {
-        LOG.info("Publishing subscription modified notification for ID: {}", id);
+        LOG.debug("Publishing subscription modified notification for ID: {}", id);
         var body = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, MODIFIED)))
-            .withChild(ImmutableNodes.leafNode(ID, id))
-            .withChild(ImmutableNodes.leafNode(URI, uri))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(BASE_QNAME, "stream")))
-                .withChild(ImmutableNodes.leafNode(
-                    QName.create(BASE_QNAME, "ietf-netconf-subscribed-notifications"), streamName))
-                .build());
+            .withNodeIdentifier(new NodeIdentifier(SubscriptionModified.QNAME))
+            .withChild(ImmutableNodes.leafNode(ID, id));
+            // FIXME: add remaining data with correct QNames
         if (filter != null) {
             body.withChild(ImmutableNodes.leafNode(FILTER, filter));
         }
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
-            .withChild(body.build())
-            .build();
-        return sendNotification(node);
+        return sendNotification(body.build());
     }
 
     /**
@@ -145,6 +138,7 @@ public class SubscriptionStateService {
             throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {}", state, id);
         final var node = ImmutableNodes.newContainerBuilder()
+            // FIXME: fix QNames
             .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
             .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
             .withChild(ImmutableNodes.newContainerBuilder()
@@ -162,6 +156,7 @@ public class SubscriptionStateService {
             final String errorReason, final String state) throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorReason);
         final var node = ImmutableNodes.newContainerBuilder()
+            // FIXME: fix QNames
             .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
             .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
             .withChild(ImmutableNodes.newContainerBuilder()
