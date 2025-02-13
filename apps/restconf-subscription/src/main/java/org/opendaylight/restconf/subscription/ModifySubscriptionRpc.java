@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -178,7 +177,12 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                             .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
                         final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
                             String.class);
-                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, "uri", null);
+                        //subscriptionStateService.subscriptionModified(id, streamName, "uri", null);
+                        final var encoding = leaf((DataContainerNode) subscription.orElseThrow(),
+                            NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING), String.class);
+                        // TODO: pass correct filter once we extract if from input
+                        subscriptionStateService.subscriptionModified(id, streamName, encoding, null,
+                            stopTime);
                     } catch (InterruptedException | ExecutionException e) {
                         LOG.warn("Could not send subscription modify notification", e);
                     }

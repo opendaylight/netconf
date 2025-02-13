@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -109,7 +108,7 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
                         .build());
                     stateMachine.moveTo(id, SubscriptionState.END);
                     try {
-                        subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
+                        subscriptionStateService.subscriptionTerminated(id, NoSuchSubscription.QNAME);
                     } catch (InterruptedException e) {
                         LOG.warn("Could not send subscription terminated notification", e);
                     }
