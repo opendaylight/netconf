@@ -13,7 +13,6 @@ import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.No
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
@@ -180,8 +179,11 @@ public class ModifySubscriptionRpc extends RpcImplementation {
                             .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
                         final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
                             String.class);
-                        subscriptionStateService.subscriptionModified(Instant.now().toString(),
-                            id.longValue(), streamName, "uri", null);
+                        final var encoding = leaf((DataContainerNode) subscription.orElseThrow(),
+                            NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING), String.class);
+                        // TODO: pass correct filter once we extract if from input
+                        subscriptionStateService.subscriptionModified(id.longValue(), streamName, encoding, null,
+                            stopTime);
                     } catch (InterruptedException | ExecutionException e) {
                         LOG.warn("Could not send subscription modify notification: {}", e.getMessage());
                     }

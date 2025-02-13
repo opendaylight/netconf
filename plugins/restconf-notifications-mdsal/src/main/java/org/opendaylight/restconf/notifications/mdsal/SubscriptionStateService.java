@@ -12,6 +12,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionCompleted;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionResumed;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspended;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminated;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -33,20 +39,10 @@ public class SubscriptionStateService {
     // Subscription states
     static final String COMPLETED = "subscription-completed";
     static final String RESUMED = "subscription-resumed";
-    static final String MODIFIED = "subscription-modified";
     static final String TERMINATED = "subscription-terminated";
     static final String SUSPENDED = "subscription-suspended";
     static final String REASON = "reason";
-
-    // Notification types
-    private static final QName RESTCONF_NOTIF_NODE_IDENTIFIER = QName.create("ietf-restconf", "notification");
-    static final QName BASE_QNAME = QName.create("urn:opendaylight:restconf:notifications",
-        "restconf-notifications").intern();
-    static final QName EVENT_TIME = QName.create(BASE_QNAME, "eventTime");
-    static final QName FILTER = QName.create(BASE_QNAME, "stream-xpath-filter");
-    static final QName ID = QName.create(BASE_QNAME, "id");
-    static final QName NETCONF_NOTIFICATION = QName.create(BASE_QNAME, "ietf-subscribed-notifications");
-    static final QName URI = QName.create(BASE_QNAME, "uri");
+    static final String ID = "id";
 
     private final DOMNotificationPublishService publishService;
 
@@ -59,98 +55,91 @@ public class SubscriptionStateService {
     /**
      * Sends a notification indicating the subscription was modified.
      *
-     * @param eventTime  the event timestamp
      * @param id         the subscription ID
-     * @param uri        the subscription URI
      * @param streamName the subscription stream name
+     * @param encoding   the optional subscription encoding
      * @param filter     the optional subscription filter
+     * @param stopTime   the optional subscription stop time
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionModified(final String eventTime, final Long id, final String uri,
-            final String streamName, final @Nullable String filter) throws InterruptedException {
-        LOG.info("Publishing subscription modified notification for ID: {}", id);
+    public ListenableFuture<?> subscriptionModified(final Long id, final String streamName,
+            final @Nullable String encoding, final @Nullable String filter,
+            final @Nullable DateAndTime stopTime) throws InterruptedException {
+        LOG.debug("Publishing subscription modified notification for ID: {}", id);
         var body = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, MODIFIED)))
-            .withChild(ImmutableNodes.leafNode(ID, id))
-            .withChild(ImmutableNodes.leafNode(URI, uri))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(BASE_QNAME, "stream")))
-                .withChild(ImmutableNodes.leafNode(
-                    QName.create(BASE_QNAME, "ietf-netconf-subscribed-notifications"), streamName))
-                .build());
-        if (filter != null) {
-            body.withChild(ImmutableNodes.leafNode(FILTER, filter));
+            .withNodeIdentifier(new NodeIdentifier(SubscriptionModified.QNAME))
+            .withChild(ImmutableNodes.leafNode(QName.create(SubscriptionModified.QNAME, ID).intern(), id))
+            .withChild(ImmutableNodes.leafNode(QName.create(SubscriptionModified.QNAME, "stream")
+                .intern(), streamName));
+        if (encoding != null) {
+            body.withChild(ImmutableNodes.leafNode(QName.create(SubscriptionModified.QNAME, "encoding")
+                .intern(), encoding));
         }
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
-            .withChild(body.build())
-            .build();
-        return sendNotification(node);
+        if (filter != null) {
+            body.withChild(ImmutableNodes.leafNode(QName.create(SubscriptionModified.QNAME, "stream-subtree-filter")
+                .intern(), filter));
+        }
+        if (stopTime != null) {
+            body.withChild(ImmutableNodes.leafNode(QName.create(SubscriptionModified.QNAME, "stop-time")
+                .intern(), stopTime));
+        }
+        return sendNotification(body.build());
     }
 
     /**
      * Sends a notification indicating the subscription was completed.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionCompleted(final String eventTime, final Long id)
+    public ListenableFuture<?> subscriptionCompleted(final Long id)
             throws InterruptedException {
-        return sendStateNotification(eventTime, id, COMPLETED);
+        return sendStateNotification(SubscriptionCompleted.QNAME, id, COMPLETED);
     }
 
     /**
      * Sends a notification indicating the subscription was resumed.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionResumed(final String eventTime, final Long id) throws InterruptedException {
-        return sendStateNotification(eventTime, id, RESUMED);
+    public ListenableFuture<?> subscriptionResumed(final Long id) throws InterruptedException {
+        return sendStateNotification(SubscriptionResumed.QNAME, id, RESUMED);
     }
 
     /**
      * Sends a notification indicating the subscription was terminated.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @param errorReason   the error ID associated with termination
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionTerminated(final String eventTime, final Long id, final String errorReason)
+    public ListenableFuture<?> subscriptionTerminated(final Long id, final QName errorReason)
             throws InterruptedException {
-        return sendErrorStateNotification(eventTime, id, errorReason, TERMINATED);
+        return sendErrorStateNotification(SubscriptionTerminated.QNAME, id, errorReason, TERMINATED);
     }
 
     /**
      * Sends a notification indicating the subscription was suspended.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @param errorReason   the error ID associated with suspension
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionSuspended(final String eventTime,final  Long id, final String errorReason)
+    public ListenableFuture<?> subscriptionSuspended(final  Long id, final QName errorReason)
             throws InterruptedException {
-        return sendErrorStateNotification(eventTime, id, errorReason, SUSPENDED);
+        return sendErrorStateNotification(SubscriptionSuspended.QNAME, id, errorReason, SUSPENDED);
     }
 
     /**
      * Builds and sends a generic state notification.
      */
-    private ListenableFuture<?> sendStateNotification(final String eventTime, final Long id, final String state)
+    private ListenableFuture<?> sendStateNotification(final QName qname, final Long id, final String state)
             throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {}", state, id);
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, state)))
-                .withChild(ImmutableNodes.leafNode(ID, id))
-                .build())
+        var node = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(qname))
+            .withChild(ImmutableNodes.leafNode(QName.create(qname, ID).intern(), id))
             .build();
         return sendNotification(node);
     }
@@ -158,17 +147,13 @@ public class SubscriptionStateService {
     /**
      * Builds and sends an error state notification.
      */
-    private ListenableFuture<?> sendErrorStateNotification(final String eventTime, final Long id,
-            final String errorReason, final String state) throws InterruptedException {
+    private ListenableFuture<?> sendErrorStateNotification(final QName qname, final Long id,
+            final QName errorReason, final String state) throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorReason);
-        final var node = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RESTCONF_NOTIF_NODE_IDENTIFIER))
-            .withChild(ImmutableNodes.leafNode(EVENT_TIME, eventTime))
-            .withChild(ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(NETCONF_NOTIFICATION, state)))
-                .withChild(ImmutableNodes.leafNode(ID, id))
-                .withChild(ImmutableNodes.leafNode(QName.create(BASE_QNAME, REASON), errorReason))
-                .build())
+        var node = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(qname))
+            .withChild(ImmutableNodes.leafNode(QName.create(qname, ID).intern(), id))
+            .withChild(ImmutableNodes.leafNode(QName.create(qname, REASON).intern(), errorReason))
             .build();
         return sendNotification(node);
     }

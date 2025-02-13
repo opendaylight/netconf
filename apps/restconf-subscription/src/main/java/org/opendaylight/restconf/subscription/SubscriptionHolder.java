@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.subscription;
 
-import java.time.Instant;
 import java.util.NoSuchElementException;
 import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -31,8 +31,7 @@ public record SubscriptionHolder(
         final var id = subscription.getId().getValue();
         try {
             stateMachine.moveTo(id, SubscriptionState.END);
-            subscriptionStateService.subscriptionTerminated(Instant.now().toString(),
-                id.longValue(), "subscription-kill");
+            subscriptionStateService.subscriptionTerminated(id.longValue(), SubscriptionTerminatedReason.QNAME);
         } catch (InterruptedException e) {
             LOG.warn("Could not send subscription terminated notification: {}", e.getMessage());
         } catch (IllegalStateException | NoSuchElementException e) {
