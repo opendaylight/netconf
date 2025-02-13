@@ -10,6 +10,7 @@ package org.opendaylight.restconf.subscription;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -24,22 +25,26 @@ class StateTransitionTest {
 
     private SubscriptionStateMachine subscriptionStateMachine;
 
-    @Test
-    void transitionStateTest() {
+    @BeforeEach
+    void before() {
         // initializing state machine
         subscriptionStateMachine = new SubscriptionStateMachine();
         subscriptionStateMachine.registerSubscription(session, Uint32.ONE);
 
         // Checking default stating state
-        var state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
-        assertEquals(SubscriptionState.START, state);
+        assertEquals(SubscriptionState.START, subscriptionStateMachine.getSubscriptionState(Uint32.ONE));
+    }
 
-        // Checking legal state transition
+    @Test
+    void transitionStateTest() {
+        // Transition state
         subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.ACTIVE);
-        state = subscriptionStateMachine.getSubscriptionState(Uint32.ONE);
-        assertEquals(SubscriptionState.ACTIVE, state);
+        assertEquals(SubscriptionState.ACTIVE, subscriptionStateMachine.getSubscriptionState(Uint32.ONE));
+    }
 
-        // Checking illegal state transition
+    @Test
+    void illegalTransitionStateTest() {
+        // Trying illegal state transition
         assertThrows(IllegalStateException.class,
             () -> subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.START));
     }
