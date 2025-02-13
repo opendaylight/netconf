@@ -171,15 +171,22 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                         .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
                         .build());
                     try {
-                        final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
-                            String.class);
-                        if (streamRegistry.lookupStream(streamName) == null) {
+                        final var subscription = mdsalService.read(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()))
+                            .get();
+                        if (subscription.isEmpty()) {
                             LOG.warn("Could not send subscription modify notification: could not read stream name");
                             return;
                         }
-
-                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, "uri", null);
-                    } catch (InterruptedException e) {
+                        final var target = (DataContainerNode) ((DataContainerNode) subscription.orElseThrow())
+                            .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
+                        final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
+                            String.class);
+                        final var encoding = leaf((DataContainerNode) subscription.orElseThrow(),
+                            NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING), String.class);
+                        // TODO: pass correct filter once we extract if from input
+                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, encoding, null,
+                            stopTime, null);
+                    } catch (InterruptedException | ExecutionException e) {
                         LOG.warn("Could not send subscription modify notification", e);
                     }
                 }
