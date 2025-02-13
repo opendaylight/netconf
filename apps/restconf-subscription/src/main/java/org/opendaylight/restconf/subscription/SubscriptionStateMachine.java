@@ -63,7 +63,7 @@ public class SubscriptionStateMachine {
         final var transition = TRANSITIONS.get(getSubscriptionState(subscriptionId)).contains(toType);
         // Check if this state transition is allowed
         if (!transition) {
-            throw new IllegalStateException(String.format("Illegal transition to {} state.", toType));
+            throw new IllegalStateException(String.format("Illegal transition to %s state.", toType));
         }
         subscriptionStateMap.replace(subscriptionId, new SessionStatePair(getSubscriptionSession(subscriptionId),
             toType));
