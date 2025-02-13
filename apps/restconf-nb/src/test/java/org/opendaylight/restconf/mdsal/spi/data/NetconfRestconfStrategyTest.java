@@ -97,7 +97,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         doReturn(Futures.immediateFailedFuture(new TransactionCommitFailedException(
             "Commit of transaction " + this + " failed", new NetconfDocumentedException("id",
-                ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))).when(netconfService).commit();
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))).when(netconfService).commit();
         return jukeboxDataOperations();
     }
 
@@ -435,7 +435,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     RestconfStrategy deleteNonexistentDataTestStrategy() {
         mockLockUnlockDiscard();
         doReturn(Futures.immediateFailedFuture(
-            new TransactionCommitFailedException("Commit of transaction " + this + " failed",
+            new TransactionCommitFailedException("Commit of transaction deleteNonexistentData failed",
                 new NetconfDocumentedException("id", ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))))
             .when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -450,8 +450,8 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
-        assertEquals(new ErrorMessage("Data does not exist"), globalError.message());
-        assertEquals(ErrorType.PROTOCOL, globalError.type());
+        assertEquals(new ErrorMessage("Commit of transaction deleteNonexistentData failed"), globalError.message());
+        assertEquals(ErrorType.RPC, globalError.type());
         assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
 
