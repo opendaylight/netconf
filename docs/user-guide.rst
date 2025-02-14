@@ -979,7 +979,7 @@ POST request to:
 
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
             <stream>NETCONF</stream>
-            <encoding>xml</encoding>
+            <encoding>encode-xml</encoding>
             <stream-subtree-filter></ietf-vrrp:vrrp-protocol-error-event></stream-subtree-filter>
           </input>
 
@@ -1065,7 +1065,7 @@ Use this when you want to include everything within a specific subtree in the no
            {
               "ietf-subscribed-notifications:input": {
                   "stream": "NETCONF",
-                  "encoding": "json",
+                  "encoding": "encode-json",
                   "stream-subtree-filter": {
                       "users" : {}
                   },
@@ -1091,7 +1091,7 @@ This filter retrieves only the <name> elements from each <user> within the <user
 
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
             <stream>NETCONF</stream>
-            <encoding>xml</encoding>
+            <encoding>encode-xml</encoding>
             <stream-subtree-filter>
               <users>
                 <user>
@@ -1114,7 +1114,7 @@ This filter retrieves only the <name> elements from each <user> within the <user
            {
              "ietf-subscribed-notifications:input": {
                "stream": "NETCONF",
-               "encoding": "json",
+               "encoding": "encode-json",
                "stream-subtree-filter": {
                  "users": {
                    "user": {
@@ -1134,7 +1134,7 @@ To listen to the notifications for an established subscription, use the followin
 .. code-block::
 
     GET
-    http://localhost:8182/restconf/subscriptions/{subscription-id}
+    http://localhost:8182/subscriptions/{subscription-id}
     Accept: text/event-stream
 
 Replace {subscription-id} with the ID returned in the establish-subscription RPC response.
@@ -1167,7 +1167,7 @@ POST request to:
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
             <subscription-id>2147483648</subscription-id>
             <stream-subtree-filter></ietf-vrrp:vrrp-protocol-error-event></stream-subtree-filter>
-            <encoding>json</encoding>
+            <encoding>encode-xml</encoding>
           </input>
 
    .. tab:: JSON
@@ -1181,12 +1181,12 @@ POST request to:
        .. code-block:: json
 
            {
-               "input": {
+               "ietf-subscribed-notifications:input": {
                  "subscription-id": "2147483648",
                  "stream-subtree-filter": {
                      "/ietf-vrrp:vrrp-protocol-error-event" : {}
                  },
-                 "encoding": "xml"
+                 "encoding": "encode-xml"
                }
            }
 
@@ -1233,7 +1233,7 @@ POST request to:
        .. code-block:: json
 
            {
-               "input": {
+               "ietf-subscribed-notifications:input": {
                  "subscription-id": "2147483648"
                }
            }
@@ -1277,7 +1277,7 @@ POST request to:
        .. code-block:: json
 
            {
-               "input": {
+               "ietf-subscribed-notifications:input": {
                  "subscription-id": "2147483648"
                }
            }
