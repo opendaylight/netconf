@@ -30,10 +30,12 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -165,13 +167,15 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         deviceDataBroker = newDeviceDataBroker(mountContext, preferences);
         netconfService = newNetconfDataTreeService(mountContext, preferences);
 
-        // We need to create ProxyDOMDataBroker so accessing mountpoint
-        // on leader node would be same as on follower node
-        final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
+        final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
-        final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
-            actorSystem.dispatcher(), actorResponseWaitTime);
-        mount.onDeviceConnected(mountContext.modelContext(), deviceServices, proxyDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(mountContext.modelContext(),
+            new NetconfRestconfStrategy(DatabindContext.ofMountPoint(mountContext), proxyNetconfService),
+            deviceServices,
+            // We need to create ProxyDOMDataBroker so accessing mountpoint
+            // on leader node would be same as on follower node
+            new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime),
+            proxyNetconfService);
     }
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,

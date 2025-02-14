@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.netconf.client.mdsal.spi;
 
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
@@ -35,6 +35,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
+import org.opendaylight.restconf.mdsal.spi.data.RestconfTransaction;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -89,7 +91,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void cancel() {
+    public void cancel() {
         resultsFutures.clear();
         readListCache.clear();
         executeWithLogging(netconfService::discardChanges);
@@ -97,7 +99,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void deleteImpl(final YangInstanceIdentifier path) throws ServerException {
+    protected void deleteImpl(final YangInstanceIdentifier path) throws ServerException {
         if (isListPath(path, databind.modelContext())) {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
@@ -112,7 +114,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void removeImpl(final YangInstanceIdentifier path) throws ServerException {
+    protected void removeImpl(final YangInstanceIdentifier path) throws ServerException {
         if (isListPath(path, databind.modelContext())) {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
@@ -127,7 +129,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws ServerException {
+    protected @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws ServerException {
         // reading list is mainly invoked for subsequent removal,
         // cache data to avoid extra read invocation on delete/remove
         final var result =  RestconfStrategy.syncAccess(read(path), path);
@@ -153,12 +155,12 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    protected void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         enqueueOperation(() -> netconfService.merge(CONFIGURATION, path, data, Optional.empty()));
     }
 
     @Override
-    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    protected void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
@@ -173,7 +175,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    protected void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
@@ -188,11 +190,11 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    ListenableFuture<? extends @NonNull CommitInfo> commit() {
-        final SettableFuture<CommitInfo> commitResult = SettableFuture.create();
+    public ListenableFuture<? extends @NonNull CommitInfo> commit() {
+        final var commitResult = SettableFuture.<CommitInfo>create();
 
         // First complete all resultsFutures and merge them ...
-        final ListenableFuture<DOMRpcResult> resultErrors = mergeFutures(resultsFutures);
+        final var resultErrors = mergeFutures(resultsFutures);
 
         // ... then evaluate if there are any problems
         Futures.addCallback(resultErrors, new FutureCallback<>() {
@@ -247,7 +249,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
+    protected ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
         return netconfService.getConfig(path);
     }
 

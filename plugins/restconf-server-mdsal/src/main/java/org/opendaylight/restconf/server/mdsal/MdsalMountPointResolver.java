@@ -17,13 +17,11 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerModulesOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
-import org.opendaylight.restconf.mdsal.spi.data.NetconfRestconfStrategy;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerErrorPath;
@@ -87,10 +85,6 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
 
     private static ServerDataOperations dataOperationsOf(final DatabindContext mountDatabind,
             final DOMMountPoint mountPoint) {
-        final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
-        if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(mountDatabind, netconfService.orElseThrow());
-        }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
             return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow());

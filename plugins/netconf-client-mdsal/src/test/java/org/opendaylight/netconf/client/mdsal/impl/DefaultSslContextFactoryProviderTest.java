@@ -191,7 +191,7 @@ class DefaultSslContextFactoryProviderTest {
 
                 final var decodedCerts = new ArrayList<byte[]>();
                 for (final var cert : certChain) {
-                    decodedCerts.add(new SecurityHelper().decodeCertificate(cert).getEncoded());
+                    decodedCerts.add(SecurityHelper.decodeCertificate(cert).getEncoded());
                 }
 
 
@@ -217,7 +217,7 @@ class DefaultSslContextFactoryProviderTest {
                 final var certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
                 final var certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
 
-                final var cert = new SecurityHelper().decodeCertificate(certData).getEncoded();
+                final var cert = SecurityHelper.decodeCertificate(certData).getEncoded();
 
                 trustedCertificates.add(new TrustedCertificateBuilder()
                     .withKey(new TrustedCertificateKey(certName))
