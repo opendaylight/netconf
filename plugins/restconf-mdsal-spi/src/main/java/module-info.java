@@ -15,9 +15,7 @@ module org.opendaylight.restconf.mdsal.spi {
     requires transitive org.opendaylight.restconf.server.api;
     requires transitive org.opendaylight.restconf.server.spi;
     requires com.google.gson;
-    requires org.opendaylight.mdsal.dom.spi;
     requires org.opendaylight.netconf.api;
-    requires org.opendaylight.netconf.dom.api;
     requires org.opendaylight.odlparent.logging.markers;
     requires org.opendaylight.yang.gen.ietf.restconf.rfc8040;
     requires org.opendaylight.yangtools.binding.spec;

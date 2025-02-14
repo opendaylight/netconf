@@ -79,7 +79,7 @@ class NetconfDeviceSalFacadeTest {
         deviceFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
             netconfSessionPreferences, deviceServices);
-        verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
+        verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), any(), eq(deviceServices),
             any(DOMDataBroker.class), any(NetconfDataTreeService.class));
 
         // Verify that onDeviceDisconnected is not called after close.
@@ -101,8 +101,8 @@ class NetconfDeviceSalFacadeTest {
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
             netconfSessionPreferences, deviceServices);
 
-        verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
-            any(DOMDataBroker.class), any(NetconfDataTreeService.class));
+        verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), any(), eq(deviceServices), any(), any(),
+            any());
     }
 
     @Test

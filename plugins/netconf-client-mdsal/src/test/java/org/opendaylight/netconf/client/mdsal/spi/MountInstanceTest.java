@@ -30,6 +30,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
@@ -56,6 +57,8 @@ class MountInstanceTest {
     private ObjectRegistration<DOMMountPoint> registration;
     @Mock
     private DOMNotification notification;
+    @Mock
+    private ServerDataOperations dataOperarions;
 
     private NetconfDeviceMount mountInstance;
 
@@ -76,7 +79,7 @@ class MountInstanceTest {
 
     @Test
     void testOnTopologyDeviceConnected() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
@@ -86,7 +89,7 @@ class MountInstanceTest {
 
     @Test
     void testOnTopologyDeviceConnectedWithNetconfService() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
             notificationService, null, netconfService);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
@@ -96,17 +99,17 @@ class MountInstanceTest {
 
     @Test
     void testOnTopologyDeviceDisconnected() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         mountInstance.onDeviceDisconnected();
         verify(registration).close();
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
     }
 
     @Test
     void testClose() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         mountInstance.close();
         verify(registration).close();
@@ -114,7 +117,7 @@ class MountInstanceTest {
 
     @Test
     void testPublishNotification() {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
