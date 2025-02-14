@@ -30,6 +30,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
@@ -164,13 +165,15 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         deviceDataBroker = newDeviceDataBroker(databind, preferences);
         netconfService = newNetconfDataTreeService(databind, preferences);
 
-        // We need to create ProxyDOMDataBroker so accessing mountpoint
-        // on leader node would be same as on follower node
-        final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
+        final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
-        final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
-            actorSystem.dispatcher(), actorResponseWaitTime);
-        mount.onDeviceConnected(databind.modelContext(), deviceServices, proxyDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(databind.modelContext(),
+            new NetconfRestconfStrategy(databind, proxyNetconfService),
+            deviceServices,
+            // We need to create ProxyDOMDataBroker so accessing mountpoint
+            // on leader node would be same as on follower node
+            new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime),
+            proxyNetconfService);
     }
 
     protected DOMDataBroker newDeviceDataBroker(final DatabindContext databind,

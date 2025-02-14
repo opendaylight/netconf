@@ -11,7 +11,6 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -99,7 +98,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Baseline class for {@link ServerDataOperations} implementations.
  *
- * @see NetconfRestconfStrategy
  * @see MdsalRestconfStrategy
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
@@ -112,7 +110,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
     protected final @NonNull DatabindContext databind;
 
-    RestconfStrategy(final DatabindContext databind) {
+    protected RestconfStrategy(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
     }
 
@@ -122,7 +120,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @return A {@link RestconfTransaction}. This transaction needs to be either committed or canceled before doing
      *         anything else.
      */
-    abstract RestconfTransaction prepareWriteExecution();
+    protected abstract RestconfTransaction prepareWriteExecution();
 
     /**
      * Read data from the datastore.
@@ -131,17 +129,17 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param path the data object path
      * @return a ListenableFuture containing the result of the read
      */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
+    protected abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
+        YangInstanceIdentifier path);
 
     /**
      * Check if data already exists in the configuration datastore.
      *
-     * @param request {@link ServerRequest} for this request
      * @param path the data object path
      */
     // FIXME: this method should be hosted in RestconfTransaction
     // FIXME: this method should only be needed in MdsalRestconfStrategy
-    abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
+    protected abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
 
     @Override
     public final void mergeData(final ServerRequest<DataPatchResult> request, final Data path,
@@ -604,8 +602,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     }
 
     @NonNullByDefault
-    static final void completeDataGET(final ServerRequest<DataGetResult> request, final @Nullable NormalizedNode node,
-            final Data path, final NormalizedNodeWriterFactory writerFactory,
+    public static final void completeDataGET(final ServerRequest<DataGetResult> request,
+            final @Nullable NormalizedNode node, final Data path, final NormalizedNodeWriterFactory writerFactory,
             final @Nullable ConfigurationMetadata metadata) {
         // Non-existing data
         if (node == null) {
@@ -629,8 +627,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @return {@link NormalizedNode}
      */
     // FIXME: NETCONF-1155: this method should asynchronous
-    @VisibleForTesting
-    final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    protected final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) throws RequestException {
         return switch (content) {
             case ALL -> {
@@ -656,8 +653,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         return syncAccess(read(store, path), path).orElse(null);
     }
 
-    final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
-            final WithDefaultsMode defaultsMode) throws RequestException {
+    protected final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData,
+            final YangInstanceIdentifier path, final WithDefaultsMode defaultsMode) throws RequestException {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;
@@ -814,7 +811,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         return childCtx;
     }
 
-    static final NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
+    public static final NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
             final NormalizedNode configDataNode) throws RequestException {
         if (stateDataNode == null) {
             // No state, return config
@@ -1026,7 +1023,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @throws RequestException if commit fails
      */
     // FIXME: require DatabindPath.Data here
-    static final <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
+    public static final <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
             throws RequestException {
         try {
             return future.get();
@@ -1039,7 +1036,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     }
 
     // FIXME: require DatabindPath.Data here
-    final @NonNull RequestException decodeException(final Throwable ex, final String txType,
+    protected final @NonNull RequestException decodeException(final Throwable ex, final String txType,
             final YangInstanceIdentifier path) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away

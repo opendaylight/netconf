@@ -64,7 +64,8 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
         final var netconfDataBroker = new NetconfDeviceDataBroker(id, databind, deviceRpc, sessionPreferences,
             lockDatastore);
 
-        mount.onDeviceConnected(databind.modelContext(), services, netconfDataBroker, netconfDataTree);
+        mount.onDeviceConnected(databind.modelContext(), new NetconfRestconfStrategy(databind, netconfDataTree),
+            services, netconfDataBroker, netconfDataTree);
     }
 
     @Override
