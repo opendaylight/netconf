@@ -24,6 +24,8 @@ import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
@@ -179,7 +181,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
 
         final DateAndTime stopTime;
         try {
-            stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, DateAndTime.class);
+            final var time = leaf(body, SUBSCRIPTION_STOP_TIME, String.class);
+            stopTime = time == null ? null : DateAndTime.getDefaultInstance(time);
         } catch (IllegalArgumentException e) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
@@ -189,10 +192,13 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STOP_TIME, stopTime));
         }
 
-        final var encoding = leaf(body, SUBSCRIPTION_ENCODING, Encoding.class);
-        if (encoding != null) {
-            subscriptionBuilder.setEncoding(encoding);
-            nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, encoding));
+        final var encodingQname = leaf(body, SUBSCRIPTION_ENCODING, QName.class);
+        if (encodingQname != null) {
+            final var encoding = resolveEncoding(encodingQname);
+            if (encoding != null) {
+                subscriptionBuilder.setEncoding(encoding);
+                nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, encoding));
+            }
         }
 
         final var subscription = new SubscriptionHolder(subscriptionBuilder.build(), mdsalService,
@@ -234,5 +240,15 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                     .build())
                 .build())
             .build();
+    }
+
+    private static Encoding resolveEncoding(QName encodingQName) {
+        // Assuming concrete Encoding subclasses exist (e.g., EncodeXml, EncodeJson)
+        if (encodingQName.equals(EncodeXml$I.QNAME)) {
+            return EncodeXml$I.VALUE;
+        } else if (encodingQName.equals(EncodeJson$I.QNAME)) {
+            return EncodeJson$I.VALUE;
+        }
+        return null;
     }
 }
