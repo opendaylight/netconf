@@ -76,6 +76,10 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
 
     protected abstract @NonNull ServerMountPointResolver resolver();
 
+    public final @NonNull DatabindContext databind() {
+        return databind;
+    }
+
     @Override
     public final void dataDELETE(final ServerRequest<Empty> request, final ApiPath apiPath) {
         final Data path;

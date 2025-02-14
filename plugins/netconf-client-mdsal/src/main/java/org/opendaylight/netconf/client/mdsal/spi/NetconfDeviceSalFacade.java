@@ -18,6 +18,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
             return;
         }
         final var mountContext = deviceSchema.mountContext();
-        final var modelContext = mountContext.modelContext();
+        final var databind = DatabindContext.ofMountPoint(mountContext);
 
         final var deviceRpc = services.rpcs();
 
@@ -65,7 +66,8 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
         final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences,
             lockDatastore);
 
-        mount.onDeviceConnected(modelContext, services, netconfDataBroker, netconfDataTree);
+        mount.onDeviceConnected(databind.modelContext(), new NetconfRestconfStrategy(databind, netconfDataTree),
+            services, netconfDataBroker, netconfDataTree);
     }
 
     @Override

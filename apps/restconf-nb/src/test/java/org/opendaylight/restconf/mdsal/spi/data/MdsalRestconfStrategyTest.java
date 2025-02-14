@@ -43,6 +43,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ErrorMessage;
@@ -482,7 +483,6 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Test
     void testGetRestconfStrategyMountDataBroker() throws Exception {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
@@ -519,7 +519,6 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Test
     void testGetRestconfStrategyMountNone() throws Exception {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
