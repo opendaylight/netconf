@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.netconf.client.mdsal.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -35,6 +35,8 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
+import org.opendaylight.restconf.mdsal.spi.data.RestconfTransaction;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -60,6 +62,8 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
  *
  * @see NetconfDataTreeService
  */
+// FIXME: remove this class: we really want to provide ServerDataOperations instead
+@VisibleForTesting
 public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
@@ -69,7 +73,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfTransaction prepareWriteExecution() {
+    protected RestconfTransaction prepareWriteExecution() {
         return new NetconfRestconfTransaction(databind, netconfService);
     }
 
@@ -130,7 +134,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    protected ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return switch (store) {
             case CONFIGURATION -> netconfService.getConfig(path);
@@ -196,7 +200,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
+    protected ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
         return Futures.transform(remapException(netconfService.getConfig(path)),
             optionalNode -> optionalNode != null && optionalNode.isPresent(),
             MoreExecutors.directExecutor());
@@ -244,8 +248,9 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @throws RequestException when an error occurs
      */
     @VisibleForTesting
-    static @NonNull List<YangInstanceIdentifier> fieldsParamToPaths(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull DataSchemaContext startNode, final @NonNull FieldsParam input) throws RequestException {
+    public static @NonNull List<YangInstanceIdentifier> fieldsParamToPaths(
+            final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaContext startNode,
+            final @NonNull FieldsParam input) throws RequestException {
         final var parsed = new HashSet<LinkedPathElement>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
