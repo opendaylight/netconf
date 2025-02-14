@@ -35,7 +35,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -84,7 +83,6 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         assertNull(assertEntity(204, ar -> restconf.dataXmlPUT(
             apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, sc,
