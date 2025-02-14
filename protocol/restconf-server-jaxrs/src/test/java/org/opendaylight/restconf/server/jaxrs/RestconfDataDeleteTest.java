@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -80,7 +79,6 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         doNothing().when(tx).delete(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())

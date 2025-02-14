@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -166,7 +165,6 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         // response must contain all child nodes from config and operational containers merged in one container
         final var body = assertNormalizedBody(200, ar -> restconf.dataGET(
