@@ -132,6 +132,10 @@
             <artifactId>netconf-dom-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-mdsal-spi</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>rfc5277</artifactId>
         </dependency>

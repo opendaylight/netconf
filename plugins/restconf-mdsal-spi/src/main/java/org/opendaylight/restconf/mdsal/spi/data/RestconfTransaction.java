@@ -9,6 +9,7 @@ package org.opendaylight.restconf.mdsal.spi.data;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -26,14 +27,15 @@ import org.slf4j.LoggerFactory;
 /**
  * A handle to a set of operations being executed atomically on top of some backing store.
  */
+@Beta
 // FIXME: it seems the first two operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-abstract class RestconfTransaction {
+public abstract class RestconfTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransaction.class);
 
-    final @NonNull DatabindContext databind;
+    protected final @NonNull DatabindContext databind;
 
-    RestconfTransaction(final DatabindContext databind) {
+    protected RestconfTransaction(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
     }
 
@@ -41,26 +43,26 @@ abstract class RestconfTransaction {
      * Rollback changes and unlock the datastore.
      */
     // FIXME: this looks synchronous, but it should not be
-    abstract void cancel();
+    public abstract void cancel();
 
     /**
      * Confirm previous operations.
      *
-     * @return a FluentFuture containing the result of the commit information
+     * @return a {@link ListenableFuture} containing the result of the commit information
      */
-    abstract ListenableFuture<? extends @NonNull CommitInfo> commit();
+    public abstract @NonNull ListenableFuture<? extends @NonNull CommitInfo> commit();
 
     /**
      * Delete data from the datastore.
      *
      * @param path the data object path
      */
-    final void delete(final YangInstanceIdentifier path) throws RequestException {
+    public final void delete(final YangInstanceIdentifier path) throws RequestException {
         LOG.trace("Delete {}", path);
         deleteImpl(requireNonNull(path));
     }
 
-    abstract void deleteImpl(@NonNull YangInstanceIdentifier path) throws RequestException;
+    protected abstract void deleteImpl(@NonNull YangInstanceIdentifier path) throws RequestException;
 
     /**
      * Remove data from the datastore.
@@ -72,7 +74,7 @@ abstract class RestconfTransaction {
         removeImpl(requireNonNull(path));
     }
 
-    abstract void removeImpl(@NonNull YangInstanceIdentifier path) throws RequestException;
+    protected abstract void removeImpl(@NonNull YangInstanceIdentifier path) throws RequestException;
 
     /**
      * Merges a piece of data with the existing data at a specified path.
@@ -80,13 +82,13 @@ abstract class RestconfTransaction {
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    final void merge(final YangInstanceIdentifier path, final NormalizedNode data) {
+    public final void merge(final YangInstanceIdentifier path, final NormalizedNode data) {
         LOG.trace("Merge {}", path);
         LOG.trace(Markers.confidential(), "Merge with {}", data.prettyTree());
         mergeImpl(requireNonNull(path), data);
     }
 
-    abstract void mergeImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
+    protected abstract void mergeImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
     /**
      * Stores a piece of data at the specified path.
@@ -94,13 +96,13 @@ abstract class RestconfTransaction {
      * @param path    the data object path
      * @param data    the data object to be merged to the specified path
      */
-    final void create(final YangInstanceIdentifier path, final NormalizedNode data) throws RequestException {
+    public final void create(final YangInstanceIdentifier path, final NormalizedNode data) throws RequestException {
         LOG.trace("Create {}", path);
         LOG.trace(Markers.confidential(), "Create as {}", data.prettyTree());
         createImpl(requireNonNull(path), data);
     }
 
-    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data)
+    protected abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data)
         throws RequestException;
 
     /**
@@ -115,12 +117,12 @@ abstract class RestconfTransaction {
         replaceImpl(requireNonNull(path), data);
     }
 
-    abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
+    protected abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
-    abstract @Nullable NormalizedNodeContainer<?> readList(@NonNull YangInstanceIdentifier path)
+    protected abstract @Nullable NormalizedNodeContainer<?> readList(@NonNull YangInstanceIdentifier path)
         throws RequestException;
 
-    abstract ListenableFuture<Optional<NormalizedNode>> read(YangInstanceIdentifier path);
+    protected abstract ListenableFuture<Optional<NormalizedNode>> read(YangInstanceIdentifier path);
 
     void ensureParentsByMerge(final YangInstanceIdentifier path) {
         // no-op
