@@ -22,6 +22,30 @@
       },
       "revId": "16be93832604e3eca93a5d3a07eef82ab9add807",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18d47b16_004a0082",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-14T14:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fb6e308_56e0f5b4",
+      "range": {
+        "startLine": 1051,
+        "startChar": 17,
+        "endLine": 1051,
+        "endChar": 24
+      },
+      "revId": "16be93832604e3eca93a5d3a07eef82ab9add807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
