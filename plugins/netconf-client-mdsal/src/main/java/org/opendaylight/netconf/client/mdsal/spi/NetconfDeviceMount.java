@@ -26,7 +26,19 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
+import org.opendaylight.restconf.server.spi.CompositeServerStrategy;
+import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
+import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
+import org.opendaylight.restconf.server.spi.ServerActionOperations;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
+import org.opendaylight.restconf.server.spi.ServerRpcOperations;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -51,31 +63,53 @@ public class NetconfDeviceMount implements AutoCloseable {
         this.mountPath = requireNonNull(mountPath);
     }
 
-    public void onDeviceConnected(final EffectiveModelContext initialCtx,
-            final RemoteDeviceServices services, final DOMDataBroker broker,
-            final NetconfDataTreeService dataTreeService) {
-        onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker, dataTreeService);
+    public void onDeviceConnected(final EffectiveModelContext initialCtx, final ServerDataOperations dataOps,
+            // FIXME: ServerActionOperations and ServerRpcOperations instead
+            final RemoteDeviceServices services,
+            // FIXME: not passed in: implemented on top of ServerDataOperations
+            final DOMDataBroker broker, final NetconfDataTreeService dataTreeService) {
+        onDeviceConnected(initialCtx, dataOps, services, new NetconfDeviceNotificationService(), broker,
+            dataTreeService);
     }
 
     public synchronized void onDeviceConnected(final EffectiveModelContext initialCtx,
-            final RemoteDeviceServices services, final NetconfDeviceNotificationService newNotificationService,
-            final DOMDataBroker broker, final NetconfDataTreeService dataTreeService) {
+            final ServerDataOperations dataOps, final RemoteDeviceServices services,
+            final NetconfDeviceNotificationService newNotificationService, final DOMDataBroker broker,
+            final NetconfDataTreeService dataTreeService) {
         requireNonNull(mountService, "Closed");
         checkState(topologyRegistration == null, "Already initialized");
 
         final var mountBuilder = mountService.createMountPoint(mountPath);
+        final var databind = DatabindContext.ofModel(initialCtx);
+
         mountBuilder.addService(DOMSchemaService.class, new FixedDOMSchemaService(initialCtx));
 
         final var rpcs = services.rpcs();
         mountBuilder.addService(NetconfRpcService.class, rpcs);
+
+        final ServerRpcOperations rpcOps;
         if (rpcs instanceof Rpcs.Normalized normalized) {
             mountBuilder.addService(DOMRpcService.class, normalized.domRpcService());
+            rpcOps = new DOMServerRpcOperations(normalized.domRpcService());
         } else if (rpcs instanceof Rpcs.Schemaless schemaless) {
             mountBuilder.addService(SchemalessRpcService.class, schemaless.schemalessRpcService());
+            // FIXME: proper implementation
+            rpcOps = NotSupportedServerRpcOperations.INSTANCE;
+        } else {
+            rpcOps = NotSupportedServerRpcOperations.INSTANCE;
         }
+
+        final ServerActionOperations actionOps;
         if (services.actions() instanceof Actions.Normalized normalized) {
             mountBuilder.addService(DOMActionService.class, normalized);
+            actionOps = new DOMServerActionOperations(normalized);
+        } else {
+            actionOps = NotSupportedServerActionOperations.INSTANCE;
         }
+
+        mountBuilder.addService(DOMServerStrategy.class, new DOMServerStrategy(new CompositeServerStrategy(databind,
+            NotSupportedServerMountPointResolver.INSTANCE, actionOps, dataOps,
+            NotSupportedServerModulesOperations.INSTANCE, rpcOps)));
 
         if (broker != null) {
             mountBuilder.addService(DOMDataBroker.class, broker);
