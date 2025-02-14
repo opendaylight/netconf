@@ -46,7 +46,6 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -58,8 +57,12 @@ import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
+import org.opendaylight.restconf.server.spi.CompositeServerStrategy;
+import org.opendaylight.restconf.server.spi.ExportingServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
+import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
+import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -85,13 +88,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Mock
     private DOMRpcService rpcService;
     @Mock
-    private DOMSchemaService schemaService;
-    @Mock
     private DOMMountPointService mountPointService;
     @Mock
     private DOMMountPoint mountPoint;
-    @Mock
-    private NetconfDataTreeService netconfService;
 
     @Override
     RestconfStrategy newDataOperations(final DatabindContext databind) {
@@ -482,7 +481,6 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Test
     void testGetRestconfStrategyMountDataBroker() throws Exception {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
@@ -500,26 +498,32 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Test
-    void testGetRestconfStrategyMountNetconfService() throws Exception {
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
-        doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
-        doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
-        doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
-            .getService(DOMSchemaService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+    void testGetRestconfStrategyFromMountPointDOMServerStrategy() throws Exception {
+        // Prepare DOMServerStrategy instance.
+        final var databindContext = DatabindContext.ofModel(JUKEBOX_SCHEMA);
+        final var mdsalRestconfStrategy = new MdsalRestconfStrategy(databindContext, dataBroker);
+        final var compositeServerStrategy = new CompositeServerStrategy(databindContext,
+            NotSupportedServerMountPointResolver.INSTANCE, NotSupportedServerActionOperations.INSTANCE,
+            mdsalRestconfStrategy, new ExportingServerModulesOperations(JUKEBOX_SCHEMA),
+            NotSupportedServerRpcOperations.INSTANCE);
+        final var domServerStrategy = new DOMServerStrategy(compositeServerStrategy);
+
+        // Prepare environment.
+        doReturn(Optional.of(domServerStrategy)).when(mountPoint).getService(DOMServerStrategy.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of());
 
+        // Resolve strategy for mountPoint.
         final var strategyAndPath = jukeboxStrategy().resolveStrategy(ApiPath.parse("yang-ext:mount"));
+
+        // Verify provided strategy.
         assertEquals(ApiPath.empty(), strategyAndPath.path());
-        final var strategy = assertInstanceOf(MdsalServerStrategy.class, strategyAndPath.strategy());
-        assertInstanceOf(NetconfRestconfStrategy.class, strategy.data());
+        final var strategy = assertInstanceOf(CompositeServerStrategy.class, strategyAndPath.strategy());
+        assertInstanceOf(MdsalRestconfStrategy.class, strategy.data());
     }
 
     @Test
     void testGetRestconfStrategyMountNone() throws Exception {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMServerStrategy.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
