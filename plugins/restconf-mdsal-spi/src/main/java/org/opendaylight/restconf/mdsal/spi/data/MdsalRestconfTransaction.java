@@ -55,7 +55,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void deleteImpl(final YangInstanceIdentifier path) throws RequestException {
+    protected void deleteImpl(final YangInstanceIdentifier path) throws RequestException {
         if (RestconfStrategy.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             rwTx.delete(CONFIGURATION, path);
         } else {
@@ -66,17 +66,17 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void removeImpl(final YangInstanceIdentifier path) {
+    protected void removeImpl(final YangInstanceIdentifier path) {
         verifyNotNull(rwTx).delete(CONFIGURATION, path);
     }
 
     @Override
-    void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    protected void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         verifyNotNull(rwTx).merge(CONFIGURATION, path, data);
     }
 
     @Override
-    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) throws RequestException {
+    protected void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) throws RequestException {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
@@ -119,7 +119,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
 
     @Override
-    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    protected void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubtree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
@@ -158,12 +158,12 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
+    protected ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
         return verifyNotNull(rwTx).read(CONFIGURATION, path);
     }
 
     @Override
-    NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws RequestException {
+    protected NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws RequestException {
         return (NormalizedNodeContainer<?>) RestconfStrategy.syncAccess(read(path), path).orElse(null);
     }
 }

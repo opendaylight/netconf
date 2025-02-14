@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
