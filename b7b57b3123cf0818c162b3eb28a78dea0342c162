@@ -22,6 +22,30 @@
       },
       "revId": "b7b57b3123cf0818c162b3eb28a78dea0342c162",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8879701_39083b62",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/exception/TransactionEditConfigFailedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-14T14:11:24Z",
+      "side": 1,
+      "message": "I need a separate exception accessible to set failed PatchEntity transaction number.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115378/11/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/exception/TransactionEditConfigFailedException.java#23",
+      "parentUuid": "7e22005d_28912d7b",
+      "range": {
+        "startLine": 16,
+        "startChar": 19,
+        "endLine": 16,
+        "endChar": 55
+      },
+      "revId": "b7b57b3123cf0818c162b3eb28a78dea0342c162",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
