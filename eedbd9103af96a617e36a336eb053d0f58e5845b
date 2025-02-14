@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3220dafe_34cb6e96",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/NetconfRestconfTransaction.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2025-02-14T02:28:33Z",
+      "side": 1,
+      "message": "This dose not check the last one in resultsFutures, so when the device returns a RPC error for the last `edit-config` RPC, this becomes a success.",
+      "revId": "eedbd9103af96a617e36a336eb053d0f58e5845b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
