@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -270,7 +271,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final var newMockSchemaSourceReg = mock(Registration.class);
 
-        final EffectiveModelContextFactory newMockSchemaContextFactory = mock(EffectiveModelContextFactory.class);
+        final var newMockSchemaContextFactory = mock(EffectiveModelContextFactory.class);
         doReturn(Futures.immediateFuture(mockSchemaContext))
                 .when(newMockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
@@ -358,6 +359,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         reset(mockSchemaSourceReg1, mockSchemaSourceReg2);
 
+        doCallRealMethod().when(mockSchemaContext).getQName();
         doReturn(Futures.immediateFailedFuture(new SchemaResolutionException("mock", new SourceIdentifier("foo"),
                 new AskTimeoutException("timeout"))))
             .doReturn(Futures.immediateFuture(mockSchemaContext))
@@ -685,6 +687,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 .setBaseSchemaProvider(BASE_SCHEMAS)
                 .build(), remoteDeviceId, TIMEOUT, mockMountPointService));
 
+        doCallRealMethod().when(mockSchemaContext).getQName();
         doReturn(Futures.immediateFuture(mockSchemaContext))
                 .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
