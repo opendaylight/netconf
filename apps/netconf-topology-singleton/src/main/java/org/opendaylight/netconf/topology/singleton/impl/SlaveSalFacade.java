@@ -15,6 +15,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -51,7 +53,9 @@ public class SlaveSalFacade {
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
 
-        mount.onDeviceConnected(remoteSchemaContext, services, netconfDeviceDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(remoteSchemaContext,
+            new NetconfRestconfStrategy(DatabindContext.ofModel(remoteSchemaContext), proxyNetconfService),
+            services, netconfDeviceDataBroker, proxyNetconfService);
         LOG.info("{}: Slave mount point registered.", id);
     }
 

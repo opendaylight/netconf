@@ -9,7 +9,6 @@ package org.opendaylight.netconf.client.mdsal.spi;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -39,6 +38,12 @@ class NetconfDeviceSalFacadeTest {
 
     @Mock
     private NetconfDeviceMount mountInstance;
+    @Mock
+    private EffectiveModelContext modelContext;
+    @Mock
+    private Rpcs.Normalized normalizedRpcs;
+    @Mock
+    private DOMNotification domNotification;
 
     private NetconfDeviceSalFacade deviceFacade;
 
@@ -71,15 +76,14 @@ class NetconfDeviceSalFacadeTest {
     @Test
     void testAfterDeviceClose() {
         deviceFacade.close();
-        final var schemaContext = mock(EffectiveModelContext.class);
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
-        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
+        final var deviceServices = new RemoteDeviceServices(normalizedRpcs, null);
 
         // Verify that onDeviceConnected is not called after close.
         deviceFacade.onDeviceConnected(
-            new NetconfDeviceSchema(DatabindContext.ofModel(schemaContext), NetconfDeviceCapabilities.empty()),
+            new NetconfDeviceSchema(DatabindContext.ofModel(modelContext), NetconfDeviceCapabilities.empty()),
             netconfSessionPreferences, deviceServices);
-        verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
+        verify(mountInstance, times(0)).onDeviceConnected(eq(modelContext), any(), eq(deviceServices),
             any(DOMDataBroker.class), any(NetconfDataTreeService.class));
 
         // Verify that onDeviceDisconnected is not called after close.
@@ -93,21 +97,17 @@ class NetconfDeviceSalFacadeTest {
 
     @Test
     void testOnDeviceConnected() {
-        final var schemaContext = mock(EffectiveModelContext.class);
-
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
-        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
+        final var deviceServices = new RemoteDeviceServices(normalizedRpcs, null);
         deviceFacade.onDeviceConnected(
-            new NetconfDeviceSchema(DatabindContext.ofModel(schemaContext), NetconfDeviceCapabilities.empty()),
+            new NetconfDeviceSchema(DatabindContext.ofModel(modelContext), NetconfDeviceCapabilities.empty()),
             netconfSessionPreferences, deviceServices);
 
-        verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
-            any(DOMDataBroker.class), any(NetconfDataTreeService.class));
+        verify(mountInstance, times(1)).onDeviceConnected(eq(modelContext), any(), eq(deviceServices), any(), any());
     }
 
     @Test
     void testOnDeviceNotification() {
-        final DOMNotification domNotification = mock(DOMNotification.class);
         deviceFacade.onNotification(domNotification);
         verify(mountInstance).publish(domNotification);
     }
