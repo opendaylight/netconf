@@ -52,7 +52,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfTransaction prepareWriteExecution() {
+    protected RestconfTransaction prepareWriteExecution() {
         return new MdsalRestconfTransaction(databind, dataBroker);
     }
 
@@ -127,7 +127,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    protected ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
@@ -135,10 +135,9 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
+    protected ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.exists(LogicalDatastoreType.CONFIGURATION, path);
         }
     }
-
 }
