@@ -170,6 +170,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae120e67_c1d0e21a",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-14T23:07:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "458536ec_fb659ed9",
+      "revId": "f8c7a120f96230a14f37311925ff1842b412fe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05909ec1_1e49910a",
