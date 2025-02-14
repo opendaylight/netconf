@@ -123,7 +123,8 @@ public class ModifySubscriptionRpc extends RpcImplementation {
             .create(QName.create(Subscription.QNAME, "stream-filter")));
 
         try {
-            stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, DateAndTime.class);
+            final var time = leaf(body, SUBSCRIPTION_STOP_TIME, String.class);
+            stopTime = time == null ? null : DateAndTime.getDefaultInstance(time);
         } catch (IllegalArgumentException e) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
