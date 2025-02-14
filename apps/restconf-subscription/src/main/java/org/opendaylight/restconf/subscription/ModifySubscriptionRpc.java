@@ -29,7 +29,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -86,7 +85,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final Uint32 id;
-        final DateAndTime stopTime;
+        final String stopTime;
         final String streamFilterName;
 
         try {
@@ -127,7 +126,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             .create(QName.create(Subscription.QNAME, "stream-filter")));
 
         try {
-            stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, DateAndTime.class);
+            stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, String.class);
         } catch (IllegalArgumentException e) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
