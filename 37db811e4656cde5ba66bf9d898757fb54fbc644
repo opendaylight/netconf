@@ -39,6 +39,30 @@
       },
       "revId": "37db811e4656cde5ba66bf9d898757fb54fbc644",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52097592_304a444f",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-14T14:09:31Z",
+      "side": 1,
+      "message": "This requires rework in PatchEntity.\nhttps://github.com/opendaylight/netconf/blob/master/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchEntity.java#L61\n\nI can do it in a separate patch.",
+      "parentUuid": "1dffa813_c5cd84ff",
+      "range": {
+        "startLine": 1051,
+        "startChar": 24,
+        "endLine": 1051,
+        "endChar": 100
+      },
+      "revId": "37db811e4656cde5ba66bf9d898757fb54fbc644",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
