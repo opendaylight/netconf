@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d0d57960_e46a1a99",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-14T13:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e4fa6b5_4f9ae2a6",
+      "revId": "a90c5a12804036cee2b3b78f58f03955dc86ec95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4b3aec75_430ffed4",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
         "patchSetId": 27
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a370337_c6d17440",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-14T13:11:46Z",
+      "side": 1,
+      "message": "Changed. Done",
+      "parentUuid": "4b3aec75_430ffed4",
+      "revId": "a90c5a12804036cee2b3b78f58f03955dc86ec95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "517788be_e8a0780d",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
         "patchSetId": 27
@@ -48,6 +84,24 @@
       "writtenOn": "2025-02-14T09:29:39Z",
       "side": 1,
       "message": "Test implementation will be used for now until there is a way to set supported features for subscriptions.",
+      "revId": "a90c5a12804036cee2b3b78f58f03955dc86ec95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "343e3d1b_4b95b1bc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-14T13:11:46Z",
+      "side": 1,
+      "message": "That does not work - we want to test our real implementation.",
+      "parentUuid": "517788be_e8a0780d",
       "revId": "a90c5a12804036cee2b3b78f58f03955dc86ec95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
