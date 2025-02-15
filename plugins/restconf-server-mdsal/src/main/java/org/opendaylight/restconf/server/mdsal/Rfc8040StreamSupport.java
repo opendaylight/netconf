@@ -61,14 +61,9 @@ final class Rfc8040StreamSupport extends StreamSupport {
     @Override
     void putStream(final DOMDataTreeWriteOperations transaction, final RestconfStream<?> stream,
             final String description, final @Nullable URI restconfURI) {
-        // ietf-restconf-monitoring requires a location, if we do not have
-        if (restconfURI == null) {
-            LOG.debug("Stream {} does not have a location, skipping not exposing it through ietf-restconf-monitoring",
-                stream.name());
-            return;
-        }
-
-        final var baseStreamLocation = locationProvider.baseStreamLocation(restconfURI);
+        // ietf-restconf-monitoring requires a location, if we do not have base location we use relative location
+        final var baseStreamLocation = restconfURI != null ? locationProvider.baseStreamLocation(restconfURI)
+            : locationProvider.relativeStreamLocation();
         final var entry = streamEntry(stream.name(), description, baseStreamLocation.toString(),
             stream.encodings());
         transaction.put(LogicalDatastoreType.OPERATIONAL, RESTCONF_STATE_STREAMS.node(entry.name()), entry);
