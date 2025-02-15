@@ -76,6 +76,13 @@ public final class RestconfStream<T> {
          * @return base location URL
          */
         URI baseStreamLocation(URI restconfURI);
+
+        /**
+         * Return the relative location URL of the streams service after the base restconf path.
+         *
+         * @return base location URL
+         */
+        URI relativeStreamLocation();
     }
 
     /**
@@ -168,6 +175,18 @@ public final class RestconfStream<T> {
          */
         <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
+
+        /**
+         * Create a {@link RestconfStream} with a given name. This method will create the corresponding instance
+         * and register it.
+         *
+         * @param <T> Stream type
+         * @param name unique name as stream identifier
+         * @param source Stream instance
+         * @param description Stream description
+         * @throws NullPointerException if any argument is {@code null}
+         */
+        <T> void createStream(String name, Source<T> source, String description);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
