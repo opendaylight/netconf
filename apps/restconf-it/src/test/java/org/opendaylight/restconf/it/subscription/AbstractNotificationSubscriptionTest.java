@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -70,6 +71,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.DeleteSubscriptionRpc;
 import org.opendaylight.restconf.subscription.EstablishSubscriptionRpc;
 import org.opendaylight.restconf.subscription.KillSubscriptionRpc;
@@ -194,8 +196,19 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         domNotificationRouter = new DOMNotificationRouter(32);
         final var subscriptionStateService =
             new SubscriptionStateService(domNotificationRouter.notificationPublishService());
+        final var locationProvider = new RestconfStream.LocationProvider() {
+            @Override
+            public URI baseStreamLocation(URI restconfURI) {
+                return restconfURI.resolve("streams");
+            }
+
+            @Override
+            public URI relativeStreamLocation() {
+                return URI.create("/streams");
+            }
+        };
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
-            schemaService, uri -> uri.resolve("streams"), dataBindProvider);
+            schemaService, locationProvider, dataBindProvider);
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested
