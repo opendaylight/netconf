@@ -97,6 +97,24 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
         }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public <T> void createStream(String name, RestconfStream.Source<T> source, String description) {
+        final var stream = new RestconfStream<>(this, source, name);
+
+        Futures.addCallback(putStream(streamEntry(description)), new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(final Object result) {
+                registerStream(name, stream);
+                LOG.debug("Stream {} added", name);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Failed to add stream {}", name, cause);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
     private static @NonNull MapEntryNode streamEntry(final String description) {
         return ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Stream.QNAME, STREAM_NAME_QNAME,
