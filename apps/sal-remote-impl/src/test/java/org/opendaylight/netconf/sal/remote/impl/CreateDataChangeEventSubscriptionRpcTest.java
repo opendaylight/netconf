@@ -43,6 +43,7 @@ import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
@@ -92,8 +93,19 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         doCallRealMethod().when(dataBroker).extension(any());
-        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(
-            restconfURI -> restconfURI.resolve(TEST_STREAMS), dataBroker), databindProvider, dataBroker);
+        final var locationProvider = new RestconfStream.LocationProvider() {
+            @Override
+            public URI baseStreamLocation(URI restconfURI) {
+                return restconfURI.resolve(TEST_STREAMS);
+            }
+
+            @Override
+            public URI relativeStreamLocation() {
+                return URI.create("/" + TEST_STREAMS);
+            }
+        };
+        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(locationProvider, dataBroker),
+                databindProvider, dataBroker);
     }
 
     @Test
