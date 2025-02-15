@@ -27,6 +27,7 @@ public final class NetconfDeviceBuilder {
     private Executor processingExecutor;
     private DeviceActionFactory deviceActionFactory;
     private BaseNetconfSchemaProvider baseSchemaProvider;
+    private boolean isNetconfStreamNotificationsEnabled;
 
     public @NonNull NetconfDeviceBuilder setReconnectOnSchemasChange(final boolean reconnectOnSchemasChange) {
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -64,6 +65,12 @@ public final class NetconfDeviceBuilder {
         return this;
     }
 
+    public @NonNull NetconfDeviceBuilder setNetconfStreamNotificationsEnabled(
+            final boolean netconfStreamNotificationsEnabled) {
+        this.isNetconfStreamNotificationsEnabled = netconfStreamNotificationsEnabled;
+        return this;
+    }
+
     public @NonNull NetconfDevice build() {
         return new NetconfDevice(
             requireNonNull(id, "RemoteDeviceId is not initialized"),
@@ -71,6 +78,6 @@ public final class NetconfDeviceBuilder {
             requireNonNull(deviceSchemaProvider, "DeviceNetconfSchemaProvider is not initialized"),
             requireNonNull(salFacade, "RemoteDeviceHandler is not initialized"),
             requireNonNull(processingExecutor, "Executor is not initialized"),
-            reconnectOnSchemasChange, deviceActionFactory);
+            reconnectOnSchemasChange, deviceActionFactory, isNetconfStreamNotificationsEnabled);
     }
 }

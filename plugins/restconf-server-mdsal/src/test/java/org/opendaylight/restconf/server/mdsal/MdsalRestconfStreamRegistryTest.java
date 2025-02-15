@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,6 +102,7 @@ class MdsalRestconfStreamRegistryTest {
         when(dataBroker.extension(DOMDataBroker.DataTreeChangeExtension.class)).thenReturn(dtxExt);
         when(dtxExt.registerTreeChangeListener(any(), any())).thenReturn(regMock);
         when(schemaService.getGlobalContext()).thenReturn(effectiveModelContext);
+        when(locProvider.relativeStreamLocation()).thenReturn(java.net.URI.create(URI));
         registry = new MdsalRestconfStreamRegistry(dataBroker, notifService, schemaService, locProvider,
             databindProvider);
     }

@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 @NonNullByDefault
 public final class JaxRsLocationProvider implements LocationProvider {
     private static final URI STREAMS = URI.create(JaxRsRestconf.STREAMS_SUBPATH);
+    private static final URI RELATIVE_STREAMS = URI.create("/" + JaxRsRestconf.STREAMS_SUBPATH);
 
     @Inject
     @Activate
@@ -33,5 +34,10 @@ public final class JaxRsLocationProvider implements LocationProvider {
     @Override
     public URI baseStreamLocation(final URI restconfURI) {
         return restconfURI.resolve(STREAMS);
+    }
+
+    @Override
+    public URI relativeStreamLocation() {
+        return RELATIVE_STREAMS;
     }
 }
