@@ -220,7 +220,18 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> AbstractInstanceIdentifierTest.IID_DATABIND;
-        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, x -> x);
+        final var locationProvider = new RestconfStream.LocationProvider() {
+            @Override
+            public URI baseStreamLocation(URI restconfURI) {
+                return restconfURI;
+            }
+
+            @Override
+            public URI relativeStreamLocation() {
+                return null;
+            }
+        };
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, locationProvider);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,

@@ -64,6 +64,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final BaseNetconfSchemaProvider baseSchemaProvider;
     private final DeviceNetconfSchemaProvider deviceSchemaProvider;
     private final Executor processingExecutor;
+    private final boolean isNetconfStreamNotificationsEnabled;
 
     private final RemoteDeviceHandler salFacade;
     private final DeviceActionFactory deviceActionFactory;
@@ -77,15 +78,16 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
-            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
+            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange,
+            final boolean isNetconfStreamNotificationsEnabled) {
         this(id, baseSchemaProvider, deviceSchemaProvider, salFacade, globalProcessingExecutor,
-            reconnectOnSchemasChange, null);
+            reconnectOnSchemasChange, null, isNetconfStreamNotificationsEnabled);
     }
 
     public NetconfDevice(final RemoteDeviceId id, final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
             final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory) {
+            final DeviceActionFactory deviceActionFactory, final boolean isNetconfStreamNotificationsEnabled) {
         this.id = requireNonNull(id);
         this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
         this.deviceSchemaProvider = requireNonNull(deviceSchemaProvider);
@@ -93,6 +95,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         this.deviceActionFactory = deviceActionFactory;
         this.salFacade = salFacade;
         processingExecutor = requireNonNull(globalProcessingExecutor);
+        this.isNetconfStreamNotificationsEnabled = isNetconfStreamNotificationsEnabled;
         notificationHandler = new NotificationHandler(salFacade, id);
     }
 
@@ -155,28 +158,31 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
-                notificationHandler.addNotificationFilter(notification -> {
-                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().name().getNodeType())) {
-                        LOG.info("{}: Schemas change detected, reconnecting", id);
-                        // Only disconnect is enough,
-                        // the reconnecting nature of the connector will take care of reconnecting
-                        listener.disconnect();
-                        return false;
-                    }
-                    return true;
-                });
+                LOG.info("{}: Created subscription for 'NETCONF' notification stream.", id);
+                if (reconnectOnSchemasChange) {
+                    notificationHandler.addNotificationFilter(notification -> {
+                        if (NetconfCapabilityChange.QNAME.equals(notification.getBody().name().getNodeType())) {
+                            LOG.info("{}: Schemas change detected, reconnecting", id);
+                            // Only disconnect is enough,
+                            // the reconnecting nature of the connector will take care of reconnecting
+                            listener.disconnect();
+                            return false;
+                        }
+                        return true;
+                    });
+                }
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.warn("Unable to subscribe to base notification stream. Schemas will not be reloaded on the fly",
-                        throwable);
+                LOG.warn("Unable to subscribe to 'NETCONF' notification stream.", throwable);
             }
         }, MoreExecutors.directExecutor());
     }
 
-    private boolean shouldListenOnSchemaChange(final NetconfSessionPreferences remoteSessionCapabilities) {
-        return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
+    private boolean shouldSubscribeForNetconfNotifications(final NetconfSessionPreferences remoteSessionCapabilities) {
+        return remoteSessionCapabilities.isNotificationsSupported() && (reconnectOnSchemasChange
+                || isNetconfStreamNotificationsEnabled);
     }
 
     private synchronized void handleSalInitializationSuccess(final NetconfDeviceCommunicator listener,
@@ -189,7 +195,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             return;
         }
 
-        if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
+        if (shouldSubscribeForNetconfNotifications(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(deviceRpc, listener);
         }
 

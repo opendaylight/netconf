@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -69,6 +70,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.netty.TestRequestCallback;
 import org.opendaylight.restconf.server.netty.TestTransportChannelListener;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
@@ -176,7 +178,18 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         final var publishService = new RouterDOMPublishNotificationService(router);
         final var subscriptionStateService = new SubscriptionStateService(publishService);
         final var stateMachine = new SubscriptionStateMachine();
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        final var locationProvider = new RestconfStream.LocationProvider() {
+            @Override
+            public URI baseStreamLocation(URI restconfURI) {
+                return restconfURI.resolve("streams");
+            }
+
+            @Override
+            public URI relativeStreamLocation() {
+                return URI.create("/streams");
+            }
+        };
+        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, locationProvider);
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested

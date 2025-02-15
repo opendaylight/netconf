@@ -101,11 +101,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @Override
     public final <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
             final RestconfStream.Source<T> source, final String description) {
-        final var stream = allocateStream(source);
-        final var name = stream.name();
         if (description.isBlank()) {
             throw new IllegalArgumentException("Description must be descriptive");
         }
+
+        final var stream = allocateStream(source);
+        final var name = stream.name();
 
         Futures.addCallback(putStream(stream, description, restconfURI), new FutureCallback<>() {
             @Override
@@ -121,6 +122,30 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 request.completeWith(new RequestException("Failed to create stream " + name, cause));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public <T> void createStream(String name, RestconfStream.Source<T> source, String description) {
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("Description must be descriptive");
+        }
+
+        final var stream = new RestconfStream<>(this, source, name);
+        streams.putIfAbsent(name, stream);
+
+        Futures.addCallback(putStream(stream, description, null),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.debug("Stream {} added", name);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.debug("Failed to add stream {}", name, cause);
+                    streams.remove(name, stream);
+                }
+            }, MoreExecutors.directExecutor());
     }
 
     @Override
