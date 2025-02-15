@@ -118,6 +118,29 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public <T> void createStream(String name, RestconfStream.Source<T> source, String description) {
+        final var stream = new RestconfStream<>(this, source, name);
+        registerStream(name, stream);
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("Description must be descriptive");
+        }
+
+        Futures.addCallback(putStream(streamEntry(name, description, locationProvider.relativeStreamLocation().toString(),
+                stream.encodings())), new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(final Object result) {
+                LOG.debug("Stream {} added", name);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Failed to add stream {}", name, cause);
+                unregisterStream(name, stream);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
 
     @VisibleForTesting
     public static @NonNull MapEntryNode streamEntry(final String name, final String description,

@@ -82,6 +82,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.Root;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleAction;
@@ -193,7 +194,18 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         actionProviderService.registerImplementation(
             ActionSpec.builder(Root.class).build(ExampleAction.class), new ExampleActionImpl());
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(uri -> uri.resolve("streams"), domDataBroker);
+        final var locationProvider = new RestconfStream.LocationProvider() {
+            @Override
+            public URI baseStreamLocation(URI restconfURI) {
+                return restconfURI.resolve("streams");
+            }
+
+            @Override
+            public URI relativeStreamLocation() {
+                return URI.create("/streams");
+            }
+        };
+        final var streamRegistry = new MdsalRestconfStreamRegistry(locationProvider, domDataBroker);
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
