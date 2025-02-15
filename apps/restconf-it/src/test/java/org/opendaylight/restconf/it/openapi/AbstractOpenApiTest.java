@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -84,6 +85,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
@@ -189,9 +191,20 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
         domNotificationRouter = new DOMNotificationRouter(32);
+        final var locationProvider = new RestconfStream.LocationProvider() {
+            @Override
+            public URI baseStreamLocation(URI restconfURI) {
+                return restconfURI.resolve("streams");
+            }
+
+            @Override
+            public URI relativeStreamLocation() {
+                return URI.create("/streams");
+            }
+        };
 
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
-            schemaService, uri -> uri.resolve("streams"), dataBindProvider);
+            schemaService, locationProvider, dataBindProvider);
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
             domRpcRouter.actionService(), domMountPointService, List.of());
 
