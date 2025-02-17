@@ -9,11 +9,16 @@ package org.opendaylight.netconf.transport.ssh;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.netconf.shaded.sshd.common.session.SessionListener.Event.Authenticated;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildClientAuthWithPassword;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildClientIdentityWithPassword;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildServerIdentityWithKeyPair;
@@ -22,10 +27,12 @@ import static org.opendaylight.netconf.transport.ssh.TestUtils.generateKeyPairWi
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -57,6 +64,61 @@ public class NC1423Test extends AbstractClientServerTest {
             .configurator(null)
             .buildChecked();
         transportSshSpy = spy(transportSshClient);
+    }
+
+    @Test
+    void testAuthenticationSessionEventFailure() throws Exception {
+        // Prepares a use case where Authenticated sessionEvent is called and fails to register a channel
+        // into the ConnectionService.
+        final var sessionRegisterExc = new IOException("Failed to initialize and register channel");
+        doAnswer(sessionListenerInv -> {
+            final var sessionListenerSpy = spy(sessionListenerInv.<SessionListener>getArgument(0));
+            // Capture sessionEvent on spy SessionListener and modifies its parameters to throw an IOException.
+            doAnswer(sessionEventInv -> {
+                final var sessionArg = sessionEventInv.<Session>getArgument(0);
+
+                // Prepare mocked session with correct ID.
+                final var sessionMock = mock(TransportClientSession.class);
+                final var ioSessionMock = mock(IoSession.class);
+                doReturn(sessionArg.getIoSession().getId()).when(ioSessionMock).getId();
+                doReturn(ioSessionMock).when(sessionMock).getIoSession();
+                // Throw exception when createSubsystemChannel method is called.
+                doThrow(sessionRegisterExc).when(sessionMock).createSubsystemChannel(eq(SUBSYSTEM));
+
+                // Replace original arguments with mock session and Authenticated Event.
+                final var arguments = sessionEventInv.getArguments();
+                arguments[0] = sessionMock;
+                arguments[1] = Authenticated;
+                // Invoke real sessionEvent method with modified parameters.
+                return sessionEventInv.callRealMethod();
+            }).when(sessionListenerSpy).sessionEvent(any(), any());
+
+            // Replace original arguments with prepared spy Listener.
+            final var arguments = sessionListenerInv.getArguments();
+            arguments[0] = sessionListenerSpy;
+            // Invoke real addSessionListener method with modified parameters.
+            return sessionListenerInv.callRealMethod();
+        }).when(transportSshSpy).addSessionListener(any());
+
+        final var sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        final var sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        try {
+            // Execute connect.
+            sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
+            sshClient.connect(clientBootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+
+            // Verify thrown IOException exception.
+            final var exceptionCapture = ArgumentCaptor.forClass(IOException.class);
+            verify(clientListener, timeout(200000)).onTransportChannelFailed(exceptionCapture.capture());
+            final var receivedException = exceptionCapture.getValue();
+
+            // Verify correct exception message.
+            assertEquals(sessionRegisterExc, receivedException);
+        } finally {
+            // Close resources after test.
+            sshServer.shutdown().get(20, TimeUnit.SECONDS);
+            sshClient.shutdown().get(20, TimeUnit.SECONDS);
+        }
     }
 
     @Test

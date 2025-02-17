@@ -101,7 +101,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onAuthenticated(session);
                     } catch (IOException e) {
                         LOG.error("Post-authentication step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        transportFailed(sessionId, e);
                     }
                 }
                 case KexCompleted -> {
