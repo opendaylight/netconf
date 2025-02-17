@@ -33,6 +33,24 @@
       "message": "what about to move some parts to @Before?",
       "revId": "c68e128b36f3622e3f6675dfcccfb20d7a21fffd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c9a6128_e0721eb0",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/StateTransitionTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-02-17T11:37:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52745bba_660ba5db",
+      "revId": "c68e128b36f3622e3f6675dfcccfb20d7a21fffd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
