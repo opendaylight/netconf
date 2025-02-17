@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.ssh;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelHandlerContext;
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -68,8 +69,14 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionDisconnect(final Session session, final int reason, final String msg, final String language,
                 final boolean initiator) {
             final var sessionId = sessionId(session);
-            LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-            deleteSession(sessionId);
+            final var sb = new StringBuilder(SshConstants.getDisconnectReasonName(reason));
+            if (msg != null) {
+                sb.append(" \"").append(msg).append('"');
+            }
+            final var reasonStr = sb.toString();
+
+            LOG.debug("Session {} disconnected: {}", sessionId, reasonStr);
+            transportFailed(sessionId, new EOFException("Session disconnected: " + reasonStr));
         }
 
         @Override
