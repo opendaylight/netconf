@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
@@ -56,6 +57,47 @@ public class NC1423Test extends AbstractClientServerTest {
             .configurator(null)
             .buildChecked();
         transportSshSpy = spy(transportSshClient);
+    }
+
+    @Test
+    void testSessionDisconnectWhileClientProcessingConnect() throws Exception {
+        // Prepares a use case where sessionDisconnect is invoked when sessionEvent is processed.
+        doAnswer(sessionListenerInv -> {
+            final var sessionListenerSpy = spy(sessionListenerInv.<SessionListener>getArgument(0));
+            // Capture sessionEvent on spy SessionListener and invoke sessionDisconnect.
+            doAnswer(sessionEventInv -> {
+                final var sessionArg = sessionEventInv.<Session>getArgument(0);
+                // SSH2_DISCONNECT_BY_APPLICATION == 11
+                sessionListenerSpy.sessionDisconnect(sessionArg, 11, "disconnect", "lang", false);
+                return null;
+            }).when(sessionListenerSpy).sessionEvent(any(), any());
+
+            // Replace original arguments with prepared spy Listener.
+            final var arguments = sessionListenerInv.getArguments();
+            arguments[0] = sessionListenerSpy;
+            // Invoke real addSessionListener method with modified parameters.
+            return sessionListenerInv.callRealMethod();
+        }).when(transportSshSpy).addSessionListener(any());
+
+        final var sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        final var sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        try {
+            // Execute connect.
+            sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
+            sshClient.connect(clientBootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+
+            // Verify thrown IllegalStateException exception.
+            final var exceptionCapture = ArgumentCaptor.forClass(IllegalStateException.class);
+            verify(clientListener, timeout(2000)).onTransportChannelFailed(exceptionCapture.capture());
+            final var receivedException = exceptionCapture.getValue();
+
+            // Verify correct exception message.
+            assertEquals("Session 1 disconnected: SSH2_DISCONNECT_BY_APPLICATION", receivedException.getMessage());
+        } finally {
+            // Close resources after test.
+            sshServer.shutdown().get(20, TimeUnit.SECONDS);
+            sshClient.shutdown().get(20, TimeUnit.SECONDS);
+        }
     }
 
     @Test
