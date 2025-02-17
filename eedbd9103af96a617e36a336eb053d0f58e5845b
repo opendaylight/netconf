@@ -34,6 +34,24 @@
       "parentUuid": "3220dafe_34cb6e96",
       "revId": "eedbd9103af96a617e36a336eb053d0f58e5845b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cb81835_d41d0b99",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/NetconfRestconfTransaction.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-17T07:41:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38e82e03_3d38af45",
+      "revId": "eedbd9103af96a617e36a336eb053d0f58e5845b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
