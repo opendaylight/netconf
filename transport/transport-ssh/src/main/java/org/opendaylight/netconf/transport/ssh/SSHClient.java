@@ -64,6 +64,12 @@ public final class SSHClient extends SSHTransportStack {
             .buildChecked());
     }
 
+    @VisibleForTesting
+    static SSHClient of(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
+        final TransportSshClient transportSshClient) throws UnsupportedConfigurationException {
+        return new SSHClient(subsystem, listener, transportSshClient);
+    }
+
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
             throws UnsupportedConfigurationException {
         return connect(bootstrap, connectParams, asListener());
