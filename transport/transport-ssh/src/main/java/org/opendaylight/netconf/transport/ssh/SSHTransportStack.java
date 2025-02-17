@@ -68,8 +68,10 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         public void sessionDisconnect(final Session session, final int reason, final String msg, final String language,
                 final boolean initiator) {
             final var sessionId = sessionId(session);
-            LOG.debug("Session {} disconnected: {}", sessionId, SshConstants.getDisconnectReasonName(reason));
-            deleteSession(sessionId);
+            final var disconnectReasonName = SshConstants.getDisconnectReasonName(reason);
+            LOG.debug("Session {} disconnected: {}", sessionId, disconnectReasonName);
+            transportFailed(sessionId, new IllegalStateException("Session " + sessionId + " disconnected: "
+                + disconnectReasonName));
         }
 
         @Override
