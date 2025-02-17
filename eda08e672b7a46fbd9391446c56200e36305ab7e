@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e68dc67_73d036ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6258
+      },
+      "writtenOn": "2025-02-17T13:05:18Z",
+      "side": 1,
+      "message": "jjb-deploy netconf-csit-1node-gate-userfeatures-all-calcium",
+      "revId": "eda08e672b7a46fbd9391446c56200e36305ab7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
