@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -74,10 +74,7 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier OUTPUT_ID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionOutput.QNAME, "id").intern());
 
-    // Start subscription ID generation from the upper half of uint32 (2,147,483,648)
-    private static final long INITIAL_SUBSCRIPTION_ID = 2147483648L;
-
-    private final AtomicLong subscriptionIdCounter = new AtomicLong(INITIAL_SUBSCRIPTION_ID);
+    private final AtomicInteger subscriptionIdCounter = new AtomicInteger();
     private final MdsalNotificationService mdsalService;
     private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
@@ -111,7 +108,7 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var id = Uint32.valueOf(SubscriptionUtil.generateSubscriptionId(subscriptionIdCounter));
+        final var id = Uint32.fromIntBits(subscriptionIdCounter.incrementAndGet());
 
         final var subscriptionBuilder = new SubscriptionBuilder();
         subscriptionBuilder.setId(new SubscriptionId(id));
