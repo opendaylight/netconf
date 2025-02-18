@@ -120,7 +120,6 @@ class NetconfDeviceCommunicatorTest {
         return resultFuture;
     }
 
-    @SuppressWarnings("unchecked")
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithoutMocking(final String messageID,
         final boolean doLastTest) {
         final var doc = UntrustedXML.newDocumentBuilder().newDocument();
