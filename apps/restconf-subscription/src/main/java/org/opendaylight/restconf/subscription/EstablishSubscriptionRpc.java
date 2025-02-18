@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -43,6 +42,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -109,7 +109,20 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             return;
         }
         final var session = request.session();
-        final var id =  Uint32.valueOf(SubscriptionUtil.generateSubscriptionId(subscriptionIdCounter));
+
+        // FIXME: this is ugly, this should explicitly:
+        //        - define overflow mechanics: how can we operate when we reach 2^32?
+        //        - use AtomicInteger to store bits
+        //        - use Uint32.fromIntBits(int) and have no exception here
+        //        - have an explicit test covering this case
+        final var longId = subscriptionIdCounter.getAndIncrement();
+        final Uint32 id;
+        try {
+            id = Uint32.valueOf(longId);
+        } catch (IllegalArgumentException e) {
+            request.completeWith(new ServerException("Session ID overflow", e));
+            return;
+        }
 
         final var subscriptionBuilder = new SubscriptionBuilder();
         subscriptionBuilder.setId(new SubscriptionId(id));
@@ -204,7 +217,7 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
         mdsalService.writeSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()), node)
             .addCallback(new FutureCallback<CommitInfo>() {
                 @Override
-                public void onSuccess(CommitInfo result) {
+                public void onSuccess(final CommitInfo result) {
                     stateMachine.moveTo(id, SubscriptionState.ACTIVE);
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
@@ -213,14 +226,14 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
+                public void onFailure(final Throwable throwable) {
                     request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                         throwable.getCause().getMessage()));
                 }
             }, MoreExecutors.directExecutor());
     }
 
-    private static ContainerNode generateReceivers(String receiver) {
+    private static ContainerNode generateReceivers(final String receiver) {
         return ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
             .create(Receivers.QNAME))
                 .withChild(ImmutableNodes.newSystemMapBuilder()
