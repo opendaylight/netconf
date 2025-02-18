@@ -92,7 +92,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                         onKeyEstablished(session);
                     } catch (IOException e) {
                         LOG.error("Post-key step failed on session {}", sessionId, e);
-                        deleteSession(sessionId);
+                        transportFailed(sessionId, e);
                     }
                 }
                 case Authenticated -> {
