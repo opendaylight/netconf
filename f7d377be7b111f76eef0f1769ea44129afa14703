@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb31d1b0_d4a8036c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-18T23:41:07Z",
+      "side": 1,
+      "message": "There is more to it than this. This patch will need to be rebased on top of https://git.opendaylight.org/gerrit/c/netconf/+/115468.\n\nRestconfNotification should be removed in favor of using  DOMNotificationEvent.Rfc6020.",
+      "revId": "f7d377be7b111f76eef0f1769ea44129afa14703",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
