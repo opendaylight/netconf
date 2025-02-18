@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.subscription;
 
-import java.util.concurrent.atomic.AtomicLong;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
@@ -41,15 +40,5 @@ public final class SubscriptionUtil {
 
     private SubscriptionUtil() {
         // hidden on purpose
-    }
-
-    /**
-     * Generates a new subscription ID.
-     * This method guarantees thread-safe, unique subscription IDs.
-     *
-     * @return A new subscription ID.
-     */
-    public static long generateSubscriptionId(final AtomicLong id) {
-        return id.getAndIncrement();
     }
 }
