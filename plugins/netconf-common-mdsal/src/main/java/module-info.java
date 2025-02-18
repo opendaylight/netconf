@@ -12,6 +12,7 @@ module org.opendaylight.netconf.common.mdsal {
     exports org.opendaylight.netconf.common.mdsal;
 
     requires transitive java.xml;
+    requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.yangtools.yang.data.api;
     requires transitive org.opendaylight.yangtools.yang.data.impl;
     requires com.google.common;
