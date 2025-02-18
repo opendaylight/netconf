@@ -69,8 +69,7 @@ public final class NormalizedDataUtil {
             final AnyXmlNamespaceContext namespaceContext = new AnyXmlNamespaceContext(Map.of("op", netconfNamespace));
 
             try {
-                final XMLStreamWriter testWriter = xmlFactory.createXMLStreamWriter(new DOMResult(
-                    XmlUtil.newDocument()));
+                final var testWriter = xmlFactory.createXMLStreamWriter(new DOMResult(XmlUtil.newDocument()));
                 testWriter.setNamespaceContext(namespaceContext);
             } catch (final UnsupportedOperationException e) {
                 // This happens with JDK's DOM writer, which we may be using

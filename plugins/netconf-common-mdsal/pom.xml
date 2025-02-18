@@ -11,14 +11,20 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>bnd-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../../bnd-parent</relativePath>
     </parent>
 
     <artifactId>netconf-common-mdsal</artifactId>
+    <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-    <packaging>bundle</packaging>
+    <description>NETCONF/MD-SAL commons</description>
+
+    <properties>
+        <!-- FIXME: remove this override -->
+        <odlparent.dependency.enforce>false</odlparent.dependency.enforce>
+    </properties>
 
     <dependencies>
         <dependency>
