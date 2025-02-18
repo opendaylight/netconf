@@ -111,7 +111,19 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var id = Uint32.valueOf(SubscriptionUtil.generateSubscriptionId(subscriptionIdCounter));
+        // FIXME: this is ugly, this should explicitly:
+        //        - define overflow mechanics: how can we operate when we reach 2^32?
+        //        - use AtomicInteger to store bits
+        //        - use Uint32.fromIntBits(int) and have no exception here
+        //        - have an explicit test covering this case
+        final var longId = subscriptionIdCounter.getAndIncrement();
+        final Uint32 id;
+        try {
+            id = Uint32.valueOf(longId);
+        } catch (IllegalArgumentException e) {
+            request.completeWith(new ServerException("Session ID overflow", e));
+            return;
+        }
 
         final var subscriptionBuilder = new SubscriptionBuilder();
         subscriptionBuilder.setId(new SubscriptionId(id));
