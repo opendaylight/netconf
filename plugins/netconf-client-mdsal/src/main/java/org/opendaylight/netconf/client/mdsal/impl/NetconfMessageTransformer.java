@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -41,11 +40,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMEvent;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -55,6 +51,7 @@ import org.opendaylight.netconf.client.mdsal.api.ActionTransformer;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
@@ -99,6 +96,15 @@ import org.w3c.dom.NodeList;
 
 public class NetconfMessageTransformer
         implements ActionTransformer, NotificationTransformer, RpcTransformer<ContainerNode, DOMRpcResult> {
+    @NonNullByDefault
+    private record NestedNotificationInfo(Absolute type, YangInstanceIdentifier path, Element element) {
+        NestedNotificationInfo {
+            requireNonNull(type);
+            requireNonNull(path);
+            requireNonNull(element);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
@@ -165,7 +171,7 @@ public class NetconfMessageTransformer
     }
 
     @Override
-    public synchronized DOMNotification toNotification(final NetconfMessage message) {
+    public synchronized DOMNotificationEvent toNotification(final NetconfMessage message) {
         final Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
@@ -181,24 +187,24 @@ public class NetconfMessageTransformer
         if (!matchingTopLevel.isEmpty()) {
             final var notification = getMostRecentNotification(matchingTopLevel);
             // FIXME: we really should have a pre-constructed identifier here
-            return new NetconfDeviceNotification(toNotification(Absolute.of(notification.getQName()), element),
+            return new DOMNotificationEvent.Rfc6020(toNotification(Absolute.of(notification.getQName()), element),
                 stripped.getKey());
         }
 
         final var nestedInfo = findNestedNotification(message, element)
             .orElseThrow(() -> new IllegalArgumentException("Unable to parse notification for " + element
                 + ". Available notifications: " + mappedNotifications.keySet()));
-        final var schemaPath = nestedInfo.schemaPath;
-        return new NetconfDeviceTreeNotification(toNotification(schemaPath, nestedInfo.element), schemaPath,
-            stripped.getKey(), nestedInfo.instancePath);
+        return new DOMNotificationEvent.Rfc7950(nestedInfo.type, nestedInfo.path,
+            toNotification(nestedInfo.type, nestedInfo.element), stripped.getKey());
     }
 
     @GuardedBy("this")
+    @NonNullByDefault
     private ContainerNode toNotification(final Absolute notificationPath, final Element element) {
-        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
+        final var resultHolder = new NormalizationResultHolder();
         try {
-            final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
+            final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+            final var xmlParser = XmlParserStream.create(writer, mountContext,
                 SchemaInferenceStack.of(mountContext.modelContext(), notificationPath).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException | UnsupportedOperationException e) {
@@ -253,8 +259,10 @@ public class NetconfMessageTransformer
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
             schemaBuilder.add(schemaNode.getQName());
 
-            return new NestedNotificationInfo(Absolute.of(schemaBuilder),
-                DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, instanceBuilder.build()), xmlNode);
+            if (xmlNode instanceof Element element) {
+                return new NestedNotificationInfo(Absolute.of(schemaBuilder), instanceBuilder.build(), element);
+            }
+            throw new IllegalArgumentException("Unexpected document node " + xmlNode);
         }
         throw new IllegalStateException("No notification found");
     }
@@ -477,68 +485,5 @@ public class NetconfMessageTransformer
             throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
         }
         return (ContainerNode) resultHolder.getResult().data();
-    }
-
-    @Beta
-    public static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
-        private final ContainerNode content;
-        private final Absolute schemaPath;
-        private final Instant eventTime;
-
-        NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
-            this.content = content;
-            this.eventTime = eventTime;
-            schemaPath = Absolute.of(content.name().getNodeType());
-        }
-
-        NetconfDeviceNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime) {
-            this.content = content;
-            this.eventTime = eventTime;
-            this.schemaPath = schemaPath;
-        }
-
-        @Override
-        public Absolute getType() {
-            return schemaPath;
-        }
-
-        @Override
-        public ContainerNode getBody() {
-            return content;
-        }
-
-        @Override
-        public Instant getEventInstant() {
-            return eventTime;
-        }
-    }
-
-    @Beta
-    public static class NetconfDeviceTreeNotification extends NetconfDeviceNotification {
-        private final DOMDataTreeIdentifier domDataTreeIdentifier;
-
-        NetconfDeviceTreeNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime,
-                final DOMDataTreeIdentifier domDataTreeIdentifier) {
-            super(content, schemaPath, eventTime);
-            this.domDataTreeIdentifier = domDataTreeIdentifier;
-        }
-
-        public DOMDataTreeIdentifier getDomDataTreeIdentifier() {
-            return domDataTreeIdentifier;
-        }
-    }
-
-    private static final class NestedNotificationInfo {
-        final @NonNull DOMDataTreeIdentifier instancePath;
-        final @NonNull Absolute schemaPath;
-        final @NonNull Element element;
-
-        NestedNotificationInfo(final Absolute schemaPath, final DOMDataTreeIdentifier instancePath,
-                final Node documentNode) {
-            this.schemaPath = requireNonNull(schemaPath);
-            this.instancePath = requireNonNull(instancePath);
-            checkArgument(documentNode instanceof Element, "Unexpected document node %s", documentNode);
-            element = (Element) documentNode;
-        }
     }
 }

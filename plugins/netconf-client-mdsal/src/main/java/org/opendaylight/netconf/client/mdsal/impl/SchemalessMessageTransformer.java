@@ -8,12 +8,12 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -38,7 +38,7 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
     }
 
     @Override
-    public DOMNotification toNotification(final NetconfMessage message) {
+    public DOMNotificationEvent toNotification(final NetconfMessage message) {
         final var stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
@@ -49,7 +49,7 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
                     + message + ", cannot find namespace", e);
         }
 
-        return new NetconfMessageTransformer.NetconfDeviceNotification(ImmutableNodes.newContainerBuilder()
+        return new DOMNotificationEvent.Rfc6020(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(SCHEMALESS_NOTIFICATION_PAYLOAD)
             .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                 .withNodeIdentifier(new NodeIdentifier(notificationNoRev))
