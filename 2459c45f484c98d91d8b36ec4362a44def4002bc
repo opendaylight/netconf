@@ -70,6 +70,30 @@
       },
       "revId": "2459c45f484c98d91d8b36ec4362a44def4002bc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e6b71a5_c389bfd9",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-18T13:46:12Z",
+      "side": 1,
+      "message": "so the entire DTO is passed to here: https://github.com/opendaylight/netconf/blob/2b7832cfbcc706981da929669ff50118fa0662d2/apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java#L21-L22\n\nand the only thing that is being used from there is the ID, from whence we extract the original Uint32: https://github.com/opendaylight/netconf/blob/2b7832cfbcc706981da929669ff50118fa0662d2/apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java#L31\n\nso construction of that DTO seems completely superfluous",
+      "parentUuid": "072af89d_e4cc325f",
+      "range": {
+        "startLine": 245,
+        "startChar": 28,
+        "endLine": 245,
+        "endChar": 43
+      },
+      "revId": "2459c45f484c98d91d8b36ec4362a44def4002bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
