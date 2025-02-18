@@ -130,7 +130,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
                     onKeyEstablished(session);
                 } catch (IOException e) {
                     LOG.error("Post-key step failed on session {}", sessionId, e);
-                    deleteSession(sessionId);
+                    transportFailed(sessionId, e);
                 }
             }
             case Authenticated -> {
@@ -180,13 +180,6 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
             underlay.channel().close();
             notifyTransportChannelFailed(cause);
         });
-    }
-
-    @NonNullByDefault
-    private void deleteSession(final Long sessionId) {
-        sessions.remove(sessionId);
-        // auth failure, close underlay if any
-        completeUnderlay(sessionId, underlay -> underlay.channel().close());
     }
 
     @NonNullByDefault
