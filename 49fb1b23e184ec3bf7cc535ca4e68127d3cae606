@@ -57,6 +57,30 @@
       },
       "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5d520f7_142e44ad",
+        "filename": "apps/odl-device-notification/src/main/java/org/opendaylight/netconf/odl/device/notification/DeviceNotificationAggregate.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2025-02-18T15:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da4f7a4f_fdfc624f",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 7
+      },
+      "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
