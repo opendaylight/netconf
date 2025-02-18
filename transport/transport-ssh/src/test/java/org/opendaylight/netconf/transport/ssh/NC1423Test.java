@@ -21,6 +21,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.shaded.sshd.common.session.SessionListener.Event.Authenticated;
+import static org.opendaylight.netconf.shaded.sshd.common.session.SessionListener.Event.KeyEstablished;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildClientAuthWithPassword;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildClientIdentityWithPassword;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildServerIdentityWithKeyPair;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.netconf.shaded.sshd.common.SshException;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
@@ -88,6 +90,56 @@ class NC1423Test extends AbstractClientServerTest {
                 }
             }, "SSH Client shutdown failed")
         );
+    }
+
+    @Test
+    void testKeyEstablishedEventFailure() throws Exception {
+        // Prepares a use case where KeyEstablished sessionEvent is called and fails to update current authFutureHolder
+        // in ClientUserAuthService.
+        final var authFutureUpdateExc = new SshException("Authentication already ongoing");
+        doAnswer(sessionListenerInv -> {
+            final var sessionListenerSpy = spy(sessionListenerInv.<SessionListener>getArgument(0));
+            // Capture sessionEvent on spy SessionListener and modifies its parameters to throw an IOException.
+            doAnswer(sessionEventInv -> {
+                final var sessionArg = sessionEventInv.<Session>getArgument(0);
+
+                // Prepare mocked session with correct ID.
+                final var sessionMock = mock(TransportClientSession.class);
+                final var ioSessionMock = mock(IoSession.class);
+                doReturn(sessionArg.getIoSession().getId()).when(ioSessionMock).getId();
+                doReturn(ioSessionMock).when(sessionMock).getIoSession();
+                // Throw exception when createSubsystemChannel method is called.
+                doThrow(authFutureUpdateExc).when(sessionMock).auth();
+
+                // Replace original arguments with mock session and Authenticated Event.
+                final var arguments = sessionEventInv.getArguments();
+                arguments[0] = sessionMock;
+                arguments[1] = KeyEstablished;
+                // Invoke real sessionEvent method with modified parameters.
+                return sessionEventInv.callRealMethod();
+            }).when(sessionListenerSpy).sessionEvent(any(), any());
+
+            // Replace original arguments with prepared spy Listener.
+            final var arguments = sessionListenerInv.getArguments();
+            arguments[0] = sessionListenerSpy;
+            // Invoke real addSessionListener method with modified parameters.
+            return sessionListenerInv.callRealMethod();
+        }).when(transportSshSpy).addSessionListener(any());
+
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+
+        // Execute connect.
+        sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
+        sshClient.connect(clientBootstrap, tcpClientConfig).get(2, TimeUnit.SECONDS);
+
+        // Verify thrown IOException exception.
+        final var exceptionCapture = ArgumentCaptor.forClass(IOException.class);
+        verify(clientListener, timeout(2000)).onTransportChannelFailed(exceptionCapture.capture());
+        final var receivedException = exceptionCapture.getValue();
+
+        // Verify correct exception.
+        assertEquals(authFutureUpdateExc, receivedException);
     }
 
     @Test
