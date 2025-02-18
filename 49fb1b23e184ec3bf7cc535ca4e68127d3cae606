@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddeeecf1_15aaf750",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-18T15:00:02Z",
+      "side": 1,
+      "message": "overall I do not like how this is structured: at the end of the day this is an application working *on top of* netconf-topology, I do not quite see why it should require modifications across the stack.",
+      "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da4f7a4f_fdfc624f",
+        "filename": "apps/odl-device-notification/src/main/java/org/opendaylight/netconf/odl/device/notification/DeviceNotificationAggregate.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-18T15:00:02Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 7
+      },
+      "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
