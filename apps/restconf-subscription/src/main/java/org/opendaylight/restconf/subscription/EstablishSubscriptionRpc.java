@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -43,6 +42,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -95,11 +95,13 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
 
     @Override
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
-        if (request.session() == null) {
+        final var session = request.session();
+        if (session == null) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
                 "This end point does not support dynamic subscriptions."));
             return;
         }
+
         final var body = input.input();
         final var target = (DataContainerNode) body.childByArg(SUBSCRIPTION_TARGET);
         if (target == null) {
@@ -108,8 +110,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                 "No stream specified"));
             return;
         }
-        final var session = request.session();
-        final var id =  Uint32.valueOf(SubscriptionUtil.generateSubscriptionId(subscriptionIdCounter));
+
+        final var id = Uint32.valueOf(SubscriptionUtil.generateSubscriptionId(subscriptionIdCounter));
 
         final var subscriptionBuilder = new SubscriptionBuilder();
         subscriptionBuilder.setId(new SubscriptionId(id));
@@ -121,8 +123,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
         final var nodeTargetBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
             .create(SubscriptionUtil.QNAME_TARGET));
 
-        final var receiver = request.principal() == null ? "unknown" : request.principal().getName();
-        nodeBuilder.withChild(generateReceivers(receiver));
+        final var principal = request.principal();
+        nodeBuilder.withChild(generateReceivers(principal == null ? "unknown" : principal.getName()));
 
         // check stream name
         final var streamName = leaf(target, SUBSCRIPTION_STREAM, String.class);
@@ -204,7 +206,7 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
         mdsalService.writeSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()), node)
             .addCallback(new FutureCallback<CommitInfo>() {
                 @Override
-                public void onSuccess(CommitInfo result) {
+                public void onSuccess(final CommitInfo result) {
                     stateMachine.moveTo(id, SubscriptionState.ACTIVE);
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
@@ -213,14 +215,14 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
+                public void onFailure(final Throwable throwable) {
                     request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                         throwable.getCause().getMessage()));
                 }
             }, MoreExecutors.directExecutor());
     }
 
-    private static ContainerNode generateReceivers(String receiver) {
+    private static ContainerNode generateReceivers(final String receiver) {
         return ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
             .create(Receivers.QNAME))
                 .withChild(ImmutableNodes.newSystemMapBuilder()
