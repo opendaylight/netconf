@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "448ac0bb_a2ebc126",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2025-02-18T15:19:46Z",
+      "side": 1,
+      "message": "Yes, I agree it is an app on top of what is already implemented therefore the logic is in apps/odl-device-notification.\nTo avoid modifications across the stack would be better to:\n1. move changes from netconf-node-optional.yang to odl-device-notification.yang?\n2. call RPC \"create-subscription\" from DeviceNotificationAggregate instead of NetconfDevice?\n\nAny other proposal how to structure it better, please?",
+      "parentUuid": "ddeeecf1_15aaf750",
+      "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da4f7a4f_fdfc624f",
         "filename": "apps/odl-device-notification/src/main/java/org/opendaylight/netconf/odl/device/notification/DeviceNotificationAggregate.java",
         "patchSetId": 2
