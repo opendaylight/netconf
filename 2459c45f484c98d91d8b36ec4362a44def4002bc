@@ -46,6 +46,30 @@
       },
       "revId": "2459c45f484c98d91d8b36ec4362a44def4002bc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "072af89d_e4cc325f",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-18T13:39:49Z",
+      "side": 1,
+      "message": "I understand that, but I do not understand the overall need for the entire translation -- not saying there is none, but rather that is certainly non-obvious",
+      "parentUuid": "b0f2a59d_6bb44892",
+      "range": {
+        "startLine": 245,
+        "startChar": 28,
+        "endLine": 245,
+        "endChar": 43
+      },
+      "revId": "2459c45f484c98d91d8b36ec4362a44def4002bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
