@@ -115,8 +115,8 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
         subscriptionBuilder.setId(new SubscriptionId(id));
         final var streamBuilder = new StreamBuilder();
 
-        final var nodeBuilder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(NodeIdentifierWithPredicates
-            .of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id))
+        final var nodeBuilder = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id))
             .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id));
         final var nodeTargetBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
             .create(SubscriptionUtil.QNAME_TARGET));
