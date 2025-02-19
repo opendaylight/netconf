@@ -9,9 +9,7 @@ package org.opendaylight.restconf.notifications.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.BASE_QNAME;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.COMPLETED;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.MODIFIED;
@@ -21,17 +19,18 @@ import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateSer
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.SUSPENDED;
 import static org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService.TERMINATED;
 
-import com.google.common.util.concurrent.Futures;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.netconf.mdsal.testkit.MdsalTestkit;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.IetfRestconfSubscribedNotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -45,28 +44,32 @@ class SubscriptionStateServiceTest {
     private static final String STREAM_NAME = "NETCONF";
     private static final String ERROR_REASON = "example-error-reason";
 
-    private SubscriptionStateService notifications;
-
-    @Mock
-    private DOMNotificationPublishService mockPublishService;
+    private static MdsalTestkit TESTKIT;
 
     @Captor
     private ArgumentCaptor<DOMNotification> captor;
 
-    @BeforeEach
-    void setUp() {
-        notifications = new SubscriptionStateService(mockPublishService);
+    private final SubscriptionStateService notifications =
+        new SubscriptionStateService(TESTKIT.domNotificationPublishService());
+
+    @BeforeAll
+    static void beforeAll() {
+        TESTKIT = MdsalTestkit.builder(IetfRestconfSubscribedNotificationsData.class,
+            IetfSubscribedNotificationsData.class).build();
     }
 
-    enum SubscriptionType {
+    @AfterAll
+    static void afterAll() {
+        TESTKIT.close();
+    }
+
+    private enum SubscriptionType {
         MODIFIED, COMPLETED, RESUMED, TERMINATED, SUSPENDED
     }
 
     @ParameterizedTest
     @EnumSource(SubscriptionType.class)
     void testSubscriptionEvents(final SubscriptionType type) throws InterruptedException {
-        when(mockPublishService.putNotification(any())).thenReturn(Futures.immediateFuture(null));
-
         final QName eventQName = switch (type) {
             case MODIFIED -> {
                 notifications.subscriptionModified(EVENT_TIME, ID, URI, STREAM_NAME, FILTER);

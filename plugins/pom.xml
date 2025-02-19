@@ -29,6 +29,7 @@
     </properties>
 
     <modules>
+        <module>mdsal-testkit</module>
         <module>netconf-auth-aaa</module>
         <module>netconf-client-mdsal</module>
         <module>netconf-common-mdsal</module>
