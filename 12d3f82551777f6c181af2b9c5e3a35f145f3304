@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9569b424_848d1f77",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-19T10:33:22Z",
+      "side": 1,
+      "message": "no we are not, as evidenced in features/odl-restconf-notification/target/SFT/karaf.log:\n\nCaused by: java.lang.NullPointerException: Cannot invoke \"java.net.URI.resolve(java.net.URI)\" because \"restconfURI\" is null\n        at org.opendaylight.restconf.server.jaxrs.JaxRsLocationProvider.baseStreamLocation(JaxRsLocationProvider.java:35) ~[?:?]\n        at org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry.createStream(MdsalRestconfStreamRegistry.java:97) ~[?:?]\n        at org.opendaylight.restconf.subscription.ContextListener.\u003cinit\u003e(ContextListener.java:45) ~[?:?]\n        at org.opendaylight.restconf.subscription.NetconfStream.\u003cinit\u003e(NetconfStream.java:42) ~[?:?]\n        at jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62) ~[?:?]\n        ... 313 more\n\n\nalso createStream() is explicitly documented as rejecting null!",
+      "range": {
+        "startLine": 83,
+        "startChar": 41,
+        "endLine": 83,
+        "endChar": 77
+      },
+      "revId": "12d3f82551777f6c181af2b9c5e3a35f145f3304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d28ef91_d7f8bb16",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-19T10:33:22Z",
+      "side": 1,
+      "message": "should actually complete request with the stream",
+      "range": {
+        "startLine": 90,
+        "startChar": 16,
+        "endLine": 90,
+        "endChar": 24
+      },
+      "revId": "12d3f82551777f6c181af2b9c5e3a35f145f3304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be9b2b1b_8f47cf1b",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-19T10:33:22Z",
+      "side": 1,
+      "message": "should propagate cause to request",
+      "range": {
+        "startLine": 95,
+        "startChar": 16,
+        "endLine": 95,
+        "endChar": 25
+      },
+      "revId": "12d3f82551777f6c181af2b9c5e3a35f145f3304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
