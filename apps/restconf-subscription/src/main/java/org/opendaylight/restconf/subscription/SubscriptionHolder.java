@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.NoSuchElementException;
 import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -31,12 +32,11 @@ public record SubscriptionHolder(
         final var id = subscription.getId().getValue();
         try {
             stateMachine.moveTo(id, SubscriptionState.END);
-            subscriptionStateService.subscriptionTerminated(Instant.now().toString(),
-                id.longValue(), "subscription-kill");
+            subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
         } catch (InterruptedException e) {
-            LOG.warn("Could not send subscription terminated notification: {}", e.getMessage());
+            LOG.warn("Could not send subscription terminated notification", e);
         } catch (IllegalStateException | NoSuchElementException e) {
-            LOG.warn("Could not move subscription to END state: {}", e.getMessage());
+            LOG.warn("Could not move subscription to END state", e);
         }
 
         mdsalNotificationService.deleteSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(

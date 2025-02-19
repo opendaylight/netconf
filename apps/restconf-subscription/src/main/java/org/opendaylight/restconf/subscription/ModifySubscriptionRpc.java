@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -34,6 +33,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -79,7 +79,7 @@ public class ModifySubscriptionRpc extends RpcImplementation {
     }
 
     @Override
-    public void invoke(ServerRequest<ContainerNode> request, URI restconfURI, OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final Uint32 id;
         final DateAndTime stopTime;
@@ -163,7 +163,7 @@ public class ModifySubscriptionRpc extends RpcImplementation {
         mdsalService.mergeSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()), node)
             .addCallback(new FutureCallback<CommitInfo>() {
                 @Override
-                public void onSuccess(CommitInfo result) {
+                public void onSuccess(final CommitInfo result) {
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
                         .build());
@@ -178,17 +178,17 @@ public class ModifySubscriptionRpc extends RpcImplementation {
                             .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
                         final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
                             String.class);
-                        subscriptionStateService.subscriptionModified(Instant.now().toString(),
-                            id.longValue(), streamName, "uri", null);
+                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, "uri", null);
                     } catch (InterruptedException | ExecutionException e) {
-                        LOG.warn("Could not send subscription modify notification: {}", e.getMessage());
+                        LOG.warn("Could not send subscription modify notification", e);
                     }
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
-                    request.completeWith(new ServerException(ErrorType.APPLICATION,
-                        ErrorTag.OPERATION_FAILED, throwable.getCause().getMessage()));
+                public void onFailure(final Throwable throwable) {
+                    request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                        // FIXME: why getCause()?
+                        throwable.getCause()));
                 }
             }, MoreExecutors.directExecutor());
     }
