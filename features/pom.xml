@@ -47,13 +47,12 @@
         <module>odl-netconf-keystore</module>
         <module>odl-netconf-keystore-plaintext</module>
         <module>odl-netconf-mdsal</module>
-        <module>odl-netconf-ssh</module>
+        <module>odl-netconf-mdsal-common</module>
         <module>odl-netconf-test-tools</module>
         <module>odl-netconf-topology</module>
         <module>odl-netconf-transport</module>
         <module>odl-netconf-transport-api</module>
         <module>odl-netconf-truststore</module>
-        <module>odl-netconf-util</module>
         <module>odl-restconf</module>
         <module>odl-restconf-all</module>
         <module>odl-restconf-api</module>

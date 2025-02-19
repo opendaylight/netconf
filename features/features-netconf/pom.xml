@@ -78,13 +78,13 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-model-rfc5277</artifactId>
+            <artifactId>odl-netconf-mdsal-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-util</artifactId>
+            <artifactId>odl-netconf-model-rfc5277</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
