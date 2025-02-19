@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
  */
 @MetaInfServices
 @NonNullByDefault
-public class IetfSubscriptionFeatureProvider implements YangFeatureProvider<IetfSubscribedNotificationsData> {
+public final class IetfSubscriptionFeatureProvider implements YangFeatureProvider<IetfSubscribedNotificationsData> {
     @Override
     public Class<IetfSubscribedNotificationsData> boundModule() {
         return IetfSubscribedNotificationsData.class;
