@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = RpcImplementation.class)
-public class DeleteSubscriptionRpc extends RpcImplementation {
+public final class DeleteSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(DeleteSubscriptionInput.QNAME, "id").intern());
 

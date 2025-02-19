@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Singleton
 @Component(service = RpcImplementation.class)
-public class EstablishSubscriptionRpc extends RpcImplementation {
+public final class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER_NAME =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM =
