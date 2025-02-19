@@ -16,10 +16,17 @@
         <relativePath>../parent</relativePath>
     </parent>
 
-    <artifactId>odl-netconf-util</artifactId>
+    <artifactId>odl-netconf-mdsal-common</artifactId>
     <packaging>feature</packaging>
+    <description>Common NETCONF/MD-SAL components</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>odl-mdsal-dom-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>odl-yangtools-codec</artifactId>
@@ -36,6 +43,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-common-mdsal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-dom-api</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -380,6 +380,13 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>odl-netconf-mdsal-common</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-model-rfc5277</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
@@ -388,13 +395,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-monitoring</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>odl-netconf-util</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
