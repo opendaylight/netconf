@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "019421d7_cf6723cf",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-19T11:01:31Z",
+      "side": 1,
+      "message": "The problem is that createStream() is meant for dynamically-created stream (hence request and restconfURI).\n\nThe NETCONF stream is not such a thing: it really should not be created via this facility.",
+      "parentUuid": "9569b424_848d1f77",
+      "range": {
+        "startLine": 83,
+        "startChar": 41,
+        "endLine": 83,
+        "endChar": 77
+      },
+      "revId": "12d3f82551777f6c181af2b9c5e3a35f145f3304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5d28ef91_d7f8bb16",
         "filename": "plugins/restconf-notifications-mdsal/src/main/java/org/opendaylight/restconf/notifications/mdsal/RestconfSubscriptionsStreamRegistry.java",
         "patchSetId": 2
