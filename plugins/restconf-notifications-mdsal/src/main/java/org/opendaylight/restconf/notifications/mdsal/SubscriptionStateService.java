@@ -67,14 +67,14 @@ public class SubscriptionStateService {
      * {@link Uint32} as expressed in {@link SubscriptionId}.
      */
     private static final NodeIdentifier ID_NODEID =
-        NodeIdentifier.create(QName.create(SubscriptionCompleted.QNAME, "id"));
+        NodeIdentifier.create(QName.create(SubscriptionCompleted.QNAME, "id").intern());
     /**
      * {@link NodeIdentifier} of {@code leaf reason} in {@link SubscriptionSuspended} and
      * {@link SubscriptionTerminated}. Value domains are identities derived from {@link SubscriptionSuspendedReason} and
      * {@link SubscriptionTerminatedReason}.
      */
     private static final NodeIdentifier REASON_NODEID =
-        NodeIdentifier.create(QName.create(SubscriptionSuspended.QNAME, "reason"));
+        NodeIdentifier.create(QName.create(SubscriptionSuspended.QNAME, "reason").intern());
     /**
      * {@link NodeIdentifier} of {@code leaf stream-xpath-filter} alternative in {@link FilterSpec} as expressed in
      * {@link StreamXpathFilter#getStreamXpathFilter()}.
