@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = RpcImplementation.class)
-public class ModifySubscriptionRpc extends RpcImplementation {
+public final class ModifySubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "id").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER_NAME =

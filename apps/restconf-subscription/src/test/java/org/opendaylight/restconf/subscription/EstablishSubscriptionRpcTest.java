@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 import java.net.URI;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,11 +42,12 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
-public class EstablishSubscriptionRpcTest {
+class EstablishSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
 
@@ -73,7 +73,7 @@ public class EstablishSubscriptionRpcTest {
     private EstablishSubscriptionRpc rpc;
 
     @BeforeEach
-    public void before() {
+    void before() {
         final var mdsalService = new MdsalNotificationService(dataBroker);
         rpc = new EstablishSubscriptionRpc(mdsalService, subscriptionStateService, stateMachine);
     }
@@ -183,7 +183,7 @@ public class EstablishSubscriptionRpcTest {
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
             .withChild(ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
                     .create(SubscriptionUtil.QNAME_TARGET))
-                .withChild((ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF")))
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
                 .build())
             .build();
     }

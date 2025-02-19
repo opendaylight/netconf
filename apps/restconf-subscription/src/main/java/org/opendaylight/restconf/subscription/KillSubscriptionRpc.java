@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = RpcImplementation.class)
-public class KillSubscriptionRpc extends RpcImplementation {
+public final class KillSubscriptionRpc extends RpcImplementation {
     private static final YangInstanceIdentifier.NodeIdentifier SUBSCRIPTION_ID =
         YangInstanceIdentifier.NodeIdentifier.create(QName.create(KillSubscriptionInput.QNAME, "id").intern());
 

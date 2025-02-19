@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
-public class DeleteSubscriptionRpcTest {
+class DeleteSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
     private static final YangInstanceIdentifier.NodeIdentifierWithPredicates IDENTIFIER =
@@ -71,7 +71,7 @@ public class DeleteSubscriptionRpcTest {
     private DeleteSubscriptionRpc rpc;
 
     @BeforeEach
-    public void before() {
+    void before() {
         mdsalService = new MdsalNotificationService(dataBroker);
         rpc = new DeleteSubscriptionRpc(mdsalService, subscriptionStateService, stateMachine);
     }

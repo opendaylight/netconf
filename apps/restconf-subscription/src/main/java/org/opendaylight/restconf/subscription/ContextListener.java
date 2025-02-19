@@ -20,14 +20,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class recreates DefaultNotificationSource when model context is updated.
  */
 final class ContextListener implements Registration {
-    private static final Logger LOG = LoggerFactory.getLogger(ContextListener.class);
     private static final String NAME = "NETCONF";
     private static final QName NAME_QNAME = QName.create(Stream.QNAME, "name").intern();
     private static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
