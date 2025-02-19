@@ -20,14 +20,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class recreates DefaultNotificationSource when model context is updated.
  */
 final class ContextListener implements Registration {
-    private static final Logger LOG = LoggerFactory.getLogger(ContextListener.class);
     private static final String NAME = "NETCONF";
     private static final QName NAME_QNAME = QName.create(Stream.QNAME, "name").intern();
     private static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
@@ -45,6 +42,7 @@ final class ContextListener implements Registration {
         this.streamRegistry = streamRegistry;
         notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
 
+        // FIXME: NETCONF-714: fails during activation due to NPE induced by these nulls
         streamRegistry.createStream(null, null, notificationSource, DESCRIPTION);
         registration = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
@@ -55,6 +53,7 @@ final class ContextListener implements Registration {
         }
         notificationSource = new DefaultNotificationSource(notificationService, context);
 
+        // FIXME: NETCONF-714: fails with NPE induced by these nulls
         streamRegistry.createStream(null, null, notificationSource, DESCRIPTION);
     }
 

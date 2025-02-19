@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -43,6 +42,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Singleton
 @Component(service = RpcImplementation.class)
-public class EstablishSubscriptionRpc extends RpcImplementation {
+public final class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER_NAME =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM =
@@ -204,7 +204,7 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
         mdsalService.writeSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()), node)
             .addCallback(new FutureCallback<CommitInfo>() {
                 @Override
-                public void onSuccess(CommitInfo result) {
+                public void onSuccess(final CommitInfo result) {
                     stateMachine.moveTo(id, SubscriptionState.ACTIVE);
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
@@ -213,14 +213,14 @@ public class EstablishSubscriptionRpc extends RpcImplementation {
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
+                public void onFailure(final Throwable throwable) {
                     request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                         throwable.getCause().getMessage()));
                 }
             }, MoreExecutors.directExecutor());
     }
 
-    private static ContainerNode generateReceivers(String receiver) {
+    private static ContainerNode generateReceivers(final String receiver) {
         return ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
             .create(Receivers.QNAME))
                 .withChild(ImmutableNodes.newSystemMapBuilder()
