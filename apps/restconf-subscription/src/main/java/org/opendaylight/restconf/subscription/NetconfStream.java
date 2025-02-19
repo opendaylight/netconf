@@ -7,8 +7,7 @@
  */
 package org.opendaylight.restconf.subscription;
 
-
-import java.io.Closeable;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -29,8 +28,8 @@ import org.osgi.service.component.annotations.Reference;
  * <p>It automatically re-registers to current YANG notifications on controller's {@code EffectiveModelContext} change.
  */
 @Singleton
-@Component(service = {})
-public final class NetconfStream implements Closeable {
+@Component(service = { })
+public final class NetconfStream implements AutoCloseable {
     private final @NonNull Registration contextListenerReg;
 
     @Inject
@@ -43,6 +42,7 @@ public final class NetconfStream implements Closeable {
         contextListenerReg = new ContextListener(notificationService, schemaService, streamRegistry);
     }
 
+    @PreDestroy
     @Deactivate
     @Override
     public void close() {
