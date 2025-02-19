@@ -23,6 +23,12 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-aaa-netconf-plugin</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-all</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
@@ -35,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-aaa-netconf-plugin</artifactId>
+            <artifactId>odl-netconf-mdsal-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -45,13 +51,14 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-server-mdsal</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-nb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-server-mdsal</artifactId>
         </dependency>
     </dependencies>
 </project>
