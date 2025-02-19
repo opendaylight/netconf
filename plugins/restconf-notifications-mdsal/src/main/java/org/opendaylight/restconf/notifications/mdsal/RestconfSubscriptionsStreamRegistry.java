@@ -87,12 +87,12 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
             @Override
             public void onSuccess(final Object result) {
                 registerStream(DEFAULT_STREAM_NAME, stream);
-                LOG.debug("Stream {} added", DEFAULT_STREAM_NAME);
+                LOG.info("Subscribed notifications stream {} added", DEFAULT_STREAM_NAME);
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                LOG.debug("Failed to add stream {}", DEFAULT_STREAM_NAME, cause);
+                LOG.error("Failed to add subscribed notification stream {}", DEFAULT_STREAM_NAME, cause);
             }
         }, MoreExecutors.directExecutor());
     }
