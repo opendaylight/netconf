@@ -25,6 +25,7 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -67,7 +68,7 @@ public class DeleteSubscriptionRpc extends RpcImplementation {
     }
 
     @Override
-    public void invoke(ServerRequest<ContainerNode> request, URI restconfURI, OperationInput input) {
+    public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final Uint32 id;
         try {
@@ -102,21 +103,20 @@ public class DeleteSubscriptionRpc extends RpcImplementation {
                 .NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id)))
             .addCallback(new FutureCallback<CommitInfo>() {
                 @Override
-                public void onSuccess(CommitInfo result) {
+                public void onSuccess(final CommitInfo result) {
                     request.completeWith(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
                         .build());
                     stateMachine.moveTo(id, SubscriptionState.END);
                     try {
-                        subscriptionStateService.subscriptionTerminated(Instant.now().toString(),
-                            id.longValue(), "subscription-delete");
+                        subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
                     } catch (InterruptedException e) {
-                        LOG.warn("Could not send subscription terminated notification: {}", e.getMessage());
+                        LOG.warn("Could not send subscription terminated notification", e);
                     }
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
+                public void onFailure(final Throwable throwable) {
                     request.completeWith(new ServerException(ErrorType.APPLICATION,
                         ErrorTag.OPERATION_FAILED, throwable.getMessage()));
                 }
