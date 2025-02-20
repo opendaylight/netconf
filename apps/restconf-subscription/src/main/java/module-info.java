@@ -18,6 +18,7 @@ module org.opendaylight.restconf.subscription {
     requires transitive org.opendaylight.restconf.server.spi;
     requires transitive org.opendaylight.yangtools.concepts;
     requires transitive org.opendaylight.yangtools.yang.common;
+    requires org.opendaylight.netconf.common.mdsal;
     requires org.opendaylight.restconf.mdsal.spi;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.data.api;
