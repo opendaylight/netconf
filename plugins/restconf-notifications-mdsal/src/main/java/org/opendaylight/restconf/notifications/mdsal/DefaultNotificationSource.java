@@ -42,7 +42,8 @@ final class DefaultNotificationSource extends AbstractNotificationSource impleme
             .flatMap(module -> module.streamEffectiveSubstatements(NotificationEffectiveStatement.class))
             .map(notification -> SchemaNodeIdentifier.Absolute.of(notification.argument()))
             .toList();
-        return reg = notificationService.registerNotificationListener(new Listener(sink, () -> context), notifications);
+        return reg = notificationService.registerNotificationListener(new Listener(sink, () -> context),
+            notifications);
     }
 
     @Override
