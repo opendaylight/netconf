@@ -32,20 +32,20 @@ class StateTransitionTest {
         subscriptionStateMachine.registerSubscription(session, Uint32.ONE);
 
         // Checking default stating state
-        assertEquals(SubscriptionState.START, subscriptionStateMachine.getSubscriptionState(Uint32.ONE));
+        assertEquals(SubscriptionState.START, subscriptionStateMachine.lookupSubscriptionState(Uint32.ONE));
     }
 
     @Test
     void transitionStateTest() {
         // Transition state
         subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.ACTIVE);
-        assertEquals(SubscriptionState.ACTIVE, subscriptionStateMachine.getSubscriptionState(Uint32.ONE));
+        assertEquals(SubscriptionState.ACTIVE, subscriptionStateMachine.lookupSubscriptionState(Uint32.ONE));
     }
 
     @Test
     void illegalTransitionStateTest() {
         // Trying illegal state transition
         assertThrows(IllegalStateException.class,
-            () -> subscriptionStateMachine.moveTo(Uint32.ONE, SubscriptionState.START));
+            () -> subscriptionStateMachine.withState(Uint32.ONE, SubscriptionState.START));
     }
 }
