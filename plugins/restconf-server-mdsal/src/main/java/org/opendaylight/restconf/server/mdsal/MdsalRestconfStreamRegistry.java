@@ -9,32 +9,24 @@ package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.util.Set;
-import java.util.UUID;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.restconf.server.api.ServerException;
-import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.restconf.subscription.SubscriptionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -48,110 +40,88 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Component(service = RestconfStream.Registry.class)
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry {
-    @VisibleForTesting
-    public static final QName NAME_QNAME =  QName.create(Stream.QNAME, "name").intern();
-    @VisibleForTesting
-    public static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
-    @VisibleForTesting
-    public static final QName ENCODING_QNAME =  QName.create(Stream.QNAME, "encoding").intern();
-    @VisibleForTesting
-    public static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
-
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
-    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
-        NodeIdentifier.create(RestconfState.QNAME),
-        NodeIdentifier.create(Streams.QNAME),
-        NodeIdentifier.create(Stream.QNAME));
 
     private final DOMDataBroker dataBroker;
-    private final RestconfStream.LocationProvider locationProvider;
+    private final List<StreamSupport> supports;
 
     @Inject
     @Activate
-    public MdsalRestconfStreamRegistry(@Reference final RestconfStream.LocationProvider locationProvider,
-            @Reference final DOMDataBroker dataBroker) {
-        super(Stream.QNAME);
-        this.locationProvider = requireNonNull(locationProvider);
+    public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
+            @Reference final RestconfStream.LocationProvider locationProvider) {
         this.dataBroker = requireNonNull(dataBroker);
+        supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
+
+        // FIXME: populate the default stream
+        // private static final String DEFAULT_STREAM_NAME = "NETCONF";
     }
 
     @Override
-    public ListenableFuture<?> putStream(final MapEntryNode stream) {
+    protected ListenableFuture<Void> putStream(final RestconfStream<?> stream, final String description,
+            final URI restconfURI) {
         // Now issue a put operation
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, RESTCONF_STATE_STREAMS.node(stream.name()), stream);
-        return tx.commit();
+        for (var support : supports) {
+            support.putStream(tx, stream, description, restconfURI);
+        }
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
-    protected ListenableFuture<?> deleteStream(final NodeIdentifierWithPredicates streamName) {
+    protected ListenableFuture<Void> deleteStream(final String streamName) {
         // Now issue a delete operation while the name is still protected by being associated in the map.
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.delete(LogicalDatastoreType.OPERATIONAL, RESTCONF_STATE_STREAMS.node(streamName));
-        return tx.commit();
+        for (var support : supports) {
+            support.deleteStream(tx, streamName);
+        }
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
-    public <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
-            final RestconfStream.Source<T> source, final String description) {
-        final var baseStreamLocation = locationProvider.baseStreamLocation(restconfURI);
-        final var stream = allocateStream(source);
-        final var name = stream.name();
-        if (description.isBlank()) {
-            throw new IllegalArgumentException("Description must be descriptive");
-        }
+    protected ListenableFuture<RestconfStream.Subscription> createSubscription(
+            final RestconfStream.Subscription subscription) {
+        final var id = subscription.id();
+        final var receiver = subscription.receiverName();
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
 
-        Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation.toString(),
-            stream.encodings())), new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(final Object result) {
-                    LOG.debug("Stream {} added", name);
-                    request.completeWith(stream);
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    LOG.debug("Failed to add stream {}", name, cause);
-                    unregisterStream(name, stream);
-                    request.completeWith(new ServerException("Failed to allocate stream " + name, cause));
-                }
-            }, MoreExecutors.directExecutor());
-    }
-
-
-    @VisibleForTesting
-    public static @NonNull MapEntryNode streamEntry(final String name, final String description,
-            final String baseStreamLocation, final Set<RestconfStream.EncodingName> encodings) {
-        final var accessBuilder = ImmutableNodes.newSystemMapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(Access.QNAME));
-        for (var encoding : encodings) {
-            final var encodingName = encoding.name();
-            accessBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, encodingName))
-                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, encodingName))
-                .withChild(ImmutableNodes.leafNode(LOCATION_QNAME,
-                    baseStreamLocation + '/' + encodingName + '/' + name))
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+            ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(nodeId)
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()))
+//                    .withChild(ImmutableNodes.newChoiceBuilder()
+//                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
+//                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
+//                            subscription.filterName()))
+//                        .build())
+                    .build())
+                .withChild(ImmutableNodes.newContainerBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
+                    .withChild(ImmutableNodes.newSystemMapBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
+                        .withChild(ImmutableNodes.newMapEntryBuilder()
+                            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
+                                SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
+                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
+                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
+                                Receiver.State.Active.getName()))
+                            .build())
+                        .build())
+                    .build())
                 .build());
-        }
-
-        return ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, name))
-            .withChild(ImmutableNodes.leafNode(NAME_QNAME, name))
-            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, description))
-            .withChild(accessBuilder.build())
-            .build();
+        return tx.commit().transform(info -> {
+            LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
+            return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
+        }, MoreExecutors.directExecutor());
     }
 
-    protected <T> RestconfStream<T> allocateStream(final RestconfStream.Source<T> source) {
-        String name;
-        RestconfStream<T> stream;
-        do {
-            // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
-            // it into UUID URN namespace as defined by RFC4122
-            name = "urn:uuid:" + UUID.randomUUID();
-            stream = new RestconfStream<>(this, source, name);
-        } while (registerStream(name, stream) != null);
-
-        return stream;
+    @Override
+    public RestconfStream.@Nullable Subscription lookupSubscription(final Uint32 id) {
+        // FIXME: implement this
+        return null;
     }
 }
