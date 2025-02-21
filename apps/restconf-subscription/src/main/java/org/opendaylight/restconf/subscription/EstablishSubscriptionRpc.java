@@ -42,8 +42,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -110,7 +110,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
 
         final var body = input.input();
-        final var target = (DataContainerNode) body.childByArg(SUBSCRIPTION_TARGET);
+        final var target = (ChoiceNode) body.childByArg(SUBSCRIPTION_TARGET);
         if (target == null) {
             // means there is no stream information present
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
@@ -152,11 +152,12 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         nodeTargetBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, streamName));
 
         // check stream filter
-        final var streamFilter = (DataContainerNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
+        final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         if (streamFilter != null) {
             final var streamFilterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
-            final var nodeFilterBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
-                .create(StreamFilter.QNAME));
+            final var nodeFilterBuilder = ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME));
+
             if (streamFilterName != null) {
                 try {
                     if (!mdsalService.exist(SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(
