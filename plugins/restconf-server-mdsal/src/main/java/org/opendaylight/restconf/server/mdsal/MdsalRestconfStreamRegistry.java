@@ -26,10 +26,15 @@ import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -76,19 +81,19 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<?> putStream(final MapEntryNode stream) {
+    public ListenableFuture<Void> putStream(final MapEntryNode stream) {
         // Now issue a put operation
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, RESTCONF_STATE_STREAMS.node(stream.name()), stream);
-        return tx.commit();
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
-    protected ListenableFuture<?> deleteStream(final NodeIdentifierWithPredicates streamName) {
+    protected ListenableFuture<Void> deleteStream(final NodeIdentifierWithPredicates streamName) {
         // Now issue a delete operation while the name is still protected by being associated in the map.
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, RESTCONF_STATE_STREAMS.node(streamName));
-        return tx.commit();
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -102,9 +107,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }
 
         Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation.toString(),
-            stream.encodings())), new FutureCallback<Object>() {
+            stream.encodings())), new FutureCallback<Void>() {
                 @Override
-                public void onSuccess(final Object result) {
+                public void onSuccess(final Void result) {
                     LOG.debug("Stream {} added", name);
                     request.completeWith(stream);
                 }
@@ -117,7 +122,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 }
             }, MoreExecutors.directExecutor());
     }
-
 
     @VisibleForTesting
     public static @NonNull MapEntryNode streamEntry(final String name, final String description,
@@ -142,7 +146,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             .build();
     }
 
-    protected <T> RestconfStream<T> allocateStream(final RestconfStream.Source<T> source) {
+    <T> RestconfStream<T> allocateStream(final RestconfStream.Source<T> source) {
         String name;
         RestconfStream<T> stream;
         do {
@@ -153,5 +157,47 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         } while (registerStream(name, stream) != null);
 
         return stream;
+    }
+
+    @Override
+    protected ListenableFuture<RestconfStream.Subscription> createSubscription(
+            final RestconfStream.Subscription subscription) {
+        final var id = subscription.id();
+        final var receiver = subscription.receiverName();
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
+
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+            ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(nodeId)
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()))
+                    .withChild(ImmutableNodes.newChoiceBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
+                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
+                            subscription.filterName()))
+                        .build())
+                    .build())
+                .withChild(ImmutableNodes.newContainerBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
+                    .withChild(ImmutableNodes.newSystemMapBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
+                        .withChild(ImmutableNodes.newMapEntryBuilder()
+                            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
+                                SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
+                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
+                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
+                                Receiver.State.Active.getName()))
+                            .build())
+                        .build())
+                    .build())
+                .build());
+        return tx.commit().transform(info -> {
+            LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
+            return new MdsalRestconfStreamSubscription(subscription, dataBroker);
+        }, MoreExecutors.directExecutor());
     }
 }

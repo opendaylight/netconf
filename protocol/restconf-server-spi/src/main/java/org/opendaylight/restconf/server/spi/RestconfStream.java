@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
@@ -25,8 +26,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +50,7 @@ public final class RestconfStream<T> {
      *
      * @param name Encoding name, as visible via the stream's {@code access} list
      */
+    // FIXME: reconcile with RFC8639
     public record EncodingName(@NonNull String name) {
         private static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
 
@@ -160,7 +167,7 @@ public final class RestconfStream<T> {
          * create the corresponding instance and register it.
          *
          * @param <T> Stream type
-         * @param request {@link ServerRequest} for this invocation.
+         * @param request {@link ServerRequest} for this invocation
          * @param restconfURI resolved {@code {+restconf}} resource name
          * @param source Stream instance
          * @param description Stream descriptiion
@@ -168,14 +175,143 @@ public final class RestconfStream<T> {
          */
         <T> void createStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
             String description);
+
+        /**
+         * Establish a new RFC8639 subscription to a stream.
+         *
+         * @param request {@link ServerRequest} for this invocation
+         * @param encoding requested encoding
+         * @param streamName requested stream name
+         * @param filterName optional filter
+         * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
+         */
+        @NonNullByDefault
+        void establishSubscription(ServerRequest<Subscription> request, String streamName, QName encoding,
+            @Nullable SubscriptionFilter filter);
+    }
+
+    /**
+     * A handle to a RFC8639 subscription.
+     */
+    // TODO: a .toOperational() should result in the equivalent MapEntryNode equivalent of a Binding Subscription
+    @Beta
+    public abstract static sealed class Subscription
+            permits AbstractRestconfStreamSubscription, ForwardingRestconfStreamSubscription {
+        @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/2749")
+        private volatile QName terminated;
+
+        /**
+         * Returns the {@code subscription id}.
+         *
+         * @return the {@code subscription id}
+         */
+        @NonNullByDefault
+        public abstract Uint32 id();
+
+        /**
+         * Returns the {@code receiver name}.
+         *
+         * @return the {@code receiver name}
+         */
+        @NonNullByDefault
+        public abstract String receiverName();
+
+        /**
+         * Returns the encoding.
+         *
+         * @return the encoding
+         */
+        @NonNullByDefault
+        public abstract QName encoding();
+
+        /**
+         * Returns the {@code stream name}.
+         *
+         * @return the {@code stream name}
+         */
+        @NonNullByDefault
+        public abstract String streamName();
+
+        @NonNullByDefault
+        public final void terminate(final ServerRequest<Empty> request, final QName reason) {
+            final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
+            if (witness != null) {
+                request.completeWith(new ServerException("Subscription already terminated with " + witness));
+                return;
+            }
+
+            LOG.debug("Terminating subscription {} due to {}", id(), reason);
+            terminateImpl(request, reason);
+        }
+
+        @NonNullByDefault
+        protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+
+        @Override
+        public final String toString() {
+            return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
+        }
+
+        @NonNullByDefault
+        protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+            return helper.add("terminated", terminated);
+        }
+    }
+
+    /**
+     * A subscription filter. It can be either one of
+     * <ul>
+     *   <li>a {@code SubscriptionFilter.Reference}, which needs to be resolved, or<li>
+     *   <li>a {@code SubscriptionFilter.SubtreeDefinition}, where we need to parse a document chunk, or</li>
+     *   <li>a {@code SubscriptionFilter.XPathDefinition}, where we need to parse an XPath expression</li>
+     * </ul>
+     */
+    @NonNullByDefault
+    public sealed interface SubscriptionFilter {
+        /**
+         * A reference to an externally-provided filter.
+         *
+         * @param filter name
+         */
+        record Reference(String filterName) implements SubscriptionFilter {
+            public Reference {
+                requireNonNull(filterName);
+            }
+        }
+
+        /**
+         * A subtree filter definition, provided as an {@link AnydataNode} document.
+         *
+         * @param document the subtree filter
+         */
+        record SubtreeDefinition(AnydataNode<?> document) implements SubscriptionFilter {
+            public SubtreeDefinition {
+                requireNonNull(document);
+            }
+        }
+
+        /**
+         * A XPath filter definition, provided as a string containing the filter expression.
+         *
+         * @param xpath the XPath filter expression
+         */
+        record XPathDefinition(String xpath) implements SubscriptionFilter {
+            public XPathDefinition {
+                requireNonNull(xpath);
+            }
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
-    private static final VarHandle SUBSCRIBERS;
+    private static final VarHandle SUBSCRIBERS_VH;
+    private static final VarHandle TERMINATED_VH;
 
     static {
+        final var lookup = MethodHandles.lookup();
         try {
-            SUBSCRIBERS = MethodHandles.lookup().findVarHandle(RestconfStream.class, "subscribers", Subscribers.class);
+            SUBSCRIBERS_VH = lookup.findVarHandle(RestconfStream.class, "subscribers", Subscribers.class);
+            TERMINATED_VH = lookup.findVarHandle(Subscription.class, "terminated", QName.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -195,19 +331,19 @@ public final class RestconfStream<T> {
         @Override
         public void endOfStream() {
             // Atomic assertion we are ending plus guarded cleanup
-            final var local = (Subscribers<T>) SUBSCRIBERS.getAndSetRelease(RestconfStream.this, null);
+            final var local = (Subscribers<T>) SUBSCRIBERS_VH.getAndSetRelease(RestconfStream.this, null);
             if (local != null) {
                 terminate();
                 local.endOfStream();
             }
         }
     };
+
     private final @NonNull AbstractRestconfStreamRegistry registry;
     private final @NonNull Source<T> source;
     private final @NonNull String name;
 
     // Accessed via SUBSCRIBERS, 'null' indicates we have been shut down
-    @SuppressWarnings("unused")
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile Subscribers<T> subscribers = Subscribers.empty();
 
@@ -281,7 +417,7 @@ public final class RestconfStream<T> {
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.add(toAdd);
-            final var witness = (Subscribers<T>) SUBSCRIBERS.compareAndExchangeRelease(this, observed, next);
+            final var witness = (Subscribers<T>) SUBSCRIBERS_VH.compareAndExchangeRelease(this, observed, next);
             if (witness == observed) {
                 LOG.debug("Subscriber {} is added.", handler);
                 if (observed instanceof Subscribers.Empty) {
@@ -310,7 +446,7 @@ public final class RestconfStream<T> {
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.remove(toRemove);
-            final var witness = (Subscribers<T>) SUBSCRIBERS.compareAndExchangeRelease(this, observed, next);
+            final var witness = (Subscribers<T>) SUBSCRIBERS_VH.compareAndExchangeRelease(this, observed, next);
             if (witness == observed) {
                 LOG.debug("Subscriber {} is removed", subscriber);
                 if (next == null) {
@@ -326,7 +462,7 @@ public final class RestconfStream<T> {
     }
 
     private Subscribers<T> acquireSubscribers() {
-        return (Subscribers<T>) SUBSCRIBERS.getAcquire(this);
+        return (Subscribers<T>) SUBSCRIBERS_VH.getAcquire(this);
     }
 
     private void startSource() {
