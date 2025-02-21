@@ -21,6 +21,12 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.yang.gen.v1.http.example.com.ns.augmented.jukebox.rev160505.AugmentedJukeboxData;
+import org.opendaylight.yang.gen.v1.http.example.com.ns.example.jukebox.rev150404.ExampleJukeboxData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetTypesData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.IetfRestconfMonitoringData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.IetfYangTypesData;
+import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -34,7 +40,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractJukeboxTest {
     @FunctionalInterface
@@ -107,13 +112,9 @@ public abstract class AbstractJukeboxTest {
             .withChild(SONG2)
         .build();
 
-    protected static final @NonNull EffectiveModelContext JUKEBOX_SCHEMA =
-        YangParserTestUtils.parseYangResources(AbstractJukeboxTest.class,
-            "/jukebox-model/augmented-jukebox@2016-05-05.yang",
-            "/jukebox-model/example-jukebox@2015-04-04.yang",
-            "/jukebox-model/ietf-inet-types.yang",
-            "/jukebox-model/ietf-restconf-monitoring@2017-01-26.yang",
-            "/jukebox-model/ietf-yang-types.yang");
+    protected static final @NonNull EffectiveModelContext JUKEBOX_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(
+        ExampleJukeboxData.class, AugmentedJukeboxData.class, IetfInetTypesData.class, IetfYangTypesData.class,
+        IetfRestconfMonitoringData.class);
     protected static final @NonNull DatabindContext JUKEBOX_DATABIND = DatabindContext.ofModel(JUKEBOX_SCHEMA);
 
     protected static final @NonNull Data JUKEBOX_PATH = jukeboxPath(JUKEBOX_IID);
