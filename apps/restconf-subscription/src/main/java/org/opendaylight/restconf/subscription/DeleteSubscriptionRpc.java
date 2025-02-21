@@ -82,7 +82,7 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
                 "No ID specified."));
             return;
         }
-        final var state = stateMachine.getSubscriptionState(id);
+        final var state = stateMachine.lookupSubscriptionState(id);
         if (state == null) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
@@ -94,7 +94,7 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        if (stateMachine.getSubscriptionSession(id) != request.session()) {
+        if (stateMachine.lookupSubscriptionSession(id) != request.session()) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
