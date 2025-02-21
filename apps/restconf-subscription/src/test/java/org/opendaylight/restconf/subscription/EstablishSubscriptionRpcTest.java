@@ -33,9 +33,11 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.Target;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -104,14 +106,14 @@ class EstablishSubscriptionRpcTest {
         final var expectedNode = ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, ID))
             .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
+            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, EncodeJson$I.QNAME))
             .withChild(nodeReceivers)
             .withChild(nodeTarget)
             .build();
 
         final var responseBuilder = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionOutput.QNAME))
-            .withChild(ImmutableNodes.leafNode(NodeIdentifier.create(QName.create(EstablishSubscriptionOutput.QNAME,
-                "id").intern()), ID))
+            .withChild(ImmutableNodes.leafNode(QName.create(EstablishSubscriptionOutput.QNAME, "id"), ID))
             .build();
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
@@ -152,11 +154,11 @@ class EstablishSubscriptionRpcTest {
     void establishSubscriptionWrongFilterTest() {
         final var input = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
-            .withChild(ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
-                    .create(SubscriptionUtil.QNAME_TARGET))
+            .withChild(ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(Target.QNAME))
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
-                .withChild(ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
-                        .create(QName.create(Subscription.QNAME, "stream-filter")))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
                     .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, "filter"))
                     .build())
                 .build())
@@ -177,8 +179,9 @@ class EstablishSubscriptionRpcTest {
     private static ContainerNode getInput() {
         return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
-            .withChild(ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
-                    .create(SubscriptionUtil.QNAME_TARGET))
+            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, EncodeJson$I.QNAME))
+            .withChild(ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(Target.QNAME))
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
                 .build())
             .build();
