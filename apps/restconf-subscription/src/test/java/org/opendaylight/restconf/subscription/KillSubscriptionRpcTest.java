@@ -81,7 +81,7 @@ class KillSubscriptionRpcTest {
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
+        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL),
@@ -91,7 +91,7 @@ class KillSubscriptionRpcTest {
 
     @Test
     void killSubscriptionWrongIDTest() {
-        doReturn(null).when(stateMachine).getSubscriptionState(ID);
+        doReturn(null).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -100,7 +100,7 @@ class KillSubscriptionRpcTest {
 
     @Test
     void killSubscriptionAlreadyEndedTest() {
-        doReturn(SubscriptionState.END).when(stateMachine).getSubscriptionState(ID);
+        doReturn(SubscriptionState.END).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());

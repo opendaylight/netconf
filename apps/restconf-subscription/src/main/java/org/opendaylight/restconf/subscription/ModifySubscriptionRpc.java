@@ -74,7 +74,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     public ModifySubscriptionRpc(@Reference final MdsalNotificationService mdsalService,
             @Reference final SubscriptionStateService subscriptionStateService,
             @Reference final SubscriptionStateMachine stateMachine,
-            @Reference RestconfStream.Registry streamRegistry) {
+            @Reference final RestconfStream.Registry streamRegistry) {
         super(ModifySubscription.QNAME);
         this.mdsalService = requireNonNull(mdsalService);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
@@ -101,7 +101,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var state = stateMachine.getSubscriptionState(id);
+        final var state = stateMachine.lookupSubscriptionState(id);
         if (state == null) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
@@ -113,7 +113,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        if (stateMachine.getSubscriptionSession(id) != request.session()) {
+        if (stateMachine.lookupSubscriptionSession(id) != request.session()) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
