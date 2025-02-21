@@ -35,7 +35,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
@@ -43,10 +44,10 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 class DeleteSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
-    private static final YangInstanceIdentifier.NodeIdentifierWithPredicates IDENTIFIER =
-        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, ID);
+    private static final NodeIdentifierWithPredicates IDENTIFIER =
+        NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, ID);
     private static final ContainerNode INPUT = ImmutableNodes.newContainerBuilder()
-        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(DeleteSubscriptionInput.QNAME))
+        .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionInput.QNAME))
         .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
         .build();
 
@@ -79,7 +80,7 @@ class DeleteSubscriptionRpcTest {
     @Test
     void deleteSubscriptionTest() {
         final var responseBuilder = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
+            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
             .build();
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
