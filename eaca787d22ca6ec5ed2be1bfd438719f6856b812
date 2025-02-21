@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f043d61d_ea6ea0c2",
+        "filename": "plugins/restconf-notifications-mdsal/pom.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-21T17:01:37Z",
+      "side": 1,
+      "message": "should be alpha-sorted",
+      "range": {
+        "startLine": 93,
+        "startChar": 21,
+        "endLine": 93,
+        "endChar": 45
+      },
+      "revId": "eaca787d22ca6ec5ed2be1bfd438719f6856b812",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
