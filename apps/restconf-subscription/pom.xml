@@ -113,8 +113,7 @@
 
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-api</artifactId>
-            <type>test-jar</type>
+            <artifactId>restconf-server-api-testlib</artifactId>
         </dependency>
     </dependencies>
 
