@@ -92,8 +92,8 @@ class ModifySubscriptionRpcTest {
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
-        doReturn(session).when(stateMachine).getSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
+        doReturn(session).when(stateMachine).lookupSubscriptionSession(ID);
+        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL),
@@ -106,8 +106,8 @@ class ModifySubscriptionRpcTest {
     void modifySubscriptionWrongSessionTest() {
         doReturn(session).when(request).session();
         // return session different from request session
-        doReturn(null).when(stateMachine).getSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).getSubscriptionState(ID);
+        doReturn(null).when(stateMachine).lookupSubscriptionSession(ID);
+        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(responseCaptor.capture());
@@ -117,7 +117,7 @@ class ModifySubscriptionRpcTest {
 
     @Test
     void modifySubscriptionWrongIDTest() {
-        doReturn(null).when(stateMachine).getSubscriptionState(ID);
+        doReturn(null).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(responseCaptor.capture());
@@ -126,7 +126,7 @@ class ModifySubscriptionRpcTest {
 
     @Test
     void modifySubscriptionAlreadyEndedTest() {
-        doReturn(SubscriptionState.END).when(stateMachine).getSubscriptionState(ID);
+        doReturn(SubscriptionState.END).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(responseCaptor.capture());

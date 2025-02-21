@@ -28,6 +28,7 @@ module org.opendaylight.restconf.subscription {
     // Annotations
     requires static transitive java.annotation;
     requires static transitive javax.inject;
+    requires static transitive org.eclipse.jdt.annotation;
     requires static org.kohsuke.metainf_services;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.annotation.bundle;

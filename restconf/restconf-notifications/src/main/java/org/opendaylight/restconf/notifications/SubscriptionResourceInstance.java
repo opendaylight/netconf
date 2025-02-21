@@ -111,7 +111,7 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
-        final var subscriptionState = machine.getSubscriptionState(Uint32.valueOf(subscriptionId));
+        final var subscriptionState = machine.lookupSubscriptionState(Uint32.valueOf(subscriptionId));
         if (subscriptionState == null) {
             LOG.debug("Subscription for id {} not found", subscriptionId);
             return EmptyResponse.NOT_FOUND;

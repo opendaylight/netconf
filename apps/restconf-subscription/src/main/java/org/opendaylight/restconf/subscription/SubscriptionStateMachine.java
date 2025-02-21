@@ -7,12 +7,16 @@
  */
 package org.opendaylight.restconf.subscription;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import static java.util.Objects.requireNonNull;
+
+import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.service.component.annotations.Activate;
@@ -23,16 +27,45 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Component(service = SubscriptionStateMachine.class)
 public class SubscriptionStateMachine {
+    /**
+     * Internal helper DTO that not meant to be used anywhere else. Used to increase readability of the code and allow
+     * us store subscription session and state in one map.
+     */
+    @NonNullByDefault
+    private record SessionStatePair(TransportSession session, SubscriptionState state) {
+        SessionStatePair {
+            requireNonNull(session);
+            requireNonNull(state);
+        }
+
+        SessionStatePair withState(final Uint32 id, final SubscriptionState newState) {
+            return switch (state) {
+                case START, SUSPENDED -> switch (newState) {
+                    case START, SUSPENDED -> throw reject(id, newState);
+                    case ACTIVE, END -> accept(id, newState);
+                };
+                case ACTIVE -> switch (newState) {
+                    case START, ACTIVE -> throw reject(id, newState);
+                    case SUSPENDED, END -> accept(id, newState);
+                };
+                case END -> throw reject(id, newState);
+            };
+        }
+
+        private SessionStatePair accept(final Uint32 id, final SubscriptionState newState) {
+            LOG.debug("Subscription {} moving from {} to {}", id, state, newState);
+            return new SessionStatePair(session, newState);
+        }
+
+        private IllegalStateException reject(final Uint32 id, final SubscriptionState newState) {
+            return new IllegalStateException(
+                "Subscription %s cannot transition from %s to %s".formatted(id, state, newState));
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionStateMachine.class);
 
-    // All legal transitions from one state to another
-    private static final Map<SubscriptionState, Set<SubscriptionState>> TRANSITIONS = new EnumMap<>(Map.of(
-        SubscriptionState.START, Set.of(SubscriptionState.ACTIVE, SubscriptionState.END),
-        SubscriptionState.ACTIVE, Set.of(SubscriptionState.SUSPENDED, SubscriptionState.END),
-        SubscriptionState.SUSPENDED, Set.of(SubscriptionState.ACTIVE, SubscriptionState.END)
-    ));
-
-    private final Map<Uint32, SessionStatePair> subscriptionStateMap = new HashMap<>();
+    private final ConcurrentMap<Uint32, SessionStatePair> subscriptionStateMap = new ConcurrentHashMap<>();
 
     @Inject
     @Activate
@@ -46,6 +79,7 @@ public class SubscriptionStateMachine {
      * @param session session on which we are registering the subscription
      * @param subscriptionId id of the newly registered subscription
      */
+    @NonNullByDefault
     public void registerSubscription(final TransportSession session, final Uint32 subscriptionId) {
         subscriptionStateMap.put(subscriptionId, new SessionStatePair(session, SubscriptionState.START));
     }
@@ -54,52 +88,41 @@ public class SubscriptionStateMachine {
      * Moves subscription from its current state to new one assuming this transition is legal.
      *
      * @param subscriptionId id of the subscription
-     * @param toType new state assigned to subscription
+     * @param newState new state assigned to subscription
+     * @throws NoSuchElementException if the subscription is not found
      * @throws IllegalStateException if transition to a new state is not legal
      */
-    public void moveTo(final Uint32 subscriptionId, final SubscriptionState toType) {
-        final var transition = TRANSITIONS.get(getSubscriptionState(subscriptionId)).contains(toType);
-        // Check if this state transition is allowed
-        if (!transition) {
-            throw new IllegalStateException(String.format("Illegal transition to %s state.", toType));
+    @NonNullByDefault
+    public void moveTo(final Uint32 subscriptionId, final SubscriptionState newState) {
+        requireNonNull(newState);
+        // atomic search-check-and-replace, since we normally produce non-null, a null return indicates the mapping was
+        // not present
+        final var found = subscriptionStateMap.computeIfPresent(subscriptionId,
+            (id, pair) -> pair.withState(id, newState));
+        if (found == null) {
+            throw new NoSuchElementException("No subscription " + subscriptionId);
         }
-        subscriptionStateMap.replace(subscriptionId, new SessionStatePair(getSubscriptionSession(subscriptionId),
-            toType));
     }
 
     /**
-     * Retrieves state of given subscription.
+     * Retrieves state of given subscription, if present.
      *
      * @param subscriptionId id of the subscription
-     * @return current state of subscription
+     * @return current state of subscription, or {@code null}
      */
-    public SubscriptionState getSubscriptionState(final Uint32 subscriptionId) {
-        final var currentState = subscriptionStateMap.get(subscriptionId);
-        // Check if subscription exist
-        if (currentState == null) {
-            return null;
-        }
-        return currentState.state();
+    public @Nullable SubscriptionState lookupSubscriptionState(final @NonNull Uint32 subscriptionId) {
+        final var pair = subscriptionStateMap.get(subscriptionId);
+        return pair != null ? pair.state : null;
     }
 
     /**
-     * Retrieves session of given subscription.
+     * Retrieves session of given subscription, if present.
      *
      * @param subscriptionId id of the subscription
-     * @return session tied to the subscription
+     * @return session tied to the subscription, or {@code null}
      */
-    public TransportSession getSubscriptionSession(final Uint32 subscriptionId) {
-        final var currentState = subscriptionStateMap.get(subscriptionId);
-        // Check if subscription exist
-        if (currentState == null) {
-            return null;
-        }
-        return currentState.session();
+    public @Nullable TransportSession lookupSubscriptionSession(final @NonNull Uint32 subscriptionId) {
+        final var pair = subscriptionStateMap.get(subscriptionId);
+        return pair != null ? pair.session : null;
     }
-
-    /**
-     * Internal helper class that not meant to be used anywhere else. Used to increase readability of the code and allow
-     * us store subscription session and state in one map.
-     */
-    private record SessionStatePair(TransportSession session, SubscriptionState state) { }
 }
