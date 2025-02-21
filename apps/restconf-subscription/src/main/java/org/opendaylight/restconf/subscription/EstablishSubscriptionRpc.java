@@ -9,14 +9,11 @@ package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerException;
@@ -24,24 +21,14 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodingUnsupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.dynamic.Stream1Builder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.StreamBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.stream.filter.ByReferenceBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -65,8 +52,6 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter").intern());
-    private static final NodeIdentifier SUBSCRIPTION_STOP_TIME =
-        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
     private static final NodeIdentifier SUBSCRIPTION_ENCODING =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "encoding").intern());
     private static final NodeIdentifier ESTABLISH_SUBSCRIPTION_OUTPUT =
@@ -74,16 +59,12 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier OUTPUT_ID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionOutput.QNAME, "id").intern());
 
-    // As per https://www.rfc-editor.org/rfc/rfc8639.html#section-6
-    //
-    //    A best practice is to use the lower half of the "id"
-    //    object's integer space when that "id" is assigned by an external
-    //    entity (such as with a configured subscription).  This leaves the
-    //    upper half of the subscription integer space available to be
-    //    dynamically assigned by the publisher.
-    // FIXME: NETCONF-714: this should live in an actual service, not here, so that we can safely wrap without trampling
-    //                     on an existing subscription.
-    private final AtomicInteger subscriptionIdCounter = new AtomicInteger(Integer.MAX_VALUE);
+    private static final Set<QName> SUPPORTED_ENCODINGS = Set.of(
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .EncodeJson$I.QNAME,
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .EncodeXml$I.QNAME);
+
     private final MdsalNotificationService mdsalService;
     private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
@@ -112,6 +93,14 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
 
         final var body = input.input();
+        var encoding = leaf(body, SUBSCRIPTION_ENCODING, QName.class);
+        if (encoding == null) {
+            // FIXME: derive from request
+        } else if (!SUPPORTED_ENCODINGS.contains(encoding)) {
+            request.completeWith(new ServerException(EncodingUnsupported.VALUE.toString()));
+            return;
+        }
+
         final var target = (DataContainerNode) body.childByArg(SUBSCRIPTION_TARGET);
         if (target == null) {
             // means there is no stream information present
@@ -120,21 +109,6 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var id = Uint32.fromIntBits(subscriptionIdCounter.incrementAndGet());
-
-        final var subscriptionBuilder = new SubscriptionBuilder();
-        subscriptionBuilder.setId(new SubscriptionId(id));
-        final var streamBuilder = new StreamBuilder();
-
-        final var nodeBuilder = ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id))
-            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id));
-        final var nodeTargetBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
-            .create(SubscriptionUtil.QNAME_TARGET));
-
-        final var principal = request.principal();
-        nodeBuilder.withChild(generateReceivers(principal == null ? "unknown" : principal.getName()));
-
         // check stream name
         final var streamName = leaf(target, SUBSCRIPTION_STREAM, String.class);
         if (streamName == null) {
@@ -142,103 +116,42 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
                 "No stream specified"));
             return;
         }
-        if (streamRegistry.lookupStream(streamName) == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-                "%s refers to an unknown stream", streamName));
-            return;
-        }
-
-        final var stream1Builder = new Stream1Builder();
-        stream1Builder.setStream(streamName);
-        streamBuilder.addAugmentation(stream1Builder.build());
-        nodeTargetBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, streamName));
 
         // check stream filter
         final var streamFilter = (DataContainerNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
+        final String filterName;
         if (streamFilter != null) {
-            final var streamFilterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
-            final var nodeFilterBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
-                .create(StreamFilter.QNAME));
-            if (streamFilterName != null) {
+            filterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
+            if (filterName != null) {
                 try {
                     if (!mdsalService.exist(SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(
-                            StreamFilter.QNAME, SubscriptionUtil.QNAME_STREAM_FILTER_NAME, streamFilterName))).get()) {
+                            StreamFilter.QNAME, SubscriptionUtil.QNAME_STREAM_FILTER_NAME, filterName))).get()) {
                         request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-                            "%s refers to an unknown stream filter", streamFilterName));
+                            "%s refers to an unknown stream filter", filterName));
                         return;
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
                     return;
                 }
-                final var byReferenceBuilder = new ByReferenceBuilder();
-                byReferenceBuilder.setStreamFilterName(streamFilterName);
-                streamBuilder.setStreamFilter(byReferenceBuilder.build());
-                nodeFilterBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
-                    streamFilterName));
-                nodeTargetBuilder.withChild(nodeFilterBuilder.build());
             }
             //  TODO: parse anydata filter, rfc6241? https://www.rfc-editor.org/rfc/rfc8650#name-filter-example
             //    {@link StreamSubtreeFilter}.
-        }
-        nodeBuilder.withChild(nodeTargetBuilder.build());
-
-        final DateAndTime stopTime;
-        try {
-            stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, DateAndTime.class);
-        } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
-            return;
-        }
-        if (stopTime != null) {
-            subscriptionBuilder.setStopTime(stopTime);
-            nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STOP_TIME, stopTime));
+        } else {
+            filterName = null;
         }
 
-        final var encoding = leaf(body, SUBSCRIPTION_ENCODING, Encoding.class);
-        if (encoding != null) {
-            subscriptionBuilder.setEncoding(encoding);
-            nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, encoding));
-        }
+        streamRegistry.establishSubscription(request.transform(subscription -> {
+            final var id = subscription.id();
+            final var holder = new SubscriptionHolder(subscription, subscriptionStateService, stateMachine);
+            session.registerResource(holder);
+            stateMachine.registerSubscription(session, id);
+            stateMachine.moveTo(id, SubscriptionState.ACTIVE);
 
-        final var subscription = new SubscriptionHolder(subscriptionBuilder.build(), mdsalService,
-            subscriptionStateService, stateMachine);
-        session.registerResource(subscription);
-        final var node = nodeBuilder.build();
-        stateMachine.registerSubscription(session, id);
-
-        mdsalService.writeSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()), node)
-            .addCallback(new FutureCallback<CommitInfo>() {
-                @Override
-                public void onSuccess(final CommitInfo result) {
-                    stateMachine.moveTo(id, SubscriptionState.ACTIVE);
-                    request.completeWith(ImmutableNodes.newContainerBuilder()
-                        .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
-                        .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))
-                        .build());
-                }
-
-                @Override
-                public void onFailure(final Throwable throwable) {
-                    request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                        throwable.getCause().getMessage()));
-                }
-            }, MoreExecutors.directExecutor());
-    }
-
-    private static ContainerNode generateReceivers(final String receiver) {
-        return ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
-            .create(Receivers.QNAME))
-                .withChild(ImmutableNodes.newSystemMapBuilder()
-                        .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
-                    .withChild(ImmutableNodes.newMapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                        SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
-                        Receiver.State.Active.getName()))
-                    .build())
-                .build())
-            .build();
+            return ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
+                .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))
+                .build();
+        }), streamName, encoding, filterName);
     }
 }
