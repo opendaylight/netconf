@@ -177,8 +177,8 @@ class EstablishSubscriptionRpcTest {
     private static ContainerNode getInput() {
         return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
-            .withChild(ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
-                    .create(SubscriptionUtil.QNAME_TARGET))
+            .withChild(ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
                 .build())
             .build();
