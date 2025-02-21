@@ -16,7 +16,7 @@ import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.OperationInputBody;
-import org.opendaylight.restconf.server.spi.AbstractInstanceIdentifierTest;
+import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;

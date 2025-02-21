@@ -91,6 +91,12 @@
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-util</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-test-util</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

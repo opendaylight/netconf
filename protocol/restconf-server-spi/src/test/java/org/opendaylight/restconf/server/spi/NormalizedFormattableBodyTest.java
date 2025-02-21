@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;

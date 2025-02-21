@@ -169,11 +169,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-spi</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>sal-remote-impl</artifactId>
             <scope>test</scope>
         </dependency>

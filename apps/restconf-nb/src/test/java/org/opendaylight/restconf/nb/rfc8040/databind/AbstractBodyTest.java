@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.restconf.server.spi.AbstractInstanceIdentifierTest;
+import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
 public abstract class AbstractBodyTest extends AbstractInstanceIdentifierTest {

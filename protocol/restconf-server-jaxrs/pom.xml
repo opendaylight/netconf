@@ -147,11 +147,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-spi</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>test-models</artifactId>
         </dependency>
