@@ -25,11 +25,11 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
-import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -61,16 +61,16 @@ class KillSubscriptionRpcTest {
     private DOMDataTreeWriteTransaction writeTx;
     @Mock
     private CompletingServerRequest<ContainerNode> request;
+    @Mock
+    private RestconfStream.Registry streamRegistry;
     @Captor
     private ArgumentCaptor<ServerException> response;
 
-    private MdsalNotificationService mdsalService;
     private KillSubscriptionRpc rpc;
 
     @BeforeEach
     void before() {
-        mdsalService = new MdsalNotificationService(dataBroker);
-        rpc = new KillSubscriptionRpc(mdsalService, subscriptionStateService, stateMachine);
+        rpc = new KillSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
     }
 
     @Test

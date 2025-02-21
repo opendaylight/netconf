@@ -26,7 +26,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
-import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -80,8 +79,7 @@ class EstablishSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        final var mdsalService = new MdsalNotificationService(dataBroker);
-        rpc = new EstablishSubscriptionRpc(mdsalService, subscriptionStateService, stateMachine, streamRegistry);
+        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
     }
 
     @Test

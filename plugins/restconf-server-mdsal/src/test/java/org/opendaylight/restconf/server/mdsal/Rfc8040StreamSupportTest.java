@@ -20,9 +20,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 
 /**
- * Unit tests for {@link MdsalRestconfStreamRegistry}.
+ * Unit tests for {@link Rfc8040StreamSupport}.
  */
-class MdsalRestconfStreamRegistryTest {
+class Rfc8040StreamSupportTest {
     @Test
     void toStreamEntryNodeTest() throws Exception {
         final var outputType = "XML";
@@ -30,7 +30,7 @@ class MdsalRestconfStreamRegistryTest {
         final var streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         assertMappedData(prepareMap(streamName, uri, outputType),
-            MdsalRestconfStreamRegistry.streamEntry(streamName, "description", "location",
+            Rfc8040StreamSupport.streamEntry(streamName, "description", "location",
                 Set.of(new EncodingName(outputType))));
     }
 
@@ -40,16 +40,16 @@ class MdsalRestconfStreamRegistryTest {
         final var uri = "uri";
 
         assertMappedData(prepareMap("notifi", uri, outputType),
-            MdsalRestconfStreamRegistry.streamEntry("notifi", "description", "location",
+            Rfc8040StreamSupport.streamEntry("notifi", "description", "location",
                 Set.of(new EncodingName(outputType))));
     }
 
     private static Map<QName, Object> prepareMap(final String name, final String uri, final String outputType) {
         return Map.of(
-            MdsalRestconfStreamRegistry.NAME_QNAME, name,
-            MdsalRestconfStreamRegistry.LOCATION_QNAME, uri,
-            MdsalRestconfStreamRegistry.ENCODING_QNAME, outputType,
-            MdsalRestconfStreamRegistry.DESCRIPTION_QNAME, "description");
+            Rfc8040StreamSupport.NAME_QNAME, name,
+            Rfc8040StreamSupport.LOCATION_QNAME, uri,
+            Rfc8040StreamSupport.ENCODING_QNAME, outputType,
+            Rfc8040StreamSupport.DESCRIPTION_QNAME, "description");
     }
 
     private static void assertMappedData(final Map<QName, Object> map, final MapEntryNode mappedData) {
