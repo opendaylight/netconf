@@ -26,7 +26,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.Xpath10;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +63,36 @@ public final class RestconfStream<T> {
         public EncodingName {
             if (!PATTERN.matcher(name).matches()) {
                 throw new IllegalArgumentException("name must match " + PATTERN);
+            }
+        }
+    }
+
+    /**
+     * A subscription filter specification, as manifested in {@link FilterSpec}.
+     */
+    @NonNullByDefault
+    public sealed interface FilterSpecification {
+        /**
+         * A <a href="http://tools.ietf.org/html/rfc6241#section-6">RFC6241 Subtree Filter</a>, as manifested in
+         * {@link StreamSubtreeFilter}.
+         *
+         * @param filter the subtree filter
+         */
+        record SubtreeFilter(AnydataNode anydata) implements FilterSpecification {
+            public SubtreeFilter {
+                requireNonNull(anydata);
+            }
+        }
+
+        /**
+         * A <a href="http://tools.ietf.org/html/rfc6241#section-6">RFC6241 Subtree Filter</a>, as manifested in
+         * {@link StreamSubtreeFilter}.
+         *
+         * @param filter the subtree filter
+         */
+        record XPathFilter(Xpath10 xpath) implements FilterSpecification {
+            public XPathFilter {
+                requireNonNull(anydata);
             }
         }
     }

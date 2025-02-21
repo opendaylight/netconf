@@ -16,13 +16,13 @@ module org.opendaylight.restconf.subscription {
     requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.restconf.notifications.mdsal;
     requires transitive org.opendaylight.restconf.server.spi;
+    requires transitive org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires transitive org.opendaylight.yangtools.concepts;
     requires transitive org.opendaylight.yangtools.yang.common;
     requires org.opendaylight.restconf.mdsal.spi;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.data.api;
     requires org.opendaylight.yangtools.yang.data.spi;
-    requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.slf4j;
 
     // Annotations
