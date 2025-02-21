@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "63381034073419c7601be56f37a57c49a6a5b3ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e21762cd_5fa9aacc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 48
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-21T16:04:54Z",
+      "side": 1,
+      "message": "these two need to be closed, I think",
+      "range": {
+        "startLine": 123,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 24
+      },
+      "revId": "63381034073419c7601be56f37a57c49a6a5b3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
