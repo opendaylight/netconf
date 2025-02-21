@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53414bf0_9a1f182b",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-21T00:00:41Z",
+      "side": 1,
+      "message": "Right, this is a good first step, but we should be holding on to it. I\u0027ll submit a follow-up to show why.",
+      "range": {
+        "startLine": 145,
+        "startChar": 12,
+        "endLine": 145,
+        "endChar": 51
+      },
+      "revId": "6be847e5775bc76266633a337895e33cb00666d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
