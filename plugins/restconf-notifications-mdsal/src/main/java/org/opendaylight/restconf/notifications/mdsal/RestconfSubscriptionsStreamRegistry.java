@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -60,19 +61,19 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
     }
 
     @Override
-    protected @NonNull ListenableFuture<?> putStream(final @NonNull MapEntryNode stream) {
+    protected @NonNull ListenableFuture<Void> putStream(final @NonNull MapEntryNode stream) {
         // Now issue a put operation
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, RFC8639_STREAMS.node(stream.name()), stream);
-        return tx.commit();
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
-    protected @NonNull ListenableFuture<?> deleteStream(final @NonNull NodeIdentifierWithPredicates streamName) {
+    protected @NonNull ListenableFuture<Void> deleteStream(final @NonNull NodeIdentifierWithPredicates streamName) {
         // Now issue a delete operation while the name is still protected by being associated in the map.
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, RFC8639_STREAMS.node(streamName));
-        return tx.commit();
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -83,9 +84,9 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
         //  As solution we are currently accepting request and uri being null which is not correct as per documentation.
         final var stream = new RestconfStream<>(this, source, DEFAULT_STREAM_NAME);
 
-        Futures.addCallback(putStream(streamEntry(description)), new FutureCallback<Object>() {
+        Futures.addCallback(putStream(streamEntry(description)), new FutureCallback<>() {
             @Override
-            public void onSuccess(final Object result) {
+            public void onSuccess(final Void result) {
                 registerStream(DEFAULT_STREAM_NAME, stream);
                 LOG.debug("Stream {} added", DEFAULT_STREAM_NAME);
             }
@@ -104,5 +105,10 @@ public final class RestconfSubscriptionsStreamRegistry extends AbstractRestconfS
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_QNAME, DEFAULT_STREAM_NAME))
             .withChild(ImmutableNodes.leafNode(STREAM_DESCRIPTION_QNAME, description))
             .build();
+    }
+
+    @Override
+    protected ListenableFuture<@NonNull Subscription> createSubscription(final Subscription subscription) {
+        throw new UnsupportedOperationException();
     }
 }
