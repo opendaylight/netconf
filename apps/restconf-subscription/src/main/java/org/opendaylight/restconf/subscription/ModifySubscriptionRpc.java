@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -63,19 +62,16 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
-    private final MdsalNotificationService mdsalService;
     private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public ModifySubscriptionRpc(@Reference final MdsalNotificationService mdsalService,
+    public ModifySubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
             @Reference final SubscriptionStateService subscriptionStateService,
-            @Reference final SubscriptionStateMachine stateMachine,
-            @Reference final RestconfStream.Registry streamRegistry) {
+            @Reference final SubscriptionStateMachine stateMachine) {
         super(ModifySubscription.QNAME);
-        this.mdsalService = requireNonNull(mdsalService);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry = requireNonNull(streamRegistry);
