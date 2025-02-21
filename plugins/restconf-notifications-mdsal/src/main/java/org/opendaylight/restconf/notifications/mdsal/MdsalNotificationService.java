@@ -46,13 +46,6 @@ public class MdsalNotificationService {
         }
     }
 
-    public FluentFuture<? extends @NonNull CommitInfo> writeSubscription(final YangInstanceIdentifier path,
-            final NormalizedNode data) {
-        final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, path, data);
-        return tx.commit();
-    }
-
     public FluentFuture<? extends @NonNull CommitInfo> mergeSubscription(final YangInstanceIdentifier path,
             final NormalizedNode data) {
         final var tx = dataBroker.newWriteOnlyTransaction();
