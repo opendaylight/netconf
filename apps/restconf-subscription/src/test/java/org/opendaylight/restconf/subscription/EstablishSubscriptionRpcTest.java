@@ -70,7 +70,7 @@ class EstablishSubscriptionRpcTest {
     @Mock
     private RestconfStream.Registry streamRegistry;
     @Mock
-    private RestconfStream restconfStream;
+    private RestconfStream<?> restconfStream;
     @Captor
     private ArgumentCaptor<ServerException> response;
 
