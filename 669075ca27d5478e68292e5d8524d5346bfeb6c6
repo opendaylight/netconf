@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cd7b916_24da8203",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionTest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-21T13:21:35Z",
+      "side": 1,
+      "message": "generally we do not need so many empty lines - we write \"more concise\" code",
+      "revId": "669075ca27d5478e68292e5d8524d5346bfeb6c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed4c3c1b_aa547c64",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionTest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-21T13:21:35Z",
+      "side": 1,
+      "message": "there is space only for one parameter with %s",
+      "revId": "669075ca27d5478e68292e5d8524d5346bfeb6c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
