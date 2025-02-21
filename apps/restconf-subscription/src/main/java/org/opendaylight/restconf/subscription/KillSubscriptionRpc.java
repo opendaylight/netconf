@@ -81,7 +81,7 @@ public final class KillSubscriptionRpc extends RpcImplementation {
                 "No id specified"));
             return;
         }
-        final var state = stateMachine.getSubscriptionState(id);
+        final var state = stateMachine.lookupSubscriptionState(id);
         if (state == null) {
             request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
