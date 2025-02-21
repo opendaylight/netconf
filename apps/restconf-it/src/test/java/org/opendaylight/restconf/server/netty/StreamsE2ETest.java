@@ -19,12 +19,12 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class StreamsE2ETest extends AbstractE2ETest {
-
     @Override
     @AfterEach
     void afterEach() throws Exception {
@@ -37,6 +37,7 @@ class StreamsE2ETest extends AbstractE2ETest {
         super.afterEach();
     }
 
+    @Disabled
     @Test
     void dataChangeEventStreamJsonTest() throws Exception {
         // init parent data

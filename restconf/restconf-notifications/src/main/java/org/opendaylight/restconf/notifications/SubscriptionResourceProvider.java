@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
-import org.opendaylight.restconf.notifications.mdsal.MdsalNotificationService;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionStateMachine;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -28,16 +27,13 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true)
 public final class SubscriptionResourceProvider implements WebHostResourceProvider {
     private final SubscriptionStateMachine machine;
-    private final MdsalNotificationService mdsalService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
     public SubscriptionResourceProvider(@Reference final SubscriptionStateMachine machine,
-            @Reference final MdsalNotificationService mdsalService,
             @Reference final RestconfStream.Registry streamRegistry) {
         this.machine = machine;
-        this.mdsalService = mdsalService;
         this.streamRegistry = streamRegistry;
     }
 
@@ -49,7 +45,7 @@ public final class SubscriptionResourceProvider implements WebHostResourceProvid
     // FIXME Consider not hardcoding SSE maximum fragment length and heartbeat interval millis
     @Override
     public WebHostResourceInstance createInstance(final String path) {
-        return new SubscriptionResourceInstance(path, machine, streamRegistry, mdsalService, Uint16.ZERO.toJava(),
+        return new SubscriptionResourceInstance(path, machine, streamRegistry, Uint16.ZERO.toJava(),
             Uint16.valueOf(10_000).toJava());
     }
 }

@@ -30,10 +30,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
         </dependency>
@@ -61,10 +57,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-notifications-mdsal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-subscription</artifactId>
         </dependency>
         <dependency>
@@ -84,20 +76,12 @@
             <artifactId>restconf-server-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc8639</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>concepts</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
