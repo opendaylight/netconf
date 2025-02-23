@@ -12,15 +12,7 @@ import static java.util.Objects.requireNonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.api.ErrorMessage;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -106,53 +98,5 @@ public final class DatabindContext {
         final var created = XmlCodecFactory.create(mountContext);
         final var witness = (XmlCodecFactory) XML_CODECS.compareAndExchangeRelease(this, null, created);
         return witness != null ? witness : created;
-    }
-
-    /**
-     * Return a new {@link ServerException} constructed from the combination of a message and a caught exception.
-     * Provided exception and its causal chain will be examined for well-known constructs in an attempt to extract
-     * error information. If no such information is found an error with type {@link ErrorType#PROTOCOL} and tag
-     * {@link ErrorTag#MALFORMED_MESSAGE} will be reported.
-     *
-     * @param messagePrefix exception message prefix
-     * @param caught caught exception
-     * @return A new {@link ServerException}
-     */
-    @NonNullByDefault
-    public ServerException newProtocolMalformedMessageServerException(final String messagePrefix,
-            final Exception caught) {
-        return newServerParseException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, messagePrefix, caught);
-    }
-
-    @NonNullByDefault
-    private ServerException newServerParseException(final ErrorType type, final ErrorTag tag,
-            final String messagePrefix, final Exception caught) {
-        final var message = requireNonNull(messagePrefix) + ": " + caught.getMessage();
-        final var errors = exceptionErrors(caught);
-        return new ServerException(message, errors != null ? errors : List.of(new ServerError(type, tag, message)),
-            caught);
-    }
-
-    private @Nullable List<@NonNull ServerError> exceptionErrors(final Exception caught) {
-        Throwable cause = caught;
-        do {
-            if (cause instanceof YangNetconfErrorAware infoAware) {
-                return infoAware.getNetconfErrors().stream()
-                    .map(error -> {
-                        final var message = error.message();
-                        final var path = error.path();
-
-                        return new ServerError(error.type(), error.tag(),
-                            message != null ? new ErrorMessage(message) : null, error.appTag(),
-                            path != null ? new ServerErrorPath(this, path) : null,
-                            // FIXME: pass down error.info()
-                            null);
-                    })
-                    .collect(Collectors.toList());
-            }
-            cause = cause.getCause();
-        } while (cause != null);
-
-        return null;
     }
 }

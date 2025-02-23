@@ -51,7 +51,7 @@ public abstract sealed class OperationInputBody extends RequestBody
             }
             return (ContainerNode) holder.getResult().data();
         } catch (IOException e) {
-            throw path.databind().newProtocolMalformedMessageServerException("Invalid input", e);
+            throw newProtocolMalformedMessageServerException(path, "Invalid input", e);
         }
     }
 

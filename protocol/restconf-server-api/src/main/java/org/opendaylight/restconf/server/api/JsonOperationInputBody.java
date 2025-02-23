@@ -28,13 +28,12 @@ public final class JsonOperationInputBody extends OperationInputBody {
     @Override
     void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
             throws ServerException {
-        final var databind = path.databind();
         try {
-            JsonParserStream.create(writer, databind.jsonCodecs(), path.inference())
+            JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference())
                 .parse(new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)));
         } catch (JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);
-            throw databind.newProtocolMalformedMessageServerException("Invalid JSON", unmaskIOException(e));
+            throw newProtocolMalformedMessageServerException(path, "Invalid JSON", unmaskIOException(e));
         }
     }
 }

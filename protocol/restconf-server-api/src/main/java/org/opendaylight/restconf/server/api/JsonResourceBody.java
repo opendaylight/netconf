@@ -39,8 +39,7 @@ public final class JsonResourceBody extends ResourceBody {
             }
         } catch (IllegalArgumentException | IOException | JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);
-            throw path.databind().newProtocolMalformedMessageServerException("Error parsing input",
-                unmaskIOException(e));
+            throw newProtocolMalformedMessageServerException(path, "Error parsing input", unmaskIOException(e));
         }
     }
 

@@ -51,7 +51,7 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
             streamTo(path, expectedName, consume(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
-            throw path.databind().newProtocolMalformedMessageServerException("Error parsing input", e);
+            throw newProtocolMalformedMessageServerException(path, "Error parsing input", e);
         }
 
         final var parsedData = holder.getResult().data();
