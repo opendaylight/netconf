@@ -27,20 +27,22 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.guicedee.services</groupId>
-            <artifactId>javax.inject</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
+        </dependency>
+
+        <!-- FIXME: compilation fails downstream if these are correct -->
+        <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.jdt</groupId>
             <artifactId>org.eclipse.jdt.annotation</artifactId>
