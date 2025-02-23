@@ -7,10 +7,8 @@
  */
 package org.opendaylight.restconf.api.query;
 
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * This class represents a {@code depth} parameter as defined in
@@ -21,7 +19,6 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
     @SuppressWarnings("checkstyle:ConstantName")
     public static final @NonNull String uriName = "depth";
 
-    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.DEPTH);
     private static final @NonNull DepthParam MIN = new DepthParam(1);
     private static final @NonNull DepthParam MAX = new DepthParam(65535);
 
@@ -91,10 +88,5 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
 
     public int value() {
         return value;
-    }
-
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    public static @NonNull URI capabilityUri() {
-        return CAPABILITY;
     }
 }

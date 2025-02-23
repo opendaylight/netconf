@@ -7,9 +7,7 @@
  */
 package org.opendaylight.restconf.api.query;
 
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * OpenDaylight extension parameter. When used as {@code changed-leaf-nodes-only=true}, it will instruct the listener
@@ -20,7 +18,6 @@ public final class ChangedLeafNodesOnlyParam implements RestconfQueryParam<Chang
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "changed-leaf-nodes-only";
 
-    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.ODL_CHANGED_LEAF_NODES_ONLY);
     private static final @NonNull ChangedLeafNodesOnlyParam FALSE = new ChangedLeafNodesOnlyParam(false);
     private static final @NonNull ChangedLeafNodesOnlyParam TRUE = new ChangedLeafNodesOnlyParam(true);
 
@@ -59,10 +56,5 @@ public final class ChangedLeafNodesOnlyParam implements RestconfQueryParam<Chang
 
     public boolean value() {
         return value;
-    }
-
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    public static @NonNull URI capabilityUri() {
-        return CAPABILITY;
     }
 }

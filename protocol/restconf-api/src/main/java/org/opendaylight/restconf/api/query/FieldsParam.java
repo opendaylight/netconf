@@ -12,11 +12,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
-import java.net.URI;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.api.CapabilityURN;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
@@ -91,7 +89,6 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "fields";
-    private static final URI CAPABILITY = URI.create(CapabilityURN.FIELDS);
 
     private final ImmutableList<NodeSelector> nodeSelectors;
 
@@ -128,11 +125,6 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     @Override
     public String paramName() {
         return uriName;
-    }
-
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    public static URI capabilityUri() {
-        return CAPABILITY;
     }
 
     /**

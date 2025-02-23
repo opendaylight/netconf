@@ -9,9 +9,7 @@ package org.opendaylight.restconf.api.query;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * This class represents a {@code filter} parameter as defined in
@@ -22,8 +20,6 @@ public final class FilterParam implements RestconfQueryParam<FilterParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
     public static final @NonNull String uriName = "filter";
-
-    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.FILTER);
 
     // FIXME: can we have a parsed, but not bound version of an XPath, please?
     private final @NonNull String value;
@@ -49,10 +45,5 @@ public final class FilterParam implements RestconfQueryParam<FilterParam> {
 
     public static @NonNull FilterParam forUriValue(final String uriValue) {
         return new FilterParam(uriValue);
-    }
-
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    public static @NonNull URI capabilityUri() {
-        return CAPABILITY;
     }
 }
