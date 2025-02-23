@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.netconf.common.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;

@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.common.ErrorMessage;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -82,12 +83,12 @@ public final class ServerException extends Exception {
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
-            final @Nullable ServerErrorPath path) {
+            final @Nullable ErrorPath path) {
         this(type, tag, message, path, null);
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
-            final @Nullable ServerErrorPath path, final @Nullable Throwable cause) {
+            final @Nullable ErrorPath path, final @Nullable Throwable cause) {
         this(message, new ServerError(type, tag, new ErrorMessage(message), null, path, null), cause);
     }
 

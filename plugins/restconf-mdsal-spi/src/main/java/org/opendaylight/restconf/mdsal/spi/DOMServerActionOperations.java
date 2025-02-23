@@ -14,7 +14,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.restconf.server.api.DatabindPath.Action;
+import org.opendaylight.netconf.common.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ServerActionOperations;

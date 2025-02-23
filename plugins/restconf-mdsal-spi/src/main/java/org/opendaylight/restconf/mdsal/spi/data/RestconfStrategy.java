@@ -36,6 +36,8 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.common.DatabindPath.Data;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -45,12 +47,10 @@ import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerError;
-import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractServerDataOperations;
@@ -599,7 +599,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         if (syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
-                new ServerErrorPath(databind, path));
+                new ErrorPath(databind, path));
         }
     }
 
@@ -1054,11 +1054,11 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
                         return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
-                            path != null ? new ServerErrorPath(databind, path) : null, ex);
+                            path != null ? new ErrorPath(databind, path) : null, ex);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
                         return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                            "Data does not exist", path != null ? new ServerErrorPath(databind, path) : null, ex);
+                            "Data does not exist", path != null ? new ErrorPath(databind, path) : null, ex);
                     }
                 }
             }

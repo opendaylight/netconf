@@ -7,9 +7,9 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import org.opendaylight.netconf.common.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;

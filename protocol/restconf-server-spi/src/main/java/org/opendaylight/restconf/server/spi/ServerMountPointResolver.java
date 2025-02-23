@@ -9,7 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.netconf.common.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerException;
 
 /**

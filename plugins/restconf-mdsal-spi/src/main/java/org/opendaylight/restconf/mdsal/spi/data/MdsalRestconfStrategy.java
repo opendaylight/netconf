@@ -22,10 +22,10 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.common.DatabindPath.Data;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
-import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
@@ -64,7 +64,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             public void onSuccess(final Boolean result) {
                 if (!result) {
                     cancelTx(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
-                        new ServerErrorPath(path)));
+                        new ErrorPath(path)));
                     return;
                 }
 
@@ -77,8 +77,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        request.completeWith(new ServerException("Transaction to delete failed",
-                            new ServerErrorPath(path), cause));
+                        request.completeWith(new ServerException("Transaction to delete failed", new ErrorPath(path),
+                            cause));
                     }
                 }, MoreExecutors.directExecutor());
             }

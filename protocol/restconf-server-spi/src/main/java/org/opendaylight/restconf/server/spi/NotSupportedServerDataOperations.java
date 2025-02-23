@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.common.DatabindPath.Data;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -15,9 +17,7 @@ import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.PatchContext;
-import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -81,6 +81,6 @@ public final class NotSupportedServerDataOperations implements ServerDataOperati
 
     private static void notSupported(final ServerRequest<?> request, final Data path) {
         request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
-            "Data request not supported", new ServerErrorPath(path), null));
+            "Data request not supported", new ErrorPath(path), null));
     }
 }

@@ -21,9 +21,9 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.restconf.mdsal.spi.data.ExistenceCheck.Conflict;
 import org.opendaylight.restconf.mdsal.spi.data.ExistenceCheck.Result;
-import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -61,7 +61,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
         } else {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
-                new ServerErrorPath(databind, path));
+                new ErrorPath(databind, path));
         }
     }
 
@@ -96,7 +96,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             // ... finally collect existence checks and abort the transaction if any of them failed.
             if (getOrThrow(check) instanceof Conflict conflict) {
                 throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
-                    new ServerErrorPath(databind, conflict.path()));
+                    new ErrorPath(databind, conflict.path()));
             }
         } else {
             RestconfStrategy.checkItemDoesNotExists(databind, verifyNotNull(rwTx).exists(CONFIGURATION, path), path);

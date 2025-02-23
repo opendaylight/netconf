@@ -11,9 +11,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.DatabindContext;
 import org.opendaylight.netconf.common.ErrorMessage;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorInfo;
-import org.opendaylight.restconf.server.api.ServerErrorPath;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -39,7 +39,7 @@ class YangErrorsBodyTest extends AbstractJukeboxTest {
             new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("message 2"),
                 "app tag #2", null, new ServerErrorInfo("my info")),
             new ServerError(ErrorType.RPC, ErrorTag.DATA_MISSING, new ErrorMessage("message 3"), " app tag #3",
-                new ServerErrorPath(DATABIND, YangInstanceIdentifier.builder()
+                new ErrorPath(DATABIND, YangInstanceIdentifier.builder()
                     .node(QName.create(MONITORING_MODULE_INFO, "patch-cont"))
                     .node(QName.create(MONITORING_MODULE_INFO, "my-list1"))
                     .nodeWithKey(QName.create(MONITORING_MODULE_INFO, "my-list1"),

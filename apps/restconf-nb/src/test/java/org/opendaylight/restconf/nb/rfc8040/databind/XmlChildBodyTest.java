@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.DatabindContext;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.netconf.common.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
