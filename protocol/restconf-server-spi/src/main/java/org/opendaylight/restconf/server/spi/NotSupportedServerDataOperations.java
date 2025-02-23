@@ -8,8 +8,8 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindPath.Data;
-import org.opendaylight.netconf.common.ErrorPath;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;

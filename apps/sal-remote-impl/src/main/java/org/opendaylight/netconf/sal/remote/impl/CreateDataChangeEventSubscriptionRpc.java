@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
-import org.opendaylight.netconf.common.DatabindProvider;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;

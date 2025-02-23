@@ -5,25 +5,26 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.common;
+package org.opendaylight.netconf.databind;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The contents of a {@code error-message} element as defined in
- * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-83">RFC8040 errors grouping</a>. This object can optionally
- * transport the <a href="https://www.w3.org/TR/xml/#sec-lang-tag">Language Identification</a> as conveyed via,
- * for example, <a href="https://www.rfc-editor.org/rfc/rfc6241#page-17">RFC6241 error-message element</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-7.1">RFC8040 Error Response Message</a>, bound to a
+ * {@link DatabindContext}.
  *
  * @param elementBody the string to be displayed
  * @param xmlLang optional Language Identification string
  */
+// TODO: move to yangtools.yang.common for integration into RpcError
+@Beta
 @NonNullByDefault
-// TODO: consider sharing this class with netconf-api's NetconfDocumentedException
 public record ErrorMessage(String elementBody, @Nullable String xmlLang) {
     public ErrorMessage {
         requireNonNull(elementBody);

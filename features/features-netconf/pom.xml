@@ -66,6 +66,12 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-databind</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-impl</artifactId>
             <type>xml</type>
             <classifier>features</classifier>

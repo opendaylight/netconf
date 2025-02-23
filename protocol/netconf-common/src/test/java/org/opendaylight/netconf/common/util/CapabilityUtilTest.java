@@ -25,6 +25,7 @@ import org.opendaylight.netconf.api.capability.ExiCapability;
 import org.opendaylight.netconf.api.capability.ExiSchemas;
 import org.opendaylight.netconf.api.capability.SimpleCapability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
+import org.opendaylight.netconf.common.CapabilityUtil;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**

@@ -16,7 +16,7 @@ import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;

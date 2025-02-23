@@ -29,6 +29,7 @@
     </properties>
 
     <modules>
+        <module>databind</module>
         <module>netconf-api</module>
         <module>netconf-client</module>
         <module>netconf-codec</module>

@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindPath.Data;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.concepts.Immutable;

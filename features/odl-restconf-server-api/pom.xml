@@ -41,13 +41,13 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-api</artifactId>
+            <artifactId>odl-netconf-databind</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>odl-yangtools-codec</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-api</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

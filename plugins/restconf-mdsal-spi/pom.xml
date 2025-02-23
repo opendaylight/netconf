@@ -67,11 +67,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-api</artifactId>
+            <artifactId>databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-common</artifactId>
+            <artifactId>netconf-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

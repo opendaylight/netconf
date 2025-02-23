@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.common.DatabindPath.OperationPath;
+import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;

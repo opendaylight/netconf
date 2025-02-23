@@ -43,6 +43,7 @@
         <module>odl-netconf-connector-all</module>
         <module>odl-netconf-connector</module>
         <module>odl-netconf-console</module>
+        <module>odl-netconf-databind</module>
         <module>odl-netconf-impl</module>
         <module>odl-netconf-keystore</module>
         <module>odl-netconf-keystore-plaintext</module>
