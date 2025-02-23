@@ -12,19 +12,15 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>bnd-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../../bnd-parent</relativePath>
     </parent>
 
     <artifactId>sal-remote-impl</artifactId>
     <name>${project.artifactId}</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>Implementation of sal-remote</description>
-
-    <properties>
-        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -51,6 +47,10 @@
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-dom-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -128,11 +128,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-common</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server-api-testlib</artifactId>
         </dependency>
         <dependency>
@@ -145,4 +140,17 @@
             <artifactId>yang-test-util</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependency>org.opendaylight.netconf:netconf-common</ignoredNonTestScopedDependency>
+                    </ignoredNonTestScopedDependencies>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
