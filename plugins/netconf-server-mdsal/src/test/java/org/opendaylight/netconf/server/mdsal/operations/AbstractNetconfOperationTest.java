@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.EnumMap;
-import java.util.concurrent.ExecutorService;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -35,7 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
@@ -87,22 +85,22 @@ abstract class AbstractNetconfOperationTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
-        final DOMSchemaService schemaService = new FixedDOMSchemaService(SCHEMA_CONTEXT);
-        final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
-        final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
-
-        currentSchemaContext = CurrentSchemaContext.create(schemaService,
+        final var schemaService = new FixedDOMSchemaService(() -> SCHEMA_CONTEXT,
             sourceIdentifier -> Futures.immediateFuture(new DelegatedYangTextSource(sourceIdentifier,
                 CharSource.wrap("module test"))));
+        final var operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
+        final var configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
+
+        currentSchemaContext = new CurrentSchemaContext(schemaService);
 
         final var datastores = new EnumMap<LogicalDatastoreType, DOMStore>(LogicalDatastoreType.class);
         datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
         datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 
-        final ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
+        final var listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
             16, 16, "CommitFutures", CopyConfigTest.class);
 
-        final SerializedDOMDataBroker sdb = new SerializedDOMDataBroker(datastores,
+        final var sdb = new SerializedDOMDataBroker(datastores,
             MoreExecutors.listeningDecorator(listenableFutureExecutor));
         transactionProvider = new TransactionProvider(sdb, SESSION_ID_FOR_REPORTING);
     }

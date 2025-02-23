@@ -8,29 +8,20 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Addresses issue with list key of type instance-identifier being not recognized properly.
  */
-@ExtendWith(MockitoExtension.class)
-public class NC1214Test {
-
+class NC1214Test {
     private static final String MODULE1 = """
         module module1 {
             yang-version 1;
@@ -77,35 +68,25 @@ public class NC1214Test {
             </reference>
         </root>
         """;
-
-    private static EffectiveModelContext CONTEXT = YangParserTestUtils.parseYang(MODULE1, MODULE2);
-    private static final QNameModule M1 =
-        QNameModule.of(XMLNamespace.of("urn:test:module1"), Revision.of("2024-05-06"));
-    private static final QNameModule M2 =
-        QNameModule.of(XMLNamespace.of("urn:test:module2"), Revision.of("2024-05-06"));
-    private static QName M1_ROOT = QName.create(M1, "root");
-    private static QName M1_ITEMS = QName.create(M1, "items");
-    private static QName M1_ITEM_KEY = QName.create(M1, "name");
-    private static QName M2_ROOT = QName.create(M2, "root");
-    private static QName M2_REF = QName.create(M2, "reference");
-    private static QName M2_REF_KEY = QName.create(M2, "ref");
-
-    @Mock
-    CurrentSchemaContext currentContext;
+    private static final QNameModule M1 = QNameModule.ofRevision("urn:test:module1", "2024-05-06");
+    private static final QNameModule M2 = QNameModule.ofRevision("urn:test:module2", "2024-05-06");
+    private static final QName M1_ITEMS = QName.create(M1, "items");
+    private static final QName M2_REF = QName.create(M2, "reference");
 
     @Test
     void instanceIdentifierReference() throws Exception {
-        doReturn(CONTEXT).when(currentContext).getCurrentContext();
+        final var databind = DatabindContext.ofModel(YangParserTestUtils.parseYang(MODULE1, MODULE2));
 
         final var xmlElement = XmlElement.fromDomDocument(XmlUtil.readXmlToDocument(XML));
-        final var validator = new FilterContentValidator(currentContext);
+        final var validator = new FilterContentValidator(() -> databind);
         final var expected = YangInstanceIdentifier.builder()
-            .node(M2_ROOT)
+            .node(QName.create(M2, "root"))
             .node(M2_REF)
-            .nodeWithKey(M2_REF, M2_REF_KEY, YangInstanceIdentifier.builder()
-                .node(M1_ROOT)
+            .nodeWithKey(M2_REF, QName.create(M2, "ref"), YangInstanceIdentifier.builder()
+                .node(QName.create(M1, "root"))
                 .node(M1_ITEMS)
-                .nodeWithKey(M1_ITEMS, M1_ITEM_KEY, "test").build()
+                .nodeWithKey(M1_ITEMS, QName.create(M1, "name"), "test")
+                .build()
             ).build();
 
         assertEquals(expected, validator.validate(xmlElement));

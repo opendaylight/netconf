@@ -18,7 +18,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -29,7 +29,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +42,9 @@ public final class EditConfig extends AbstractEdit {
 
     private final TransactionProvider transactionProvider;
 
-    public EditConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
+    public EditConfig(final SessionIdType sessionId, final DatabindProvider databindProvider,
             final TransactionProvider transactionProvider) {
-        super(sessionId, schemaContext);
+        super(sessionId, databindProvider);
         this.transactionProvider = requireNonNull(transactionProvider);
     }
 
@@ -134,7 +133,7 @@ public final class EditConfig extends AbstractEdit {
                                   final NormalizedNode change) {
         final var parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
-            final var dataSchemaNode = DataSchemaContextTree.from(schemaContext.getCurrentContext())
+            final var dataSchemaNode = databindProvider.currentDatabind().schemaTree()
                 .findChild(parentNodeYid)
                 .orElseThrow(() -> new IllegalStateException("Cannot find schema for " + parentNodeYid))
                 .dataSchemaNode();
