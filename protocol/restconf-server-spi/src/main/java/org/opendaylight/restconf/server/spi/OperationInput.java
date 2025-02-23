@@ -10,7 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindPath.OperationPath;
+import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**

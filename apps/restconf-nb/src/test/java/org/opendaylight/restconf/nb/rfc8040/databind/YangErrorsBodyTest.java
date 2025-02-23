@@ -9,9 +9,9 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.common.DatabindContext;
-import org.opendaylight.netconf.common.ErrorMessage;
-import org.opendaylight.netconf.common.ErrorPath;
+import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.YangErrorsBody;

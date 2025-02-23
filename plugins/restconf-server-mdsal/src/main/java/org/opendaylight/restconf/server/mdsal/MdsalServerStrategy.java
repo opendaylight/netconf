@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;

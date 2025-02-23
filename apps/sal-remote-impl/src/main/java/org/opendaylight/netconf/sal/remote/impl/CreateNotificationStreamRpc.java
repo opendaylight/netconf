@@ -14,7 +14,7 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.netconf.common.DatabindProvider;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.restconf.mdsal.spi.NotificationSource;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;

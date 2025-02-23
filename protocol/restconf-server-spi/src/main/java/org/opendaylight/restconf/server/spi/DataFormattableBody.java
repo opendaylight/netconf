@@ -14,7 +14,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;

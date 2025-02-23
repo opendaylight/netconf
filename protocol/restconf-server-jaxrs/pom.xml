@@ -129,7 +129,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-common</artifactId>
+            <artifactId>databind</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

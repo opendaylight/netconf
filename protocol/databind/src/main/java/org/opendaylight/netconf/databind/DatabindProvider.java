@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.common;
+package org.opendaylight.netconf.databind;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -15,7 +15,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public interface DatabindProvider {
     /**
-     * Return the current {@link DatabindContext}.
+     * Return the current {@link DatabindContext}. Users should hold on to the returned context for as long as needed,
+     * as the next invocation of this method may return a different context.
      *
      * @return the current {@link DatabindContext}
      */

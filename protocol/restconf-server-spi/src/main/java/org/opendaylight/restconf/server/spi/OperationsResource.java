@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindPath.Rpc;
+import org.opendaylight.netconf.databind.DatabindPath.Rpc;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.ServerException;
