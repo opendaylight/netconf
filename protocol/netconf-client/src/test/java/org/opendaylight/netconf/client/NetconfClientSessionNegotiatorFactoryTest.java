@@ -14,7 +14,7 @@ import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
+import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 
 class NetconfClientSessionNegotiatorFactoryTest {
     @Test

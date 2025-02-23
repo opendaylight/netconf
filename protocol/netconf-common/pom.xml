@@ -11,19 +11,15 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>bnd-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../../bnd-parent</relativePath>
     </parent>
 
     <artifactId>netconf-common</artifactId>
     <name>${project.artifactId}</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>Shared NETCONF protocol components</description>
-
-    <properties>
-        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -50,14 +46,6 @@
             <artifactId>org.eclipse.jdt.annotation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component.annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.metatype.annotations</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-api</artifactId>
         </dependency>
@@ -68,6 +56,14 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.metatype.annotations</artifactId>
         </dependency>
 
         <dependency>

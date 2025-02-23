@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.TransportConstants;
-import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
+import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;

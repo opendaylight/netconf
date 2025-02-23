@@ -56,7 +56,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
+import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
