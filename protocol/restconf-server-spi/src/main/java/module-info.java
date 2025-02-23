@@ -10,6 +10,8 @@
  */
 module org.opendaylight.restconf.server.spi {
     exports org.opendaylight.restconf.server.spi;
+    // TODO: move this package more upwards a common place with netconf-server
+    exports org.opendaylight.netconf.server.subtree;
 
     requires transitive com.google.common;
     requires transitive org.opendaylight.netconf.databind;
