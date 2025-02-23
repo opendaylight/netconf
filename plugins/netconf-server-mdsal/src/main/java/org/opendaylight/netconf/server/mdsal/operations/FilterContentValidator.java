@@ -18,8 +18,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -31,16 +29,12 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
-import org.opendaylight.yangtools.yang.data.util.codec.TypeAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
@@ -48,7 +42,6 @@ import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 /**
  * Class validates filter content against schema context.
@@ -189,46 +182,45 @@ public class FilterContentValidator {
         }
     }
 
+    // FIXME: receive DatabindContext?
     private Map<QName, Object> getKeyValues(final List<String> path, final XmlElement filterContent,
             final DataSchemaNode parentSchemaNode, final ListSchemaNode listSchemaNode) {
         XmlElement current = filterContent;
         //find list element
         for (final String pathElement : path) {
-            final List<XmlElement> childElements = current.getChildElements(pathElement);
+            final var childElements = current.getChildElements(pathElement);
             // if there are multiple list entries present in the filter, we can't use any keys and must read whole list
             if (childElements.size() != 1) {
                 return Map.of();
             }
             current = childElements.get(0);
         }
-        final Map<QName, Object> keys = new HashMap<>();
-        final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
-        for (final QName qualifiedName : keyDefinition) {
-            final var optChildElements = current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
+
+        final var keyDef = listSchemaNode.getKeyDefinition();
+        final var keys = HashMap.<QName, Object>newHashMap(keyDef.size());
+        for (var qname : keyDef) {
+            final var optChildElements = current.getOnlyChildElementOptionally(qname.getLocalName());
             if (optChildElements.isEmpty()) {
                 return Map.of();
             }
             optChildElements.orElseThrow().getOnlyTextContentOptionally().ifPresent(keyValue -> {
-                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qualifiedName);
+                final var listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qname);
                 if (listKey instanceof IdentityrefTypeDefinition) {
-                    keys.put(qualifiedName, keyValue);
+                    keys.put(qname, keyValue);
                 } else {
-                    final TypeDefinition<? extends TypeDefinition<?>> keyType = listKey.getType();
+                    final var keyType = listKey.getType();
                     if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition
                             || keyType instanceof InstanceIdentifierTypeDefinition) {
-                        final Document document = filterContent.getDomElement().getOwnerDocument();
-                        final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
-                        final EffectiveModelContext modelContext = schemaContext.getCurrentContext();
-                        final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(modelContext);
-                        final SchemaInferenceStack resolver = SchemaInferenceStack.of(modelContext, Absolute.of(
-                                parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));
-                        final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory
-                                .codecFor(listKey, resolver);
-                        final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue);
-                        keys.put(qualifiedName, deserializedKeyValue);
+                        final var document = filterContent.getDomElement().getOwnerDocument();
+                        final var nsContext = new UniversalNamespaceContextImpl(document, false);
+                        final var databind = schemaContext.currentDatabind();
+                        // TODO: ofDataTreePath() ?
+                        final var stack = SchemaInferenceStack.of(databind.modelContext(),
+                            Absolute.of(parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));
+                        keys.put(qname,
+                            databind.xmlCodecs().codecFor(listKey, stack).parseValue(nsContext, keyValue));
                     } else {
-                        final Object deserializedKey = TypeDefinitionAwareCodec.from(keyType).deserialize(keyValue);
-                        keys.put(qualifiedName, deserializedKey);
+                        keys.put(qname, TypeDefinitionAwareCodec.from(keyType).deserialize(keyValue));
                     }
                 }
             });
