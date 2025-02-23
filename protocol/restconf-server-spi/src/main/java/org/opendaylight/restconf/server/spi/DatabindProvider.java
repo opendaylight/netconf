@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.netconf.common.DatabindContext;
 
 /**
  * A service providing access to a {@link DatabindContext}.
