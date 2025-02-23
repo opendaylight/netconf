@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.common.DatabindContext;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
-import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 

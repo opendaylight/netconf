@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.netconf.common.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.OperationInputBody;

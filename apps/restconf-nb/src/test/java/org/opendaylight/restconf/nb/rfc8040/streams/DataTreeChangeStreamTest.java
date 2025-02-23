@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBro
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
+import org.opendaylight.netconf.common.DatabindProvider;
 import org.opendaylight.netconf.sal.remote.impl.DataTreeChangeSource;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
@@ -41,7 +42,6 @@ import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;

@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.common.DatabindContext;
 
 /**
  * Common interface for contracts that provide a {@link DatabindContext} instance via {@link #databind()}.

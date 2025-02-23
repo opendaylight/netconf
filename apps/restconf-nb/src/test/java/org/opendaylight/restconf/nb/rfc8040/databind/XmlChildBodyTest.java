@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.netconf.common.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.yangtools.yang.common.QName;
