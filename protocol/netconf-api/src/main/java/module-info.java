@@ -7,9 +7,10 @@
  */
 module org.opendaylight.netconf.api {
     exports org.opendaylight.netconf.api;
-    exports org.opendaylight.netconf.api.messages;
-    exports org.opendaylight.netconf.api.xml;
     exports org.opendaylight.netconf.api.capability;
+    exports org.opendaylight.netconf.api.messages;
+    exports org.opendaylight.netconf.api.subtree;
+    exports org.opendaylight.netconf.api.xml;
 
     requires transitive io.netty.transport;
     requires transitive java.xml;
