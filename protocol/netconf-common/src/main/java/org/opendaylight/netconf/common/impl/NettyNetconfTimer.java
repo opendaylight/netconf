@@ -15,9 +15,6 @@ import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -29,14 +26,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default {@link NetconfTimer}, delegating to a {@link HashedWheelTimer}.
+ * Simple implementation of {@link NetconfTimer}, delegating to a {@link HashedWheelTimer}.
  */
-@Singleton
 @Component(service = NetconfTimer.class, configurationPid = "org.opendaylight.netconf.timer")
-@Designate(ocd = DefaultNetconfTimer.Configuration.class)
-public final class DefaultNetconfTimer implements NetconfTimer, AutoCloseable {
+@Designate(ocd = NettyNetconfTimer.Configuration.class)
+public final class NettyNetconfTimer implements NetconfTimer, AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(NettyNetconfTimer.class);
+    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
+        .setNameFormat("netconf-timer-%d")
+        .setDaemon(true)
+        .build();
+
     /**
-     * Configuration of {@link DefaultNetconfTimer}.
+     * Configuration of {@link NettyNetconfTimer}.
      */
     @ObjectClassDefinition
     public @interface Configuration {
@@ -57,43 +59,7 @@ public final class DefaultNetconfTimer implements NetconfTimer, AutoCloseable {
         int ticks$_$per$_$wheel() default 512;
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfTimer.class);
-    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
-        .setNameFormat("netconf-timer-%d")
-        .setDaemon(true)
-        .build();
-
     private HashedWheelTimer delegate;
-
-    /**
-     * Default constructor. Uses default values for both tick duration and wheel size.
-     */
-    @Inject
-    public DefaultNetconfTimer() {
-        this(100, TimeUnit.MILLISECONDS, 512);
-    }
-
-    /**
-     * Low-level constructor.
-     *
-     * @param tickDuration the duration between tick
-     * @param unit the time unit of the {@code tickDuration}
-     * @param ticksPerWheel the size of the wheel
-     */
-    public DefaultNetconfTimer(final long tickDuration, final TimeUnit unit, final int ticksPerWheel) {
-        delegate = new HashedWheelTimer(THREAD_FACTORY, tickDuration, unit, ticksPerWheel);
-        LOG.info("NETCONF timer started");
-    }
-
-    /**
-     * OSGi constructor. Uses values from supplied {@link Configuration}.
-     *
-     * @param config the configuration
-     */
-    @Activate
-    public DefaultNetconfTimer(final Configuration config) {
-        this(config.tick$_$duration$_$_millis(), TimeUnit.MILLISECONDS, config.ticks$_$per$_$wheel());
-    }
 
     @Override
     public Timeout newTimeout(final TimerTask task, final long delay, final TimeUnit unit) {
@@ -104,9 +70,31 @@ public final class DefaultNetconfTimer implements NetconfTimer, AutoCloseable {
         return local.newTimeout(requireNonNull(task), delay, requireNonNull(unit));
     }
 
-    @Deactivate
-    @PreDestroy
+
+    /**
+     * Default constructor.
+     *
+     * @param tickDuration the duration between tick
+     * @param unit the time unit of the {@code tickDuration}
+     * @param ticksPerWheel the size of the wheel
+     */
+    public NettyNetconfTimer(final long tickDuration, final TimeUnit unit, final int ticksPerWheel) {
+        delegate = new HashedWheelTimer(THREAD_FACTORY, tickDuration, unit, ticksPerWheel);
+        LOG.info("NETCONF timer started");
+    }
+
+    /**
+     * OSGi constructor. Uses values from supplied {@link Configuration}.
+     *
+     * @param config the configuration
+     */
+    @Activate
+    public NettyNetconfTimer(final Configuration config) {
+        this(config.tick$_$duration$_$_millis(), TimeUnit.MILLISECONDS, config.ticks$_$per$_$wheel());
+    }
+
     @Override
+    @Deactivate
     public void close() {
         if (delegate != null) {
             delegate.stop();
