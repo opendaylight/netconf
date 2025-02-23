@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.netconf.common.ErrorMessage;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorInfo;

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.netconf.common.ErrorMessage;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
