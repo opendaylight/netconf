@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.ParseException;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.common.DatabindContext;
 import org.opendaylight.netconf.common.ErrorMessage;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerException;

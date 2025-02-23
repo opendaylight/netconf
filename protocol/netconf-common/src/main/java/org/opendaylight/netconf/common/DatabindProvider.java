@@ -5,10 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.spi;
+package org.opendaylight.netconf.common;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.server.api.DatabindContext;
 
 /**
  * A service providing access to a {@link DatabindContext}.
