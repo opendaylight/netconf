@@ -14,6 +14,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.common.DatabindContext;
 import org.opendaylight.netconf.common.ErrorMessage;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -36,7 +37,7 @@ public record ServerError(
         ErrorTag tag,
         @Nullable ErrorMessage message,
         @Nullable String appTag,
-        @Nullable ServerErrorPath path,
+        @Nullable ErrorPath path,
         @Nullable ServerErrorInfo info) {
     public ServerError {
         requireNonNull(type);
