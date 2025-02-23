@@ -14,7 +14,7 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.odlparent.logging.markers.Markers;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;

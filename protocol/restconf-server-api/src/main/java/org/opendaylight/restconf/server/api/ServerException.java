@@ -18,8 +18,8 @@ import java.io.ObjectStreamException;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.common.ErrorMessage;
-import org.opendaylight.netconf.common.ErrorPath;
+import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 

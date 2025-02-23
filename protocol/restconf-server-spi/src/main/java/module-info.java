@@ -12,7 +12,7 @@ module org.opendaylight.restconf.server.spi {
     exports org.opendaylight.restconf.server.spi;
 
     requires transitive com.google.common;
-    requires transitive org.opendaylight.netconf.common;
+    requires transitive org.opendaylight.netconf.databind;
     requires transitive org.opendaylight.restconf.api;
     requires transitive org.opendaylight.restconf.server.api;
     requires org.opendaylight.netconf.api;

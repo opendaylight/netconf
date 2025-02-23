@@ -5,17 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.common.util;
+package org.opendaylight.netconf.common;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableListMultimap;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
@@ -25,15 +24,14 @@ import org.opendaylight.netconf.api.capability.ExiCapability;
 import org.opendaylight.netconf.api.capability.ExiSchemas;
 import org.opendaylight.netconf.api.capability.SimpleCapability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
-import org.opendaylight.yangtools.yang.common.AbstractQName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.DeviationEffectiveStatement;
 
 /**
  * Utility class used for simple creation and parsing Capability objects.
  */
+@Beta
 public final class CapabilityUtil {
     private static final String MODULE_PARAM = "module";
     private static final String REVISION_PARAM = "revision";
@@ -93,39 +91,27 @@ public final class CapabilityUtil {
      */
     public static @NonNull List<YangModuleCapability> extractYangModuleCapabilities(
             final @NonNull EffectiveModelContext context) {
-        requireNonNull(context);
-        final var modules = context.getModules();
-        final var list = new ArrayList<YangModuleCapability>(modules.size());
-        final var deviationsMap = buildDeviationsMap(context);
-        for (final var module : modules) {
-            final var moduleNamespace = module.getNamespace().toString();
-            final var moduleName = module.getName();
-            final var revision = module.getRevision().map(Revision::toString).orElse(null);
-            final var namespace = module.getQNameModule();
-            final var features = module.getFeatures().stream()
-                .map(FeatureDefinition::getQName)
-                // ensure the features belong to same module
-                .filter(featureName -> namespace.equals(featureName.getModule()))
-                .map(AbstractQName::getLocalName)
-                .toList();
-            final var deviations = deviationsMap.get(namespace);
-            list.add(new YangModuleCapability(moduleNamespace, moduleName, revision, features, deviations));
+        // construct back references from deviated module to the module defining the deviation
+        final var builder = ImmutableListMultimap.<QNameModule, String>builder();
+        for (final var module : context.getModuleStatements().values()) {
+            module.streamEffectiveSubstatements(DeviationEffectiveStatement.class)
+                .map(deviation -> deviation.argument().lastNodeIdentifier().getModule())
+                .forEach(target -> builder.put(target, module.argument().getLocalName()));
         }
-        return ImmutableList.copyOf(list);
-    }
+        final var deviations = builder.build();
 
-    private static Map<QNameModule, List<String>> buildDeviationsMap(final EffectiveModelContext context) {
-        final var result = new HashMap<QNameModule, List<String>>();
-        for (final var module : context.getModules()) {
-            if (module.getDeviations() == null || module.getDeviations().isEmpty()) {
-                continue;
-            }
-            for (final var deviation : module.getDeviations()) {
-                final var targetQname = deviation.getTargetPath().lastNodeIdentifier().getModule();
-                result.computeIfAbsent(targetQname, key -> new LinkedList<>()).add(module.getName());
-            }
-        }
-        return ImmutableMap.copyOf(result);
+        return context.getModuleStatements().values().stream()
+            .map(module -> {
+                final var namespace = module.localQNameModule();
+                final var revision = namespace.revision();
+                return new YangModuleCapability(
+                    namespace.namespace().toString(),
+                    module.argument().getLocalName(),
+                    revision != null ? revision.toString() : null,
+                    module.features().stream().map(feature -> feature.argument().getLocalName()).toList(),
+                    deviations.get(namespace));
+            })
+            .collect(ImmutableList.toImmutableList());
     }
 
     private static Capability parseYangModuleCapability(final String moduleNamespace,

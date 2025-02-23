@@ -5,26 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * RESTCONF server API.
- */
-module org.opendaylight.restconf.server.api {
-    exports org.opendaylight.restconf.server.api;
+module org.opendaylight.netconf.databind {
+    exports org.opendaylight.netconf.databind;
 
-    requires transitive com.google.common;
-    requires transitive org.opendaylight.netconf.databind;
-    requires transitive org.opendaylight.restconf.api;
-    requires transitive org.opendaylight.yangtools.yang.data.api;
+    requires transitive org.opendaylight.yangtools.yang.common;
     requires transitive org.opendaylight.yangtools.yang.data.codec.gson;
     requires transitive org.opendaylight.yangtools.yang.data.codec.xml;
     requires transitive org.opendaylight.yangtools.yang.data.util;
     requires transitive org.opendaylight.yangtools.yang.model.api;
-    requires transitive org.opendaylight.yang.gen.ietf.yang.patch.rfc8072;
-    requires org.opendaylight.yang.gen.ietf.restconf.rfc8040;
-    requires org.opendaylight.yangtools.yang.data.impl;
-    requires org.opendaylight.yangtools.yang.data.spi;
+    requires com.google.common;
     requires org.slf4j;
-    requires stax.utils;
 
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;

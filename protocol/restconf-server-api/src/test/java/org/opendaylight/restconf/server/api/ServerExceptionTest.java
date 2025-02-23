@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.common.ErrorMessage;
+import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
