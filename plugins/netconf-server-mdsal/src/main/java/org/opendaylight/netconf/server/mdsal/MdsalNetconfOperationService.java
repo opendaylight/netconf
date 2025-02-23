@@ -10,6 +10,7 @@ package org.opendaylight.netconf.server.mdsal;
 import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.mdsal.operations.Commit;
@@ -28,19 +29,19 @@ final class MdsalNetconfOperationService implements NetconfOperationService {
     private final ImmutableSet<NetconfOperation> operations;
     private final TransactionProvider transactionProvider;
 
-    MdsalNetconfOperationService(final CurrentSchemaContext schemaContext, final SessionIdType sessionId,
+    MdsalNetconfOperationService(final DatabindProvider databindProvider, final SessionIdType sessionId,
             final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
         transactionProvider = new TransactionProvider(dataBroker, sessionId);
         operations = ImmutableSet.of(
             new Commit(sessionId, transactionProvider),
             new DiscardChanges(sessionId, transactionProvider),
-            new EditConfig(sessionId, schemaContext, transactionProvider),
-            new CopyConfig(sessionId, schemaContext, transactionProvider),
-            new Get(sessionId, schemaContext, transactionProvider),
-            new GetConfig(sessionId, schemaContext, transactionProvider),
+            new EditConfig(sessionId, databindProvider, transactionProvider),
+            new CopyConfig(sessionId, databindProvider, transactionProvider),
+            new Get(sessionId, databindProvider, transactionProvider),
+            new GetConfig(sessionId, databindProvider, transactionProvider),
             new Lock(sessionId),
             new Unlock(sessionId),
-            new RuntimeRpc(sessionId, schemaContext, rpcService),
+            new RuntimeRpc(sessionId, databindProvider, rpcService),
             new Validate(sessionId, transactionProvider));
     }
 

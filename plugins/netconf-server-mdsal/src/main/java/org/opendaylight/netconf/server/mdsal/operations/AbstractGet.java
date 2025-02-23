@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
@@ -20,8 +21,8 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -38,34 +39,31 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-// FIXME: seal when we have JDK17+
-abstract class AbstractGet extends AbstractSingletonNetconfOperation {
+abstract sealed class AbstractGet extends AbstractSingletonNetconfOperation permits Get, GetConfig {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
-    private final CurrentSchemaContext schemaContext;
+    private final DatabindProvider databindProvider;
     private final FilterContentValidator validator;
 
-    AbstractGet(final SessionIdType sessionId, final CurrentSchemaContext schemaContext) {
+    AbstractGet(final SessionIdType sessionId, final DatabindProvider databindProvider) {
         super(sessionId);
-        this.schemaContext = schemaContext;
-        validator = new FilterContentValidator(schemaContext);
+        this.databindProvider = requireNonNull(databindProvider);
+        validator = new FilterContentValidator(databindProvider);
     }
 
     // FIXME: throw a DocumentedException
     private Node transformNormalizedNode(final Document document, final NormalizedNode data,
                                          final YangInstanceIdentifier dataRoot) {
-        final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
-        final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
-        final EffectiveModelContext currentContext = schemaContext.getCurrentContext();
-
-        final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-            currentContext);
+        final var result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
+        final var xmlWriter = getXmlStreamWriter(result);
+        final var modelContext = databindProvider.currentDatabind().modelContext();
+        final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, modelContext);
 
         try {
             if (dataRoot.isEmpty()) {
                 writeRoot(nnStreamWriter, data);
             } else {
-                write(nnStreamWriter, currentContext, dataRoot.coerceParent(), data);
+                write(nnStreamWriter, modelContext, dataRoot.coerceParent(), data);
             }
         } catch (IOException e) {
             // FIXME: throw DocumentedException

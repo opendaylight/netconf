@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
 
 import com.google.common.base.MoreObjects;
@@ -21,7 +22,7 @@ import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -34,7 +35,6 @@ import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
@@ -47,12 +47,12 @@ import org.slf4j.LoggerFactory;
  * Class validates filter content against schema context.
  */
 public class FilterContentValidator {
-
     private static final Logger LOG = LoggerFactory.getLogger(FilterContentValidator.class);
-    private final CurrentSchemaContext schemaContext;
 
-    public FilterContentValidator(final CurrentSchemaContext schemaContext) {
-        this.schemaContext = schemaContext;
+    private final DatabindProvider databindProvider;
+
+    public FilterContentValidator(final DatabindProvider databindProvider) {
+        this.databindProvider = requireNonNull(databindProvider);
     }
 
     /**
@@ -72,39 +72,28 @@ public class FilterContentValidator {
             throw new IllegalArgumentException("Wrong namespace in element + " + filterContent.toString(), e);
         }
 
-        try {
-            final Module module = schemaContext.getCurrentContext().findModules(namespace).iterator().next();
-            final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
-            final FilterTree filterTree = validateNode(
-                    filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER, schema));
-            return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
-        } catch (final ValidationException e) {
-            LOG.debug("Filter content isn't valid", e);
-            throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
-                    ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
-        }
-    }
+        final var databind = databindProvider.currentDatabind();
+        final var modelContext = databind.modelContext();
+        final var module = modelContext.findModules(namespace).iterator().next();
+        final var name = filterContent.getName();
 
-    /**
-     * Returns module's child data node of given name space and name.
-     *
-     * @param module    module
-     * @param nameSpace name space
-     * @param name      name
-     * @return child data node schema
-     * @throws DocumentedException if child with given name is not present
-     */
-    private DataSchemaNode getRootDataSchemaNode(final Module module, final XMLNamespace nameSpace, final String name)
-            throws DocumentedException {
-        for (final DataSchemaNode childNode : module.getChildNodes()) {
-            final QName qName = childNode.getQName();
-            if (qName.getNamespace().equals(nameSpace) && qName.getLocalName().equals(name)) {
-                return childNode;
+        for (var childNode : module.getChildNodes()) {
+            final var qName = childNode.getQName();
+            if (qName.getNamespace().equals(namespace) && qName.getLocalName().equals(name)) {
+                try {
+                    final var filterTree = validateNode(
+                            filterContent, childNode, new FilterTree(childNode.getQName(), Type.OTHER, childNode));
+                    return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
+                } catch (final ValidationException e) {
+                    LOG.debug("Filter content isn't valid", e);
+                    throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
+                            ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
+                }
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + " in schema context: "
-                + schemaContext.getCurrentContext(),
-                ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
+        throw new DocumentedException(
+            "Unable to find node with namespace: " + namespace + " in schema context: " + modelContext,
+            ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
     }
 
     /**
@@ -213,7 +202,7 @@ public class FilterContentValidator {
                             || keyType instanceof InstanceIdentifierTypeDefinition) {
                         final var document = filterContent.getDomElement().getOwnerDocument();
                         final var nsContext = new UniversalNamespaceContextImpl(document, false);
-                        final var databind = schemaContext.currentDatabind();
+                        final var databind = databindProvider.currentDatabind();
                         // TODO: ofDataTreePath() ?
                         final var stack = SchemaInferenceStack.of(databind.modelContext(),
                             Absolute.of(parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));

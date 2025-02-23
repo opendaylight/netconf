@@ -14,7 +14,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -27,15 +27,16 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class GetConfig extends AbstractGet {
+// Non-sealed for testing
+public non-sealed class GetConfig extends AbstractGet {
     private static final Logger LOG = LoggerFactory.getLogger(GetConfig.class);
     private static final String OPERATION_NAME = "get-config";
 
     private final TransactionProvider transactionProvider;
 
-    public GetConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
+    public GetConfig(final SessionIdType sessionId, final DatabindProvider databindProvider,
             final TransactionProvider transactionProvider) {
-        super(sessionId, schemaContext);
+        super(sessionId, databindProvider);
         this.transactionProvider = transactionProvider;
     }
 

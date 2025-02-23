@@ -36,45 +36,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // FIXME: this is a very bad name, come up with something better
-// Non-final for mocking
-@SuppressWarnings("checkstyle:FinalClass")
-public class CurrentSchemaContext implements DatabindProvider, AutoCloseable {
+public final class CurrentSchemaContext implements DatabindProvider, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CurrentSchemaContext.class);
 
     private final AtomicReference<NetconfServerStrategy> currentStrategy = new AtomicReference<>();
     private final Set<CapabilityListener> listeners = Collections.synchronizedSet(new HashSet<>());
     private final YangTextSourceExtension yangTextSourceExtension;
 
-    private Registration schemaContextListenerListenerRegistration;
+    private final Registration registration;
 
-    private CurrentSchemaContext(final YangTextSourceExtension yangTextSourceExtension) {
-        this.yangTextSourceExtension = yangTextSourceExtension;
+    public CurrentSchemaContext(final DOMSchemaService schemaService) {
+        yangTextSourceExtension = schemaService.extension(YangTextSourceExtension.class);
+        registration = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
 
-    // keep spotbugs from complaining about overridable method in constructor
-    public static CurrentSchemaContext create(final DOMSchemaService schemaService,
-            final YangTextSourceExtension yangTextSourceExtension) {
-        var context = new CurrentSchemaContext(yangTextSourceExtension);
-        final var registration = schemaService.registerSchemaContextListener(context::onModelContextUpdated);
-        context.setRegistration(registration);
-        return context;
-    }
-
-    private void setRegistration(final Registration registration) {
-        schemaContextListenerListenerRegistration = registration;
-    }
-
-    public @NonNull NetconfServerStrategy currentStrategy() {
+    @NonNull NetconfServerStrategy currentStrategy() {
         return verifyNotNull(currentStrategy.get(), "Current context not received");
     }
 
     @Override
     public DatabindContext currentDatabind() {
         return currentStrategy().databind();
-    }
-
-    public @NonNull EffectiveModelContext getCurrentContext() {
-        return currentStrategy().databind().modelContext();
     }
 
     private void onModelContextUpdated(final EffectiveModelContext modelContext) {
@@ -135,8 +117,8 @@ public class CurrentSchemaContext implements DatabindProvider, AutoCloseable {
 
     @Override
     public void close() {
+        registration.close();
         listeners.clear();
-        schemaContextListenerListenerRegistration.close();
         currentStrategy.set(null);
     }
 

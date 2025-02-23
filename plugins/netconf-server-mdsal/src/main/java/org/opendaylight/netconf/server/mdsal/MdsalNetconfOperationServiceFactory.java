@@ -13,7 +13,6 @@ import java.util.Set;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -36,7 +35,6 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     private final DOMRpcService rpcService;
 
     private final CurrentSchemaContext currentSchemaContext;
-    private final YangTextSourceExtension yangTextSourceExtension;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
     @Activate
@@ -48,8 +46,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         this.rpcService = requireNonNull(rpcService);
         this.netconfOperationServiceFactoryListener = requireNonNull(netconfOperationServiceFactoryListener);
 
-        yangTextSourceExtension = schemaService.extension(YangTextSourceExtension.class);
-        currentSchemaContext = CurrentSchemaContext.create(requireNonNull(schemaService), yangTextSourceExtension);
+        currentSchemaContext = new CurrentSchemaContext(schemaService);
         netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
 

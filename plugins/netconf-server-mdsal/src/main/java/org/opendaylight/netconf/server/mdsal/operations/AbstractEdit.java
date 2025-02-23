@@ -7,16 +7,17 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.util.Iterator;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -26,9 +27,7 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaTreeInference;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
@@ -40,11 +39,11 @@ abstract class AbstractEdit extends AbstractConfigOperation {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEdit.class);
     private static final String TARGET_KEY = "target";
 
-    final CurrentSchemaContext schemaContext;
+    final @NonNull DatabindProvider databindProvider;
 
-    AbstractEdit(final SessionIdType sessionId, final CurrentSchemaContext schemaContext) {
+    AbstractEdit(final SessionIdType sessionId, final DatabindProvider schemaContext) {
         super(sessionId);
-        this.schemaContext = schemaContext;
+        databindProvider = requireNonNull(schemaContext);
     }
 
     static final void parseIntoNormalizedNode(final SchemaTreeInference inference, final XmlElement element,
@@ -79,16 +78,16 @@ abstract class AbstractEdit extends AbstractConfigOperation {
 
         // Returns module with newest revision since findModuleByNamespace returns a set of modules and we only
         // need the newest one
-        final EffectiveModelContext ctx = schemaContext.getCurrentContext();
-        final Iterator<? extends @NonNull Module> it = ctx.findModules(ns).iterator();
+        final var modelContext = databindProvider.currentDatabind().modelContext();
+        final var it = modelContext.findModules(ns).iterator();
         if (!it.hasNext()) {
             // No module is present with this namespace
             throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
                 ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
 
-        final Module module = it.next();
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(ctx);
+        final var module = it.next();
+        final var stack = SchemaInferenceStack.of(modelContext);
         final String elementName = element.getName();
         try {
             // FIXME: This is a bit suspect. The element is formed using XML encoding, hence it corresponds to

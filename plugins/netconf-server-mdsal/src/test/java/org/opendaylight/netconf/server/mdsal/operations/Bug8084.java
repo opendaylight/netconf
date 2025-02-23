@@ -8,14 +8,12 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -31,12 +29,10 @@ class Bug8084 {
 
     @Test
     void testValidateTypes() throws Exception {
-        final var context = YangParserTestUtils.parseYangResources(Bug8084.class,
+        final var databind = DatabindContext.ofModel(YangParserTestUtils.parseYangResources(Bug8084.class,
             "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
-            "/yang/mdsal-netconf-mapping-test.yang");
-        final var currentContext = mock(CurrentSchemaContext.class);
-        doReturn(context).when(currentContext).getCurrentContext();
-        final var validator = new FilterContentValidator(currentContext);
+            "/yang/mdsal-netconf-mapping-test.yang"));
+        final var validator = new FilterContentValidator(() -> databind);
 
         final var document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class
                 .getResourceAsStream("/filter/bug8084.xml"));

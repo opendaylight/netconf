@@ -13,8 +13,6 @@ import static org.junit.Assume.assumeThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -62,13 +60,12 @@ class FilterContentValidatorTest {
 
     @BeforeEach
     void setUp() {
-        final var context = YangParserTestUtils.parseYangResources(FilterContentValidatorTest.class,
-            "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
-            "/yang/mdsal-netconf-mapping-test.yang");
+        final var databind = DatabindContext.ofModel(
+            YangParserTestUtils.parseYangResources(FilterContentValidatorTest.class,
+                "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
+                "/yang/mdsal-netconf-mapping-test.yang"));
 
-        final var currentContext = mock(CurrentSchemaContext.class);
-        doReturn(context).when(currentContext).getCurrentContext();
-        validator = new FilterContentValidator(currentContext);
+        validator = new FilterContentValidator(() -> databind);
     }
 
     @ParameterizedTest
