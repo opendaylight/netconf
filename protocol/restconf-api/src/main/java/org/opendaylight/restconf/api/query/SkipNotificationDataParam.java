@@ -7,9 +7,7 @@
  */
 package org.opendaylight.restconf.api.query;
 
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.api.CapabilityURN;
 
 /**
  * OpenDaylight extension parameter. When used as {@code odl-skip-notification-data=true}, it will instruct the listener
@@ -20,7 +18,6 @@ public final class SkipNotificationDataParam implements RestconfQueryParam<SkipN
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "odl-skip-notification-data";
 
-    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.ODL_SKIP_NOTIFICATION_DATA);
     private static final @NonNull SkipNotificationDataParam FALSE = new SkipNotificationDataParam(false);
     private static final @NonNull SkipNotificationDataParam TRUE = new SkipNotificationDataParam(true);
 
@@ -59,10 +56,5 @@ public final class SkipNotificationDataParam implements RestconfQueryParam<SkipN
 
     public boolean value() {
         return value;
-    }
-
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    public static @NonNull URI capabilityUri() {
-        return CAPABILITY;
     }
 }

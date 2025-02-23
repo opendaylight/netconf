@@ -9,9 +9,7 @@ package org.opendaylight.restconf.api.query;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.api.CapabilityURN;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 
 /**
@@ -42,8 +40,6 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
     public static final @NonNull String uriName = "with-defaults";
-
-    private static final @NonNull URI CAPABILITY = URI.create(CapabilityURN.WITH_DEFAULTS);
 
     private final @NonNull WithDefaultsMode mode;
 
@@ -85,10 +81,5 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
 
     public @NonNull WithDefaultsMode mode() {
         return mode;
-    }
-
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    public static @NonNull URI capabilityUri() {
-        return CAPABILITY;
     }
 }
