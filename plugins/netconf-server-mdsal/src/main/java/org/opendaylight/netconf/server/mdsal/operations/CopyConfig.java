@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -27,7 +26,7 @@ import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -35,9 +34,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
@@ -64,9 +61,9 @@ public final class CopyConfig extends AbstractEdit {
 
     private final TransactionProvider transactionProvider;
 
-    public CopyConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
+    public CopyConfig(final SessionIdType sessionId, final DatabindProvider databindProvider,
                       final TransactionProvider transactionProvider) {
-        super(sessionId, schemaContext);
+        super(sessionId, databindProvider);
         this.transactionProvider = transactionProvider;
     }
 
@@ -185,12 +182,12 @@ public final class CopyConfig extends AbstractEdit {
         final Element configElement = document.createElementNS(NamespaceURN.BASE, CONFIG_KEY);
         final DOMResult result = new DOMResult(configElement);
         try {
-            final XMLStreamWriter xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
-            final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                schemaContext.getCurrentContext());
+            final var xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
+            final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+                databindProvider.currentDatabind().modelContext());
 
-            final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true);
-            for (DataContainerChild child : data.body()) {
+            final var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true);
+            for (var child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();

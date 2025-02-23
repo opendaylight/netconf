@@ -57,16 +57,12 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalOperationProvider.class);
 
     private final Set<Capability> caps;
-    private final YangTextSourceExtension sourceProvider;
     private final DOMSchemaService schemaService;
 
-    MdsalOperationProvider(final SessionIdProvider idProvider,
-                           final Set<Capability> caps,
-                           final EffectiveModelContext schemaContext,
-                           final YangTextSourceExtension sourceProvider) {
-        this.caps = caps;
-        schemaService = new FixedDOMSchemaService(schemaContext);
-        this.sourceProvider = sourceProvider;
+    MdsalOperationProvider(final SessionIdProvider idProvider, final Set<Capability> caps,
+            final EffectiveModelContext modelContext, final YangTextSourceExtension sourceProvider) {
+        this.caps = requireNonNull(caps);
+        schemaService = new FixedDOMSchemaService(() -> modelContext, sourceProvider);
     }
 
     @Override
@@ -82,7 +78,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     @Override
     public NetconfOperationService createService(final SessionIdType sessionId) {
-        return new MdsalOperationService(sessionId, schemaService, caps, sourceProvider);
+        return new MdsalOperationService(sessionId, schemaService, caps);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
@@ -90,14 +86,12 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final DOMSchemaService schemaService;
         private final Set<Capability> caps;
         private final DOMDataBroker dataBroker;
-        private final YangTextSourceExtension sourceProvider;
 
         MdsalOperationService(final SessionIdType currentSessionId, final DOMSchemaService schemaService,
-                              final Set<Capability> caps, final YangTextSourceExtension sourceProvider) {
+                              final Set<Capability> caps) {
             this.currentSessionId = requireNonNull(currentSessionId);
             this.schemaService = requireNonNull(schemaService);
             this.caps = caps;
-            this.sourceProvider = sourceProvider;
 
             dataBroker = createDataStore(schemaService, currentSessionId);
         }
@@ -117,7 +111,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             }
 
             TransactionProvider transactionProvider = new TransactionProvider(dataBroker, currentSessionId);
-            CurrentSchemaContext currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
+            CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService);
 
             final Get get = new Get(currentSessionId, currentSchemaContext, transactionProvider);
             final EditConfig editConfig = new EditConfig(currentSessionId, currentSchemaContext, transactionProvider);

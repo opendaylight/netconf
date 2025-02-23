@@ -8,13 +8,11 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -24,11 +22,9 @@ class Netconf506Test {
 
     @Test
     void testValidateTypes() throws Exception {
-        final var context = YangParserTestUtils.parseYangResources(Bug8084.class,
-                "/yang/filter-validator-test-mod-0.yang", "/yang/mdsal-netconf-mapping-test.yang");
-        final var currentContext = mock(CurrentSchemaContext.class);
-        doReturn(context).when(currentContext).getCurrentContext();
-        final var validator = new FilterContentValidator(currentContext);
+        final var databind = DatabindContext.ofModel(YangParserTestUtils.parseYangResources(Bug8084.class,
+                "/yang/filter-validator-test-mod-0.yang", "/yang/mdsal-netconf-mapping-test.yang"));
+        final var validator = new FilterContentValidator(() -> databind);
 
         final var document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class
                 .getResourceAsStream("/filter/netconf506.xml"));

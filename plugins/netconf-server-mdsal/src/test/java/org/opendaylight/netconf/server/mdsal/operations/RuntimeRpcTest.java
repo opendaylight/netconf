@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
@@ -161,9 +162,10 @@ class RuntimeRpcTest {
     void setUp() {
         doNothing().when(registration).close();
         doAnswer(invocationOnMock -> {
-            ((Consumer<EffectiveModelContext>) invocationOnMock.getArgument(0)).accept(SCHEMA_CONTEXT);
+            invocationOnMock.<Consumer<EffectiveModelContext>>getArgument(0).accept(SCHEMA_CONTEXT);
             return registration;
         }).when(schemaService).registerSchemaContextListener(any());
+        doReturn(sourceProvider).when(schemaService).extension(YangTextSourceExtension.class);
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
@@ -172,7 +174,7 @@ class RuntimeRpcTest {
             invocationOnMock.getArgument(0, SourceIdentifier.class), CharSource.wrap("module test"))))
             .when(sourceProvider).getYangTexttSource(any(SourceIdentifier.class));
 
-        currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
+        currentSchemaContext = new CurrentSchemaContext(schemaService);
     }
 
     @AfterEach

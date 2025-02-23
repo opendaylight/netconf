@@ -9,13 +9,11 @@ package org.opendaylight.netconf.server.mdsal.operations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -41,11 +39,10 @@ class Netconf538Test {
 
     @Test
     void testRootMap() throws Exception {
-        final var context = YangParserTestUtils.parseYangResources(Netconf538Test.class, "/yang/simple-list.yang");
-        final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
-        doReturn(context).when(currentContext).getCurrentContext();
+        final var databind = DatabindContext.ofModel(
+            YangParserTestUtils.parseYangResources(Netconf538Test.class, "/yang/simple-list.yang"));
 
-        final GetConfig getConfig = new GetConfig(SESSION_ID_FOR_REPORTING, currentContext, transactionProvider);
+        final GetConfig getConfig = new GetConfig(SESSION_ID_FOR_REPORTING, () -> databind, transactionProvider);
 
         final Document document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class
                 .getResourceAsStream("/filter/netconf538.xml"));

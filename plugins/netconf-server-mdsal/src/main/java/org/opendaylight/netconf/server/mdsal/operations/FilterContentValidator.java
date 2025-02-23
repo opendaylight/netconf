@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
 
 import com.google.common.base.MoreObjects;
@@ -18,12 +19,10 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -31,16 +30,11 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
-import org.opendaylight.yangtools.yang.data.util.codec.TypeAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
@@ -48,18 +42,17 @@ import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 /**
  * Class validates filter content against schema context.
  */
 public class FilterContentValidator {
-
     private static final Logger LOG = LoggerFactory.getLogger(FilterContentValidator.class);
-    private final CurrentSchemaContext schemaContext;
 
-    public FilterContentValidator(final CurrentSchemaContext schemaContext) {
-        this.schemaContext = schemaContext;
+    private final DatabindProvider databindProvider;
+
+    public FilterContentValidator(final DatabindProvider databindProvider) {
+        this.databindProvider = requireNonNull(databindProvider);
     }
 
     /**
@@ -79,39 +72,28 @@ public class FilterContentValidator {
             throw new IllegalArgumentException("Wrong namespace in element + " + filterContent.toString(), e);
         }
 
-        try {
-            final Module module = schemaContext.getCurrentContext().findModules(namespace).iterator().next();
-            final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
-            final FilterTree filterTree = validateNode(
-                    filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER, schema));
-            return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
-        } catch (final ValidationException e) {
-            LOG.debug("Filter content isn't valid", e);
-            throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
-                    ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
-        }
-    }
+        final var databind = databindProvider.currentDatabind();
+        final var modelContext = databind.modelContext();
+        final var module = modelContext.findModules(namespace).iterator().next();
+        final var name = filterContent.getName();
 
-    /**
-     * Returns module's child data node of given name space and name.
-     *
-     * @param module    module
-     * @param nameSpace name space
-     * @param name      name
-     * @return child data node schema
-     * @throws DocumentedException if child with given name is not present
-     */
-    private DataSchemaNode getRootDataSchemaNode(final Module module, final XMLNamespace nameSpace, final String name)
-            throws DocumentedException {
-        for (final DataSchemaNode childNode : module.getChildNodes()) {
-            final QName qName = childNode.getQName();
-            if (qName.getNamespace().equals(nameSpace) && qName.getLocalName().equals(name)) {
-                return childNode;
+        for (var childNode : module.getChildNodes()) {
+            final var qName = childNode.getQName();
+            if (qName.getNamespace().equals(namespace) && qName.getLocalName().equals(name)) {
+                try {
+                    final var filterTree = validateNode(
+                            filterContent, childNode, new FilterTree(childNode.getQName(), Type.OTHER, childNode));
+                    return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
+                } catch (final ValidationException e) {
+                    LOG.debug("Filter content isn't valid", e);
+                    throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
+                            ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
+                }
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + " in schema context: "
-                + schemaContext.getCurrentContext(),
-                ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
+        throw new DocumentedException(
+            "Unable to find node with namespace: " + namespace + " in schema context: " + modelContext,
+            ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
     }
 
     /**
@@ -189,46 +171,45 @@ public class FilterContentValidator {
         }
     }
 
+    // FIXME: receive DatabindContext?
     private Map<QName, Object> getKeyValues(final List<String> path, final XmlElement filterContent,
             final DataSchemaNode parentSchemaNode, final ListSchemaNode listSchemaNode) {
         XmlElement current = filterContent;
         //find list element
         for (final String pathElement : path) {
-            final List<XmlElement> childElements = current.getChildElements(pathElement);
+            final var childElements = current.getChildElements(pathElement);
             // if there are multiple list entries present in the filter, we can't use any keys and must read whole list
             if (childElements.size() != 1) {
                 return Map.of();
             }
             current = childElements.get(0);
         }
-        final Map<QName, Object> keys = new HashMap<>();
-        final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
-        for (final QName qualifiedName : keyDefinition) {
-            final var optChildElements = current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
+
+        final var keyDef = listSchemaNode.getKeyDefinition();
+        final var keys = HashMap.<QName, Object>newHashMap(keyDef.size());
+        for (var qname : keyDef) {
+            final var optChildElements = current.getOnlyChildElementOptionally(qname.getLocalName());
             if (optChildElements.isEmpty()) {
                 return Map.of();
             }
             optChildElements.orElseThrow().getOnlyTextContentOptionally().ifPresent(keyValue -> {
-                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qualifiedName);
+                final var listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qname);
                 if (listKey instanceof IdentityrefTypeDefinition) {
-                    keys.put(qualifiedName, keyValue);
+                    keys.put(qname, keyValue);
                 } else {
-                    final TypeDefinition<? extends TypeDefinition<?>> keyType = listKey.getType();
+                    final var keyType = listKey.getType();
                     if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition
                             || keyType instanceof InstanceIdentifierTypeDefinition) {
-                        final Document document = filterContent.getDomElement().getOwnerDocument();
-                        final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
-                        final EffectiveModelContext modelContext = schemaContext.getCurrentContext();
-                        final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(modelContext);
-                        final SchemaInferenceStack resolver = SchemaInferenceStack.of(modelContext, Absolute.of(
-                                parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));
-                        final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory
-                                .codecFor(listKey, resolver);
-                        final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue);
-                        keys.put(qualifiedName, deserializedKeyValue);
+                        final var document = filterContent.getDomElement().getOwnerDocument();
+                        final var nsContext = new UniversalNamespaceContextImpl(document, false);
+                        final var databind = databindProvider.currentDatabind();
+                        // TODO: ofDataTreePath() ?
+                        final var stack = SchemaInferenceStack.of(databind.modelContext(),
+                            Absolute.of(parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));
+                        keys.put(qname,
+                            databind.xmlCodecs().codecFor(listKey, stack).parseValue(nsContext, keyValue));
                     } else {
-                        final Object deserializedKey = TypeDefinitionAwareCodec.from(keyType).deserialize(keyValue);
-                        keys.put(qualifiedName, deserializedKey);
+                        keys.put(qname, TypeDefinitionAwareCodec.from(keyType).deserialize(keyValue));
                     }
                 }
             });
