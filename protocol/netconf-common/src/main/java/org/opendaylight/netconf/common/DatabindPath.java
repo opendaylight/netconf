@@ -5,13 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.api;
+package org.opendaylight.netconf.common;
 
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.common.DatabindContext;
-import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
@@ -22,7 +20,8 @@ import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
- * An {@link ApiPath} resolved against a {@link DatabindContext}. This can be either
+ * A request path (such as the path part of a RESTCONF request URI} resolved against a {@link DatabindContext}. This can
+ * be either
  * <ul>
  *   <li>a {@link Data} pointing to a datastore resource, or</li>
  *   <li>an {@link Rpc} pointing to a YANG {@code rpc} statement, or</li>
@@ -30,7 +29,14 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * </ul>
  */
 @NonNullByDefault
-public sealed interface DatabindPath extends DatabindAware {
+public sealed interface DatabindPath {
+    /**
+     * Returns the associated DatabindContext.
+     *
+     * @return the associated DatabindContext
+     */
+    DatabindContext databind();
+
     /**
      * Returns the {@link EffectiveStatementInference} made by this path.
      *
@@ -138,12 +144,12 @@ public sealed interface DatabindPath extends DatabindAware {
         YangInstanceIdentifier instance();
 
         /**
-         * Returns this reference as a {@link ServerErrorPath}.
+         * Returns this reference as a {@link ErrorPath}.
          *
-         * @return this reference as a {@link ServerErrorPath}
+         * @return this reference as a {@link ErrorPath}
          */
-        default ServerErrorPath toErrorPath() {
-            return new ServerErrorPath(databind(), instance());
+        default ErrorPath toErrorPath() {
+            return new ErrorPath(databind(), instance());
         }
     }
 
