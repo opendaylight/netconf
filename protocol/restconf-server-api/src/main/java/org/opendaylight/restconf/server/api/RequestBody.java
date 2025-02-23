@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.common.DatabindContext;
+import org.opendaylight.netconf.common.DatabindPath;
 import org.opendaylight.netconf.common.ErrorMessage;
+import org.opendaylight.netconf.common.ErrorPath;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -72,7 +74,7 @@ abstract sealed class RequestBody extends ConsumableBody
 
                         return new ServerError(error.type(), error.tag(),
                             message != null ? new ErrorMessage(message) : null, error.appTag(),
-                            path != null ? new ServerErrorPath(databind, path) : null,
+                            path != null ? new ErrorPath(databind, path) : null,
                             // FIXME: pass down error.info()
                             null);
                     })

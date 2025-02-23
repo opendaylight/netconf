@@ -10,7 +10,7 @@ package org.opendaylight.restconf.server.api;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
+import org.opendaylight.netconf.common.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;

@@ -5,27 +5,26 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.api;
+package org.opendaylight.netconf.common;
 
 import static java.util.Objects.requireNonNull;
 
-import org.opendaylight.netconf.common.DatabindContext;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.netconf.common.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
- * An {@code error-path} element in a {@link ServerError}.
+ * An {@code error-path} element bound to a {@link DatabindContext}..
  *
  * @param databind the {@link DatabindContext} to which this path is bound
  * @param path the {@link YangInstanceIdentifier}, {@link YangInstanceIdentifier#empty()} denotes the data root
  */
-public record ServerErrorPath(DatabindContext databind, YangInstanceIdentifier path) {
-    public ServerErrorPath {
+public record ErrorPath(DatabindContext databind, YangInstanceIdentifier path) {
+    public ErrorPath {
         requireNonNull(databind);
         requireNonNull(path);
     }
 
-    public ServerErrorPath(final Data path) {
+    public ErrorPath(final Data path) {
         this(path.databind(), path.instance());
     }
 }
