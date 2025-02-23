@@ -13,7 +13,7 @@ import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.netconf.common.DatabindPath.Data;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
