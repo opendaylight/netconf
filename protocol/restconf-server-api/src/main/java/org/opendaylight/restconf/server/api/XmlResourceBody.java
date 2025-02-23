@@ -35,8 +35,7 @@ public final class XmlResourceBody extends ResourceBody {
     @Override
     void streamTo(final Data path, final PathArgument name, final InputStream inputStream,
             final NormalizedNodeStreamWriter writer) throws ServerException {
-        final var databind = path.databind();
-        try (var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), path.inference())) {
+        try (var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), path.inference())) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final var docRoot = doc.getDocumentElement();
             final var docRootName = docRoot.getLocalName();
@@ -53,7 +52,7 @@ public final class XmlResourceBody extends ResourceBody {
             xmlParser.traverse(new DOMSource(docRoot));
         } catch (IllegalArgumentException | IOException | SAXException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            throw databind.newProtocolMalformedMessageServerException("Error parsing input", e);
+            throw newProtocolMalformedMessageServerException(path, "Error parsing input", e);
         }
     }
 }

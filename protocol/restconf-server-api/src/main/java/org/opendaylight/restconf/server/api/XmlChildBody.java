@@ -46,7 +46,7 @@ public final class XmlChildBody extends ChildBody {
             doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
         } catch (SAXException | IOException e) {
             LOG.debug("Error parsing XML input", e);
-            throw path.databind().newProtocolMalformedMessageServerException("Invalid XML input", e);
+            throw newProtocolMalformedMessageServerException(path, "Invalid XML input", e);
         }
 
         final var pathInference = path.inference();
@@ -106,7 +106,7 @@ public final class XmlChildBody extends ChildBody {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
         } catch (IllegalArgumentException | IOException | XMLStreamException e) {
             LOG.debug("Error parsing XML", e);
-            throw databind.newProtocolMalformedMessageServerException("Invalid XML content", e);
+            throw newProtocolMalformedMessageServerException(path, "Invalid XML content", e);
         }
         var parsed = resultHolder.getResult().data();
 

@@ -30,13 +30,12 @@ public final class XmlOperationInputBody extends OperationInputBody {
         final var stack = path.inference().toSchemaInferenceStack();
         stack.enterDataTree(path.inputStatement().argument());
 
-        final var databind = path.databind();
         try {
-            XmlParserStream.create(writer, databind.xmlCodecs(), stack.toInference())
+            XmlParserStream.create(writer, path.databind().xmlCodecs(), stack.toInference())
                 .parse(UntrustedXML.createXMLStreamReader(inputStream));
         } catch (IllegalArgumentException | IOException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            throw databind.newProtocolMalformedMessageServerException("Invalid XML", e);
+            throw newProtocolMalformedMessageServerException(path, "Invalid XML", e);
         }
     }
 }

@@ -70,7 +70,7 @@ public final class JsonChildBody extends ChildBody {
                     Error parsing json input: Failed to create new parse result data. Are you creating multiple \
                     resources/subresources in POST request?""", e);
             }
-            throw path.databind().newProtocolMalformedMessageServerException("Invalid JSON input", e);
+            throw newProtocolMalformedMessageServerException(path, "Invalid JSON input", e);
         }
 
         return resultHolder.getResult().data();
