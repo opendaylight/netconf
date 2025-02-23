@@ -12,6 +12,9 @@ module org.opendaylight.netconf.common {
 
     requires transitive io.netty.common;
     requires transitive org.opendaylight.yangtools.yang.common;
+    requires transitive org.opendaylight.yangtools.yang.data.codec.gson;
+    requires transitive org.opendaylight.yangtools.yang.data.codec.xml;
+    requires transitive org.opendaylight.yangtools.yang.data.util;
     requires transitive org.opendaylight.yangtools.yang.model.api;
     requires transitive org.opendaylight.netconf.api;
     requires com.google.common;
@@ -21,6 +24,7 @@ module org.opendaylight.netconf.common {
     requires static transitive java.annotation;
     requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
+    requires static com.github.spotbugs.annotations;
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.service.metatype.annotations;
