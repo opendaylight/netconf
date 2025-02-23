@@ -7,7 +7,7 @@
  */
 module org.opendaylight.netconf.common {
     exports org.opendaylight.netconf.common;
-    exports org.opendaylight.netconf.common.impl;
+    exports org.opendaylight.netconf.common.di;
     exports org.opendaylight.netconf.common.util;
 
     requires transitive io.netty.common;
@@ -21,6 +21,7 @@ module org.opendaylight.netconf.common {
     requires static transitive java.annotation;
     requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
+    requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.service.metatype.annotations;
 }
