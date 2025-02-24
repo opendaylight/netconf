@@ -38,7 +38,6 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +50,7 @@ class WriteCandidateRunningTxTest extends AbstractTestModelTest {
     @BeforeEach
     void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
-        netconfOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));
+        netconfOps = new NetconfBaseOps(TEST_DATABIND, rpc);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
     }
 
