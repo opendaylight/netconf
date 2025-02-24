@@ -81,13 +81,13 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     void modifySubscriptionTest() throws Exception {
         final var request1 = prepareEstablishRPCRequest();
         // Modify the subscription
-        final var modifyInput = String.format("""
+        final var modifyInput = """
             {
               "input": {
                 "id": 2147483648,
                 "stop-time": "2025-03-20T15:30:00Z"
               }
-            }""");
+            }""";
         final var request2 = buildRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON, modifyInput,
             APPLICATION_JSON);
         final var response = invokeTwoRequests(request1, request2);
@@ -122,13 +122,13 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     @Test
     void modifyNonExistentSubscriptionTest() throws Exception {
-        final var input = String.format("""
+        final var input = """
             {
               "input": {
                 "id": 99999,
                 "stop-time": "2025-03-20T15:30:00Z"
               }
-            }""");
+            }""";
         final var response = invokeRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON, input,
             APPLICATION_JSON);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
@@ -150,12 +150,12 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     void deleteSubscriptionTest() throws Exception {
         final var request1 = prepareEstablishRPCRequest();
         // Delete the subscription
-        final var deleteInput = String.format("""
+        final var deleteInput = """
             {
               "input": {
                 "id": 2147483648
               }
-            }""");
+            }""";
         final var request2 = buildRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, deleteInput,
             APPLICATION_JSON);
         final var response = invokeTwoRequests(request1, request2);
@@ -188,12 +188,12 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     void killSubscriptionTest() throws Exception {
         final var request1 = prepareEstablishRPCRequest();
         // Kill the subscription
-        final var killInput = String.format("""
+        final var killInput = """
             {
               "input": {
                 "id": 2147483648
               }
-            }""");
+            }""";
         final var request2 = buildRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, killInput,
             APPLICATION_JSON);
         final var response = invokeTwoRequests(request1, request2);
