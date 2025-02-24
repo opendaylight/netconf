@@ -18,6 +18,7 @@ import java.io.ObjectStreamException;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -125,11 +126,11 @@ public final class ServerException extends Exception {
         throw new NotSerializableException();
     }
 
-    private static @Nullable ServerErrorInfo errorInfoOf(final @Nullable Throwable cause) {
+    private static @Nullable ErrorInfo errorInfoOf(final @Nullable Throwable cause) {
         if (cause != null) {
             final var message = cause.getMessage();
             if (message != null) {
-                return new ServerErrorInfo(message);
+                return new ErrorInfo(message);
             }
         }
         return null;

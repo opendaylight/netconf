@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.text.ParseException;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.ServerError;
-import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -102,7 +102,7 @@ class NC1265Test {
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
         assertEquals(new ErrorMessage("Invalid value 'nc1265:baz=123' for (nc1265)key"), error.message());
-        assertEquals(new ServerErrorInfo("""
+        assertEquals(new ErrorInfo("""
             Could not parse Instance Identifier 'nc1265:baz=123'. Offset: 0 : Reason: Identifier must start with '/'.\
             """), error.info());
     }
@@ -113,7 +113,7 @@ class NC1265Test {
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
         assertEquals(new ErrorMessage("Invalid value '/nc1265:baz[key='abc']' for (nc1265)key"), error.message());
-        assertEquals(new ServerErrorInfo("""
+        assertEquals(new ErrorInfo("""
             Incorrect lexical representation of integer value: abc.
             An integer value can be defined as:
               - a decimal number,

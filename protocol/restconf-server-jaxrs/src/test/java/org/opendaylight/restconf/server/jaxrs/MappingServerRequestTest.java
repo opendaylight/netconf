@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -22,7 +23,6 @@ import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ServerError;
-import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -131,7 +131,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
             new ServerError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, new ErrorMessage("message 1"), "app tag #1",
                 null, null),
             new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("message 2"),
-                "app tag #2", null, new ServerErrorInfo("my info")),
+                "app tag #2", null, new ErrorInfo("my info")),
             new ServerError(ErrorType.RPC, ErrorTag.DATA_MISSING, new ErrorMessage("message 3"), " app tag #3",
                 new ErrorPath(DATABIND, YangInstanceIdentifier.builder()
                     .node(QName.create(MONITORING_MODULE_INFO, "patch-cont"))
@@ -139,7 +139,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
                     .nodeWithKey(QName.create(MONITORING_MODULE_INFO, "my-list1"),
                         QName.create(MONITORING_MODULE_INFO, "name"), "sample")
                     .node(QName.create(MONITORING_MODULE_INFO, "my-leaf12"))
-                    .build()), new ServerErrorInfo("my error info"))),
+                    .build()), new ErrorInfo("my error info"))),
             new IllegalStateException("cause"), "general message"));
 
         assertFormat("""

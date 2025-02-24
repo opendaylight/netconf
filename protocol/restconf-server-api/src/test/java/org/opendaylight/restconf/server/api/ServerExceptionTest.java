@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -63,7 +64,7 @@ class ServerExceptionTest {
         assertSame(cause, ex.getCause());
         assertServerError(
             new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("some message"), null,
-                null, new ServerErrorInfo("cause message")),
+                null, new ErrorInfo("cause message")),
             ex);
     }
 
@@ -75,7 +76,7 @@ class ServerExceptionTest {
         assertSame(cause, ex.getCause());
         assertServerError(
             new ServerError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, new ErrorMessage("some message"), null, null,
-                new ServerErrorInfo("cause message")),
+                new ErrorInfo("cause message")),
             ex);
     }
 
@@ -87,7 +88,7 @@ class ServerExceptionTest {
         assertSame(cause, ex.getCause());
         assertServerError(
             new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, new ErrorMessage("some message"),
-                null, null, new ServerErrorInfo("cause message")),
+                null, null, new ErrorInfo("cause message")),
             ex);
     }
 
