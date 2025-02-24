@@ -17,7 +17,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.DatabindPath.InstanceReference;
+import org.opendaylight.netconf.databind.DatabindPath.InstanceRequest;
 import org.opendaylight.netconf.databind.DatabindPath.Rpc;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -131,7 +131,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
 
     @Override
     public final void dataOPTIONS(final ServerRequest<OptionsResult> request, final ApiPath apiPath) {
-        final InstanceReference path;
+        final InstanceRequest path;
         try {
             path = pathNormalizer.normalizeDataOrActionPath(apiPath);
         } catch (ServerException e) {
@@ -214,7 +214,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
     @Override
     public final void dataPOST(final ServerRequest<DataPostResult> request, final ApiPath path,
             final DataPostBody body) {
-        final InstanceReference ref;
+        final InstanceRequest ref;
         try {
             ref = pathNormalizer.normalizeDataOrActionPath(path);
         } catch (ServerException e) {

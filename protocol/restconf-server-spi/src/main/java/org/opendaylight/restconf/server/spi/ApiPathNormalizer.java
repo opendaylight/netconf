@@ -21,7 +21,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.DatabindPath.InstanceReference;
+import org.opendaylight.netconf.databind.DatabindPath.InstanceRequest;
 import org.opendaylight.netconf.databind.DatabindPath.Rpc;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
@@ -262,7 +262,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "%s does not refer to an RPC", qname);
     }
 
-    public @NonNull InstanceReference normalizeDataOrActionPath(final ApiPath apiPath) throws ServerException {
+    public @NonNull InstanceRequest normalizeDataOrActionPath(final ApiPath apiPath) throws ServerException {
         // FIXME: optimize this
         final var path = normalizePath(apiPath);
         if (path instanceof Data dataPath) {
