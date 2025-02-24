@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60573dd7_6b9e2db9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-24T08:20:57Z",
+      "side": 1,
+      "message": "does this helps to test notification streams? @Yaroslav",
+      "revId": "bcd2e41e55603f25bc8d89035bf9dee42c028fd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
