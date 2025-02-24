@@ -58,6 +58,7 @@ import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -71,7 +72,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
@@ -119,7 +119,7 @@ class NetconfNodeHandlerTest {
     @Captor
     private ArgumentCaptor<TimerTask> timerCaptor;
     @Mock
-    private EffectiveModelContext schemaContext;
+    private EffectiveModelContext modelContext;
 
     private NetconfTopologySchemaAssembler schemaAssembler;
     private NetconfNodeHandler handler;
@@ -177,8 +177,8 @@ class NetconfNodeHandlerTest {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
-        final var schema = new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
-            MountPointContext.of(schemaContext));
+        final var schema = new NetconfDeviceSchema(DatabindContext.ofModel(modelContext),
+            NetconfDeviceCapabilities.empty());
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
         final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
 

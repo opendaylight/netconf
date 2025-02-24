@@ -9,18 +9,16 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.DatabindContext;
 
 /**
- * {@link NetconfDeviceCapabilities} and {@link MountPointContext} pertaining to a {@link NetconfDevice}.
+ * {@link NetconfDeviceCapabilities} and {@link DatabindContext} pertaining to a {@link NetconfDevice}.
  */
-public record NetconfDeviceSchema(
-    @NonNull NetconfDeviceCapabilities capabilities,
-    @NonNull MountPointContext mountContext) {
-
+@NonNullByDefault
+public record NetconfDeviceSchema(DatabindContext databind, NetconfDeviceCapabilities capabilities) {
     public NetconfDeviceSchema {
+        requireNonNull(databind);
         requireNonNull(capabilities);
-        requireNonNull(mountContext);
     }
 }
