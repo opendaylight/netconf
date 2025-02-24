@@ -76,6 +76,6 @@ public final class OperationsResource implements HttpGetResource {
             request.completeWith(e);
             return;
         }
-        request.completeWith(new OneOperation(path.inference().modelContext(), path.rpc().argument()));
+        request.completeWith(new OneOperation(path.inference().modelContext(), path.statement().argument()));
     }
 }

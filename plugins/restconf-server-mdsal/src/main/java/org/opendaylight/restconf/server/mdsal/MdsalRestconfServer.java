@@ -115,7 +115,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         final var rpcDelegate = rpcService != null ? new DOMServerRpcOperations(rpcService)
             : NotSupportedServerRpcOperations.INSTANCE;
         rpc = rpcs.isEmpty() ? rpcDelegate
-            : new InterceptingServerRpcOperations(path -> rpcs.get(path.rpc().argument()), rpcDelegate);
+            : new InterceptingServerRpcOperations(path -> rpcs.get(path.statement().argument()), rpcDelegate);
         action = actionService != null ? new DOMServerActionOperations(actionService)
             : NotSupportedServerActionOperations.INSTANCE;
 

@@ -44,30 +44,31 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
     public void invokeRpc(final ServerRequest<InvokeResult> request, final URI restconfURI, final Rpc path,
             final ContainerNode input) {
         // FIXME: NETCONF-773: why not DOMRpcResultCallback?
-        Futures.addCallback(rpcService.invokeRpc(path.rpc().argument(), input), new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(final DOMRpcResult result) {
-                final var errors = result.errors();
-                if (errors.isEmpty()) {
-                    request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));
-                } else {
-                    LOG.debug("RPC invocation reported {}", result.errors());
-                    request.completeWith(new ServerException(result.errors().stream()
-                        .map(ServerError::ofRpcError)
-                        .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
+        Futures.addCallback(rpcService.invokeRpc(path.statement().argument(), input),
+            new FutureCallback<DOMRpcResult>() {
+                @Override
+                public void onSuccess(final DOMRpcResult result) {
+                    final var errors = result.errors();
+                    if (errors.isEmpty()) {
+                        request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));
+                    } else {
+                        LOG.debug("RPC invocation reported {}", result.errors());
+                        request.completeWith(new ServerException(result.errors().stream()
+                            .map(ServerError::ofRpcError)
+                            .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(final Throwable cause) {
-                LOG.debug("RPC invocation failed, cause");
-                if (cause instanceof ServerException ex) {
-                    request.completeWith(ex);
-                } else {
-                    // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                    request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.debug("RPC invocation failed, cause");
+                    if (cause instanceof ServerException ex) {
+                        request.completeWith(ex);
+                    } else {
+                        // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
+                        request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
+                    }
                 }
-            }
-        }, MoreExecutors.directExecutor());
+            }, MoreExecutors.directExecutor());
     }
 }
