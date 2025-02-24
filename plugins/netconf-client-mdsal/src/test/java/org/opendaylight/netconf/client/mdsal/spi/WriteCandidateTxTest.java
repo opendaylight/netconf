@@ -31,7 +31,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 @ExtendWith(MockitoExtension.class)
 class WriteCandidateTxTest extends AbstractTestModelTest {
@@ -45,7 +44,7 @@ class WriteCandidateTxTest extends AbstractTestModelTest {
     @BeforeEach
     void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
-        netconfOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));
+        netconfOps = new NetconfBaseOps(TEST_DATABIND, rpc);
     }
 
     @Test

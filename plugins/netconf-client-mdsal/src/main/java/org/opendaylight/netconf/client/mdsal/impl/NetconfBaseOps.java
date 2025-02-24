@@ -62,7 +62,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
@@ -81,9 +80,9 @@ public final class NetconfBaseOps {
     private final DatabindContext databind;
     private final RpcStructureTransformer transformer;
 
-    public NetconfBaseOps(final Rpcs rpc, final MountPointContext mountContext) {
+    public NetconfBaseOps(final DatabindContext databind, final Rpcs rpc) {
+        this.databind = requireNonNull(databind);
         this.rpc = requireNonNull(rpc);
-        databind = DatabindContext.ofMountPoint(mountContext);
 
         if (rpc instanceof Rpcs.Schemaless) {
             transformer = new SchemalessRpcStructureTransformer();

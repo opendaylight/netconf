@@ -217,7 +217,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         device.onRemoteSessionDown();
         verify(facade, timeout(5000)).onDeviceDisconnected();
         //complete schema setup
-        schemaFuture.set(new DeviceNetconfSchema(NetconfDeviceCapabilities.empty(), SCHEMA_CONTEXT));
+        schemaFuture.set(new DeviceNetconfSchema(NetconfDeviceCapabilities.empty(), TEST_MODEL));
         //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
         verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any(RemoteDeviceServices.class));
     }
@@ -249,7 +249,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         // session back up, start another schema resolution
         device.onRemoteSessionUp(sessionCaps, listener);
         // complete schema setup
-        schemaFuture.set(SCHEMA_CONTEXT);
+        schemaFuture.set(TEST_MODEL);
         // schema setup performed twice
         verify(schemaFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
         // onDeviceConnected called once
@@ -352,8 +352,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     private EffectiveModelContextFactory getSchemaFactory() {
-        doReturn(Futures.immediateFuture(SCHEMA_CONTEXT))
-                .when(schemaFactory).createEffectiveModelContext(anyCollection());
+        doReturn(TEST_MODEL_FUTURE).when(schemaFactory).createEffectiveModelContext(anyCollection());
         return schemaFactory;
     }
 

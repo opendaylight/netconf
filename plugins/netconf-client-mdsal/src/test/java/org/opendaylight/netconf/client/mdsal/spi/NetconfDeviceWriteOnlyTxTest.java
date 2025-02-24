@@ -39,6 +39,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
@@ -52,8 +53,8 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
@@ -62,6 +63,8 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Mock
     private Rpcs.Normalized rpc;
+    @Mock
+    private EffectiveModelContext modelContext;
 
     private void mockFuture() {
         final var successFuture = Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null));
@@ -69,16 +72,17 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
             .when(rpc).invokeNetconf(any(), any());
     }
 
-    private static MountPointContext baseMountPointContext() {
+    private static DatabindContext baseMountPointContext() {
         return BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of(
             "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&revision=2010-10-04")))
-            .mountPointContext();
+            .databind();
     }
 
     @Test
     void testIgnoreNonVisibleData() {
         mockFuture();
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(DatabindContext.ofModel(modelContext), rpc), false,
+            true);
         tx.init();
 
         final var emptyList = ImmutableNodes.newSystemMapBuilder()
@@ -93,7 +97,8 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Test
     void testDiscardChanges() {
         mockFuture();
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(DatabindContext.ofModel(modelContext), rpc), false,
+            true);
         tx.init();
         final var future = tx.commit();
         assertThrows(ExecutionException.class, () -> Futures.getDone(future));
@@ -114,7 +119,8 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
                 new ErrorTag("a"), "m"))))
             .when(rpc).invokeNetconf(any(), any());
 
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(DatabindContext.ofModel(modelContext), rpc), false,
+            true);
         tx.init();
 
         final var future = tx.commit();
@@ -128,10 +134,10 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
             Futures.immediateFailedFuture(new IllegalStateException("Failed tx")))
             .when(rpc).invokeNetconf(any(), any());
 
-        final var tx = new WriteRunningTx(ID, new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaForCapabilities(
+        final var tx = new WriteRunningTx(ID, new NetconfBaseOps(BASE_SCHEMAS.baseSchemaForCapabilities(
             NetconfSessionPreferences.fromStrings(Set.of(CapabilityURN.NOTIFICATION,
                 "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring"
-                    + "&revision=2010-10-04"))).mountPointContext()), false, true);
+                    + "&revision=2010-10-04"))).databind(), rpc), false, true);
         tx.init();
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
@@ -147,7 +153,7 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     void testListenerSuccess() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .when(rpc).invokeNetconf(any(), any());
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(baseMountPointContext(), rpc), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
@@ -163,7 +169,7 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Test
     void testListenerCancellation() {
         mockFuture();
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(baseMountPointContext(), rpc), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
@@ -180,7 +186,7 @@ class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     void testListenerFailure() {
         final var cause = new IllegalStateException("Failed tx");
         doReturn(Futures.immediateFailedFuture(cause)).when(rpc).invokeNetconf(any(), any());
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(baseMountPointContext(), rpc), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);

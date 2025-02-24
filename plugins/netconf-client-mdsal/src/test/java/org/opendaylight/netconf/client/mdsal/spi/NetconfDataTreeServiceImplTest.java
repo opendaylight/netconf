@@ -47,7 +47,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
@@ -160,10 +159,8 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     private AbstractNetconfDataTreeService getNetconService() {
-        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
-        final RemoteDeviceId id =
-                new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return AbstractNetconfDataTreeService.of(id, MountPointContext.of(SCHEMA_CONTEXT), rpcService, prefs,
-            true);
+        final var prefs = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
+        final var id = new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
+        return AbstractNetconfDataTreeService.of(id, TEST_DATABIND, rpcService, prefs, true);
     }
 }
