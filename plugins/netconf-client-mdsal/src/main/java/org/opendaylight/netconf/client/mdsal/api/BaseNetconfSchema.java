@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -22,20 +23,30 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 @NonNullByDefault
 public interface BaseNetconfSchema extends Immutable {
     /**
-     * Return the {@link MountPointContext}.
+     * Return the {@link DatabindContext}.
      *
-     * @return the mount point context
+     * @return the databind
      */
-    MountPointContext mountPointContext();
+    DatabindContext databind();
 
     /**
-     * Return the {@link MountPointContext}. This is a convenience equivalent to
-     * {@code mountPointContext().modelContext()}.
+     * Return the {@link MountPointContext}. This is a convenience equivalent to {@code databind().mountContext()}.
      *
      * @return the mount point context
      */
+    @Deprecated(since = "9.0.0")
+    default MountPointContext mountPointContext() {
+        return databind().mountContext();
+    }
+
+    /**
+     * Return the {@link EffectiveModelContext}. This is a convenience equivalent to {@code databind().modelContext()}.
+     *
+     * @return the model context
+     */
+    @Deprecated(since = "9.0.0")
     default EffectiveModelContext modelContext() {
-        return mountPointContext().modelContext();
+        return databind().modelContext();
     }
 
     /**
