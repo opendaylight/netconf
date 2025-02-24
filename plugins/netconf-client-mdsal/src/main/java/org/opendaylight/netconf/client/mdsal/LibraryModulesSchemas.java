@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -193,9 +195,7 @@ public final class LibraryModulesSchemas {
      */
     public static LibraryModulesSchemas create(final String url, final String username, final String password) {
         try {
-            final URL urlConnection = new URL(requireNonNull(url));
-            final URLConnection connection = urlConnection.openConnection();
-
+            final var connection = new URI(requireNonNull(url)).toURL().openConnection();
             if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
                 final String userpass = username + ":" + password;
@@ -205,7 +205,7 @@ public final class LibraryModulesSchemas {
 
             return createFromURLConnection(connection);
 
-        } catch (final IOException e) {
+        } catch (IllegalArgumentException | IOException | URISyntaxException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
@@ -238,8 +238,8 @@ public final class LibraryModulesSchemas {
     public static LibraryModulesSchemas create(final String url) {
         final URLConnection connection;
         try {
-            connection = new URL(requireNonNull(url)).openConnection();
-        } catch (final IOException e) {
+            connection = new URI(requireNonNull(url)).toURL().openConnection();
+        } catch (IllegalArgumentException | IOException | URISyntaxException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
@@ -362,8 +362,8 @@ public final class LibraryModulesSchemas {
                 : QName.create(XMLNamespace.of(moduleNameSpace), moduleName);
 
         try {
-            return Map.entry(moduleQName, new URL(schemaUriAsString.orElseThrow()));
-        } catch (final MalformedURLException e) {
+            return Map.entry(moduleQName, new URI(schemaUriAsString.orElseThrow()).toURL());
+        } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
                     moduleNode, schemaUriAsString.orElseThrow());
             return null;
