@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.common.mdsal;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -17,10 +19,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -94,8 +98,34 @@ public final class NormalizedDataUtil {
     // FIXME: this needs to be called when and why?
     private static final NamespaceSetter XML_NAMESPACE_SETTER = NamespaceSetter.forFactory(XML_FACTORY);
 
-    private NormalizedDataUtil() {
-        // No-op
+    private final @NonNull DatabindContext databind;
+
+    public NormalizedDataUtil(final DatabindContext databind) {
+        this.databind = requireNonNull(databind);
+    }
+
+    public @NonNull DatabindContext databind() {
+        return databind;
+    }
+
+    /**
+     * Write {@code normalized} data along with corresponding {@code metadata} into {@link DOMResult}.
+     *
+     * @param data data to be written
+     * @param metadata  optional metadata to be written
+     * @param result DOM result holder
+     * @param parent optional schema node identifier of the parent node
+     * @throws IOException when failed to write data into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException when failed to serialize data into XML document
+     */
+    @NonNullByDefault
+    public void writeNode(final NormalizedNode data, final @Nullable NormalizedMetadata metadata,
+            final DOMResult result, final @Nullable Absolute parent) throws IOException, XMLStreamException {
+        if (metadata != null) {
+            writeNode(databind.modelContext(), data, metadata, result, parent);
+        } else {
+            writeNode(databind.modelContext(), data, result, parent);
+        }
     }
 
     @NonNullByDefault
@@ -123,6 +153,27 @@ public final class NormalizedDataUtil {
             writer.flush();
         } finally {
             xmlWriter.close();
+        }
+    }
+
+    /**
+     * Write elements equivalent to specified by {@link YangInstanceIdentifier} along with corresponding
+     * {@code metadata} into {@link DOMResult}.
+     *
+     * @param path path to write
+     * @param metadata optional metadata to be written
+     * @param result DOM result holder
+     * @param parent optional schema node identifier of the parent node
+     * @throws IOException when failed to write data into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException when failed to serialize data into XML document
+     */
+    @NonNullByDefault
+    public void writePath(final YangInstanceIdentifier path, final @Nullable NormalizedMetadata metadata,
+            final DOMResult result, final @Nullable Absolute parent) throws IOException, XMLStreamException {
+        if (metadata != null) {
+            writePath(databind.modelContext(), path, metadata, result, parent);
+        } else {
+            writePath(databind.modelContext(), path, result, parent);
         }
     }
 
@@ -170,6 +221,7 @@ public final class NormalizedDataUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
+    @Deprecated
     public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
             final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         writeNode(context, normalized, result, path);
@@ -186,6 +238,7 @@ public final class NormalizedDataUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
+    @Deprecated
     public static void writeNormalizedNode(final NormalizedNode normalized, final @Nullable NormalizedMetadata metadata,
             final DOMResult result, final EffectiveModelContext context, final @Nullable Absolute path)
                 throws IOException, XMLStreamException {
@@ -206,6 +259,7 @@ public final class NormalizedDataUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
+    @Deprecated
     public static void writeNormalizedNode(final YangInstanceIdentifier query, final DOMResult result,
             final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         writePath(context, query, result, path);
@@ -223,6 +277,7 @@ public final class NormalizedDataUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
+    @Deprecated
     public static void writeNormalizedNode(final YangInstanceIdentifier query,
             final @Nullable NormalizedMetadata metadata, final DOMResult result, final EffectiveModelContext context,
             final @Nullable Absolute path) throws IOException, XMLStreamException {
