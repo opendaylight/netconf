@@ -18,10 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.ServerError;
-import org.opendaylight.restconf.server.api.ServerErrorInfo;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -302,7 +302,7 @@ class ApiPathNormalizerTest {
             error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
-        assertEquals(new ServerErrorInfo("Invalid value '' for boolean type. Allowed values are 'true' and 'false'"),
+        assertEquals(new ErrorInfo("Invalid value '' for boolean type. Allowed values are 'true' and 'false'"),
             error.info());
     }
 
