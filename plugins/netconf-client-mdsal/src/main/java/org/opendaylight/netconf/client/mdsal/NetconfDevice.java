@@ -18,6 +18,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
@@ -44,7 +45,6 @@ import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -115,8 +115,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
         // Potentially acquire mount point list and interpret it
         final var netconfDeviceSchemaFuture = Futures.transformAsync(deviceSchema,
-            result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
-                mount -> new NetconfDeviceSchema(DatabindContext.ofMountPoint(mount), result.capabilities()),
+            result -> Futures.transform(discoverMountPoints(result.modelContext(), baseSchema, listener),
+                withMounts -> new NetconfDeviceSchema(withMounts, result.capabilities()),
                 processingExecutor),
             processingExecutor);
         schemaFuture = netconfDeviceSchemaFuture;
@@ -220,39 +220,40 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         notificationHandler.onRemoteSchemaDown();
     }
 
-    private ListenableFuture<@NonNull MountPointContext> createMountPointContext(
-            final EffectiveModelContext schemaContext, final BaseNetconfSchema baseSchema,
+    private ListenableFuture<@NonNull DatabindContext> discoverMountPoints(
+            final EffectiveModelContext modelContext, final BaseNetconfSchema baseSchema,
             final NetconfDeviceCommunicator listener) {
-        final var emptyDatabind = DatabindContext.ofModel(schemaContext);
-        if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
-            return Futures.immediateFuture(emptyDatabind.mountContext());
+        final var emptyDatabind = DatabindContext.ofModel(modelContext);
+        if (modelContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
+            return Futures.immediateFuture(emptyDatabind);
         }
 
         // Create a temporary RPC invoker and acquire the mount point tree
         LOG.debug("{}: Acquiring available mount points", id);
-        final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
+        final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(modelContext, listener,
             new NetconfMessageTransformer(emptyDatabind, false, baseSchema));
 
         return Futures.transform(deviceRpc.domRpcService().invokeRpc(Get.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
-            .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
+            .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, modelContext))
             .build()), rpcResult -> processSchemaMounts(rpcResult, emptyDatabind), MoreExecutors.directExecutor());
     }
 
-    private @NonNull MountPointContext processSchemaMounts(final DOMRpcResult rpcResult,
+    @NonNullByDefault
+    private DatabindContext processSchemaMounts(final DOMRpcResult rpcResult,
             final DatabindContext emptyDatabind) {
-        final var emptyContext = emptyDatabind.mountContext();
         final var errors = rpcResult.errors();
         if (!errors.isEmpty()) {
             LOG.warn("{}: Schema-mounts acquisition resulted in errors {}", id, errors);
         }
+
         final var schemaMounts = rpcResult.value();
         if (schemaMounts == null) {
             LOG.debug("{}: device does not define any schema mounts", id);
-            return emptyContext;
+            return emptyDatabind;
         }
 
-        return DeviceMountPointContext.create(emptyContext, schemaMounts);
+        return DeviceMountPointContext.create(emptyDatabind, schemaMounts);
     }
 
     @Override
