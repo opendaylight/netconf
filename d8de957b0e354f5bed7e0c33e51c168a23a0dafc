@@ -16,6 +16,24 @@
       "message": "During executing of these tests we don\u0027t touch new functionality \u0027transportFailed(sessionId, e)`. onAuthenticated(session) should fail with IOException)",
       "revId": "d8de957b0e354f5bed7e0c33e51c168a23a0dafc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5917d851_f030b4f7",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-24T18:27:19Z",
+      "side": 1,
+      "message": "Correct. The previous test was designed to test an already merged patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/114512\n\nI have replaced it with a new test to verify the intended functionality.",
+      "parentUuid": "37bb207d_4f29af03",
+      "revId": "d8de957b0e354f5bed7e0c33e51c168a23a0dafc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
