@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef72401_7ac2e690",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-24T08:19:55Z",
+      "side": 1,
+      "message": "not needed line",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73451e4b_8f8991d7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-24T08:19:55Z",
+      "side": 1,
+      "message": "just class without public",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "745748d7_cd4f9193",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-24T08:19:55Z",
+      "side": 1,
+      "message": "not needed line",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "674eb494_91d0ff9d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-24T08:19:55Z",
+      "side": 1,
+      "message": "you are not testing filter",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ecd49ad_caf6f022",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-24T08:19:55Z",
+      "side": 1,
+      "message": "I do not believe \"test notification\" will work without without model loaded in controller, perhaps \"empty\" notification maybe",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
