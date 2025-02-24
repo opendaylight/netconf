@@ -19,7 +19,7 @@
     <artifactId>databind</artifactId>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
-    <description>Shared NETCONF protocol components</description>
+    <description>Common NETCONF/RESTCONF databind</description>
 
     <dependencies>
         <dependency>
@@ -31,7 +31,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.eclipse.jdt</groupId>
             <artifactId>org.eclipse.jdt.annotation</artifactId>
