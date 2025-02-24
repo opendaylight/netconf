@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b20f63ff_6f174038",
+        "filename": "plugins/restconf-notifications-mdsal/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-24T14:38:37Z",
+      "side": 1,
+      "message": "alpha sorted, always",
+      "range": {
+        "startLine": 62,
+        "startChar": 23,
+        "endLine": 62,
+        "endChar": 47
+      },
+      "revId": "6760f087be5f31b80dd6c2d199fee343d53a158e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfdf7f8e_f9fafe14",
+        "filename": "plugins/restconf-notifications-mdsal/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-24T14:38:37Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 70,
+        "startChar": 24,
+        "endLine": 70,
+        "endChar": 44
+      },
+      "revId": "6760f087be5f31b80dd6c2d199fee343d53a158e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
