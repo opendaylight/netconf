@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37bb207d_4f29af03",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-02-24T07:31:27Z",
+      "side": 1,
+      "message": "During executing of these tests we don\u0027t touch new functionality \u0027transportFailed(sessionId, e)`. onAuthenticated(session) should fail with IOException)",
+      "revId": "d8de957b0e354f5bed7e0c33e51c168a23a0dafc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
