@@ -451,14 +451,12 @@ public class NetconfMessageTransformer
             .addAll(operSteps)
             .add(operOutput.getQName())
             .build());
-        // FIXME: we should have a cached inference here, or XMLParserStream should accept Absolute instead
-        final var inference = SchemaInferenceStack.of(databind.modelContext(), outputPath).toInference();
 
         final var resultHolder = new NormalizationResultHolder();
         final var element = message.getDocument().getDocumentElement();
         try {
             final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), inference, strictParsing);
+            final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), outputPath, strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException e) {
             throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
