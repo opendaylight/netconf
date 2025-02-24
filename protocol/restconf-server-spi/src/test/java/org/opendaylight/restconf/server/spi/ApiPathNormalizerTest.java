@@ -106,7 +106,7 @@ class ApiPathNormalizerTest {
             .node(list)
             .nodeWithKey(list, QName.create(list, "name"), "eth0")
             .build(), result.instance());
-        assertEquals(QName.create(ACTIONS_INTERFACES, "reset"), result.action().argument());
+        assertEquals(QName.create(ACTIONS_INTERFACES, "reset"), result.statement().argument());
     }
 
     /**
@@ -128,7 +128,7 @@ class ApiPathNormalizerTest {
             .node(list)
             .nodeWithKey(list, QName.create(list, "name"), "eth0")
             .build(), result.instance());
-        assertEquals(QName.create(ACTIONS_INTERFACES, "reboot"), result.action().argument());
+        assertEquals(QName.create(ACTIONS_INTERFACES, "reboot"), result.statement().argument());
     }
 
     /**
