@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "317fdef6_fd08e07c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-24T12:03:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fef72401_7ac2e690",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73451e4b_8f8991d7",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-24T08:19:55Z",
       "side": 1,
       "message": "just class without public",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b398dee0_4dc30c43",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-24T12:03:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73451e4b_8f8991d7",
       "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cbd4260_f103ef3b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-24T12:03:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "745748d7_cd4f9193",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "674eb494_91d0ff9d",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-02-24T08:19:55Z",
       "side": 1,
       "message": "you are not testing filter",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dda5bba7_35d360aa",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-24T12:03:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "674eb494_91d0ff9d",
       "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
