@@ -5,37 +5,39 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.common.mdsal;
+package org.opendaylight.netconf.api.xml;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 import static javax.xml.XMLConstants.XML_NS_PREFIX;
 import static javax.xml.XMLConstants.XML_NS_URI;
 
-import com.google.common.collect.BiMap;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableListMultimap;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.xml.namespace.NamespaceContext;
-import org.opendaylight.yangtools.concepts.Immutable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
-final class AnyXmlNamespaceContext implements Immutable, NamespaceContext {
+/**
+ * An immutable {@link NamespaceContext}.
+ */
+record ImmutableNamespaceContext(
+        ImmutableListMultimap<String, String> uriToPrefix,
+        ImmutableBiMap<String, String> prefixToUri) implements NamespaceContext {
     private static final ImmutableBiMap<String, String> FIXED_PREFIX_TO_URI = ImmutableBiMap.of(
         XML_NS_PREFIX, XML_NS_URI,
         XMLNS_ATTRIBUTE, XMLNS_ATTRIBUTE_NS_URI);
 
-    private final ImmutableListMultimap<String, String> uriToPrefix;
-    private final ImmutableBiMap<String, String> prefixToUri;
+    static final ImmutableNamespaceContext EMPTY = of(Map.of());
 
-    AnyXmlNamespaceContext(final Map<String, String> prefixToUri) {
-        final ImmutableListMultimap.Builder<String, String> uriToPrefixBuilder = ImmutableListMultimap.builder();
-        final BiMap<String, String> prefixToUriBuilder = HashBiMap.create();
+    static ImmutableNamespaceContext of(final Map<String, String> prefixToUri) {
+        final var uriToPrefixBuilder = ImmutableListMultimap.<String, String>builder();
+        final var prefixToUriBuilder = HashBiMap.<String, String>create();
 
         // Populate well-known prefixes
         prefixToUriBuilder.putAll(FIXED_PREFIX_TO_URI);
@@ -50,18 +52,17 @@ final class AnyXmlNamespaceContext implements Immutable, NamespaceContext {
         }
 
         // ... and then process all the rest
-        for (Entry<String, String> entry : prefixToUri.entrySet()) {
-            final String prefix = requireNonNull(entry.getKey());
+        for (var entry : prefixToUri.entrySet()) {
+            final var prefix = requireNonNull(entry.getKey());
             if (!prefix.isEmpty()) {
-                final String namespaceURI = requireNonNull(entry.getValue());
+                final var namespaceURI = requireNonNull(entry.getValue());
                 checkMapping(prefix, namespaceURI);
                 uriToPrefixBuilder.put(namespaceURI, prefix);
                 prefixToUriBuilder.putIfAbsent(prefix, namespaceURI);
             }
         }
 
-        uriToPrefix = uriToPrefixBuilder.build();
-        this.prefixToUri = ImmutableBiMap.copyOf(prefixToUriBuilder);
+        return new ImmutableNamespaceContext(uriToPrefixBuilder.build(), ImmutableBiMap.copyOf(prefixToUriBuilder));
     }
 
     @Override
@@ -76,24 +77,39 @@ final class AnyXmlNamespaceContext implements Immutable, NamespaceContext {
 
     @Override
     public Iterator<String> getPrefixes(final String namespaceURI) {
-        checkArgument(namespaceURI != null);
-        return uriToPrefix.get(namespaceURI).iterator();
+        return uriToPrefix.get(rejectNull(namespaceURI)).iterator();
     }
 
-    Collection<Entry<String, String>> uriPrefixEntries() {
-        return uriToPrefix.entries();
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this).add("prefixToUri", prefixToUri).toString();
     }
 
     private static void checkMapping(final String prefix, final String namespaceURI) {
-        checkArgument(!namespaceURI.isEmpty(), "Namespace must not be empty (%s)", prefix);
-        checkArgument(!FIXED_PREFIX_TO_URI.containsKey(prefix), "Cannot bind prefix %s", prefix);
-        checkArgument(!FIXED_PREFIX_TO_URI.containsValue(namespaceURI), "Cannot bind namespace %s", namespaceURI);
+        if (namespaceURI.isEmpty()) {
+            throw new IllegalArgumentException("Namespace must not be empty (%s)".formatted(prefix));
+        }
+        final var pref = FIXED_PREFIX_TO_URI.get(prefix);
+        if (pref != null) {
+            throw new IllegalArgumentException(
+                "Cannot rebind prefix %s from %s to %s".formatted(prefix, pref, namespaceURI));
+        }
+        if (FIXED_PREFIX_TO_URI.containsValue(namespaceURI)) {
+            throw new IllegalArgumentException("Cannot bind namespace %s".formatted(namespaceURI));
+        }
     }
 
     private static String getValue(final ImmutableBiMap<String, String> map, final String key,
             final String defaultValue) {
-        checkArgument(key != null);
-        final String found;
-        return (found = map.get(key)) == null ? defaultValue : found;
+        final var found = map.get(rejectNull(key));
+        return found != null ? found : defaultValue;
+    }
+
+    // Peculiarity of NamespaceContext: nulls are rejected with IAE instead of NPE as would be usual
+    private static @NonNull String rejectNull(final @Nullable String str) {
+        if (str == null) {
+            throw new IllegalArgumentException();
+        }
+        return str;
     }
 }
