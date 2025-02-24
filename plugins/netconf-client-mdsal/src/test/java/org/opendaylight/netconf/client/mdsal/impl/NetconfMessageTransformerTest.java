@@ -39,6 +39,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
@@ -75,7 +76,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -184,7 +184,7 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         XMLUnit.setIgnoreComments(true);
 
         netconfMessageTransformer = getTransformer(SCHEMA);
-        actionNetconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(ACTION_SCHEMA), true,
+        actionNetconfMessageTransformer = new NetconfMessageTransformer(DatabindContext.ofModel(ACTION_SCHEMA), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
@@ -206,7 +206,7 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     void testCreateSubscriberNotificationSchemaNotPresent() {
-        final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
+        final var transformer = new NetconfMessageTransformer(DatabindContext.ofModel(SCHEMA), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(
                 Set.of(CapabilityURN.NOTIFICATION))));
         var netconfMessage = transformer.toRpcRequest(CreateSubscription.QNAME, ImmutableNodes.newContainerBuilder()
@@ -531,7 +531,7 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
-        return new NetconfMessageTransformer(MountPointContext.of(schema), true,
+        return new NetconfMessageTransformer(DatabindContext.ofModel(schema), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
@@ -1115,21 +1115,22 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     // Proof that YANGTOOLS-1362 works on DOM level
     void testConfigChangeToNotification() throws Exception {
         final var message = new NetconfMessage(XmlUtil.readXmlToDocument(
-            "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">\n"
-            + " <eventTime>2021-11-11T11:26:16Z</eventTime> \n"
-            + "  <netconf-config-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">\n"
-            + "     <changed-by> \n"
-            + "       <username>root</username> \n"
-            + "       <session-id>3</session-id> \n"
-            + "     </changed-by> \n"
-            + "     <datastore>running</datastore> \n"
-            + "     <edit> \n"
-            + "        <target xmlns:ncm=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">/ncm:netconf-state"
-            + "/ncm:datastores/ncm:datastore[ncm:name='running']</target>\n"
-            + "        <operation>replace</operation> \n"
-            + "     </edit> \n"
-            + "  </netconf-config-change> \n"
-            + "</notification>"));
+            """
+                <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+                 <eventTime>2021-11-11T11:26:16Z</eventTime>\s
+                  <netconf-config-change xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications">
+                     <changed-by>\s
+                       <username>root</username>\s
+                       <session-id>3</session-id>\s
+                     </changed-by>\s
+                     <datastore>running</datastore>\s
+                     <edit>\s
+                        <target xmlns:ncm="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">/ncm:netconf-state\
+                /ncm:datastores/ncm:datastore[ncm:name='running']</target>
+                        <operation>replace</operation>\s
+                     </edit>\s
+                  </netconf-config-change>\s
+                </notification>"""));
 
         final var change = netconfMessageTransformer.toNotification(message).getBody();
         final var editList = change.getChildByArg(new NodeIdentifier(Edit.QNAME));

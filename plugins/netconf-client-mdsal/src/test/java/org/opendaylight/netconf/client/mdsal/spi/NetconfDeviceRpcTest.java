@@ -40,6 +40,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -49,7 +50,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -81,7 +81,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA_CONTEXT), true,
+        final var transformer = new NetconfMessageTransformer(DatabindContext.ofModel(SCHEMA_CONTEXT), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
         reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"

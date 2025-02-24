@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
@@ -107,7 +108,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
         final var baseSchema = baseSchemaProvider.baseSchemaForCapabilities(remoteSessionCapabilities);
         final var initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
-            new NetconfMessageTransformer(baseSchema.mountPointContext(), false, baseSchema));
+            new NetconfMessageTransformer(baseSchema.databind(), false, baseSchema));
 
         final var deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpc,
             baseSchema, processingExecutor);
@@ -191,7 +192,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             registerToBaseNetconfStream(deviceRpc, listener);
         }
 
-        final var messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true, baseSchema);
+        final var databind = DatabindContext.ofMountPoint(deviceSchema.mountContext());
+        final var messageTransformer = new NetconfMessageTransformer(databind, true, baseSchema);
 
         // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
         // whatever notifications have been held back
@@ -229,7 +231,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // Create a temporary RPC invoker and acquire the mount point tree
         LOG.debug("{}: Acquiring available mount points", id);
         final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
-            new NetconfMessageTransformer(emptyContext, false, baseSchema));
+            new NetconfMessageTransformer(DatabindContext.ofMountPoint(emptyContext), false, baseSchema));
 
         return Futures.transform(deviceRpc.domRpcService().invokeRpc(Get.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
@@ -265,7 +267,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
             final RemoteDeviceCommunicator listener, final BaseNetconfSchema schema) {
         return new NetconfDeviceRpc(result.modelContext(), listener,
-            new NetconfMessageTransformer(result, true, schema));
+            new NetconfMessageTransformer(DatabindContext.ofMountPoint(result), true, schema));
     }
 
     /**

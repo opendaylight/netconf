@@ -39,6 +39,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.output.Data;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -92,7 +93,7 @@ class NetconfBaseOpsTest extends AbstractTestModelTest {
     @BeforeEach
     void setUp() {
         final var rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, new NetconfMessageTransformer(
-            MountPointContext.of(SCHEMA_CONTEXT), true,
+            DatabindContext.ofModel(SCHEMA_CONTEXT), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of()))));
         callback = new NetconfRpcFutureCallback("prefix",
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));

@@ -21,7 +21,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -33,11 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -52,6 +49,7 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
@@ -62,25 +60,19 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -89,10 +81,8 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class NetconfMessageTransformer
         implements ActionTransformer, NotificationTransformer, RpcTransformer<ContainerNode, DOMRpcResult> {
@@ -112,23 +102,19 @@ public class NetconfMessageTransformer
         NetconfCapabilityChange.QNAME.getNamespace(),
         CreateSubscription.QNAME.getNamespace());
 
-    private final MountPointContext mountContext;
-    private final DataSchemaContextTree contextTree;
+    private final DatabindContext databind;
     private final BaseNetconfSchema baseSchema;
-    private final MessageCounter counter;
+    private final MessageCounter counter = new MessageCounter();
     private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final Multimap<QName, ? extends NotificationDefinition> mappedNotifications;
     private final boolean strictParsing;
     private final ImmutableMap<Absolute, ActionDefinition> actions;
 
-    public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
+    public NetconfMessageTransformer(final DatabindContext databind, final boolean strictParsing,
                                      final BaseNetconfSchema baseSchema) {
-        counter = new MessageCounter();
-        this.mountContext = requireNonNull(mountContext);
+        this.databind = requireNonNull(databind);
 
-        final EffectiveModelContext modelContext = mountContext.modelContext();
-        contextTree = DataSchemaContextTree.from(modelContext);
-
+        final var modelContext = databind.modelContext();
         mappedRpcs = Maps.uniqueIndex(modelContext.getOperations(), SchemaNode::getQName);
         actions = getActions(modelContext);
 
@@ -148,21 +134,21 @@ public class NetconfMessageTransformer
 
     private static void findAction(final DataSchemaNode dataSchemaNode, final Deque<QName> path,
             final ImmutableMap.Builder<Absolute, ActionDefinition> builder) {
-        if (dataSchemaNode instanceof ActionNodeContainer) {
-            for (ActionDefinition actionDefinition : ((ActionNodeContainer) dataSchemaNode).getActions()) {
+        if (dataSchemaNode instanceof ActionNodeContainer actionContainer) {
+            for (var actionDefinition : actionContainer.getActions()) {
                 path.addLast(actionDefinition.getQName());
                 builder.put(Absolute.of(path), actionDefinition);
                 path.removeLast();
             }
         }
-        if (dataSchemaNode instanceof DataNodeContainer) {
-            for (DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
+        if (dataSchemaNode instanceof DataNodeContainer dataContainer) {
+            for (var innerDataSchemaNode : dataContainer.getChildNodes()) {
                 path.addLast(innerDataSchemaNode.getQName());
                 findAction(innerDataSchemaNode, path, builder);
                 path.removeLast();
             }
-        } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
-            for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
+        } else if (dataSchemaNode instanceof ChoiceSchemaNode choice) {
+            for (var caze : choice.getCases()) {
                 path.addLast(caze.getQName());
                 findAction(caze, path, builder);
                 path.removeLast();
@@ -172,7 +158,7 @@ public class NetconfMessageTransformer
 
     @Override
     public synchronized DOMNotificationEvent toNotification(final NetconfMessage message) {
-        final Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
+        final var stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
             notificationNoRev = QName.create(
@@ -204,8 +190,8 @@ public class NetconfMessageTransformer
         final var resultHolder = new NormalizationResultHolder();
         try {
             final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final var xmlParser = XmlParserStream.create(writer, mountContext,
-                SchemaInferenceStack.of(mountContext.modelContext(), notificationPath).toInference(), strictParsing);
+            final var xmlParser = XmlParserStream.create(writer, databind.mountContext(),
+                SchemaInferenceStack.of(databind.modelContext(), notificationPath).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
@@ -215,15 +201,15 @@ public class NetconfMessageTransformer
 
     private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
             final Element element) {
-        final var modules = mountContext.modelContext().findModules(XMLNamespace.of(element.getNamespaceURI()))
+        final var modules = databind.modelContext().findModules(XMLNamespace.of(element.getNamespaceURI()))
             .iterator();
         if (!modules.hasNext()) {
             throw new IllegalArgumentException(
                     "Unable to parse notification " + message + ", cannot find top level module");
         }
-        final Module module = modules.next();
-        final QName topLevelNodeQName = QName.create(element.getNamespaceURI(), element.getLocalName());
-        for (DataSchemaNode childNode : module.getChildNodes()) {
+        final var module = modules.next();
+        final var topLevelNodeQName = QName.create(element.getNamespaceURI(), element.getLocalName());
+        for (var childNode : module.getChildNodes()) {
             if (topLevelNodeQName.isEqualWithoutRevision(childNode.getQName())) {
                 return Optional.of(traverseXmlNodeContainingNotification(element, childNode, new ArrayList<>(),
                     YangInstanceIdentifier.builder()));
@@ -241,23 +227,23 @@ public class NetconfMessageTransformer
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
             schemaBuilder.add(containerSchema.getQName());
 
-            Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, containerSchema);
+            final var xmlContainerChildPair = findXmlContainerChildPair(xmlNode, containerSchema);
             return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
                     xmlContainerChildPair.getValue(), schemaBuilder, instanceBuilder);
         } else if (schemaNode instanceof ListSchemaNode listSchema) {
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
             schemaBuilder.add(listSchema.getQName());
 
-            Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchema);
+            final var listKeys = findXmlListKeys(xmlNode, listSchema);
             instanceBuilder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
 
-            Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchema);
+            final var xmlListChildPair = findXmlListChildPair(xmlNode, listSchema);
             return traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
                     xmlListChildPair.getValue(), schemaBuilder, instanceBuilder);
-        } else if (schemaNode instanceof NotificationDefinition) {
+        } else if (schemaNode instanceof NotificationDefinition notifSchema) {
             // FIXME: this should not be here: it does not form a valid YangInstanceIdentifier
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
-            schemaBuilder.add(schemaNode.getQName());
+            schemaBuilder.add(notifSchema.getQName());
 
             if (xmlNode instanceof Element element) {
                 return new NestedNotificationInfo(Absolute.of(schemaBuilder), instanceBuilder.build(), element);
@@ -269,16 +255,17 @@ public class NetconfMessageTransformer
 
     private static Entry<Node, SchemaNode> findXmlContainerChildPair(final Node xmlNode,
             final ContainerSchemaNode container) {
-        final NodeList nodeList = xmlNode.getChildNodes();
-        final Map<QName, SchemaNode> childrenWithoutRevision =
-                Streams.concat(container.getChildNodes().stream(), container.getNotifications().stream())
-                    .collect(Collectors.toMap(child -> child.getQName().withoutRevision(), Function.identity()));
+        final var nodeList = xmlNode.getChildNodes();
+        final var childrenWithoutRevision = Streams.concat(
+            container.getChildNodes().stream(),
+            container.getNotifications().stream())
+            .collect(Collectors.toMap(child -> child.getQName().withoutRevision(), Function.identity()));
 
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node currentNode = nodeList.item(i);
+            final var currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
-                SchemaNode schemaChildNode = childrenWithoutRevision.get(currentNodeQName);
+                final var currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                final var schemaChildNode = childrenWithoutRevision.get(currentNodeQName);
                 if (schemaChildNode != null) {
                     return Map.entry(currentNode, schemaChildNode);
                 }
@@ -288,14 +275,15 @@ public class NetconfMessageTransformer
     }
 
     private static Map<QName, Object> findXmlListKeys(final Node xmlNode, final ListSchemaNode listSchemaNode) {
-        Map<QName, Object> listKeys = new HashMap<>();
-        NodeList nodeList = xmlNode.getChildNodes();
-        Set<QName> keyDefinitionsWithoutRevision = listSchemaNode.getKeyDefinition().stream()
-                .map(QName::withoutRevision).collect(Collectors.toSet());
+        final var listKeys = new HashMap<QName, Object>();
+        final var nodeList = xmlNode.getChildNodes();
+        final var keyDefinitionsWithoutRevision = listSchemaNode.getKeyDefinition().stream()
+                .map(QName::withoutRevision)
+                .collect(Collectors.toSet());
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node currentNode = nodeList.item(i);
+            final var currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                final var currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
                 if (keyDefinitionsWithoutRevision.contains(currentNodeQName)) {
                     listKeys.put(currentNodeQName, currentNode.getFirstChild().getNodeValue());
                 }
@@ -308,12 +296,12 @@ public class NetconfMessageTransformer
     }
 
     private static Entry<Node, SchemaNode> findXmlListChildPair(final Node xmlNode, final ListSchemaNode list) {
-        final NodeList nodeList = xmlNode.getChildNodes();
+        final var nodeList = xmlNode.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node currentNode = nodeList.item(i);
+            final var currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
-                for (SchemaNode childNode : Iterables.concat(list.getChildNodes(), list.getNotifications())) {
+                final var currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                for (var childNode : Iterables.concat(list.getChildNodes(), list.getNotifications())) {
                     if (!list.getKeyDefinition().contains(childNode.getQName())
                             && currentNodeQName.isEqualWithoutRevision(childNode.getQName())) {
                         return new AbstractMap.SimpleEntry<>(currentNode, childNode);
@@ -338,14 +326,9 @@ public class NetconfMessageTransformer
         // and also check if the device exposed model for base netconf.
         // If no, use pre built base netconf operations model
         final boolean needToUseBaseCtx = mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc);
-        final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
-        if (needToUseBaseCtx) {
-            currentMappedRpcs = baseSchema.mappedRpcs();
-        } else {
-            currentMappedRpcs = mappedRpcs;
-        }
+        final var currentMappedRpcs = needToUseBaseCtx ? baseSchema.mappedRpcs() : mappedRpcs;
 
-        final RpcDefinition mappedRpc = checkNotNull(currentMappedRpcs.get(rpc),
+        final var mappedRpc = checkNotNull(currentMappedRpcs.get(rpc),
                 "Unknown rpc %s, available rpcs: %s", rpc, currentMappedRpcs.keySet());
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter)
@@ -354,43 +337,42 @@ public class NetconfMessageTransformer
 
         checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
 
-        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
+        final var result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
         try {
             // If the schema context for netconf device does not contain model for base netconf operations,
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            final var modelContext = needToUseBaseCtx ? baseSchema.modelContext() : mountContext.modelContext();
+            final var modelContext = needToUseBaseCtx ? baseSchema.modelContext() : databind.modelContext();
             NetconfMessageTransformUtil.writeNormalizedOperationInput(payload, result, Absolute.of(rpc), modelContext);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + rpc, e);
         }
 
-        final Document node = result.getNode().getOwnerDocument();
-
-        return new NetconfMessage(node);
+        return new NetconfMessage(result.getNode().getOwnerDocument());
     }
 
     @Override
     public NetconfMessage toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode payload) {
-        final ActionDefinition actionDef = actions.get(action);
+        final var actionDef = actions.get(action);
         checkArgument(actionDef != null, "Action does not exist: %s", action);
 
-        final InputSchemaNode inputDef = actionDef.getInput();
+        final var inputDef = actionDef.getInput();
         if (inputDef.getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
-                domDataTreeIdentifier, counter, actionDef.getQName()).getNode().getOwnerDocument());
+            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(
+                databind.schemaTree(), domDataTreeIdentifier, counter,
+                actionDef.getQName()).getNode().getOwnerDocument());
         }
 
         checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
         checkArgument(payload instanceof ContainerNode,
                 "Transforming an action with input: %s, payload has to be a container, but was: %s", action, payload);
 
-        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
+        final var result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(databind.schemaTree(),
             domDataTreeIdentifier, counter, actionDef.getQName());
         try {
             NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, action,
-                mountContext.modelContext());
+                databind.modelContext());
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + action, e);
         }
@@ -429,7 +411,7 @@ public class NetconfMessageTransformer
                 currentMappedRpcs = mappedRpcs;
             }
 
-            final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpc);
+            final var rpcDefinition = currentMappedRpcs.get(rpc);
             checkArgument(rpcDefinition != null, "Unable to parse response of %s, the rpc is unknown", rpc);
 
             // In case no input for rpc is defined, we can simply construct the payload here
@@ -440,20 +422,17 @@ public class NetconfMessageTransformer
 
     @Override
     public DOMRpcResult toActionResult(final Absolute action, final NetconfMessage message) {
-        final ActionDefinition actionDefinition = actions.get(action);
+        final var actionDefinition = actions.get(action);
         checkArgument(actionDefinition != null, "Action does not exist: %s", action);
-        final ContainerNode normalizedNode = parseResult(message, action, actionDefinition);
+        final var normalizedNode = parseResult(message, action, actionDefinition);
 
-        if (normalizedNode == null) {
-            return new DefaultDOMRpcResult(List.of());
-        } else {
-            return new DefaultDOMRpcResult(normalizedNode, List.of());
-        }
+        return normalizedNode == null ? new DefaultDOMRpcResult(List.of())
+            : new DefaultDOMRpcResult(normalizedNode, List.of());
     }
 
     private ContainerNode parseResult(final NetconfMessage message, final Absolute operationPath,
             final OperationDefinition operationDef) {
-        final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
+        final var okResponseElement = XmlElement.fromDomDocument(message.getDocument())
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
         final var operOutput = operationDef.getOutput();
         if (operOutput.getChildNodes().isEmpty()) {
@@ -473,13 +452,13 @@ public class NetconfMessageTransformer
             .add(operOutput.getQName())
             .build());
         // FIXME: we should have a cached inference here, or XMLParserStream should accept Absolute instead
-        final var inference = SchemaInferenceStack.of(mountContext.modelContext(), outputPath).toInference();
+        final var inference = SchemaInferenceStack.of(databind.modelContext(), outputPath).toInference();
 
-        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
-        final Element element = message.getDocument().getDocumentElement();
+        final var resultHolder = new NormalizationResultHolder();
+        final var element = message.getDocument().getDocumentElement();
         try {
-            final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext, inference, strictParsing);
+            final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+            final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), inference, strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException e) {
             throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
