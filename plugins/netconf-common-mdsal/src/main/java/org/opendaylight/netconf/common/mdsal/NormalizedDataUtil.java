@@ -23,6 +23,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.xml.XMLSupport;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -66,7 +67,7 @@ public final class NormalizedDataUtil {
         void initializeNamespace(XMLStreamWriter writer) throws XMLStreamException;
 
         static NamespaceSetter forFactory(final XMLOutputFactory xmlFactory) {
-            final var namespaceContext = new AnyXmlNamespaceContext(Map.of("op", NamespaceURN.BASE));
+            final var namespaceContext = XMLSupport.fixedNamespaceContextOf(Map.of("op", NamespaceURN.BASE));
 
             try {
                 final var testWriter = xmlFactory.createXMLStreamWriter(new DOMResult(XmlUtil.newDocument()));
