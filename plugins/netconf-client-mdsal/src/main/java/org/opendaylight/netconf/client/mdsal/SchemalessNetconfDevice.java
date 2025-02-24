@@ -39,7 +39,6 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
     public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
             final NetconfDeviceCommunicator netconfDeviceCommunicator) {
         final var baseSchema = baseSchemas.baseSchemaForCapabilities(remoteSessionCapabilities);
-        final var mountContext = baseSchema.mountPointContext();
 
         final var counter = new MessageCounter();
         final var rpcTransformer = new BaseRpcSchemalessTransformer(baseSchema, counter);
@@ -47,7 +46,8 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
 
         salFacade.onDeviceConnected(
             // FIXME: or bound from base schema rather?
-            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), mountContext), remoteSessionCapabilities,
+            new NetconfDeviceSchema(baseSchema.databind(), NetconfDeviceCapabilities.empty()),
+            remoteSessionCapabilities,
             new RemoteDeviceServices(
                 new SchemalessNetconfDeviceRpc(id, netconfDeviceCommunicator, rpcTransformer, messageTransformer),
                 null));
