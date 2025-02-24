@@ -54,13 +54,15 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
             return new NetconfMessage(domResult.getNode().getOwnerDocument());
         }
 
-        checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
-        checkArgument(payload instanceof ContainerNode,
-                "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpc, payload);
+        if (!(payload instanceof ContainerNode payloadContainer)) {
+            throw new IllegalArgumentException(
+                "Transforming an rpc with input: %s, payload has to be a container, but was: %s".formatted(rpc,
+                    payload));
+        }
 
         final DOMResult result = domResult;
         try {
-            NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, Absolute.of(rpc),
+            NetconfMessageTransformUtil.writeNormalizedOperationInput(payloadContainer, result, Absolute.of(rpc),
                 baseSchema.modelContext());
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + rpc, e);
