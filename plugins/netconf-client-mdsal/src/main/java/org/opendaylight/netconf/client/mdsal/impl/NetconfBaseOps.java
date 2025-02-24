@@ -43,6 +43,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CopyConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
@@ -77,17 +78,17 @@ public final class NetconfBaseOps {
         ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, "rollback-on-error");
 
     private final NetconfRpcService rpc;
-    private final MountPointContext mountContext;
+    private final DatabindContext databind;
     private final RpcStructureTransformer transformer;
 
     public NetconfBaseOps(final Rpcs rpc, final MountPointContext mountContext) {
         this.rpc = requireNonNull(rpc);
-        this.mountContext = requireNonNull(mountContext);
+        databind = DatabindContext.ofMountPoint(mountContext);
 
         if (rpc instanceof Rpcs.Schemaless) {
             transformer = new SchemalessRpcStructureTransformer();
         } else if (rpc instanceof Rpcs.Normalized) {
-            transformer = new NetconfRpcStructureTransformer(mountContext);
+            transformer = new NetconfRpcStructureTransformer(databind);
         } else {
             throw new IllegalStateException("Unhandled rpcs " + rpc);
         }
@@ -282,7 +283,7 @@ public final class NetconfBaseOps {
         return addCallback(requireNonNull(callback), rpc.invokeNetconf(Get.QNAME,
             nonEmptyFilter(filterPath)
                 .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
-                    toFilterStructure(path, mountContext.modelContext())))
+                    toFilterStructure(path, databind.modelContext())))
                 .orElse(NetconfMessageTransformUtil.GET_RPC_CONTENT)));
     }
 
