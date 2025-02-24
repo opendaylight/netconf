@@ -29,8 +29,8 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,7 +77,7 @@ class NetconfDeviceSalFacadeTest {
 
         // Verify that onDeviceConnected is not called after close.
         deviceFacade.onDeviceConnected(
-            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
+            new NetconfDeviceSchema(DatabindContext.ofModel(schemaContext), NetconfDeviceCapabilities.empty()),
             netconfSessionPreferences, deviceServices);
         verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
             any(DOMDataBroker.class), any(NetconfDataTreeService.class));
@@ -93,12 +93,12 @@ class NetconfDeviceSalFacadeTest {
 
     @Test
     void testOnDeviceConnected() {
-        final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
+        final var schemaContext = mock(EffectiveModelContext.class);
 
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
         final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
         deviceFacade.onDeviceConnected(
-            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
+            new NetconfDeviceSchema(DatabindContext.ofModel(schemaContext), NetconfDeviceCapabilities.empty()),
             netconfSessionPreferences, deviceServices);
 
         verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), eq(deviceServices),

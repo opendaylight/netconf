@@ -55,8 +55,9 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
             LOG.warn("{}: Device mount was closed before device connected setup finished.", id);
             return;
         }
-        final var mountContext = deviceSchema.mountContext();
-        final var modelContext = mountContext.modelContext();
+
+        final var databind = deviceSchema.databind();
+        final var mountContext = databind.mountContext();
 
         final var deviceRpc = services.rpcs();
 
@@ -65,7 +66,7 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
         final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences,
             lockDatastore);
 
-        mount.onDeviceConnected(modelContext, services, netconfDataBroker, netconfDataTree);
+        mount.onDeviceConnected(databind.modelContext(), services, netconfDataBroker, netconfDataTree);
     }
 
     @Override

@@ -30,13 +30,12 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,14 +155,14 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private void registerMasterMountPoint() {
         requireNonNull(id);
 
-        final var mountContext = requireNonNull(currentSchema,
+        final var databind = requireNonNull(currentSchema,
             "Device has no remote schema context yet. Probably not fully connected.")
-            .mountContext();
+            .databind();
         final var preferences = requireNonNull(netconfSessionPreferences,
             "Device has no capabilities yet. Probably not fully connected.");
 
-        deviceDataBroker = newDeviceDataBroker(mountContext, preferences);
-        netconfService = newNetconfDataTreeService(mountContext, preferences);
+        deviceDataBroker = newDeviceDataBroker(databind, preferences);
+        netconfService = newNetconfDataTreeService(databind, preferences);
 
         // We need to create ProxyDOMDataBroker so accessing mountpoint
         // on leader node would be same as on follower node
@@ -171,22 +170,24 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             actorResponseWaitTime);
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
-        mount.onDeviceConnected(mountContext.modelContext(), deviceServices, proxyDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(databind.modelContext(), deviceServices, proxyDataBroker, proxyNetconfService);
     }
 
-    protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
+    protected DOMDataBroker newDeviceDataBroker(final DatabindContext databind,
             final NetconfSessionPreferences preferences) {
-        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences, lockDatastore);
+        return new NetconfDeviceDataBroker(id, databind.mountContext(), deviceServices.rpcs(), preferences,
+            lockDatastore);
     }
 
-    protected NetconfDataTreeService newNetconfDataTreeService(final MountPointContext mountContext,
+    protected NetconfDataTreeService newNetconfDataTreeService(final DatabindContext databind,
             final NetconfSessionPreferences preferences) {
-        return AbstractNetconfDataTreeService.of(id, mountContext, deviceServices.rpcs(), preferences, lockDatastore);
+        return AbstractNetconfDataTreeService.of(id, databind.mountContext(), deviceServices.rpcs(), preferences,
+            lockDatastore);
     }
 
     private Future<Object> sendInitialDataToActor() {
-        final List<SourceIdentifier> sourceIdentifiers = List.copyOf(SchemaContextUtil.getConstituentModuleIdentifiers(
-            currentSchema.mountContext().modelContext()));
+        final var sourceIdentifiers = List.copyOf(SchemaContextUtil.getConstituentModuleIdentifiers(
+            currentSchema.databind().modelContext()));
 
         LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}", id, sourceIdentifiers,
             masterActorRef);

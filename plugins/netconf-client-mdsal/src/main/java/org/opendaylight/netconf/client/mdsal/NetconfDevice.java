@@ -116,7 +116,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // Potentially acquire mount point list and interpret it
         final var netconfDeviceSchemaFuture = Futures.transformAsync(deviceSchema,
             result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
-                mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
+                mount -> new NetconfDeviceSchema(DatabindContext.ofMountPoint(mount), result.capabilities()),
+                processingExecutor),
             processingExecutor);
         schemaFuture = netconfDeviceSchemaFuture;
 
@@ -124,7 +125,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             @Override
             public void onSuccess(final NetconfDeviceSchema result) {
                 handleSalInitializationSuccess(listener, baseSchema, result, remoteSessionCapabilities,
-                    getDeviceSpecificRpc(result.mountContext(), listener, baseSchema));
+                    getDeviceSpecificRpc(result.databind(), listener, baseSchema));
             }
 
             @Override
@@ -192,8 +193,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             registerToBaseNetconfStream(deviceRpc, listener);
         }
 
-        final var databind = DatabindContext.ofMountPoint(deviceSchema.mountContext());
-        final var messageTransformer = new NetconfMessageTransformer(databind, true, baseSchema);
+        final var messageTransformer = new NetconfMessageTransformer(deviceSchema.databind(), true, baseSchema);
 
         // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
         // whatever notifications have been held back
@@ -223,24 +223,25 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private ListenableFuture<@NonNull MountPointContext> createMountPointContext(
             final EffectiveModelContext schemaContext, final BaseNetconfSchema baseSchema,
             final NetconfDeviceCommunicator listener) {
-        final var emptyContext = MountPointContext.of(schemaContext);
+        final var emptyDatabind = DatabindContext.ofModel(schemaContext);
         if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
-            return Futures.immediateFuture(emptyContext);
+            return Futures.immediateFuture(emptyDatabind.mountContext());
         }
 
         // Create a temporary RPC invoker and acquire the mount point tree
         LOG.debug("{}: Acquiring available mount points", id);
         final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
-            new NetconfMessageTransformer(DatabindContext.ofMountPoint(emptyContext), false, baseSchema));
+            new NetconfMessageTransformer(emptyDatabind, false, baseSchema));
 
         return Futures.transform(deviceRpc.domRpcService().invokeRpc(Get.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
-            .build()), rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
+            .build()), rpcResult -> processSchemaMounts(rpcResult, emptyDatabind), MoreExecutors.directExecutor());
     }
 
     private @NonNull MountPointContext processSchemaMounts(final DOMRpcResult rpcResult,
-            final MountPointContext emptyContext) {
+            final DatabindContext emptyDatabind) {
+        final var emptyContext = emptyDatabind.mountContext();
         final var errors = rpcResult.errors();
         if (!errors.isEmpty()) {
             LOG.warn("{}: Schema-mounts acquisition resulted in errors {}", id, errors);
@@ -265,10 +266,10 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         notificationHandler.handleNotification(notification);
     }
 
-    protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
+    protected NetconfDeviceRpc getDeviceSpecificRpc(final DatabindContext result,
             final RemoteDeviceCommunicator listener, final BaseNetconfSchema schema) {
         return new NetconfDeviceRpc(result.modelContext(), listener,
-            new NetconfMessageTransformer(DatabindContext.ofMountPoint(result), true, schema));
+            new NetconfMessageTransformer(result, true, schema));
     }
 
     /**
