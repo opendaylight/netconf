@@ -19,11 +19,11 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
     private final NetconfDOMDataBrokerFieldsExtension fieldsExtension = new NetconfDOMDataBrokerFieldsExtensionImpl();
@@ -34,10 +34,10 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     private final boolean runningWritable;
     private final boolean lockDatastore;
 
-    public NetconfDeviceDataBroker(final RemoteDeviceId id, final MountPointContext mountContext, final Rpcs rpcs,
+    public NetconfDeviceDataBroker(final RemoteDeviceId id, final DatabindContext databind, final Rpcs rpcs,
             final NetconfSessionPreferences netconfSessionPreferences, final boolean lockDatastore) {
         this.id = id;
-        netconfOps = new NetconfBaseOps(rpcs, mountContext);
+        netconfOps = new NetconfBaseOps(databind, rpcs);
         // get specific attributes from netconf preferences and get rid of it
         // no need to keep the entire preferences object, its quite big with all the capability QNames
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
