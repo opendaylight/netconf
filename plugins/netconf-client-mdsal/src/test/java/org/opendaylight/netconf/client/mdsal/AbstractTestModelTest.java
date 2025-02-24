@@ -7,11 +7,18 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import org.eclipse.jdt.annotation.NonNull;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@NonNullByDefault
 public abstract class AbstractTestModelTest extends AbstractBaseSchemasTest {
-    protected static final @NonNull EffectiveModelContext SCHEMA_CONTEXT =
+    protected static final EffectiveModelContext TEST_MODEL =
         YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
+    protected static final DatabindContext TEST_DATABIND = DatabindContext.ofModel(TEST_MODEL);
+    protected static final ListenableFuture<EffectiveModelContext> TEST_MODEL_FUTURE =
+        Futures.immediateFuture(TEST_MODEL);
 }

@@ -68,7 +68,7 @@ class SchemaSetupTest extends AbstractTestModelTest {
     void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
         final var ex = new SchemaResolutionException("fail first", TEST_SID, new Throwable("YangTools parser fail"));
         doAnswer(invocation -> invocation.getArgument(0, Collection.class).size() == 2
-            ? Futures.immediateFailedFuture(ex) : Futures.immediateFuture(SCHEMA_CONTEXT))
+            ? Futures.immediateFailedFuture(ex) : TEST_MODEL_FUTURE)
             .when(contextFactory).createEffectiveModelContext(anyCollection());
 
         doReturn(Futures.immediateFuture(source)).when(schemaRepository)
@@ -81,7 +81,7 @@ class SchemaSetupTest extends AbstractTestModelTest {
 
         final var result = Futures.getDone(setup.startResolution());
         verify(contextFactory, times(2)).createEffectiveModelContext(anyCollection());
-        assertSame(SCHEMA_CONTEXT, result.modelContext());
+        assertSame(TEST_MODEL, result.modelContext());
     }
 
     @Test
@@ -92,8 +92,7 @@ class SchemaSetupTest extends AbstractTestModelTest {
                 .when(schemaRepository).getSchemaSource(TEST_SID, YangTextSource.class);
         doReturn(Futures.immediateFuture(source)).when(schemaRepository)
             .getSchemaSource(TEST_SID2, YangTextSource.class);
-        doReturn(Futures.immediateFuture(SCHEMA_CONTEXT)).when(contextFactory)
-            .createEffectiveModelContext(anyCollection());
+        doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
             new NetconfDeviceSchemas(Set.of(TEST_QNAME, TEST_QNAME2), FeatureSet.builder().build(), Set.of(),
@@ -104,15 +103,14 @@ class SchemaSetupTest extends AbstractTestModelTest {
         final var captor = ArgumentCaptor.forClass(Collection.class);
         verify(contextFactory).createEffectiveModelContext(captor.capture());
         assertEquals(List.of(TEST_SID2), captor.getValue());
-        assertSame(SCHEMA_CONTEXT, result.modelContext());
+        assertSame(TEST_MODEL, result.modelContext());
     }
 
     @Test
     void testNetconfDeviceNotificationsCapabilityIsNotPresent() throws Exception {
         doReturn(Futures.immediateFuture(source)).when(schemaRepository)
             .getSchemaSource(any(), eq(YangTextSource.class));
-        doReturn(Futures.immediateFuture(SCHEMA_CONTEXT)).when(contextFactory)
-            .createEffectiveModelContext(anyCollection());
+        doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
             new NetconfDeviceSchemas(Set.of(TEST_QNAME), FeatureSet.builder().build(), Set.of(),
