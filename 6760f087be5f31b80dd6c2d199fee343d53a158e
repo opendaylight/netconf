@@ -45,6 +45,29 @@
       },
       "revId": "6760f087be5f31b80dd6c2d199fee343d53a158e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7b9bfd4_e31d047c",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-02-24T14:39:41Z",
+      "side": 1,
+      "message": "please keep the switch expression: it makes sure we cover all the cases",
+      "range": {
+        "startLine": 107,
+        "startChar": 12,
+        "endLine": 107,
+        "endChar": 45
+      },
+      "revId": "6760f087be5f31b80dd6c2d199fee343d53a158e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
