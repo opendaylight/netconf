@@ -10,7 +10,6 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
@@ -26,11 +25,12 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
 class ReadOnlyTxTest {
@@ -38,12 +38,14 @@ class ReadOnlyTxTest {
     private Rpcs.Normalized rpc;
     @Mock
     private ContainerNode mockedNode;
+    @Mock
+    private EffectiveModelContext modelContext;
 
     private NetconfBaseOps netconfOps;
 
     @BeforeEach
     void setUp() {
-        netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
+        netconfOps = new NetconfBaseOps(DatabindContext.ofModel(modelContext), rpc);
     }
 
     @Test

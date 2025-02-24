@@ -29,12 +29,12 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfRpcFutureCallback;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,10 +167,9 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
         this.lockDatastore = lockDatastore;
     }
 
-    public static @NonNull AbstractNetconfDataTreeService of(final RemoteDeviceId id,
-            final MountPointContext mountContext, final Rpcs rpcs,
-            final NetconfSessionPreferences sessionPreferences, final boolean lockDatastore) {
-        final var netconfOps = new NetconfBaseOps(rpcs, mountContext);
+    public static @NonNull AbstractNetconfDataTreeService of(final RemoteDeviceId id, final DatabindContext databind,
+            final Rpcs rpcs, final NetconfSessionPreferences sessionPreferences, final boolean lockDatastore) {
+        final var netconfOps = new NetconfBaseOps(databind, rpcs);
         final boolean rollbackSupport = sessionPreferences.isRollbackSupported();
 
         // Examine preferences and decide which implementation to use

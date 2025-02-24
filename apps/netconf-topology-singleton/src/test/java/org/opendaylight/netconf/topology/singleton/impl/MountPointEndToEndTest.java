@@ -229,7 +229,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private TransactionChain slaveTxChain;
 
     private NetconfClientConfigurationBuilderFactory builderFactory;
-    private EffectiveModelContext deviceSchemaContext;
+    private EffectiveModelContext deviceModelContext;
     private YangModuleInfo topModuleInfo;
     private QName putTopRpcSchemaPath;
     private QName getTopRpcSchemaPath;
@@ -252,9 +252,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         topModuleInfo = BindingRuntimeHelpers.getYangModuleInfo(Top.class);
 
-        deviceSchemaContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
+        deviceModelContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
 
-        final var router = new DOMRpcRouter(new FixedDOMSchemaService(deviceSchemaContext));
+        final var router = new DOMRpcRouter(new FixedDOMSchemaService(deviceModelContext));
 
         putTopRpcSchemaPath = findRpcDefinition("put-top").getQName();
         getTopRpcSchemaPath = findRpcDefinition("get-top").getQName();
@@ -408,7 +408,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
-            new NetconfDeviceSchema(DatabindContext.ofModel(deviceSchemaContext), NetconfDeviceCapabilities.empty()),
+            new NetconfDeviceSchema(DatabindContext.ofModel(deviceModelContext), NetconfDeviceCapabilities.empty()),
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 
@@ -480,7 +480,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
-            new NetconfDeviceSchema(DatabindContext.ofModel(deviceSchemaContext), NetconfDeviceCapabilities.empty()),
+            new NetconfDeviceSchema(DatabindContext.ofModel(deviceModelContext), NetconfDeviceCapabilities.empty()),
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 
@@ -726,7 +726,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private RpcDefinition findRpcDefinition(final String rpc) {
-        Module topModule = deviceSchemaContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision())
+        Module topModule = deviceModelContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision())
             .orElseThrow();
         RpcDefinition rpcDefinition = null;
         for (RpcDefinition def: topModule.getRpcs()) {
