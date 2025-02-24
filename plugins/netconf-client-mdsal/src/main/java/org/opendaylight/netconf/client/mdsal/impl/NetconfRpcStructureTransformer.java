@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -15,11 +17,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
@@ -33,20 +35,19 @@ import org.xml.sax.SAXException;
 class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfRpcStructureTransformer.class);
 
-    private final MountPointContext mountContext;
+    private final DatabindContext databind;
 
-    NetconfRpcStructureTransformer(final MountPointContext mountContext) {
-        this.mountContext = mountContext;
+    NetconfRpcStructureTransformer(final DatabindContext databind) {
+        this.databind = requireNonNull(databind);
     }
 
     @Override
     public Optional<NormalizedNode> selectFromDataStructure(final DataContainerChild data,
             final YangInstanceIdentifier path) {
-        if (data instanceof DOMSourceAnyxmlNode) {
+        if (data instanceof DOMSourceAnyxmlNode anyxml) {
             final NormalizationResultHolder node;
             try {
-                node = NormalizedDataUtil.transformDOMSourceToNormalizedNode(mountContext,
-                    ((DOMSourceAnyxmlNode)data).body());
+                node = NormalizedDataUtil.transformDOMSourceToNormalizedNode(databind.mountContext(), anyxml.body());
                 return NormalizedNodes.findNode(node.getResult().data(), path.getPathArguments());
             } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 LOG.error("Cannot parse anyxml.", e);
@@ -61,19 +62,19 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     public AnyxmlNode<DOMSource> createEditConfigStructure(final Optional<NormalizedNode> data,
             final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.createEditConfigAnyxml(mountContext.modelContext(), dataPath, operation,
+        return NetconfMessageTransformUtil.createEditConfigAnyxml(databind.modelContext(), dataPath, operation,
             data);
     }
 
     @Override
     public AnyxmlNode<?> toFilterStructure(final YangInstanceIdentifier path) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.modelContext());
+        return NetconfMessageTransformUtil.toFilterStructure(path, databind.modelContext());
     }
 
     @Override
     public AnyxmlNode<?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.toFilterStructure(fieldsFilters, mountContext.modelContext());
+        return NetconfMessageTransformUtil.toFilterStructure(fieldsFilters, databind.modelContext());
     }
 }
