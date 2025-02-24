@@ -20,9 +20,9 @@ import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
@@ -41,7 +41,7 @@ class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
 
         final NetconfMessage notificationMessage = prepareNotification("/nested-notification-payload.xml");
         NetconfMessageTransformer messageTransformer = new NetconfMessageTransformer(
-            MountPointContext.of(context), true,
+            DatabindContext.ofModel(context), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
         final DOMNotification domNotification = messageTransformer.toNotification(notificationMessage);
         final ContainerNode root = domNotification.getBody();
