@@ -22,9 +22,12 @@ import org.opendaylight.netconf.api.NamespaceURN;
  */
 @NonNullByDefault
 public final class XMLSupport {
-    // The prefix we use for constructs defined in RFC4741, for example the 'operation' attribute in 'config' anyxml.
-    // FIXME: use "xc" for consistency
-    private static final String RFC4741_PREFIX = "op";
+    /**
+     * The prefix we use for constructs defined in RFC4741, for example the 'operation' attribute in 'config' anyxml.
+     * We use {@code xc} as that is what all examples of
+     * <a href="https://www.rfc-editor.org/rfc/rfc6241#section-7.2">edit-config</a> use.
+     */
+    private static final String RFC4741_PREFIX = "xc";
     private static final XMLOutputFactory XML_FACTORY;
     private static final NamespaceSetter XML_NAMESPACE_SETTER;
 
