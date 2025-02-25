@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95de98b2_e7f01eab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-25T08:43:14Z",
+      "side": 1,
+      "message": "Create separate test class for filtering and for counters",
+      "revId": "e10db4f6c25a90c3d46b882ab0864199e7c286d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
