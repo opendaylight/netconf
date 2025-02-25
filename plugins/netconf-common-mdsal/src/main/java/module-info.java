@@ -19,7 +19,6 @@ module org.opendaylight.netconf.common.mdsal {
     requires com.google.common;
     requires org.opendaylight.netconf.api;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
-    requires org.slf4j;
 
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;
