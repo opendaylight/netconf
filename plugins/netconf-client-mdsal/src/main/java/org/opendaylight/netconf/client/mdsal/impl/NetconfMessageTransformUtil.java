@@ -16,14 +16,11 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,6 +32,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.messages.RpcReplyMessage;
+import org.opendaylight.netconf.api.xml.XMLSupport;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -66,7 +64,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedMetadata;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -328,8 +325,8 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static Map.Entry<Instant, XmlElement> stripNotification(final NetconfMessage message) {
-        final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
-        final List<XmlElement> childElements = xmlElement.getChildElements();
+        final var xmlElement = XmlElement.fromDomDocument(message.getDocument());
+        final var childElements = xmlElement.getChildElements();
         Preconditions.checkArgument(childElements.size() == 2, "Unable to parse notification %s, unexpected format."
                 + "\nExpected 2 childElements, actual childElements size is %s", message, childElements.size());
 
@@ -362,12 +359,12 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static DOMResult prepareDomResultForRpcRequest(final QName rpcQName, final MessageCounter counter) {
-        final Document document = XmlUtil.newDocument();
-        final Element rpcNS =
+        final var document = XmlUtil.newDocument();
+        final var rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
         // set msg id
         rpcNS.setAttribute(XmlNetconfConstants.MESSAGE_ID, counter.getNewMessageId(MESSAGE_ID_PREFIX));
-        final Element elementNS = document.createElementNS(rpcQName.getNamespace().toString(), rpcQName.getLocalName());
+        final var elementNS = document.createElementNS(rpcQName.getNamespace().toString(), rpcQName.getLocalName());
         rpcNS.appendChild(elementNS);
         document.appendChild(rpcNS);
         return new DOMResult(elementNS);
@@ -375,18 +372,18 @@ public final class NetconfMessageTransformUtil {
 
     public static DOMResult prepareDomResultForActionRequest(final DataSchemaContextTree dataSchemaContextTree,
             final DOMDataTreeIdentifier domDataTreeIdentifier, final MessageCounter counter, final QName action) {
-        final Document document = XmlUtil.newDocument();
-        final Element rpcNS =
+        final var document = XmlUtil.newDocument();
+        final var rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
         // set msg id
         rpcNS.setAttribute(XmlNetconfConstants.MESSAGE_ID, counter.getNewMessageId(MESSAGE_ID_PREFIX));
 
-        final Element actionNS = document.createElementNS(YangConstants.RFC6020_YANG_NAMESPACE_STRING, "action");
-        final DataSchemaContext rootSchemaContextNode = dataSchemaContextTree.getRoot();
-        final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
+        final var actionNS = document.createElementNS(YangConstants.RFC6020_YANG_NAMESPACE_STRING, "action");
+        final var rootSchemaContextNode = dataSchemaContextTree.getRoot();
+        final var actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.path().getPathArguments().iterator(), document);
 
-        final Element specificActionElement =
+        final var specificActionElement =
                 document.createElementNS(action.getNamespace().toString(), action.getLocalName());
         actionData.appendChild(specificActionElement);
         rpcNS.appendChild(actionNS);
@@ -397,27 +394,31 @@ public final class NetconfMessageTransformUtil {
     private static Element prepareActionData(final DataSchemaContext currentParentSchemaNode,
             final Element actionNS, final Iterator<PathArgument> iterator, final Document document) {
         if (iterator.hasNext()) {
-            final PathArgument next = iterator.next();
+            final var next = iterator.next();
 
-            final DataSchemaContext current = currentParentSchemaNode instanceof DataSchemaContext.Composite composite
+            final var current = currentParentSchemaNode instanceof DataSchemaContext.Composite composite
                 ? composite.childByArg(next) : null;
-            Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
+            if (current == null) {
+                throw new IllegalArgumentException("Invalid input: schema for argument %s not found".formatted(next));
+            }
 
             if (current instanceof PathMixin) {
                 return prepareActionData(current, actionNS, iterator, document);
             }
 
-            final QName actualNS = next.getNodeType();
-            final Element actualElement = document.createElementNS(actualNS.getNamespace().toString(),
+            final var actualNS = next.getNodeType();
+            final var actualElement = document.createElementNS(actualNS.getNamespace().toString(),
                     actualNS.getLocalName());
-            if (next instanceof NodeWithValue) {
-                actualElement.setNodeValue(((NodeWithValue<?>) next).getValue().toString());
-            } else if (next instanceof NodeIdentifierWithPredicates) {
-                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
-                    final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
-                            entry.getKey().getLocalName());
-                    entryElement.setTextContent(entry.getValue().toString());
-                    entryElement.setNodeValue(entry.getValue().toString());
+            if (next instanceof NodeWithValue<?> withValue) {
+                actualElement.setNodeValue(withValue.getValue().toString());
+            } else if (next instanceof NodeIdentifierWithPredicates nip) {
+                for (var entry : nip.entrySet()) {
+                    final var qname = entry.getKey();
+                    final var entryElement = document.createElementNS(qname.getNamespace().toString(),
+                            qname.getLocalName());
+                    final var value = entry.getValue().toString();
+                    entryElement.setTextContent(value);
+                    entryElement.setNodeValue(value);
                     actualElement.appendChild(entryElement);
                 }
             }
@@ -435,20 +436,16 @@ public final class NetconfMessageTransformUtil {
         stack.enterSchemaTree(YangConstants.operationInputQName(operationPath.lastNodeIdentifier().getModule()));
         final var inputInference = stack.toSchemaTreeInference();
 
-        final XMLStreamWriter writer = NormalizedDataUtil.XML_FACTORY.createXMLStreamWriter(result);
+        final var xmlWriter = XMLSupport.newStreamWriter(result);
         try {
-            try (NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(writer, inputInference)) {
-                try (SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
-                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, inputInference)) {
-                    final Collection<DataContainerChild> value = normalized.body();
-                    normalizedNodeWriter.write(value);
-                    normalizedNodeWriter.flush();
-                }
+            try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inputInference);
+                 var nnWriter = new SchemaOrderedNormalizedNodeWriter(streamWriter, inputInference)) {
+                nnWriter.write(normalized.body());
+                nnWriter.flush();
             }
         } finally {
             try {
-                writer.close();
+                xmlWriter.close();
             } catch (final XMLStreamException e) {
                 LOG.warn("Unable to close resource properly", e);
             }
