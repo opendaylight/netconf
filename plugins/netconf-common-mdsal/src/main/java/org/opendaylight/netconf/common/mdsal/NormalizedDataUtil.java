@@ -12,19 +12,14 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XMLSupport;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -50,54 +45,7 @@ import org.xml.sax.SAXException;
  * Utility methods to work with {@link NormalizedNode} and related constructs in the context of NETCONF protocol.
  */
 public final class NormalizedDataUtil {
-    /**
-     * Shim interface to handle differences around namespace handling between various XMLStreamWriter implementations.
-     * Specifically:
-     * <ul>
-     *   <li>OpenJDK DOM writer (com.sun.xml.internal.stream.writers.XMLDOMWriterImpl) throws
-     *       UnsupportedOperationException from its setNamespaceContext() method</li>
-     *   <li>Woodstox DOM writer (com.ctc.wstx.dom.WstxDOMWrappingWriter) works with namespace context, but treats
-     *       setPrefix() calls as hints -- which are not discoverable.</li>
-     * </ul>
-     *
-     * <p>Due to this we perform a quick test for behavior and decide the appropriate strategy.
-     */
-    @FunctionalInterface
-    private interface NamespaceSetter {
-        void initializeNamespace(XMLStreamWriter writer) throws XMLStreamException;
-
-        static NamespaceSetter forFactory(final XMLOutputFactory xmlFactory) {
-            final var namespaceContext = XMLSupport.fixedNamespaceContextOf(Map.of("op", NamespaceURN.BASE));
-
-            try {
-                final var testWriter = xmlFactory.createXMLStreamWriter(new DOMResult(XmlUtil.newDocument()));
-                testWriter.setNamespaceContext(namespaceContext);
-            } catch (final UnsupportedOperationException e) {
-                // This happens with JDK's DOM writer, which we may be using
-                LOG.debug("Unable to set namespace context, falling back to setPrefix()", e);
-                return writer -> writer.setPrefix("op", NamespaceURN.BASE);
-            } catch (XMLStreamException e) {
-                throw new ExceptionInInitializerError(e);
-            }
-
-            // Success, we can use setNamespaceContext()
-            return writer -> writer.setNamespaceContext(namespaceContext);
-        }
-    }
-
-    private static final Logger LOG = LoggerFactory.getLogger(NormalizedDataUtil.class);
-
-    public static final XMLOutputFactory XML_FACTORY;
-
-    static {
-        final var factory = XMLOutputFactory.newFactory();
-        // FIXME: not repairing namespaces is probably common, this should be availabe as common XML constant.
-        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-        XML_FACTORY = factory;
-    }
-
-    // FIXME: this needs to be called when and why?
-    private static final NamespaceSetter XML_NAMESPACE_SETTER = NamespaceSetter.forFactory(XML_FACTORY);
+    static final Logger LOG = LoggerFactory.getLogger(NormalizedDataUtil.class);
 
     private final @NonNull DatabindContext databind;
 
@@ -132,7 +80,7 @@ public final class NormalizedDataUtil {
     @NonNullByDefault
     private static void writeNode(final EffectiveModelContext modelContext, final NormalizedNode data,
             final DOMResult result, final @Nullable Absolute parent) throws IOException, XMLStreamException {
-        final var xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        final var xmlWriter = XMLSupport.newStreamWriter(result);
         try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, modelContext, parent);
              var writer = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
             writer.write(data);
@@ -146,8 +94,7 @@ public final class NormalizedDataUtil {
     private static void writeNode(final EffectiveModelContext modelContext, final NormalizedNode data,
             final NormalizedMetadata metadata, final DOMResult result, final @Nullable Absolute parent)
                 throws IOException, XMLStreamException {
-        final var xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        final var xmlWriter = XMLSupport.newNetconfStreamWriter(result);
         try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, modelContext, parent);
              var writer = NormalizedMetadataWriter.forStreamWriter(streamWriter)) {
             writer.write(data, metadata);
@@ -181,8 +128,7 @@ public final class NormalizedDataUtil {
     @NonNullByDefault
     private static void writePath(final EffectiveModelContext modelContext, final YangInstanceIdentifier path,
             final DOMResult result, final @Nullable Absolute parent) throws IOException, XMLStreamException {
-        final var xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        final var xmlWriter = XMLSupport.newNetconfStreamWriter(result);
         try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, modelContext, parent);
              var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final var it = path.getPathArguments().iterator();
@@ -198,8 +144,7 @@ public final class NormalizedDataUtil {
     private static void writePath(final EffectiveModelContext modelContext, final YangInstanceIdentifier path,
             final NormalizedMetadata metadata, final DOMResult result, final @Nullable Absolute parent)
                 throws IOException, XMLStreamException {
-        final var xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        final var xmlWriter = XMLSupport.newNetconfStreamWriter(result);
         try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, modelContext, parent);
              var writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter,
                  streamWriter.extension(MetadataExtension.class), metadata)) {
@@ -306,7 +251,7 @@ public final class NormalizedDataUtil {
             return;
         }
 
-        final var xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        final var xmlWriter = XMLSupport.newStreamWriter(result);
         try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final var it = query.getPathArguments().iterator();
@@ -341,7 +286,7 @@ public final class NormalizedDataUtil {
         final var aggregatedFields = aggregateFields(fields);
         final var rootNode = constructPathArgumentTree(query, aggregatedFields);
 
-        final var xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        final var xmlWriter = XMLSupport.newStreamWriter(result);
         try {
             try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
                  var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
