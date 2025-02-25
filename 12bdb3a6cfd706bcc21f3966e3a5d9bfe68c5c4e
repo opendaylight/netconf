@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87eb65e5_70417dd3",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-25T13:58:03Z",
+      "side": 1,
+      "message": "I have used different approach, which not required this connect method. Removed.",
+      "parentUuid": "15984520_075ccdf1",
+      "range": {
+        "startLine": 72,
+        "startChar": 5,
+        "endLine": 72,
+        "endChar": 22
+      },
+      "revId": "12bdb3a6cfd706bcc21f3966e3a5d9bfe68c5c4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f54f1c8_ffe02fec",
