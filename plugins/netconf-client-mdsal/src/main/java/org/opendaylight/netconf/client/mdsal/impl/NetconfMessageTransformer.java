@@ -51,6 +51,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.ActionTransformer;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
@@ -445,7 +446,8 @@ public class NetconfMessageTransformer
 
     private ContainerNode parseResult(final NetconfMessage message, final Absolute operationPath,
             final OperationDefinition operationDef) {
-        final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
+        final var doc = message.getDocument();
+        final var okResponseElement = XmlElement.fromDomDocument(doc)
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
         final var operOutput = operationDef.getOutput();
         if (operOutput.getChildNodes().isEmpty()) {
@@ -459,6 +461,11 @@ public class NetconfMessageTransformer
             return null;
         }
 
+        // We are about to parse a <rpc-reply> element into YANG world.
+        // Remove "message-id" attribute, as that is it does not have a representation there.
+        final var element = doc.getDocumentElement();
+        element.removeAttribute(XmlNetconfConstants.MESSAGE_ID);
+
         final var operSteps = operationPath.getNodeIdentifiers();
         final var outputPath = Absolute.of(ImmutableList.<QName>builderWithExpectedSize(operSteps.size() + 1)
             .addAll(operSteps)
@@ -467,8 +474,7 @@ public class NetconfMessageTransformer
         // FIXME: we should have a cached inference here, or XMLParserStream should accept Absolute instead
         final var inference = SchemaInferenceStack.of(mountContext.modelContext(), outputPath).toInference();
 
-        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
-        final Element element = message.getDocument().getDocumentElement();
+        final var resultHolder = new NormalizationResultHolder();
         try {
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext, inference, strictParsing);
