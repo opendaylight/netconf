@@ -16,6 +16,24 @@
       "message": "private?",
       "revId": "3cce8a05243334ce58dc9c0d40c2f608084009a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "225c818f_d53774cc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-02-25T09:07:37Z",
+      "side": 1,
+      "message": "later needs to be accessible from subclass",
+      "parentUuid": "3e5773b1_0387d65d",
+      "revId": "3cce8a05243334ce58dc9c0d40c2f608084009a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
