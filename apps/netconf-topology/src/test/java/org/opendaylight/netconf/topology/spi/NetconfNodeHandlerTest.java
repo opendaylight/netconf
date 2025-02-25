@@ -57,7 +57,6 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -116,6 +115,8 @@ class NetconfNodeHandlerTest {
     // Mock Timer-related things
     @Mock
     private Timeout timeout;
+    @Mock
+    private NetconfTimer netconfTimer;
     @Captor
     private ArgumentCaptor<TimerTask> timerCaptor;
     @Mock
@@ -268,13 +269,12 @@ class NetconfNodeHandlerTest {
 
     @Test
     void failToConnectOnUnsupportedConfiguration() {
-        final var defaultTimer = new DefaultNetconfTimer();
-        final var factory = new NetconfClientFactoryImpl(defaultTimer);
+        final var factory = new NetconfClientFactoryImpl(netconfTimer);
 
         final var keyId = "keyId";
-        final var keyAuthHandler = new NetconfNodeHandler(factory, defaultTimer, BASE_SCHEMAS, schemaManager,
-            schemaAssembler, new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-                sslContextFactoryProvider),
+        var keyAuthHandler = new NetconfNodeHandler(factory, netconfTimer, BASE_SCHEMAS, schemaManager, schemaAssembler,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+                    sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
@@ -298,7 +298,8 @@ class NetconfNodeHandlerTest {
                         .setKeyId(keyId)
                         .build())
                     .build())
-                .build(), null);
+                .build(),
+                null);
 
         // return null when attempt to load credentials fot key id
         doReturn(null).when(credentialProvider).credentialForId(any());
@@ -308,8 +309,7 @@ class NetconfNodeHandlerTest {
         // attempt to connect fails due to unsupported configuration, and there is attempt to reconnect
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
-        final var deviceException = captor.getValue();
-        assertInstanceOf(IllegalArgumentException.class, deviceException);
+        final var deviceException = assertInstanceOf(IllegalArgumentException.class, captor.getValue());
         assertEquals("No keypair found with keyId=keyId", deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
