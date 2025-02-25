@@ -10,18 +10,26 @@ package org.opendaylight.netconf.databind;
 import static java.util.Objects.requireNonNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode.BuilderFactory;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
  * An immutable context holding a consistent view of things related to data bind operations.
@@ -180,5 +188,14 @@ public final class DatabindContext {
         final var created = XmlCodecFactory.create(mountContext);
         final var witness = (XmlCodecFactory) XML_CODECS.compareAndExchangeRelease(this, null, created);
         return witness != null ? witness : created;
+    }
+
+    @NonNullByDefault
+    public void writeNormalized(final XMLStreamWriter writer, final @Nullable Absolute parent,
+            final NormalizedNode data) throws IOException, XMLStreamException {
+        try (var nnw = NormalizedNodeWriter.forStreamWriter(
+                XMLStreamNormalizedNodeStreamWriter.create(writer, modelContext(), parent), true)) {
+            nnw.write(data);
+        }
     }
 }
