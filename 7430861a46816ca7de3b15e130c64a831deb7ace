@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4624992f_358e5862",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DefaultNotificationSource.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-25T08:40:05Z",
+      "side": 1,
+      "message": "Here, we have no access to subscriptions and its filters. Additionally, this source is used for every subscriptions.\n\nFor now:\n1. manually write some filter to config datastore to filters container\n2. document what has been written into datastore - anydata node?\n3. write unit tests for FilteredListener class with structures alike they are written into datastore",
+      "revId": "7430861a46816ca7de3b15e130c64a831deb7ace",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
