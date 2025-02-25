@@ -11,6 +11,7 @@
 module org.opendaylight.netconf.databind {
     exports org.opendaylight.netconf.databind;
 
+    requires transitive java.xml;
     requires transitive org.opendaylight.yangtools.yang.common;
     requires transitive org.opendaylight.yangtools.yang.data.codec.gson;
     requires transitive org.opendaylight.yangtools.yang.data.codec.xml;
