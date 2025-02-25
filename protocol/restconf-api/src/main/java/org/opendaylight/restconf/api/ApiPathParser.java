@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.util.HexFormat;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
@@ -141,13 +142,13 @@ sealed class ApiPathParser {
         // First process while we are seeing a slash
         while (true) {
             final int slash = str.indexOf('/', idx);
-            if (slash != -1) {
-                final int next = parseStep(str, idx, slash);
-                verify(next == slash, "Unconsumed bytes: %s next %s limit", next, slash);
-                idx = next + 1;
-            } else {
+            if (slash == -1) {
                 break;
             }
+
+            final int next = parseStep(str, idx, slash);
+            verify(next == slash, "Unconsumed bytes: %s next %s limit", next, slash);
+            idx = next + 1;
         }
 
         // Now process the tail of the string
@@ -165,12 +166,17 @@ sealed class ApiPathParser {
         int idx = startIdentifier(str, offset, limit);
         while (idx < limit) {
             final char ch = peekBasicLatin(str, idx, limit);
-            if (ch == ':') {
-                return parseStep(endSub(str, idx), str, nextOffset, limit);
-            } else if (ch == '=') {
-                return parseStep(null, endUnqualified(str, idx), str, nextOffset, limit);
+            switch (ch) {
+                case ':' -> {
+                    return parseStep(endSub(str, idx), str, nextOffset, limit);
+                }
+                case '=' -> {
+                    return parseStep(null, endUnqualified(str, idx), str, nextOffset, limit);
+                }
+                default -> {
+                    idx = continueIdentifer(idx, ch);
+                }
             }
-            idx = continueIdentifer(idx, ch);
         }
 
         steps.add(new ApiIdentifier(null, endUnqualified(str, idx)));
@@ -202,28 +208,32 @@ sealed class ApiPathParser {
         int idx = offset;
         while (idx < limit) {
             final char ch = str.charAt(idx);
-            if (ch == ',') {
-                values.add(endSub(str, idx));
-                startSub(++idx);
-            } else if (ch != '%') {
-                append(ch);
-                idx++;
-            } else {
-                // Save current string content and capture current index for reporting
-                final var sb = flushSub(str, idx);
-                final int errorOffset = idx;
-
-                var utf = buf;
-                if (utf == null) {
-                    buf = utf = new Utf8Buffer();
+            switch (ch) {
+                case ',' -> {
+                    values.add(endSub(str, idx));
+                    startSub(++idx);
                 }
+                case '%' -> {
+                    // Save current string content and capture current index for reporting
+                    final var sb = flushSub(str, idx);
+                    final int errorOffset = idx;
 
-                do {
-                    utf.appendByte(parsePercent(str, idx, limit));
-                    idx += 3;
-                } while (idx < limit && str.charAt(idx) == '%');
+                    var utf = buf;
+                    if (utf == null) {
+                        buf = utf = new Utf8Buffer();
+                    }
 
-                utf.flushTo(sb, errorOffset);
+                    do {
+                        utf.appendByte(parsePercent(str, idx, limit));
+                        idx += 3;
+                    } while (idx < limit && str.charAt(idx) == '%');
+
+                    utf.flushTo(sb, errorOffset);
+                }
+                default -> {
+                    append(ch);
+                    idx++;
+                }
             }
         }
 
@@ -314,13 +324,19 @@ sealed class ApiPathParser {
         return (byte) (parseHex(str, offset + 1) << 4 | parseHex(str, offset + 2));
     }
 
-    @SuppressWarnings("checkstyle:AvoidHidingCauseException")
     private static int parseHex(final String str, final int offset) throws ParseException {
         try {
             return HexFormat.fromHexDigit(str.charAt(offset));
         } catch (NumberFormatException e) {
-            // There is no way to preserve the cause which CheckStyle would recognize
-            throw new ParseException(e.getMessage(), offset);
+            throw newParseException(e, offset);
         }
+    }
+
+    // not inlined to defeat checkstyle's AvoidHidingCauseException
+    @NonNullByDefault
+    private static ParseException newParseException(final Throwable cause, final int offset) {
+        final var ex = new ParseException(cause.getMessage(), offset);
+        ex.initCause(cause);
+        return ex;
     }
 }
