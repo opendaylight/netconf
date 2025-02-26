@@ -16,6 +16,24 @@
       "message": "Now, when and where we are deleting session?",
       "revId": "ac6235c10302405ac01cebd547fe169831850f3b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5350a440_243c56f0",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T09:48:41Z",
+      "side": 0,
+      "message": "In transportFailed method. It does the same thing, except it propagate the error with notifyTransportChannelFailed method.\n\nJust removing the closed session is the wrong solution, which creates this issue. If we did not notify TransportChannel that the session is closed, we would get stuck here:\nhttps://github.com/opendaylight/netconf/blob/ab5d7984150aa04ee039276ea55bad6321ab6cd6/apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java#L66-L92",
+      "parentUuid": "abc20168_f9a56aae",
+      "revId": "ac6235c10302405ac01cebd547fe169831850f3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
