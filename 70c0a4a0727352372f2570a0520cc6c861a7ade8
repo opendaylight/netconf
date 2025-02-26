@@ -274,6 +274,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15f7fccc_d9aeba6a",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-26T08:16:54Z",
+      "side": 1,
+      "message": "oh probably not possible",
+      "parentUuid": "636ce524_d989041d",
+      "revId": "70c0a4a0727352372f2570a0520cc6c861a7ade8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02e77859_cb52c3a1",
