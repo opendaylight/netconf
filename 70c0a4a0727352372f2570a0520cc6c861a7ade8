@@ -88,6 +88,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7e5d0313_c102d18d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-02-26T08:08:05Z",
+      "side": 1,
+      "message": "indent",
+      "revId": "70c0a4a0727352372f2570a0520cc6c861a7ade8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2230f0f7_ea284882",
         "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/AbstractClientServerTest.java",
         "patchSetId": 27
