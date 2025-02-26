@@ -139,6 +139,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "29a77d81_d936351a",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/AbstractClientServerTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-26T07:53:41Z",
+      "side": 1,
+      "message": "(indent)    throws ..",
+      "revId": "70c0a4a0727352372f2570a0520cc6c861a7ade8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "db43fe39_70fd53ed",
         "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
         "patchSetId": 27
