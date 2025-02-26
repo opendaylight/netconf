@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b16b49fd_7251ac88",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T12:28:32Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/114354/27..29/transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/AbstractClientServerTest.java#b49",
+      "parentUuid": "72719bd3_f4c22e08",
+      "revId": "4ab9912236a62a254b682819459ad16cac5f8397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95c9edd4_cc8c0a9e",
