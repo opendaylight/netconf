@@ -210,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1b2983d_fadd2008",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T10:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "caa39c32_864146bf",
+      "revId": "70c0a4a0727352372f2570a0520cc6c861a7ade8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2230f0f7_ea284882",
@@ -556,6 +574,24 @@
       "writtenOn": "2025-02-26T08:04:29Z",
       "side": 1,
       "message": "so this could be in @AfterEach?",
+      "revId": "70c0a4a0727352372f2570a0520cc6c861a7ade8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e72dc8c7_83f2647c",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T10:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02e77859_cb52c3a1",
       "revId": "70c0a4a0727352372f2570a0520cc6c861a7ade8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
