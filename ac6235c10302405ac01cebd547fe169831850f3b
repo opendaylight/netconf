@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abc20168_f9a56aae",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-26T07:18:43Z",
+      "side": 0,
+      "message": "Now, when and where we are deleting session?",
+      "revId": "ac6235c10302405ac01cebd547fe169831850f3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
