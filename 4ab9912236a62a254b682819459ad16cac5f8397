@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "72719bd3_f4c22e08",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-02-26T12:12:10Z",
+      "side": 1,
+      "message": "Why are you closing FACTORY in abstract test class - for one child class?\n\nIMHO creating abstract test class here is not very \"well defined\" in this case.",
+      "parentUuid": "db88d711_50441373",
+      "revId": "4ab9912236a62a254b682819459ad16cac5f8397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "95c9edd4_cc8c0a9e",
         "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
         "patchSetId": 29
