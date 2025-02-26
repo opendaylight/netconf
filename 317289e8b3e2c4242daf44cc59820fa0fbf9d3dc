@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef385d33_236b2928",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T09:50:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45598bf9_f127eeba",
+      "revId": "317289e8b3e2c4242daf44cc59820fa0fbf9d3dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8989bb6c_b33859a5",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-26T07:38:44Z",
       "side": 1,
       "message": "https://git.opendaylight.org/gerrit/c/netconf/+/115035 proposes EOFE in this case",
+      "revId": "317289e8b3e2c4242daf44cc59820fa0fbf9d3dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "505e2066_5a99d9b4",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T09:50:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8989bb6c_b33859a5",
       "revId": "317289e8b3e2c4242daf44cc59820fa0fbf9d3dc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
