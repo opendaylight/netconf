@@ -88,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5cc713f_e80a5f70",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T13:30:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95c9edd4_cc8c0a9e",
+      "revId": "4ab9912236a62a254b682819459ad16cac5f8397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "988eb372_2d689b97",
@@ -101,6 +119,24 @@
       "writtenOn": "2025-02-26T12:10:26Z",
       "side": 1,
       "message": "deprecated",
+      "revId": "4ab9912236a62a254b682819459ad16cac5f8397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "687e8d7e_6508a87b",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1423Test.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-02-26T13:30:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "988eb372_2d689b97",
       "revId": "4ab9912236a62a254b682819459ad16cac5f8397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
