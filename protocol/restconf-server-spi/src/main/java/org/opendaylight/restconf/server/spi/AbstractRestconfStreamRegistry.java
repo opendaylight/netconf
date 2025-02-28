@@ -35,6 +35,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -231,8 +232,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    private static EventStreamFilter parseXpathFilter(final String xpath) throws ServerException {
-        // TODO: integrate yang-xpath-api and validate the propose xpath
+    private static EventStreamFilter parseXpathFilter(final YangXPathExpression xpath) throws ServerException {
         // TODO: implement XPath filter evaluation
         throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             "XPath filtering not implemented");

@@ -47,6 +47,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathParser;
 
 @ExtendWith(MockitoExtension.class)
 class EstablishSubscriptionRpcTest {
@@ -73,6 +74,8 @@ class EstablishSubscriptionRpcTest {
     private RestconfStream.Registry streamRegistry;
     @Mock
     private RestconfStream<?> restconfStream;
+    @Mock
+    private YangXPathParser xpathParser;
     @Captor
     private ArgumentCaptor<ServerException> response;
 
@@ -80,7 +83,7 @@ class EstablishSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
+        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine, xpathParser);
     }
 
     @Disabled
