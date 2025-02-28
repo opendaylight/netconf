@@ -34,6 +34,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -304,8 +305,7 @@ public final class RestconfStream<T> {
          *
          * @param xpath the XPath filter expression
          */
-        // FIXME: this should be already parsed to yang-xpath-api
-        record XPathDefinition(String xpath) implements SubscriptionFilter {
+        record XPathDefinition(YangXPathExpression xpath) implements SubscriptionFilter {
             public XPathDefinition {
                 requireNonNull(xpath);
             }
