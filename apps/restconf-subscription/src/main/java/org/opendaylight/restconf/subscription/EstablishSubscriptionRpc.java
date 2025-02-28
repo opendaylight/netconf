@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
@@ -36,6 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathParser;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -71,16 +73,18 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
+    private final YangXPathParser xpathParser;
 
     @Inject
     @Activate
     public EstablishSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
             @Reference final SubscriptionStateService subscriptionStateService,
-            @Reference final SubscriptionStateMachine stateMachine) {
+            @Reference final SubscriptionStateMachine stateMachine, @Reference final YangXPathParser xpathParser) {
         super(EstablishSubscription.QNAME);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.xpathParser = requireNonNull(xpathParser);
     }
 
     @Override
@@ -121,7 +125,18 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         // check stream filter
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
-        final var filter = streamFilter == null ? null : extractFilter(streamFilter);
+        final SubscriptionFilter filter;
+        if (streamFilter != null) {
+            try {
+                filter = extractFilter(streamFilter);
+            } catch (XPathExpressionException e) {
+                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                    "Invalid XPath filter", e));
+                return;
+            }
+        } else {
+            filter = null;
+        }
 
         streamRegistry.establishSubscription(request.transform(subscription -> {
             final var id = subscription.id();
@@ -137,7 +152,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }), streamName, encoding, filter);
     }
 
-    private static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
+    private @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) throws XPathExpressionException {
         final var filterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
         if (filterName != null) {
             return new SubscriptionFilter.Reference(filterName);
@@ -152,6 +167,9 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
         final var xpath = leaf(filterSpec, new NodeIdentifier(QName.create(FilterSpec.QNAME, "stream-xpath-filter")),
             String.class);
-        return xpath != null ? new SubscriptionFilter.XPathDefinition(xpath) : null;
+        if (xpath != null) {
+            return new SubscriptionFilter.XPathDefinition(xpathParser.parseExpression(xpath));
+        }
+        return null;
     }
 }
