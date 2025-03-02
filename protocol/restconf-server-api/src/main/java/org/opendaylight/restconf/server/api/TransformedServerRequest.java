@@ -22,10 +22,11 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 /**
  * A {@link ServerRequest} transformed through a {@link Function}.
  *
- * @param <T> type of reported result
+ * @param <I> input result type
+ * @param <R> output result type
  */
 @NonNullByDefault
-record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> function) implements ServerRequest<O> {
+record TransformedServerRequest<I, R>(ServerRequest<R> delegate, Function<I, R> function) implements ServerRequest<I> {
     TransformedServerRequest {
         requireNonNull(delegate);
         requireNonNull(function);
@@ -52,8 +53,8 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     }
 
     @Override
-    public void completeWith(final O result) {
-        delegate.completeWith(function.apply(result));
+    public void completeWith(final I result) {
+        delegate.completeWith(function.apply(requireNonNull(result)));
     }
 
     @Override

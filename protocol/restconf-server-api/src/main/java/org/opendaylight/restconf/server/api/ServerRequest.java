@@ -7,48 +7,30 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import java.security.Principal;
-import java.util.UUID;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.netconf.databind.Request;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 /**
- * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing the request
- * on the transport (typically HTTP) layer. This includes:
+ * A {@link Request} to {@link RestconfServer}. It contains state and binding established by whoever is performing the
+ * request on the transport (typically HTTP) layer. This includes:
  * <ul>
- *   <li>requesting {@link #principal()}</li>
  *   <li>HTTP request {@link #queryParameters() query parameters},</li>
+ *   <li>the transport {@link #session()} invoking this request</li>
  * </ul>
- * It notably does <b>not</b> hold the HTTP request path, nor the request body. Those are passed as separate arguments
- * to server methods as implementations of those methods are expected to act on them on multiple layers, i.e. they are
- * not a request invariant at the various processing layers.
  *
- * <p>Every request needs to be completed via one of {@link #completeWith(Object)},
- * {@link #completeWith(RequestException)} or other {@code completeWith} methods.
+ * <p>It notably does <b>not</b> hold the HTTP request path, nor the request body. Those are passed as separate
+ * arguments to server methods as implementations of those methods are expected to act on them on multiple layers, i.e.
+ * they are not a request invariant at the various processing layers.
  *
- * @param <T> type of reported result
+ * @param <R> type of reported result
  */
 @NonNullByDefault
-public sealed interface ServerRequest<T> permits AbstractServerRequest, TransformedServerRequest {
-    /**
-     * Return the identifier of this request.
-     *
-     * @return an UUID
-     */
-    UUID uuid();
-
-    /**
-     * Returns the Principal making this request.
-     *
-     * @return the Principal making this request, {@code null} if unauthenticated
-     */
-    @Nullable Principal principal();
-
+public sealed interface ServerRequest<R> extends Request<R> permits AbstractServerRequest, TransformedServerRequest {
     /**
      * Returns the {@link TransportSession} on which this request is executing, or {@code null} if there is no control
      * over transport sessions.
@@ -64,15 +46,12 @@ public sealed interface ServerRequest<T> permits AbstractServerRequest, Transfor
      */
     QueryParameters queryParameters();
 
-    void completeWith(T result);
-
-    void completeWith(RequestException failure);
-
     void completeWith(YangErrorsBody errors);
 
     void completeWith(ErrorTag errorTag, FormattableBody body);
 
-    default <O> ServerRequest<O> transform(final Function<O, T> function) {
+    @Override
+    default <I> ServerRequest<I> transform(final Function<I, R> function) {
         return new TransformedServerRequest<>(this, function);
     }
 }
