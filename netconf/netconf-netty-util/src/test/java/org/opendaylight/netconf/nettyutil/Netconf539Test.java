@@ -10,11 +10,15 @@ package org.opendaylight.netconf.nettyutil;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.util.Timeout;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +34,7 @@ import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageWriter;
-import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.common.NetconfTimer.TimeoutCallback;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
@@ -40,19 +44,24 @@ class Netconf539Test {
     private NetconfSessionListener<TestingNetconfSession> listener;
     @Mock
     private Promise<TestingNetconfSession> promise;
+    @Mock
+    private Function<TimeoutCallback, Timeout> timer;
+    @Mock
+    private Timeout timeout;
 
     private final EmbeddedChannel channel = new EmbeddedChannel();
     private TestSessionNegotiator negotiator;
 
     @BeforeEach
     void setUp() {
+        doReturn(timeout).when(timer).apply(any());
         channel.pipeline()
             .addLast("mockEncoder", new MessageEncoder(XMLMessageWriter.of()))
             .addLast(MessageDecoder.HANDLER_NAME, new HelloXMLMessageDecoder())
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
         negotiator = new TestSessionNegotiator(
-            HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty()), promise, channel,
-            new DefaultNetconfTimer(), listener, 100L);
+            HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty()), promise, channel, timer,
+            listener);
     }
 
     @Test

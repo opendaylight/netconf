@@ -33,4 +33,14 @@ public interface NetconfTimer {
      *                                    instability in the system
      */
     Timeout newTimeout(TimerTask task, long delay, TimeUnit unit);
+
+    default Timeout newTimeout(final TimeoutCallback callback, final long timeoutNanos) {
+        return newTimeout(new CallbackTimerTask(System.nanoTime(), callback), timeoutNanos, TimeUnit.NANOSECONDS);
+    }
+
+    @FunctionalInterface
+    interface TimeoutCallback {
+
+        void onTimeout(long elapsedNanos);
+    }
 }

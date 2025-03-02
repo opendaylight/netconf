@@ -13,15 +13,19 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
+import io.netty.util.Timeout;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.common.NetconfTimer.TimeoutCallback;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -40,29 +44,26 @@ public class NetconfServerSessionNegotiatorFactory {
         CapabilityURN.NOTIFICATION);
 
     private final @NonNegative int maximumIncomingChunkSize;
-    private final NetconfTimer timer;
+    private final @NonNull Function<TimeoutCallback, Timeout> timer;
     private final SessionIdProvider idProvider;
     private final NetconfOperationServiceFactory aggregatedOpService;
-    private final long connectionTimeoutMillis;
     private final NetconfMonitoringService monitoringService;
     private final Set<String> baseCapabilities;
 
-    protected NetconfServerSessionNegotiatorFactory(final NetconfTimer timer,
+    protected NetconfServerSessionNegotiatorFactory(final Function<TimeoutCallback, Timeout> timer,
             final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
-            final long connectionTimeoutMillis,  final NetconfMonitoringService monitoringService,
-            final Set<String> baseCapabilities) {
-        this(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities,
+            final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
+        this(timer, netconfOperationProvider, idProvider, monitoringService, baseCapabilities,
             NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
-    private NetconfServerSessionNegotiatorFactory(final NetconfTimer timer,
+    private NetconfServerSessionNegotiatorFactory(final Function<TimeoutCallback, Timeout> timer,
             final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
-            final long connectionTimeoutMillis, final NetconfMonitoringService monitoringService,
-            final Set<String> baseCapabilities, final @NonNegative int maximumIncomingChunkSize) {
+            final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities,
+            final @NonNegative int maximumIncomingChunkSize) {
         this.timer = requireNonNull(timer);
         aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
-        this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.monitoringService = monitoringService;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         this.baseCapabilities = validateBaseCapabilities(baseCapabilities == null ? DEFAULT_BASE_CAPABILITIES :
@@ -110,7 +111,7 @@ public class NetconfServerSessionNegotiatorFactory {
             promise, channel, timer,
             new NetconfServerSessionListener(new NetconfOperationRouterImpl(service, monitoringService, sessionId),
                 monitoringService, service),
-            connectionTimeoutMillis, maximumIncomingChunkSize);
+            maximumIncomingChunkSize);
     }
 
     protected NetconfOperationService getOperationServiceForAddress(final SessionIdType sessionId,
@@ -176,8 +177,10 @@ public class NetconfServerSessionNegotiatorFactory {
 
         public NetconfServerSessionNegotiatorFactory build() {
             validate();
-            return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider,
-                    connectionTimeoutMillis, monitoringService, baseCapabilities, maximumIncomingChunkSize);
+            final Function<TimeoutCallback, Timeout> timerFn =
+                callback -> timer.newTimeout(callback, TimeUnit.MILLISECONDS.toNanos(connectionTimeoutMillis));
+            return new NetconfServerSessionNegotiatorFactory(timerFn, aggregatedOpService, idProvider,
+                monitoringService, baseCapabilities, maximumIncomingChunkSize);
         }
 
         private void validate() {

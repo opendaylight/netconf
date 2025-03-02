@@ -11,7 +11,9 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.server.NetconfServer;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
@@ -28,9 +30,9 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-@Component(service = { OSGiNetconfServer.class }, configurationPid = "org.opendaylight.netconf.impl")
+@Component(configurationPid = "org.opendaylight.netconf.impl")
 @Designate(ocd = OSGiNetconfServer.Configuration.class)
-public final class OSGiNetconfServer {
+public final class OSGiNetconfServer implements NetconfServer {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition(min = "0")
@@ -41,7 +43,7 @@ public final class OSGiNetconfServer {
 
     private final AggregatedNetconfOperationServiceFactory mappers = new AggregatedNetconfOperationServiceFactory();
     private final ComponentInstance<DefaultNetconfMonitoringService> monitoring;
-    private final ServerTransportInitializer serverTransportInitializer;
+    private final @NonNull ServerTransportInitializer serverTransportInitializer;
 
     @Activate
     public OSGiNetconfServer(
@@ -69,7 +71,8 @@ public final class OSGiNetconfServer {
         mappers.close();
     }
 
-    ServerTransportInitializer serverTransportInitializer() {
+    @Override
+    public ServerTransportInitializer serverTransportInitializer() {
         return serverTransportInitializer;
     }
 

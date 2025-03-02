@@ -20,7 +20,7 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
@@ -40,7 +40,7 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.codec.XMLMessageWriter;
-import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.common.NetconfTimer.TimeoutCallback;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,10 +92,9 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     protected final @NonNull Channel channel;
 
     private final @NonNegative int maximumIncomingChunkSize;
-    private final long connectionTimeoutMillis;
     private final @NonNull Promise<S> promise;
     private final @NonNull L sessionListener;
-    private final @NonNull NetconfTimer timer;
+    private final @NonNull Function<TimeoutCallback, Timeout> timer;
 
     @GuardedBy("this")
     private Timeout timeoutTask;
@@ -103,14 +102,13 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     private State state = State.IDLE;
 
     protected NetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise, final Channel channel,
-            final NetconfTimer timer, final L sessionListener, final long connectionTimeoutMillis,
+            final Function<TimeoutCallback, Timeout> timer, final L sessionListener,
             final @NonNegative int maximumIncomingChunkSize) {
         localHello = requireNonNull(hello);
         this.promise = requireNonNull(promise);
         this.channel = requireNonNull(channel);
         this.timer = requireNonNull(timer);
         this.sessionListener = requireNonNull(sessionListener);
-        this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         checkArgument(maximumIncomingChunkSize > 0, "Invalid maximum incoming chunk size %s", maximumIncomingChunkSize);
     }
@@ -122,17 +120,18 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     protected final void startNegotiation() {
         if (ifNegotiatedAlready()) {
             LOG.debug("Negotiation on channel {} already started", channel);
-        } else {
-            final var sslHandler = getSslHandler(channel);
-            if (sslHandler != null) {
-                sslHandler.handshakeFuture().addListener(future -> {
-                    checkState(future.isSuccess(), "Ssl handshake was not successful");
-                    LOG.debug("Ssl handshake complete");
-                    start();
-                });
-            } else {
+            return;
+        }
+
+        final var sslHandler = getSslHandler(channel);
+        if (sslHandler != null) {
+            sslHandler.handshakeFuture().addListener(future -> {
+                checkState(future.isSuccess(), "Ssl handshake was not successful");
+                LOG.debug("Ssl handshake complete");
                 start();
-            }
+            });
+        } else {
+            start();
         }
     }
 
@@ -185,8 +184,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
             lockedChangeState(State.OPEN_WAIT);
 
             // Service the timeout on channel's eventloop, so that we do not get state transition problems
-            timeoutTask = timer.newTimeout(unused -> channel.eventLoop().execute(this::timeoutExpired),
-                connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+            timeoutTask = timer.apply(this::onTimeoutExpired);
         }
 
         LOG.debug("Session negotiation started on channel {}", channel);
@@ -205,7 +203,11 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
         }
     }
 
-    private synchronized void timeoutExpired() {
+    private void onTimeoutExpired(final long elapsedNanos) {
+        channel.eventLoop().execute(() -> timeoutExpired(elapsedNanos));
+    }
+
+    private synchronized void timeoutExpired(final long elapsedNanos) {
         if (timeoutTask == null) {
             // cancelTimeout() between expiry and execution on the loop
             return;
@@ -213,14 +215,12 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
         timeoutTask = null;
 
         if (state != State.ESTABLISHED) {
-            LOG.debug("Connection timeout after {}ms, session backed by channel {} is in state {}",
-                connectionTimeoutMillis, channel, state);
+            LOG.debug("Connection timeout, session backed by channel {} is in state {}", channel, state);
 
             // Do not fail negotiation if promise is done or canceled
             // It would result in setting result of the promise second time and that throws exception
             if (!promise.isDone() && !promise.isCancelled()) {
-                LOG.warn("Netconf session backed by channel {} was not established after {}", channel,
-                    connectionTimeoutMillis);
+                LOG.warn("Session negotiation timeout, session backed by channel {} was not established", channel);
                 failAndClose();
             }
         } else if (channel.isOpen()) {

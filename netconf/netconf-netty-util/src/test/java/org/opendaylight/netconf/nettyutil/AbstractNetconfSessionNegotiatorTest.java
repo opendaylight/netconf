@@ -28,19 +28,17 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
-import io.netty.util.TimerTask;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -54,7 +52,7 @@ import org.opendaylight.netconf.codec.FrameDecoder;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.XMLMessageWriter;
-import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.common.NetconfTimer.TimeoutCallback;
 import org.opendaylight.netconf.nettyutil.handler.HelloXMLMessageDecoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,9 +64,12 @@ class AbstractNetconfSessionNegotiatorTest {
     @Mock
     private SslHandler sslHandler;
     @Mock
-    private NetconfTimer timer;
+    private Function<TimeoutCallback, Timeout> timer;
     @Mock
     private Timeout timeout;
+    @Captor
+    private ArgumentCaptor<TimeoutCallback> callbackCaptor;
+
     private TestSessionNegotiator negotiator;
 
     private final HelloMessage hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
@@ -83,7 +84,7 @@ class AbstractNetconfSessionNegotiatorTest {
             .addLast("mockEncoder", new MessageEncoder(XMLMessageWriter.pretty()))
             .addLast(MessageDecoder.HANDLER_NAME, xmlToHello)
             .addLast(FrameDecoder.HANDLER_NAME, new EOMFrameDecoder());
-        negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
+        negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener);
     }
 
     @Test
@@ -107,7 +108,7 @@ class AbstractNetconfSessionNegotiatorTest {
         doReturn(true).when(sslHandler).isSharable();
         doNothing().when(sslHandler).handlerAdded(any());
         doNothing().when(sslHandler).write(any(), any(), any());
-        final Future<EmbeddedChannel> handshakeFuture = channel.eventLoop().newSucceededFuture(channel);
+        final var handshakeFuture = channel.eventLoop().newSucceededFuture(channel);
         doReturn(handshakeFuture).when(sslHandler).handshakeFuture();
         doNothing().when(sslHandler).flush(any());
         channel.pipeline().addLast(sslHandler);
@@ -124,11 +125,10 @@ class AbstractNetconfSessionNegotiatorTest {
         doReturn(false).when(promise).isDone();
         doReturn(false).when(promise).isCancelled();
 
-        final var captor = ArgumentCaptor.forClass(TimerTask.class);
-        doReturn(timeout).when(timer).newTimeout(captor.capture(), eq(100L), eq(TimeUnit.MILLISECONDS));
+        doReturn(timeout).when(timer).apply(callbackCaptor.capture());
         negotiator.startNegotiation();
 
-        captor.getValue().run(timeout);
+        callbackCaptor.getValue().onTimeout(0);
         channel.runPendingTasks();
         verify(closedDetector).close(any(), any());
     }
@@ -157,7 +157,7 @@ class AbstractNetconfSessionNegotiatorTest {
 
     @Test
     void testReplaceHelloMessageInboundHandler() throws Exception {
-        final List<Object> out = new ArrayList<>();
+        final var out = new ArrayList<>();
         final byte[] msg = "<rpc/>".getBytes();
         final ByteBuf msgBuf = Unpooled.wrappedBuffer(msg);
         final ByteBuf helloBuf = Unpooled.wrappedBuffer(XmlUtil.toString(hello.getDocument()).getBytes());
@@ -180,13 +180,13 @@ class AbstractNetconfSessionNegotiatorTest {
         enableTimerTask();
         doReturn(true).when(timeout).cancel();
         negotiator.startNegotiation();
-        final RuntimeException cause = new RuntimeException("failure cause");
+        final var cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
         verify(promise).setFailure(cause);
     }
 
     private void enableTimerTask() {
-        doReturn(timeout).when(timer).newTimeout(any(), eq(100L), eq(TimeUnit.MILLISECONDS));
+        doReturn(timeout).when(timer).apply(any());
     }
 
     private static final class CloseDetector extends ChannelOutboundHandlerAdapter {
