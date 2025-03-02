@@ -9,8 +9,8 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
-import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.appendListKeyNodes;
-import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.writeSchemalessFilter;
+import static org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil.appendListKeyNodes;
+import static org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil.writeSchemalessFilter;
 
 import java.util.List;
 import java.util.Optional;

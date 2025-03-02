@@ -16,7 +16,7 @@ import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
-import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
+import org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;

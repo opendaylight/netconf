@@ -16,14 +16,13 @@ import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
- * A baseline {@link DOMNotification} which is also a {@link DOMEvent}. This is equivalent to a
- * {@link NotificationMessage}.
+ * A baseline {@link DOMNotification} which is also a {@link DOMEvent}. This is equivalent to a {@code <notification/>}
+ * message.
  */
 @Beta
 @NonNullByDefault

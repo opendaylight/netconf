@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Common utilities to deal with <a href="https://datatracker.ietf.org/wg/netconf/">NETCONF</a> constructs and MD-SAL.
+ * Common utilities to deal with MD-SAL integration.
  */
 @org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.common.mdsal;
