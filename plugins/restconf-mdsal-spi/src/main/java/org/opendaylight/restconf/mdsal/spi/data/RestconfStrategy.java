@@ -39,6 +39,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -51,7 +52,6 @@ import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractServerDataOperations;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
@@ -171,7 +171,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         final Boolean exists;
         try {
             exists = syncAccess(exists(instance), instance);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -186,7 +186,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         final Boolean exists;
         try {
             exists = syncAccess(exists(path), path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -196,7 +196,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         try {
             checkListAndOrderedType(parentPath);
             commitFuture = insertAndCommitPut(path, data, insert, parentPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -220,7 +220,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,
             final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath)
-                throws ServerException {
+                throws RequestException {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
@@ -233,7 +233,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                     tx.remove(parentPath);
                     tx.replace(path, data);
                     tx.replace(parentPath, readData);
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     throw e;
                 }
                 yield tx.commit();
@@ -246,7 +246,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         yield replaceAndCommit(tx, path, data);
                     }
                     insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     throw e;
                 }
                 yield tx.commit();
@@ -258,7 +258,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         yield replaceAndCommit(tx, path, data);
                     }
                     insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     throw e;
                 }
                 yield tx.commit();
@@ -268,7 +268,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
     private void insertWithPointPut(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final @NonNull PathArgument pointArg, final NormalizedNodeContainer<?> readList,
-            final boolean before) throws ServerException {
+            final boolean before) throws RequestException {
         tx.remove(path.getParent());
 
         int lastItemPosition = 0;
@@ -308,7 +308,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         return tx.commit();
     }
 
-    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) throws ServerException {
+    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) throws RequestException {
         // FIXME: we have this available in InstanceIdentifierContext
         final var dataSchemaNode = databind.schemaTree().findChild(path).orElseThrow().dataSchemaNode();
 
@@ -326,7 +326,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         } else {
             message = "Insert parameter can be used only with list or leaf-list";
         }
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, message);
+        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, message);
     }
 
     @Override
@@ -335,7 +335,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         final var tx = prepareWriteExecution();
         try {
             tx.create(parentPath, data);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             tx.cancel();
             request.completeWith(e);
             return;
@@ -350,7 +350,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         try {
             checkListAndOrderedType(parentPath);
             future = insertAndCommit(parentPath, data, insert);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -368,7 +368,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                     apiPath = new ApiPathCanonizer(databind).dataToApiPath(
                         data instanceof MapNode mapData && !mapData.isEmpty()
                         ? path.node(mapData.body().iterator().next().name()) : path);
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     // This should never happen
                     request.completeWith(e);
                     return;
@@ -385,7 +385,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommit(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert) throws ServerException {
+            final NormalizedNode data, final @NonNull Insert insert) throws RequestException {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
@@ -400,7 +400,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         tx.replace(path, data);
                         tx.replace(path, readData);
                     }
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     tx.cancel();
                     throw e;
                 }
@@ -409,7 +409,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             case LAST -> {
                 try {
                     tx.create(path, data);
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     tx.cancel();
                     throw e;
                 }
@@ -424,7 +424,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         checkListDataDoesNotExist(path, data);
                         insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
                     }
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     tx.cancel();
                     throw e;
                 }
@@ -439,7 +439,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         checkListDataDoesNotExist(path, data);
                         insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
                     }
-                } catch (ServerException e) {
+                } catch (RequestException e) {
                     tx.cancel();
                     throw e;
                 }
@@ -465,7 +465,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         try {
                             tx.create(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (ServerException e) {
+                        } catch (RequestException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                             noError = false;
                         }
@@ -474,7 +474,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         try {
                             tx.delete(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (ServerException e) {
+                        } catch (RequestException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                             noError = false;
                         }
@@ -492,7 +492,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         try {
                             tx.remove(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (ServerException e) {
+                        } catch (RequestException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
                             noError = false;
                         }
@@ -536,7 +536,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
     private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final PathArgument pointArg, final NormalizedNodeContainer<?> readList,
-            final boolean before) throws ServerException {
+            final boolean before) throws RequestException {
         tx.remove(path);
 
         int lastItemPosition = 0;
@@ -572,17 +572,17 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      *
      * @param data Data to be checked
      * @param path Path to be checked
-     * @throws ServerException if data already exists.
+     * @throws RequestException if data already exists.
      */
     private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data)
-            throws ServerException {
+            throws RequestException {
         if (data instanceof NormalizedNodeContainer<?> dataNode) {
             for (final var node : dataNode.body()) {
                 final var nodePath = path.node(node.name());
                 checkItemDoesNotExists(databind, exists(nodePath), nodePath);
             }
         } else {
-            throw new ServerException("Unexpected node type: " + data.getClass().getName());
+            throw new RequestException("Unexpected node type: " + data.getClass().getName());
         }
     }
 
@@ -592,13 +592,13 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param existsFuture if checked data exists
      * @paran databind the {@link DatabindContext}
      * @param path path to be checked
-     * @throws ServerException if data already exists.
+     * @throws RequestException if data already exists.
      */
     static void checkItemDoesNotExists(final DatabindContext databind, final ListenableFuture<Boolean> existsFuture,
-            final YangInstanceIdentifier path) throws ServerException {
+            final YangInstanceIdentifier path) throws RequestException {
         if (syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
                 new ErrorPath(databind, path));
         }
     }
@@ -609,7 +609,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final @Nullable ConfigurationMetadata metadata) {
         // Non-existing data
         if (node == null) {
-            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                 "Request could not be completed because the relevant data model content does not exist"));
             return;
         }
@@ -631,7 +631,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     // FIXME: NETCONF-1155: this method should asynchronous
     @VisibleForTesting
     final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) throws ServerException {
+            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) throws RequestException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -652,17 +652,17 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     }
 
     private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) throws ServerException {
+            final YangInstanceIdentifier path) throws RequestException {
         return syncAccess(read(store, path), path).orElse(null);
     }
 
     final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
-            final WithDefaultsMode defaultsMode) throws ServerException {
+            final WithDefaultsMode defaultsMode) throws RequestException {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;
             case ReportAll, ReportAllTagged ->
-                throw new ServerException("Unsupported with-defaults value %s", defaultsMode.getName());
+                throw new RequestException("Unsupported with-defaults value %s", defaultsMode.getName());
         };
 
         // FIXME: we have this readily available in InstanceIdentifierContext
@@ -815,7 +815,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     }
 
     static final NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
-            final NormalizedNode configDataNode) throws ServerException {
+            final NormalizedNode configDataNode) throws RequestException {
         if (stateDataNode == null) {
             // No state, return config
             return configDataNode;
@@ -836,7 +836,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @return {@link NormalizedNode}
      */
     private static @NonNull NormalizedNode mergeStateAndConfigData(final @NonNull NormalizedNode stateDataNode,
-            final @NonNull NormalizedNode configDataNode) throws ServerException {
+            final @NonNull NormalizedNode configDataNode) throws RequestException {
         validateNodeMerge(stateDataNode, configDataNode);
         // FIXME: this check is bogus, as it confuses yang.data.api (NormalizedNode) with yang.model.api (RpcDefinition)
         if (configDataNode instanceof RpcDefinition) {
@@ -853,11 +853,11 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param configDataNode data node of config data
      */
     private static void validateNodeMerge(final @NonNull NormalizedNode stateDataNode,
-                                          final @NonNull NormalizedNode configDataNode) throws ServerException {
+                                          final @NonNull NormalizedNode configDataNode) throws RequestException {
         final QNameModule moduleOfStateData = stateDataNode.name().getNodeType().getModule();
         final QNameModule moduleOfConfigData = configDataNode.name().getNodeType().getModule();
         if (!moduleOfStateData.equals(moduleOfConfigData)) {
-            throw new ServerException("Unable to merge data from different modules.");
+            throw new RequestException("Unable to merge data from different modules.");
         }
     }
 
@@ -1017,55 +1017,55 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     }
 
     /**
-     * Synchronize access to a path resource, translating any failure to a {@link ServerException}.
+     * Synchronize access to a path resource, translating any failure to a {@link RequestException}.
      *
      * @param <T> The type being accessed
      * @param future Access future
      * @param path Path being accessed
      * @return The accessed value
-     * @throws ServerException if commit fails
+     * @throws RequestException if commit fails
      */
     // FIXME: require DatabindPath.Data here
     static final <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
-            throws ServerException {
+            throws RequestException {
         try {
             return future.get();
         } catch (ExecutionException e) {
-            throw new ServerException("Failed to access " + path, e);
+            throw new RequestException("Failed to access " + path, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServerException("Interrupted while accessing " + path, e);
+            throw new RequestException("Interrupted while accessing " + path, e);
         }
     }
 
     // FIXME: require DatabindPath.Data here
-    final @NonNull ServerException decodeException(final Throwable ex, final String txType,
+    final @NonNull RequestException decodeException(final Throwable ex, final String txType,
             final YangInstanceIdentifier path) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
-            // netconfSB and we create ServerException accordingly.
+            // netconfSB and we create RequestException accordingly.
             for (var error : Throwables.getCausalChain(ex)) {
                 if (error instanceof NetconfDocumentedException netconfError) {
-                    return new ServerException(netconfError.getErrorType(), netconfError.getErrorTag(), ex);
+                    return new RequestException(netconfError.getErrorType(), netconfError.getErrorTag(), ex);
                 }
                 if (error instanceof DocumentedException documentedError) {
                     final var errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-                        return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
+                        return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
                             path != null ? new ErrorPath(databind, path) : null, ex);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-                        return new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                        return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                             "Data does not exist", path != null ? new ErrorPath(databind, path) : null, ex);
                     }
                 }
             }
 
-            return new ServerException("Transaction(" + txType + ") not committed correctly", ex);
+            return new RequestException("Transaction(" + txType + ") not committed correctly", ex);
         }
 
-        return new ServerException("Transaction(" + txType + ") failed", ex);
+        return new RequestException("Transaction(" + txType + ") failed", ex);
     }
 }

@@ -15,8 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.netconf.databind.DatabindProvider;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.mdsal.spi.NotificationSource;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -81,19 +81,19 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
         for (var qname : qnames) {
             final var optModule = modelContext.findModuleStatement(qname.getModule());
             if (optModule.isEmpty()) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                     "%s refers to an unknown module", qname));
                 return;
             }
             final var module = optModule.orElseThrow();
             final var optStmt = module.findSchemaTreeNode(qname);
             if (optStmt.isEmpty()) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                     "%s refers to an unknown notification", qname));
                 return;
             }
             if (!(optStmt.orElseThrow() instanceof NotificationEffectiveStatement)) {
-                request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                     "%s refers to a non-notification", qname));
                 return;
             }

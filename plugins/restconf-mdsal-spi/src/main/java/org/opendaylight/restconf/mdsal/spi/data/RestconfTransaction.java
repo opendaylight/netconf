@@ -15,8 +15,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.odlparent.logging.markers.Markers;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
@@ -55,24 +55,24 @@ abstract class RestconfTransaction {
      *
      * @param path the data object path
      */
-    final void delete(final YangInstanceIdentifier path) throws ServerException {
+    final void delete(final YangInstanceIdentifier path) throws RequestException {
         LOG.trace("Delete {}", path);
         deleteImpl(requireNonNull(path));
     }
 
-    abstract void deleteImpl(@NonNull YangInstanceIdentifier path) throws ServerException;
+    abstract void deleteImpl(@NonNull YangInstanceIdentifier path) throws RequestException;
 
     /**
      * Remove data from the datastore.
      *
      * @param path the data object path
      */
-    final void remove(final YangInstanceIdentifier path) throws ServerException {
+    final void remove(final YangInstanceIdentifier path) throws RequestException {
         LOG.trace("Remove {}", path);
         removeImpl(requireNonNull(path));
     }
 
-    abstract void removeImpl(@NonNull YangInstanceIdentifier path) throws ServerException;
+    abstract void removeImpl(@NonNull YangInstanceIdentifier path) throws RequestException;
 
     /**
      * Merges a piece of data with the existing data at a specified path.
@@ -94,13 +94,14 @@ abstract class RestconfTransaction {
      * @param path    the data object path
      * @param data    the data object to be merged to the specified path
      */
-    final void create(final YangInstanceIdentifier path, final NormalizedNode data) throws ServerException {
+    final void create(final YangInstanceIdentifier path, final NormalizedNode data) throws RequestException {
         LOG.trace("Create {}", path);
         LOG.trace(Markers.confidential(), "Create as {}", data.prettyTree());
         createImpl(requireNonNull(path), data);
     }
 
-    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data) throws ServerException;
+    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data)
+        throws RequestException;
 
     /**
      * Replace a piece of data at the specified path.
@@ -116,7 +117,8 @@ abstract class RestconfTransaction {
 
     abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
-    abstract @Nullable NormalizedNodeContainer<?> readList(@NonNull YangInstanceIdentifier path) throws ServerException;
+    abstract @Nullable NormalizedNodeContainer<?> readList(@NonNull YangInstanceIdentifier path)
+        throws RequestException;
 
     abstract ListenableFuture<Optional<NormalizedNode>> read(YangInstanceIdentifier path);
 

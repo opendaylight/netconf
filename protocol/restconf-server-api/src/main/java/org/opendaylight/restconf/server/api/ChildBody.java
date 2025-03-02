@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -34,11 +35,11 @@ public abstract sealed class ChildBody extends RequestBody permits JsonChildBody
      *
      * @param path POST request path
      * @return A {@link PrefixAndBody}
-     * @throws ServerException if an error occurs
+     * @throws RequestException if an error occurs
      */
-    public final PrefixAndBody toPayload(final Data path) throws ServerException {
+    public final PrefixAndBody toPayload(final Data path) throws RequestException {
         return toPayload(path, consume());
     }
 
-    abstract PrefixAndBody toPayload(Data path, InputStream inputStream) throws ServerException;
+    abstract PrefixAndBody toPayload(Data path, InputStream inputStream) throws RequestException;
 }

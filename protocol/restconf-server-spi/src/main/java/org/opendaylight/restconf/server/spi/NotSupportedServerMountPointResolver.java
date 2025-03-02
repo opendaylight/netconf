@@ -10,7 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorPath;
-import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -26,8 +26,8 @@ public final class NotSupportedServerMountPointResolver implements ServerMountPo
     }
 
     @Override
-    public ServerStrategy resolveMountPoint(final Data mountPath) throws ServerException {
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, "Mount points not supported",
+    public ServerStrategy resolveMountPoint(final Data mountPath) throws RequestException {
+        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, "Mount points not supported",
             new ErrorPath(mountPath));
     }
 }

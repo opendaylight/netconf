@@ -29,6 +29,7 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
@@ -36,7 +37,6 @@ import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -79,7 +79,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         final var instance = path.instance();
         try {
             tx.delete(instance);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             tx.cancel();
             request.completeWith(e);
             return;
@@ -106,7 +106,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             final List<YangInstanceIdentifier> tmp;
             try {
                 tmp = fieldsParamToPaths(path.inference().modelContext(), path.schema(), fields);
-            } catch (ServerException e) {
+            } catch (RequestException e) {
                 request.completeWith(e);
                 return;
             }
@@ -122,7 +122,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             } else {
                 node = readData(params.content(), path.instance(), params.withDefaults());
             }
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -155,11 +155,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @param withDefa value of with-defaults parameter
      * @param fields   paths to selected subtrees which should be read, relative to the parent path
      * @return {@link NormalizedNode}
+     * @throws RequestException when an error occurs
      */
     // FIXME: NETCONF-1155: this method should asynchronous
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull List<YangInstanceIdentifier> fields) throws ServerException {
+            final @NonNull List<YangInstanceIdentifier> fields) throws RequestException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -186,10 +187,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @param path                  parent path to selected fields
      * @param fields                paths to selected subtrees which should be read, relative to the parent path
      * @return {@link NormalizedNode}
+     * @throws RequestException when an error occurs
      */
     private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
             final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields)
-                throws ServerException {
+                throws RequestException {
         return syncAccess(read(store, path, fields), path).orElse(null);
     }
 
@@ -239,10 +241,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @param input input value of fields parameter
      * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
      *         of provided {@code identifier}
+     * @throws RequestException when an error occurs
      */
     @VisibleForTesting
     static @NonNull List<YangInstanceIdentifier> fieldsParamToPaths(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull DataSchemaContext startNode, final @NonNull FieldsParam input) throws ServerException {
+            final @NonNull DataSchemaContext startNode, final @NonNull FieldsParam input) throws RequestException {
         final var parsed = new HashSet<LinkedPathElement>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
@@ -251,7 +254,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final LinkedPathElement startPathElement,
-            final List<NodeSelector> selectors) throws ServerException {
+            final List<NodeSelector> selectors) throws RequestException {
         for (var selector : selectors) {
             var pathElement = startPathElement;
             var namespace = startNamespace;
@@ -280,7 +283,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     private static LinkedPathElement addChildPathElement(final LinkedPathElement currentElement,
-            final QName childQName) throws ServerException {
+            final QName childQName) throws RequestException {
         final var collectedMixinNodes = new ArrayList<PathArgument>();
 
         DataSchemaContext currentNode = currentElement.targetNode;
@@ -306,7 +309,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         }
 
         if (actualContextNode == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Child %s node missing in %s",
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Child %s node missing in %s",
                 childQName.getLocalName(), currentNode.getPathStep().getNodeType().getLocalName());
         }
 

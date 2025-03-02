@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.ChildBody;
@@ -29,7 +30,6 @@ import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -218,9 +218,9 @@ public interface ServerStrategy {
      * @param path {@link ApiPath} to resolve
      * @return A strategy and the remaining path
      * @throws NullPointerException if {@code path} is {@code null}
-     * @throws ServerException if an error occurs
+     * @throws RequestException if an error occurs
      */
-    StrategyAndPath resolveStrategy(ApiPath path) throws ServerException;
+    StrategyAndPath resolveStrategy(ApiPath path) throws RequestException;
 
     /**
      * Result of a {@link ApiPath} lookup for the purposes of supporting {@code yang-ext:mount}-delimited mount points

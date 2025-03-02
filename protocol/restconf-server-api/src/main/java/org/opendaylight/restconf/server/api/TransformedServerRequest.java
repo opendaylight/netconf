@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -56,7 +57,7 @@ record TransformedServerRequest<O, T>(ServerRequest<T> delegate, Function<O, T> 
     }
 
     @Override
-    public void completeWith(final ServerException failure) {
+    public void completeWith(final RequestException failure) {
         delegate.completeWith(failure);
     }
 

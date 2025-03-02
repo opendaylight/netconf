@@ -23,10 +23,10 @@ import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.DatabindPath.InstanceRequest;
 import org.opendaylight.netconf.databind.DatabindPath.Rpc;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.api.ApiPath.Step;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -65,7 +65,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         return databind;
     }
 
-    public @NonNull DatabindPath normalizePath(final ApiPath apiPath) throws ServerException {
+    public @NonNull DatabindPath normalizePath(final ApiPath apiPath) throws RequestException {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
             return new Data(databind);
@@ -79,7 +79,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         final var firstStep = it.next();
         final var firstModule = firstStep.module();
         if (firstModule == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                 "First member must use namespace-qualified form, '%s' does not", firstStep.identifier());
         }
 
@@ -96,12 +96,12 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
 
             // We have found an RPC match,
             if (it.hasNext()) {
-                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                     "First step in the path resolves to RPC '%s' and therefore it must be the only step present",
                     qname);
             }
             if (step instanceof ListInstance) {
-                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                     "First step in the path resolves to RPC '%s' and therefore it must not contain key values", qname);
             }
 
@@ -117,7 +117,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
 
     @NonNull DatabindPath normalizeSteps(final SchemaInferenceStack stack, final @NonNull DataSchemaContext rootNode,
             final @NonNull List<PathArgument> pathPrefix, final @NonNull QNameModule firstNamespace,
-            final @NonNull Step firstStep, final Iterator<@NonNull Step> it) throws ServerException {
+            final @NonNull Step firstStep, final Iterator<@NonNull Step> it) throws RequestException {
         var parentNode = rootNode;
         var namespace = firstNamespace;
         var step = firstStep;
@@ -132,11 +132,11 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
                     final var action = optAction.orElseThrow();
 
                     if (it.hasNext()) {
-                        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                             "Request path resolves to action '%s' and therefore it must not continue past it", qname);
                     }
                     if (step instanceof ListInstance) {
-                        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                             "Request path resolves to action '%s' and therefore it must not contain key values", qname);
                     }
 
@@ -152,7 +152,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
             final var found = parentNode instanceof DataSchemaContext.Composite composite
                 ? composite.enterChild(stack, qname) : null;
             if (found == null) {
-                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found",
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found",
                     qname);
             }
 
@@ -172,17 +172,17 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
                     pathArg = prepareNodeWithPredicates(stack, qname, listSchema, values);
                 } else if (schema instanceof LeafListSchemaNode leafListSchema) {
                     if (values.size() != 1) {
-                        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE,
+                        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE,
                             "Entry '%s' requires one value predicate.", qname);
                     }
                     pathArg = new NodeWithValue<>(qname, parserJsonValue(stack, leafListSchema, values.get(0)));
                 } else {
-                    throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
+                    throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
                         "Entry '%s' does not take a key or value predicate.", qname);
                 }
             } else {
                 if (childNode.dataSchemaNode() instanceof ListSchemaNode list && !list.getKeyDefinition().isEmpty()) {
-                    throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
+                    throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
                         "Entry '%s' requires key or value predicate to be present.", qname);
                 }
                 pathArg = childNode.getPathStep();
@@ -205,44 +205,44 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         }
     }
 
-    public @NonNull Data normalizeDataPath(final ApiPath apiPath) throws ServerException {
+    public @NonNull Data normalizeDataPath(final ApiPath apiPath) throws RequestException {
         final var path = normalizePath(apiPath);
         if (path instanceof Data dataPath) {
             return dataPath;
         }
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Point '%s' resolves to non-data %s",
+        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Point '%s' resolves to non-data %s",
             apiPath, path);
     }
 
     @Override
-    public PathArgument normalizePoint(final ApiPath value) throws ServerException {
+    public PathArgument normalizePoint(final ApiPath value) throws RequestException {
         final var path = normalizePath(value);
         if (path instanceof Data dataPath) {
             final var lastArg = dataPath.instance().getLastPathArgument();
             if (lastArg != null) {
                 return lastArg;
             }
-            throw new ServerException(ErrorType.PROTOCOL,  ErrorTag.DATA_MISSING,
+            throw new RequestException(ErrorType.PROTOCOL,  ErrorTag.DATA_MISSING,
                 "Point '%s' resolves to an empty path", value);
         }
-        throw new ServerException(ErrorType.PROTOCOL,  ErrorTag.DATA_MISSING, "Point '%s' resolves to non-data %s",
+        throw new RequestException(ErrorType.PROTOCOL,  ErrorTag.DATA_MISSING, "Point '%s' resolves to non-data %s",
             value, path);
     }
 
-    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) throws ServerException {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) throws RequestException {
         final var steps = apiPath.steps();
         return switch (steps.size()) {
-            case 0 -> throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "RPC name must be present");
+            case 0 -> throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "RPC name must be present");
             case 1 -> normalizeRpcPath(steps.get(0));
-            default -> throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+            default -> throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                 "%s does not refer to an RPC", apiPath);
         };
     }
 
-    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) throws ServerException {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) throws RequestException {
         final var firstModule = step.module();
         if (firstModule == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                 "First member must use namespace-qualified form, '%s' does not", step.identifier());
         }
 
@@ -253,16 +253,16 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         try {
             stmt = stack.enterSchemaTree(qname);
         } catch (IllegalArgumentException e) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, qname + " does not refer to an RPC",
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, qname + " does not refer to an RPC",
                 e);
         }
         if (stmt instanceof RpcEffectiveStatement rpc) {
             return new Rpc(databind, stack.toInference(), rpc);
         }
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "%s does not refer to an RPC", qname);
+        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "%s does not refer to an RPC", qname);
     }
 
-    public @NonNull InstanceRequest normalizeDataOrActionPath(final ApiPath apiPath) throws ServerException {
+    public @NonNull InstanceRequest normalizeDataOrActionPath(final ApiPath apiPath) throws RequestException {
         // FIXME: optimize this
         final var path = normalizePath(apiPath);
         if (path instanceof Data dataPath) {
@@ -271,16 +271,16 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         if (path instanceof Action actionPath) {
             return actionPath;
         }
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Unexpected path %s", path);
+        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Unexpected path %s", path);
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
-            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) throws ServerException {
+            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) throws RequestException {
         final var keyDef = schema.getKeyDefinition();
         final var keySize = keyDef.size();
         final var varSize = keyValues.size();
         if (keySize != varSize) {
-            throw new ServerException(ErrorType.PROTOCOL,
+            throw new RequestException(ErrorType.PROTOCOL,
                 keySize > varSize ? ErrorTag.MISSING_ATTRIBUTE : ErrorTag.UNKNOWN_ATTRIBUTE,
                 "Schema for %s requires %s key values, %s supplied", qname, keySize, varSize);
         }
@@ -299,7 +299,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
     }
 
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
-            final @NonNull String value) throws ServerException {
+            final @NonNull String value) throws RequestException {
         if (schemaNode instanceof TypedDataSchemaNode typedSchema) {
             return parserJsonValue(stack, typedSchema, value);
         }
@@ -307,7 +307,7 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
     }
 
     private Object parserJsonValue(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
-            final String value) throws ServerException {
+            final String value) throws RequestException {
         // As per https://www.rfc-editor.org/rfc/rfc8040#page-29:
         //            The syntax for
         //            "api-identifier" and "key-value" MUST conform to the JSON identifier
@@ -318,17 +318,17 @@ public final class ApiPathNormalizer implements Insert.PointNormalizer {
         try {
             return databind.jsonCodecs().codecFor(schemaNode, stack).parseValue(value);
         } catch (IllegalArgumentException e) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Invalid value '" + value + "' for " + schemaNode.getQName(), e);
         }
     }
 
-    private @NonNull QNameModule resolveNamespace(final String moduleName) throws ServerException {
+    private @NonNull QNameModule resolveNamespace(final String moduleName) throws RequestException {
         final var it = databind.modelContext().findModuleStatements(moduleName).iterator();
         if (it.hasNext()) {
             return it.next().localQNameModule();
         }
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
+        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
             "Failed to lookup for module with name '%s'.", moduleName);
     }
 }

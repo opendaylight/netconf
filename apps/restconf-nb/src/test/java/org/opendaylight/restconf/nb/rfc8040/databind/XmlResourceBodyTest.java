@@ -22,9 +22,9 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -78,7 +78,7 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     private void assertThrowsException(final String uriPath, final String expectedErrorMessage) {
-        final var ex = assertThrows(ServerException.class, () -> parse(uriPath, """
+        final var ex = assertThrows(RequestException.class, () -> parse(uriPath, """
                 <cont1 xmlns="instance:identifier:module"/>"""));
         final var errors = ex.errors();
         assertEquals(1, errors.size());

@@ -17,8 +17,8 @@ import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.InvokeResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -56,21 +56,21 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
         if (errors.isEmpty()) {
             request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));
         } else {
-            request.completeWith(new ServerException(errors, null, "Invocation failed"));
+            request.completeWith(new RequestException(errors, null, "Invocation failed"));
         }
     }
 
     @Override
     public void onFailure(final Throwable cause) {
         if (cause instanceof DOMActionException e) {
-            request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, e));
-        } else if (cause instanceof ServerException e) {
+            request.completeWith(new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, e));
+        } else if (cause instanceof RequestException e) {
             request.completeWith(e);
         } else if (cause instanceof CancellationException e) {
-            request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.PARTIAL_OPERATION,
+            request.completeWith(new RequestException(ErrorType.RPC, ErrorTag.PARTIAL_OPERATION,
                 "Action cancelled while executing", e));
         } else {
-            request.completeWith(new ServerException("Invocation failed", cause));
+            request.completeWith(new RequestException("Invocation failed", cause));
         }
     }
 }

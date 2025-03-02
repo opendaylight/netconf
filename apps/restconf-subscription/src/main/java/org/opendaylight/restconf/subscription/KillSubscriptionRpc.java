@@ -14,8 +14,8 @@ import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -71,29 +71,29 @@ public final class KillSubscriptionRpc extends RpcImplementation {
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
         if (id == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No id specified"));
             return;
         }
         final var state = stateMachine.lookupSubscriptionState(id);
         if (state == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
 
         final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }

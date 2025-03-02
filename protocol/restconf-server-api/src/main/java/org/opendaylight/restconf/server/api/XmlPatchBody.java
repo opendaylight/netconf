@@ -17,6 +17,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -40,18 +41,18 @@ public final class XmlPatchBody extends PatchBody {
 
     @Override
     PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream)
-            throws IOException, ServerException {
+            throws IOException, RequestException {
         try {
             return parse(resource, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (XMLStreamException | SAXException | URISyntaxException e) {
             LOG.debug("Failed to parse YANG Patch XML", e);
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                 "Error parsing YANG Patch XML: " + e.getMessage(), e);
         }
     }
 
     private static @NonNull PatchContext parse(final ResourceContext resource, final Document doc)
-            throws IOException, ServerException, XMLStreamException, SAXException, URISyntaxException {
+            throws IOException, RequestException, XMLStreamException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
@@ -104,16 +105,16 @@ public final class XmlPatchBody extends PatchBody {
      * @return List of value elements
      */
     private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation)
-            throws ServerException {
+            throws RequestException {
         final var valueNode = element.getElementsByTagName("value").item(0);
 
         final boolean isWithValue = requiresValue(operation);
         if (isWithValue && valueNode == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
         }
 
         if (!isWithValue && valueNode != null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
         }
 
         if (valueNode == null) {

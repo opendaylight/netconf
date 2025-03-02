@@ -16,8 +16,8 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -113,7 +113,7 @@ abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
     }
 
     protected abstract List<T> translateFields(@NonNull EffectiveModelContext modelContext,
-        @NonNull DataSchemaContext startNode, @NonNull FieldsParam fields) throws ServerException;
+        @NonNull DataSchemaContext startNode, @NonNull FieldsParam fields) throws RequestException;
 
     /**
      * Test parse fields parameter containing only one child selected.
@@ -304,7 +304,7 @@ abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
     void testMissingChildSchema() throws ParseException {
         final var input = FieldsParam.parse("library(not-existing)");
 
-        final var ex = assertThrows(ServerException.class,
+        final var ex = assertThrows(RequestException.class,
             () -> translateFields(JUKEBOX_SCHEMA, jukeboxSchemaNode, input));
         // Bad request
         final var errors = ex.errors();

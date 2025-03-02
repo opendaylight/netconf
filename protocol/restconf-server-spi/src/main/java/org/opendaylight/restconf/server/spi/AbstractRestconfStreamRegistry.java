@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
@@ -110,7 +110,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             public void onFailure(final Throwable cause) {
                 LOG.debug("Failed to add stream {}", name, cause);
                 streams.remove(name, stream);
-                request.completeWith(new ServerException("Failed to create stream " + name, cause));
+                request.completeWith(new RequestException("Failed to create stream " + name, cause));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -166,7 +166,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final QName encoding, final @Nullable SubscriptionFilter filter) {
         final var stream = lookupStream(streamName);
         if (stream == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "%s refers to an unknown stream", streamName));
             return;
         }
@@ -174,7 +174,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final EventStreamFilter filterImpl;
         try {
             filterImpl = resolveFilter(filter);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -194,7 +194,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(new ServerException(cause));
+                request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -203,7 +203,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
 
     private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
-            throws ServerException {
+            throws RequestException {
         return switch (filter) {
             case null -> null;
             case SubscriptionFilter.Reference(var filterName) -> getFilter(filterName);
@@ -213,28 +213,28 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    private EventStreamFilter getFilter(final String filterName) throws ServerException {
+    private EventStreamFilter getFilter(final String filterName) throws RequestException {
         final var impl = filters.get(filterName);
         if (impl != null) {
             return impl;
         }
-        throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+        throw new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
             "%s refers to an unknown stream filter", filterName);
     }
 
     @NonNullByDefault
-    private static EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws ServerException {
+    private static EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
         // FIXME: parse SubtreeDefinition anydata filter, rfc6241
         //        https://www.rfc-editor.org/rfc/rfc8650#name-filter-example
-        throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+        throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Subtree filtering not implemented");
     }
 
     @NonNullByDefault
-    private static EventStreamFilter parseXpathFilter(final String xpath) throws ServerException {
+    private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
         // TODO: integrate yang-xpath-api and validate the propose xpath
         // TODO: implement XPath filter evaluation
-        throw new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+        throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             "XPath filtering not implemented");
     }
 }

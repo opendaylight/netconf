@@ -24,9 +24,9 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
@@ -63,7 +63,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             @Override
             public void onSuccess(final Boolean result) {
                 if (!result) {
-                    cancelTx(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
+                    cancelTx(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
                         new ErrorPath(path)));
                     return;
                 }
@@ -77,7 +77,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        request.completeWith(new ServerException("Transaction to delete failed", new ErrorPath(path),
+                        request.completeWith(new RequestException("Transaction to delete failed", new ErrorPath(path),
                             cause));
                     }
                 }, MoreExecutors.directExecutor());
@@ -85,10 +85,10 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancelTx(new ServerException("Failed to access " + path, cause));
+                cancelTx(new RequestException("Failed to access " + path, cause));
             }
 
-            private void cancelTx(final ServerException ex) {
+            private void cancelTx(final RequestException ex) {
                 tx.cancel();
                 request.completeWith(ex);
             }
@@ -106,7 +106,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             try {
                 translated = NormalizedNodeWriter.translateFieldsParam(path.inference().modelContext(), path.schema(),
                     fields);
-            } catch (ServerException e) {
+            } catch (RequestException e) {
                 request.completeWith(e);
                 return;
             }
@@ -118,7 +118,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         final NormalizedNode data;
         try {
             data = readData(params.content(), path.instance(), params.withDefaults());
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -26,7 +27,7 @@ public final class XmlOperationInputBody extends OperationInputBody {
 
     @Override
     void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
-            throws ServerException {
+            throws RequestException {
         final var stack = path.inference().toSchemaInferenceStack();
         stack.enterDataTree(path.inputStatement().argument());
 

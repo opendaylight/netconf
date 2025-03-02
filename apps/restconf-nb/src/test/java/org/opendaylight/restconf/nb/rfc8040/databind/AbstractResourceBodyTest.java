@@ -26,10 +26,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.ResourceBody;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
@@ -83,7 +83,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
     }
 
-    final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws ServerException {
+    final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws RequestException {
         final ApiPath apiPath;
         try {
             apiPath = ApiPath.parse(uriPath);
@@ -97,7 +97,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         final StrategyAndPath stratAndPath;
         try {
             stratAndPath = strategy.resolveStrategy(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             throw new AssertionError(e);
         }
 
@@ -107,7 +107,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
     }
 
     static final RequestError assertError(final Executable executable) {
-        final var ex = assertThrows(ServerException.class, executable);
+        final var ex = assertThrows(RequestException.class, executable);
         final var errors = ex.errors();
         assertEquals(1, errors.size());
         return errors.get(0);

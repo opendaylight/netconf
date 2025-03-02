@@ -10,7 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.netconf.databind.RequestException;
 
 /**
  * A resolver of {@code yang-ext:mount} references to {@link ServerStrategy}..
@@ -23,7 +23,7 @@ public interface ServerMountPointResolver {
      *
      * @param mountPath mount point path
      * @return resolved {@link ServerStrategy}
-     * @throws ServerException when an error occurs
+     * @throws RequestException when an error occurs
      */
-    ServerStrategy resolveMountPoint(Data mountPath) throws ServerException;
+    ServerStrategy resolveMountPoint(Data mountPath) throws RequestException;
 }

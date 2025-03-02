@@ -20,10 +20,10 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -46,10 +46,9 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * This is an experimental iterator over a {@link NormalizedNode}. This is essentially
- * the opposite of a {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over
- * the backing data, this encapsulates a {@link NormalizedNodeStreamWriter} and allows
- * us to write multiple nodes.
+ * This is an experimental iterator over a {@link NormalizedNode}. This is essentially the opposite of a
+ * {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over the backing data, this encapsulates
+ * a {@link NormalizedNodeStreamWriter} and allows us to write multiple nodes.
  */
 @NonNullByDefault
 public abstract class NormalizedNodeWriter implements Flushable, Closeable {
@@ -122,10 +121,11 @@ public abstract class NormalizedNodeWriter implements Flushable, Closeable {
      * @param startNode {@link DataSchemaContext} of the API request path
      * @param input input value of fields parameter
      * @return {@link List} of levels; each level contains set of {@link QName}
+     * @throws RequestException when an error occurs
      */
     @Beta
     public static List<Set<QName>> translateFieldsParam(final EffectiveModelContext modelContext,
-            final DataSchemaContext startNode, final FieldsParam input) throws ServerException {
+            final DataSchemaContext startNode, final FieldsParam input) throws RequestException {
         final var parsed = new ArrayList<Set<QName>>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(), startNode,
             input.nodeSelectors(), 0);
@@ -134,7 +134,7 @@ public abstract class NormalizedNodeWriter implements Flushable, Closeable {
 
     private static void processSelectors(final List<Set<QName>> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final DataSchemaContext startNode, final List<NodeSelector> selectors,
-            final int index) throws ServerException {
+            final int index) throws RequestException {
         final Set<QName> startLevel;
         if (parsed.size() <= index) {
             startLevel = new HashSet<>();
@@ -221,18 +221,18 @@ public abstract class NormalizedNodeWriter implements Flushable, Closeable {
      * @return {@link DataSchemaContextNode}
      */
     private static DataSchemaContext addChildToResult(final DataSchemaContext currentNode, final QName childQName,
-            final Set<QName> level) throws ServerException {
+            final Set<QName> level) throws RequestException {
         // resolve parent node
         final var parentNode = resolveMixinNode(currentNode, level, currentNode.dataSchemaNode().getQName());
         if (parentNode == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                     "Not-mixin node missing in %s", currentNode.getPathStep().getNodeType().getLocalName());
         }
 
         // resolve child node
         final var childNode = resolveMixinNode(childByQName(parentNode, childQName), level, childQName);
         if (childNode == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Child %s node missing in %s", childQName.getLocalName(),
                 currentNode.getPathStep().getNodeType().getLocalName());
         }

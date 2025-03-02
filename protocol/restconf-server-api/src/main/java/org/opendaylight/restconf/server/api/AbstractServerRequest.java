@@ -17,6 +17,7 @@ import java.lang.invoke.VarHandle;
 import java.util.UUID;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.slf4j.Logger;
@@ -97,7 +98,7 @@ public abstract non-sealed class AbstractServerRequest<T> implements ServerReque
     }
 
     @Override
-    public final void completeWith(final ServerException failure) {
+    public final void completeWith(final RequestException failure) {
         LOG.debug("Request {} failed", this, failure);
         final var errors = failure.errors();
         onFailure(new YangErrorsBody(errors));

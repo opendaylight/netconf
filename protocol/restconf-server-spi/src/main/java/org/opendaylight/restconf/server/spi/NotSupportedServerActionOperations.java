@@ -9,8 +9,8 @@ package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath.Action;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.InvokeResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -31,7 +31,7 @@ public final class NotSupportedServerActionOperations implements ServerActionOpe
     @Override
     public void invokeAction(final ServerRequest<? super InvokeResult> request, final Action path,
             final ContainerNode input) {
-        request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Action not supported"));
     }
 }

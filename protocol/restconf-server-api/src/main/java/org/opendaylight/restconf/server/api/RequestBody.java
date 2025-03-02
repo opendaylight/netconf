@@ -21,6 +21,7 @@ import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -42,26 +43,26 @@ abstract sealed class RequestBody extends ConsumableBody
     }
 
     /**
-     * Return a new {@link ServerException} constructed from the combination of a message and a caught exception.
+     * Return a new {@link RequestException} constructed from the combination of a message and a caught exception.
      * Provided exception and its causal chain will be examined for well-known constructs in an attempt to extract
      * error information. If no such information is found an error with type {@link ErrorType#PROTOCOL} and tag
      * {@link ErrorTag#MALFORMED_MESSAGE} will be reported.
      *
      * @param messagePrefix exception message prefix
      * @param caught caught exception
-     * @return A new {@link ServerException}
+     * @return A new {@link RequestException}
      */
-    protected static final ServerException newProtocolMalformedMessageServerException(final DatabindPath path,
+    protected static final RequestException newProtocolMalformedMessageServerException(final DatabindPath path,
             final String messagePrefix, final Exception caught) {
         return newServerParseException(path, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, messagePrefix, caught);
     }
 
-    private static ServerException newServerParseException(final DatabindPath path, final ErrorType type,
+    private static RequestException newServerParseException(final DatabindPath path, final ErrorType type,
             final ErrorTag tag, final String messagePrefix, final Exception caught) {
         final var message = requireNonNull(messagePrefix) + ": " + caught.getMessage();
         final var errors = exceptionErrors(path.databind(), caught);
-        return new ServerException(message, errors != null ? errors : List.of(new RequestError(type, tag, message)),
-            caught);
+        return new RequestException(errors != null ? errors : List.of(new RequestError(type, tag, message)), caught,
+            message);
     }
 
     private static @Nullable List<RequestError> exceptionErrors(final DatabindContext databind,

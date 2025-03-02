@@ -39,7 +39,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -153,7 +153,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
     void createStreamWrongValueTest() {
         rpc.invoke(request, RESTCONF_URI, createInput("path", "String value"));
 
-        final var ex = assertThrows(ServerException.class, request::getResult);
+        final var ex = assertThrows(RequestException.class, request::getResult);
         final var errors = ex.errors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -169,7 +169,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
     void createStreamWrongInputRpcTest() {
         rpc.invoke(request, RESTCONF_URI, createInput(null, null));
 
-        final var ex = assertThrows(ServerException.class, request::getResult);
+        final var ex = assertThrows(RequestException.class, request::getResult);
         final var errors = ex.errors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
@@ -33,7 +34,7 @@ public final class JsonResourceBody extends ResourceBody {
 
     @Override
     void streamTo(final Data path, final PathArgument name, final InputStream inputStream,
-            final NormalizedNodeStreamWriter writer) throws ServerException {
+            final NormalizedNodeStreamWriter writer) throws RequestException {
         try (var jsonParser = newParser(path, writer)) {
             try (var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 jsonParser.parse(reader);

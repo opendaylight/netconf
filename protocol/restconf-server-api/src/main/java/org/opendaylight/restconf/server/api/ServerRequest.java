@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -28,7 +29,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
  * not a request invariant at the various processing layers.
  *
  * <p>Every request needs to be completed via one of {@link #completeWith(Object)},
- * {@link #completeWith(ServerException)} or other {@code completeWith} methods.
+ * {@link #completeWith(RequestException)} or other {@code completeWith} methods.
  *
  * @param <T> type of reported result
  */
@@ -65,7 +66,7 @@ public sealed interface ServerRequest<T> permits AbstractServerRequest, Transfor
 
     void completeWith(T result);
 
-    void completeWith(ServerException failure);
+    void completeWith(RequestException failure);
 
     void completeWith(YangErrorsBody errors);
 

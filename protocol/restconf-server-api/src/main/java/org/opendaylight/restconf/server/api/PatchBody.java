@@ -15,6 +15,7 @@ import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -41,28 +42,28 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
          *
          * @param apiPath sub-resource
          * @return A {@link ResourceContext}
-         * @throws ServerException if the sub-resource cannot be resolved
+         * @throws RequestException if the sub-resource cannot be resolved
          */
-        protected abstract ResourceContext resolveRelative(ApiPath apiPath) throws ServerException;
+        protected abstract ResourceContext resolveRelative(ApiPath apiPath) throws RequestException;
     }
 
     PatchBody(final InputStream inputStream) {
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull ResourceContext resource) throws ServerException {
+    public final @NonNull PatchContext toPatchContext(final @NonNull ResourceContext resource) throws RequestException {
         try (var is = consume()) {
             return toPatchContext(resource, is);
         } catch (IOException e) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
         }
     }
 
     abstract @NonNull PatchContext toPatchContext(@NonNull ResourceContext resource, @NonNull InputStream inputStream)
-        throws IOException, ServerException;
+        throws IOException, RequestException;
 
     static final Data parsePatchTarget(final @NonNull ResourceContext resource, final String target)
-            throws ServerException {
+            throws RequestException {
         // As per: https://www.rfc-editor.org/rfc/rfc8072#page-18:
         //
         //        "Identifies the target data node for the edit
@@ -75,13 +76,13 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
         try {
             targetPath = ApiPath.parse(target.startsWith("/") ? target.substring(1) : target);
         } catch (ParseException e) {
-            throw new ServerException(ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE,
+            throw new RequestException(ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE,
                 "Failed to parse edit target '" + target + "'", e);
         }
 
         final var result  = resource.resolveRelative(targetPath).path;
         if (result.instance().isEmpty()) {
-            throw new ServerException(ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE,
+            throw new RequestException(ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE,
                 "Target node resource must not be a datastore resource");
         }
         return result;

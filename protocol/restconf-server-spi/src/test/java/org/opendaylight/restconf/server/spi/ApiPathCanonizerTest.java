@@ -19,8 +19,8 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -352,7 +352,7 @@ class ApiPathCanonizerTest {
     private static void assertApiPath(final String expected, final YangInstanceIdentifier path) {
         try {
             assertEquals(newApiPath(expected), CANONIZER.dataToApiPath(path));
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             throw new AssertionError(e);
         }
     }
@@ -360,13 +360,13 @@ class ApiPathCanonizerTest {
     private static YangInstanceIdentifier assertNormalized(final String str) {
         try {
             return assertInstanceOf(Data.class, NORMALIZER.normalizePath(newApiPath(str))).instance();
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             throw new AssertionError(e);
         }
     }
 
     private static RequestError assertError(final YangInstanceIdentifier path) {
-        final var errors = assertThrows(ServerException.class, () -> CANONIZER.dataToApiPath(path)).errors();
+        final var errors = assertThrows(RequestException.class, () -> CANONIZER.dataToApiPath(path)).errors();
         assertEquals(1, errors.size());
         return errors.get(0);
     }
