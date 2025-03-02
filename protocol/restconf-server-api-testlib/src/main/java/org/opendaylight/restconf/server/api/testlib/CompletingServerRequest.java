@@ -49,7 +49,12 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     public CompletingServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
-        super(queryParameters, defaultPrettyPrint);
+        this(null, queryParameters, defaultPrettyPrint);
+    }
+
+    public CompletingServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
+            final PrettyPrintParam defaultPrettyPrint) {
+        super(principal, queryParameters, defaultPrettyPrint);
     }
 
     public T getResult() throws RequestException, InterruptedException, TimeoutException {
@@ -68,11 +73,6 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
             Throwables.throwIfUnchecked(cause);
             throw new UncheckedExecutionException(cause);
         }
-    }
-
-    @Override
-    public @Nullable Principal principal() {
-        return null;
     }
 
     @Override

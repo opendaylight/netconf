@@ -21,7 +21,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
-import java.security.Principal;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
@@ -276,7 +275,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
         // Inserting new song at 3rd position (aka as last element)
-        final var request = spy(new MappingServerRequest<DataPutResult>(QueryParameters.of(
+        final var request = spy(new MappingServerRequest<DataPutResult>(null, QueryParameters.of(
             // insert new item after last existing item in list
             InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
             PrettyPrintParam.TRUE, ErrorTagMapping.RFC8040) {
@@ -288,11 +287,6 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 @Override
                 protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
                     // To be verified
-                }
-
-                @Override
-                public Principal principal() {
-                    return null;
                 }
 
                 @Override
@@ -340,7 +334,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
-        final var request = spy(new MappingServerRequest<DataPostResult>(QueryParameters.of(InsertParam.AFTER,
+        final var request = spy(new MappingServerRequest<DataPostResult>(null, QueryParameters.of(InsertParam.AFTER,
             PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE,
             ErrorTagMapping.RFC8040) {
                 @Override
@@ -351,11 +345,6 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 @Override
                 protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
                     // To be verified
-                }
-
-                @Override
-                public Principal principal() {
-                    return null;
                 }
 
                 @Override

@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.QueryStringDecoder;
-import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.PendingRequestListener;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -32,7 +31,7 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
 
     private NettyServerRequest(final EndpointInvariants invariants, final AbstractPendingRequest<T> request,
             final PendingRequestListener listener) {
-        super(QueryParameters.ofMultiValue(new QueryStringDecoder(request.targetUri).parameters()),
+        super(request.principal, QueryParameters.ofMultiValue(new QueryStringDecoder(request.targetUri).parameters()),
             invariants.defaultPrettyPrint(), invariants.errorTagMapping());
         this.request = requireNonNull(request);
         this.listener = requireNonNull(listener);
@@ -40,11 +39,6 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
 
     NettyServerRequest(final AbstractPendingRequest<@NonNull T> request, final PendingRequestListener listener) {
         this(request.invariants, request, listener);
-    }
-
-    @Override
-    public Principal principal() {
-        return request.principal;
     }
 
     @Override

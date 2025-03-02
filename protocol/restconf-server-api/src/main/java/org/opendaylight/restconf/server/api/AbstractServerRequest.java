@@ -10,8 +10,10 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.AbstractRequest;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.QueryParameters;
@@ -45,7 +47,10 @@ public abstract non-sealed class AbstractServerRequest<R> extends AbstractReques
      * @param defaultPrettyPrint default {@link PrettyPrintParam}
      */
     @NonNullByDefault
-    protected AbstractServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
+    protected AbstractServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
+            final PrettyPrintParam defaultPrettyPrint) {
+        super(principal);
+
         // We always recognize PrettyPrintParam and it is an output processing flag. We therefore filter it if present.
         final var tmp = queryParameters.lookup(PrettyPrintParam.uriName, PrettyPrintParam::forUriValue);
         if (tmp != null) {

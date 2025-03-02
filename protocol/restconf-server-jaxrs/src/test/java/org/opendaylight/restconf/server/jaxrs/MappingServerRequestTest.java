@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 class MappingServerRequestTest extends AbstractJukeboxTest {
     private abstract static class Req extends MappingServerRequest<Object> {
         Req() {
-            super(QueryParameters.of(), PrettyPrintParam.TRUE, ErrorTagMapping.RFC8040);
+            super(null, QueryParameters.of(), PrettyPrintParam.TRUE, ErrorTagMapping.RFC8040);
         }
 
         @Override

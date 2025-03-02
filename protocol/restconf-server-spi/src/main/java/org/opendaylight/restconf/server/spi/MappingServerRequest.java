@@ -9,7 +9,9 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
@@ -29,9 +31,9 @@ public abstract class MappingServerRequest<T> extends AbstractServerRequest<T> {
 
     private final ErrorTagMapping errorTagMapping;
 
-    protected MappingServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint,
-            final ErrorTagMapping errorTagMapping) {
-        super(queryParameters, defaultPrettyPrint);
+    protected MappingServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
+            final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping) {
+        super(principal, queryParameters, defaultPrettyPrint);
         this.errorTagMapping = requireNonNull(errorTagMapping);
     }
 

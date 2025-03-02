@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
-import java.security.Principal;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -34,15 +32,13 @@ import org.opendaylight.restconf.server.spi.MappingServerRequest;
  * @param <T> type of reported result
  */
 abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
-    private final @Nullable Principal principal;
     private final @NonNull AsyncResponse ar;
 
     @NonNullByDefault
     private JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
             final SecurityContext sc, final AsyncResponse ar, final QueryParameters queryParameters) {
-        super(queryParameters, defaultPrettyPrint, errorTagMapping);
+        super(sc.getUserPrincipal(), queryParameters, defaultPrettyPrint, errorTagMapping);
         this.ar = requireNonNull(ar);
-        principal = sc.getUserPrincipal();
     }
 
     @NonNullByDefault
@@ -64,11 +60,6 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
-    }
-
-    @Override
-    public final Principal principal() {
-        return principal;
     }
 
     @Override
