@@ -11,7 +11,6 @@ module org.opendaylight.netconf.sal.remote.impl {
     requires transitive org.opendaylight.restconf.mdsal.spi;
     requires transitive org.opendaylight.restconf.server.api;
     requires transitive org.opendaylight.restconf.server.spi;
-    requires transitive org.opendaylight.netconf.dom.api;
     requires org.opendaylight.netconf.sal.remote;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.data.spi;
