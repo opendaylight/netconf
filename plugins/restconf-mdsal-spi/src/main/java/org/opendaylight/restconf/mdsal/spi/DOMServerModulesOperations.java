@@ -13,8 +13,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ServerModulesOperations;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -46,8 +46,8 @@ public record DOMServerModulesOperations(
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    request.completeWith(cause instanceof ServerException e ? e
-                        : new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
+                    request.completeWith(cause instanceof RequestException e ? e
+                        : new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
                 }
             }, MoreExecutors.directExecutor());
         } else {

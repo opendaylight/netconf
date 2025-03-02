@@ -14,7 +14,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.restconf.server.api.ServerException;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ForwardingRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -55,7 +55,7 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.warn("Failed to remove subscription {} from operational datastore", id, cause);
-                request.completeWith(new ServerException(cause));
+                request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
     }

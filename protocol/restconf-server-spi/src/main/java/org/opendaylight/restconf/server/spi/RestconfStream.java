@@ -25,8 +25,8 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -245,7 +245,7 @@ public final class RestconfStream<T> {
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
             if (witness != null) {
-                request.completeWith(new ServerException("Subscription already terminated with " + witness));
+                request.completeWith(new RequestException("Subscription already terminated with " + witness));
                 return;
             }
 

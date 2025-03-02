@@ -16,8 +16,8 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -124,14 +124,14 @@ class NC1265Test {
     private static void assertNormalized(final YangInstanceIdentifier expected, final String apiPath) {
         try {
             assertEquals(expected, NORMALIZER.normalizeDataPath(assertApiPath(apiPath)).instance());
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             throw new AssertionError(e);
         }
     }
 
     private static RequestError assertError(final String apiPath) {
         final var parsed = assertApiPath(apiPath);
-        final var errors = assertThrows(ServerException.class, () -> NORMALIZER.normalizeDataPath(parsed)).errors();
+        final var errors = assertThrows(RequestException.class, () -> NORMALIZER.normalizeDataPath(parsed)).errors();
         assertEquals(1, errors.size());
         return errors.get(0);
     }

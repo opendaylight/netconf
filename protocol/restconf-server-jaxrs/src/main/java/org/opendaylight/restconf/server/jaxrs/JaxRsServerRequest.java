@@ -18,11 +18,11 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -82,7 +82,7 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
         final Response response;
         try {
             response = transform(result);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             completeWith(e);
             return;
         }
@@ -97,5 +97,5 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
     }
 
     @NonNullByDefault
-    abstract Response transform(T result) throws ServerException;
+    abstract Response transform(T result) throws RequestException;
 }

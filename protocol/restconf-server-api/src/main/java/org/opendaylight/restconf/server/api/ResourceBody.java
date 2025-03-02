@@ -12,6 +12,7 @@ import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -41,10 +42,10 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
      * Acquire the {@link NormalizedNode} representation of this body.
      *
      * @param path A {@link DatabindPath.Data} corresponding to the body
-     * @throws ServerException if the body cannot be decoded or it does not match {@code path}
+     * @throws RequestException if the body cannot be decoded or it does not match {@code path}
      */
     public final @NonNull NormalizedNode toNormalizedNode(final DatabindPath.@NonNull Data path)
-            throws ServerException {
+            throws RequestException {
         final var instance = path.instance();
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
@@ -67,7 +68,7 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
 
         final var dataName = data.name();
         if (!dataName.equals(expectedName)) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                 "Payload name (%s) is different from identifier name (%s)", dataName, expectedName);
         }
 
@@ -76,5 +77,5 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
 
     @NonNullByDefault
     abstract void streamTo(DatabindPath.Data path, PathArgument name, InputStream inputStream,
-        NormalizedNodeStreamWriter writer) throws ServerException;
+        NormalizedNodeStreamWriter writer) throws RequestException;
 }

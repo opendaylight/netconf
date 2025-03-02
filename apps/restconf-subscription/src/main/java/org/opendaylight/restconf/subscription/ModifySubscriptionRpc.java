@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -80,29 +80,29 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
         if (id == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No ID specified."));
             return;
         }
 
         final var state = stateMachine.lookupSubscriptionState(id);
         if (state == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
 
         if (stateMachine.lookupSubscriptionSession(id) != request.session()) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
         }
@@ -117,7 +117,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         try {
             stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, String.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
 
@@ -133,12 +133,12 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
 //                try {
 //                    if (!mdsalService.exist(SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(
 //                        StreamFilter.QNAME, SubscriptionUtil.QNAME_STREAM_FILTER_NAME, streamFilterName))).get()) {
-//                        request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+//                        request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
 //                            "%s refers to an unknown stream filter", streamFilterName));
 //                        return;
 //                    }
 //                } catch (InterruptedException | ExecutionException e) {
-//                    request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+//                    request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
 //                    return;
 //                }
                 nodeFilterBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
@@ -152,7 +152,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         }
 //        final var node = nodeBuilder.build();
 
-        request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Not implemented yet"));
 
 // FIXME: reconcile
@@ -186,7 +186,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
 //
 //                @Override
 //                public void onFailure(final Throwable throwable) {
-//                    request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+//                    request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
 //                        // FIXME: why getCause()?
 //                        throwable.getCause()));
 //                }

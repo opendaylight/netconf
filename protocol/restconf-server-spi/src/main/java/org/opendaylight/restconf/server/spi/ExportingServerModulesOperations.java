@@ -13,8 +13,8 @@ import com.google.common.io.CharSource;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -48,7 +48,7 @@ public final class ExportingServerModulesOperations implements ServerModulesOper
         } else if (YinTextSource.class.isAssignableFrom(representation)) {
             exportSource(request, source, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
         } else {
-            request.completeWith(new ServerException("Unsupported source representation " + representation.getName()));
+            request.completeWith(new RequestException("Unsupported source representation " + representation.getName()));
         }
     }
 
@@ -79,6 +79,6 @@ public final class ExportingServerModulesOperations implements ServerModulesOper
         final var sb = new StringBuilder().append("Source ").append(source.name().getLocalName());
         optRevision.ifPresent(rev -> sb.append('@').append(rev));
         sb.append(" not found");
-        request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
+        request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
     }
 }

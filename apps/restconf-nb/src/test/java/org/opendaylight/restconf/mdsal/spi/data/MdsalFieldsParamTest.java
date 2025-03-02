@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 class MdsalFieldsParamTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
     protected List<Set<QName>> translateFields(final EffectiveModelContext modelContext,
-            final DataSchemaContext startNode, final FieldsParam fields) throws ServerException {
+            final DataSchemaContext startNode, final FieldsParam fields) throws RequestException {
         return NormalizedNodeWriter.translateFieldsParam(modelContext, startNode, fields);
     }
 

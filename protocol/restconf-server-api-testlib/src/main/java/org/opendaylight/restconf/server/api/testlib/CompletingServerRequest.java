@@ -16,11 +16,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -52,19 +52,19 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
         super(queryParameters, defaultPrettyPrint);
     }
 
-    public T getResult() throws ServerException, InterruptedException, TimeoutException {
+    public T getResult() throws RequestException, InterruptedException, TimeoutException {
         return getResult(1, TimeUnit.SECONDS);
     }
 
     @SuppressWarnings("checkstyle:avoidHidingCauseException")
     public T getResult(final int timeout, final TimeUnit unit)
-            throws ServerException, InterruptedException, TimeoutException {
+            throws RequestException, InterruptedException, TimeoutException {
         try {
             return future.get(timeout, unit);
         } catch (ExecutionException e) {
             LOG.debug("Request failed", e);
             final var cause = e.getCause();
-            Throwables.throwIfInstanceOf(cause, ServerException.class);
+            Throwables.throwIfInstanceOf(cause, RequestException.class);
             Throwables.throwIfUnchecked(cause);
             throw new UncheckedExecutionException(cause);
         }
@@ -87,7 +87,7 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
 
     @Override
     protected void onFailure(final YangErrorsBody errors) {
-        future.completeExceptionally(new ServerException(errors.errors(), null, "reconstructed for testing"));
+        future.completeExceptionally(new RequestException(errors.errors(), null, "reconstructed for testing"));
     }
 
     @Override

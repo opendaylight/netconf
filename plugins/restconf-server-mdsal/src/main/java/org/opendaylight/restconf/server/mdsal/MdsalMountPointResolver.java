@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerModulesOperations;
@@ -27,7 +28,6 @@ import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.mdsal.spi.data.NetconfRestconfStrategy;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.ErrorTags;
 import org.opendaylight.restconf.server.spi.ExportingServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
@@ -51,9 +51,9 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
     }
 
     @Override
-    public ServerStrategy resolveMountPoint(final Data mountPath) throws ServerException {
+    public ServerStrategy resolveMountPoint(final Data mountPath) throws RequestException {
         final var mountPoint = mountPointService.getMountPoint(mountPath.instance())
-            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
+            .orElseThrow(() -> new RequestException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
                 "Mount point does not exist", new ErrorPath(mountPath), null));
         final var serverStrategy = mountPoint.getService(DOMServerStrategy.class);
         if (serverStrategy.isPresent()) {
@@ -61,11 +61,11 @@ public record MdsalMountPointResolver(DOMMountPointService mountPointService) im
         }
 
         final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
-            .orElseThrow(() -> new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
+            .orElseThrow(() -> new RequestException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
                 "Mount point does not expose DOMSchemaService", new ErrorPath(mountPath), null));
         final var mountModelContext = mountSchemaService.getGlobalContext();
         if (mountModelContext == null) {
-            throw new ServerException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT,
                 "Mount point does not have any models", new ErrorPath(mountPath), null);
         }
         final var sourceExporter = new ExportingServerModulesOperations(mountModelContext);

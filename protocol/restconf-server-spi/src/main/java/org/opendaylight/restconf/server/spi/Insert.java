@@ -17,11 +17,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
@@ -39,7 +39,7 @@ public final class Insert implements Immutable {
     @FunctionalInterface
     public interface PointNormalizer {
 
-        PathArgument normalizePoint(ApiPath value) throws ServerException;
+        PathArgument normalizePoint(ApiPath value) throws RequestException;
     }
 
     private final @NonNull InsertParam insert;
@@ -119,7 +119,7 @@ public final class Insert implements Immutable {
     private static PathArgument parsePoint(final PointNormalizer pointParser, final String value) {
         try {
             return pointParser.normalizePoint(ApiPath.parse(value));
-        } catch (ParseException | ServerException e) {
+        } catch (ParseException | RequestException e) {
             throw new IllegalArgumentException("Malformed point parameter '" + value + "': " + e.getMessage(), e);
         }
     }

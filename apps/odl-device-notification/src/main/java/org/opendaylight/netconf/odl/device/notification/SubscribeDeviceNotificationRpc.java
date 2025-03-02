@@ -13,8 +13,8 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -63,23 +63,23 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         final var body = input.input();
         final var pathLeaf = body.childByArg(DEVICE_NOTIFICATION_PATH_NODEID);
         if (pathLeaf == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No path specified"));
             return;
         }
         final var pathLeafBody = pathLeaf.body();
         if (!(pathLeafBody instanceof YangInstanceIdentifier path)) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Unexpected path %s", pathLeafBody));
             return;
         }
         if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "%s does not refer to a list item", path));
             return;
         }
         if (listId.size() != 1) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "%s uses multiple keys", path));
             return;
         }
@@ -87,7 +87,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         final ApiPath apiPath;
         try {
             apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }

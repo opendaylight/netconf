@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -33,9 +34,9 @@ public abstract sealed class OperationInputBody extends RequestBody
      *
      * @param path The {@link OperationPath} of the operation invocation
      * @return The document body, or an empty container node
-     * @throws ServerException when an I/O error occurs
+     * @throws RequestException when an I/O error occurs
      */
-    public final @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws ServerException {
+    public final @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws RequestException {
         try (var is = new PushbackInputStream(consume())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
@@ -56,5 +57,5 @@ public abstract sealed class OperationInputBody extends RequestBody
     }
 
     abstract void streamTo(@NonNull OperationPath path, @NonNull InputStream inputStream,
-        @NonNull NormalizedNodeStreamWriter writer) throws ServerException;
+        @NonNull NormalizedNodeStreamWriter writer) throws RequestException;
 }

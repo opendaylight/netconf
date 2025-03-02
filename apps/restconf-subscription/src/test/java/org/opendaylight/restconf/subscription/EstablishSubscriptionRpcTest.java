@@ -27,8 +27,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -74,7 +74,7 @@ class EstablishSubscriptionRpcTest {
     @Mock
     private RestconfStream<?> restconfStream;
     @Captor
-    private ArgumentCaptor<ServerException> response;
+    private ArgumentCaptor<RequestException> response;
 
     private EstablishSubscriptionRpc rpc;
 

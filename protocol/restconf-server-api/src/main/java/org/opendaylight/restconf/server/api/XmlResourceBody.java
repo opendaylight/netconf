@@ -12,6 +12,7 @@ import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -34,7 +35,7 @@ public final class XmlResourceBody extends ResourceBody {
 
     @Override
     void streamTo(final Data path, final PathArgument name, final InputStream inputStream,
-            final NormalizedNodeStreamWriter writer) throws ServerException {
+            final NormalizedNodeStreamWriter writer) throws RequestException {
         try (var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), path.inference())) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final var docRoot = doc.getDocumentElement();
@@ -44,7 +45,7 @@ public final class XmlResourceBody extends ResourceBody {
             final var pathName = qname.getLocalName();
             final var pathNs = qname.getNamespace().toString();
             if (!docRootName.equals(pathName) || !docRootNs.equals(pathNs)) {
-                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
                     "Incorrect message root element (%s)%s, should be (%s)%s", docRootNs, docRootName, pathNs,
                     pathName);
             }

@@ -45,6 +45,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
@@ -54,7 +55,6 @@ import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
@@ -537,7 +537,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         final var request = new CompletingServerRequest<DataGetResult>();
         strategyAndPath.strategy().dataGET(request);
 
-        final var errors = assertThrows(ServerException.class, request::getResult).errors();
+        final var errors = assertThrows(RequestException.class, request::getResult).errors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.PROTOCOL, error.type());

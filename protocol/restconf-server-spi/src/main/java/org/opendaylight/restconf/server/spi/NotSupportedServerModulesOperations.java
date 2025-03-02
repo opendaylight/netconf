@@ -8,8 +8,8 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -30,7 +30,7 @@ public final class NotSupportedServerModulesOperations implements ServerModulesO
     @Override
     public void getModelSource(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
             final Class<? extends SourceRepresentation> representation) {
-        request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Modules not supported"));
     }
 }

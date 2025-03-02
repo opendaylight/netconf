@@ -21,11 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchContext;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
@@ -65,7 +65,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     }
 
     final @NonNull PatchContext parse(final String prefix, final String suffix, final String patchBody)
-            throws ServerException {
+            throws RequestException {
         final String uriPath;
         if (prefix.isEmpty()) {
             uriPath = suffix;
@@ -87,7 +87,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         final StrategyAndPath stratAndPath;
         try {
             stratAndPath = strategy.resolveStrategy(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             throw new AssertionError(e);
         }
 

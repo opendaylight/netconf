@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public final class JsonOperationInputBody extends OperationInputBody {
 
     @Override
     void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
-            throws ServerException {
+            throws RequestException {
         try {
             JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference())
                 .parse(new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)));

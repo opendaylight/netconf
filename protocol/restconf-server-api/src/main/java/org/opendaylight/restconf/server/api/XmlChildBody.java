@@ -14,6 +14,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -40,7 +41,7 @@ public final class XmlChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final Data path, final InputStream inputStream) throws ServerException {
+    PrefixAndBody toPayload(final Data path, final InputStream inputStream) throws RequestException {
         final Document doc;
         try {
             doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
@@ -60,7 +61,7 @@ public final class XmlChildBody extends ChildBody {
             if (hackStmt instanceof DataSchemaNode data) {
                 parentNode = data;
             } else {
-                throw new ServerException("Unknown SchemaNode %s", hackStmt);
+                throw new RequestException("Unknown SchemaNode %s", hackStmt);
             }
         }
 
@@ -70,7 +71,7 @@ public final class XmlChildBody extends ChildBody {
         final var context = pathInference.modelContext();
         final var it = context.findModuleStatements(docRootNamespace).iterator();
         if (!it.hasNext()) {
-            throw new ServerException("Failed to find module for %s", docRootNamespace);
+            throw new RequestException("Failed to find module for %s", docRootNamespace);
         }
 
         final var databind = path.databind();
@@ -85,7 +86,8 @@ public final class XmlChildBody extends ChildBody {
             final var next = current instanceof DataSchemaContext.Composite compositeCurrent
                 ? compositeCurrent.enterChild(stack, qname) : null;
             if (next == null) {
-                throw new ServerException("Child \"%s\" was not found in parent schema node \"%s\"", qname, schemaNode);
+                throw new RequestException("Child \"%s\" was not found in parent schema node \"%s\"", qname,
+                    schemaNode);
             }
 
             // Careful about steps: for keyed list items the individual item does not have a PathArgument step,

@@ -15,8 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -87,7 +87,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var session = request.session();
         if (session == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
                 "This end point does not support dynamic subscriptions."));
             return;
         }
@@ -99,14 +99,14 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             encoding =  org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
                 .EncodeJson$I.QNAME;
         } else if (!SUPPORTED_ENCODINGS.contains(encoding)) {
-            request.completeWith(new ServerException(EncodingUnsupported.VALUE.toString()));
+            request.completeWith(new RequestException(EncodingUnsupported.VALUE.toString()));
             return;
         }
 
         final var target = (ChoiceNode) body.childByArg(SUBSCRIPTION_TARGET);
         if (target == null) {
             // means there is no stream information present
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No stream specified"));
             return;
         }
@@ -114,7 +114,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         // check stream name
         final var streamName = leaf(target, SUBSCRIPTION_STREAM, String.class);
         if (streamName == null) {
-            request.completeWith(new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No stream specified"));
             return;
         }

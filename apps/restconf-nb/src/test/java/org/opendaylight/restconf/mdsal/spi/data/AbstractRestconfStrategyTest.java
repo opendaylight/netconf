@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
@@ -33,7 +34,6 @@ import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
@@ -248,7 +248,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     final void testNegativeDeleteData() {
         testNegativeDeleteDataStrategy().deleteData(dataDeleteRequest, new Data(JUKEBOX_DATABIND));
 
-        final var errors = assertThrows(ServerException.class, dataDeleteRequest::getResult).errors();
+        final var errors = assertThrows(RequestException.class, dataDeleteRequest::getResult).errors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.PROTOCOL, error.type());
@@ -277,7 +277,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         final var domException = new DOMException((short) 414, "Post request failed");
         testPostDataFailStrategy(domException).createData(dataPostRequest, JUKEBOX_PATH, jukeboxPayload(EMPTY_JUKEBOX));
 
-        final var errors = assertThrows(ServerException.class, dataPostRequest::getResult).errors();
+        final var errors = assertThrows(RequestException.class, dataPostRequest::getResult).errors();
         assertEquals(1, errors.size());
         assertThat(errors.get(0).info().elementBody(), containsString(domException.getMessage()));
     }
@@ -493,7 +493,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
         try {
             return strategy.readData(content, path, null);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             throw new AssertionError(e);
         }
     }
@@ -504,7 +504,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         final PatchStatusContext patchStatusContext;
         try {
             patchStatusContext = dataYangPatchRequest.getResult().status();
-        } catch (ServerException | InterruptedException | TimeoutException e) {
+        } catch (RequestException | InterruptedException | TimeoutException e) {
             throw new AssertionError(e);
         }
 

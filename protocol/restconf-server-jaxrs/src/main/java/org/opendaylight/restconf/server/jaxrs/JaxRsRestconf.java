@@ -51,6 +51,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -76,7 +77,6 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
@@ -234,7 +234,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar, uriInfo) {
             @Override
-            Response transform(final DataGetResult result) throws ServerException {
+            Response transform(final DataGetResult result) throws RequestException {
                 final var builder = Response.ok()
                     .entity(new JaxRsFormattableBody(result.body(), prettyPrint()))
                     .cacheControl(NO_CACHE);
@@ -999,12 +999,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private JaxRsServerRequest<ModulesGetResult> newModulesGET(final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, sc, ar) {
             @Override
-            Response transform(final ModulesGetResult result) throws ServerException {
+            Response transform(final ModulesGetResult result) throws RequestException {
                 final Reader reader;
                 try {
                     reader = result.source().openStream();
                 } catch (IOException e) {
-                    throw new ServerException("Cannot open source", e);
+                    throw new RequestException("Cannot open source", e);
                 }
                 return Response.ok(reader).build();
             }

@@ -11,9 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
@@ -54,13 +54,13 @@ public record YangLibraryVersionResource(DatabindContext databind, Inference res
             leafInference = stack.toInference();
         } catch (IllegalArgumentException e) {
             LOG.debug("Cannot find yang-library-version", e);
-            return new FailedHttpGetResource(new ServerException("yang-library-version is not available", e));
+            return new FailedHttpGetResource(new RequestException("yang-library-version is not available", e));
         }
 
         final var it = modelContext.findModuleStatements("ietf-yang-library").iterator();
         if (!it.hasNext()) {
             LOG.debug("Cannot find ietf-yang-library");
-            return new FailedHttpGetResource(new ServerException("No ietf-yang-library present"));
+            return new FailedHttpGetResource(new RequestException("No ietf-yang-library present"));
         }
 
         return new YangLibraryVersionResource(databind, leafInference,

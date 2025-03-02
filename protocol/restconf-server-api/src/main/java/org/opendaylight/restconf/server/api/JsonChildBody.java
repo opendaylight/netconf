@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -34,7 +35,7 @@ public final class JsonChildBody extends ChildBody {
     }
 
     @Override
-    PrefixAndBody toPayload(final Data path, final InputStream inputStream) throws ServerException {
+    PrefixAndBody toPayload(final Data path, final InputStream inputStream) throws RequestException {
         var result = toNormalizedNode(path, inputStream);
 
         final var iiToDataList = ImmutableList.<PathArgument>builder();
@@ -55,7 +56,7 @@ public final class JsonChildBody extends ChildBody {
 
     @SuppressWarnings("checkstyle:illegalCatch")
     private static @NonNull NormalizedNode toNormalizedNode(final Data path, final InputStream inputStream)
-            throws ServerException {
+            throws RequestException {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final var jsonParser = JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference());
@@ -66,7 +67,7 @@ public final class JsonChildBody extends ChildBody {
         } catch (Exception e) {
             LOG.debug("Error parsing json input", e);
             if (e instanceof ResultAlreadySetException) {
-                throw new ServerException("""
+                throw new RequestException("""
                     Error parsing json input: Failed to create new parse result data. Are you creating multiple \
                     resources/subresources in POST request?""", e);
             }

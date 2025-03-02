@@ -19,6 +19,7 @@ import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.DatabindPath.InstanceRequest;
 import org.opendaylight.netconf.databind.DatabindPath.Rpc;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
@@ -39,7 +40,6 @@ import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.ResourceBody;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -81,13 +81,13 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
         final var instance = path.instance();
         if (instance.isEmpty()) {
-            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
                 "Cannot delete a datastore"));
             return;
         }
@@ -104,7 +104,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -117,7 +117,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             params = DataGetParams.of(request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Invalid GET /data parameters", e));
             return;
         }
@@ -134,7 +134,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final InstanceRequest path;
         try {
             path = pathNormalizer.normalizeDataOrActionPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -159,7 +159,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -170,7 +170,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -188,7 +188,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -199,7 +199,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final PatchContext patch;
         try {
             patch = body.toPatchContext(new DefaultResourceContext(path));
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -217,7 +217,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final InstanceRequest ref;
         try {
             ref = pathNormalizer.normalizeDataOrActionPath(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -242,13 +242,13 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             insert = Insert.of(path.databind(), request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
         final PrefixAndBody payload;
         try {
             payload = body.toPayload(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -266,7 +266,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -284,7 +284,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -297,13 +297,13 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             insert = Insert.of(databind, request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -329,7 +329,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
     public final void operationsOPTIONS(final ServerRequest<OptionsResult> request, final ApiPath operation) {
         try {
             pathNormalizer.normalizeRpcPath(operation);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -353,7 +353,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -361,7 +361,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
-        } catch (ServerException e) {
+        } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
@@ -375,7 +375,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
     }
 
     @Override
-    public final StrategyAndPath resolveStrategy(final ApiPath path) throws ServerException {
+    public final StrategyAndPath resolveStrategy(final ApiPath path) throws RequestException {
         var mount = path.indexOf("yang-ext", "mount");
         return mount == -1 ? new StrategyAndPath(this, path)
             : resolver().resolveMountPoint(pathNormalizer.normalizeDataPath(path.subPath(0, mount)))

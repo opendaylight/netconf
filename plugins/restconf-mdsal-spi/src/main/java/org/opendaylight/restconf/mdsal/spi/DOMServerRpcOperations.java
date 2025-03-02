@@ -19,8 +19,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.databind.DatabindPath.Rpc;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.InvokeResult;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerRpcOperations;
@@ -53,7 +53,7 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
                         request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));
                     } else {
                         LOG.debug("RPC invocation reported {}", result.errors());
-                        request.completeWith(new ServerException(result.errors().stream()
+                        request.completeWith(new RequestException(result.errors().stream()
                             .map(RequestError::ofRpcError)
                             .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
                     }
@@ -62,11 +62,11 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
                 @Override
                 public void onFailure(final Throwable cause) {
                     LOG.debug("RPC invocation failed, cause");
-                    if (cause instanceof ServerException ex) {
+                    if (cause instanceof RequestException ex) {
                         request.completeWith(ex);
                     } else {
                         // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                        request.completeWith(new ServerException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
+                        request.completeWith(new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
                     }
                 }
             }, MoreExecutors.directExecutor());

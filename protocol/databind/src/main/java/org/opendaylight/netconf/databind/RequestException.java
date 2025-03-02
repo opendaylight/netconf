@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.api;
+package org.opendaylight.netconf.databind;
 
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
@@ -18,87 +18,83 @@ import java.io.ObjectStreamException;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.databind.ErrorPath;
-import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 /**
- * A server-side processing exception, reporting a single {@link RequestError}. This exception is not serializable on
+ * A request processing exception, reporting one or more {@link RequestError}s. This exception is not serializable on
  * purpose.
  */
 @NonNullByDefault
-public final class ServerException extends Exception {
+public final class RequestException extends Exception {
     @java.io.Serial
     private static final long serialVersionUID = 0L;
 
     @SuppressWarnings("serial")
     private final List<RequestError> errors;
 
-    ServerException(final String message, final List<RequestError> errors, final @Nullable Throwable cause) {
+    RequestException(final String message, final List<RequestError> errors, final @Nullable Throwable cause) {
         super(message, cause);
         this.errors = requireNonNull(errors);
         verify(!errors.isEmpty());
     }
 
-    private ServerException(final String message, final RequestError error, final @Nullable Throwable cause) {
+    private RequestException(final String message, final RequestError error, final @Nullable Throwable cause) {
         super(message, cause);
         errors = List.of(error);
     }
 
-    public ServerException(final String message) {
+    public RequestException(final String message) {
         this(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, requireNonNull(message));
     }
 
-    public ServerException(final String format, final Object @Nullable ... args) {
+    public RequestException(final String format, final Object @Nullable ... args) {
         this(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, format, args);
     }
 
-    public ServerException(final Throwable cause) {
+    public RequestException(final Throwable cause) {
         this(ErrorType.APPLICATION, errorTagOf(cause), cause);
     }
 
-    public ServerException(final String message, final @Nullable Throwable cause) {
+    public RequestException(final String message, final @Nullable Throwable cause) {
         this(ErrorType.APPLICATION, errorTagOf(cause), requireNonNull(message), cause);
     }
 
-    public ServerException(final ErrorType type, final ErrorTag tag, final String message) {
+    public RequestException(final ErrorType type, final ErrorTag tag, final String message) {
         this(type, tag, message, (Throwable) null);
     }
 
-    public ServerException(final ErrorType type, final ErrorTag tag, final Throwable cause) {
+    public RequestException(final ErrorType type, final ErrorTag tag, final Throwable cause) {
         this(cause.toString(), new RequestError(type, tag, new ErrorMessage(cause.getMessage()), null, null, null),
             cause);
     }
 
-    public ServerException(final ErrorType type, final ErrorTag tag, final String message,
+    public RequestException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable Throwable cause) {
         this(requireNonNull(message),
             new RequestError(type, tag, new ErrorMessage(message), null, null, errorInfoOf(cause)), cause);
     }
 
-    public ServerException(final ErrorType type, final ErrorTag tag, final String format,
+    public RequestException(final ErrorType type, final ErrorTag tag, final String format,
             final Object @Nullable ... args) {
         this(type, tag, format.formatted(args));
     }
 
-    public ServerException(final ErrorType type, final ErrorTag tag, final String message,
+    public RequestException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable ErrorPath path) {
         this(type, tag, message, path, null);
     }
 
-    public ServerException(final ErrorType type, final ErrorTag tag, final String message,
+    public RequestException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable ErrorPath path, final @Nullable Throwable cause) {
         this(message, new RequestError(type, tag, new ErrorMessage(message), null, path, null), cause);
     }
 
-    public ServerException(final List<RequestError> errors, final @Nullable Throwable cause, final String message) {
+    public RequestException(final List<RequestError> errors, final @Nullable Throwable cause, final String message) {
         this(message, errors, cause);
     }
 
-    public ServerException(final List<RequestError> errors, final @Nullable Throwable cause, final String format,
+    public RequestException(final List<RequestError> errors, final @Nullable Throwable cause, final String format,
             final Object... args) {
         this(errors, cause, format.formatted(args));
     }

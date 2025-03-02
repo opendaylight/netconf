@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -102,11 +102,11 @@ class JsonPatchBodyTest extends AbstractPatchBodyTest {
 
     /**
      * Test trying to use Patch create operation which requires value without value. Test should fail with
-     * {@link ServerException} with error code 400.
+     * {@link RequestException} with error code 400.
      */
     @Test
     final void modulePatchValueMissingNegativeTest() {
-        final var ex = assertThrows(ServerException.class,
+        final var ex = assertThrows(RequestException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -127,11 +127,11 @@ class JsonPatchBodyTest extends AbstractPatchBodyTest {
 
     /**
      * Test trying to use value with Patch delete operation which does not support value. Test should fail with
-     * {@link ServerException} with error code 400.
+     * {@link RequestException} with error code 400.
      */
     @Test
     final void modulePatchValueNotSupportedNegativeTest() {
-        final var ex = assertThrows(ServerException.class,
+        final var ex = assertThrows(RequestException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
                   "ietf-yang-patch:yang-patch" : {

@@ -19,11 +19,11 @@ import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
@@ -57,7 +57,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
     @Test
     void messageOnlyException() {
         final var body = assertMapped(HttpStatusCode.INTERNAL_SERVER_ERROR,
-            new ServerException("Sample error message"));
+            new RequestException("Sample error message"));
 
         assertFormat("""
             {
@@ -85,7 +85,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
 
     @Test
     void mismatchedErrorTags() {
-        final var body = assertMapped(HttpStatusCode.BAD_REQUEST, new ServerException(List.of(
+        final var body = assertMapped(HttpStatusCode.BAD_REQUEST, new RequestException(List.of(
             new RequestError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1"),
             new RequestError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "message 2")),
             new IllegalStateException("cause"), "general message"));
@@ -127,7 +127,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
 
     @Test
     void complexException() {
-        final var body = assertMapped(HttpStatusCode.BAD_REQUEST, new ServerException(List.of(
+        final var body = assertMapped(HttpStatusCode.BAD_REQUEST, new RequestException(List.of(
             new RequestError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, new ErrorMessage("message 1"), "app tag #1",
                 null, null),
             new RequestError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("message 2"),
@@ -199,7 +199,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
             """, body::formatToXML, true);
     }
 
-    private static FormattableBody assertMapped(final HttpStatusCode expectedCode, final ServerException ex) {
+    private static FormattableBody assertMapped(final HttpStatusCode expectedCode, final RequestException ex) {
         final var req = spy(Req.class);
         req.completeWith(ex);
         final var captor = ArgumentCaptor.forClass(FormattableBody.class);
