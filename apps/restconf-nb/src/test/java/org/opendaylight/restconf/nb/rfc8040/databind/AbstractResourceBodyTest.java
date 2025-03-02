@@ -25,10 +25,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.ResourceBody;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
@@ -106,7 +106,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         }
     }
 
-    static final ServerError assertError(final Executable executable) {
+    static final RequestError assertError(final Executable executable) {
         final var ex = assertThrows(ServerException.class, executable);
         final var errors = ex.errors();
         assertEquals(1, errors.size());

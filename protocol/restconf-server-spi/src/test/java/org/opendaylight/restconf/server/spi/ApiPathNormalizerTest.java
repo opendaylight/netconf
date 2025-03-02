@@ -20,8 +20,8 @@ import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -447,7 +447,7 @@ class ApiPathNormalizerTest {
             "deserializer-test-included:refs/list-with-identityref=deserializer-test:derived-identity/foo");
     }
 
-    private static ServerError assertErrorPath(final String path) {
+    private static RequestError assertErrorPath(final String path) {
         final var apiPath = assertApiPath(path);
         final var errors = assertThrows(ServerException.class, () -> NORMALIZER.normalizePath(apiPath)).errors();
         assertEquals(1, errors.size());

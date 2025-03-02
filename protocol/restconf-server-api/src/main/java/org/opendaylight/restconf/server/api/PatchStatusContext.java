@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestError;
 
 /**
  * Holder of patch status context.
@@ -20,7 +21,7 @@ public record PatchStatusContext(
     @NonNull String patchId,
     @NonNull List<PatchStatusEntity> editCollection,
     boolean ok,
-    @Nullable List<ServerError> globalErrors) {
+    @Nullable List<RequestError> globalErrors) {
 
     public PatchStatusContext {
         requireNonNull(patchId);

@@ -35,10 +35,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
@@ -115,7 +115,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertResponse(expectedStatus, invocation).getEntity();
     }
 
-    static final ServerError assertError(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
+    static final RequestError assertError(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
         final var errors = assertErrors(expectedStatus, invocation);
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -123,7 +123,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return error;
     }
 
-    static final List<ServerError> assertErrors(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
+    static final List<RequestError> assertErrors(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class,
             assertEntity(JaxRsFormattableBody.class, expectedStatus, invocation).body()).errors();
     }

@@ -30,10 +30,10 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.spi.ErrorTags;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -289,7 +289,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
         }
     }
 
-    private ServerError assertInvalidValue(final String fileName, final String revision) {
+    private RequestError assertInvalidValue(final String fileName, final String revision) {
         final var error = assertError(400, ar -> restconf.modulesYangGET(fileName, revision, sc, ar));
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());

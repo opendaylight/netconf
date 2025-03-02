@@ -38,6 +38,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorPath;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -50,7 +51,6 @@ import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractServerDataOperations;
@@ -499,7 +499,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         break;
                     default:
                         editCollection.add(new PatchStatusEntity(editId, false, List.of(
-                            new ServerError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                            new RequestError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
                                 "Not supported Yang Patch operation"))));
                         noError = false;
                         break;

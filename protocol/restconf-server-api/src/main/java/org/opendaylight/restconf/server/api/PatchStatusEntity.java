@@ -10,13 +10,14 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import org.opendaylight.netconf.databind.RequestError;
 
 public class PatchStatusEntity {
     private final String editId;
-    private final List<ServerError> editErrors;
+    private final List<RequestError> editErrors;
     private final boolean ok;
 
-    public PatchStatusEntity(final String editId, final boolean ok, final List<ServerError> editErrors) {
+    public PatchStatusEntity(final String editId, final boolean ok, final List<RequestError> editErrors) {
         this.editId = requireNonNull(editId);
         this.ok = ok;
         this.editErrors = editErrors;
@@ -30,7 +31,7 @@ public class PatchStatusEntity {
         return ok;
     }
 
-    public List<ServerError> getEditErrors() {
+    public List<RequestError> getEditErrors() {
         return editErrors;
     }
 }

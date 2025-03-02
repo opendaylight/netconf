@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
@@ -35,16 +36,16 @@ public final class YangErrorsBody extends FormattableBody {
     private static final String ERROR_INFO = "error-info";
     private static final String ERROR_PATH = "error-path";
 
-    private final List<ServerError> errors;
+    private final List<RequestError> errors;
 
-    public YangErrorsBody(final List<ServerError> errors) {
+    public YangErrorsBody(final List<RequestError> errors) {
         if (errors.isEmpty()) {
             throw new IllegalArgumentException("empty errors");
         }
         this.errors = List.copyOf(errors);
     }
 
-    public YangErrorsBody(final ServerError error) {
+    public YangErrorsBody(final RequestError error) {
         this(List.of(error));
     }
 
@@ -53,7 +54,7 @@ public final class YangErrorsBody extends FormattableBody {
      *
      * @return reported errors, guaranteed to have at least one element
      */
-    public List<ServerError> errors() {
+    public List<RequestError> errors() {
         return errors;
     }
 

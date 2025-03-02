@@ -88,8 +88,8 @@
             <artifactId>repackaged-shiro</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>draft-ietf-restconf-server</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -114,6 +114,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-restconf-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>

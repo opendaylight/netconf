@@ -20,6 +20,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.ErrorPath;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -59,11 +60,12 @@ abstract sealed class RequestBody extends ConsumableBody
             final ErrorTag tag, final String messagePrefix, final Exception caught) {
         final var message = requireNonNull(messagePrefix) + ": " + caught.getMessage();
         final var errors = exceptionErrors(path.databind(), caught);
-        return new ServerException(message, errors != null ? errors : List.of(new ServerError(type, tag, message)),
+        return new ServerException(message, errors != null ? errors : List.of(new RequestError(type, tag, message)),
             caught);
     }
 
-    private static @Nullable List<ServerError> exceptionErrors(final DatabindContext databind, final Exception caught) {
+    private static @Nullable List<RequestError> exceptionErrors(final DatabindContext databind,
+            final Exception caught) {
         Throwable cause = caught;
         do {
             if (cause instanceof YangNetconfErrorAware infoAware) {
@@ -72,7 +74,7 @@ abstract sealed class RequestBody extends ConsumableBody
                         final var message = error.message();
                         final var path = error.path();
 
-                        return new ServerError(error.type(), error.tag(),
+                        return new RequestError(error.type(), error.tag(),
                             message != null ? new ErrorMessage(message) : null, error.appTag(),
                             path != null ? new ErrorPath(databind, path) : null,
                             // FIXME: pass down error.info()

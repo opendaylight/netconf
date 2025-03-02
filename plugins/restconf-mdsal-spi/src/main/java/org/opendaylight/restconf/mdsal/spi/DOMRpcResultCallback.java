@@ -16,8 +16,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.databind.DatabindPath.OperationPath;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.server.api.InvokeResult;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
@@ -51,7 +51,7 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
                 }
                 return true;
             })
-            .map(ServerError::ofRpcError)
+            .map(RequestError::ofRpcError)
             .collect(Collectors.toList());
         if (errors.isEmpty()) {
             request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));

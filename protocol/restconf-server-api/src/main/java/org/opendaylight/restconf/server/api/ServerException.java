@@ -21,11 +21,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.ErrorPath;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 /**
- * A server-side processing exception, reporting a single {@link ServerError}. This exception is not serializable on
+ * A server-side processing exception, reporting a single {@link RequestError}. This exception is not serializable on
  * purpose.
  */
 @NonNullByDefault
@@ -34,15 +35,15 @@ public final class ServerException extends Exception {
     private static final long serialVersionUID = 0L;
 
     @SuppressWarnings("serial")
-    private final List<ServerError> errors;
+    private final List<RequestError> errors;
 
-    ServerException(final String message, final List<ServerError> errors, final @Nullable Throwable cause) {
+    ServerException(final String message, final List<RequestError> errors, final @Nullable Throwable cause) {
         super(message, cause);
         this.errors = requireNonNull(errors);
         verify(!errors.isEmpty());
     }
 
-    private ServerException(final String message, final ServerError error, final @Nullable Throwable cause) {
+    private ServerException(final String message, final RequestError error, final @Nullable Throwable cause) {
         super(message, cause);
         errors = List.of(error);
     }
@@ -68,14 +69,14 @@ public final class ServerException extends Exception {
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final Throwable cause) {
-        this(cause.toString(), new ServerError(type, tag, new ErrorMessage(cause.getMessage()), null, null, null),
+        this(cause.toString(), new RequestError(type, tag, new ErrorMessage(cause.getMessage()), null, null, null),
             cause);
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable Throwable cause) {
         this(requireNonNull(message),
-            new ServerError(type, tag, new ErrorMessage(message), null, null, errorInfoOf(cause)), cause);
+            new RequestError(type, tag, new ErrorMessage(message), null, null, errorInfoOf(cause)), cause);
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String format,
@@ -90,24 +91,24 @@ public final class ServerException extends Exception {
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable ErrorPath path, final @Nullable Throwable cause) {
-        this(message, new ServerError(type, tag, new ErrorMessage(message), null, path, null), cause);
+        this(message, new RequestError(type, tag, new ErrorMessage(message), null, path, null), cause);
     }
 
-    public ServerException(final List<ServerError> errors, final @Nullable Throwable cause, final String message) {
+    public ServerException(final List<RequestError> errors, final @Nullable Throwable cause, final String message) {
         this(message, errors, cause);
     }
 
-    public ServerException(final List<ServerError> errors, final @Nullable Throwable cause, final String format,
+    public ServerException(final List<RequestError> errors, final @Nullable Throwable cause, final String format,
             final Object... args) {
         this(errors, cause, format.formatted(args));
     }
 
     /**
-     * Return the reported {@link ServerError}.
+     * Return the reported {@link RequestError}.
      *
-     * @return the reported {@link ServerError}
+     * @return the reported {@link RequestError}
      */
-    public List<ServerError> errors() {
+    public List<RequestError> errors() {
         return errors;
     }
 

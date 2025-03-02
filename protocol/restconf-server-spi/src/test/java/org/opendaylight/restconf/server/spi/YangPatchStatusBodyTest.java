@@ -9,15 +9,15 @@ package org.opendaylight.restconf.server.spi;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 class YangPatchStatusBodyTest extends AbstractJukeboxTest {
-    private final ServerError error = new ServerError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
+    private final RequestError error = new RequestError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
         "Data already exists");
     private final PatchStatusEntity statusEntity = new PatchStatusEntity("patch1", true, null);
     private final PatchStatusEntity statusEntityError = new PatchStatusEntity("patch1", false, List.of(error));

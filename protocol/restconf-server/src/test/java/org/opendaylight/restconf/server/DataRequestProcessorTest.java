@@ -37,6 +37,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
@@ -59,7 +60,6 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
@@ -339,13 +339,13 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         final var contextOk = new PatchStatusContext("patch-id1", List.of(), true, null);
         final var containsOk = List.of("patch-id1");
         final var contextError1 = new PatchStatusContext("patch-id2", List.of(), false,
-            List.of(new ServerError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "operation-failed-error")));
+            List.of(new RequestError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "operation-failed-error")));
         final var containsError1 = List.of(
             "patch-id2", ErrorTag.OPERATION_FAILED.elementBody(), "operation-failed-error");
         final var contextError2 = new PatchStatusContext("patch-id3", List.of(
             new PatchStatusEntity("edit-id1", true, null),
             new PatchStatusEntity("edit-id2", false,
-                List.of(new ServerError(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, "data-missing-error")))
+                List.of(new RequestError(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, "data-missing-error")))
         ), false, null);
         final var containsError2 = List.of("patch-id3", "edit-id1", "edit-id2", ErrorTag.DATA_MISSING.elementBody(),
             "data-missing-error");

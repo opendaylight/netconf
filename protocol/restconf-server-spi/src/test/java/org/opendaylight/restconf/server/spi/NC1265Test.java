@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.ErrorMessage;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -129,7 +129,7 @@ class NC1265Test {
         }
     }
 
-    private static ServerError assertError(final String apiPath) {
+    private static RequestError assertError(final String apiPath) {
         final var parsed = assertApiPath(apiPath);
         final var errors = assertThrows(ServerException.class, () -> NORMALIZER.normalizeDataPath(parsed)).errors();
         assertEquals(1, errors.size());

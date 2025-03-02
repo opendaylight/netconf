@@ -50,6 +50,7 @@ import javax.ws.rs.sse.SseEventSink;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -75,7 +76,6 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
@@ -530,7 +530,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 return HttpStatusCode.INTERNAL_SERVER_ERROR;
             }
 
-            private HttpStatusCode statusOfFirst(final List<ServerError> error) {
+            private HttpStatusCode statusOfFirst(final List<RequestError> error) {
                 return errorTagMapping.statusOf(error.get(0).tag());
             }
         };

@@ -23,7 +23,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -108,7 +108,7 @@ final class ExistenceCheck implements FutureCallback<Boolean> {
         // are okay -- they differ only in what we report. We rely on SettableFuture's synchronization faculties to
         // reconcile any conflict with onSuccess() failure path.
         future.completeExceptionally(new ServerException(cause.getErrorList().stream()
-            .map(ServerError::ofRpcError)
+            .map(RequestError::ofRpcError)
             .collect(Collectors.toList()), cause, "Could not determine the existence of path %s", parentPath));
     }
 }

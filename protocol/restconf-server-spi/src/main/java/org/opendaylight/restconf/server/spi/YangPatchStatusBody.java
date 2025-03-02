@@ -17,11 +17,11 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.FormattableBodySupport;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
 import org.opendaylight.yangtools.yang.data.codec.gson.DefaultJSONValueWriter;
 
@@ -121,7 +121,7 @@ public final class YangPatchStatusBody extends FormattableBody {
         writer.name("ok").beginArray().nullValue().endArray();
     }
 
-    private static void writeErrors(final List<ServerError> errors, final JsonWriter writer) throws IOException {
+    private static void writeErrors(final List<RequestError> errors, final JsonWriter writer) throws IOException {
         writer.name("errors").beginObject().name("error").beginArray();
 
         for (var error : errors) {
@@ -150,7 +150,7 @@ public final class YangPatchStatusBody extends FormattableBody {
         writer.endArray().endObject();
     }
 
-    private static void reportErrors(final List<ServerError> errors, final XMLStreamWriter writer)
+    private static void reportErrors(final List<RequestError> errors, final XMLStreamWriter writer)
             throws XMLStreamException {
         writer.writeStartElement("errors");
 

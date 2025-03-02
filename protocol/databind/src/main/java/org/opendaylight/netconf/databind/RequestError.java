@@ -5,25 +5,21 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.api;
+package org.opendaylight.netconf.databind;
 
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
 /**
- * Encapsulates a single {@code error} within the
- * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.9">"errors" YANG Data Template</a> as bound to a particular
- * {@link DatabindContext}.
+ * A basic request error, as defined in both
+ * <a href="https://www.rfc-editor.org/rfc/rfc6241#section-4.3">RFC6241 rpc-error element</a> and a single {@code error}
+ * within the <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.9">RFC8040 "errors" YANG Data Template</a>.
  *
  * @param type value of {@code error-type} leaf
  * @param tag value of {@code error-tag} leaf
@@ -33,27 +29,27 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  * @param info optional content of {@code error-info} anydata
  */
 @NonNullByDefault
-public record ServerError(
+public record RequestError(
         ErrorType type,
         ErrorTag tag,
         @Nullable ErrorMessage message,
         @Nullable String appTag,
         @Nullable ErrorPath path,
         @Nullable ErrorInfo info) {
-    public ServerError {
+    public RequestError {
         requireNonNull(type);
         requireNonNull(tag);
     }
 
-    public ServerError(final ErrorType type, final ErrorTag tag, final String message) {
+    public RequestError(final ErrorType type, final ErrorTag tag, final String message) {
         this(type, tag, new ErrorMessage(message), null, null, null);
     }
 
-    public static ServerError ofRpcError(final RpcError rpcError) {
+    public static RequestError ofRpcError(final RpcError rpcError) {
         final var tag = rpcError.getTag();
         final var errorTag = tag != null ? tag : ErrorTag.OPERATION_FAILED;
         final var errorMessage = rpcError.getMessage();
-        return new ServerError(rpcError.getErrorType(), errorTag,
+        return new RequestError(rpcError.getErrorType(), errorTag,
             errorMessage != null ? new ErrorMessage(errorMessage) : null, rpcError.getApplicationTag(), null,
             extractErrorInfo(rpcError));
     }

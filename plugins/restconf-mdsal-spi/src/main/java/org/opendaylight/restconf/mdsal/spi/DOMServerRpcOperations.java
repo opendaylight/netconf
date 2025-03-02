@@ -18,8 +18,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.databind.DatabindPath.Rpc;
+import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.server.api.InvokeResult;
-import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.InterceptingServerRpcOperations;
@@ -54,7 +54,7 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
                     } else {
                         LOG.debug("RPC invocation reported {}", result.errors());
                         request.completeWith(new ServerException(result.errors().stream()
-                            .map(ServerError::ofRpcError)
+                            .map(RequestError::ofRpcError)
                             .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
                     }
                 }
