@@ -15,7 +15,6 @@ import java.net.URI;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
@@ -24,7 +23,6 @@ import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -117,11 +115,5 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
             return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
         }, MoreExecutors.directExecutor());
-    }
-
-    @Override
-    public RestconfStream.@Nullable Subscription lookupSubscription(final Uint32 id) {
-        // FIXME: implement this
-        return null;
     }
 }

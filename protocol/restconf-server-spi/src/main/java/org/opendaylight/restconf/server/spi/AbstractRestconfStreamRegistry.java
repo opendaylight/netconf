@@ -52,7 +52,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         boolean test(YangInstanceIdentifier path, ContainerNode body);
     }
 
-    private static final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
+    private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
         SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
                 final @Nullable EventStreamFilter filter) {
             super(id, encoding, streamName, receiverName, filter);
@@ -60,7 +60,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
-            // FIXME: id tracking: remove this ID from the pool of used IDs
+            subscriptions.remove(id(), this);
         }
     }
 
@@ -80,13 +80,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Uint32, Subscription> subscriptions = new ConcurrentHashMap<>();
     // FIXME: DTCL-driven population of these
     //    if (!mdsalService.exist(SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(
     //        StreamFilter.QNAME, SubscriptionUtil.QNAME_STREAM_FILTER_NAME, filterName))).get()) {
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
 
     @Override
-    public final @Nullable RestconfStream<?> lookupStream(final String name) {
+    public final RestconfStream<?> lookupStream(final String name) {
         return streams.get(requireNonNull(name));
     }
 
@@ -162,6 +163,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract @NonNull ListenableFuture<Void> deleteStream(@NonNull String streamName);
 
     @Override
+    public final Subscription lookupSubscription(final Uint32 id) {
+        return subscriptions.get(requireNonNull(id));
+    }
+
+    @Override
     public final void establishSubscription(final ServerRequest<Subscription> request, final String streamName,
             final QName encoding, final @Nullable SubscriptionFilter filter) {
         final var stream = lookupStream(streamName);
@@ -180,11 +186,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         final var principal = request.principal();
-        final var subscription = new SubscriptionImpl(Uint32.fromIntBits(prevDynamicId.incrementAndGet()), encoding,
-            streamName,
+        final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
+        final var subscription = new SubscriptionImpl(id, encoding, streamName,
             // FIXME: 'anonymous' instead of 'unknown' ?
             principal != null ? principal.getName() : "<unknown>",
             filterImpl);
+
+        subscriptions.put(id, subscription);
 
         Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
             @Override
@@ -194,6 +202,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             @Override
             public void onFailure(final Throwable cause) {
+                subscriptions.remove(id, subscription);
                 request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
