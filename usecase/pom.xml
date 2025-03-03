@@ -28,5 +28,7 @@
     <modules>
         <module>karaf</module>
         <module>karaf-static</module>
+        <module>netconf-test-perf</module>
+        <module>netconf-testtool</module>
     </modules>
 </project>
