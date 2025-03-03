@@ -102,8 +102,15 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
-        // FIXME: check Uin32.valueOf() exception
-        final var subscriptionState = machine.lookupSubscriptionState(Uint32.valueOf(subscriptionId));
+
+        final Uint32 id;
+        try {
+            id = Uint32.valueOf(subscriptionId);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Invalid subscription id {}", subscriptionId, e);
+            return new EmptyResponse(HttpResponseStatus.BAD_REQUEST);
+        }
+        final var subscriptionState = machine.lookupSubscriptionState(id);
         if (subscriptionState == null) {
             LOG.debug("Subscription for id {} not found", subscriptionId);
             return EmptyResponse.NOT_FOUND;
@@ -113,7 +120,7 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
             return new EmptyResponse(HttpResponseStatus.CONFLICT);
         }
 
-        final var subscription = streamRegistry.lookupSubscription(Uint32.valueOf(subscriptionId));
+        final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
             LOG.warn("Could not send event stream response: could not read subscription");
             return EmptyResponse.NOT_FOUND;
