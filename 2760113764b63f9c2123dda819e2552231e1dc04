@@ -156,6 +156,24 @@
       "message": "I do not believe \"test notification\" will work without without model loaded in controller, perhaps \"empty\" notification maybe",
       "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68397eae_1a17f2ad",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-03T13:37:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ecd49ad_caf6f022",
+      "revId": "2760113764b63f9c2123dda819e2552231e1dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
