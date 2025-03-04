@@ -49,9 +49,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final RestconfStream.LocationProvider locationProvider) {
         this.dataBroker = requireNonNull(dataBroker);
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
-
-        // FIXME: populate the default stream
-        // private static final String DEFAULT_STREAM_NAME = "NETCONF";
     }
 
     @Override
