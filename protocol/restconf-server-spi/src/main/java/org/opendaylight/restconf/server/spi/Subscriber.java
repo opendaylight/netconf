@@ -20,11 +20,18 @@ final class Subscriber<T> extends AbstractRegistration {
     private final @NonNull RestconfStream<T> stream;
     private final @NonNull Sender sender;
     private final @NonNull EventFormatter<T> formatter;
+    private final @NonNull ReceiverImpl receiver;
 
-    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter) {
+    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
+        final @NonNull ReceiverImpl receiver) {
         this.stream = requireNonNull(stream);
         this.sender = requireNonNull(sender);
         this.formatter = requireNonNull(formatter);
+        this.receiver = requireNonNull(receiver);
+    }
+
+    @NonNull ReceiverImpl receiver() {
+        return receiver;
     }
 
     @NonNull EventFormatter<T> formatter() {
