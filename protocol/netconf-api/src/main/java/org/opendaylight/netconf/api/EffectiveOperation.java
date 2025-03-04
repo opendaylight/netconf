@@ -74,25 +74,9 @@ public enum EffectiveOperation {
      * Check if this operation is a candidate for {@code default-operation} argument.
      *
      * @return {@code true} if this operation can be used as {@code default-operation}, {@code false} otherwise.
-     * @deprecated Use {@link #isDefaultOperation()} instead
-     */
-    @Deprecated(since = "5.0.0", forRemoval = true)
-    public boolean isAsDefaultPermitted() {
-        return isDefaultOperation;
-    }
-
-    /**
-     * Check if this operation is a candidate for {@code default-operation} argument.
-     *
-     * @return {@code true} if this operation can be used as {@code default-operation}, {@code false} otherwise.
      */
     public boolean isDefaultOperation() {
         return isDefaultOperation;
-    }
-
-    @Deprecated(since = "5.0.0", forRemoval = true)
-    public boolean isOnElementPermitted() {
-        return isOperation;
     }
 
     /**
