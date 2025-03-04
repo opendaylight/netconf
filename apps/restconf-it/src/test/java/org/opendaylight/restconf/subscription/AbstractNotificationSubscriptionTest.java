@@ -57,6 +57,7 @@ import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.notifications.SubscriptionResourceProvider;
+import org.opendaylight.restconf.notifications.mdsal.ContextListener;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;

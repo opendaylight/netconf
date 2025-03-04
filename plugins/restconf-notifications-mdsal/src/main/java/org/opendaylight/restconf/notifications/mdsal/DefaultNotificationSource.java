@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.subscription;
+package org.opendaylight.restconf.notifications.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,6 +21,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
 
+/**
+ * The purpose of this class is to provide source of all controller's YANG notifications.
+ */
 final class DefaultNotificationSource extends AbstractNotificationSource implements Closeable {
     private final @NonNull DOMNotificationService notificationService;
     private final @NonNull EffectiveModelContext context;
