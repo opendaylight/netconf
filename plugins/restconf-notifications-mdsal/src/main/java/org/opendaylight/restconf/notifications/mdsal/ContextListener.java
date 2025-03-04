@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others. All rights reserved.
+ * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.subscription;
+package org.opendaylight.restconf.notifications.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -24,7 +24,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 /**
  * This class recreates DefaultNotificationSource when model context is updated.
  */
-final class ContextListener implements Registration {
+public final class ContextListener implements Registration {
     private static final String NAME = "NETCONF";
     private static final QName NAME_QNAME = QName.create(Stream.QNAME, "name").intern();
     private static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
@@ -36,7 +36,7 @@ final class ContextListener implements Registration {
 
     private DefaultNotificationSource notificationSource;
 
-    ContextListener(final DOMNotificationService notificationService, final DOMSchemaService schemaService,
+    public ContextListener(final DOMNotificationService notificationService, final DOMSchemaService schemaService,
             final RestconfStream.Registry streamRegistry) {
         this.notificationService = requireNonNull(notificationService);
         this.streamRegistry = streamRegistry;
