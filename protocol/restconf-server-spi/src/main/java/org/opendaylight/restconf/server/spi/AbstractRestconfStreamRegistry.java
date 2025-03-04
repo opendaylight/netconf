@@ -43,6 +43,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRestconfStreamRegistry implements RestconfStream.Registry {
     /**
+     * Default NETCONF stream according name. We follow
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.3.1">RFC 8040</a>.
+     */
+    private static final String DEFAULT_STREAM_NAME = "NETCONF";
+    private static final String DEFAULT_STREAM_DESCRIPTION = "Default XML encoded NETCONF stream";
+
+    /**
      * An Event Stream Filter.
      */
     @Beta
@@ -112,6 +119,24 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 LOG.debug("Failed to add stream {}", name, cause);
                 streams.remove(name, stream);
                 request.completeWith(new RequestException("Failed to create stream " + name, cause));
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public <T> void start(final Source<T> source) {
+        final var stream = new RestconfStream<>(this, source, DEFAULT_STREAM_NAME);
+        streams.put(DEFAULT_STREAM_NAME, stream);
+        Futures.addCallback(putStream(stream, DEFAULT_STREAM_DESCRIPTION, null), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Void result) {
+                LOG.debug("Default stream {} added", DEFAULT_STREAM_NAME);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Failed to add default stream {}", DEFAULT_STREAM_NAME, cause);
+                streams.remove(DEFAULT_STREAM_NAME, stream);
             }
         }, MoreExecutors.directExecutor());
     }
