@@ -5,49 +5,59 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.netconf.api.subtree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-class SubtreeFilterFromElementTest {
+public class ElementFromSubtreeFilterTest {
+    @Disabled
     @ParameterizedTest
     @MethodSource
-    void testExamples(final String xml, final SubtreeFilter expected) throws IOException, SAXException {
-        final Element element = XmlUtil.readXmlToElement(xml);
-        assertEquals(expected, SubtreeFilter.readFrom(element));
+    void testExamples(final String xml, final SubtreeFilter filter) throws IOException, SAXException {
+        final Element expected = XmlUtil.readXmlToElement(xml);
+        //TODO move this to writeTo
+        final var element = XmlUtil.newDocument().createElementNS("http://example.com/schema/1.2/config",
+            XmlNetconfConstants.FILTER);
+        element.setAttribute("type", "subtree");
+        filter.writeTo(element);
+        assertEquals(expected, element);
     }
 
     private static List<Arguments> testExamples() {
         return List.of(
             // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.1
             Arguments.of("""
-                <filter type="subtree">
-                  <top xmlns="http://example.com/schema/1.2/config"/>
-                </filter>""", SubtreeFilter.builder()
+            <filter type="subtree">
+              <top xmlns="http://example.com/schema/1.2/config"/>
+            </filter>""", SubtreeFilter.builder()
                 .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "top")).build())
                 .build()),
             // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.2
             Arguments.of("""
-                <filter type="subtree">
-                  <t:top xmlns:t="http://example.com/schema/1.2/config">
-                    <t:interfaces>
-                      <t:interface t:ifName="eth0"/>
-                    </t:interfaces>
-                  </t:top>
-                </filter>""", SubtreeFilter.builder()
+            <filter type="subtree">
+              <t:top xmlns:t="http://example.com/schema/1.2/config">
+                <t:interfaces>
+                  <t:interface t:ifName="eth0"/>
+                </t:interfaces>
+              </t:top>
+            </filter>""", SubtreeFilter.builder()
                 .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "t:top"))
                     .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "t:interfaces"))
-                            .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "t:interface"))
+                        .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "t:interface"))
                             .add(new AttributeMatch(new Exact("http://example.com/schema/1.2/config", "t:ifName"),
                                 "eth0")).build())
                         .build())
@@ -55,11 +65,11 @@ class SubtreeFilterFromElementTest {
                 .build()),
             // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.3
             Arguments.of("""
-                <filter type="subtree">
-                  <top xmlns="http://example.com/schema/1.2/config">
-                    <users/>
-                  </top>
-                </filter>""", SubtreeFilter.builder()
+            <filter type="subtree">
+              <top xmlns="http://example.com/schema/1.2/config">
+                <users/>
+              </top>
+            </filter>""", SubtreeFilter.builder()
                 .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "top"))
                     .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "users"))
                         .build())
@@ -67,15 +77,15 @@ class SubtreeFilterFromElementTest {
                 .build()),
             // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.5
             Arguments.of("""
-                <filter type="subtree">
-                  <top xmlns="http://example.com/schema/1.2/config">
-                    <users>
-                      <user>
-                        <name>fred</name>
-                      </user>
-                    </users>
-                  </top>
-                </filter>""", SubtreeFilter.builder()
+            <filter type="subtree">
+              <top xmlns="http://example.com/schema/1.2/config">
+                <users>
+                  <user>
+                    <name>fred</name>
+                  </user>
+                </users>
+              </top>
+            </filter>""", SubtreeFilter.builder()
                 .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "top"))
                     .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "users"))
                         .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "user"))

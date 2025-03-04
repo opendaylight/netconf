@@ -12,6 +12,13 @@ import java.util.List;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
+import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
@@ -67,8 +74,89 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
      * @throws IllegalArgumentException if the proposed element has invalid structure
      */
     public static SubtreeFilter readFrom(final Element element) {
-        // FIXME: NETCONF-1445: implement this method
-        throw new UnsupportedOperationException();
+        final var filter = XmlElement.fromDomElement(element);
+        final XmlElement xml;
+        try {
+            xml = filter.getOnlyChildElement();
+        } catch (DocumentedException e) {
+            throw new IllegalArgumentException("Filter node has invalid structure");
+        }
+        final String namespace;
+        try {
+            namespace = xml.getNamespace();
+        } catch (MissingNameSpaceException e) {
+            throw new IllegalArgumentException("Element doesn't contain namespace");
+        }
+        final var domXml = xml.getDomElement();
+
+        if (xml.getChildElements().isEmpty()) {
+            // check if child nodes are xml or text to determine type of node
+            final String content = getTextContent(xml);
+            if (content.isEmpty()) {
+                // return selection
+                return builder().add(fillSelection(domXml)).build();
+            } else {
+                // return content
+                return builder()
+                    .add(new ContentMatchNode(new Exact(namespace, domXml.getNodeName()), domXml.getNodeValue()))
+                    .build();
+            }
+        } else {
+            // return containment
+            return builder()
+                .add(fillContainment(domXml, ContainmentNode.builder(new Exact(namespace, domXml.getNodeName())))
+                    .build()).build();
+        }
+    }
+
+    private static String getTextContent(final XmlElement xml) {
+        final String content;
+        try {
+            content = xml.getTextContent();
+        } catch (DocumentedException e) {
+            throw new IllegalArgumentException("Content of node has invalid structure");
+        }
+        return content;
+    }
+
+    private static ContainmentNode.Builder fillContainment(final Element element,
+            final ContainmentNode.Builder builder) {
+        final var xml = XmlElement.fromDomElement(element);
+        for (var child : xml.getChildElements()) {
+            final var domChild = child.getDomElement();
+            if (child.getChildElements().isEmpty()) {
+                // check if child node has text content to determine type of node
+                final String content = getTextContent(child);
+                if (content.isEmpty()) {
+                    // add selection
+                    builder.add(fillSelection(child.getDomElement()));
+                } else {
+                    // add content
+                    builder.add(new ContentMatchNode(new Exact(child.namespace(), domChild.getNodeName()), content))
+                        .build();
+                }
+            } else {
+                // add containment
+                builder.add(fillContainment(domChild, ContainmentNode.builder(new Exact(child.namespace(),
+                    domChild.getNodeName()))).build()).build();
+            }
+        }
+        return builder;
+    }
+
+    private static SelectionNode fillSelection(final Element element) {
+        final var xml = XmlElement.fromDomElement(element);
+        // build node
+        final var selection = SelectionNode.builder(new Exact(xml.namespace(), element.getNodeName()));
+
+        // fill attributes
+        if (!xml.getAttributes().isEmpty()) {
+            for (final var attribute : xml.getAttributes().entrySet()) {
+                selection.add(new AttributeMatch(new Exact(xml.namespace(), attribute.getKey()), attribute.getValue()
+                    .getNodeValue()));
+            }
+        }
+        return selection.build();
     }
 
     /**
