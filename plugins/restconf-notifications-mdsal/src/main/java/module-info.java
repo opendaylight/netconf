@@ -9,9 +9,10 @@ module org.opendaylight.restconf.notifications.mdsal {
     exports org.opendaylight.restconf.notifications.mdsal;
 
     requires transitive org.opendaylight.mdsal.dom.api;
-    requires transitive org.opendaylight.yangtools.yang.common;
     requires transitive org.opendaylight.restconf.server.spi;
+    requires transitive org.opendaylight.yangtools.concepts;
     requires org.opendaylight.netconf.common.mdsal;
+    requires org.opendaylight.restconf.mdsal.spi;
     requires org.opendaylight.yang.gen.ietf.inet.types.rfc6991;
     requires org.opendaylight.yang.gen.ietf.restconf.subscribed.notifications.rfc8650;
     requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
@@ -20,6 +21,7 @@ module org.opendaylight.restconf.notifications.mdsal {
 
     // Annotations
     requires static transitive javax.inject;
+    requires transitive org.eclipse.jdt.annotation;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.annotation.bundle;
 }
