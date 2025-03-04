@@ -980,7 +980,6 @@ POST request to:
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
             <stream>NETCONF</stream>
             <encoding>encode-xml</encoding>
-            <stream-subtree-filter></ietf-vrrp:vrrp-protocol-error-event></stream-subtree-filter>
           </input>
 
    .. tab:: JSON
@@ -996,10 +995,7 @@ POST request to:
            {
               "ietf-subscribed-notifications:input": {
                   "stream": "NETCONF",
-                  "encoding": "json",
-                  "stream-subtree-filter": {
-                      "ietf-vrrp:vrrp-protocol-error-event" : {}
-                  },
+                  "encoding": "encode-json",
               }
            }
 
@@ -1008,8 +1004,8 @@ Upon successful establishment, the server returns a subscription ID:
 .. code-block:: json
 
     {
-      "output": {
-        "subscription-id": "2147483648"
+      "ietf-subscribed-notifications:output": {
+        "id": "2147483648"
       }
     }
 
@@ -1046,7 +1042,7 @@ Use this when you want to include everything within a specific subtree in the no
 
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
             <stream>NETCONF</stream>
-            <encoding>xml</encoding>
+            <encoding>encode-xml</encoding>
             <stream-subtree-filter>
                 <users/>
             </stream-subtree-filter>
@@ -1134,10 +1130,10 @@ To listen to the notifications for an established subscription, use the followin
 .. code-block::
 
     GET
-    http://localhost:8182/subscriptions/{subscription-id}
+    http://localhost:8182/subscriptions/{id}
     Accept: text/event-stream
 
-Replace {subscription-id} with the ID returned in the establish-subscription RPC response.
+Replace {id} with the subscription ID returned in the establish-subscription RPC response.
 
 Modifying a Subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1165,7 +1161,7 @@ POST request to:
       .. code-block:: xml
 
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
-            <subscription-id>2147483648</subscription-id>
+            <id>2147483648</id>
             <stream-subtree-filter></ietf-vrrp:vrrp-protocol-error-event></stream-subtree-filter>
             <encoding>encode-xml</encoding>
           </input>
@@ -1182,11 +1178,11 @@ POST request to:
 
            {
                "ietf-subscribed-notifications:input": {
-                 "subscription-id": "2147483648",
+                 "id": "2147483648",
                  "stream-subtree-filter": {
                      "/ietf-vrrp:vrrp-protocol-error-event" : {}
                  },
-                 "encoding": "encode-xml"
+                 "encoding": "encode-json"
                }
            }
 
@@ -1204,7 +1200,7 @@ POST request to:
 
 .. code-block::
 
-    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:modify-subscription
+    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:delete-subscription
 
 .. tabs::
 
@@ -1219,7 +1215,7 @@ POST request to:
       .. code-block:: xml
 
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
-            <subscription-id>2147483648</subscription-id>
+            <id>2147483648</id>
           </input>
 
    .. tab:: JSON
@@ -1234,7 +1230,7 @@ POST request to:
 
            {
                "ietf-subscribed-notifications:input": {
-                 "subscription-id": "2147483648"
+                 "id": "2147483648"
                }
            }
 
@@ -1263,7 +1259,7 @@ POST request to:
       .. code-block:: xml
 
           <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
-            <subscription-id>2147483648</subscription-id>
+            <id>2147483648</id>
           </input>
 
    .. tab:: JSON
@@ -1278,7 +1274,7 @@ POST request to:
 
            {
                "ietf-subscribed-notifications:input": {
-                 "subscription-id": "2147483648"
+                 "id": "2147483648"
                }
            }
 
