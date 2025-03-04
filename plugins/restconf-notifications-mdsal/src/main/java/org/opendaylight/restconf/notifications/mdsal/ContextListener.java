@@ -9,41 +9,32 @@ package org.opendaylight.restconf.notifications.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * This class recreates DefaultNotificationSource when model context is updated.
  */
+@NonNullByDefault
 public final class ContextListener implements Registration {
-    private static final String NAME = "NETCONF";
-    private static final QName NAME_QNAME = QName.create(Stream.QNAME, "name").intern();
-    private static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
-    private static final String DESCRIPTION = "Stream for subscription state change notifications";
+    private final DOMNotificationService notificationService;
+    private final Registration registration;
+    private final RestconfStream.Registry streamRegistry;
 
-    private final @NonNull DOMNotificationService notificationService;
-    private final @NonNull Registration registration;
-    private final RestconfStream.@NonNull Registry streamRegistry;
-
-    private DefaultNotificationSource notificationSource;
+    private @Nullable DefaultNotificationSource notificationSource;
 
     public ContextListener(final DOMNotificationService notificationService, final DOMSchemaService schemaService,
             final RestconfStream.Registry streamRegistry) {
         this.notificationService = requireNonNull(notificationService);
-        this.streamRegistry = streamRegistry;
+        this.streamRegistry = requireNonNull(streamRegistry);
         notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
 
-        // FIXME: NETCONF-714: fails during activation due to NPE induced by these nulls
-        streamRegistry.createStream(null, null, notificationSource, DESCRIPTION);
+        streamRegistry.start(notificationSource);
         registration = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
 
@@ -52,17 +43,7 @@ public final class ContextListener implements Registration {
             notificationSource.close();
         }
         notificationSource = new DefaultNotificationSource(notificationService, context);
-
-        // FIXME: NETCONF-714: fails with NPE induced by these nulls
-        streamRegistry.createStream(null, null, notificationSource, DESCRIPTION);
-    }
-
-    public static @NonNull MapEntryNode streamEntry() {
-        return ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, NAME))
-            .withChild(ImmutableNodes.leafNode(NAME_QNAME, NAME))
-            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, DESCRIPTION))
-            .build();
+        streamRegistry.start(notificationSource);
     }
 
     @Override
