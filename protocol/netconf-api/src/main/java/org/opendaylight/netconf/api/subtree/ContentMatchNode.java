@@ -25,11 +25,6 @@ public record ContentMatchNode(NamespaceSelection selection, String value) imple
         checkNotWhitespace("trailing", value.charAt(value.length() - 1));
     }
 
-    @Override
-    public String value() {
-        return value;
-    }
-
     // RFC6241 says 'whitespace', we are assuming it means "XML whitespace", which can be found at
     // https://www.w3.org/TR/xml/#sec-common-syn
     private static void checkNotWhitespace(final String kind, final char ch) {
