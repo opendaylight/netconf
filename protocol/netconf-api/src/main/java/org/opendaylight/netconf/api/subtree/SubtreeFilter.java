@@ -7,11 +7,18 @@
  */
 package org.opendaylight.netconf.api.subtree;
 
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+
 import com.google.common.base.MoreObjects;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.api.subtree.NamespaceSelection.Wildcard;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
@@ -67,8 +74,113 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
      * @throws IllegalArgumentException if the proposed element has invalid structure
      */
     public static SubtreeFilter readFrom(final Element element) {
-        // FIXME: NETCONF-1445: implement this method
-        throw new UnsupportedOperationException();
+        final var filter = XmlElement.fromDomElement(element);
+        final XmlElement xml;
+        try {
+            xml = filter.getOnlyChildElement();
+        } catch (DocumentedException e) {
+            throw new IllegalArgumentException("Filter node has invalid structure", e);
+        }
+        final var domXml = xml.getDomElement();
+
+        if (xml.getChildElements().isEmpty()) {
+            // check if child nodes are xml or text to determine type of node
+            final String content = getTextContent(xml);
+            if (content.isEmpty()) {
+                // return selection
+                return builder().add(fillSelection(domXml)).build();
+            } else {
+                // return content
+                return builder()
+                    .add(new ContentMatchNode(getNamespaceSelection(xml), domXml.getNodeValue()))
+                    .build();
+            }
+        } else {
+            // create containment
+            final var containment = ContainmentNode.builder(getNamespaceSelection(xml));
+
+            // return containment
+            return builder()
+                .add(fillContainment(domXml, containment)
+                    .build()).build();
+        }
+    }
+
+    private static NamespaceSelection getNamespaceSelection(final XmlElement xml) {
+        if (xml.namespace() != null) {
+            return new Exact(xml.namespace(), xml.getName());
+        } else {
+            return new Wildcard(xml.getName());
+        }
+    }
+
+    private static String getTextContent(final XmlElement xml) {
+        final String content;
+        try {
+            content = xml.getTextContent();
+        } catch (DocumentedException e) {
+            throw new IllegalArgumentException("Content of node has invalid structure", e);
+        }
+        return content;
+    }
+
+    private static ContainmentNode.Builder fillContainment(final Element element,
+            final ContainmentNode.Builder builder) {
+        final var xml = XmlElement.fromDomElement(element);
+        for (var child : xml.getChildElements()) {
+            final var domChild = child.getDomElement();
+            if (child.getChildElements().isEmpty()) {
+                // check if child node has text content to determine type of node
+                final String content = getTextContent(child);
+                if (content.isEmpty()) {
+                    // add selection
+                    builder.add(fillSelection(child.getDomElement()));
+                } else {
+                    // add content
+                    builder.add(new ContentMatchNode(getNamespaceSelection(child), content))
+                        .build();
+                }
+            } else {
+                // add containment
+                builder.add(fillContainment(domChild, ContainmentNode.builder(getNamespaceSelection(child))).build())
+                    .build();
+            }
+        }
+        return builder;
+    }
+
+    private static SelectionNode fillSelection(final Element element) {
+        final var xml = XmlElement.fromDomElement(element);
+        // build selection
+        final var selection = SelectionNode.builder(getNamespaceSelection(xml));
+
+        // add attributes
+        final var attributeMatches = collectAttributes(element);
+        for (var attribute : attributeMatches) {
+            selection.add(attribute);
+        }
+
+        // return filled selection
+        return selection.build();
+    }
+
+    private static List<AttributeMatch> collectAttributes(final Element element) {
+        final var attributeMatches = new ArrayList<AttributeMatch>();
+        if (element.hasAttributes()) {
+            final var attributes = element.getAttributes();
+            for (var i = 0; i < attributes.getLength(); i++) {
+                final var attribute = attributes.item(i);
+                // skip namespace
+                // check by "namespace for namespaces" to include only them
+                if (attribute.getNamespaceURI().equals(XMLNS_ATTRIBUTE_NS_URI)) {
+                    continue;
+                }
+                // add attribute
+                attributeMatches.add(new AttributeMatch(new Exact(attribute.getNamespaceURI(),
+                    attribute.getLocalName()), attribute.getNodeValue()));
+            }
+        }
+        return attributeMatches;
     }
 
     /**
