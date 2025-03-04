@@ -8,6 +8,9 @@
 package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_ID;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_RECEIVER_NAME;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_SENT_EVENT_RECORDS;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -18,11 +21,14 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -73,17 +79,36 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
+    public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long sentEventCounter) {
+        // Now issue a merge operation
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var subscriptionId = receiver.subscriptionId();
+        final var counterValue = ImmutableNodes.leafNode(
+            QNAME_SENT_EVENT_RECORDS, new ZeroBasedCounter64(Uint64.valueOf(sentEventCounter)));
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, subscriptionId);
+
+        final var sentEventIid = SubscriptionUtil.SUBSCRIPTIONS.node(nodeId)
+            .node(NodeIdentifier.create(Receivers.QNAME))
+            .node(NodeIdentifierWithPredicates.of(Receiver.QNAME, QNAME_RECEIVER_NAME,
+                receiver.receiverName()))
+            .node(new NodeIdentifier(QNAME_SENT_EVENT_RECORDS));
+
+        tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid, counterValue);
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
+    }
+
+    @Override
     protected ListenableFuture<RestconfStream.Subscription> createSubscription(
             final RestconfStream.Subscription subscription) {
         final var id = subscription.id();
         final var receiver = subscription.receiverName();
-        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(nodeId)
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.leafNode(QNAME_ID, id))
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))

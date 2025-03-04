@@ -13,6 +13,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ListenableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -207,6 +208,8 @@ public final class RestconfStream<T> {
          * @return A {@link Subscription}, or {@code null} if the stream with specified name does not exist.
          */
         @Nullable Subscription lookupSubscription(Uint32 id);
+
+        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long sentEventCounter);
     }
 
     /**
