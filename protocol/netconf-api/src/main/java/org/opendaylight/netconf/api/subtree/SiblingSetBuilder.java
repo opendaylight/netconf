@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Abstract base class for {@link ContainmentNode.Builder} and {@link ContainmentNode.Builder}.
+ * Abstract base class for {@link ContainmentNode.Builder} and {@link SubtreeFilter.Builder}.
  *
  * @param <T> result type
  */
@@ -56,9 +56,14 @@ abstract sealed class SiblingSetBuilder permits ContainmentNode.Builder, Subtree
     private static final Comparator<Sibling> COMPARATOR = Comparator.comparing(NamespaceName::of);
 
     private final ArrayList<Sibling> siblings = new ArrayList<>();
+    private final ArrayList<AttributeMatch> attributeMatches = new ArrayList<>();
 
     final void addSibling(final Sibling sibling) {
         siblings.add(requireNonNull(sibling));
+    }
+
+    final void addAttributeMatch(final AttributeMatch attributeMatch) {
+        attributeMatches.add(requireNonNull(attributeMatch));
     }
 
     final <S extends Sibling> List<S> siblings(final Class<S> filter) {
@@ -66,6 +71,13 @@ abstract sealed class SiblingSetBuilder permits ContainmentNode.Builder, Subtree
             .filter(filter::isInstance).map(filter::cast)
             .distinct()
             .sorted(COMPARATOR)
+            .collect(Collectors.toUnmodifiableList());
+    }
+
+    final List<AttributeMatch> attributes() {
+        return attributeMatches.stream()
+            .filter(AttributeMatch.class::isInstance).map(AttributeMatch.class::cast)
+            .distinct()
             .collect(Collectors.toUnmodifiableList());
     }
 }

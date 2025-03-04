@@ -10,6 +10,7 @@ package org.opendaylight.netconf.api.subtree;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -25,6 +26,7 @@ public final class ContainmentNode implements Sibling, SiblingSet {
      */
     public static final class Builder extends SiblingSetBuilder {
         private final NamespaceSelection selection;
+        private final ArrayList<AttributeMatch> attributeMatches = new ArrayList<>();
 
         private Builder(final NamespaceSelection selection) {
             this.selection = requireNonNull(selection);
@@ -32,6 +34,11 @@ public final class ContainmentNode implements Sibling, SiblingSet {
 
         public Builder add(final Sibling sibling) {
             addSibling(sibling);
+            return this;
+        }
+
+        public Builder add(final AttributeMatch attributeMatch) {
+            addAttributeMatch(attributeMatch);
             return this;
         }
 
@@ -44,12 +51,18 @@ public final class ContainmentNode implements Sibling, SiblingSet {
     private final List<ContentMatchNode> contentMatches;
     private final List<ContainmentNode> containments;
     private final List<SelectionNode> selections;
+    private final List<AttributeMatch> attributeMatches;
 
     private ContainmentNode(final Builder builder) {
         selection = builder.selection;
         contentMatches = builder.siblings(ContentMatchNode.class);
         containments = builder.siblings(ContainmentNode.class);
         selections = builder.siblings(SelectionNode.class);
+        attributeMatches = builder.attributes();
+    }
+
+    public static Builder builder(final NamespaceSelection selection) {
+        return new Builder(selection);
     }
 
     @Override
@@ -72,6 +85,10 @@ public final class ContainmentNode implements Sibling, SiblingSet {
         return selections;
     }
 
+    public List<AttributeMatch> attributeMatches() {
+        return attributeMatches;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(selection, contentMatches, containments, selections);
@@ -81,7 +98,7 @@ public final class ContainmentNode implements Sibling, SiblingSet {
     public boolean equals(final @Nullable Object obj) {
         return obj == this || obj instanceof ContainmentNode other && selection.equals(other.selection)
             && contentMatches.equals(other.contentMatches) && containments.equals(other.containments)
-            && selections.equals(other.selections);
+            && selections.equals(other.selections) && attributeMatches.equals(other.attributeMatches);
     }
 
     @Override
