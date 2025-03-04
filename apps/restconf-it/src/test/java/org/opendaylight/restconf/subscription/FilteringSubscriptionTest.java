@@ -25,7 +25,10 @@ import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterOutOfBread;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
+import org.opendaylight.yang.gen.v1.test.notification.rev250303.ExampleNotification;
+import org.opendaylight.yang.gen.v1.test.notification.rev250303.example.notification.Entry;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -35,6 +38,8 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 public class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final NodeIdentifier BREAD_NODEID =
         NodeIdentifier.create(QName.create(ToasterRestocked.QNAME, "amountOfBread").intern());
+    private static final QName QNAME_PROPERTY_ID = QName.create(Entry.QNAME, "id");
+    private static final QName QNAME_PROPERTY_NAME = QName.create(Entry.QNAME, "name");
     private static final Instant EVENT_TIME =
         OffsetDateTime.of(LocalDateTime.of(2024, Month.OCTOBER, 30, 12, 34, 56), ZoneOffset.UTC).toInstant();
 
@@ -141,6 +146,53 @@ public class FilteringSubscriptionTest extends AbstractNotificationSubscriptionT
               "ietf-restconf:notification": {
                 "event-time": "%s",
                 "toaster:toasterOutOfBread": {}
+              }
+            }""", EVENT_TIME.atOffset(ZoneOffset.ofHours(1))), eventListener.readNext(), JSONCompareMode.LENIENT);
+    }
+
+    @Disabled
+    @Test
+    void filterNotificationPartialTest() throws Exception {
+        streamClient = startStreamClient();
+        final var response = establishFilteredSubscription(NETCONF_STREAM, ENCODE_XML, """
+            <test-notification xmlns="test:notification">
+              <properties>
+                <id/>
+              </properties>
+            </test-notification>
+            """, streamClient);
+
+        assertEquals(HttpResponseStatus.OK, response.status());
+
+        startStreamClient();
+        final var eventListener = startSubscriptionStream("2147483648");
+
+        final var toasterRestockedNotification = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(ExampleNotification.QNAME))
+            .withChild(ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(Entry.QNAME))
+                .withChild(ImmutableNodes.newMapEntryBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Entry.QNAME,
+                        QNAME_PROPERTY_ID, "ID"))
+                    .withChild(ImmutableNodes.leafNode(QNAME_PROPERTY_ID, "ID"))
+                    .withChild(ImmutableNodes.leafNode(QNAME_PROPERTY_NAME, "name"))
+                    .build())
+                .build())
+            .build();
+        publishService.putNotification(new DOMNotificationEvent.Rfc6020(toasterRestockedNotification, EVENT_TIME));
+
+        // verify name was filtered out
+        JSONAssert.assertEquals(String.format("""
+            {
+              "ietf-restconf:notification" : {
+                "event-time" : "%s",
+                "notification-test:example-notification" : {
+                  "entry" : [
+                    {
+                      "id" : "ID"
+                    }
+                  ]
+                }
               }
             }""", EVENT_TIME.atOffset(ZoneOffset.ofHours(1))), eventListener.readNext(), JSONCompareMode.LENIENT);
     }
