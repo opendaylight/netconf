@@ -37,6 +37,9 @@ public final class SubscriptionUtil {
     public static final QName QNAME_RECEIVER_NAME = QName.create(Receiver.QNAME, "name");
     public static final QName QNAME_RECEIVER_STATE = QName.create(Receiver.QNAME, "state");
     public static final QName QNAME_TARGET = QName.create(Subscription.QNAME, "target");
+    public static final QName QNAME_SENT_EVENT_RECORDS = QName.create(Receiver.QNAME, "sent-event-records");
+    public static final QName QNAME_EXCLUDE_EVENT_RECORDS = QName
+        .create(Receiver.QNAME, "exclude-event-records");
 
     private SubscriptionUtil() {
         // hidden on purpose
