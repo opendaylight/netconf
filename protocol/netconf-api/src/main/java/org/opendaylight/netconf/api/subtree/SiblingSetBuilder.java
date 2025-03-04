@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Abstract base class for {@link ContainmentNode.Builder} and {@link ContainmentNode.Builder}.
+ * Abstract base class for {@link ContainmentNode.Builder} and {@link SubtreeFilter.Builder}.
  *
  * @param <T> result type
  */
