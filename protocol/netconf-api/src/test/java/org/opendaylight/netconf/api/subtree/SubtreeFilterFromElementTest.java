@@ -10,32 +10,91 @@ package org.opendaylight.netconf.api.subtree;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Element;
 
 class SubtreeFilterFromElementTest {
-    @Disabled
     @ParameterizedTest
     @MethodSource
-    void testExamples(final String xml, final SubtreeFilter expected) {
-        // FIXME: NETCONF-1445 parse XML into a Document and this should be its document element
-        final Element element = null;
-        assertEquals(expected, SubtreeFilter.readFrom(element));
+    void testExamples(final String xml, final SubtreeFilter expected) throws Exception {
+        final Element element = XmlUtil.readXmlToElement(xml);
+        final var actual = SubtreeFilter.readFrom(element);
+        assertEquals(expected, actual);
     }
 
     private static List<Arguments> testExamples() {
-        // FIXME: NETCONF-1445: expand to cover all examples in RFC6241
         return List.of(
             // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.1
             Arguments.of("""
                 <filter type="subtree">
                   <top xmlns="http://example.com/schema/1.2/config"/>
                 </filter>""", SubtreeFilter.builder()
-                .add(SelectionNode.builder(new Exact("xmlns=\"http://example.com/schema/1.2/config", "top")).build())
+                .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "top")).build())
+                .build()),
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.2
+            Arguments.of("""
+                <filter type="subtree">
+                  <t:top xmlns:t="http://example.com/schema/1.2/config">
+                    <t:interfaces>
+                      <t:interface t:ifName="eth0"/>
+                    </t:interfaces>
+                  </t:top>
+                </filter>""", SubtreeFilter.builder()
+                .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "top"))
+                    .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "interfaces"))
+                            .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "interface"))
+                            .add(new AttributeMatch(new Exact("http://example.com/schema/1.2/config", "ifName"),
+                                "eth0")).build())
+                        .build())
+                    .build())
+                .build()),
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.3
+            Arguments.of("""
+                <filter type="subtree">
+                  <top xmlns="http://example.com/schema/1.2/config">
+                    <users/>
+                  </top>
+                </filter>""", SubtreeFilter.builder()
+                .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "top"))
+                    .add(SelectionNode.builder(new Exact("http://example.com/schema/1.2/config", "users"))
+                        .build())
+                    .build())
+                .build()),
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.5
+            Arguments.of("""
+                <filter type="subtree">
+                  <top xmlns="http://example.com/schema/1.2/config">
+                    <users>
+                      <user>
+                        <name>fred</name>
+                      </user>
+                    </users>
+                  </top>
+                </filter>""", SubtreeFilter.builder()
+                .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "top"))
+                    .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "users"))
+                        .add(ContainmentNode.builder(new Exact("http://example.com/schema/1.2/config", "user"))
+                            .add(new ContentMatchNode(new Exact("http://example.com/schema/1.2/config", "name"),
+                                "fred"))
+                            .build())
+                        .build())
+                    .build())
+                .build()),
+            // custom example to test no namespace xml
+            Arguments.of("""
+                <filter type="subtree">
+                  <top>
+                    <users/>
+                  </top>
+                </filter>""", SubtreeFilter.builder()
+                .add(ContainmentNode.builder(new NamespaceSelection.Wildcard("top"))
+                    .add(SelectionNode.builder(new NamespaceSelection.Wildcard("users"))
+                        .build())
+                    .build())
                 .build()));
     }
 }
