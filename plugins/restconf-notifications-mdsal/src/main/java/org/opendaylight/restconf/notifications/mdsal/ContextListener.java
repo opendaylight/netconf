@@ -5,10 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.subscription;
+package org.opendaylight.restconf.notifications.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -20,11 +22,16 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * This class recreates DefaultNotificationSource when model context is updated.
  */
-final class ContextListener implements Registration {
+@Singleton
+@Component(service = { })
+public final class ContextListener implements Registration {
     private static final String NAME = "NETCONF";
     private static final QName NAME_QNAME = QName.create(Stream.QNAME, "name").intern();
     private static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
@@ -36,8 +43,10 @@ final class ContextListener implements Registration {
 
     private DefaultNotificationSource notificationSource;
 
-    ContextListener(final DOMNotificationService notificationService, final DOMSchemaService schemaService,
-            final RestconfStream.Registry streamRegistry) {
+    @Inject
+    @Activate
+    public ContextListener(@Reference final DOMNotificationService notificationService,
+            @Reference final DOMSchemaService schemaService, @Reference final RestconfStream.Registry streamRegistry) {
         this.notificationService = requireNonNull(notificationService);
         this.streamRegistry = streamRegistry;
         notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
