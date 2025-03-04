@@ -1,0 +1,22 @@
+module notification-test {
+    yang-version 1.1;
+    namespace "test:notification";
+    prefix "notif";
+    description "Test model for notifications";
+    revision "2025-03-03";
+
+    notification example-notification {
+        list entry {
+            key "id";
+            leaf id {
+                type string;
+            }
+            leaf name {
+                type string;
+            }
+            leaf value {
+                type string;
+            }
+        }
+    }
+}
