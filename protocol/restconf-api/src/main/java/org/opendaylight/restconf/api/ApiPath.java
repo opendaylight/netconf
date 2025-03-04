@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.api;
 
-import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
@@ -28,7 +27,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.HierarchicalIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
-import org.opendaylight.yangtools.yang.common.UnresolvedQName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 /**
@@ -47,13 +45,6 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
     public abstract static sealed class Step implements Immutable {
         private final @Nullable String module;
         private final Unqualified identifier;
-
-        @Deprecated(since = "7.0.4", forRemoval = true)
-        Step(final @Nullable String module, final String identifier) {
-            this.identifier = verifyNotNull(UnresolvedQName.tryLocalName(identifier),
-                "Unexpected invalid identifier %s", identifier);
-            this.module = module;
-        }
 
         Step(final @Nullable String module, final Unqualified identifier) {
             this.module = module;
@@ -104,11 +95,6 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
      * An {@code api-identifier} step in a {@link ApiPath}.
      */
     public static final class ApiIdentifier extends Step {
-        @Deprecated(since = "7.0.4", forRemoval = true)
-        public ApiIdentifier(final @Nullable String module, final String identifier) {
-            super(module, identifier);
-        }
-
         public ApiIdentifier(final @Nullable String module, final Unqualified identifier) {
             super(module, identifier);
         }
