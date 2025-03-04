@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2a902d1_977fc9f0",
+        "filename": "plugins/restconf-notifications-mdsal/src/main/java/module-info.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-04T15:22:56Z",
+      "side": 0,
+      "message": "requires transitive org.opendaylight.yangtools.yang.common; contains concepts",
+      "revId": "0aaff0e7be407627ba237871e1d2116364922beb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
