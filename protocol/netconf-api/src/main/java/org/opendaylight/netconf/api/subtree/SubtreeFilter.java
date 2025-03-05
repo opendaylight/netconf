@@ -7,12 +7,17 @@
  */
 package org.opendaylight.netconf.api.subtree;
 
+import static java.util.Objects.requireNonNull;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 import com.google.common.base.MoreObjects;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TreeSet;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
@@ -21,6 +26,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -174,8 +180,48 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
      * @throws IllegalArgumentException if the proposed element has invalid structure
      */
     public void writeTo(final Element element) {
-        // FIXME: NETCONF-1445: implement this method
-        throw new UnsupportedOperationException();
+        final var doc = element.getOwnerDocument();
+        final var xml = XmlElement.fromDomElement(element);
+
+        // generate prefixes for namespaces
+        final var prefixes = Prefixes.of(this);
+
+        writeSiblings(doc, xml, prefixes, this);
+    }
+
+    private void writeSiblings(final Document doc, final XmlElement xml, final Prefixes prefixes,
+            final SiblingSet siblings) {
+        for (final var contentMatch : siblings.contentMatches()) {
+            final var child = writeSibling(contentMatch, doc, prefixes);
+            child.setTextContent(contentMatch.value());
+            xml.appendChild(child);
+        }
+        for (final var selection : siblings.selections()) {
+            final var child = writeSibling(selection, doc, prefixes);
+            for (final var attr : selection.attributeMatches()) {
+                child.setAttributeNS(attr.selection().namespace(), attr.selection().name(), attr.value());
+            }
+            xml.appendChild(child);
+        }
+        for (final var containment : siblings.containments()) {
+            final var child = writeSibling(containment, doc, prefixes);
+            writeSiblings(doc, XmlElement.fromDomElement(child), prefixes, containment);
+            xml.appendChild(child);
+        }
+    }
+
+    private static Element writeSibling(final Sibling sibling, final Document doc, final Prefixes prefixes) {
+        final Element child;
+        switch (sibling.selection()) {
+            case Exact(var namespace, var name) -> {
+                child = doc.createElementNS(namespace, name);
+                child.setPrefix(prefixes.getPrefix(namespace));
+            }
+            case Wildcard(var name) -> {
+                child = doc.createElement(name);
+            }
+        }
+        return child;
     }
 
     @Override
@@ -212,5 +258,61 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).add("siblings", siblings()).toString();
+    }
+
+    // FIXME this can be extracted to separate class and reused in SubtreeFilterPrettyTree
+    private record Prefixes(HashMap<String, String> prefixToNs) {
+        private Prefixes(final HashMap<String, String> prefixToNs) {
+            this.prefixToNs = requireNonNull(prefixToNs);
+        }
+
+        @NonNullByDefault
+        static Prefixes of(final SubtreeFilter filter) {
+            final var namespaces = new TreeSet<String>();
+            // traversing the filter to fill prefixes map
+            createPrefixes(filter.siblings(), namespaces);
+
+            // LinkedHashMap to preserve ordering
+            final var prefixes = new HashMap<String, String>(namespaces.size());
+            int counter = 0;
+            for (var ns : namespaces) {
+                var prefix = prefixOf(counter);
+                // Skipping "xml" or "xmlns", as those are reserved
+                if (prefix.equals("xml") || prefix.equals("xmlns")) {
+                    counter++;
+                    prefix = prefixOf(counter);
+                }
+                counter++;
+                prefixes.put(ns, prefix);
+            }
+
+            return new Prefixes(prefixes);
+        }
+
+        private static void createPrefixes(final Collection<Sibling> siblings, final TreeSet<String> namespaces) {
+            for (final var sibling : siblings) {
+                if (sibling.selection() instanceof Exact exact) {
+                    namespaces.add(exact.namespace());
+                    if (sibling instanceof ContainmentNode containment) {
+                        createPrefixes(containment.siblings(), namespaces);
+                    }
+                }
+            }
+        }
+
+        // Used for prefix assignment by following pattern: a, b, c, d, ..., y, z, aa, ab, ..., zz, aaa, aab, ...
+        static String prefixOf(final int index) {
+            final var prefix = index < 0 ? "" : prefixOf((index / 26) - 1) + (char)(65 + index % 26);
+            return prefix.toLowerCase(Locale.ROOT);
+        }
+
+        @NonNullByDefault
+        String getPrefix(final String namespace) {
+            final var prefix = prefixToNs.get(requireNonNull(namespace));
+            if (prefix == null) {
+                throw new IllegalStateException("No prefix assigned to namespace " + namespace);
+            }
+            return prefix;
+        }
     }
 }
