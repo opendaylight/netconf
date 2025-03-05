@@ -21,6 +21,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -173,8 +174,44 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
      * @throws IllegalArgumentException if the proposed element has invalid structure
      */
     public void writeTo(final Element element) {
-        // FIXME: NETCONF-1445: implement this method
-        throw new UnsupportedOperationException();
+        final var doc = element.getOwnerDocument();
+        final var xml = XmlElement.fromDomElement(element);
+        // FIXME collect namespaces here and append them to first node with according prefixes
+        writeSiblings(doc, xml, this);
+    }
+
+    private void writeSiblings(final Document doc, final XmlElement xml, final SiblingSet siblings) {
+        for (final var contentMatch : siblings.contentMatches()) {
+            final var child = writeSibling(contentMatch, doc);
+            child.setNodeValue(contentMatch.value());
+            xml.appendChild(child);
+        }
+        for (final var selection : siblings.selections()) {
+            final var child = writeSibling(selection, doc);
+            for (final var attr : selection.attributeMatches()) {
+                child.setAttributeNS(attr.selection().namespace(), attr.selection().name(), attr.value());
+            }
+            xml.appendChild(child);
+        }
+        for (final var containment : siblings.containments()) {
+            final var child = writeSibling(containment, doc);
+            writeSiblings(doc, XmlElement.fromDomElement(child), containment);
+            xml.appendChild(child);
+        }
+    }
+
+    private static Element writeSibling(Sibling containment, Document doc) {
+        final Element child;
+        // FIXME use assigned to namespace prefix in node names
+        switch (containment.selection()) {
+            case Exact(var namespace, var name) -> {
+                child = doc.createElementNS(namespace, name);
+            }
+            case NamespaceSelection.Wildcard(var name) -> {
+                child = doc.createElement(name);
+            }
+        }
+        return child;
     }
 
     @Override
@@ -211,5 +248,10 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).add("siblings", siblings()).toString();
+    }
+
+    // Used for prefix assignment by following pattern: a, b, c, d, ..., y, z, aa, ab, ..., zz, aaa, aab, ...
+    static String prefixOf(final int i) {
+        return i < 0 ? "" : (prefixOf((i / 26) - 1) + (char)(65 + i % 26)).toLowerCase();
     }
 }
