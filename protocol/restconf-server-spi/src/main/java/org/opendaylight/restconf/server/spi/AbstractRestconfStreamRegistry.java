@@ -68,6 +68,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
+            request.completeWith(Empty.value());
         }
     }
 
@@ -217,17 +218,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             principal != null ? principal.getName() : "<unknown>",
             filterImpl);
 
-        subscriptions.put(id, subscription);
-
         Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
             @Override
             public void onSuccess(final Subscription result) {
+                subscriptions.put(id, result);
                 request.completeWith(result);
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                subscriptions.remove(id, subscription);
                 request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());

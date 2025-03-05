@@ -49,7 +49,7 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             @Override
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Removed subscription {} from operational datastore as of {}", id, result);
-                request.completeWith(Empty.value());
+                delegate.terminate(request.transform(ignored -> Empty.value()), terminationReason);
             }
 
             @Override

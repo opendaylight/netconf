@@ -40,13 +40,17 @@ final class SubscriptionHolder extends AbstractRegistration {
         try {
             stateMachine.moveTo(id, SubscriptionState.END);
         } catch (IllegalStateException | NoSuchElementException e) {
+            // TODO: reconsider this being logged as WARN
+            //  This may be not so big problem as this can just mean the subscription was ENDED elsewhere.
+            //  For example this can occur when we properly delete subscription and
+            //  afterwards session ends as registrations are kept on session even on proper delete of subscription
             LOG.warn("Could not move subscription to END state", e);
             return;
         }
 
         try {
             // FIXME: proper arguments
-            subscription.terminate(null, null);
+            subscription.terminate(null, NoSuchSubscription.QNAME);
         } finally {
             try {
                 subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
