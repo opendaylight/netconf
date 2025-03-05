@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a3bbb57_5cc5c06a",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/NetconfStream.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-05T09:22:12Z",
+      "side": 1,
+      "message": "maybe we can get rid of this class and start ContextListener directly (make it a component)",
+      "revId": "cd5b79e63e2f4f65ae8b6b5173a60480b6a498c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
