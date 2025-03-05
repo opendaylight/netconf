@@ -8,32 +8,29 @@
 
 package org.opendaylight.netconf.api.subtree;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class ElementFromSubtreeFilterTest {
-    @Disabled
     @ParameterizedTest
     @MethodSource
     void testExamples(final String xml, final SubtreeFilter filter) throws IOException, SAXException {
         final Element expected = XmlUtil.readXmlToElement(xml);
-        //TODO move this to writeTo
-        final var element = XmlUtil.newDocument().createElementNS("http://example.com/schema/1.2/config",
-            XmlNetconfConstants.FILTER);
+        final var element = XmlUtil.newDocument().createElementNS(null, XmlNetconfConstants.FILTER);
         element.setAttribute("type", "subtree");
         filter.writeTo(element);
-        assertEquals(expected, element);
+        assertTrue(XmlElement.fromDomElement(expected).equals(XmlElement.fromDomElement(element)));
     }
 
     private static List<Arguments> testExamples() {
