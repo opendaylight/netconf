@@ -21,6 +21,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -177,8 +178,48 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
      * @throws IllegalArgumentException if the proposed element has invalid structure
      */
     public void writeTo(final Element element) {
-        // FIXME: NETCONF-1445: implement this method
-        throw new UnsupportedOperationException();
+        final var doc = element.getOwnerDocument();
+        final var xml = XmlElement.fromDomElement(element);
+
+        // generate prefixes for namespaces
+        final var prefixes = Prefixes.of(this);
+
+        writeSiblings(doc, xml, prefixes, this);
+    }
+
+    private void writeSiblings(final Document doc, final XmlElement xml, final Prefixes prefixes,
+            final SiblingSet siblings) {
+        for (final var contentMatch : siblings.contentMatches()) {
+            final var child = writeSibling(contentMatch, doc, prefixes);
+            child.setTextContent(contentMatch.value());
+            xml.appendChild(child);
+        }
+        for (final var selection : siblings.selections()) {
+            final var child = writeSibling(selection, doc, prefixes);
+            for (final var attr : selection.attributeMatches()) {
+                child.setAttributeNS(attr.selection().namespace(), attr.selection().name(), attr.value());
+            }
+            xml.appendChild(child);
+        }
+        for (final var containment : siblings.containments()) {
+            final var child = writeSibling(containment, doc, prefixes);
+            writeSiblings(doc, XmlElement.fromDomElement(child), prefixes, containment);
+            xml.appendChild(child);
+        }
+    }
+
+    private static Element writeSibling(final Sibling sibling, final Document doc, final Prefixes prefixes) {
+        final Element child;
+        switch (sibling.selection()) {
+            case Exact(var namespace, var name) -> {
+                child = doc.createElementNS(namespace, name);
+                child.setPrefix(prefixes.getPrefix(namespace));
+            }
+            case Wildcard(var name) -> {
+                child = doc.createElement(name);
+            }
+        }
+        return child;
     }
 
     @Override

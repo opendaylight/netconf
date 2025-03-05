@@ -18,6 +18,7 @@ import org.opendaylight.yangtools.concepts.PrettyTree;
  * A {@link PrettyTree} of a {@link SubtreeFilter}.
  */
 final class SubtreeFilterPrettyTree extends PrettyTree {
+    // FIXME: reuse already defined in this package record Prefixes
     private static final class Prefixes {
         final LinkedHashMap<String, String> prefixToNs;
 
