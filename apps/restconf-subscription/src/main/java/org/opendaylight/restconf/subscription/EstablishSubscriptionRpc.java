@@ -137,7 +137,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }), streamName, encoding, filter);
     }
 
-    private static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
+    static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
         final var filterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
         if (filterName != null) {
             return new SubscriptionFilter.Reference(filterName);
