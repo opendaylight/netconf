@@ -12,7 +12,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
@@ -24,7 +26,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull QName encoding;
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
-    private final @Nullable EventStreamFilter filter;
+    private @Nullable EventStreamFilter filter;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
             final String receiverName, final @Nullable EventStreamFilter filter) {
@@ -57,6 +59,11 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
 
     final @Nullable EventStreamFilter filter() {
         return filter;
+    }
+
+    @Override
+    public void modifyFilter(final ServerRequest<Empty> request, final EventStreamFilter filter) {
+        this.filter = filter;
     }
 
     @Override
