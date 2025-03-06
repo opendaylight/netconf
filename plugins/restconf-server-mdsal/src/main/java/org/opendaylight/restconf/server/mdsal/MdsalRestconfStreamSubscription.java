@@ -16,13 +16,16 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ForwardingRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,28 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     MdsalRestconfStreamSubscription(final T delegate, final DOMDataBroker dataBroker) {
         super(delegate);
         this.dataBroker = requireNonNull(dataBroker);
+    }
+
+    @Override
+    public void modifyFilter(final AbstractRestconfStreamRegistry.EventStreamFilter filter) {
+        delegate.modifyFilter(filter);
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id());
+        ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
+            SubscriptionUtil.QNAME_ID, id()))
+        tx.merge(LogicalDatastoreType.OPERATIONAL,  SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+            ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(nodeId)
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id()))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, streamName()))
+//                    .withChild(ImmutableNodes.newChoiceBuilder()
+//                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
+//                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
+//                            subscription.filterName()))
+//                        .build())
+                    .build()).build());
     }
 
     @Override
