@@ -233,6 +233,19 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public void modifySubscription(final ServerRequest<Empty> request, final Subscription subscription,
+            final SubscriptionFilter filter) {
+        final EventStreamFilter filterImpl;
+        try {
+            filterImpl = resolveFilter(filter);
+        } catch (RequestException e) {
+            request.completeWith(e);
+            return;
+        }
+        subscription.modifyFilter(request, filterImpl);
+    }
+
     @NonNullByDefault
     protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
 
