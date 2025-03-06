@@ -232,8 +232,47 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public void modifySubscription(final ServerRequest<Subscription> request, final Uint32 id,
+            final SubscriptionFilter filter) {
+        requireNonNull(filter);
+        final var oldSubscription = lookupSubscription(id);
+        if (oldSubscription == null) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+                "There is no subscription with given ID."));
+            return;
+        }
+
+        final EventStreamFilter filterImpl;
+        try {
+            filterImpl = resolveFilter(filter);
+        } catch (RequestException e) {
+            request.completeWith(e);
+            return;
+        }
+        final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
+            oldSubscription.receiverName(), filterImpl);
+
+        Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Subscription result) {
+                subscriptions.put(id, result);
+                request.completeWith(result);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                request.completeWith(new RequestException(cause));
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
     @NonNullByDefault
     protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
+
+    @NonNullByDefault
+    protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
+        SubscriptionFilter filter);
 
     private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
             throws RequestException {
