@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -201,6 +202,18 @@ public final class RestconfStream<T> {
             @Nullable SubscriptionFilter filter);
 
         /**
+         * Establish a new RFC8639 subscription to a stream.
+         *
+         * @param request {@link ServerRequest} for this invocation
+         * @param encoding requested encoding
+         * @param streamName requested stream name
+         * @param filter optional filter
+         * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
+         */
+        @NonNullByDefault
+        void modifySubscription(ServerRequest<Empty> request, Subscription subscription, SubscriptionFilter filter);
+
+        /**
          * Lookup an existing subscription.
          *
          * @param id subscription ID
@@ -263,6 +276,8 @@ public final class RestconfStream<T> {
             LOG.debug("Terminating subscription {} due to {}", id(), reason);
             terminateImpl(request, reason);
         }
+
+        public abstract void modifyFilter(ServerRequest<Empty> request, EventStreamFilter filter);
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
