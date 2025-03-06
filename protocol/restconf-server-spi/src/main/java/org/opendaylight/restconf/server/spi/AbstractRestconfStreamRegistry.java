@@ -233,6 +233,36 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public void modifySubscription(final ServerRequest<Subscription> request, final Uint32 id,
+            SubscriptionFilter filter) {
+        final var oldSubscription = lookupSubscription(id);
+        final EventStreamFilter filterImpl;
+        try {
+            filterImpl = resolveFilter(filter);
+        } catch (RequestException e) {
+            request.completeWith(e);
+            return;
+        }
+
+        final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
+            oldSubscription.receiverName(), filterImpl);
+
+        // FIXME: createSubscription probably incorrect here
+        Futures.addCallback(createSubscription(newSubscription), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Subscription result) {
+                subscriptions.put(id, result);
+                request.completeWith(result);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                request.completeWith(new RequestException(cause));
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
     @NonNullByDefault
     protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
 
