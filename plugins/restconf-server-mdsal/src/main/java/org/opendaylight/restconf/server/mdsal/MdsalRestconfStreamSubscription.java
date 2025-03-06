@@ -39,7 +39,7 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     }
 
     @Override
-    protected void terminateImpl(final ServerRequest<Empty> request,final QName terminationReason) {
+    protected void terminateImpl(final ServerRequest<Empty> request, final QName terminationReason) {
         final var id = id();
         LOG.debug("{} terminated with reason {}", id, terminationReason);
 
