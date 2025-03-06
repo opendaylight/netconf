@@ -19,10 +19,15 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ForwardingRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +43,54 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     }
 
     @Override
-    protected void terminateImpl(final ServerRequest<Empty> request,final QName terminationReason) {
+    public void modifyFilter(final ServerRequest<Empty> request, final RestconfStream.SubscriptionFilter filter) {
+        delegate.modifyFilter(request, filter);
+        final DataContainerChild filterNode = switch (filter) {
+            case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
+                ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
+            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(anydata)
+                    .build();
+            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
+                    .build();
+        };
+
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id());
+        tx.merge(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+            ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(nodeId)
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id()))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                        .withChild(ImmutableNodes.newChoiceBuilder()
+                            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(StreamFilter.QNAME))
+                            .withChild(filterNode)
+                            .build())
+                .build())
+            .build());
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("Modified subscription {} in operational datastore as of {}", id(), result);
+                request.completeWith(Empty.value());
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.warn("Failed to modify subscription {} in operational datastore", id(), cause);
+                request.completeWith(new RequestException(cause));
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    protected void terminateImpl(final ServerRequest<Empty> request, final QName terminationReason) {
         final var id = id();
         LOG.debug("{} terminated with reason {}", id, terminationReason);
 

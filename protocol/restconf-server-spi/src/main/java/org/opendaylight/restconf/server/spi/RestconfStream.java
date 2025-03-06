@@ -265,6 +265,9 @@ public final class RestconfStream<T> {
         }
 
         @NonNullByDefault
+        public abstract void modifyFilter(ServerRequest<Empty> request, SubscriptionFilter filter);
+
+        @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
         @Override
