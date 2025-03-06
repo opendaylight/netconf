@@ -14,25 +14,20 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodingUnsupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -47,8 +42,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = RpcImplementation.class)
 @NonNullByDefault
 public final class EstablishSubscriptionRpc extends RpcImplementation {
-    private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER_NAME =
-        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream").intern());
     private static final NodeIdentifier SUBSCRIPTION_TARGET =
@@ -121,7 +114,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         // check stream filter
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
-        final var filter = streamFilter == null ? null : extractFilter(streamFilter);
+        final var filter = streamFilter == null ? null : SubscriptionUtil.extractFilter(streamFilter);
 
         streamRegistry.establishSubscription(request.transform(subscription -> {
             final var id = subscription.id();
@@ -135,23 +128,5 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
                 .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))
                 .build();
         }), streamName, encoding, filter);
-    }
-
-    private static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
-        final var filterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
-        if (filterName != null) {
-            return new SubscriptionFilter.Reference(filterName);
-        }
-        final var filterSpec = (ChoiceNode) streamFilter.childByArg(new NodeIdentifier(FilterSpec.QNAME));
-        if (filterSpec == null) {
-            return null;
-        }
-        final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
-        if (subtree != null) {
-            return new SubscriptionFilter.SubtreeDefinition(subtree);
-        }
-        final var xpath = leaf(filterSpec, new NodeIdentifier(QName.create(FilterSpec.QNAME, "stream-xpath-filter")),
-            String.class);
-        return xpath != null ? new SubscriptionFilter.XPathDefinition(xpath) : null;
     }
 }
