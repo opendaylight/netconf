@@ -10,8 +10,10 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -20,15 +22,14 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -41,11 +42,10 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = RpcImplementation.class)
+@NonNullByDefault
 public final class ModifySubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "id").intern());
-    private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER_NAME =
-        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter-name").intern());
     private static final NodeIdentifier SUBSCRIPTION_TARGET =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
@@ -72,7 +72,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final Uint32 id;
-        final String streamFilterName;
 
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
@@ -104,79 +103,34 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var target = (DataContainerNode) body.childByArg(SUBSCRIPTION_TARGET);
-        final var nodeBuilder = ImmutableNodes.newMapEntryBuilder();
-        final var nodeTargetBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
-            .create(SubscriptionUtil.QNAME_TARGET));
-        final var nodeFilterBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
-            .create(QName.create(Subscription.QNAME, "stream-filter")));
+        final var target = (ChoiceNode) body.childByArg(SUBSCRIPTION_TARGET);
 
-        nodeBuilder.withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-            SubscriptionUtil.QNAME_ID, id));
-        nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id));
-        if (target != null) {
-            final var streamFilter = (DataContainerNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
-            streamFilterName = leaf(streamFilter, SUBSCRIPTION_STREAM_FILTER_NAME, String.class);
-            //  TODO: parse anydata filter, rfc6241? https://www.rfc-editor.org/rfc/rfc8650#name-filter-example
-            //    {@link StreamSubtreeFilter}.
-            if (streamFilterName != null) {
-//                try {
-//                    if (!mdsalService.exist(SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(
-//                        StreamFilter.QNAME, SubscriptionUtil.QNAME_STREAM_FILTER_NAME, streamFilterName))).get()) {
-//                        request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-//                            "%s refers to an unknown stream filter", streamFilterName));
-//                        return;
-//                    }
-//                } catch (InterruptedException | ExecutionException e) {
-//                    request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
-//                    return;
-//                }
-                nodeFilterBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
-                    streamFilterName));
-                nodeTargetBuilder.withChild(nodeFilterBuilder.build());
-                nodeBuilder.withChild(nodeTargetBuilder.build());
-            }
+        if (target == null) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+                "No filter specified"));
+            return;
         }
-//        final var node = nodeBuilder.build();
+        final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
+        final var filter = streamFilter == null ? null : SubscriptionUtil.extractFilter(streamFilter);
+        if (filter == null) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+                "No filter specified"));
+            return;
+        }
 
-        request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-            "Not implemented yet"));
+        streamRegistry.modifySubscription(request.transform(subscription -> {
+            try {
+                // FIXME: pass correct filter once we extract if from input
+                subscriptionStateService.subscriptionModified(Instant.now(), id, subscription.streamName(),
+                    subscription.encoding(), null, null, null);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Could not send subscription modify notification", e);
+            }
 
-// FIXME: reconcile
-//        mdsalService.mergeSubscription(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()), node)
-//            .addCallback(new FutureCallback<CommitInfo>() {
-//                @Override
-//                public void onSuccess(final CommitInfo result) {
-//                    request.completeWith(ImmutableNodes.newContainerBuilder()
-//                        .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
-//                        .build());
-//                    try {
-//                        final var subscription = mdsalService.read(SubscriptionUtil.SUBSCRIPTIONS.node(node.name()))
-//                            .get();
-//                        if (subscription.isEmpty()) {
-//                            LOG.warn("Could not send subscription modify notification: could not read stream name");
-//                            return;
-//                        }
-//                        final var target = (DataContainerNode) ((DataContainerNode) subscription.orElseThrow())
-//                            .childByArg(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET));
-//                        final var streamName = leaf(target, NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM),
-//                            String.class);
-//                        final var encoding = leaf((DataContainerNode) subscription.orElseThrow(),
-//                            NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING), QName.class);
-//                        // TODO: pass correct filter once we extract if from input
-//                        subscriptionStateService.subscriptionModified(Instant.now(), id, streamName, encoding, null,
-//                            stopTime, null);
-//                    } catch (InterruptedException | ExecutionException e) {
-//                        LOG.warn("Could not send subscription modify notification", e);
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(final Throwable throwable) {
-//                    request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-//                        // FIXME: why getCause()?
-//                        throwable.getCause()));
-//                }
-//            }, MoreExecutors.directExecutor());
+            return ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
+                .build();
+        }), id, filter);
     }
 }
