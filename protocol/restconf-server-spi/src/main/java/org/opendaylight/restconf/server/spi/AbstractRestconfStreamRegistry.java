@@ -66,6 +66,18 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         @Override
+        public void modifyFilter(ServerRequest<Empty> request, SubscriptionFilter filter) {
+            final EventStreamFilter filterImpl;
+            try {
+                filterImpl = resolveFilter(filter);
+            } catch (RequestException e) {
+                request.completeWith(e);
+                return;
+            }
+            setFilter(filterImpl);
+        }
+
+        @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
         }
