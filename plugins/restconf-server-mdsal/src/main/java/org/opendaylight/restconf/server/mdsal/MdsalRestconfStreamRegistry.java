@@ -26,14 +26,18 @@ import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
@@ -156,6 +160,46 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
         return tx.commit().transform(info -> {
             LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
+            return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
+        }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    protected ListenableFuture<RestconfStream.Subscription> modifySubscriptionFilter(
+            final RestconfStream.Subscription subscription, final RestconfStream.SubscriptionFilter filter) {
+        final var id = subscription.id();
+
+        final DataContainerChild filterNode = switch (filter) {
+            case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
+                ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
+            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(anydata)
+                    .build();
+            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
+                    .build();
+        };
+
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+            ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(nodeId)
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withChild(ImmutableNodes.newChoiceBuilder()
+                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(StreamFilter.QNAME))
+                        .withChild(filterNode)
+                        .build())
+                    .build())
+                .build());
+        return tx.commit().transform(info -> {
+            LOG.debug("Modified subscription {} to operational datastore as of {}", id, info);
             return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
         }, MoreExecutors.directExecutor());
     }
