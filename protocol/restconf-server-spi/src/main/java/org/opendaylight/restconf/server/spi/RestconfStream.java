@@ -202,6 +202,17 @@ public final class RestconfStream<T> {
             @Nullable SubscriptionFilter filter);
 
         /**
+         * Establish a new RFC8639 subscription to a stream.
+         *
+         * @param request {@link ServerRequest} for this invocation
+         * @param id id of subscription
+         * @param filter optional filter
+         * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
+         */
+        @NonNullByDefault
+        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
+
+        /**
          * Lookup an existing subscription.
          *
          * @param id subscription ID
