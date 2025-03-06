@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a173081_79055ed8",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-06T07:51:25Z",
+      "side": 1,
+      "message": "this will be another task - properly end subscription",
+      "revId": "2de078f213f71df5878d9b989f77fd92b1a6102b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5d8f9f6_b1808d62",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-06T07:51:25Z",
+      "side": 1,
+      "message": "fixed?",
+      "revId": "2de078f213f71df5878d9b989f77fd92b1a6102b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
