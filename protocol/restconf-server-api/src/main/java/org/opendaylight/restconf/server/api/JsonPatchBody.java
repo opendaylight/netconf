@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import java.io.IOException;
@@ -35,8 +36,12 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JsonPatchBody extends PatchBody {
+    private static final Logger LOG = LoggerFactory.getLogger(JsonPatchBody.class);
+
     public JsonPatchBody(final InputStream inputStream) {
         super(inputStream);
     }
@@ -124,7 +129,15 @@ public final class JsonPatchBody extends PatchBody {
                 }
                 case "operation" -> {
                     verifyStringValueType(in.peek(), editDefinition);
-                    edit.setOperation(Operation.ofName(in.nextString()));
+                    final Operation operation;
+                    try {
+                        operation = Operation.ofName(in.nextString());
+                    } catch (IllegalArgumentException e) {
+                        LOG.error("Provided operation type does not match", e);
+                        throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                            "Operation value is incorrect: " + e.getMessage(), e);
+                    }
+                    edit.setOperation(operation);
                 }
                 case "target" -> {
                     verifyStringValueType(in.peek(), editDefinition);
@@ -280,12 +293,18 @@ public final class JsonPatchBody extends PatchBody {
      * Read patch edit data defined in value node to NormalizedNode.
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
+     * @throws RequestException if parsing of {@link JsonReader} fails due to invalid data.
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in, final @NonNull Inference targetSchemaNode,
-            final @NonNull JSONCodecFactory codecs) {
+            final @NonNull JSONCodecFactory codecs) throws RequestException {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        JsonParserStream.create(writer, codecs, targetSchemaNode).parse(in);
+        try {
+            JsonParserStream.create(writer, codecs, targetSchemaNode).parse(in);
+        } catch (IllegalArgumentException | IllegalStateException | JsonParseException e) {
+            LOG.error("Failed to parse provided JSON data", e);
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, e);
+        }
         return resultHolder.getResult().data();
     }
 
