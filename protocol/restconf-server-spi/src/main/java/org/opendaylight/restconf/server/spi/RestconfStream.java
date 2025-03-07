@@ -252,19 +252,21 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         public abstract String streamName();
 
-        @NonNullByDefault
+//        @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
-            final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
-            if (witness != null) {
-                request.completeWith(new RequestException("Subscription already terminated with " + witness));
-                return;
-            }
+                final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
+                if (witness != null) {
+                    if (request == null) {
+                        request.completeWith(new RequestException("Subscription already terminated with " + witness));
+                    }
+                    return;
+                }
 
             LOG.debug("Terminating subscription {} due to {}", id(), reason);
             terminateImpl(request, reason);
         }
 
-        @NonNullByDefault
+//        @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
         @Override
