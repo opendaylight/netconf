@@ -17,15 +17,23 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.YangPatch;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A YANG Patch body.
  */
 public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody, XmlPatchBody {
+    static final QName PATCH_ID = QName.create(YangPatch.QNAME, "patch-id").intern();
+    static final QName EDIT_ID = QName.create(Edit.QNAME, "edit-id").intern();
+    static final QName OPERATION = QName.create(Edit.QNAME, "operation").intern();
+    static final QName TARGET = QName.create(Edit.QNAME, "target").intern();
+
     /**
      * Resource context needed to completely resolve a {@link PatchBody}.
      */
@@ -99,5 +107,21 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
             case Create, Insert, Merge, Replace -> true;
             case Delete, Move, Remove -> false;
         };
+    }
+
+    /**
+     * Check if provided value is not null.
+     *
+     * @param value node value
+     * @param qname node QName
+     * @return provided value if it is not null, otherwise throws RequestException
+     * @throws RequestException if the value is null
+     */
+    static <T> T requireNonNullValue(final T value, final QName qname) throws RequestException {
+        if (value == null) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                "Missing required element " + qname);
+        }
+        return value;
     }
 }
