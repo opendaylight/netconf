@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.api;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 
 public final class ServerUtil {
 
@@ -28,5 +29,21 @@ public final class ServerUtil {
         if (!condition) {
             throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, message);
         }
+    }
+
+    /**
+     * Check if provided value is not null.
+     *
+     * @param value node value
+     * @param qname node QName
+     * @return provided value if it is not null, otherwise throws RequestException
+     * @throws RequestException if the value is null
+     */
+    static <T> T requireNonNullValue(final T value, final QName qname) throws RequestException {
+        if (value == null) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                "Missing required schema node " + qname);
+        }
+        return value;
     }
 }
