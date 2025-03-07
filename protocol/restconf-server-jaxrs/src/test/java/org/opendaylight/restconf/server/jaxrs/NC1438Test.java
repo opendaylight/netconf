@@ -535,6 +535,149 @@ class NC1438Test extends AbstractRestconfTest {
             }""", body::formatToJSON, true);
     }
 
+    @Test
+    void testXmlPatchWrongOperationData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>WRONG</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Operation value is incorrect: "WRONG" is not a valid name</error-message>
+                <error-tag>invalid-value</error-tag>
+                <error-info>"WRONG" is not a valid name</error-info>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchWrongOperationData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "wrong",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "invalid-value",
+                    "error-info": "\\"wrong\\" is not a valid name",
+                    "error-message": "Operation value is incorrect: \\"wrong\\" is not a valid name",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:LineLength")
+    void testXmlPatchWrongLeafData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <WRONG>0.2</WRONG>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>protocol</error-type>
+                <error-message>Error parsing YANG Patch XML: ParseError at [row,col]:[-1,-1]
+            Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=2015-04-04)player}</error-message>
+                <error-tag>malformed-message</error-tag>
+                <error-info>ParseError at [row,col]:[-1,-1]
+            Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=2015-04-04)player}</error-info>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:LineLength")
+    void testPatchWrongLeafData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "wrong" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Schema node with name wrong was not found under (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
     private static YangErrorsBody assert400PatchError(final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class, assertFormattableBody(400, invocation));
     }
