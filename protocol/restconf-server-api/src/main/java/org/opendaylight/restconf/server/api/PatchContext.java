@@ -13,13 +13,16 @@ import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.YangPatch;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
+import org.opendaylight.yangtools.yang.common.QName;
 
 @Beta
 @NonNullByDefault
 public record PatchContext(String patchId, ImmutableList<PatchEntity> entities) {
     public PatchContext {
-        requireNonNull(patchId);
-        requireNonNull(entities);
+        requireNonNull(patchId, "Missing required Schema node " + QName.create(YangPatch.QNAME, "patch-id"));
+        requireNonNull(entities, "Missing required Schema node" + Edit.QNAME);
     }
 
     public PatchContext(final String patchId, final List<PatchEntity> entities) {

@@ -10,7 +10,9 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -30,10 +32,12 @@ public class PatchEntity {
      */
     public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode,
                        final NormalizedNode node) {
-        this.editId = requireNonNull(editId);
-        this.operation = requireNonNull(operation);
-        this.targetNode = requireNonNull(targetNode);
-        this.node = requireNonNull(node);
+        this.editId = requireNonNull(editId, "Missing required Schema node" + QName.create(Edit.QNAME, "edit-id"));
+        this.operation = requireNonNull(operation, "Missing required Schema node" + QName.create(Edit.QNAME,
+            "operation"));
+        this.targetNode = requireNonNull(targetNode, "Missing required Schema node" + QName.create(Edit.QNAME,
+            "target"));
+        this.node = requireNonNull(node, "Missing required Schema node" + QName.create(Edit.QNAME, "value"));
     }
 
     /**
@@ -44,9 +48,11 @@ public class PatchEntity {
      * @param targetNode Target node for Patch edit operation
      */
     public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode) {
-        this.editId = requireNonNull(editId);
-        this.operation = requireNonNull(operation);
-        this.targetNode = requireNonNull(targetNode);
+        this.editId = requireNonNull(editId, "Missing required Schema node" + QName.create(Edit.QNAME, "edit-id"));
+        this.operation = requireNonNull(operation, "Missing required Schema node" + QName.create(Edit.QNAME,
+            "operation"));
+        this.targetNode = requireNonNull(targetNode, "Missing required Schema node" + QName.create(Edit.QNAME,
+            "target"));
         node = null;
     }
 

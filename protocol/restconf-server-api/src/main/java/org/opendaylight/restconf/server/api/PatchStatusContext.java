@@ -13,6 +13,8 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * Holder of patch status context.
@@ -24,7 +26,7 @@ public record PatchStatusContext(
     @Nullable List<RequestError> globalErrors) {
 
     public PatchStatusContext {
-        requireNonNull(patchId);
-        requireNonNull(editCollection);
+        requireNonNull(patchId, "Missing required Schema node" + QName.create(YangPatchStatus.QNAME, "patch-id"));
+        requireNonNull(editCollection, "required collection" + QName.create(YangPatchStatus.QNAME, "edit-status"));
     }
 }
