@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -46,9 +47,10 @@ public final class JsonPatchBody extends PatchBody {
             throws IOException, RequestException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
-            final var resultList = read(jsonReader, resource, patchId);
+            final var resultList = requireNonNullValue(read(jsonReader, resource, patchId), Edit.QNAME);
+            final var id = requireNonNullValue(patchId.get(), PATCH_ID);
             // Note: patchId side-effect of above
-            return new PatchContext(patchId.get(), resultList);
+            return new PatchContext(id, resultList);
         }
     }
 
@@ -159,8 +161,8 @@ public final class JsonPatchBody extends PatchBody {
 
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
-            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                codecs));
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
+                requireNonNullValue(edit.getTargetSchemaNode(), TARGET), codecs));
         }
     }
 
@@ -273,21 +275,23 @@ public final class JsonPatchBody extends PatchBody {
      * @throws RequestException if the {@link PatchEdit} is not consistent
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
-        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
-            && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (!requiresValue(edit.getOperation())) {
-                return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+        final var operation = requireNonNullValue(edit.getOperation(), OPERATION);
+        final var target = requireNonNullValue(edit.getTarget(), TARGET);
+        if (edit.getTargetSchemaNode() != null && checkDataPresence(operation, edit.getData() != null)) {
+            final var editId = requireNonNullValue(edit.getId(), EDIT_ID);
+            if (!requiresValue(operation)) {
+                return new PatchEntity(editId, operation, target);
             }
 
             // for lists allow to manipulate with list items through their parent
             final YangInstanceIdentifier targetNode;
-            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                targetNode = edit.getTarget().getParent();
+            if (target.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                targetNode = target.getParent();
             } else {
-                targetNode = edit.getTarget();
+                targetNode = target;
             }
 
-            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+            return new PatchEntity(editId, operation, targetNode, edit.getData());
         }
 
         throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
