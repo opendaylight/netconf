@@ -175,6 +175,80 @@ public class Netconf1438Test extends AbstractRestconfTest {
             }""", body::formatToJSON, true);
     }
 
+    @Test
+    void testPatchWrongOperationData() {
+        final var body = assertPatchError(400, ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "wrong",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "\\"wrong\\" is not a valid name",
+                    "error-type": "protocol"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testPatchWrongLeafData() {
+        final var body = assertPatchError(400, ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "wrong" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Schema node with name wrong was not found under (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
+                    "error-type": "protocol"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
     private static YangErrorsBody assertPatchError(final int status, final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class, assertFormattableBody(status, invocation));
     }

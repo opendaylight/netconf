@@ -126,7 +126,11 @@ public final class JsonPatchBody extends PatchBody {
                 }
                 case "operation" -> {
                     verifyStringValueType(in.peek(), editDefinition);
-                    edit.setOperation(Operation.ofName(in.nextString()));
+                    try {
+                        edit.setOperation(Operation.ofName(in.nextString()));
+                    } catch (IllegalArgumentException e) {
+                        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
+                    }
                 }
                 case "target" -> {
                     verifyStringValueType(in.peek(), editDefinition);
@@ -273,11 +277,16 @@ public final class JsonPatchBody extends PatchBody {
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private static NormalizedNode readEditData(final @NonNull JsonReader in, final @NonNull Inference targetSchemaNode,
-            final @NonNull JSONCodecFactory codecs) {
+            final @NonNull JSONCodecFactory codecs) throws RequestException {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        JsonParserStream.create(writer, codecs, targetSchemaNode).parse(in);
+        try {
+            JsonParserStream.create(writer, codecs, targetSchemaNode).parse(in);
+        } catch (RuntimeException e) {
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
+        }
         return resultHolder.getResult().data();
     }
 
