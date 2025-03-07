@@ -54,15 +54,19 @@ public final class XmlPatchBody extends PatchBody {
     private static @NonNull PatchContext parse(final ResourceContext resource, final Document doc)
             throws IOException, RequestException, XMLStreamException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
-        final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
-        final var editNodes = doc.getElementsByTagName("edit");
+        final var patchId = requireNonNullValue(doc.getElementsByTagName(PATCH_ID).item(0), PATCH_ID)
+            .getFirstChild().getNodeValue();
+        final var editNodes = doc.getElementsByTagName(EDIT);
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
-            final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
+            final String operation = requireNonNullValue(element.getElementsByTagName(OPERATION).item(0), OPERATION)
+                .getFirstChild().getNodeValue();
             final Operation oper = Operation.ofName(operation);
-            final String editId = element.getElementsByTagName("edit-id").item(0).getFirstChild().getNodeValue();
-            final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
+            final String editId = requireNonNullValue(element.getElementsByTagName(EDIT_ID).item(0), EDIT_ID)
+                .getFirstChild().getNodeValue();
+            final String target = requireNonNullValue(element.getElementsByTagName(TARGET).item(0), TARGET)
+                .getFirstChild().getNodeValue();
             final List<Element> values = readValueNodes(element, oper);
             final Element firstValueElement = values != null ? values.get(0) : null;
 
@@ -106,7 +110,7 @@ public final class XmlPatchBody extends PatchBody {
      */
     private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation)
             throws RequestException {
-        final var valueNode = element.getElementsByTagName("value").item(0);
+        final var valueNode = element.getElementsByTagName(VALUE).item(0);
 
         final boolean isWithValue = requiresValue(operation);
         if (isWithValue && valueNode == null) {

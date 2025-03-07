@@ -26,6 +26,13 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
  * A YANG Patch body.
  */
 public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody, XmlPatchBody {
+    static final String PATCH_ID = "patch-id";
+    static final String EDIT_ID = "edit-id";
+    static final String OPERATION = "operation";
+    static final String TARGET = "target";
+    static final String EDIT = "edit";
+    static final String VALUE = "value";
+
     /**
      * Resource context needed to completely resolve a {@link PatchBody}.
      */
@@ -99,5 +106,21 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
             case Create, Insert, Merge, Replace -> true;
             case Delete, Move, Remove -> false;
         };
+    }
+
+    /**
+     * Check if provided value is not null.
+     *
+     * @param value node value
+     * @param elementName element name
+     * @return provided value if it is not null, otherwise throws RequestException
+     * @throws RequestException if the value is null
+     */
+    static <T> T requireNonNullValue(final T value, final String elementName) throws RequestException {
+        if (value == null) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                "Missing required element '" + elementName + "'");
+        }
+        return value;
     }
 }

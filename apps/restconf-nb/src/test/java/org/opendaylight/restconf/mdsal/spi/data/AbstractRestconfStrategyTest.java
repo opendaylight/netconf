@@ -309,7 +309,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testPatchListDataStrategy();
 
     @Test
-    final void testPatchDataReplaceMergeAndRemove() {
+    final void testPatchDataReplaceMergeAndRemove() throws Exception {
         final var buildArtistList = ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
             .withChild(ImmutableNodes.newMapEntryBuilder()
@@ -329,7 +329,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy();
 
     @Test
-    final void testPatchDataCreateAndDelete() {
+    final void testPatchDataCreateAndDelete() throws Exception {
         patch(new PatchContext("patchCD", List.of(
             new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
             new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET))),
@@ -339,7 +339,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
 
     @Test
-    final void testPatchMergePutContainer() {
+    final void testPatchMergePutContainer() throws Exception {
         patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
             testPatchMergePutContainerStrategy(), false);
     }
