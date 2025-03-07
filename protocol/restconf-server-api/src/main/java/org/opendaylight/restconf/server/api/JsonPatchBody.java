@@ -46,9 +46,10 @@ public final class JsonPatchBody extends PatchBody {
             throws IOException, RequestException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
-            final var resultList = read(jsonReader, resource, patchId);
+            final var resultList = requireNonNullValue(read(jsonReader, resource, patchId), EDIT);
+            final var id = requireNonNullValue(patchId.get(), PATCH_ID);
             // Note: patchId side-effect of above
-            return new PatchContext(patchId.get(), resultList);
+            return new PatchContext(id, resultList);
         }
     }
 
@@ -82,7 +83,7 @@ public final class JsonPatchBody extends PatchBody {
             final @NonNull Builder<PatchEntity> resultCollection, final @NonNull AtomicReference<String> patchId)
                 throws IOException, RequestException  {
         switch (name) {
-            case "edit" -> {
+            case EDIT -> {
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
                     in.beginArray();
 
@@ -99,7 +100,7 @@ public final class JsonPatchBody extends PatchBody {
                     edit.clear();
                 }
             }
-            case "patch-id" -> patchId.set(in.nextString());
+            case PATCH_ID -> patchId.set(in.nextString());
             default -> {
                 // No-op
             }
@@ -117,9 +118,9 @@ public final class JsonPatchBody extends PatchBody {
         while (in.hasNext()) {
             final String editDefinition = in.nextName();
             switch (editDefinition) {
-                case "edit-id" -> edit.setId(in.nextString());
-                case "operation" -> edit.setOperation(Operation.ofName(in.nextString()));
-                case "target" -> {
+                case EDIT_ID -> edit.setId(in.nextString());
+                case OPERATION -> edit.setOperation(Operation.ofName(in.nextString()));
+                case TARGET -> {
                     // target can be specified completely in request URI
                     final var target = parsePatchTarget(resource, in.nextString());
                     edit.setTarget(target.instance());
@@ -134,7 +135,7 @@ public final class JsonPatchBody extends PatchBody {
                     }
                     edit.setTargetSchemaNode(stack.toInference());
                 }
-                case "value" -> {
+                case VALUE -> {
                     if (edit.getData() != null || deferredValue != null) {
                         throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
                             "Multiple value entries found");
@@ -159,8 +160,8 @@ public final class JsonPatchBody extends PatchBody {
 
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
-            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                codecs));
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
+                requireNonNullValue(edit.getTargetSchemaNode(), TARGET), codecs));
         }
     }
 
@@ -273,21 +274,23 @@ public final class JsonPatchBody extends PatchBody {
      * @throws RequestException if the {@link PatchEdit} is not consistent
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
-        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
-            && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (!requiresValue(edit.getOperation())) {
-                return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+        final var operation = requireNonNullValue(edit.getOperation(), OPERATION);
+        final var target = requireNonNullValue(edit.getTarget(), TARGET);
+        if (edit.getTargetSchemaNode() != null && checkDataPresence(operation, edit.getData() != null)) {
+            final var editId = requireNonNullValue(edit.getId(), EDIT_ID);
+            if (!requiresValue(operation)) {
+                return new PatchEntity(editId, operation, target);
             }
 
             // for lists allow to manipulate with list items through their parent
             final YangInstanceIdentifier targetNode;
-            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                targetNode = edit.getTarget().getParent();
+            if (target.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                targetNode = target.getParent();
             } else {
-                targetNode = edit.getTarget();
+                targetNode = target;
             }
 
-            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+            return new PatchEntity(editId, operation, targetNode, edit.getData());
         }
 
         throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");

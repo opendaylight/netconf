@@ -117,6 +117,268 @@ class NC1438Test extends AbstractRestconfTest {
             }""", body::formatToJSON, true);
     }
 
+    @Test
+    void testXmlPatchMissingEditIdData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Missing required element 'edit-id'</error-message>
+                <error-tag>malformed-message</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchMissingEditIdData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Missing required element 'edit-id'",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testXmlPatchMissingPatchIdData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Missing required element 'patch-id'</error-message>
+                <error-tag>malformed-message</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchMissingPatchIdData() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Missing required element 'patch-id'",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testXmlPatchMissingOperation() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Missing required element 'operation'</error-message>
+                <error-tag>malformed-message</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchMissingOperation() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Missing required element 'operation'",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testXmlPatchMissingTarget() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Missing required element 'target'</error-message>
+                <error-tag>malformed-message</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchMissingTarget() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Missing required element 'target'",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
     private static YangErrorsBody assert400PatchError(final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class, assertFormattableBody(400, invocation));
     }
