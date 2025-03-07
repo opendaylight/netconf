@@ -43,6 +43,7 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:IllegalCatch")
     PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream)
             throws IOException, RequestException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
@@ -50,6 +51,8 @@ public final class JsonPatchBody extends PatchBody {
             final var resultList = read(jsonReader, resource, patchId);
             // Note: patchId side-effect of above
             return new PatchContext(patchId.get(), resultList);
+        } catch (RuntimeException e) {
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
         }
     }
 
