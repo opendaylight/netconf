@@ -40,13 +40,12 @@ final class SubscriptionHolder extends AbstractRegistration {
         try {
             stateMachine.moveTo(id, SubscriptionState.END);
         } catch (IllegalStateException | NoSuchElementException e) {
-            LOG.warn("Could not move subscription to END state", e);
+            LOG.debug("Subscription id:{} already in end state during attempt to end it", id, e);
             return;
         }
 
         try {
-            // FIXME: proper arguments
-            subscription.terminate(null, null);
+            subscription.terminate(null, NoSuchSubscription.QNAME);
         } finally {
             try {
                 subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);

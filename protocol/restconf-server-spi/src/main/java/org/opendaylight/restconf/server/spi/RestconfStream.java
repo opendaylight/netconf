@@ -252,11 +252,12 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         public abstract String streamName();
 
-        @NonNullByDefault
-        public final void terminate(final ServerRequest<Empty> request, final QName reason) {
+        public final void terminate(final ServerRequest<Empty> request, final @NonNull QName reason) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
             if (witness != null) {
-                request.completeWith(new RequestException("Subscription already terminated with " + witness));
+                if (request != null) {
+                    request.completeWith(new RequestException("Subscription already terminated with " + witness));
+                }
                 return;
             }
 
@@ -264,8 +265,7 @@ public final class RestconfStream<T> {
             terminateImpl(request, reason);
         }
 
-        @NonNullByDefault
-        protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+        protected abstract void terminateImpl(ServerRequest<Empty> request, @NonNull QName reason);
 
         @Override
         public final String toString() {

@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -38,7 +39,7 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     }
 
     @Override
-    protected void terminateImpl(final ServerRequest<Empty> request,final QName terminationReason) {
+    protected void terminateImpl(final ServerRequest<Empty> request, final @NonNull QName terminationReason) {
         final var id = id();
         LOG.debug("{} terminated with reason {}", id, terminationReason);
 
@@ -49,13 +50,16 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             @Override
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Removed subscription {} from operational datastore as of {}", id, result);
-                delegate.terminate(request.transform(ignored -> Empty.value()), terminationReason);
+                delegate.terminate(request != null ? request.transform(ignored -> Empty.value()) : null,
+                    terminationReason);
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.warn("Failed to remove subscription {} from operational datastore", id, cause);
-                request.completeWith(new RequestException(cause));
+                if (request != null) {
+                    request.completeWith(new RequestException(cause));
+                }
             }
         }, MoreExecutors.directExecutor());
     }
