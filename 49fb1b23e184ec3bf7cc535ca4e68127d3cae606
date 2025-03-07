@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "166166ec_de01e2d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2025-03-07T08:23:43Z",
+      "side": 1,
+      "message": "Robert, should I implement changes 1. and 2.? What changes are required to get it merged, please?",
+      "parentUuid": "448ac0bb_a2ebc126",
+      "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da4f7a4f_fdfc624f",
         "filename": "apps/odl-device-notification/src/main/java/org/opendaylight/netconf/odl/device/notification/DeviceNotificationAggregate.java",
         "patchSetId": 2
