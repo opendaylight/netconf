@@ -47,8 +47,9 @@ public final class JsonPatchBody extends PatchBody {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
             final var resultList = read(jsonReader, resource, patchId);
+            final var id = requireNonNullValue(patchId.get(), "patch-id");
             // Note: patchId side-effect of above
-            return new PatchContext(patchId.get(), resultList);
+            return new PatchContext(id, resultList);
         }
     }
 
@@ -159,8 +160,8 @@ public final class JsonPatchBody extends PatchBody {
 
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
-            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                codecs));
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
+                requireNonNullValue(edit.getTargetSchemaNode(), "target"), codecs));
         }
     }
 
@@ -273,21 +274,23 @@ public final class JsonPatchBody extends PatchBody {
      * @throws RequestException if the {@link PatchEdit} is not consistent
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
-        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
-            && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (!requiresValue(edit.getOperation())) {
-                return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+        final var operation = requireNonNullValue(edit.getOperation(), "operation");
+        final var target = requireNonNullValue(edit.getTarget(), "target");
+        if (edit.getTargetSchemaNode() != null && checkDataPresence(operation, edit.getData() != null)) {
+            final var editId = requireNonNullValue(edit.getId(), "edit-id");
+            if (!requiresValue(operation)) {
+                return new PatchEntity(editId, operation, target);
             }
 
             // for lists allow to manipulate with list items through their parent
             final YangInstanceIdentifier targetNode;
-            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                targetNode = edit.getTarget().getParent();
+            if (target.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                targetNode = target.getParent();
             } else {
-                targetNode = edit.getTarget();
+                targetNode = target;
             }
 
-            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+            return new PatchEntity(editId, operation, targetNode, edit.getData());
         }
 
         throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
