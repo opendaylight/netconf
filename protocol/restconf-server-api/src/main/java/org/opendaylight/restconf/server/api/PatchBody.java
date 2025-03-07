@@ -21,6 +21,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A YANG Patch body.
@@ -99,5 +100,21 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
             case Create, Insert, Merge, Replace -> true;
             case Delete, Move, Remove -> false;
         };
+    }
+
+    /**
+     * Check if required value for Schema node is not null.
+     *
+     * @param value Schema node value
+     * @param qname QName for Schema node
+     * @return value if is not null, otherwise throws exception.
+     * @throws RequestException if the value is null.
+     */
+    static <T> T requireNonNullValue(final T value, final QName qname) throws RequestException {
+        if (value == null) {
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Missing required Schema node " + qname);
+        }
+        return value;
     }
 }

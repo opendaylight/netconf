@@ -94,7 +94,7 @@ public final class XmlPatchBody extends PatchBody {
             }
         }
 
-        return new PatchContext(patchId, entities.build());
+        return PatchContext.createPatchContext(patchId, entities.build());
     }
 
     /**

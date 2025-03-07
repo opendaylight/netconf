@@ -7,15 +7,23 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.api.PatchBody.requireNonNullValue;
 
 import com.google.common.annotations.Beta;
+import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 @Beta
 public class PatchEntity {
+    private static final QName QN_EDIT_ID = QName.create(Edit.QNAME, "edit-id");
+    private static final QName QN_OPERATION = QName.create(Edit.QNAME, "operation");
+    private static final QName QN_TARGET = QName.create(Edit.QNAME, "target");
+    private static final QName QN_VALUE = QName.create(Edit.QNAME, "value");
+
     private final Operation operation;
     private final String editId;
     private final YangInstanceIdentifier targetNode;
@@ -29,11 +37,11 @@ public class PatchEntity {
      * @param node Data defined by value leaf used by edit operation
      */
     public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode,
-                       final NormalizedNode node) {
-        this.editId = requireNonNull(editId);
-        this.operation = requireNonNull(operation);
-        this.targetNode = requireNonNull(targetNode);
-        this.node = requireNonNull(node);
+                       final NormalizedNode node) throws RequestException {
+        this.editId = requireNonNullValue(editId, QN_EDIT_ID);
+        this.operation = requireNonNullValue(operation, QN_OPERATION);
+        this.targetNode = requireNonNullValue(targetNode, QN_TARGET);
+        this.node = requireNonNullValue(node, QN_VALUE);
     }
 
     /**
@@ -43,10 +51,11 @@ public class PatchEntity {
      * @param operation Patch edit operation
      * @param targetNode Target node for Patch edit operation
      */
-    public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode) {
-        this.editId = requireNonNull(editId);
-        this.operation = requireNonNull(operation);
-        this.targetNode = requireNonNull(targetNode);
+    public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode)
+            throws RequestException {
+        this.editId = requireNonNullValue(editId, QN_EDIT_ID);
+        this.operation = requireNonNullValue(operation, QN_OPERATION);
+        this.targetNode = requireNonNullValue(targetNode, QN_TARGET);
         node = null;
     }
 
