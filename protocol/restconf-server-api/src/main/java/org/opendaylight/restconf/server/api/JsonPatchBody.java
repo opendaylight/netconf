@@ -23,9 +23,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -37,6 +39,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 public final class JsonPatchBody extends PatchBody {
+    private static final QName TARGET = QName.create(Edit.QNAME, "target").intern();
+
     public JsonPatchBody(final InputStream inputStream) {
         super(inputStream);
     }
@@ -48,7 +52,7 @@ public final class JsonPatchBody extends PatchBody {
             final var patchId = new AtomicReference<String>();
             final var resultList = read(jsonReader, resource, patchId);
             // Note: patchId side-effect of above
-            return new PatchContext(patchId.get(), resultList);
+            return PatchContext.create(patchId.get(), resultList);
         }
     }
 
@@ -156,8 +160,8 @@ public final class JsonPatchBody extends PatchBody {
 
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
-            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                codecs));
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
+                requireNonNullValue(edit.getTargetSchemaNode(), TARGET), codecs));
         }
     }
 
@@ -312,6 +316,22 @@ public final class JsonPatchBody extends PatchBody {
         if (!condition) {
             throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, message);
         }
+    }
+
+    /**
+     * Check if provided value is not null.
+     *
+     * @param value node value
+     * @param qname node QName
+     * @return provided value if it is not null, otherwise throws RequestException
+     * @throws RequestException if the value is null
+     */
+    static <T> T requireNonNullValue(final T value, final QName qname) throws RequestException {
+        if (value == null) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                "Missing required field " + qname);
+        }
+        return value;
     }
 
     /**
