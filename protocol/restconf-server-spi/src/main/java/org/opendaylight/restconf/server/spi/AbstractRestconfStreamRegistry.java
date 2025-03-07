@@ -66,9 +66,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         @Override
-        protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
+        protected void terminateImpl(final ServerRequest<Empty> request, final @NonNull QName reason) {
             subscriptions.remove(id(), this);
-            request.completeWith(Empty.value());
+            if (request != null) {
+                request.completeWith(Empty.value());
+            }
         }
     }
 
