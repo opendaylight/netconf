@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc669edd_95dd307d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T13:48:00Z",
+      "side": 1,
+      "message": "contains unresolved comments",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87c4ada5_a9baaf47",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T13:48:00Z",
+      "side": 1,
+      "message": "final var subtreeFilterBuilder \u003d new Builder(); would be more \"readable\", IMO",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d14003e6_1466e06b",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T13:48:00Z",
+      "side": 1,
+      "message": "check if child nodes - when xml.getChildElements().isEmpty()?\n\nwe have no children - what to check?",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f622b9b_b8332b73",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T13:48:00Z",
+      "side": 1,
+      "message": "what if (xml.getChildElements().isEmpty() is null?",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "daa93b7e_424dd3d8",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T13:48:00Z",
+      "side": 1,
+      "message": "`throws Exception` is usually enough in tests",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8bb5370_ad44405e",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T13:48:00Z",
+      "side": 1,
+      "message": "do we have example for Wildcard?",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
