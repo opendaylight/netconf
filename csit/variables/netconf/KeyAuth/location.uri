@@ -1,1 +1,1 @@
-rests/operations/netconf-keystore:add-keystore-entry
+$RESTCONF_ROOT/operations/netconf-keystore:add-keystore-entry
