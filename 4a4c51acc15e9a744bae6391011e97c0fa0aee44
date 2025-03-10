@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cf31b60_c73237f9",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T14:16:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87c4ada5_a9baaf47",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d14003e6_1466e06b",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-03-10T13:48:00Z",
       "side": 1,
       "message": "check if child nodes - when xml.getChildElements().isEmpty()?\n\nwe have no children - what to check?",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33907432_537412ac",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T14:16:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d14003e6_1466e06b",
       "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -87,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b3e6964_a875dd64",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T14:16:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cfe3086_52cd4325",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "daa93b7e_424dd3d8",
@@ -100,6 +154,24 @@
       "writtenOn": "2025-03-10T13:48:00Z",
       "side": 1,
       "message": "`throws Exception` is usually enough in tests",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a49fccda_a5045646",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T14:16:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daa93b7e_424dd3d8",
       "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
