@@ -118,9 +118,16 @@ public final class JsonPatchBody extends PatchBody {
         while (in.hasNext()) {
             final String editDefinition = in.nextName();
             switch (editDefinition) {
-                case "edit-id" -> edit.setId(in.nextString());
-                case "operation" -> edit.setOperation(Operation.ofName(in.nextString()));
+                case "edit-id" -> {
+                    verifyStringValueType(in.peek(), editDefinition);
+                    edit.setId(in.nextString());
+                }
+                case "operation" -> {
+                    verifyStringValueType(in.peek(), editDefinition);
+                    edit.setOperation(Operation.ofName(in.nextString()));
+                }
                 case "target" -> {
+                    verifyStringValueType(in.peek(), editDefinition);
                     // target can be specified completely in request URI
                     final var target = parsePatchTarget(resource, in.nextString());
                     edit.setTarget(target.instance());
@@ -162,6 +169,21 @@ public final class JsonPatchBody extends PatchBody {
             // read saved data to normalized node when target schema is already known
             edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
                 requireNonNullValue(edit.getTargetSchemaNode(), TARGET), codecs));
+        }
+    }
+
+    /**
+     * Check if provided {@link JsonToken} is a STRING type. If not throws {@link RequestException}.
+     *
+     * @param token {@link JsonToken}
+     * @param editDefinition Node name from {@link Edit} list
+     * @throws RequestException if provided {@link JsonToken} is not equals to {@link JsonToken#STRING}
+     */
+    private static void verifyStringValueType(final JsonToken token, final String editDefinition)
+            throws RequestException {
+        if (token != JsonToken.STRING) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                "Expected STRING for value of '" + editDefinition + "', but received " + token);
         }
     }
 
