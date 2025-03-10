@@ -143,6 +143,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e4506a38_056cd165",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T14:29:12Z",
+      "side": 1,
+      "message": "not done",
+      "parentUuid": "5b3e6964_a875dd64",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "daa93b7e_424dd3d8",
         "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
         "patchSetId": 11
@@ -207,6 +225,24 @@
       "side": 1,
       "message": "In RFC6241 - no",
       "parentUuid": "c8bb5370_ad44405e",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "745170a0_ec0acb5d",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T14:29:12Z",
+      "side": 1,
+      "message": "add one please",
+      "parentUuid": "60b7769a_af7038b9",
       "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
