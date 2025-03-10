@@ -139,6 +139,42 @@ public class Netconf1438Test extends AbstractRestconfTest {
             }""", body::formatToJSON, true);
     }
 
+    @Test
+    @SuppressWarnings("checkstyle:LineLength")
+    void testIncorrectEditIdValue() {
+        final var body = assertPatchError(400, ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : 1,
+                    "operation" : "create",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Expected STRING for value of 'edit-id', but received NUMBER",
+                    "error-type": "protocol"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
     private static YangErrorsBody assertPatchError(final int status, final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class, assertFormattableBody(status, invocation));
     }
