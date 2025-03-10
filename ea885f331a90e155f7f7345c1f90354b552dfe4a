@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e080cee4_4530d0d6",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T15:15:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb203fb8_68faa098",
+      "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e586dc08_2d20b4e0",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9684068e_d865b80e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T15:15:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e586dc08_2d20b4e0",
+      "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06c28978_ab20e955",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-10T14:29:54Z",
       "side": 1,
       "message": "does not need to be public",
+      "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "611e08c8_ad396682",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T15:15:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06c28978_ab20e955",
       "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
