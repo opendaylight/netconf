@@ -1,1 +1,1 @@
-rests/operations/netconf-node-topology:add-netconf-node
+$RESTCONF_ROOT/operations/netconf-node-topology:add-netconf-node

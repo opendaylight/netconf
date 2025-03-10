@@ -1,1 +1,1 @@
-restconf/config/network-topology:network-topology/topology/topology-netconf/node/$DEVICE_NAME
+$RESTCONF_ROOT/config/network-topology:network-topology/topology/topology-netconf/node/$DEVICE_NAME
