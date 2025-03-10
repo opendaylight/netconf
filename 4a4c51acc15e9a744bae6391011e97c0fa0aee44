@@ -101,6 +101,24 @@
       "message": "do we have example for Wildcard?",
       "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60b7769a_af7038b9",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T13:52:13Z",
+      "side": 1,
+      "message": "In RFC6241 - no",
+      "parentUuid": "c8bb5370_ad44405e",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
