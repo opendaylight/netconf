@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06c28978_ab20e955",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T14:29:54Z",
+      "side": 1,
+      "message": "does not need to be public",
+      "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
