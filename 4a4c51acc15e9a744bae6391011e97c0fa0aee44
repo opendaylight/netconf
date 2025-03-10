@@ -179,6 +179,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e99b3f87_1d5fd8d1",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T14:45:09Z",
+      "side": 1,
+      "message": "not done!!!!\n\nif (XMLNS_ATTRIBUTE_NS_URI.equals(attribute.getNamespaceURI()))",
+      "parentUuid": "0e5ba306_6339f3f7",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "daa93b7e_424dd3d8",
         "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
         "patchSetId": 11
