@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bb203fb8_68faa098",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T14:32:56Z",
+      "side": 1,
+      "message": "there seems to be no reason to use linked map",
+      "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e586dc08_2d20b4e0",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-10T14:32:56Z",
+      "side": 1,
+      "message": "traverseFilter?",
+      "revId": "ea885f331a90e155f7f7345c1f90354b552dfe4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "06c28978_ab20e955",
         "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
         "patchSetId": 11
