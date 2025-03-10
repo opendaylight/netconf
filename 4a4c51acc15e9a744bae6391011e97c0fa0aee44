@@ -195,6 +195,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "750775db_034c7a49",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T15:15:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e99b3f87_1d5fd8d1",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "daa93b7e_424dd3d8",
@@ -279,6 +297,24 @@
       "side": 1,
       "message": "add one please",
       "parentUuid": "60b7769a_af7038b9",
+      "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f42cbe20_d51aacb3",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/SubtreeFilterFromElementTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-10T15:15:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "745170a0_ec0acb5d",
       "revId": "4a4c51acc15e9a744bae6391011e97c0fa0aee44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
