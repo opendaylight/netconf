@@ -379,6 +379,126 @@ class NC1438Test extends AbstractRestconfTest {
             }""", body::formatToJSON, true);
     }
 
+    @Test
+    void tesXmltPatchWithMissingValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Create operation requires 'value' element</error-message>
+                <error-tag>invalid-value</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchWithMissingValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox"
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "invalid-value",
+                    "error-message": "Create operation requires 'value' element",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testXmlPatchWithRequiredEmptyValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>delete</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Delete operation can not have 'value' element</error-message>
+                <error-tag>invalid-value</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchWithRequiredEmptyValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "delete",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "invalid-value",
+                    "error-message": "Delete operation can not have 'value' element",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
     private static YangErrorsBody assert400PatchError(final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class, assertFormattableBody(400, invocation));
     }
