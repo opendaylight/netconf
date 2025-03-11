@@ -8,9 +8,8 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.api.ServerUtil.verify;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -131,12 +130,12 @@ public final class JsonPatchBody extends PatchBody {
 
                     if (!stack.isEmpty()) {
                         final var parentStmt = stack.currentStatement();
-                        verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
+                        verify(parentStmt instanceof SchemaNode, "Unexpected parent " + parentStmt);
                     }
                     edit.setTargetSchemaNode(stack.toInference());
                 }
                 case "value" -> {
-                    checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
+                    verify(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
                     if (edit.getTargetSchemaNode() == null) {
                         // save data defined in value node for next (later) processing, because target needs to be read
