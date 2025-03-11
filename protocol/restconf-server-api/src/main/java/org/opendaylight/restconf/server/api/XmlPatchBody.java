@@ -112,27 +112,22 @@ public final class XmlPatchBody extends PatchBody {
             throws RequestException {
         final var valueNode = element.getElementsByTagName("value").item(0);
 
-        final boolean isWithValue = requiresValue(operation);
-        if (isWithValue && valueNode == null) {
-            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
-        }
-
-        if (!isWithValue && valueNode != null) {
-            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
-        }
-
-        if (valueNode == null) {
-            return null;
-        }
-
-        final var result = new ArrayList<Element>();
-        final var childNodes = valueNode.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            if (childNodes.item(i) instanceof Element childElement) {
-                result.add(childElement);
+        if (checkDataPresence(operation, valueNode != null)) {
+            if (valueNode == null) {
+                return null;
             }
-        }
 
-        return result;
+            final var result = new ArrayList<Element>();
+            final var childNodes = valueNode.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                if (childNodes.item(i) instanceof Element childElement) {
+                    result.add(childElement);
+                }
+            }
+
+            return result;
+        }
+        throw new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, operation + " operation "
+            + (requiresValue(operation) ? "requires" : "can not have") + " 'value' element");
     }
 }
