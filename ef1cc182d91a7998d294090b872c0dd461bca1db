@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2af1c13e_d667fddb",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T14:59:41Z",
+      "side": 1,
+      "message": "missing null annotations",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "999d5f2f_0a74fe56",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T14:59:41Z",
+      "side": 1,
+      "message": "IIRC requireNonNull(prefixToNs) is enought without this.prefixes\u003d",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d15030a_1f61c3f3",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T14:59:41Z",
+      "side": 1,
+      "message": "this annotation should be on another place, maybe",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1f7994d_3000db33",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T14:59:41Z",
+      "side": 1,
+      "message": "this is not LinkedHashMap",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
