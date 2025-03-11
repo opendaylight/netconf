@@ -102,6 +102,18 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
     }
 
     /**
+     * Check if data is present when operation requires it and not present when operation data is not allowed.
+     *
+     * @param operation Name of operation
+     * @param hasData Data in edit are present/not present
+     * @return true if data is present when operation requires it or if there are no data when operation does not
+     *     allow it, false otherwise
+     */
+    static final boolean checkDataPresence(final @NonNull Operation operation, final boolean hasData) {
+        return requiresValue(operation)  == hasData;
+    }
+
+    /**
      * Check if provided value is not null.
      *
      * @param value node value
