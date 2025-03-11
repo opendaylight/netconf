@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -115,14 +116,16 @@ class JsonPatchBodyTest extends AbstractPatchBodyTest {
                     "edit" : [
                       {
                         "edit-id": "edit1",
-                        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name=\
-'my-leaf20']",
+                        "target": "/my-list2=my-leaf20",
                         "operation": "create"
                       }
                     ]
                   }
                 }"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.errors().get(0).tag());
+        final var requestError = ex.errors().get(0);
+        assertEquals(ErrorTag.INVALID_VALUE, requestError.tag());
+        assertEquals(ErrorType.APPLICATION, requestError.type());
+        assertEquals("Create operation requires 'value' element", requestError.message().elementBody());
     }
 
     /**
@@ -141,8 +144,7 @@ class JsonPatchBodyTest extends AbstractPatchBodyTest {
                       {
                         "edit-id": "edit2",
                         "operation": "delete",
-                        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name=\
-'my-leaf20']",
+                        "target": "/my-list2=my-leaf20",
                         "value": {
                           "my-list2": [
                             {
@@ -154,7 +156,10 @@ class JsonPatchBodyTest extends AbstractPatchBodyTest {
                     ]
                   }
                 }"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.errors().get(0).tag());
+        final var requestError = ex.errors().get(0);
+        assertEquals(ErrorTag.INVALID_VALUE, requestError.tag());
+        assertEquals(ErrorType.APPLICATION, requestError.type());
+        assertEquals("Delete operation can not have 'value' element", requestError.message().elementBody());
     }
 
     /**
