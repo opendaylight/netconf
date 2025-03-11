@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c4545b0_b1ec2ea0",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T07:55:47Z",
+      "side": 1,
+      "message": "why? how? I see usages only in this class.\n\nPlease add reference to patch which resolves this comment.",
+      "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbc9455b_ceb2a8bb",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T07:55:47Z",
+      "side": 1,
+      "message": "please add reference to RFC",
+      "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
