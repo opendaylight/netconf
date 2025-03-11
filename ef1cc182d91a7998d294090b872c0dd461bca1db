@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "921cb778_428f645e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T15:14:34Z",
+      "side": 1,
+      "message": "probably just class - its not just data carrier - is it?",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "999d5f2f_0a74fe56",
         "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
         "patchSetId": 19
@@ -65,6 +82,23 @@
       "writtenOn": "2025-03-11T14:59:41Z",
       "side": 1,
       "message": "this is not LinkedHashMap",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b1a0575_bea353a3",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T15:14:34Z",
+      "side": 1,
+      "message": "private",
       "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
