@@ -16,6 +16,24 @@
       "message": "Can you try to follow suggestions in your IDE - don\u0027t you have enough time to see that `arrt` has no sense?",
       "revId": "55c3c78502f79b95772b84e6a7ab7254dbd5b86d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c88bd702_20f5b637",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T08:55:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8be3007_a943a906",
+      "revId": "55c3c78502f79b95772b84e6a7ab7254dbd5b86d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
