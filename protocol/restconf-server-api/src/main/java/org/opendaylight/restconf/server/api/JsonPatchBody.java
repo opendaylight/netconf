@@ -273,10 +273,12 @@ public final class JsonPatchBody extends PatchBody {
      * @throws RequestException if the {@link PatchEdit} is not consistent
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
-        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
-            && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (!requiresValue(edit.getOperation())) {
-                return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+        final var operation = edit.getOperation();
+        requireNonNullValue(operation, QName.create(Edit.QNAME, "operation"));
+        requireNonNullValue(edit.getTargetSchemaNode(), QName.create(Edit.QNAME, "target"));
+        if (checkDataPresence(operation, edit.getData() != null)) {
+            if (!requiresValue(operation)) {
+                return new PatchEntity(edit.getId(), operation, edit.getTarget());
             }
 
             // for lists allow to manipulate with list items through their parent
@@ -287,10 +289,12 @@ public final class JsonPatchBody extends PatchBody {
                 targetNode = edit.getTarget();
             }
 
-            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+            return new PatchEntity(edit.getId(), operation, targetNode, edit.getData());
         }
 
-        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
+        throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, "Provided 'operation' value "
+            + operation + " requires" + (requiresValue(operation) ? " a non-empty" : " an empty")
+            + " value for the 'value' field");
     }
 
     /**
