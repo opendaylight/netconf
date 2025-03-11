@@ -227,6 +227,108 @@ public class NC1438Test extends AbstractRestconfTest {
             }""", body::formatToJSON, true);
     }
 
+    @Test
+    @SuppressWarnings("checkstyle:LineLength")
+    void testPatchMissingOperation() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Missing required field (urn:ietf:params:xml:ns:yang:ietf-yang-patch?revision=2017-02-22)operation",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:LineLength")
+    void testPatchWithEmptyValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox"
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Provided 'operation' value Create requires a non-empty value for the 'value' field",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testPatchWithRequiredEmptyValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "delete",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "malformed-message",
+                    "error-message": "Provided 'operation' value Delete requires an empty value for the 'value' field",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
     private static YangErrorsBody assert400PatchError(final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(YangErrorsBody.class, assertFormattableBody(400, invocation));
     }
