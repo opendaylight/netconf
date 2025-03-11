@@ -33,6 +33,7 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
     static final QName EDIT_ID = QName.create(Edit.QNAME, "edit-id").intern();
     static final QName OPERATION = QName.create(Edit.QNAME, "operation").intern();
     static final QName TARGET = QName.create(Edit.QNAME, "target").intern();
+    static final QName VALUE = QName.create(Edit.QNAME, "value").intern();
 
     /**
      * Resource context needed to completely resolve a {@link PatchBody}.
@@ -107,6 +108,18 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
             case Create, Insert, Merge, Replace -> true;
             case Delete, Move, Remove -> false;
         };
+    }
+
+    /**
+     * Check if data is present when operation requires it and not present when operation data is not allowed.
+     *
+     * @param operation Name of operation
+     * @param hasData Data in edit are present/not present
+     * @return true if data is present when operation requires it or if there are no data when operation does not
+     *     allow it, false otherwise
+     */
+    static boolean checkDataPresence(final @NonNull Operation operation, final boolean hasData) {
+        return requiresValue(operation)  == hasData;
     }
 
     /**
