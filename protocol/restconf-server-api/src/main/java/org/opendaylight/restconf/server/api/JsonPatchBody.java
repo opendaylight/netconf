@@ -168,9 +168,8 @@ public final class JsonPatchBody extends PatchBody {
                         edit.setData(readEditData(in, edit.getTargetSchemaNode(), codecs));
                     }
                 }
-                default -> {
-                    // FIXME: this does not look right, as it can wreck our logic
-                }
+                default -> throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                    "Provided unknown field " + QName.create(Edit.QNAME, editDefinition));
             }
         }
 
