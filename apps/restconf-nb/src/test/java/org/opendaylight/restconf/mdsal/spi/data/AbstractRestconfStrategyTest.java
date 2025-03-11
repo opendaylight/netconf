@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -320,7 +319,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build();
 
         patch(new PatchContext("patchRMRm",
-            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
+            ImmutableList.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
                 new PatchEntity("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
                 new PatchEntity("edit3", Operation.Remove, ARTIST_IID))),
             testPatchDataReplaceMergeAndRemoveStrategy(), false);
@@ -330,7 +329,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchDataCreateAndDelete() {
-        patch(new PatchContext("patchCD", List.of(
+        patch(new PatchContext("patchCD", ImmutableList.of(
             new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
             new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET))),
             testPatchDataCreateAndDeleteStrategy(), true);
@@ -340,8 +339,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchMergePutContainer() {
-        patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
-            testPatchMergePutContainerStrategy(), false);
+        patch(new PatchContext("patchM", ImmutableList.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID,
+                EMPTY_JUKEBOX))), testPatchMergePutContainerStrategy(), false);
     }
 
     abstract @NonNull RestconfStrategy testPatchMergePutContainerStrategy();
@@ -349,7 +348,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     final void testDeleteNonexistentData() throws Exception {
         deleteNonexistentDataTestStrategy().patchData(dataYangPatchRequest, new Data(JUKEBOX_DATABIND),
-            new PatchContext("patchD", List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))));
+            new PatchContext("patchD", ImmutableList.of(new PatchEntity("edit", Operation.Delete,
+                CREATE_AND_DELETE_TARGET))));
 
         final var status = dataYangPatchRequest.getResult().status();
         assertEquals("patchD", status.patchId());

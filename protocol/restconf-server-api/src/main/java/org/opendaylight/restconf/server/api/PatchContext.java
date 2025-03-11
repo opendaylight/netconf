@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @Beta
@@ -20,9 +19,5 @@ public record PatchContext(String patchId, ImmutableList<PatchEntity> entities) 
     public PatchContext {
         requireNonNull(patchId);
         requireNonNull(entities);
-    }
-
-    public PatchContext(final String patchId, final List<PatchEntity> entities) {
-        this(patchId, ImmutableList.copyOf(entities));
     }
 }
