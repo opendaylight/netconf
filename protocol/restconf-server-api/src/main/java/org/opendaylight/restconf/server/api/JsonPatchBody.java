@@ -8,8 +8,6 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
@@ -131,12 +129,12 @@ public final class JsonPatchBody extends PatchBody {
 
                     if (!stack.isEmpty()) {
                         final var parentStmt = stack.currentStatement();
-                        verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
+                        verify(parentStmt instanceof SchemaNode, "Unexpected parent " + parentStmt);
                     }
                     edit.setTargetSchemaNode(stack.toInference());
                 }
                 case "value" -> {
-                    checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
+                    verify(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
                     if (edit.getTargetSchemaNode() == null) {
                         // save data defined in value node for next (later) processing, because target needs to be read
@@ -300,6 +298,19 @@ public final class JsonPatchBody extends PatchBody {
      */
     private static boolean checkDataPresence(final @NonNull Operation operation, final boolean hasData) {
         return requiresValue(operation)  == hasData;
+    }
+
+    /**
+     * If provided parameter condition is false, throw a {@link RequestException}.
+     *
+     * @param condition {@code boolean}
+     * @param message message thrown if condition is false
+     * @throws RequestException if condition is false
+     */
+    private static void verify(final boolean condition, final String message) throws RequestException {
+        if (!condition) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, message);
+        }
     }
 
     /**
