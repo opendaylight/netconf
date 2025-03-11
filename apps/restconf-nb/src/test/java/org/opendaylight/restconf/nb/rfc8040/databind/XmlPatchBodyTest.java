@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -72,7 +73,10 @@ class XmlPatchBodyTest extends AbstractPatchBodyTest {
                         <target>/my-list2</target>
                     </edit>
                 </yang-patch>"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.errors().get(0).tag());
+        final var requestError = ex.errors().get(0);
+        assertEquals(ErrorTag.MISSING_ELEMENT, requestError.tag());
+        assertEquals(ErrorType.APPLICATION, requestError.type());
+        assertEquals("Create operation requires 'value' element", requestError.message().elementBody());
     }
 
     /**
@@ -99,7 +103,10 @@ class XmlPatchBodyTest extends AbstractPatchBodyTest {
                         </value>
                     </edit>
                 </yang-patch>"""));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.errors().get(0).tag());
+        final var requestError = ex.errors().get(0);
+        assertEquals(ErrorTag.UNKNOWN_ELEMENT, requestError.tag());
+        assertEquals(ErrorType.APPLICATION, requestError.type());
+        assertEquals("Delete operation can not have 'value' element", requestError.message().elementBody());
     }
 
     /**
