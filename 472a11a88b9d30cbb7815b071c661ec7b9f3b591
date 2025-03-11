@@ -16,6 +16,24 @@
       "message": "correct the source of the exception istead",
       "revId": "472a11a88b9d30cbb7815b071c661ec7b9f3b591",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d7efb5e_c7e9a0d7",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-11T12:01:12Z",
+      "side": 1,
+      "message": "Thanks, fixed.",
+      "parentUuid": "b45db103_aa6c8a7f",
+      "revId": "472a11a88b9d30cbb7815b071c661ec7b9f3b591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
