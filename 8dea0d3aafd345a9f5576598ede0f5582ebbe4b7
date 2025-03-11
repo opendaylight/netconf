@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cefa27fb_23343697",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T14:13:52Z",
+      "side": 1,
+      "message": "IDK can we consider to catch exceptions from parsing and rethrow them in `RequestException`?\n\nThere are multiple places where we have `requireNonNull`, `checkArgument`, etc. are we going to add checks like this everywhere?",
+      "revId": "8dea0d3aafd345a9f5576598ede0f5582ebbe4b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
