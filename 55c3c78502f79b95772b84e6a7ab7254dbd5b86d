@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8be3007_a943a906",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T07:55:54Z",
+      "side": 1,
+      "message": "Can you try to follow suggestions in your IDE - don\u0027t you have enough time to see that `arrt` has no sense?",
+      "revId": "55c3c78502f79b95772b84e6a7ab7254dbd5b86d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
