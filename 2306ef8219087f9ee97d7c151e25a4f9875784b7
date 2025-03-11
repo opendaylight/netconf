@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11549440_8193667f",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractRestconfStrategyTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-11T14:08:22Z",
+      "side": 0,
+      "message": "Where is a test asserting RequestException is thrown?",
+      "revId": "2306ef8219087f9ee97d7c151e25a4f9875784b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
