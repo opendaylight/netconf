@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed896268_f15aaa31",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 983,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-11T18:48:06Z",
+      "side": 0,
+      "message": "not sure about this, but to me it seems redundant as subtree filtering is explained in next \u0027chapter\u0027 right below this",
+      "range": {
+        "startLine": 983,
+        "startChar": 9,
+        "endLine": 983,
+        "endChar": 97
+      },
+      "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
