@@ -8,7 +8,6 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
@@ -136,7 +135,10 @@ public final class JsonPatchBody extends PatchBody {
                     edit.setTargetSchemaNode(stack.toInference());
                 }
                 case "value" -> {
-                    checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
+                    if (edit.getData() != null || deferredValue != null) {
+                        throw new ServerException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                            "Multiple value entries found");
+                    }
 
                     if (edit.getTargetSchemaNode() == null) {
                         // save data defined in value node for next (later) processing, because target needs to be read
