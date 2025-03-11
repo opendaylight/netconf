@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3730780_3c9ebd5d",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T15:43:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "921cb778_428f645e",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72593561_bb00773d",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T15:43:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2af1c13e_d667fddb",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "999d5f2f_0a74fe56",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-11T14:59:41Z",
       "side": 1,
       "message": "IIRC requireNonNull(prefixToNs) is enought without this.prefixes\u003d",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cce81d8a_7cfd0316",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T15:43:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "999d5f2f_0a74fe56",
       "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6511bfe3_c7aa73c8",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T15:43:55Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "1d15030a_1f61c3f3",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1f7994d_3000db33",
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c13a56c6_a1ceb102",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T15:43:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1f7994d_3000db33",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b1a0575_bea353a3",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-03-11T15:14:34Z",
       "side": 1,
       "message": "private",
+      "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59e95593_bf58ca36",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-11T15:43:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1a0575_bea353a3",
       "revId": "ef1cc182d91a7998d294090b872c0dd461bca1db",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
