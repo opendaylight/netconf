@@ -276,7 +276,7 @@ public final class JsonPatchBody extends PatchBody {
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
         final var operation = requireNonNullValue(edit.getOperation(), OPERATION);
         final var target = requireNonNullValue(edit.getTarget(), TARGET);
-        if (edit.getTargetSchemaNode() != null && checkDataPresence(operation, edit.getData() != null)) {
+        if (checkDataPresence(operation, edit.getData() != null)) {
             final var editId = requireNonNullValue(edit.getId(), EDIT_ID);
             if (!requiresValue(operation)) {
                 return new PatchEntity(editId, operation, target);
@@ -293,18 +293,8 @@ public final class JsonPatchBody extends PatchBody {
             return new PatchEntity(editId, operation, targetNode, edit.getData());
         }
 
-        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
-    }
-
-    /**
-     * Check if data is present when operation requires it and not present when operation data is not allowed.
-     * @param operation Name of operation
-     * @param hasData Data in edit are present/not present
-     * @return true if data is present when operation requires it or if there are no data when operation does not
-     *     allow it, false otherwise
-     */
-    private static boolean checkDataPresence(final @NonNull Operation operation, final boolean hasData) {
-        return requiresValue(operation)  == hasData;
+        throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, "Provided 'operation' value "
+            + operation + (requiresValue(operation) ? " requires '" : " can not have '") + VALUE + "' element");
     }
 
     /**
