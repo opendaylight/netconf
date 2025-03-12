@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cce4258e_7d979e3f",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-12T08:42:13Z",
+      "side": 1,
+      "message": "What about second argument?",
+      "revId": "0caabe40665413dba83c4cab338474492ff05c82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9da0afa_f3db2a60",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-12T08:42:13Z",
+      "side": 1,
+      "message": "Can probably be done on the previous patch",
+      "revId": "0caabe40665413dba83c4cab338474492ff05c82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
