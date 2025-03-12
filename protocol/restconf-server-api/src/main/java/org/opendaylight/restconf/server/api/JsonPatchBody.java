@@ -198,8 +198,9 @@ public final class JsonPatchBody extends PatchBody {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private static String readValueNode(final @NonNull JsonReader in) throws IOException {
+    private static String readValueNode(final @NonNull JsonReader in) throws IOException, RequestException {
         in.beginObject();
+        verify(in.peek() == JsonToken.NAME, "Empty 'value' field is not allowed");
         final var sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
 
         switch (in.peek()) {
@@ -293,10 +294,10 @@ public final class JsonPatchBody extends PatchBody {
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         try {
             JsonParserStream.create(writer, codecs, targetSchemaNode).parse(in);
+            return resultHolder.getResult().data();
         } catch (IllegalArgumentException | IllegalStateException | JsonParseException e) {
             throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, e);
         }
-        return resultHolder.getResult().data();
     }
 
     /**
