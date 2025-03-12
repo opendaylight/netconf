@@ -133,7 +133,10 @@ public final class XmlPatchBody extends PatchBody {
                     result.add(childElement);
                 }
             }
-
+            if (result.isEmpty()) {
+                throw new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+                    "Empty 'value' element is not allowed");
+            }
             return result;
         }
         if (requiresValue(operation)) {
