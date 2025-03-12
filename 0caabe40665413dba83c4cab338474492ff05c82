@@ -33,6 +33,24 @@
       "message": "Can probably be done on the previous patch",
       "revId": "0caabe40665413dba83c4cab338474492ff05c82",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "692f80a4_ea682280",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-12T15:06:08Z",
+      "side": 1,
+      "message": "patch abandoned after rebase\nIMHO it fits here, only after this changes request can be null",
+      "parentUuid": "f9da0afa_f3db2a60",
+      "revId": "0caabe40665413dba83c4cab338474492ff05c82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
