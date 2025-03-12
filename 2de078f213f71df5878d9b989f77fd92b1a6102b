@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d14b662e_cd5f07ea",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-12T09:27:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a5657bf_1a2a3ae6",
+      "revId": "2de078f213f71df5878d9b989f77fd92b1a6102b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5d8f9f6_b1808d62",
@@ -71,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e06bfee8_2f5af26a",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-12T09:27:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a629096c_f32741b8",
+      "revId": "2de078f213f71df5878d9b989f77fd92b1a6102b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "89bca65a_d541f20c",
@@ -84,6 +120,30 @@
       "writtenOn": "2025-03-07T14:36:59Z",
       "side": 1,
       "message": "\"this\" might not be correct here as \"this\" might be just delegate of forwarding subscription here",
+      "range": {
+        "startLine": 70,
+        "startChar": 39,
+        "endLine": 70,
+        "endChar": 43
+      },
+      "revId": "2de078f213f71df5878d9b989f77fd92b1a6102b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aa71d84_f8f19d17",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-12T09:27:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89bca65a_d541f20c",
       "range": {
         "startLine": 70,
         "startChar": 39,
