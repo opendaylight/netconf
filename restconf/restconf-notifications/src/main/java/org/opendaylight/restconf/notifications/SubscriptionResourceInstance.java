@@ -30,6 +30,7 @@ import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.ChannelSender;
+import org.opendaylight.restconf.server.StreamSender;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionState;
