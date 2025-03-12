@@ -22,6 +22,30 @@
       },
       "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d47bf816_bba6ae41",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 983,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-12T15:13:51Z",
+      "side": 0,
+      "message": "Yes, looks like we can delete this property from the request",
+      "parentUuid": "ed896268_f15aaa31",
+      "range": {
+        "startLine": 983,
+        "startChar": 9,
+        "endLine": 983,
+        "endChar": 97
+      },
+      "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
