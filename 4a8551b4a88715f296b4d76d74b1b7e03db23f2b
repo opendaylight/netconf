@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "4a8551b4a88715f296b4d76d74b1b7e03db23f2b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "453db7e2_5aadd234",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-12T14:11:34Z",
+      "side": 1,
+      "message": "do we need it second time?",
+      "revId": "4a8551b4a88715f296b4d76d74b1b7e03db23f2b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78b2f3a9_f6553a97",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-12T14:11:34Z",
+      "side": 1,
+      "message": "why start it again?",
+      "revId": "4a8551b4a88715f296b4d76d74b1b7e03db23f2b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
