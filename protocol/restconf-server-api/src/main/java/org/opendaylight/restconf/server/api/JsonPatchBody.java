@@ -156,10 +156,7 @@ public final class JsonPatchBody extends PatchBody {
                     edit.setTargetSchemaNode(stack.toInference());
                 }
                 case "value" -> {
-                    if (edit.getData() != null || deferredValue != null) {
-                        throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
-                            "Multiple value entries found");
-                    }
+                    verifyCondition(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
                     if (edit.getTargetSchemaNode() == null) {
                         // save data defined in value node for next (later) processing, because target needs to be read
@@ -205,8 +202,9 @@ public final class JsonPatchBody extends PatchBody {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private static String readValueNode(final @NonNull JsonReader in) throws IOException {
+    private static String readValueNode(final @NonNull JsonReader in) throws IOException, RequestException {
         in.beginObject();
+        verifyCondition(in.peek() == JsonToken.NAME, "Empty 'value' element is not allowed");
         final var sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
 
         switch (in.peek()) {
@@ -304,7 +302,12 @@ public final class JsonPatchBody extends PatchBody {
             LOG.error("Failed to parse provided JSON data", e);
             throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, e);
         }
-        return resultHolder.getResult().data();
+        try {
+            return resultHolder.getResult().data();
+        } catch (IllegalStateException e) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                "Empty 'value' element is not allowed", e);
+        }
     }
 
     /**
@@ -335,6 +338,19 @@ public final class JsonPatchBody extends PatchBody {
 
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, "Provided 'operation' value "
             + operation + (requiresValue(operation) ? " requires '" : " can not have '") + VALUE + "' element");
+    }
+
+    /**
+     * If provided parameter condition is false, throw a {@link RequestException}.
+     *
+     * @param condition {@code boolean}
+     * @param message message thrown if condition is false
+     * @throws RequestException if condition is false
+     */
+    private static void verifyCondition(final boolean condition, final String message) throws RequestException {
+        if (!condition) {
+            throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, message);
+        }
     }
 
     /**
