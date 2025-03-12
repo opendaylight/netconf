@@ -7,7 +7,11 @@
  */
 package org.opendaylight.restconf.server.jaxrs;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.Map;
@@ -552,6 +556,97 @@ class NC1438Test extends AbstractRestconfTest {
                   {
                     "error-tag": "unknown-element",
                     "error-message": "Provided unknown element 'wrong'",
+                    "error-type": "application"
+                  }
+                ]
+              }
+            }""", body::formatToJSON, true);
+    }
+
+    @Test
+    void testPatchEmptyValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        final var expectedStringPattern = "Holder org.opendaylight.yangtools.yang.data.impl.schema."
+            + "NormalizationResultHolder@[0-9a-f]+ has not been completed";
+
+        final var requestError = body.errors().getFirst();
+        final var info = requestError.info();
+        assertNotNull(info);
+        assertThat(info.elementBody(), matchesPattern(expectedStringPattern));
+        final var type = requestError.type();
+        assertNotNull(type);
+        assertEquals("application", type.elementBody());
+        final var message = requestError.message();
+        assertNotNull(message);
+        assertEquals("Empty 'value' element is not allowed", message.elementBody());
+    }
+
+    @Test
+    void testXmlPatchEmptyValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            <?xml version="1.0" ?>
+            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <error>
+                <error-type>application</error-type>
+                <error-message>Empty 'value' element is not allowed</error-message>
+                <error-tag>invalid-value</error-tag>
+              </error>
+            </errors>
+            """, body::formatToXML, true);
+    }
+
+    @Test
+    void testPatchEmptyDeferredValue() {
+        final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "value" : {
+                    }
+                    "target" : "/example-jukebox:jukebox",
+                  }
+                ]
+              }
+            }"""), uriInfo, sc, ar));
+
+        assertFormat("""
+            {
+              "errors": {
+                "error": [
+                  {
+                    "error-tag": "invalid-value",
+                    "error-message": "Empty 'value' element is not allowed",
                     "error-type": "application"
                   }
                 ]
