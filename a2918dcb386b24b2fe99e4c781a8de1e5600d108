@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e7121c7a_f81de974",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-12T11:22:26Z",
+      "side": 1,
+      "message": "Consider rebasing your changes on https://git.opendaylight.org/gerrit/c/netconf/+/115758",
+      "revId": "a2918dcb386b24b2fe99e4c781a8de1e5600d108",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "97847c65_db052223",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 2
