@@ -16,6 +16,24 @@
       "message": "createAndValidateAnd...?\n\nIMO we do not need this method and do al work in constructor including validation.",
       "revId": "cf452b5c57791e8c177114e536638c1deb496015",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63860582_546ca721",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchContext.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-12T13:56:11Z",
+      "side": 1,
+      "message": "Record constructor does not support throwing checked exception\n\n    public PatchContext {\n        requireNonNull(patchId);\n        requireNonNull(entities);\n    }\n\nMethod name changed to \"create\"",
+      "parentUuid": "7e2f21b4_e66c3aa0",
+      "revId": "cf452b5c57791e8c177114e536638c1deb496015",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
