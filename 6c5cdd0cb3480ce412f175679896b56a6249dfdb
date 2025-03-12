@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aec3408_b89579b5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-12T16:04:13Z",
+      "side": 1,
+      "message": "remove this line",
+      "revId": "6c5cdd0cb3480ce412f175679896b56a6249dfdb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3168c107_9ee1013e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-12T16:04:13Z",
+      "side": 1,
+      "message": "Unnecessary \u0027;\u0027",
+      "range": {
+        "startLine": 102,
+        "startChar": 29,
+        "endLine": 102,
+        "endChar": 30
+      },
+      "revId": "6c5cdd0cb3480ce412f175679896b56a6249dfdb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
