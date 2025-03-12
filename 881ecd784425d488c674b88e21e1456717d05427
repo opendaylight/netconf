@@ -33,6 +33,24 @@
       "message": "There is no encoding leaf in modify-subscription rpc, it should be changed to stop-time leaf",
       "revId": "881ecd784425d488c674b88e21e1456717d05427",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d881d14d_41292363",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1166,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-12T15:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef93f4c1_56fe3f78",
+      "revId": "881ecd784425d488c674b88e21e1456717d05427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
