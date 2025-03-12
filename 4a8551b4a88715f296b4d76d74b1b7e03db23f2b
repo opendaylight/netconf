@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b0888e08_f3282149",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-12T14:19:36Z",
+      "side": 1,
+      "message": "can this be parametrized test? Flow is pretty similar for two tests here and third one in next patch. If you move check for subscription-modified notification separately and unify remaining into parametrized test, pass through arguments filter and expected notification then it seems doable. What do you think?",
+      "range": {
+        "startLine": 56,
+        "startChar": 9,
+        "endLine": 56,
+        "endChar": 39
+      },
+      "revId": "4a8551b4a88715f296b4d76d74b1b7e03db23f2b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0bec1058_7aa95f9e",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
         "patchSetId": 8
