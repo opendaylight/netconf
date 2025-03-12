@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "a2918dcb386b24b2fe99e4c781a8de1e5600d108",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97847c65_db052223",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-12T08:42:17Z",
+      "side": 1,
+      "message": "Why not to check request \u003d\u003d null here?",
+      "revId": "a2918dcb386b24b2fe99e4c781a8de1e5600d108",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
