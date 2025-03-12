@@ -41,7 +41,8 @@ import org.slf4j.LoggerFactory;
  * RESTCONF implementation of {@link KillSubscription}.
  */
 @Singleton
-@Component(service = RpcImplementation.class)
+// FIXME: disabled until NETCONF-1353 is resolved
+@Component(service = RpcImplementation.class, enabled = false)
 @NonNullByDefault
 public final class KillSubscriptionRpc extends RpcImplementation {
     private static final Logger LOG = LoggerFactory.getLogger(KillSubscriptionRpc.class);
