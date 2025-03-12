@@ -131,7 +131,10 @@ public final class XmlPatchBody extends PatchBody {
                     result.add(childElement);
                 }
             }
-
+            if (result.isEmpty()) {
+                throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE,
+                    "Empty 'value' element is not allowed");
+            }
             return result;
         }
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, "Provided 'operation' value "
