@@ -16,6 +16,24 @@
       "message": "no test?",
       "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c64f99a0_d86012b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-12T15:04:33Z",
+      "side": 1,
+      "message": "Changes do not bring any new logic (or blocks of code) that can be tested by UT. It just extends the extended logic by introducing Holder of Receiver, which internally just increments AtomicLong. New logic should be covered by IT https://git.opendaylight.org/gerrit/c/netconf/+/115601",
+      "parentUuid": "d882b980_feb01307",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
