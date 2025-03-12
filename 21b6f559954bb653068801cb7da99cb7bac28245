@@ -16,6 +16,24 @@
       "message": "What about this, for example?",
       "revId": "21b6f559954bb653068801cb7da99cb7bac28245",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68259a44_78b35801",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-12T13:56:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5799fcd5_4fd57c6c",
+      "revId": "21b6f559954bb653068801cb7da99cb7bac28245",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
