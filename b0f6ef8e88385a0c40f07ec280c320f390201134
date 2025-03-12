@@ -22,6 +22,30 @@
       },
       "revId": "b0f6ef8e88385a0c40f07ec280c320f390201134",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a97acae_3538d4ce",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-12T17:17:17Z",
+      "side": 1,
+      "message": "I used it because a similar message is used in Yangtools:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115785/7/protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java#436\n\nHere is an example when it is thrown:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115874/3/protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java#474\n\nBut I have changed it to \u0027field\u0027.",
+      "parentUuid": "d809d954_559821bf",
+      "range": {
+        "startLine": 166,
+        "startChar": 38,
+        "endLine": 166,
+        "endChar": 44
+      },
+      "revId": "b0f6ef8e88385a0c40f07ec280c320f390201134",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
