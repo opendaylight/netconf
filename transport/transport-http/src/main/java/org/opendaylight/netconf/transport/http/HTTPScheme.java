@@ -63,6 +63,7 @@ public enum HTTPScheme {
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     twoToOne))
                 .addLast(new CleartextUpgradeHandler());
+                //.addLast("Http2FrameCodec", Http2FrameCodecBuilder.forServer().build());
         }
     },
     /**

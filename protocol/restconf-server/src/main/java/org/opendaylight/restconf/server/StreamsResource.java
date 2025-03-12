@@ -142,7 +142,7 @@ final class StreamsResource extends AbstractLeafResource {
     // HTTP/2 event stream start.
     private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
-        final var sender = new StreamSender(streamId);
+        final var sender = new StreamSender(streamId, sseMaximumFragmentLength);
         final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;
@@ -150,7 +150,7 @@ final class StreamsResource extends AbstractLeafResource {
         // Attach the
         senders.put(streamId, registration);
         // FIXME: add the sender to our a hashmap so we can respond to it being reset
-        return EmptyResponse.OK;
+        return new EventStreamResponse(HttpResponseStatus.OK, sender, sseHeartbeatIntervalMillis);
     }
 
     private static @Nullable Registration registerSender(final RestconfStream<?> stream,
