@@ -34,6 +34,24 @@
       "parentUuid": "bb81ba65_c6696d6e",
       "revId": "858f904e1201d09ef843620f4429814ce351912a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abd3e188_1e6e8b97",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-13T17:02:45Z",
+      "side": 1,
+      "message": "May be this one is better to be discussed in the chat for quicker response. I had similar situations with leaf method and may be it is possible to extract this method and leaf to utils. Or some other way to handle it. By making this method not private and reusing it in other class you just making EstablishSubscriptionRpc semi-util class. IMO this is something that should be fixed one way or another before getting +1.",
+      "parentUuid": "7aa9f2fb_fd7845d7",
+      "revId": "858f904e1201d09ef843620f4429814ce351912a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
