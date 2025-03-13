@@ -177,6 +177,24 @@
       "parentUuid": "d7252153_195fd90d",
       "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62a132d6_bdfa418b",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-13T13:10:28Z",
+      "side": 1,
+      "message": "It works - you can check test in reply above. Also about linked map - I brought it back to Prefixes. Reason for this is SubtreeFilterPrettyTree - when generating PrettyTree using HashMap is messing up order of the namespaces that is making it less readable. So to preserve the order I brought LinkedHashMap back.",
+      "parentUuid": "e8160509_a1be9d95",
+      "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
