@@ -22,6 +22,30 @@
       },
       "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "274bce19_0e9faf7c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T09:58:37Z",
+      "side": 0,
+      "message": "Not sure if I understand the question correctly,\n\nBut we need to put the result of createSubscription(subscription) in to subscriptions map instead of SubscriptionImpl, because this way we loose its result and on look up lookupSubscription()\nwe get only SubscriptionImpl so for example terminate() of MdsalRestconfStreamRegistry is never invoked and the subscription is never deleted from datastore.",
+      "parentUuid": "6eb2ab29_763b1f4c",
+      "range": {
+        "startLine": 220,
+        "startChar": 8,
+        "endLine": 220,
+        "endChar": 44
+      },
+      "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
