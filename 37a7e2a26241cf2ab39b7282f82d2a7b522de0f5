@@ -22,6 +22,30 @@
       },
       "revId": "37a7e2a26241cf2ab39b7282f82d2a7b522de0f5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3e53e05_94a07b24",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/ServerUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-13T12:29:12Z",
+      "side": 1,
+      "message": "ServerUtil removed.",
+      "parentUuid": "5d6eced2_13f39b49",
+      "range": {
+        "startLine": 14,
+        "startChar": 1,
+        "endLine": 14,
+        "endChar": 29
+      },
+      "revId": "37a7e2a26241cf2ab39b7282f82d2a7b522de0f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
