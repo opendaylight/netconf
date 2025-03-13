@@ -159,6 +159,24 @@
       "parentUuid": "84cebc63_aa1f821b",
       "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8160509_a1be9d95",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-13T10:19:48Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/115885",
+      "parentUuid": "d7252153_195fd90d",
+      "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
