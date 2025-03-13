@@ -9,51 +9,12 @@ package org.opendaylight.netconf.api.subtree;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.LinkedHashMap;
-import java.util.TreeSet;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 
 /**
  * A {@link PrettyTree} of a {@link SubtreeFilter}.
  */
 final class SubtreeFilterPrettyTree extends PrettyTree {
-    // FIXME: reuse already defined in this package record Prefixes
-    private static final class Prefixes {
-        final LinkedHashMap<String, String> prefixToNs;
-
-        Prefixes(final LinkedHashMap<String, String> prefixToNs) {
-            this.prefixToNs = requireNonNull(prefixToNs);
-        }
-
-        @NonNullByDefault
-        static Prefixes of(final SubtreeFilter filter) {
-            final var namespaces = new TreeSet<String>();
-            // FIXME: traverse the filter and fill namespaces
-
-            // LinkedHashMap to preserve ordering
-            final var map = LinkedHashMap.<String, String>newLinkedHashMap(namespaces.size());
-            int counter = 0;
-            for (var ns : namespaces) {
-                // FIXME: smarter assignment:
-                //        - a, b, c, d, ..., y, z, aa, ab, ..., zz, aaa, aab, ...
-                //        - but NOT "xml" or "xmlns", as those are reserved
-                map.put(ns, "p" + counter++);
-            }
-
-            return new Prefixes(map);
-        }
-
-        @NonNullByDefault
-        String getPrefix(final String namespace) {
-            final var prefix = prefixToNs.get(requireNonNull(namespace));
-            if (prefix == null) {
-                throw new IllegalStateException("No prefix assigned to namespace " + namespace);
-            }
-            return prefix;
-        }
-    }
-
     private final SubtreeFilter filter;
 
     SubtreeFilterPrettyTree(final SubtreeFilter filter) {
@@ -65,13 +26,8 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
         final var prefixes = Prefixes.of(filter);
 
         appendIndent(sb, depth);
-        sb.append("<filter type=\"subtree\"");
-        for (var entry : prefixes.prefixToNs.entrySet()) {
-            appendIndent(sb.append('\n'), depth);
-            appendQuoted(sb.append("        xmlns:").append(entry.getValue()).append('='), entry.getKey());
-        }
-        sb.append(">\n");
-
+        sb.append("<filter type=\"subtree\">");
+        appendIndent(sb.append('\n'), depth);
         appendSiblingSet(sb, depth + 1, prefixes, filter);
         appendIndent(sb, depth);
         sb.append("</filter>");
@@ -80,14 +36,17 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
     private static void appendContainment(final StringBuilder sb, final int depth, final Prefixes prefixes,
             final ContainmentNode node) {
         startSibling(sb, depth, prefixes, node);
+        sb.append(">\n");
         appendSiblingSet(sb, depth + 1, prefixes, node);
         endSibling(sb, depth, prefixes, node);
     }
 
     private static void appendContentMatch(final StringBuilder sb, final int depth, final Prefixes prefixes,
             final ContentMatchNode node) {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        startSibling(sb, depth, prefixes, node);
+        appendIndent(sb.append(">\n"), depth + 1);
+        sb.append(node.value()).append('\n');
+        endSibling(sb, depth, prefixes, node);
     }
 
     private static void appendSelection(final StringBuilder sb, final int depth, final Prefixes prefixes,
@@ -97,7 +56,7 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
         for (var am : node.attributeMatches()) {
             final var selection = am.selection();
             appendPrefix(sb.append(' '), prefixes, selection.namespace());
-            appendQuoted(sb.append(selection.name()).append('='), am.value());
+            appendAttributeData(sb.append(selection.name()).append('='), am.value());
         }
 
         sb.append("/>\n");
@@ -120,6 +79,23 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
             final Sibling node) {
         appendIndent(sb, depth);
         appendNamespaceSelection(sb.append('<'), prefixes, node);
+        // adding namespaces and prefixes at the top/first filter node
+        if (depth == 1) {
+            final var prefixesMap = prefixes.getPrefixToNs();
+            if (!prefixesMap.isEmpty()) {
+                final var prefixesIt = prefixesMap.entrySet().iterator();
+                // this never throws error because map not empty
+                var entry = prefixesIt.next();
+                // add first namespaces and prefix
+                appendAttributeData(sb.append(" xmlns:").append(entry.getValue()).append('='), entry.getKey());
+                // add other namespaces if there are some with indentation
+                while (prefixesIt.hasNext()) {
+                    entry = prefixesIt.next();
+                    appendIndent(sb.append('\n'), depth);
+                    appendAttributeData(sb.append(" xmlns:").append(entry.getValue()).append('='), entry.getKey());
+                }
+            }
+        }
     }
 
     private static void endSibling(final StringBuilder sb, final int depth, final Prefixes prefixes,
@@ -131,7 +107,7 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
 
     private static void appendNamespaceSelection(final StringBuilder sb, final Prefixes prefixes, final Sibling node) {
         switch (node.selection()) {
-            case NamespaceSelection.Exact(var name, var namespace) -> {
+            case NamespaceSelection.Exact(var namespace, var name) -> {
                 appendPrefix(sb, prefixes, namespace);
                 sb.append(name);
             }
@@ -143,8 +119,13 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
         sb.append(prefixes.getPrefix(namespace)).append(':');
     }
 
-    private static void appendQuoted(final StringBuilder sb, final String str) {
-        // FIXME: correct XML escaping here
-        sb.append('"').append(str).append('"');
+    // Append xml attribute data surrounded with double quotes
+    private static void appendAttributeData(final StringBuilder sb, final String str) {
+        // replace double quotes inside string with correct escaping to avoid conflicts
+        sb.append('"').append(escapeDoubleQuotes(str)).append('"');
+    }
+
+    private static String escapeDoubleQuotes(final String str) {
+        return str.replaceAll("\"", "&quot;");
     }
 }
