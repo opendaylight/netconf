@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "33058537_8fe03a04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T11:11:16Z",
+      "side": 1,
+      "message": "yes this currently uses unfinished AbstractRestconfStreamRegistry.resolveFilter()",
+      "parentUuid": "a7943ed8_2d2fb584",
+      "revId": "dba92c3007667bac3852693e089ea67a150a253c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3c0311ed_be3f48b8",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
         "patchSetId": 9
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-13T09:09:07Z",
       "side": 1,
       "message": "why commented?",
+      "revId": "dba92c3007667bac3852693e089ea67a150a253c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "594ae0ee_1163f8d9",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T11:11:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c0311ed_be3f48b8",
       "revId": "dba92c3007667bac3852693e089ea67a150a253c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

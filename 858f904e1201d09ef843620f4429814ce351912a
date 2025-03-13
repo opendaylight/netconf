@@ -16,6 +16,24 @@
       "message": "Maybe better to move this into SubscriptionUtil? since it is used in different RPC",
       "revId": "858f904e1201d09ef843620f4429814ce351912a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7aa9f2fb_fd7845d7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T11:11:16Z",
+      "side": 1,
+      "message": "so this is bit problematic to resolve as it uses leaf() which is protected in RpcImplementation, I was thinking about placing this method there but it\u0027s quite specific for RFC8639 notifications.",
+      "parentUuid": "bb81ba65_c6696d6e",
+      "revId": "858f904e1201d09ef843620f4429814ce351912a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
