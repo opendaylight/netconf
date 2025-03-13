@@ -16,6 +16,24 @@
       "message": "Why we get rid of stop-time leaf? it should be available in modify-subscription input according to YANG model",
       "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4daa168b_d6a6c2b7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-13T09:09:26Z",
+      "side": 0,
+      "message": "we do not support replay",
+      "parentUuid": "2ac20b0e_2a1ecce3",
+      "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
