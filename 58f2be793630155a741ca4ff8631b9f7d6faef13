@@ -94,6 +94,30 @@
       },
       "revId": "58f2be793630155a741ca4ff8631b9f7d6faef13",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee274ee0_7a8be3ed",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-13T09:43:11Z",
+      "side": 1,
+      "message": "It is fine the way it is now - from xml point on view they are same.",
+      "parentUuid": "a5e7b562_d026f0bd",
+      "range": {
+        "startLine": 111,
+        "startChar": 26,
+        "endLine": 116,
+        "endChar": 25
+      },
+      "revId": "58f2be793630155a741ca4ff8631b9f7d6faef13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
