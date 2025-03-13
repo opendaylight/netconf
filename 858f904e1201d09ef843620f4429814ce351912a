@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb81ba65_c6696d6e",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-13T09:14:53Z",
+      "side": 1,
+      "message": "Maybe better to move this into SubscriptionUtil? since it is used in different RPC",
+      "revId": "858f904e1201d09ef843620f4429814ce351912a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
