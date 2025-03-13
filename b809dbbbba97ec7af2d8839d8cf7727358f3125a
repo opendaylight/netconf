@@ -34,6 +34,108 @@
       "parentUuid": "d882b980_feb01307",
       "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03546812_5cec6080",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T07:39:11Z",
+      "side": 1,
+      "message": "extra empty line",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12865ed9_ea9053c3",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T07:39:11Z",
+      "side": 1,
+      "message": "final?",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fb2c301_2a3bbdd3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T07:39:11Z",
+      "side": 1,
+      "message": "extra line",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3f13fa3_057c5e53",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T07:39:11Z",
+      "side": 1,
+      "message": "indent",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63472c1f_f9c29abe",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ChannelSenderSubscription.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T07:39:11Z",
+      "side": 1,
+      "message": "extra line",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa4bdb8c_cdd63756",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ChannelSenderSubscription.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T07:39:11Z",
+      "side": 1,
+      "message": "extra line",
+      "revId": "b809dbbbba97ec7af2d8839d8cf7727358f3125a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
