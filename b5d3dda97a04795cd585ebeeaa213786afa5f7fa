@@ -16,6 +16,24 @@
       "message": "class is already Disabled",
       "revId": "b5d3dda97a04795cd585ebeeaa213786afa5f7fa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df15ac9_1e1b8d97",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-13T16:02:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28493814_348c1578",
+      "revId": "b5d3dda97a04795cd585ebeeaa213786afa5f7fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
