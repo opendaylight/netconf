@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7943ed8_2d2fb584",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-13T09:09:07Z",
+      "side": 1,
+      "message": "Do we need to deal with filtering now?",
+      "revId": "dba92c3007667bac3852693e089ea67a150a253c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c0311ed_be3f48b8",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-13T09:09:07Z",
+      "side": 1,
+      "message": "why commented?",
+      "revId": "dba92c3007667bac3852693e089ea67a150a253c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
