@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c047ef96_9afd4b85",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T14:45:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c3f95cf_e957a628",
+      "revId": "a715463f446782e02368a8c77344ff982362aa47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a520b7a8_31ee1e8c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T14:45:03Z",
+      "side": 1,
+      "message": "I have only switched from IllegalStateException to RuntimeException.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115872/7/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#297\n\nDelete is handled with test here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115872/7/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#297",
+      "parentUuid": "2296fe0f_90985b87",
+      "revId": "a715463f446782e02368a8c77344ff982362aa47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ede3265b_191a96ac",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-14T12:06:41Z",
       "side": 1,
       "message": "where is it produced?",
+      "revId": "a715463f446782e02368a8c77344ff982362aa47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90c0d04d_9f547229",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T14:45:03Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/115878/6/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#210\n\nand\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115878/6/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#303",
+      "parentUuid": "ede3265b_191a96ac",
       "revId": "a715463f446782e02368a8c77344ff982362aa47",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
