@@ -213,6 +213,24 @@
       "parentUuid": "62a132d6_bdfa418b",
       "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edead65e_a9a1caa8",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-14T16:23:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e7b6219_c3b357bc",
+      "revId": "096cf6a81bc8a4c08405b2cf3f02dc35df01cd55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
