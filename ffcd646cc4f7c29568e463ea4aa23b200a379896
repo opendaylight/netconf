@@ -33,6 +33,227 @@
       "message": "excluded-event-records",
       "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "383336bc_ba22c1f7",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "EXCLUDED_EVENT_RECORDS",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f81bf367_3f6c357a",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "the type is ZeroBasedCounter64",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e5f77d3_6bc16ca3",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "what\u0027s default? - seems you have covered all cases from enum",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2eb0eb66_39fe55f7",
+        "filename": "protocol/restconf-server-spi/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "is this a test dependency?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc279b39_6936bfdd",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "@NonNullByDefault?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bcabea4_d5d1f753",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "public final class",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b24bc16_b639d7a3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "whose name, receiver\u0027s?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8755583a_fb685960",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "what is the value you trace in logs? this one ignored here or some updated \"in the middle\" of datastore update operation?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07ef9470_ed2c4873",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "you can have one line less here",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fecef551_a4a49e0e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "the same problems as in sent counter method",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa6273fb_0d7479f3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "use imperative: Update the counter\n\nhttps://cbea.ms/git-commit/#imperative",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ab3dcb0_3ab70634",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "here its acceptable IMO",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "875ec590_194eb920",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ChannelSenderSubscription.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:28:05Z",
+      "side": 1,
+      "message": "send first - then update?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
