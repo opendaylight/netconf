@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b504db1_1407270a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 16
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T08:55:11Z",
+      "side": 1,
+      "message": "maybe it would be better to create a subtask just for counters",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
