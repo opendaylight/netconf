@@ -16,6 +16,23 @@
       "message": "maybe it would be better to create a subtask just for counters",
       "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d7e9a01_2d98fc62",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T09:03:19Z",
+      "side": 1,
+      "message": "excluded-event-records",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
