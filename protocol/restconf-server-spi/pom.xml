@@ -50,6 +50,10 @@
             <artifactId>rfc8072</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc8639</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>databind</artifactId>
         </dependency>
