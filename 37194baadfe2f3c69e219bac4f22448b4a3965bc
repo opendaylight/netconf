@@ -16,6 +16,24 @@
       "message": "how can \"aa\" equals to xml? do we need to check it?",
       "revId": "37194baadfe2f3c69e219bac4f22448b4a3965bc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "324f7da0_09de2763",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T08:38:24Z",
+      "side": 1,
+      "message": "ok, lets say it can, perhaps would be better if prefixOf will not return us this results?",
+      "parentUuid": "2bfee3f3_49bfe899",
+      "revId": "37194baadfe2f3c69e219bac4f22448b4a3965bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
