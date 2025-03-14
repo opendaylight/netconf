@@ -177,6 +177,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fe89f99_43f9e79a",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T09:45:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03f0cf7e_19708613",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "158d049a_929c10a7",
@@ -190,6 +208,24 @@
       "writtenOn": "2025-03-14T07:09:09Z",
       "side": 1,
       "message": "How do I know to use this one?",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f9a14e7_b361db85",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T09:45:42Z",
+      "side": 1,
+      "message": "You have two options, one throw a checked exception and the second do not.\n\nWe can convert PatchContext back to a normal class, so that only one constructor could be used. Would this be better?",
+      "parentUuid": "158d049a_929c10a7",
       "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
