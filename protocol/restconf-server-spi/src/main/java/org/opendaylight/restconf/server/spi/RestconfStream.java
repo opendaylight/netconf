@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
@@ -28,6 +29,14 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.ReceiversBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -275,6 +284,25 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return helper.add("terminated", terminated);
+        }
+
+        public final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription toOperational() {
+            Encoding encoding = null;
+            if (encoding().getLocalName().equals("encode-xml")){
+                encoding = EncodeXml$I.VALUE;
+            } else if (encoding().getLocalName().equals("encode-json")) {
+                encoding = EncodeJson$I.VALUE;
+            }
+            return new SubscriptionBuilder()
+                .setId(new SubscriptionId(id()))
+                .setEncoding(encoding)
+                .setReceivers(new ReceiversBuilder()
+                    .setReceiver(Map.of(new ReceiverKey(receiverName()), new ReceiverBuilder()
+                        .setName(receiverName())
+                        //FIXME: make state of receiver accessible and add it here
+                    .build())).build())
+                //TODO: add other fields
+                .build();
         }
     }
 
