@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2296fe0f_90985b87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T12:06:41Z",
+      "side": 1,
+      "message": "why not? for delete, for example?",
+      "revId": "a715463f446782e02368a8c77344ff982362aa47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c3f95cf_e957a628",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T12:06:41Z",
+      "side": 1,
+      "message": "bracelets?",
+      "revId": "a715463f446782e02368a8c77344ff982362aa47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ede3265b_191a96ac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T12:06:41Z",
+      "side": 1,
+      "message": "where is it produced?",
+      "revId": "a715463f446782e02368a8c77344ff982362aa47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
