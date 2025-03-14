@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd33bbe2_c3a182a3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 16
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b504db1_1407270a",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d7e9a01_2d98fc62",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3beacaf_f7336e80",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d7e9a01_2d98fc62",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "383336bc_ba22c1f7",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-14T09:28:05Z",
       "side": 1,
       "message": "EXCLUDED_EVENT_RECORDS",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f5c9d75_309d81ca",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "383336bc_ba22c1f7",
       "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "03046014_1d2c2d4e",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Agree but when I tried to write `new ZeroBasedCounter64(Uint64.valueOf(receiver.sentEventCounter().get()))`\nThere is an issue\n```\nTransactionCommitFailedException{message\u003dcanCommit encountered an unexpected failure, errorList\u003d[RpcError [message\u003dcanCommit encountered an unexpected failure, severity\u003dERROR, errorType\u003dAPPLICATION, tag\u003doperation-failed, applicationTag\u003dnull, info\u003dnull, cause\u003djava.io.IOException: Unhandled value type class org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64]]}\n```",
+      "parentUuid": "f81bf367_3f6c357a",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7e5f77d3_6bc16ca3",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
         "patchSetId": 16
@@ -82,6 +154,24 @@
       "writtenOn": "2025-03-14T09:28:05Z",
       "side": 1,
       "message": "what\u0027s default? - seems you have covered all cases from enum",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9855eeb1_58b1a0f4",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "It allows me to make `LeafNode\u003cUint64\u003e counterValue` final and not assign null before the switch-case construction",
+      "parentUuid": "7e5f77d3_6bc16ca3",
       "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f38e9f3_7497de91",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc279b39_6936bfdd",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0bcabea4_d5d1f753",
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d4a5aa2_f509095d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bcabea4_d5d1f753",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b24bc16_b639d7a3",
@@ -150,6 +276,24 @@
       "writtenOn": "2025-03-14T09:28:05Z",
       "side": 1,
       "message": "whose name, receiver\u0027s?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3029549e_5a23fa02",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b24bc16_b639d7a3",
       "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -188,6 +332,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23258f37_34669b46",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ReceiverHolder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07ef9470_ed2c4873",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fecef551_a4a49e0e",
@@ -222,6 +384,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9099782f_0c1a308c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa6273fb_0d7479f3",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ab3dcb0_3ab70634",
@@ -239,6 +419,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a45d4dfb_14ff4155",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ab3dcb0_3ab70634",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "875ec590_194eb920",
@@ -252,6 +450,24 @@
       "writtenOn": "2025-03-14T09:28:05Z",
       "side": 1,
       "message": "send first - then update?",
+      "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0967720_8f8cdf7d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ChannelSenderSubscription.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-14T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "875ec590_194eb920",
       "revId": "ffcd646cc4f7c29568e463ea4aa23b200a379896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
