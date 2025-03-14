@@ -50,6 +50,11 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
         return delegate.streamName();
     }
 
+    @Override
+    public final RestconfStream.Receiver receiver(){
+        return delegate.receiver();
+    }
+
     protected final @NonNull T delegate() {
         return delegate;
     }
