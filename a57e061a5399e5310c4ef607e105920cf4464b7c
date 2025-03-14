@@ -86,6 +86,24 @@
       "parentUuid": "ff1e5e40_e0156dd8",
       "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62e0dfbd_d032a00c",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T07:06:21Z",
+      "side": 1,
+      "message": "https://blogs.oracle.com/javamagazine/post/exploring-joshua-blochs-builder-design-pattern-in-java",
+      "parentUuid": "c0addbd6_ecbcf98f",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
