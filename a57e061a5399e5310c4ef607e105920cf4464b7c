@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "864e3509_376a9d54",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T09:14:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfb45ac0_2391d037",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92d37b87_7903555d",
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "then, can we get rid of passing QNames and rely on error-path?",
       "parentUuid": "92d37b87_7903555d",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dea6b819_277ace49",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T09:14:12Z",
+      "side": 1,
+      "message": "The #newProtocolMalformedMessageServerException is focused on errors from writing data to the datastore. That is why it uses ErrorType.PROTOCOL.\n\nHere is the JSON processed to a POJO class, which is then written to the datastore. Basically, it\u0027s just validating the provided JSON data based on the ietf-yang-patch model\nhttps://github.com/opendaylight/mdsal/blob/master/model/ietf/rfc8072/src/main/yang/ietf-yang-patch%402017-02-22.yang#L82\n\nSo, these methods operate on different sources of exceptions, and mixing them, IMO, is not a good idea.\n\nI choose to use QName because Yangtools replies similarly:\nhttps://github.com/opendaylight/yangtools/blob/v14.0.11/codec/yang-data-codec-gson/src/main/java/org/opendaylight/yangtools/yang/data/codec/gson/JsonParserStream.java#L295\n\nHere you can see this reply:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115785/9/protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java#436",
+      "parentUuid": "9c0f4b8b_5f01f35d",
       "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -102,6 +138,24 @@
       "side": 1,
       "message": "https://blogs.oracle.com/javamagazine/post/exploring-joshua-blochs-builder-design-pattern-in-java",
       "parentUuid": "c0addbd6_ecbcf98f",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcf69181_2cc70453",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-14T09:14:12Z",
+      "side": 1,
+      "message": "Record can not have private constructor. I can use Builder pattern:\nhttps://howtodoinjava.com/java/basics/builder-pattern-for-java-records/\n\nBut it will not prevent the use of its default public constructor.",
+      "parentUuid": "62e0dfbd_d032a00c",
       "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
