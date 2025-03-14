@@ -104,6 +104,40 @@
       "parentUuid": "c0addbd6_ecbcf98f",
       "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03f0cf7e_19708613",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T07:09:09Z",
+      "side": 1,
+      "message": "intern?",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "158d049a_929c10a7",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-14T07:09:09Z",
+      "side": 1,
+      "message": "How do I know to use this one?",
+      "revId": "a57e061a5399e5310c4ef607e105920cf4464b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
