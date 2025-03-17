@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a39f50b8_25b65a2d",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T08:28:18Z",
+      "side": 1,
+      "message": "what is key and what is the value here?",
+      "revId": "a9bb50ea7446171459d7a8d4132c3a8256c3ae5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
