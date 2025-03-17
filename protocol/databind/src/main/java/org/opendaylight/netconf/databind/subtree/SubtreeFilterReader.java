@@ -20,6 +20,12 @@ final class SubtreeFilterReader {
 
     static SubtreeFilter readSubtreeFilter(final XMLStreamReader reader, final DatabindContext databind)
             throws XMLStreamException {
+        // load from datastore
+        // read XML element from ?AnyData node? netconf.api.SubtreeFilter readFrom(final Element element)
+        // read SubtreeFilter readFrom(final DatabindContext databind, final XMLStreamReader reader)
+        // ?
+
+
         // FIXME: implement this
         throw new UnsupportedOperationException();
     }
