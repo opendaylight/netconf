@@ -132,12 +132,14 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
             LOG.debug("Stream '{}' not found", streamName);
             return EmptyResponse.NOT_FOUND;
         }
-        final var streamParams = EventStreamGetParams.of(QueryParameters.of());
 
         final var sender = new ChannelSender(sseMaximumFragmentLength);
 
         // Encoding is optional field and in case it is absent json encoding will be used by default
         final var encoding = encodingNameOf(subscription.encoding());
+
+        // 1. pass subscription#target#filter to subscriber
+        final var streamParams = EventStreamGetParams.of(QueryParameters.of());
         final var registration = registerSender(stream, encoding, streamParams, sender);
 
         if (registration == null) {
