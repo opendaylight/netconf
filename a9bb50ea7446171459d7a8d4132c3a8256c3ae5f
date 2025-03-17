@@ -16,6 +16,24 @@
       "message": "what is key and what is the value here?",
       "revId": "a9bb50ea7446171459d7a8d4132c3a8256c3ae5f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89bb76c1_70242907",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-17T12:03:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a39f50b8_25b65a2d",
+      "revId": "a9bb50ea7446171459d7a8d4132c3a8256c3ae5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
