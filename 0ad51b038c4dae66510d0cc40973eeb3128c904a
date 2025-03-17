@@ -69,6 +69,24 @@
       "parentUuid": "94188e6a_5a811298",
       "revId": "0ad51b038c4dae66510d0cc40973eeb3128c904a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b48bc02b_3c10ea84",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T15:20:44Z",
+      "side": 1,
+      "message": "yes, that can be checked in IDE, IMO",
+      "parentUuid": "69a9b5fa_1afbc701",
+      "revId": "0ad51b038c4dae66510d0cc40973eeb3128c904a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
