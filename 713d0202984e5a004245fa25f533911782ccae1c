@@ -16,6 +16,24 @@
       "message": "this is like...\n\nwhy not private?\n\nwhy not check it (all problematic fields) here?\n\nwhy to use this method from patch context?\n\nwhy not throw all validation exception from patch body/reader?",
       "revId": "713d0202984e5a004245fa25f533911782ccae1c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a2cbb27_91edbc9f",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-17T10:10:54Z",
+      "side": 1,
+      "message": "why not private?\n - Because it is used by other classes.\n\nwhy not check it (all problematic fields) here?\n - I do not understand the question. Can you please provide more detail?\n\nwhy to use this method from patch context?\n - Because these classes require a similar check (PatchEntity, PatchContext and JsonPatchBody). So the answer is removing redundant duplicate code.\n\nwhy not throw all validation exception from patch body/reader?\n - Probably answered here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115785/1..12/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#b46\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115878/comments/3abf4a7b_8e648011",
+      "parentUuid": "ad4bc6b9_278d54b8",
+      "revId": "713d0202984e5a004245fa25f533911782ccae1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
