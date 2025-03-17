@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00d298a5_df7af9d6",
+        "filename": "protocol/netconf-api/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-17T14:26:31Z",
+      "side": 1,
+      "message": "alphabetical order",
+      "revId": "0ad51b038c4dae66510d0cc40973eeb3128c904a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94188e6a_5a811298",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-17T14:26:31Z",
+      "side": 1,
+      "message": "https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringEscapeUtils.html\n\nDeprecated.\nAs of 3.6, use Apache Commons Text StringEscapeUtils instead",
+      "revId": "0ad51b038c4dae66510d0cc40973eeb3128c904a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
