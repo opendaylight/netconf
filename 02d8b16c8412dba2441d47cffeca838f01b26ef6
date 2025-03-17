@@ -16,6 +16,24 @@
       "message": "why is this moved?",
       "revId": "02d8b16c8412dba2441d47cffeca838f01b26ef6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b499e88b_b4d72fbf",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-17T10:18:41Z",
+      "side": 0,
+      "message": "To \"Handle empty \u0027value\u0027 in YangPatch\". Here is a test for this use-case:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115878/8/protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java#487",
+      "parentUuid": "612c0b03_0efee6a8",
+      "revId": "02d8b16c8412dba2441d47cffeca838f01b26ef6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
