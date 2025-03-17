@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "a50cff5384e37e441aefc8cb5cae32d1cf0423d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32f923d3_90583a98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T14:46:24Z",
+      "side": 1,
+      "message": "I have found no issue in RFC that prevents no change modifications - remove filtering logic - it will be part of another task.",
+      "revId": "a50cff5384e37e441aefc8cb5cae32d1cf0423d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c57032a6_bfb34d5f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T14:46:24Z",
+      "side": 1,
+      "message": "do we really need to bother with filtering?",
+      "revId": "a50cff5384e37e441aefc8cb5cae32d1cf0423d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
