@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a516fa9_05624143",
+        "filename": "protocol/netconf-api/src/main/java/module-info.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T11:27:26Z",
+      "side": 1,
+      "message": "this is not Annotation-only dependencies",
+      "revId": "e80ac73ec925d205ffa7fba83faf7115b6b5cfb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70b7b65f_4267c88e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T11:27:26Z",
+      "side": 1,
+      "message": "why do we need one line method?",
+      "revId": "e80ac73ec925d205ffa7fba83faf7115b6b5cfb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
