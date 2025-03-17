@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae521171_dcf1c052",
+        "filename": "protocol/netconf-api/src/main/java/module-info.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-17T11:43:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a516fa9_05624143",
+      "revId": "e80ac73ec925d205ffa7fba83faf7115b6b5cfb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70b7b65f_4267c88e",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-17T11:27:26Z",
       "side": 1,
       "message": "why do we need one line method?",
+      "revId": "e80ac73ec925d205ffa7fba83faf7115b6b5cfb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0a5657d_04f1734c",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-17T11:43:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70b7b65f_4267c88e",
       "revId": "e80ac73ec925d205ffa7fba83faf7115b6b5cfb8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
