@@ -69,6 +69,24 @@
       "parentUuid": "d304ca25_b4429095",
       "revId": "d899e5d49f1c516a4ea50f1ed91090329b7016ed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2eb3505e_113ed119",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T09:45:45Z",
+      "side": 1,
+      "message": "can you point me to the docs that says it?",
+      "parentUuid": "c061108b_307e0b02",
+      "revId": "d899e5d49f1c516a4ea50f1ed91090329b7016ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
