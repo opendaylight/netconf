@@ -52,6 +52,24 @@
       "parentUuid": "3a2cbb27_91edbc9f",
       "revId": "713d0202984e5a004245fa25f533911782ccae1c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56b0fa77_11431fee",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-17T10:22:31Z",
+      "side": 1,
+      "message": "`PatchBody` seems to be correct place for this method IMHO",
+      "parentUuid": "6d3ca438_f20417a8",
+      "revId": "713d0202984e5a004245fa25f533911782ccae1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
