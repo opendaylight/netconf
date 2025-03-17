@@ -82,6 +82,7 @@ abstract sealed class Subscribers<T> {
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             final var formatted = format(subscriber.formatter(), modelContext, input, now);
+            // 3. filter - create databind filter and use its Matcher
             if (formatted != null) {
                 subscriber.sender().sendDataMessage(formatted);
             }
@@ -121,6 +122,7 @@ abstract sealed class Subscribers<T> {
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             for (var entry : subscribers.asMap().entrySet()) {
                 final var formatted = format(entry.getKey(), modelContext, input, now);
+                // 3. filter - create databind filter and use its Matcher
                 if (formatted != null) {
                     for (var subscriber : entry.getValue()) {
                         subscriber.sender().sendDataMessage(formatted);

@@ -18,7 +18,17 @@ final class SubtreeFilterWriter {
     }
 
     static void writeSubtreeFilter(final XMLStreamWriter writer, final SubtreeFilter filter) throws XMLStreamException {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        for (final var containment : filter.containments()) {
+            final var selections = containment.selections();
+            for (final var selection : selections) {
+                final var namespaceSelection = selection.selection();
+                if (namespaceSelection instanceof NamespaceSelection.Exact exact) {
+                    // writer.write()
+                }
+                if (namespaceSelection instanceof NamespaceSelection.Wildcard) {
+                    // writer.write()
+                }
+            }
+        }
     }
 }

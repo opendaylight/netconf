@@ -7,10 +7,15 @@
  */
 package org.opendaylight.netconf.databind.subtree;
 
+import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 
 @NonNullByDefault
 final class SubtreeFilterReader {
@@ -19,8 +24,19 @@ final class SubtreeFilterReader {
     }
 
     static SubtreeFilter readSubtreeFilter(final XMLStreamReader reader, final DatabindContext databind)
-            throws XMLStreamException {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+            throws IOException, XMLStreamException {
+        final var builder = SubtreeFilter.builder(databind);
+
+        final var result = new NormalizationResultHolder();
+        final var streamWriter = ImmutableNormalizedNodeStreamWriter.from(result);
+        final var xmlParser = XmlParserStream.create(streamWriter, databind.modelContext());
+        xmlParser.parse(reader);
+        final var transformed = ((ContainerNode) result.getResult().data());
+        for (final var child : transformed.body()) {
+            final var identifier = child.name();
+            // builder.add(new Sibling with identifier - namespace/QName?)
+        }
+
+        return builder.build();
     }
 }
