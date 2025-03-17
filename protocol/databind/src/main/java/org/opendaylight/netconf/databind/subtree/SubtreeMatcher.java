@@ -28,8 +28,11 @@ public final class SubtreeMatcher implements Immutable {
     }
 
     public boolean matches() {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        // 4. filter: go over containments to node selection to attribute match
+        for (final var c : filter.containments()) {
+            return true;
+        }
+        return false;
     }
 
     @Override
