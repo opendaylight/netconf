@@ -22,6 +22,30 @@
       },
       "revId": "bc88a8aa47c4daed053a7ec2373aa4a6a2639b30",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09faa1e7_3de2479d",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-18T09:26:30Z",
+      "side": 1,
+      "message": "Fixed. Moved to:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115878/10",
+      "parentUuid": "f4670736_5011672f",
+      "range": {
+        "startLine": 311,
+        "startChar": 24,
+        "endLine": 311,
+        "endChar": 39
+      },
+      "revId": "bc88a8aa47c4daed053a7ec2373aa4a6a2639b30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
