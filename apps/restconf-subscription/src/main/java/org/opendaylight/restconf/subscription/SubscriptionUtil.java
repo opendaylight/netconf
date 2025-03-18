@@ -30,7 +30,6 @@ public final class SubscriptionUtil {
     public static final QName QNAME_ID = QName.create(Subscription.QNAME, "id");
     public static final QName QNAME_STREAM = QName.create(Subscription.QNAME, "stream");
     public static final QName QNAME_STREAM_FILTER = QName.create(Subscription.QNAME, "stream-filter-name");
-    public static final QName QNAME_STOP_TIME = QName.create(Subscription.QNAME, "stop-time");
     public static final QName QNAME_ENCODING = QName.create(Subscription.QNAME, "encoding");
     public static final QName QNAME_STREAM_NAME = QName.create(Stream.QNAME, "name");
     public static final QName QNAME_STREAM_FILTER_NAME = QName.create(StreamFilter.QNAME, "name");
