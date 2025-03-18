@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7eee2426_66ef6f4b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-18T08:43:24Z",
+      "side": 1,
+      "message": "OK, it should be there as establish and modify inputs are the same and they requires stream - but establish has one more augmentation wit stream itself referencing to stream - thus mandatory is satisfied without filters - when we just add stream reference",
+      "parentUuid": "32f923d3_90583a98",
+      "revId": "a50cff5384e37e441aefc8cb5cae32d1cf0423d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c57032a6_bfb34d5f",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-03-17T14:46:24Z",
       "side": 1,
       "message": "do we really need to bother with filtering?",
+      "revId": "a50cff5384e37e441aefc8cb5cae32d1cf0423d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b102777e_83ed7223",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-18T08:43:24Z",
+      "side": 1,
+      "message": "yes, as its the only thing we can update 😊",
+      "parentUuid": "c57032a6_bfb34d5f",
       "revId": "a50cff5384e37e441aefc8cb5cae32d1cf0423d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
