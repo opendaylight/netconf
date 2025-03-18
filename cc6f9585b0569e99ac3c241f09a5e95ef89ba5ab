@@ -16,6 +16,63 @@
       "message": "recheck",
       "revId": "cc6f9585b0569e99ac3c241f09a5e95ef89ba5ab",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f718e4f_6f97e5b0",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-18T14:30:45Z",
+      "side": 1,
+      "message": "generatePrefix? instead?",
+      "range": {
+        "startLine": 35,
+        "startChar": 29,
+        "endLine": 35,
+        "endChar": 37
+      },
+      "revId": "cc6f9585b0569e99ac3c241f09a5e95ef89ba5ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8d60776_21aef287",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-18T14:30:45Z",
+      "side": 1,
+      "message": "won\u0027t this lead to duplicate prefix?\nIMO like this index(16572) which generate \"xml\" and index++(16573) will result in same prefix",
+      "revId": "cc6f9585b0569e99ac3c241f09a5e95ef89ba5ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7711ae87_76202c21",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-18T14:30:45Z",
+      "side": 1,
+      "message": "why remove final?",
+      "revId": "cc6f9585b0569e99ac3c241f09a5e95ef89ba5ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
