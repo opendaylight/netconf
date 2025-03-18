@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34f4ca04_030c4c9f",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-18T09:26:37Z",
+      "side": 1,
+      "message": "Moved back to PatchBody class, since now it makes more sense when it is used in both XmlPatchBody and JsonPatchBody classes.",
+      "parentUuid": "756a0346_b8d5d2bc",
+      "range": {
+        "startLine": 11,
+        "startChar": 51,
+        "endLine": 11,
+        "endChar": 80
+      },
+      "revId": "5b967a1017ac83d298a3da59e25a90683f7281bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd72842d_784d12ea",
