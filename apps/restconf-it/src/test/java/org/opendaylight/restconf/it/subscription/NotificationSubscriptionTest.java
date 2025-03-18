@@ -24,7 +24,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 @Disabled
 class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final String APPLICATION_JSON = "application/json";
+    private static final String APPLICATION_XML = "application/xml";
     private static final String JSON_ENCODING = "encode-json";
+    private static final String XML_ENCODING = "encode-xml";
     private static final String NETCONF_STREAM = "NETCONF";
     private static final String DELETE_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:delete-subscription";
@@ -73,21 +75,42 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     }
 
     /**
+     * Tests successful establish subscription RPC with filter.
+     */
+    @Test
+    void establishSubscriptionWithFilterTest() throws Exception {
+        final var response = establishSubscriptionWithFilter(NETCONF_STREAM, """
+            <filter type="subtree">
+              <top xmlns="http://example.com/schema/1.2/config"/>
+            </filter>""");
+        assertEquals(HttpResponseStatus.OK, response.status());
+        final var content = response.content().toString(StandardCharsets.UTF_8);
+        JSONAssert.assertEquals("""
+            {
+              "ietf-subscribed-notifications:output":{
+                "id": 2147483648
+              }
+            }""", content, JSONCompareMode.LENIENT);
+    }
+
+    /**
      * Tests successful modify subscription RPC.
      */
     @Test
     void modifySubscriptionTest() throws Exception {
         final var request1 = prepareEstablishRPCRequest();
-        // Modify the subscription
+        // Modify the subscription filter as it is only part we
         final var modifyInput = """
-            {
-              "input": {
-                "id": 2147483648,
-                "stop-time": "2025-03-20T15:30:00Z"
-              }
-            }""";
-        final var request2 = buildRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON, modifyInput,
-            APPLICATION_JSON);
+            <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+              <id>2147483648</id>
+              <stream-subtree-filter>
+                <filter type="subtree">
+                  <top xmlns="http://example.com/schema/1.2/config"/>
+                </filter>
+               </stream-subtree-filter>
+            </input>""";
+        final var request2 = buildRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_XML, modifyInput,
+            APPLICATION_XML);
         final var response = invokeTwoRequests(request1, request2);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
     }
@@ -230,6 +253,21 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
               }
             }""", stream, JSON_ENCODING);
         return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, input, APPLICATION_JSON);
+    }
+
+    /**
+     * Utility method to establish a subscription with subtree filter.
+     */
+    private FullHttpResponse establishSubscriptionWithFilter(final String stream, final String filter)
+            throws Exception {
+        final var input = String.format("""
+            <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+              <stream>%s</stream>
+              <stream-subtree-filter>
+                %s
+               </stream-subtree-filter>
+            </input>""", stream, filter);
+        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URL, APPLICATION_XML, input, APPLICATION_XML);
     }
 
     private FullHttpRequest prepareEstablishRPCRequest() {
