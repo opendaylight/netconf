@@ -50,8 +50,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
-    private static final NodeIdentifier SUBSCRIPTION_STOP_TIME =
-        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stop-time").intern());
 
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
@@ -74,7 +72,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final Uint32 id;
-        final String stopTime;
         final String streamFilterName;
 
         try {
@@ -114,13 +111,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         final var nodeFilterBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
             .create(QName.create(Subscription.QNAME, "stream-filter")));
 
-        try {
-            stopTime = leaf(body, SUBSCRIPTION_STOP_TIME, String.class);
-        } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
-            return;
-        }
-
         nodeBuilder.withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
             SubscriptionUtil.QNAME_ID, id));
         nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id));
@@ -146,9 +136,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                 nodeTargetBuilder.withChild(nodeFilterBuilder.build());
                 nodeBuilder.withChild(nodeTargetBuilder.build());
             }
-        }
-        if (stopTime != null) {
-            nodeBuilder.withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STOP_TIME, stopTime));
         }
 //        final var node = nodeBuilder.build();
 
