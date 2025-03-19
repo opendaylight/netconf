@@ -22,6 +22,30 @@
       },
       "revId": "4d3be0390ff016892c32ca4a7a7ecc3e80d40368",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f346d99_0dacb633",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-03-19T20:32:09Z",
+      "side": 0,
+      "message": "It is a redundant condition. Fixed updating commit message.\n\n1) It is not used inside this method or under this if block.\n2) If the target is not null, then TargetSchemaNode should also not be null, or it should fail here as an invalid state:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115872/13/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#340\n\n3) The only place where TargetSchemaNode is used is here, so in this state, it is already checked.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115872/13/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#145\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115872/13/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#165",
+      "parentUuid": "ee521cc1_2d1cc5f7",
+      "range": {
+        "startLine": 280,
+        "startChar": 12,
+        "endLine": 280,
+        "endChar": 49
+      },
+      "revId": "4d3be0390ff016892c32ca4a7a7ecc3e80d40368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
