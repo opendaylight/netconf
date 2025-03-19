@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c054b78_145fb8ee",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-19T08:49:10Z",
+      "side": 1,
+      "message": "package-private so test can see it.",
+      "parentUuid": "305642aa_a1b0b165",
+      "revId": "0eb34b736b130a415c0a1c8b6909ef59464d61e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd2ebd96_94540e89",
@@ -48,6 +66,42 @@
       "writtenOn": "2025-03-19T08:06:13Z",
       "side": 1,
       "message": "you cannot increment index here, its part of logic of the caller",
+      "revId": "0eb34b736b130a415c0a1c8b6909ef59464d61e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3913886_073b7155",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-19T08:49:10Z",
+      "side": 1,
+      "message": "rolled back because checking for \"xml\", returning null and checking for null results in doubling number of ifs",
+      "parentUuid": "fd2ebd96_94540e89",
+      "revId": "0eb34b736b130a415c0a1c8b6909ef59464d61e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a16496a8_708c5c5d",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-19T08:49:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d6bdfce_61bcf52b",
       "revId": "0eb34b736b130a415c0a1c8b6909ef59464d61e2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
