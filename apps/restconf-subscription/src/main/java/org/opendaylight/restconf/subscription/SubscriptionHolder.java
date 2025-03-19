@@ -9,13 +9,16 @@ package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
-import java.util.NoSuchElementException;
+import java.security.Principal;
+import java.util.UUID;
+import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.Request;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +28,12 @@ final class SubscriptionHolder extends AbstractRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionHolder.class);
 
     private final Uint32 id;
-    private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
 
-    SubscriptionHolder(final Uint32 id, final SubscriptionStateService subscriptionStateService,
+    SubscriptionHolder(final Uint32 id,
             final SubscriptionStateMachine stateMachine, final RestconfStream.Registry streamRegistry) {
         this.id = requireNonNull(id);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry =  requireNonNull(streamRegistry);
     }
@@ -44,22 +45,15 @@ final class SubscriptionHolder extends AbstractRegistration {
             // subscription is no longer registered, it was terminated from elsewhere
             return;
         }
-        try {
-            stateMachine.moveTo(id, SubscriptionState.END);
-        } catch (IllegalStateException | NoSuchElementException e) {
-            LOG.warn("Could not move subscription to END state", e);
-            return;
-        }
+        final var state = stateMachine.lookupSubscriptionState(id);
 
-        try {
-            // FIXME: proper arguments
-            subscription.terminate(null, null);
-        } finally {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
+        if (state == null) {
+            LOG.warn("No subscription with ID:{}", id);
+        } else if (state != SubscriptionState.END) {
+            stateMachine.moveTo(id, SubscriptionState.END);
+            subscription.channelClosed(null);
+        } else {
+            LOG.debug("Subscription id:{} already in END state during attempt to end it", id);
         }
     }
 }
