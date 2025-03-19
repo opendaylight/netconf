@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.Request;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
@@ -70,6 +71,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
         }
+
+        @Override
+        public void channelClosed(Request<Empty> request) {
+            subscriptions.remove(id());
+        }
+
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamRegistry.class);
