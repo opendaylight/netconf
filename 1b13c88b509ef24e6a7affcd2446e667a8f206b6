@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd27016c_043e6ca1",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T14:21:53Z",
+      "side": 1,
+      "message": "would some better error-message be possible?\nat least mention \u003coperation\u003e name is incorrect?",
+      "range": {
+        "startLine": 575,
+        "startChar": 31,
+        "endLine": 575,
+        "endChar": 58
+      },
+      "revId": "1b13c88b509ef24e6a7affcd2446e667a8f206b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
