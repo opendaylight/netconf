@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "618bfad1_969d88bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-19T11:39:33Z",
+      "side": 1,
+      "message": "I was expecting that something like:\n```\nA ChannelDuplexHandler providing additional functionality for HTTP/2. Specifically it allows to:\nCreate new outbound streams using newStream().\nIterate over all active streams using forEachActiveStream(Http2FrameStreamVisitor).\n```\nis going to be used to serve multiple streams.\n\nSee: https://netty.io/4.1/api/io/netty/handler/codec/http2/Http2ChannelDuplexHandler.html",
+      "revId": "14140b98d215093fb14b1f01fbecaa7b8061a072",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
