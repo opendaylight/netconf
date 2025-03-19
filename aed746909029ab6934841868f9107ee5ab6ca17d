@@ -1,0 +1,141 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2c67038_1905cf5c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "same String is in NotificationSubscriptionTest, consider moving it in to AbstractNotificationSubscriptionTest",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "285f1c3f_1922127e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "notification?",
+      "range": {
+        "startLine": 34,
+        "startChar": 43,
+        "endLine": 34,
+        "endChar": 52
+      },
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12da08cc_6d464df4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "final",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ef36b36_64a88d29",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "put above @Test",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0ba84f7_dc14e747",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "delete?",
+      "range": {
+        "startLine": 144,
+        "startChar": 11,
+        "endLine": 144,
+        "endChar": 18
+      },
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cb06e5e_517f9ac3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82b4296a_f13f6b6a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T08:35:01Z",
+      "side": 1,
+      "message": "kill?",
+      "range": {
+        "startLine": 165,
+        "startChar": 11,
+        "endLine": 165,
+        "endChar": 18
+      },
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
