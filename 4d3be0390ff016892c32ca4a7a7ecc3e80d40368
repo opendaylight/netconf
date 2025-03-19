@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee521cc1_2d1cc5f7",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-19T13:31:38Z",
+      "side": 0,
+      "message": "why was this removed?",
+      "range": {
+        "startLine": 280,
+        "startChar": 12,
+        "endLine": 280,
+        "endChar": 49
+      },
+      "revId": "4d3be0390ff016892c32ca4a7a7ecc3e80d40368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
