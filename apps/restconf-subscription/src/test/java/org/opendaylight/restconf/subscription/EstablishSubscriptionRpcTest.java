@@ -80,7 +80,7 @@ class EstablishSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
+        rpc = new EstablishSubscriptionRpc(streamRegistry, stateMachine);
     }
 
     @Disabled

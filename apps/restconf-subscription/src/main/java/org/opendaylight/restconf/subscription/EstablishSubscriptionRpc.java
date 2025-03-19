@@ -68,17 +68,14 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
             .EncodeXml$I.QNAME);
 
-    private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
     public EstablishSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService,
             @Reference final SubscriptionStateMachine stateMachine) {
         super(EstablishSubscription.QNAME);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
@@ -125,7 +122,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         streamRegistry.establishSubscription(request.transform(subscription -> {
             final var id = subscription.id();
-            final var holder = new SubscriptionHolder(subscription, subscriptionStateService, stateMachine);
+            final var holder = new SubscriptionHolder(subscription, stateMachine);
             session.registerResource(holder);
             stateMachine.registerSubscription(session, id);
             stateMachine.moveTo(id, SubscriptionState.ACTIVE);
