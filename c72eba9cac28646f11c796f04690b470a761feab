@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7a8f952_1a88b3de",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-19T08:54:29Z",
+      "side": 1,
+      "message": "extra empty line",
+      "revId": "c72eba9cac28646f11c796f04690b470a761feab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
