@@ -24,35 +24,23 @@ final class SubscriptionHolder extends AbstractRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionHolder.class);
 
     private final RestconfStream.Subscription subscription;
-    private final SubscriptionStateService subscriptionStateService;
     private final SubscriptionStateMachine stateMachine;
 
-    SubscriptionHolder(final RestconfStream.Subscription subscription,
-            final SubscriptionStateService subscriptionStateService, final SubscriptionStateMachine stateMachine) {
+    SubscriptionHolder(final RestconfStream.Subscription subscription, final SubscriptionStateMachine stateMachine) {
         this.subscription = requireNonNull(subscription);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.stateMachine = requireNonNull(stateMachine);
     }
 
     @Override
     protected void removeRegistration() {
         final var id = subscription.id();
-        try {
+
+        if (stateMachine.lookupSubscriptionState(id) != SubscriptionState.END){
             stateMachine.moveTo(id, SubscriptionState.END);
-        } catch (IllegalStateException | NoSuchElementException e) {
-            LOG.warn("Could not move subscription to END state", e);
-            return;
+        } else {
+            LOG.debug("Subscription id:{} already in end state during attempt to end it", id);
         }
 
-        try {
-            // FIXME: proper arguments
-            subscription.terminate(null, null);
-        } finally {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-        }
+        subscription.channelClosed();
     }
 }
