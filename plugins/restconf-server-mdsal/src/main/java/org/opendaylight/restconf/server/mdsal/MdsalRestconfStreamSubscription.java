@@ -59,4 +59,27 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             }
         }, MoreExecutors.directExecutor());
     }
+
+    @Override
+    public void channelClosed() {
+        final var id = id();
+        LOG.debug("{} terminated after channel was closed", id);
+
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        tx.delete(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(
+            NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id)));
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("Removed subscription {} from operational datastore as of {}", id, result);
+                delegate.channelClosed();
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.warn("Failed to remove subscription {} from operational datastore", id, cause);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
 }

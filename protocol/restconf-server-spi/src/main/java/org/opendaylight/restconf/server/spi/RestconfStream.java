@@ -264,6 +264,8 @@ public final class RestconfStream<T> {
             terminateImpl(request, reason);
         }
 
+        public abstract void channelClosed();
+
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
