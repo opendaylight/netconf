@@ -37,22 +37,32 @@ final class SubscriptionHolder extends AbstractRegistration {
     @Override
     protected void removeRegistration() {
         final var id = subscription.id();
-        try {
+
+        if (stateMachine.lookupSubscriptionState(id) != SubscriptionState.END){
             stateMachine.moveTo(id, SubscriptionState.END);
-        } catch (IllegalStateException | NoSuchElementException e) {
-            LOG.warn("Could not move subscription to END state", e);
-            return;
+        } else {
+            LOG.debug("Subscription id:{} already in end state during attempt to end it", id);
         }
 
-        try {
-            // FIXME: proper arguments
-            subscription.terminate(null, null);
-        } finally {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-        }
+
+        subscription.channelClosed();
+
+//        try {
+//            stateMachine.moveTo(id, SubscriptionState.END);
+//        } catch (IllegalStateException | NoSuchElementException e) {
+//            LOG.warn("Could not move subscription to END state", e);
+//            return;
+//        }
+//
+//        try {
+//            // FIXME: proper arguments
+//            subscription.terminate(null, null);
+//        } finally {
+//            try {
+//                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
+//            } catch (InterruptedException e) {
+//                LOG.warn("Could not send subscription terminated notification", e);
+//            }
+//        }
     }
 }
