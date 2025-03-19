@@ -39,7 +39,7 @@ public final class JsonResourceBody extends ResourceBody {
             try (var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 jsonParser.parse(reader);
             }
-        } catch (IllegalArgumentException | IOException | JsonParseException e) {
+        } catch (IllegalArgumentException | IllegalStateException | IOException | JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);
             throw newProtocolMalformedMessageServerException(path, "Error parsing input", unmaskIOException(e));
         }
