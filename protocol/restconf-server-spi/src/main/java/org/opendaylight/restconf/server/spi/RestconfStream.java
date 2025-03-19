@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.Request;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -278,6 +279,8 @@ public final class RestconfStream<T> {
             LOG.debug("Terminating subscription {} due to {}", id(), reason);
             terminateImpl(request, reason);
         }
+
+        public abstract void channelClosed(Request<Empty> request);
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);

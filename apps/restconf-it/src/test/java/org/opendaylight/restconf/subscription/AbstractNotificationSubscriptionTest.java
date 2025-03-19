@@ -191,7 +191,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested
-            new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
+            new EstablishSubscriptionRpc(streamRegistry, stateMachine),
             new ModifySubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
             new DeleteSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
             new KillSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine));
