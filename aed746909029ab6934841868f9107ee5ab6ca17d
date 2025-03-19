@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0d3fe93_32e33b78",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2c67038_1905cf5c",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "285f1c3f_1922127e",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-03-19T08:35:01Z",
       "side": 1,
       "message": "notification?",
+      "range": {
+        "startLine": 34,
+        "startChar": 43,
+        "endLine": 34,
+        "endChar": 52
+      },
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa2f46e4_68cedc88",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285f1c3f_1922127e",
       "range": {
         "startLine": 34,
         "startChar": 43,
@@ -58,6 +100,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bfb8c14_99e5e3d8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12da08cc_6d464df4",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ef36b36_64a88d29",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-03-19T08:35:01Z",
       "side": 1,
       "message": "put above @Test",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6661db0_c10c009f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ef36b36_64a88d29",
       "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -98,6 +176,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "362d622c_ba047fc1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0ba84f7_dc14e747",
+      "range": {
+        "startLine": 144,
+        "startChar": 11,
+        "endLine": 144,
+        "endChar": 18
+      },
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3cb06e5e_517f9ac3",
@@ -115,6 +217,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54bdcbf3_cc94fe15",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cb06e5e_517f9ac3",
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82b4296a_f13f6b6a",
@@ -128,6 +248,30 @@
       "writtenOn": "2025-03-19T08:35:01Z",
       "side": 1,
       "message": "kill?",
+      "range": {
+        "startLine": 165,
+        "startChar": 11,
+        "endLine": 165,
+        "endChar": 18
+      },
+      "revId": "aed746909029ab6934841868f9107ee5ab6ca17d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12e8cc84_508be034",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 35
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-19T09:14:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82b4296a_f13f6b6a",
       "range": {
         "startLine": 165,
         "startChar": 11,
