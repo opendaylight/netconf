@@ -37,7 +37,9 @@ public final class JsonResourceBody extends ResourceBody {
             try (var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 jsonParser.parse(reader);
             }
-        } catch (IllegalArgumentException | IOException | JsonParseException e) {
+            // FIXME: The JsonParserStream throw IllegalArgumentException and IllegalStateException with invalid data.
+            //        Remove these exceptions when YANGTOOLS-1662 is resolved.
+        } catch (IllegalArgumentException | IllegalStateException | IOException | JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);
             throw path.databind().newProtocolMalformedMessageServerException("Error parsing input",
                 unmaskIOException(e));
