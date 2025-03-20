@@ -25,6 +25,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @Nullable EventStreamFilter filter;
+    private RestconfStream.@Nullable Sender sender;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
             final String receiverName, final @Nullable EventStreamFilter filter) {
