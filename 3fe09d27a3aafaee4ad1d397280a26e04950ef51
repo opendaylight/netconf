@@ -16,6 +16,24 @@
       "message": "This should be replaced with filtering since we do not support replay",
       "revId": "3fe09d27a3aafaee4ad1d397280a26e04950ef51",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "daa7c285_9b60d055",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-20T08:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e77d9c2_bc9a2101",
+      "revId": "3fe09d27a3aafaee4ad1d397280a26e04950ef51",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
