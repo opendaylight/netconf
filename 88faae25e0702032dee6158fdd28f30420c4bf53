@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7cec257_3541dafd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/CountersSubscriptionTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-20T16:33:03Z",
+      "side": 1,
+      "message": "Should be deleted since we don\u0027t support replay",
+      "revId": "88faae25e0702032dee6158fdd28f30420c4bf53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
