@@ -16,6 +16,7 @@ import com.google.common.collect.ListMultimap;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,11 @@ abstract sealed class Subscribers<T> {
         }
 
         @Override
+        Subscribers<T> removeBySubscription(final Uint32 id) {
+            return this;
+        }
+
+        @Override
         void endOfStream() {
             // No-op
         }
@@ -57,21 +63,28 @@ abstract sealed class Subscribers<T> {
 
     private static final class Single<T> extends Subscribers<T> {
         private final Subscriber<T> subscriber;
+        private final Uint32 subscriptionId;
 
         Single(final Subscriber<T> subscriber) {
+            this.subscriptionId = subscriber.subscriptionId();
             this.subscriber = requireNonNull(subscriber);
         }
 
         @Override
         Subscribers<T> add(final Subscriber<T> toAdd) {
             return new Multiple<>(ImmutableListMultimap.of(
-                subscriber.formatter(), subscriber,
-                toAdd.formatter(), toAdd));
+                subscriptionId, subscriber,
+                toAdd.subscriptionId(), toAdd));
         }
 
         @Override
         Subscribers<T> remove(final Subscriber<?> toRemove) {
             return toRemove.equals(subscriber) ? null : this;
+        }
+
+        @Override
+        Subscribers<T> removeBySubscription(final Uint32 id) {
+            return subscriptionId.equals(id) ? null : this;
         }
 
         @Override
@@ -89,27 +102,37 @@ abstract sealed class Subscribers<T> {
     }
 
     private static final class Multiple<T> extends Subscribers<T> {
-        private final ImmutableListMultimap<EventFormatter<T>, Subscriber<T>> subscribers;
+        private final ImmutableListMultimap<Uint32, Subscriber<T>> subscribers;
 
-        Multiple(final ListMultimap<EventFormatter<T>, Subscriber<T>> subscribers) {
+        Multiple(final ListMultimap<Uint32, Subscriber<T>> subscribers) {
             this.subscribers = ImmutableListMultimap.copyOf(subscribers);
         }
 
         @Override
         Subscribers<T> add(final Subscriber<T> toAdd) {
             final var newSubscribers = ArrayListMultimap.create(subscribers);
-            newSubscribers.put(toAdd.formatter(), toAdd);
+            newSubscribers.put(toAdd.subscriptionId(), toAdd);
             return new Multiple<>(newSubscribers);
         }
 
         @Override
         Subscribers<T> remove(final Subscriber<?> toRemove) {
             final var newSubscribers = ArrayListMultimap.create(subscribers);
-            return newSubscribers.remove(toRemove.formatter(), toRemove) ? switch (newSubscribers.size()) {
+            return newSubscribers.remove(toRemove.subscriptionId(), toRemove) ? switch (newSubscribers.size()) {
                 case 0 -> throw new VerifyException("Unexpected empty subscribers");
                 case 1 -> new Single<>(newSubscribers.values().iterator().next());
                 default -> new Multiple<>(newSubscribers);
             } : this;
+        }
+
+        @Override
+        Subscribers<T> removeBySubscription(final Uint32 id) {
+            final var newSubscribers = ArrayListMultimap.create(subscribers);
+            return newSubscribers.removeAll(id).isEmpty() ? this : switch (newSubscribers.size()) {
+                case 0 -> throw new VerifyException("Unexpected empty subscribers");
+                case 1 -> new Single<>(newSubscribers.values().iterator().next());
+                default -> new Multiple<>(newSubscribers);
+            };
         }
 
         @Override
@@ -120,9 +143,15 @@ abstract sealed class Subscribers<T> {
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             for (var entry : subscribers.asMap().entrySet()) {
-                final var formatted = format(entry.getKey(), modelContext, input, now);
-                if (formatted != null) {
-                    for (var subscriber : entry.getValue()) {
+                String formatted = null;
+                EventFormatter<T> formatter = null;
+                for (var subscriber : entry.getValue()) {
+                    if (formatter != subscriber.formatter()) {
+                        // Format only when formatter changes
+                        formatted = format(subscriber.formatter(), modelContext, input, now);
+                        formatter = subscriber.formatter();
+                    }
+                    if (formatted != null) {
                         subscriber.sender().sendDataMessage(formatted);
                     }
                 }
@@ -165,6 +194,15 @@ abstract sealed class Subscribers<T> {
      * @throws NullPointerException if {@code toRemove} is {@code null}
      */
     abstract @Nullable Subscribers<T> remove(Subscriber<?> toRemove);
+
+    /**
+     * Remove all subscriber of subscription.
+     *
+     * @param id id of subscription which subscribers are to be removed
+     * @return A new {@link Subscribers} file, or {@code null} if this file was not empty and it became empty
+     * @throws NullPointerException if {@code id} is {@code null}
+     */
+    abstract @Nullable Subscribers<T> removeBySubscription(Uint32 id);
 
     /**
      * Signal end-of-stream to all subscribers.
