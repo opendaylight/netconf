@@ -9,6 +9,7 @@ package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.time.Instant;
 import javax.inject.Inject;
@@ -99,16 +100,17 @@ public final class KillSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        subscription.terminate(request.transform(unused -> {
-            stateMachine.moveTo(id, SubscriptionState.END);
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
-                .build();
-        }), NoSuchSubscription.QNAME);
+        try {
+            subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME)
+                .addListener(() -> subscription.terminate(request.transform(unused -> {
+                    stateMachine.moveTo(id, SubscriptionState.END);
+                    return ImmutableNodes.newContainerBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
+                        .build();
+                }), NoSuchSubscription.QNAME), MoreExecutors.directExecutor());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Could not send subscription kill notification", e);
+        }
     }
 }
