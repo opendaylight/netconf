@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
@@ -43,6 +44,11 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
     @Override
     public final String streamName() {
         return delegate.streamName();
+    }
+
+    @Override
+    RestconfStream.@Nullable Sender sender() {
+        return delegate.sender();
     }
 
     protected final @NonNull T delegate() {

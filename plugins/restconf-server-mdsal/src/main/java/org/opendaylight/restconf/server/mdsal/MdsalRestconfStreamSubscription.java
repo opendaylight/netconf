@@ -60,4 +60,9 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             }
         }, MoreExecutors.directExecutor());
     }
+
+    @Override
+    public void registerSender(RestconfStream.Sender sender) {
+        delegate.registerSender(sender);
+    }
 }

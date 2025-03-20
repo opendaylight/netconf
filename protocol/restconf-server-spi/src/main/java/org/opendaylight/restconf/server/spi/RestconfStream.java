@@ -319,6 +319,11 @@ public abstract sealed class RestconfStream<T> permits LegacyRestconfStream, Res
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return helper.add("terminated", terminated);
         }
+
+        @NonNullByDefault
+        public abstract void registerSender(Sender sender);
+
+        abstract RestconfStream.@Nullable Sender sender();
     }
 
     /**
