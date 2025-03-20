@@ -69,6 +69,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
+            if (sender() != null) {
+                sender().endOfStream();
+            }
         }
     }
 
@@ -261,6 +264,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
         final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
             oldSubscription.receiverName(), filterImpl);
+        newSubscription.registerSender(oldSubscription.sender());
 
         Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
             @Override
