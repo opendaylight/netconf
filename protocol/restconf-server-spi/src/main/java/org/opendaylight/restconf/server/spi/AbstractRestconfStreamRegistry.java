@@ -60,6 +60,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
+        private RestconfStream.Sender sender;
+
         SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
                 final @Nullable EventStreamFilter filter) {
             super(id, encoding, streamName, receiverName, filter);
@@ -69,6 +71,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
+            if (sender != null) {
+                sender.endOfStream();
+            }
+        }
+
+        @Override
+        public void registerSender(RestconfStream.Sender newSender) {
+            sender = newSender;
         }
     }
 
