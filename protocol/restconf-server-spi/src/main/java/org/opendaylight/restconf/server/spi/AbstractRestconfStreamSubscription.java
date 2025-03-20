@@ -28,6 +28,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
     private final @Nullable EventStreamFilter filter;
+    private RestconfStream.@Nullable Sender sender;
 
     private @NonNull SubscriptionState state;
 
