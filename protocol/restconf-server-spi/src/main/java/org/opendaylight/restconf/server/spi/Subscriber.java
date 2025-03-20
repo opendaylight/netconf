@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
  * A single subscriber to an {@link RestconfStream}.
@@ -20,11 +21,14 @@ final class Subscriber<T> extends AbstractRegistration {
     private final @NonNull RestconfStream<T> stream;
     private final @NonNull Sender sender;
     private final @NonNull EventFormatter<T> formatter;
+    private final Uint32 subscriptionId;
 
-    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter) {
+    Subscriber(final Uint32 subscriptionId, final RestconfStream<T> stream, final Sender sender,
+               final EventFormatter<T> formatter) {
         this.stream = requireNonNull(stream);
         this.sender = requireNonNull(sender);
         this.formatter = requireNonNull(formatter);
+        this.subscriptionId = subscriptionId;
     }
 
     @NonNull EventFormatter<T> formatter() {
@@ -33,6 +37,10 @@ final class Subscriber<T> extends AbstractRegistration {
 
     @NonNull Sender sender() {
         return sender;
+    }
+
+    Uint32 subscriptionId() {
+        return subscriptionId;
     }
 
     @Override
