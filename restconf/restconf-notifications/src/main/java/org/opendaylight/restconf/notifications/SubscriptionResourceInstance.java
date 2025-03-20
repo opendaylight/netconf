@@ -141,6 +141,7 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         // Encoding is optional field and in case it is absent json encoding will be used by default
         final var encoding = encodingNameOf(subscription.encoding());
         final var registration = registerSender(stream, encoding, streamParams, sender);
+        subscription.registerSender(sender);
 
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;

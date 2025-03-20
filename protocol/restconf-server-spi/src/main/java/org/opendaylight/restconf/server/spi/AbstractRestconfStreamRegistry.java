@@ -69,6 +69,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
+            if (sender() != null) {
+                sender().endOfStream();
+            }
         }
     }
 
