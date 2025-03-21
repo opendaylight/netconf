@@ -16,6 +16,24 @@
       "message": "use MediaTypes.APPLICATION_YANG_DATA_JSON or NettyMediaTypes instead",
       "revId": "cab6149431e2de23ebe3aeca686aa7a5d9bdb644",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "714053e7_a1ad9ae3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-21T14:45:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff23180a_6ef6d42d",
+      "revId": "cab6149431e2de23ebe3aeca686aa7a5d9bdb644",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
