@@ -16,6 +16,24 @@
       "message": "session has ended, we are removing its resources, there is no one to send any termination notification, just clear receiver and its subscriptions?",
       "revId": "d4705214005ff489a92817737f5c71243612f9f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8773e9e8_5a5a696d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-21T09:09:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f4078fc_50c35607",
+      "revId": "d4705214005ff489a92817737f5c71243612f9f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

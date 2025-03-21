@@ -16,6 +16,24 @@
       "message": "maybe, first check if there is a subscription on this session at all",
       "revId": "12f0245729adcde1601d609d8c612ba648b4761e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c114fa5_b3840f87",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-03-21T09:09:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "95c586b3_6c8ed6b1",
+      "revId": "12f0245729adcde1601d609d8c612ba648b4761e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
