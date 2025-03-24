@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75a5d309_319b00f8",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T09:15:05Z",
+      "side": 1,
+      "message": "how many times prefixes are generated?",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9d59a2c_fec3f9b7",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T09:15:05Z",
+      "side": 1,
+      "message": "what if depth !\u003d 1?\n\nwhat\u0027s the meaning?",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf2e2c03_e977092c",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T09:15:05Z",
+      "side": 1,
+      "message": "what if its empty?",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
