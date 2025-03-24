@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89bf9b49_c3c3be75",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-24T12:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8d006a3_a7d48e3f",
+      "revId": "c2439d3866e7f5d4c8103c8a2abba2abaca64acd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ebb6f1de_1b385d6a",
@@ -66,6 +84,42 @@
       "side": 1,
       "message": "I am unsure, please check indentation of line 124+",
       "parentUuid": "ebb6f1de_1b385d6a",
+      "revId": "c2439d3866e7f5d4c8103c8a2abba2abaca64acd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64e4b356_31f1d255",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-24T12:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7dc4dcf_9df98549",
+      "revId": "c2439d3866e7f5d4c8103c8a2abba2abaca64acd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f716af6_611f862a",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-24T12:49:37Z",
+      "side": 1,
+      "message": "Xml above had too few. This line is ok.",
+      "parentUuid": "b4ee100d_48ab07ef",
       "revId": "c2439d3866e7f5d4c8103c8a2abba2abaca64acd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
