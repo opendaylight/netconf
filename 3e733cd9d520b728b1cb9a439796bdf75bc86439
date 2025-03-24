@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95423ea3_b85f15b3",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-24T12:47:49Z",
+      "side": 1,
+      "message": "One time. Just here.",
+      "parentUuid": "75a5d309_319b00f8",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9d59a2c_fec3f9b7",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-24T09:15:05Z",
       "side": 1,
       "message": "what if depth !\u003d 1?\n\nwhat\u0027s the meaning?",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db862079_d62b1a47",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-24T12:47:49Z",
+      "side": 1,
+      "message": "`adding namespaces and prefixes at the top/first filter node`. Here is example from tests:\n  \u003cfilter type\u003d\"subtree\"\u003e\n    \u003ca:top xmlns:a\u003d\"http://example.com/schema/1.2/config\"\n          xmlns:b\u003d\"http://example.com/schema/1.2/config2\"\u003e\n      \u003cb:users/\u003e\n    \u003c/a:top\u003e\n  \u003c/filter\u003e",
+      "parentUuid": "f9d59a2c_fec3f9b7",
       "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "additionally, do we need to call getNamespaceToPrefixMap()? how many times it will be called here?",
       "parentUuid": "cf2e2c03_e977092c",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bfe6033_4b75950e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-24T12:47:49Z",
+      "side": 1,
+      "message": "If empty \u003d no namespaces will be added here. Also means we have no prefixes and everything is a wildcard. We do need call getNamespaceToPrefixMap to know if there is anything to write namespaces with proper formatting. We need to call it one time and only for the top node.",
+      "parentUuid": "b51807e1_3c37bd1c",
       "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
