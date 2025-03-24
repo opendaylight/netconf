@@ -70,6 +70,30 @@
       },
       "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64678ee5_dde7a5b0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-24T14:11:11Z",
+      "side": 0,
+      "message": "created separate patch wit this change https://git.opendaylight.org/gerrit/c/netconf/+/116039 and better explanation of problem it is solving",
+      "parentUuid": "e8925818_eee803bc",
+      "range": {
+        "startLine": 220,
+        "startChar": 8,
+        "endLine": 220,
+        "endChar": 44
+      },
+      "revId": "b04ee0a3cdba80cd03772f07c44d0a00a7b2e0c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
