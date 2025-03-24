@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c83dd78f_15f3bf41",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T08:47:46Z",
+      "side": 1,
+      "message": "IMO replace in map with new subscription would be better?",
+      "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
