@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "865d579b_f00999f1",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T08:51:01Z",
+      "side": 1,
+      "message": "what if we just offer notification?",
+      "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6768d2c_4cea9b63",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T08:51:01Z",
+      "side": 1,
+      "message": "IMO we should throw error that we do not support xpath",
+      "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c83dd78f_15f3bf41",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 18
