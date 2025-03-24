@@ -13,8 +13,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpMessage;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpObjectDecoder;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
@@ -149,7 +155,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
 
     // Executed on respExecutor, so it is okay to block
     @NonNullByDefault
-    private static FullHttpResponse formatResponse(final FiniteResponse response, final ChannelHandlerContext ctx,
+    private static HttpResponse formatResponse(final FiniteResponse response, final ChannelHandlerContext ctx,
             final HttpVersion version) {
         // FIXME: We are filling a full ByteBuf and producing a complete FullHttpResponse, which is not want we want.
         //
@@ -170,6 +176,16 @@ final class ServerRequestExecutor implements PendingRequestListener {
         //          w.r.t. failure cases, so it needs some figuring out
         final ReadyResponse ready;
         try {
+            // see HttpResponseEncoder, HttpChunkedInput and MpscLinkedQueue
+            /**
+             * An HTTP chunk which is used for HTTP chunked transfer-encoding.
+             * {@link HttpObjectDecoder} generates {@link HttpContent} after
+             * {@link HttpMessage} when the content is large or the encoding of the content
+             * is 'chunked.  If you prefer not to receive {@link HttpContent} in your handler,
+             * place {@link HttpObjectAggregator} after {@link HttpObjectDecoder} in the
+             * {@link ChannelPipeline}.
+             */
+            // public interface HttpContent extends HttpObject, ByteBufHolder {
             ready = response.toReadyResponse(ctx.alloc());
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);

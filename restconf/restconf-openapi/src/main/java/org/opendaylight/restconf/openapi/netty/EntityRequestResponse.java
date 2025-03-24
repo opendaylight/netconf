@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ByteBufResponse;
 import org.opendaylight.netconf.transport.http.ByteStreamRequestResponse;
+import org.opendaylight.netconf.transport.http.ChunkedByteBufResponse;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 
 @NonNullByDefault
@@ -32,8 +33,8 @@ final class EntityRequestResponse extends ByteStreamRequestResponse {
     }
 
     @Override
-    protected ByteBufResponse toReadyResponse(final ByteBuf content) {
-        return new ByteBufResponse(status(), content, HttpHeaderValues.APPLICATION_JSON);
+    protected ChunkedByteBufResponse toReadyResponse(final ByteBuf content) {
+        return new ChunkedByteBufResponse(status(), content, HttpHeaderValues.APPLICATION_JSON);
     }
 
     @Override

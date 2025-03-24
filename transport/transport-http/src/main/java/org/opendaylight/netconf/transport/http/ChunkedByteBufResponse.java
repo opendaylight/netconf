@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -13,6 +13,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
@@ -20,37 +21,36 @@ import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-/**
- * A {@link ReadyResponse} containing a {@link ByteBuf} body {@link #content()}, potentially with some headers.
- */
+// TODO
 @NonNullByDefault
-public record ByteBufResponse(HttpResponseStatus status, ByteBuf content, ReadOnlyHttpHeaders headers)
+public record ChunkedByteBufResponse(HttpResponseStatus status, ByteBuf content, ReadOnlyHttpHeaders headers)
         implements ReadyResponse {
     private static final ReadOnlyHttpHeaders EMPTY_HEADERS = new ReadOnlyHttpHeaders(false);
 
-    public ByteBufResponse {
+    public ChunkedByteBufResponse {
         requireNonNull(status);
         requireNonNull(content);
         requireNonNull(headers);
     }
 
-    public ByteBufResponse(final HttpResponseStatus status, final ByteBuf content) {
+    public ChunkedByteBufResponse(final HttpResponseStatus status, final ByteBuf content) {
         this(status, content, EMPTY_HEADERS);
     }
 
-    public ByteBufResponse(final HttpResponseStatus status, final ByteBuf content,
+    public ChunkedByteBufResponse(final HttpResponseStatus status, final ByteBuf content,
             final @Nullable AsciiString contentType) {
         // send chunked header?
         this(status, content, contentType == null ? EMPTY_HEADERS
-            : new ReadOnlyHttpHeaders(false, HttpHeaderNames.CONTENT_TYPE, contentType));
+            : new ReadOnlyHttpHeaders(false, HttpHeaderNames.CONTENT_TYPE, contentType,
+                HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED));
     }
 
-    public static ByteBufResponse ok(final ByteBuf content) {
-        return new ByteBufResponse(HttpResponseStatus.OK, content);
+    public static ChunkedByteBufResponse ok(final ByteBuf content) {
+        return new ChunkedByteBufResponse(HttpResponseStatus.OK, content);
     }
 
-    public static ByteBufResponse ok(final ByteBuf content, final AsciiString contentType) {
-        return new ByteBufResponse(HttpResponseStatus.OK, content, requireNonNull(contentType));
+    public static ChunkedByteBufResponse ok(final ByteBuf content, final AsciiString contentType) {
+        return new ChunkedByteBufResponse(HttpResponseStatus.OK, content, requireNonNull(contentType));
     }
 
     @Override

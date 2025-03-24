@@ -27,12 +27,15 @@ public abstract class ByteStreamRequestResponse extends AbstractFiniteResponse {
     @Override
     public final ReadyResponse toReadyResponse(final ByteBufAllocator alloc) throws IOException {
         final var content = alloc.buffer();
+        // here is outputstream
         try (var out = new ByteBufOutputStream(content)) {
             writeBody(out);
         } catch (IOException e) {
             content.release();
             throw e;
         }
+
+        // deploy HttpObjectDecoder or write it manually?
         return toReadyResponse(content);
     }
 
