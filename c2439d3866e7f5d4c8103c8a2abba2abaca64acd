@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebb6f1de_1b385d6a",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T09:03:31Z",
+      "side": 1,
+      "message": "too many indent?",
+      "revId": "c2439d3866e7f5d4c8103c8a2abba2abaca64acd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7dc4dcf_9df98549",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/subtree/ElementFromSubtreeFilterTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-24T09:03:31Z",
+      "side": 1,
+      "message": "wrong formatting?",
+      "revId": "c2439d3866e7f5d4c8103c8a2abba2abaca64acd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
