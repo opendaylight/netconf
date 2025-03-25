@@ -22,6 +22,7 @@ public sealed interface NamespaceSelection {
     /**
      * An exact match.
      */
+    // TODO store NodeIdentifier instead of QName
     record Exact(QName qname) implements NamespaceSelection {
         public Exact {
             requireNonNull(qname);
@@ -31,6 +32,7 @@ public sealed interface NamespaceSelection {
     /**
      * A wildcard match.
      */
+    // TODO store list of NodeIdentifiers instead of list of QNames?
     record Wildcard(Unqualified name, List<QName> qnames) implements NamespaceSelection {
         public Wildcard {
             qnames.stream().forEach(qname -> {
