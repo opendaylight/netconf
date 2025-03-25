@@ -11,8 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 /**
  * A <a href="https://www.rfc-editor.org/rfc/rfc6241#section-6.2.1">Namespace Selection</a>.
@@ -22,20 +22,20 @@ public sealed interface NamespaceSelection {
     /**
      * An exact match.
      */
-    record Exact(QName qname) implements NamespaceSelection {
+    record Exact(NodeIdentifier identifier) implements NamespaceSelection {
         public Exact {
-            requireNonNull(qname);
+            requireNonNull(identifier);
         }
     }
 
     /**
      * A wildcard match.
      */
-    record Wildcard(Unqualified name, List<QName> qnames) implements NamespaceSelection {
+    record Wildcard(Unqualified name, List<NodeIdentifier> identifiers) implements NamespaceSelection {
         public Wildcard {
-            qnames.stream().forEach(qname -> {
-                if (!name.getLocalName().equals(qname.getLocalName())) {
-                    throw new IllegalArgumentException(qname + " does not match name " + name.getLocalName());
+            identifiers.stream().forEach(identifier -> {
+                if (!name.getLocalName().equals(identifier.getNodeType().getLocalName())) {
+                    throw new IllegalArgumentException(identifier + " does not match name " + name.getLocalName());
                 }
             });
         }
