@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee5afeae_09b11c59",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T13:03:27Z",
+      "side": 1,
+      "message": "not needed constants as you always use NETCONF stream ..",
+      "revId": "9899cc96915070c120e519e7659a9acf7b91ae59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f5d777a_2090be50",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T13:03:27Z",
+      "side": 1,
+      "message": "this method has always the same parameters..",
+      "revId": "9899cc96915070c120e519e7659a9acf7b91ae59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fa4ef23_7da68b46",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/CountersSubscriptionTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T13:03:27Z",
+      "side": 1,
+      "message": "package protected is enough",
+      "revId": "9899cc96915070c120e519e7659a9acf7b91ae59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a50a456_a0ab38f6",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/CountersSubscriptionTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T13:03:27Z",
+      "side": 1,
+      "message": "private static, move invoke out of this method",
+      "revId": "9899cc96915070c120e519e7659a9acf7b91ae59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
