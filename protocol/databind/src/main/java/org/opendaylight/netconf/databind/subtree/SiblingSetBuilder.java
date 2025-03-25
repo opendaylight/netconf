@@ -34,7 +34,8 @@ abstract sealed class SiblingSetBuilder permits ContainmentNode.Builder, Subtree
 
         static NamespaceName of(final Sibling sibling) {
             return switch (sibling.selection()) {
-                case NamespaceSelection.Exact(var qname) -> new NamespaceName(qname.unbind(), qname.getModule());
+                case NamespaceSelection.Exact(var identifier) -> new NamespaceName(identifier.getNodeType().unbind(),
+                    identifier.getNodeType().getModule());
                 case NamespaceSelection.Wildcard w -> new NamespaceName(w.name(), null);
             };
         }
