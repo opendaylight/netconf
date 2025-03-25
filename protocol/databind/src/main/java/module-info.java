@@ -17,6 +17,8 @@ module org.opendaylight.netconf.databind {
     requires transitive org.opendaylight.yangtools.yang.data.codec.xml;
     requires transitive org.opendaylight.yangtools.yang.data.util;
     requires transitive org.opendaylight.yangtools.yang.model.api;
+    requires org.opendaylight.yangtools.util;
+    requires org.opendaylight.yangtools.yang.data.impl;
     requires org.opendaylight.yangtools.yang.data.spi;
     requires com.google.common;
     requires org.slf4j;
