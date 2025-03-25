@@ -18,6 +18,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public record ContentMatchNode(NamespaceSelection selection, Object value) implements Sibling {
     public ContentMatchNode {
         requireNonNull(selection);
-        value = AttributeMatch.checkValue(value);
+        AttributeMatch.checkValue(value);
     }
 }
