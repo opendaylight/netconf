@@ -1,0 +1,22 @@
+module top-aug {
+  namespace "http://example.com/schema/1.2/config2";
+  prefix top;
+
+  import top {
+    prefix tm;
+  }
+
+  revision 2025-04-01 {
+    description "Test revision aug";
+  }
+
+  augment /tm:top {
+    list users {
+      container user {
+        leaf id {
+          type string;
+        }
+      }
+    }
+  }
+}
