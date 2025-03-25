@@ -9,15 +9,19 @@ package org.opendaylight.netconf.databind.subtree;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A <a href="https://www.rfc-editor.org/rfc/rfc6241#section-6.2.5">Content Match Node</a>.
  */
 @NonNullByDefault
-public record ContentMatchNode(NamespaceSelection selection, Object value) implements Sibling {
+public record ContentMatchNode(NamespaceSelection selection, Map<QName, Object> qnameValueMap) implements Sibling {
     public ContentMatchNode {
         requireNonNull(selection);
-        value = AttributeMatch.checkValue(value);
+        for (final var value : qnameValueMap.values()) {
+            AttributeMatch.checkValue(value);
+        }
     }
 }
