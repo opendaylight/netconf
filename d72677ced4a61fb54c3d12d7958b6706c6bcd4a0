@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c154d8bf_1f2ce291",
+        "filename": "apps/restconf-it/src/main/yang/notification-test@2025-03-03.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T13:04:27Z",
+      "side": 1,
+      "message": "why do we need a new model?",
+      "revId": "d72677ced4a61fb54c3d12d7958b6706c6bcd4a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d7149d60_b485a7ac",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
         "patchSetId": 13
@@ -31,6 +48,23 @@
       "writtenOn": "2025-03-25T12:59:19Z",
       "side": 1,
       "message": "why do we not filter toaster notifications?",
+      "revId": "d72677ced4a61fb54c3d12d7958b6706c6bcd4a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc1e9bc1_5ee23d25",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T13:04:27Z",
+      "side": 1,
+      "message": "EVENT_TIME?",
       "revId": "d72677ced4a61fb54c3d12d7958b6706c6bcd4a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
