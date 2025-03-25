@@ -9,7 +9,7 @@ package org.opendaylight.netconf.databind.subtree;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.List;
+import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
@@ -31,7 +31,7 @@ public sealed interface NamespaceSelection {
     /**
      * A wildcard match.
      */
-    record Wildcard(Unqualified name, List<QName> qnames) implements NamespaceSelection {
+    record Wildcard(Unqualified name, Set<QName> qnames) implements NamespaceSelection {
         public Wildcard {
             qnames.stream().forEach(qname -> {
                 if (!name.getLocalName().equals(qname.getLocalName())) {
