@@ -7,10 +7,30 @@
  */
 package org.opendaylight.netconf.databind.subtree;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javanet.staxutils.SimpleNamespaceContext;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.databind.subtree.NamespaceSelection.Wildcard;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 @NonNullByDefault
 final class SubtreeFilterReader {
@@ -18,9 +38,238 @@ final class SubtreeFilterReader {
         // Hidden on purpose
     }
 
+    /**
+     * Read xml peeling off wrapper around filter elements(usually something like
+     * {@code <filter type="subtree">}) to get to elements with filter data and construct subtree filter based
+     * those elements.
+     *
+     * @param reader reader that goes through xml elements
+     * @param databind context
+     * @return filter that was created based on elements of xml
+     * @throws XMLStreamException when encountering issues with xml structure
+     */
     static SubtreeFilter readSubtreeFilter(final XMLStreamReader reader, final DatabindContext databind)
             throws XMLStreamException {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        // pelee filter wrapper(for example <filter type="subtree"></filter>) to access elements with data
+        while (reader.hasNext()) {
+            if (reader.next() == XMLStreamConstants.START_ELEMENT) {
+                break;
+            }
+        }
+        final var subtreeFilterBuilder = SubtreeFilter.builder(databind);
+        final var context = databind.modelContext();
+        final var codec = databind.xmlCodecs();
+        final var root = databind.schemaTree().getRoot();
+        final var prefixToNs = new HashMap<String, String>();
+        for (final var module : context.getModuleStatements().values()) {
+            for (final var prefix : module.namespacePrefixes()) {
+                prefixToNs.putIfAbsent(prefix.getValue(), prefix.getKey().namespace().toString());
+            }
+        }
+        final var nsContext = new SimpleNamespaceContext(prefixToNs);
+
+        final var stack = SchemaInferenceStack.of(context);
+        // start processing filter elements
+        while (reader.hasNext()) {
+            if (reader.next() == XMLStreamConstants.START_ELEMENT) {
+                fillElement(reader, subtreeFilterBuilder, Map.of(stack, root), context, getAttributes(reader, context),
+                    codec, nsContext);
+                break;
+            }
+        }
+        return subtreeFilterBuilder.build();
+    }
+
+    /**
+     * Fills element builder with sibling nodes that represent its child elements. If child element have children of its
+     * own then fills them recursively.
+     *
+     * @param reader reader that goes through xml elements
+     * @param builder builder that will collect all sibling nodes that was processed
+     * @param parents map of path {@link SchemaInferenceStack} and node context {@link DataSchemaContext} that point to
+     *                parent/s of child that is being processed
+     * @param context model context
+     * @param attributes element attributes
+     * @throws XMLStreamException when encountering issues with xml structure
+     */
+    private static void fillElement(final XMLStreamReader reader, final SiblingSetBuilder builder,
+            final Map<SchemaInferenceStack, DataSchemaContext> parents, final EffectiveModelContext context,
+            final List<AttributeMatch> attributes, final XmlCodecFactory codec, final NamespaceContext nsContext)
+            throws XMLStreamException {
+        // get element and update path
+        final var elementName = reader.getName();
+        final var elementLocalName = elementName.getLocalPart();
+        final var elementNamespace = elementName.getNamespaceURI();
+        final var children = new HashMap<SchemaInferenceStack, DataSchemaContext>();
+        final NamespaceSelection namespace;
+        if (!elementNamespace.isEmpty()) {
+            // assume there is only one parent if there is namespace
+            final var first = parents.entrySet().stream().findFirst().orElseThrow(() ->
+                new XMLStreamException("Failed to lookup parent for node with name %s and namespace %s."
+                    .formatted(elementLocalName, elementNamespace)));
+            final var firstNode = first.getValue();
+            final var firstStack = first.getKey().copy();
+            // Account for list
+            final var parentNode = firstNode instanceof DataSchemaContext.PathMixin mixin ? mixin.enterChild(firstStack,
+                firstNode.getPathStep()) : firstNode;
+            // try to find exact module if we know namespace of the node
+            final var childModule = context.findModuleStatements(XMLNamespace.of(elementNamespace)).iterator();
+            if (childModule.hasNext()) {
+                final var module = childModule.next();
+                final var qname = QName.create(module.localQNameModule(), elementLocalName);
+                final var child = parentNode instanceof DataSchemaContext.Composite node ? node.enterChild(firstStack,
+                    qname) : null;
+                if (child != null) {
+                    namespace = new Exact(child.dataSchemaNode().getQName());
+                    children.put(firstStack, child);
+                } else {
+                    throw new XMLStreamException("Failed to lookup node with name %s and namespace %s."
+                        .formatted(elementLocalName, elementNamespace));
+                }
+            } else {
+                throw new XMLStreamException("Failed to lookup module with namespace %s.".formatted(elementNamespace));
+            }
+        } else {
+            final var childrenQNames = new ArrayList<QName>();
+            for (final var parent : parents.entrySet()) {
+                final var parentStack = parent.getKey();
+                final var parentStmt = parent.getValue();
+                // Account for list
+                final var parentNode = parentStmt instanceof DataSchemaContext.PathMixin mixin ? mixin
+                    .enterChild(parentStack, parentStmt.getPathStep()) : parentStmt;
+                final List<QName> childQNames = parentNode.dataSchemaNode() instanceof DataNodeContainer cont ? cont
+                    .getChildNodes().stream().map(SchemaNode::getQName).filter(qName -> elementLocalName.equals(qName
+                        .getLocalName())).toList() : List.of();
+                for (final var childQName : childQNames) {
+                    childrenQNames.add(childQName);
+                    final var child = parentNode instanceof DataSchemaContext.Composite node ? node
+                        .enterChild(parentStack, childQName) : null;
+                    if (child != null) {
+                        children.put(parentStack.copy(), child);
+                        parentStack.exit();
+                    }
+                }
+            }
+            namespace = new Wildcard(UnresolvedQName.Unqualified.of(elementLocalName), childrenQNames);
+        }
+        if (children.isEmpty()) {
+            throw new XMLStreamException("Failed to lookup node with name %s in schema context."
+                .formatted(elementLocalName));
+        }
+        // Check what is next event after start of the element
+        while (reader.hasNext()) {
+            switch (reader.next()) {
+                case XMLStreamConstants.START_ELEMENT: {
+                    // new element starts before previous ended means this is child element of containment
+                    final var containmentBuilder = ContainmentNode.builder(namespace);
+                    // add first sibling since we already found it
+                    fillElement(reader, containmentBuilder, children, context, getAttributes(reader, context), codec,
+                        nsContext);
+                    // add rest of the siblings until we reach the end of the element
+                    while (reader.hasNext()) {
+                        final var event = reader.next();
+                        if (event == XMLStreamConstants.START_ELEMENT) {
+                            fillElement(reader, containmentBuilder, children, context, getAttributes(reader, context),
+                                codec, nsContext);
+                        } else if (event == XMLStreamConstants.END_ELEMENT) {
+                            // if true then we reached the end of the containment element
+                            if (elementName.equals(reader.getName())) {
+                                break;
+                            }
+                        }
+                    }
+                    // build containment and add it to parent siblings
+                    builder.addSibling(containmentBuilder.build());
+                    return;
+                }
+                case XMLStreamConstants.CHARACTERS: {
+                    final var text = reader.getText();
+                    // check if there are non whitespace characters in text
+                    if (!text.trim().isEmpty()) {
+                        // create content match if there are some data inside
+                        final var contentNodes = children.entrySet();
+                        switch (namespace) {
+                            case Exact ignored: {
+                                final var entry = contentNodes.stream().findFirst().orElseThrow();
+                                final var node = entry.getValue().dataSchemaNode();
+                                if (node instanceof TypedDataSchemaNode typed) {
+                                    final var value = codec.codecFor(typed, entry.getKey()).parseValue(nsContext,
+                                        text);
+                                    builder.addSibling(new ContentMatchNode(namespace, Map.of(node.getQName(), value)));
+                                }
+                                break;
+                            }
+                            case Wildcard ignored: {
+                                final var nameValueMap = new HashMap<QName, Object>();
+                                for (final var entry : contentNodes) {
+                                    final var node = entry.getValue().dataSchemaNode();
+                                    if (node instanceof TypedDataSchemaNode typed) {
+                                        final var value = codec.codecFor(typed, entry.getKey()).parseValue(nsContext,
+                                            text);
+                                        nameValueMap.put(node.getQName(), value);
+                                    }
+
+                                }
+                                builder.addSibling(new ContentMatchNode(namespace, nameValueMap));
+                                break;
+                            }
+                        }
+                        return;
+                    }
+                    break;
+                }
+                case XMLStreamConstants.END_ELEMENT: {
+                    // end element right after start means this is empty element - create selection
+                    final var selection = SelectionNode.builder(namespace);
+                    // add attributes if there are some
+                    if (!attributes.isEmpty()) {
+                        attributes.forEach(selection::add);
+                    }
+                    builder.addSibling(selection.build());
+                    return;
+                }
+                default: {
+                    // ignore all other events
+                    break;
+                }
+            }
+        }
+        throw new XMLStreamException("Unexpected end of the document");
+    }
+
+    /**
+     * Checks if xml element has any attributes and if so - collects them into {@link AttributeMatch} list.
+     *
+     * @param reader reader that goes through xml elements
+     * @param context model context
+     * @return list of the attributes
+     * @throws XMLStreamException when encountering issues with xml structure
+     */
+    private static List<AttributeMatch> getAttributes(final XMLStreamReader reader, final EffectiveModelContext context)
+            throws XMLStreamException {
+        final var childAttributes = new ArrayList<AttributeMatch>();
+        final var attrCount = reader.getAttributeCount();
+        // go through attributes
+        for (var i = 0; i < attrCount; i++) {
+            final var attrName = reader.getAttributeName(i);
+            // attribute must have some namespace
+            if (attrName.getNamespaceURI().isEmpty()) {
+                throw new XMLStreamException("Missing namespace for attribute " + attrName);
+            }
+            final var attrNamespace = attrName.getNamespaceURI();
+            // lookup module by namespace
+            final var it = context.findModuleStatements(XMLNamespace.of(attrNamespace)).iterator();
+            final Exact exactNamespace;
+            if (it.hasNext()) {
+                exactNamespace = new Exact(QName.create(it.next().localQNameModule(), attrName.getLocalPart()));
+            } else {
+                throw new XMLStreamException("Failed to lookup module schema for namespace "
+                    + attrNamespace);
+            }
+            // FIXME parse text and create object value from attribute text
+            final var attrValue = reader.getAttributeValue(i);
+            childAttributes.add(new AttributeMatch(exactNamespace, attrValue));
+        }
+        return childAttributes;
     }
 }
