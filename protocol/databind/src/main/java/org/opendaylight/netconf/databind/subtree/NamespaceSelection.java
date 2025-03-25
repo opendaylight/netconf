@@ -10,7 +10,9 @@ package org.opendaylight.netconf.databind.subtree;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
@@ -38,6 +40,13 @@ public sealed interface NamespaceSelection {
                     throw new IllegalArgumentException(qname + " does not match name " + name.getLocalName());
                 }
             });
+        }
+
+        // Define equals to compare two wildcards ignoring order of the qnames in the list
+        @Override
+        public boolean equals(final @Nullable Object obj) {
+            return obj == this || obj instanceof Wildcard other && name.equals(other.name)
+                && qnames.size() == other.qnames.size() && qnames.containsAll(other.qnames);
         }
     }
 }
