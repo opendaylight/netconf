@@ -52,6 +52,10 @@ public final class ContainmentNode implements Sibling, SiblingSet {
         selections = builder.siblings(SelectionNode.class);
     }
 
+    public static Builder builder(final NamespaceSelection selection) {
+        return new Builder(selection);
+    }
+
     @Override
     public NamespaceSelection selection() {
         return selection;
