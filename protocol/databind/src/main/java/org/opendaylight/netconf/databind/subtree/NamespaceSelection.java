@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 
 /**
  * A <a href="https://www.rfc-editor.org/rfc/rfc6241#section-6.2.1">Namespace Selection</a>.
@@ -22,7 +23,7 @@ public sealed interface NamespaceSelection {
     /**
      * An exact match.
      */
-    record Exact(QName qname) implements NamespaceSelection {
+    record Exact(NodeIdentifier qname) implements NamespaceSelection {
         public Exact {
             requireNonNull(qname);
         }
@@ -31,6 +32,7 @@ public sealed interface NamespaceSelection {
     /**
      * A wildcard match.
      */
+    // TODO store list of NodeIdentifiers instead of list of QNames?
     record Wildcard(Unqualified name, List<QName> qnames) implements NamespaceSelection {
         public Wildcard {
             qnames.stream().forEach(qname -> {

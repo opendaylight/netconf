@@ -1,0 +1,20 @@
+module top {
+  namespace "http://example.com/schema/1.2/config";
+  prefix test-m;
+
+  container top {
+    container interfaces {
+      leaf interface {
+        type string;
+      }
+    }
+
+    container users {
+      container user {
+        leaf name {
+          type string;
+        }
+      }
+    }
+  }
+}

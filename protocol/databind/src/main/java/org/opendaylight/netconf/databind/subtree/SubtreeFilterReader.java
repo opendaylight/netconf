@@ -7,10 +7,18 @@
  */
 package org.opendaylight.netconf.databind.subtree;
 
+import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.subtree.NamespaceSelection.Exact;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 
 @NonNullByDefault
 final class SubtreeFilterReader {
@@ -19,8 +27,37 @@ final class SubtreeFilterReader {
     }
 
     static SubtreeFilter readSubtreeFilter(final XMLStreamReader reader, final DatabindContext databind)
-            throws XMLStreamException {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+            throws XMLStreamException, IOException {
+        final var builder = SubtreeFilter.builder(databind);
+
+        final var result = new NormalizationResultHolder();
+        final var streamWriter = ImmutableNormalizedNodeStreamWriter.from(result);
+        final var xmlParser = XmlParserStream.create(streamWriter, databind.modelContext());
+        xmlParser.parse(reader);
+        final var transformed = ((ContainerNode) result.getResult().data());
+        for (final var child : transformed.body()) {
+            builder.add(fillBuilder(child));
+        }
+
+        return builder.build();
+    }
+
+    private static Sibling fillBuilder(final DataContainerChild node) {
+        final var identifier = node.name();
+        if (node instanceof ContainerNode containerNode) {
+            if (containerNode.isEmpty()) {
+                return SelectionNode.builder(new Exact(identifier)).build();
+            } else {
+                final var containment = ContainmentNode.builder(new Exact(identifier));
+                for (final var child : containerNode.body()) {
+                    containment.add(fillBuilder(child));
+                }
+                return containment.build();
+            }
+        } else if (node instanceof LeafNode leaf) {
+            return new ContentMatchNode(new Exact(identifier), leaf.body());
+        }
+        // TODO choice
+        return null;
     }
 }
