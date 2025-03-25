@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7149d60_b485a7ac",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T12:59:19Z",
+      "side": 1,
+      "message": "not public",
+      "revId": "d72677ced4a61fb54c3d12d7958b6706c6bcd4a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bd7be23_2c75f56e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-25T12:59:19Z",
+      "side": 1,
+      "message": "why do we not filter toaster notifications?",
+      "revId": "d72677ced4a61fb54c3d12d7958b6706c6bcd4a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
