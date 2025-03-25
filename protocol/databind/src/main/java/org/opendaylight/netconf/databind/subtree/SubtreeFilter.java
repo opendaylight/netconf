@@ -10,6 +10,7 @@ package org.opendaylight.netconf.databind.subtree;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import javax.xml.stream.XMLStreamException;
@@ -80,7 +81,7 @@ public final class SubtreeFilter implements Immutable, PrettyTreeAware, SiblingS
      * @throws XMLStreamException when an error occurs
      */
     public static SubtreeFilter readFrom(final DatabindContext databind, final XMLStreamReader reader)
-            throws XMLStreamException {
+            throws XMLStreamException, IOException {
         return SubtreeFilterReader.readSubtreeFilter(reader, databind);
     }
 
