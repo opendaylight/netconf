@@ -16,6 +16,24 @@
       "message": "aha, your utility method usage above 😊",
       "revId": "82816dfe3d273a383dc416ecb66a7d50491e2533",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49e8bee8_1ffd2655",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-25T15:08:14Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "75c24b64_0f53c3f1",
+      "revId": "82816dfe3d273a383dc416ecb66a7d50491e2533",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
