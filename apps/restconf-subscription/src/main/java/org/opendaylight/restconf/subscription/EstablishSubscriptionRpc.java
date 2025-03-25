@@ -125,7 +125,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         streamRegistry.establishSubscription(request.transform(subscription -> {
             final var id = subscription.id();
-            final var holder = new SubscriptionHolder(subscription, subscriptionStateService, stateMachine);
+            final var holder = new SubscriptionHolder(id, subscriptionStateService, stateMachine, streamRegistry);
             session.registerResource(holder);
             stateMachine.registerSubscription(session, id);
             stateMachine.moveTo(id, SubscriptionState.ACTIVE);
