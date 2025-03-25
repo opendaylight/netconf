@@ -1,0 +1,26 @@
+module top {
+  namespace "http://example.com/schema/1.2/config";
+  prefix top;
+
+  revision 2025-03-31 {
+    description "Test revision";
+  }
+
+  container top {
+    list interfaces {
+      container interface {
+        leaf name {
+          type string;
+        }
+      }
+    }
+
+    list users {
+      container user {
+        leaf name {
+          type string;
+        }
+      }
+    }
+  }
+}
