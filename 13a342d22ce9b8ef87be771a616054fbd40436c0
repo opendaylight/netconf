@@ -70,6 +70,30 @@
       },
       "revId": "13a342d22ce9b8ef87be771a616054fbd40436c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ac59523_cb2d1d09",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonResourceBody.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-03-26T09:38:03Z",
+      "side": 1,
+      "message": "here, that it is coming from JsonParserStream\nand create a follow-up issue for JsomParserStream to clean up its error reporting",
+      "parentUuid": "73508ec8_7a93b62d",
+      "range": {
+        "startLine": 42,
+        "startChar": 44,
+        "endLine": 42,
+        "endChar": 65
+      },
+      "revId": "13a342d22ce9b8ef87be771a616054fbd40436c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
