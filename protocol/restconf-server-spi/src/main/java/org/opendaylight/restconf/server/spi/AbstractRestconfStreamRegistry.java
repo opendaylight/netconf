@@ -367,12 +367,26 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
-            final RestconfStream.Source<T> source, final String description) {
-        final var stream = allocateStream(source);
+            final Source<T> source, final String description) {
+        final var name = allocateStreamName();
+        registerStream(request, restconfURI, description, new RestconfStream<>(this, source, name));
+    }
+
+    @Override
+    @Deprecated(since = "9.0.0", forRemoval = true)
+    public final <T> void createLegacyStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final Source<T> source, final String description) {
+        final var name = allocateStreamName();
+        registerStream(request, restconfURI, description, new LegacyRestconfStream<>(this, source, name));
+    }
+
+    private <T> void registerStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final String description, final RestconfStream<T> stream) {
         final var name = stream.name();
         if (description.isBlank()) {
             throw new IllegalArgumentException("Description must be descriptive");
         }
+        streams.put(name, stream);
 
         Futures.addCallback(putStream(stream, description, restconfURI), new FutureCallback<>() {
             @Override
@@ -388,13 +402,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 request.completeWith(new RequestException("Failed to create stream " + name, cause));
             }
         }, MoreExecutors.directExecutor());
-    }
-
-    @Override
-    @Deprecated(since = "9.0.0", forRemoval = true)
-    public <T> void createLegacyStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
-            final Source<T> source, final String description) {
-        createStream(request, restconfURI, source, description);
     }
 
     /**
@@ -423,17 +430,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
-    private <T> RestconfStream<T> allocateStream(final Source<T> source) {
+    private String allocateStreamName() {
         String name;
-        RestconfStream<T> stream;
         do {
             // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
             // it into UUID URN namespace as defined by RFC4122
-            name = "urn:uuid:" + UUID.randomUUID().toString();
-            stream = new RestconfStream<>(this, source, name);
-        } while (streams.putIfAbsent(name, stream) != null);
-
-        return stream;
+            name = "urn:uuid:" + UUID.randomUUID();
+        } while (streams.containsKey(name));
+        return name;
     }
 
     protected abstract @NonNull ListenableFuture<Void> putStream(@NonNull RestconfStream<?> stream,

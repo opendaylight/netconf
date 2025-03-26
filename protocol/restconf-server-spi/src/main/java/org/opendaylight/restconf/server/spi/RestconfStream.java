@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Type of processed events
  */
-public final class RestconfStream<T> {
+public sealed class RestconfStream<T> permits LegacyRestconfStream {
     /**
      * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
      * of one or more characters matching {@code [a-zA-Z]}.
@@ -589,8 +589,14 @@ public final class RestconfStream<T> {
     }
 
     /**
-     * Removes a {@link Subscriber}. If this was the last subscriber also shut down this stream and initiate its removal
-     * from global state.
+     * Removes a {@link Subscriber}.
+     *
+     * <p>
+     * If this was the last subscriber we decide based on implementation what should
+     * happen with this stream.
+     * If it was created by {@link Registry#createLegacyStream} it will be shut down and its removal from global state
+     * should be initiated.
+     * If it was created by {@link Registry#createStream} we keep the stream running.
      *
      * @param subscriber The {@link Subscriber} to remove
      * @throws NullPointerException if {@code subscriber} is {@code null}
@@ -604,8 +610,8 @@ public final class RestconfStream<T> {
             if (witness == observed) {
                 LOG.debug("Subscriber {} is removed", subscriber);
                 if (next == null) {
-                    // We have lost the last subscriber, terminate.
-                    terminate();
+                    // We have lost the last subscriber.
+                    onLastSubscriber();
                 }
                 return;
             }
@@ -613,6 +619,11 @@ public final class RestconfStream<T> {
             // We have raced: retry the operation
             observed = witness;
         }
+    }
+
+    @Deprecated(since = "9.0.0", forRemoval = true)
+    void onLastSubscriber() {
+        //no-op
     }
 
     private Subscribers<T> acquireSubscribers() {
@@ -633,7 +644,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    private void terminate() {
+    void terminate() {
         synchronized (this) {
             if (registration != null) {
                 registration.close();
