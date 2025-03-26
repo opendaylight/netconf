@@ -16,6 +16,24 @@
       "message": "and this can stay final to operate on immutable objects",
       "revId": "b5470903cf7e1100e231e5c8abc8d8e05800a625",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67a9d9db_c99c9fff",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamSubscription.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-26T11:24:33Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "6cdaf728_9e995026",
+      "revId": "b5470903cf7e1100e231e5c8abc8d8e05800a625",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

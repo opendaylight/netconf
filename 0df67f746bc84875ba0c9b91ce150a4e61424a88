@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "beb5e7b5_6385c328",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-26T11:24:33Z",
+      "side": 1,
+      "message": "SubscriptionStateService do not have option to offer notification",
+      "parentUuid": "865d579b_f00999f1",
+      "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6768d2c_4cea9b63",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1195ae2_252a0604",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-26T11:24:33Z",
+      "side": 1,
+      "message": "this is just write to datastore which is possible.\n\nalso we should never get here as the filter is processed first and that should fail if it\u0027s not implemented",
+      "parentUuid": "a6768d2c_4cea9b63",
+      "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c83dd78f_15f3bf41",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-24T08:47:46Z",
       "side": 1,
       "message": "IMO replace in map with new subscription would be better?",
+      "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58ac53d5_87312b80",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-26T11:24:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c83dd78f_15f3bf41",
       "revId": "0df67f746bc84875ba0c9b91ce150a4e61424a88",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
