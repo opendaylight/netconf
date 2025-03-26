@@ -101,8 +101,19 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final <T> void createStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
-            final RestconfStream.Source<T> source, final String description) {
-        final var stream = allocateStream(source);
+            final Source<T> source, final String description) {
+        createStreamImpl(request, restconfURI, source, description, Legacy.NONLEGACY);
+    }
+
+    @Override
+    public final <T> void createLegacyStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final Source<T> source, final String description) {
+        createStreamImpl(request, restconfURI, source, description, Legacy.LEGACY);
+    }
+
+    private <T> void createStreamImpl(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final Source<T> source, final String description, final Legacy legacy) {
+        final var stream = allocateStream(source, legacy);
         final var name = stream.name();
         if (description.isBlank()) {
             throw new IllegalArgumentException("Description must be descriptive");
@@ -125,14 +136,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @Override
-    public <T> void createLegacyStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
-            final Source<T> source, final String description) {
-        createStream(request, restconfURI, source, description);
-    }
-
-    @Override
     public <T> void start(final Source<T> source) {
-        final var stream = new RestconfStream<>(this, source, DEFAULT_STREAM_NAME);
+        final var stream = new RestconfStreamImpl<>(this, source, DEFAULT_STREAM_NAME);
         streams.put(DEFAULT_STREAM_NAME, stream);
         Futures.addCallback(putStream(stream, DEFAULT_STREAM_DESCRIPTION, null), new FutureCallback<>() {
             @Override
@@ -148,14 +153,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
-    private <T> RestconfStream<T> allocateStream(final Source<T> source) {
+    private <T> RestconfStream<T> allocateStream(final Source<T> source, final Legacy legacy) {
         String name;
         RestconfStream<T> stream;
         do {
             // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
             // it into UUID URN namespace as defined by RFC4122
             name = "urn:uuid:" + UUID.randomUUID().toString();
-            stream = new RestconfStream<>(this, source, name);
+            stream = switch (legacy) {
+                case LEGACY -> new LegacyRestconfStream<>(this, source, name);
+                case NONLEGACY -> new RestconfStreamImpl<>(this, source, name);
+            };
         } while (streams.putIfAbsent(name, stream) != null);
 
         return stream;
@@ -275,5 +283,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         // TODO: implement XPath filter evaluation
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             "XPath filtering not implemented");
+    }
+
+    @NonNullByDefault
+    private enum Legacy {
+        LEGACY,
+        NONLEGACY;
     }
 }
