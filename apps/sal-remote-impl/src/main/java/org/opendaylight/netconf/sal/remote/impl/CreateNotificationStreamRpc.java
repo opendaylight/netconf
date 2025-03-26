@@ -108,7 +108,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
         }
         description.append("\n}");
 
-        streamRegistry.createStream(request.transform(
+        streamRegistry.createLegacyStream(request.transform(
             stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(NOTIFICATION_STREAM_IDENTIFIER_NODEID, stream.name()))

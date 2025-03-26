@@ -125,6 +125,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @Override
+    public <T> void createLegacyStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
+            final Source<T> source, final String description) {
+        createStream(request, restconfURI, source, description);
+    }
+
+    @Override
     public <T> void start(final Source<T> source) {
         final var stream = new RestconfStream<>(this, source, DEFAULT_STREAM_NAME);
         streams.put(DEFAULT_STREAM_NAME, stream);
