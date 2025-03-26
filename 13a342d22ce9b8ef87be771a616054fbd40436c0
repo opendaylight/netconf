@@ -46,6 +46,30 @@
       },
       "revId": "13a342d22ce9b8ef87be771a616054fbd40436c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73508ec8_7a93b62d",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonResourceBody.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-03-26T09:19:44Z",
+      "side": 1,
+      "message": "so document it",
+      "parentUuid": "c93e624a_9d6965f3",
+      "range": {
+        "startLine": 42,
+        "startChar": 44,
+        "endLine": 42,
+        "endChar": 65
+      },
+      "revId": "13a342d22ce9b8ef87be771a616054fbd40436c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
