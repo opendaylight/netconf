@@ -92,7 +92,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
             return;
         }
 
-        streamRegistry.createStream(
+        streamRegistry.createLegacyStream(
             request.transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
