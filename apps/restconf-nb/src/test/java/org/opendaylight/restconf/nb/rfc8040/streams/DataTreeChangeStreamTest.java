@@ -226,7 +226,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType, final boolean leafNodesOnly, final boolean skipNotificationData,
             final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws Exception {
-        streamRegistry.createStream(request, URI.create("baseURI"),
+        streamRegistry.createLegacyStream(request, URI.create("baseURI"),
             new DataTreeChangeSource(databindProvider,
                 domDataBroker.extension(DataTreeChangeExtension.class),
                 LogicalDatastoreType.CONFIGURATION, path), "test");

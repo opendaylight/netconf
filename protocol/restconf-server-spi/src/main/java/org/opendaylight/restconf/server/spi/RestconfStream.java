@@ -178,6 +178,23 @@ public final class RestconfStream<T> {
             String description);
 
         /**
+         * Create a legacy {@link RestconfStream} with a unique name. This method will atomically generate a stream
+         * name, create the corresponding instance and register it.
+         * Difference compared to normal {@link RestconfStream} created by {@link Registry#createStream} is that legacy
+         * stream is automatically closed after last {@link Subscriber} is removed.
+         *
+         * @param <T> Stream type
+         * @param request {@link ServerRequest} for this invocation
+         * @param restconfURI resolved {@code {+restconf}} resource name
+         * @param source Stream instance
+         * @param description Stream descriptiion
+         * @throws NullPointerException if any argument is {@code null}
+         */
+        @Deprecated(since = "9.0.0", forRemoval = true)
+        <T> void createLegacyStream(ServerRequest<RestconfStream<T>> request, URI restconfURI, Source<T> source,
+            String description);
+
+        /**
          * Create default {@link RestconfStream} with a predefined name.
          *
          * <p>This method will create the corresponding instance and register it.

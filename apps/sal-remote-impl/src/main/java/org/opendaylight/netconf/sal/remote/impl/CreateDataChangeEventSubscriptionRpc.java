@@ -124,7 +124,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
             return;
         }
 
-        streamRegistry.createStream(
+        streamRegistry.createLegacyStream(
             request.transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
