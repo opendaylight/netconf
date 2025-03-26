@@ -31,6 +31,7 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
+import org.opendaylight.restconf.server.spi.LegacyRestconfStream;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
@@ -72,7 +73,7 @@ class EstablishSubscriptionRpcTest {
     @Mock
     private RestconfStream.Registry streamRegistry;
     @Mock
-    private RestconfStream<?> restconfStream;
+    private LegacyRestconfStream<?> restconfStream;
     @Captor
     private ArgumentCaptor<RequestException> response;
 
