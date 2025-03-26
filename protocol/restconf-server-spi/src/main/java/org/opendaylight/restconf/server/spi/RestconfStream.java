@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Type of processed events
  */
-public final class RestconfStream<T> {
+public abstract sealed class RestconfStream<T> permits LegacyRestconfStream, RestconfStreamImpl {
     /**
      * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
      * of one or more characters matching {@code [a-zA-Z]}.
@@ -584,8 +584,11 @@ public final class RestconfStream<T> {
     }
 
     /**
-     * Removes a {@link Subscriber}. If this was the last subscriber also shut down this stream and initiate its removal
-     * from global state.
+     * Removes a {@link Subscriber}. If this was the last subscriber we decide based on implementation what should
+     * happen with this stream.
+     * If it was created by {@link Registry#createLegacyStream} it will be shut down and its removal from global state
+     * should be initiated.
+     * If it was created by {@link Registry#createStream} we keep the stream running.
      *
      * @param subscriber The {@link Subscriber} to remove
      * @throws NullPointerException if {@code subscriber} is {@code null}
@@ -600,7 +603,7 @@ public final class RestconfStream<T> {
                 LOG.debug("Subscriber {} is removed", subscriber);
                 if (next == null) {
                     // We have lost the last subscriber, terminate.
-                    terminate();
+                    onLastSubscriber();
                 }
                 return;
             }
@@ -609,6 +612,8 @@ public final class RestconfStream<T> {
             observed = witness;
         }
     }
+
+    abstract void onLastSubscriber();
 
     private Subscribers<T> acquireSubscribers() {
         return (Subscribers<T>) SUBSCRIBERS_VH.getAcquire(this);
@@ -628,7 +633,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    private void terminate() {
+    void terminate() {
         synchronized (this) {
             if (registration != null) {
                 registration.close();
