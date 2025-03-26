@@ -33,6 +33,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStreamImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
@@ -70,7 +71,7 @@ class EstablishSubscriptionRpcTest {
     @Mock
     private RestconfStream.Registry streamRegistry;
     @Mock
-    private RestconfStream<?> restconfStream;
+    private RestconfStreamImpl<?> restconfStream;
     @Captor
     private ArgumentCaptor<RequestException> response;
 
