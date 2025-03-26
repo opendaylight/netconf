@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Type of processed events
  */
-public final class RestconfStream<T> {
+public abstract sealed class RestconfStream<T> permits LegacyRestconfStream, RestconfStreamImpl {
     /**
      * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
      * of one or more characters matching {@code [a-zA-Z]}.
@@ -503,7 +503,7 @@ public final class RestconfStream<T> {
                 LOG.debug("Subscriber {} is removed", subscriber);
                 if (next == null) {
                     // We have lost the last subscriber, terminate.
-                    terminate();
+                    onLastSubscriber();
                 }
                 return;
             }
@@ -512,6 +512,8 @@ public final class RestconfStream<T> {
             observed = witness;
         }
     }
+
+    abstract void onLastSubscriber();
 
     private Subscribers<T> acquireSubscribers() {
         return (Subscribers<T>) SUBSCRIBERS_VH.getAcquire(this);
@@ -531,7 +533,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    private void terminate() {
+    void terminate() {
         synchronized (this) {
             if (registration != null) {
                 registration.close();
