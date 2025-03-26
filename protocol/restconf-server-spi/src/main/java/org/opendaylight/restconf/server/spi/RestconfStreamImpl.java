@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.restconf.server.spi;
+
+/**
+ * A RESTCONF notification event stream. Created by {@link Registry#createStream} or {@link Registry#start}.
+ * This stream is preserved even if all subscribers are removed.
+ *
+ * @param <T> Type of processed events
+ */
+public final class RestconfStreamImpl<T> extends RestconfStream<T> {
+    public RestconfStreamImpl(final AbstractRestconfStreamRegistry registry, final Source<T> source,
+            final String name) {
+        super(registry, source, name);
+    }
+
+    @Override
+    void onLastSubscriber() {
+        //no-op
+    }
+}
