@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
-import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.LegacyRestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -37,7 +37,7 @@ class SSESessionHandlerTest {
     @Mock
     private PingExecutor pingExecutor;
     @Mock
-    private RestconfStream<?> stream;
+    private LegacyRestconfStream<?> stream;
     @Mock
     private Registration pingRegistration;
     @Mock
