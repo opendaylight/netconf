@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng ODL
+Verified+1: ODL Required.GHA <releng+odl.required.gha@linuxfoundation.org>
+Code-Review+2: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Submitted-by: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Submitted-at: Thu, 27 Mar 2025 14:48:33 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/115759
+Project: netconf
+Branch: refs/heads/master
