@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d53ea3f7_4ba71db5",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-03-27T14:45:52Z",
+      "side": 1,
+      "message": "moved to constructor so it will be created only one time",
+      "parentUuid": "22c6a415_9a23660a",
+      "revId": "3e733cd9d520b728b1cb9a439796bdf75bc86439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f9d59a2c_fec3f9b7",
         "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/SubtreeFilterPrettyTree.java",
         "patchSetId": 15
