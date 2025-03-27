@@ -9,10 +9,11 @@ package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.OnCommitFutureCallback;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -45,7 +46,7 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(
             NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id)));
-        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+        tx.commit().addCallback(new OnCommitFutureCallback() {
             @Override
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Removed subscription {} from operational datastore as of {}", id, result);
@@ -53,7 +54,7 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             }
 
             @Override
-            public void onFailure(final Throwable cause) {
+            public void onFailure(final TransactionCommitFailedException cause) {
                 LOG.warn("Failed to remove subscription {} from operational datastore", id, cause);
                 request.completeWith(new RequestException(cause));
             }
