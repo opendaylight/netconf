@@ -90,11 +90,11 @@ class SubtreeFilterFromElementTest {
             // custom example to test no namespace xml
             Arguments.of("""
                 <filter type="subtree">
-                  <top>
-                    <users/>
+                  <top xmlns="http://example.com/schema/1.2/config">
+                    <users xmlns=""/>
                   </top>
                 </filter>""", SubtreeFilter.builder()
-                .add(ContainmentNode.builder(new NamespaceSelection.Wildcard("top"))
+                .add(ContainmentNode.builder(new Exact(NAMESPACE, "top"))
                     .add(SelectionNode.builder(new NamespaceSelection.Wildcard("users"))
                         .build())
                     .build())
