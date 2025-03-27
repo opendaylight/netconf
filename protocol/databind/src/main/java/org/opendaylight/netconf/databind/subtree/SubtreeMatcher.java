@@ -10,6 +10,8 @@ package org.opendaylight.netconf.databind.subtree;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -28,8 +30,29 @@ public final class SubtreeMatcher implements Immutable {
     }
 
     public boolean matches() {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        // Check containment nodes recursively
+        for (final var containment : filter.containments()) {
+            if (child == null || !matchContainment(containment, child)) {
+                return false;
+            }
+        }
+
+        // Check content matches at the top level
+        for (final var contentMatch : filter.contentMatches()) {
+            if (child == null || !matchContent(contentMatch, child)) {
+                return false;
+            }
+        }
+
+
+        // Check selection nodes (which may enforce attribute matches)
+        for (final var selection : filter.selections()) {
+            if (child == null || !matchSelection(selection, child)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
