@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52713240_7b382648",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-03-27T17:06:40Z",
+      "side": 1,
+      "message": "i.e.\n\nchannelClosed(Request\u003cEmpty\u003e request)\n\nand that can easily be used in removeSubscription() below instead of the Runnable/Consumer combo -- and terminateImpl() should be able to pass the request as well...",
+      "parentUuid": "2b0df486_6d460f5c",
+      "revId": "9a2b6c471842465ed24191dd8a59d9c278908c5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6de67adb_2490d0aa",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
         "patchSetId": 13
