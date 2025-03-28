@@ -463,6 +463,58 @@ public final class RestconfStream<T> {
         public abstract boolean canMoveTo(SubscriptionState newState);
     }
 
+    /**
+     * Receiver of a {@link Subscription} notifications.
+     */
+    @NonNullByDefault
+    public interface Receiver {
+        /**
+         * Returns the {@code receiver name}.
+         */
+        String name();
+
+        /**
+         * Returns the {@code receiver state}.
+         */
+        ReceiverState state();
+
+        /**
+         * Returns the {@code sent event counter}.
+         */
+        Long sentEventRecords();
+
+        /**
+         * Returns the {@code excluded event counter}.
+         */
+        Long excludedEventRecords();
+
+        /**
+         * Increments the {@code sent event counter}.
+         */
+        void incrementSentEventRecords();
+
+        /**
+         * Increments the {@code excluded event counter}.
+         */
+        void incrementExcludedEventRecords();
+    }
+
+    /**
+     * Logical state of a {@link Receiver}.
+     */
+    public enum ReceiverState {
+        ACTIVE,
+        SUSPENDED,
+    }
+
+    /**
+     * Type of event record
+     */
+    public enum FilteredRecordType {
+        SENT_EVENT_RECORDS,
+        EXCLUDED_EVENT_RECORDS
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
     private static final VarHandle SUBSCRIBERS_VH;
     private static final VarHandle TERMINATED_VH;
