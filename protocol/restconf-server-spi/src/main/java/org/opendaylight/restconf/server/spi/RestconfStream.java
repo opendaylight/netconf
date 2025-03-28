@@ -20,7 +20,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -288,7 +290,11 @@ public final class RestconfStream<T> {
          * @return the {@code receiver name}
          */
         @NonNullByDefault
+<<<<<<< Updated upstream
         public abstract String receiverName();
+=======
+        public abstract List<Receiver> receiver();
+>>>>>>> Stashed changes
 
         /**
          * Returns the encoding.
@@ -461,6 +467,59 @@ public final class RestconfStream<T> {
          * @return {@code true} if the transition to {@code newState} is allowed
          */
         public abstract boolean canMoveTo(SubscriptionState newState);
+    }
+
+<<<<<<< Updated upstream
+    public interface Receiver {
+=======
+    public sealed interface Receiver {
+>>>>>>> Stashed changes
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        void updateSentEventRecord();
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        void updateExcludedEventRecord();
+
+        /**
+         * Returns the {@code receiver name}.
+         */
+        String name();
+
+        /**
+         * Returns the {@code receiver state}.
+         */
+        ReceiverState state();
+
+        /**
+         * Returns the {@code sent event counter}.
+         */
+        AtomicLong sentEventRecords();
+
+        /**
+         * Returns the {@code excluded event counter}.
+         */
+        AtomicLong excludedEventRecords();
+    }
+
+<<<<<<< Updated upstream
+        enum State {
+            ACTIVE,
+            SUSPENDED,
+        }
+=======
+    public enum ReceiverState {
+        ACTIVE,
+        SUSPENDED,
+    }
+
+    public enum FilteredRecordType {
+        SENT_EVENT_RECORDS,
+        EXCLUDED_EVENT_RECORDS
+>>>>>>> Stashed changes
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
