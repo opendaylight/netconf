@@ -73,6 +73,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
+    private final Lock remoteDeviceLock = new ReentrantLock();
 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
@@ -111,6 +112,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     @Override
     public void onSessionUp(final NetconfClientSession session) {
+        final NetconfSessionPreferences remoteSessionCapabilities;
         sessionLock.lock();
         try {
             LOG.debug("{}: Session established", id);
@@ -132,10 +134,15 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 LOG.debug("{}: Session capabilities overridden, capabilities that will be used: {}", id,
                         netconfSessionPreferences);
             }
-
-            remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
+            remoteSessionCapabilities = netconfSessionPreferences;
         } finally {
             sessionLock.unlock();
+        }
+        remoteDeviceLock.lock();
+        try {
+            remoteDevice.onRemoteSessionUp(remoteSessionCapabilities, this);
+        } finally {
+            remoteDeviceLock.unlock();
         }
     }
 
@@ -152,10 +159,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
         LOG.debug("Tearing down {}", reason);
         final var futuresToCancel = new ArrayList<UncancellableFuture<RpcResult<NetconfMessage>>>();
+        boolean isCurrentSessionClosed = false;
         sessionLock.lock();
         try {
             if (currentSession != null) {
                 currentSession = null;
+                isCurrentSessionClosed = true;
                 /*
                  * Walk all requests, check if they have been executing
                  * or cancelled and remove them from the queue.
@@ -171,13 +180,18 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         semaphore.release();
                     }
                 }
-
-                remoteDevice.onRemoteSessionDown();
             }
         } finally {
             sessionLock.unlock();
         }
-
+        if (isCurrentSessionClosed) {
+            remoteDeviceLock.lock();
+            try {
+                remoteDevice.onRemoteSessionDown();
+            } finally {
+                remoteDeviceLock.unlock();
+            }
+        }
         // Notify pending request futures outside of the sessionLock to avoid unnecessarily blocking the caller.
         for (var future : futuresToCancel) {
             if (Strings.isNullOrEmpty(reason)) {
