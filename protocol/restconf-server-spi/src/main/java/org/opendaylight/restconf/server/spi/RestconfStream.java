@@ -21,6 +21,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -461,6 +462,55 @@ public final class RestconfStream<T> {
          * @return {@code true} if the transition to {@code newState} is allowed
          */
         public abstract boolean canMoveTo(SubscriptionState newState);
+    }
+
+    public interface Receiver {
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        void updateSentEventRecord();
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        void updateExcludedEventRecord();
+
+        /**
+         * Returns the {@code receiver state}.
+         */
+        State state();
+
+        /**
+         * Returns the {@code receiver name}.
+         */
+        String receiverName();
+
+        /**
+         * Returns the {@code subscription id}.
+         */
+        String subscriptionId();
+
+        /**
+         * Update state of receiver.
+         *
+         * @param newState New state of receiver.
+         */
+        void setState(State newState);
+
+        /**
+         * Returns the {@code sent event counter}.
+         */
+        AtomicLong sentEventCounter();
+
+        /**
+         * Returns the {@code excluded event counter}.
+         */
+        AtomicLong excludedEventCounter();
+
+        enum State {
+            ACTIVE,
+            SUSPENDED,
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
