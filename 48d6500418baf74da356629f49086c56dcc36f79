@@ -16,6 +16,24 @@
       "message": "Maybe some LOG.warn would be an appropriate way to notify a user about this?",
       "revId": "48d6500418baf74da356629f49086c56dcc36f79",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ca7c092_8f7c6e63",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-28T16:24:07Z",
+      "side": 1,
+      "message": "I don\u0027t think this is really necessary as this will happen when we delete subscription with RPC for example. I don\u0027t this this situation should indicate any problematic state.",
+      "parentUuid": "6cd2c5ee_6688cbe4",
+      "revId": "48d6500418baf74da356629f49086c56dcc36f79",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
