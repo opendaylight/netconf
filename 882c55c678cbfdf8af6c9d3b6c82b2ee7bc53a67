@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fa28dc1_6afe7208",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-28T13:14:57Z",
+      "side": 1,
+      "message": "I would expect that we check if \"patch-id\" is present when we read it",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4c1d249_f57f1c03",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-28T13:14:57Z",
+      "side": 1,
+      "message": "I would expect that we check if \"patch-id\" is present when we read it .. here..",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce93906a_2108fea9",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchBody.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-28T13:14:57Z",
+      "side": 1,
+      "message": "refactoring like this should be in separate patch, now there is a lot of occurrences of \"patch-id\" string around the code, and additionally we have also this constant 😄",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
