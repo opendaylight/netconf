@@ -21,6 +21,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -317,7 +318,7 @@ public final class RestconfStream<T> {
         /**
          * Sets the {@code subscription state}.
          *
-         * @param the state to set
+         * @param newState the state to set
          * @throws IllegalStateException if the subscription cannot be moved to the new state
          */
         @NonNullByDefault
@@ -461,6 +462,38 @@ public final class RestconfStream<T> {
          * @return {@code true} if the transition to {@code newState} is allowed
          */
         public abstract boolean canMoveTo(SubscriptionState newState);
+    }
+
+    public interface Receiver {
+        /**
+         * Returns the {@code receiver name}.
+         */
+        String name();
+
+        /**
+         * Returns the {@code receiver state}.
+         */
+        ReceiverState state();
+
+        /**
+         * Returns the {@code sent event counter}.
+         */
+        AtomicLong sentEventRecords();
+
+        /**
+         * Returns the {@code excluded event counter}.
+         */
+        AtomicLong excludedEventRecords();
+    }
+
+    public enum ReceiverState {
+        ACTIVE,
+        SUSPENDED,
+    }
+
+    public enum FilteredRecordType {
+        SENT_EVENT_RECORDS,
+        EXCLUDED_EVENT_RECORDS
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
