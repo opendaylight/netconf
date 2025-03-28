@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92abe8c1_d7b84916",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-28T16:45:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f43b9468_43da20c8",
+      "revId": "5bb3f22f2e414acf27c408b819b85de1cdf9a9b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8416d87_ee9b2284",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-28T11:13:15Z",
       "side": 1,
       "message": "And here constant too",
+      "revId": "5bb3f22f2e414acf27c408b819b85de1cdf9a9b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f78e932_c297d4eb",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/CountersSubscriptionTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-03-28T16:45:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8416d87_ee9b2284",
       "revId": "5bb3f22f2e414acf27c408b819b85de1cdf9a9b2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
