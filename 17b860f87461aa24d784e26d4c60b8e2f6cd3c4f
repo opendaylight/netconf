@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7d90d24_3e9f2c9a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-28T11:17:08Z",
+      "side": 1,
+      "message": "Should match the Yang model",
+      "revId": "17b860f87461aa24d784e26d4c60b8e2f6cd3c4f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
