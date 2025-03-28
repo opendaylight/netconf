@@ -21,6 +21,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -224,6 +225,54 @@ public final class RestconfStream<T> {
             ReceiverHolder.RecordType recordType);
     }
 
+
+    public static class Receiver {
+        private final String subscriptionId;
+        private final String name;
+        private State state;
+
+        private final AtomicLong sentEventCounter = new AtomicLong(0);
+        private final AtomicLong excludedEventCounter = new AtomicLong(0);
+
+        public Receiver(final String subscriptionId, final String name) {
+            this.subscriptionId = subscriptionId;
+            this.name = name;
+        }
+
+        /**
+         * Returns the {@code receiver state}.
+         *
+         * @return the {@code receiver state}
+         */
+        public State state() {
+            return state;
+        }
+
+        /**
+         * Returns the {@code receiver name}.
+         *
+         * @return the {@code receiver name}
+         */
+        public String name() {
+            return name;
+        }
+
+        /**
+         * Returns the {@code subscription id}.
+         *
+         * @return the {@code subscription id}
+         */
+        public String subscriptionId() {
+            return subscriptionId;
+        }
+
+        public enum State {
+            ACTIVE,
+            SUSPENDED,
+            CONNECTING, //check if we support
+            DISCONNECTED //check if we support
+        }
+    }
     /**
      * A handle to a RFC8639 subscription.
      */
