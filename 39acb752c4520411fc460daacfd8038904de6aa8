@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02f81fa6_b972b990",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-28T13:08:44Z",
+      "side": 1,
+      "message": "this is maybe for a different ticket, probably its just works because JsonReader autoformat values to string when reading strings",
+      "revId": "39acb752c4520411fc460daacfd8038904de6aa8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
