@@ -13,7 +13,10 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -21,6 +24,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -363,6 +367,50 @@ public final class RestconfStream<T> {
             public XPathDefinition {
                 requireNonNull(xpath);
             }
+        }
+    }
+
+    public interface Receiver {
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        void updateSentEventRecord();
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        void updateExcludedEventRecord();
+
+        /**
+         * Returns the {@code receiver state}.
+         */
+        State state();
+
+        /**
+         * Returns the {@code receiver name}.
+         */
+        String receiverName();
+
+        /**
+         * Returns the {@code subscription id}.
+         */
+        String subscriptionId();
+
+        /**
+         * Returns the {@code sent event counter}.
+         */
+        public AtomicLong sentEventCounter();
+
+        /**
+         * Returns the {@code excluded event counter}.
+         */
+        public AtomicLong excludedEventCounter();
+
+        enum State {
+            ACTIVE,
+            SUSPENDED,
+            CONNECTING, //check if we support
+            DISCONNECTED //check if we support
         }
     }
 
