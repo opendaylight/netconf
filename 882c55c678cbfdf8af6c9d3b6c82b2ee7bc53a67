@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20ec531a_2aadc24e",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-28T13:12:47Z",
+      "side": 0,
+      "message": "suddenly its redundant, in previous patch we are adding into to another place, can you make a compact patch with related changes?",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
