@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cd2c5ee_6688cbe4",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionHolder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-03-28T10:17:26Z",
+      "side": 1,
+      "message": "Maybe some LOG.warn would be an appropriate way to notify a user about this?",
+      "revId": "48d6500418baf74da356629f49086c56dcc36f79",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
