@@ -13,7 +13,10 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -21,6 +24,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -335,6 +339,99 @@ public final class RestconfStream<T> {
             public XPathDefinition {
                 requireNonNull(xpath);
             }
+        }
+    }
+
+    public static class Receiver {
+        private final String subscriptionId;
+        private final String name;
+        private final State state;
+        private final RestconfStream.Registry streamRegistry;
+        private final AtomicLong sentEventCounter = new AtomicLong(0);
+        private final AtomicLong excludedEventCounter = new AtomicLong(0);
+
+        public Receiver(final String subscriptionId, final String name, final State state,
+                        final Registry streamRegistry) {
+            this.subscriptionId = subscriptionId;
+            this.name = name;
+            this.state = state;
+            this.streamRegistry = streamRegistry;
+        }
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public void updateSentEventRecord() {
+            final var counterValue = sentEventCounter.incrementAndGet();
+            Futures.addCallback(streamRegistry.updateReceiver(null, counterValue,
+                            ReceiverHolder.RecordType.SENT_EVENT_RECORDS),
+                    new FutureCallback<>() {
+                        @Override
+                        public void onSuccess(final Void result) {
+                            LOG.trace("Sent-event-records was updated {} for {} receiver on subscription {}",
+                                    counterValue, name, subscriptionId());
+                        }
+
+                        @Override
+                        public void onFailure(final Throwable cause) {
+                            LOG.warn("Failed update sent-event-records {} for {} receiver on subscription {}",
+                                    counterValue, name, subscriptionId(), cause);
+                        }
+                    }, MoreExecutors.directExecutor());
+        }
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public void updateExcludedEventRecord() {
+            final var counterValue = excludedEventCounter.incrementAndGet();
+            Futures.addCallback(streamRegistry.updateReceiver(null, counterValue,
+                            ReceiverHolder.RecordType.EXCLUDED_EVENT_RECORDS),
+                    new FutureCallback<>() {
+                        @Override
+                        public void onSuccess(final Void result) {
+                            LOG.trace("Excluded-event-records was updated {} for {} receiver on subscription {}",
+                                    counterValue, name, subscriptionId());
+                        }
+
+                        @Override
+                        public void onFailure(final Throwable cause) {
+                            LOG.warn("Failed update excluded-event-records {} for {} receiver on subscription {}",
+                                    counterValue, name, subscriptionId(), cause);
+                        }
+                    }, MoreExecutors.directExecutor());
+        }
+        /**
+         * Returns the {@code receiver state}.
+         *
+         * @return the {@code receiver state}
+         */
+        public State state() {
+            return state;
+        }
+
+        /**
+         * Returns the {@code receiver name}.
+         *
+         * @return the {@code receiver name}
+         */
+        public String name() {
+            return name;
+        }
+
+        /**
+         * Returns the {@code subscription id}.
+         *
+         * @return the {@code subscription id}
+         */
+        public String subscriptionId() {
+            return subscriptionId;
+        }
+
+        public enum State {
+            ACTIVE,
+            SUSPENDED,
+            CONNECTING, //check if we support
+            DISCONNECTED //check if we support
         }
     }
 
