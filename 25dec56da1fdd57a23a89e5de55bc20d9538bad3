@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "25dec56da1fdd57a23a89e5de55bc20d9538bad3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "130597fc_3be88087",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-31T13:26:47Z",
+      "side": 1,
+      "message": "A subscription \"stop-time\" can be specified as part of a\n      notification replay.  This supports a capability analogous to the\n      \u003cstopTime\u003e parameter of [RFC5277].  However, in this\n      specification, a \"stop-time\" parameter can also be applied without\n      replay.",
+      "revId": "25dec56da1fdd57a23a89e5de55bc20d9538bad3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
