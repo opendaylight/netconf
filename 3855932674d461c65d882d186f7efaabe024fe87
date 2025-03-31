@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5f3cb43_b43d9606",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-31T12:57:22Z",
+      "side": 1,
+      "message": "what\u0027s the name of this child?",
+      "revId": "3855932674d461c65d882d186f7efaabe024fe87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7051fdb9_a9c2e52d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-31T12:57:22Z",
+      "side": 1,
+      "message": "@Nullable for filter",
+      "revId": "3855932674d461c65d882d186f7efaabe024fe87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0449a7d_91475298",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-31T12:57:22Z",
+      "side": 1,
+      "message": "@Nullable for filter or adapt this accordingly",
+      "revId": "3855932674d461c65d882d186f7efaabe024fe87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6652dfc_bb0a5e13",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-03-31T12:57:22Z",
+      "side": 1,
+      "message": "what encoding? etc...",
+      "revId": "3855932674d461c65d882d186f7efaabe024fe87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
