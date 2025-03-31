@@ -29,7 +29,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.dynamic.Stream1;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -86,12 +85,6 @@ public class SubscriptionStateService {
     private static final NodeIdentifier REASON_NODEID =
         NodeIdentifier.create(QName.create(SubscriptionSuspended.QNAME, "reason").intern());
     /**
-     * {@link NodeIdentifier} of {@code leaf stop-time} in {@link SubscriptionModified}. Value domain is
-     * {@link String} as expressed in {@link DateAndTime}.
-     */
-    private static final NodeIdentifier STOP_TIME_NODEID =
-        NodeIdentifier.create(QName.create(SubscriptionModified.QNAME, "stop-time").intern());
-    /**
      * {@link NodeIdentifier} of {@code leaf stream} in {@link SubscriptionModified}. Value domain is all of
      * {@link String} as expressed in {@link Stream1#getStream()}.
      */
@@ -125,13 +118,12 @@ public class SubscriptionStateService {
      * @param streamName the subscription stream name
      * @param encoding   the optional subscription encoding
      * @param filter     the optional subscription filter
-     * @param stopTime   the optional subscription stop time
      * @param uri        the optional subscription uri
      * @return a listenable future outcome of the notification
      */
     public ListenableFuture<?> subscriptionModified(final Instant eventTime, final Uint32 id, final String streamName,
-            final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
-            final @Nullable String stopTime, final @Nullable String uri) throws InterruptedException {
+            final @Nullable QName encoding, final @Nullable NormalizedAnydata filter, final @Nullable String uri)
+            throws InterruptedException {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
         var body = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(State.MODIFIED.nodeId)
@@ -145,9 +137,6 @@ public class SubscriptionStateService {
                 .withNodeIdentifier(SUBTREE_FILTER_NODEID)
                 .withValue(filter)
                 .build());
-        }
-        if (stopTime != null) {
-            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime));
         }
         if (uri != null) {
             body.withChild(ImmutableNodes.leafNode(URI_NODEID, uri));

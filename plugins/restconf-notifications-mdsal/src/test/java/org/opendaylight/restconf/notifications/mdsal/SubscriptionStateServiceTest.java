@@ -45,7 +45,6 @@ class SubscriptionStateServiceTest {
     private static final Instant EVENT_TIME =
         OffsetDateTime.of(LocalDateTime.of(2024, Month.OCTOBER, 30, 12, 34, 56), ZoneOffset.UTC).toInstant();
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
-    private static final String STOP_TIME = "2024-10-30T12:34:56Z";
     private static final String STREAM_NAME = "NETCONF";
     private static final String URI = "http://example.com";
     private static final QName ENCODING = EncodeXml$I.QNAME;
@@ -77,7 +76,7 @@ class SubscriptionStateServiceTest {
 
         final QName eventQName = switch (type) {
             case MODIFIED -> {
-                notifications.subscriptionModified(EVENT_TIME, ID, STREAM_NAME, ENCODING, null, STOP_TIME, URI);
+                notifications.subscriptionModified(EVENT_TIME, ID, STREAM_NAME, ENCODING, null, URI);
                 yield SubscriptionModified.QNAME;
             }
             case COMPLETED -> {
@@ -111,8 +110,6 @@ class SubscriptionStateServiceTest {
                     new NodeIdentifier(QName.create(eventQName, "encoding"))).body());
                 assertEquals(STREAM_NAME, notification.getChildByArg(
                     new NodeIdentifier(QName.create(eventQName, "stream"))).body());
-                assertEquals(STOP_TIME, notification.getChildByArg(
-                    new NodeIdentifier(QName.create(eventQName, "stop-time"))).body());
                 assertEquals(URI, notification.getChildByArg(URI_NODEID).body());
             }
             case SUSPENDED, TERMINATED ->
