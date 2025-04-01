@@ -13,7 +13,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -247,20 +246,6 @@ public final class RestconfStream<T> {
          * @return A {@link Subscription}, or {@code null} if the stream with specified name does not exist.
          */
         @Nullable Subscription lookupSubscription(Uint32 id);
-
-        /**
-         * Update the counter value for a specific receiver in the operational datastore.
-         *
-         * <p>This method writes an updated counter for the receiver identified by the provided {@code ReceiverHolder}.
-         * The type of counter to update is specified by the {@code recordType} parameter. The update is performed on
-         * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
-         * that completes when the commit succeeds or fails.
-         *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
-         * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
-         */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
     }
 
     /**
@@ -283,12 +268,12 @@ public final class RestconfStream<T> {
         public abstract Uint32 id();
 
         /**
-         * Returns the {@code receiver name}.
+         * Returns the {@code receiver}.
          *
-         * @return the {@code receiver name}
+         * @return the {@code receiver}
          */
         @NonNullByDefault
-        public abstract String receiverName();
+        public abstract Receiver receiver();
 
         /**
          * Returns the encoding.
@@ -345,6 +330,17 @@ public final class RestconfStream<T> {
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+
+
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public abstract void updateSentEventRecord();
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public abstract void updateExcludedEventRecord();
 
         @Override
         public final String toString() {
@@ -467,7 +463,7 @@ public final class RestconfStream<T> {
      * Receiver of a {@link Subscription} notifications.
      */
     @NonNullByDefault
-    public interface Receiver {
+    public sealed interface Receiver permits AbstractSubscriptionReceiver {
         /**
          * Returns the {@code receiver name}.
          */
@@ -505,14 +501,6 @@ public final class RestconfStream<T> {
     public enum ReceiverState {
         ACTIVE,
         SUSPENDED,
-    }
-
-    /**
-     * Type of event record.
-     */
-    public enum FilteredRecordType {
-        SENT_EVENT_RECORDS,
-        EXCLUDED_EVENT_RECORDS
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
