@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
@@ -274,7 +275,7 @@ public final class RestconfStream<T> {
          * @return the {@code receiver}
          */
         @NonNullByDefault
-        public abstract Receiver receiver();
+        public abstract List<Receiver> receiver();
 
         /**
          * Returns the encoding.
@@ -480,7 +481,6 @@ public final class RestconfStream<T> {
          * Returns the {@code excluded event counter}.
          */
         AtomicLong excludedEventRecords();
-
     }
 
     public enum ReceiverState {
