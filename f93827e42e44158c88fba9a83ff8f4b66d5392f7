@@ -33,6 +33,23 @@
       "message": "then",
       "revId": "f93827e42e44158c88fba9a83ff8f4b66d5392f7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ff0a959_d1105679",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-01T13:56:59Z",
+      "side": 1,
+      "message": "JIRA ID?",
+      "revId": "f93827e42e44158c88fba9a83ff8f4b66d5392f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
