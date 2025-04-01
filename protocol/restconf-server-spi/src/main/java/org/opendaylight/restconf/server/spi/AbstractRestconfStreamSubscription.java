@@ -24,21 +24,21 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 public abstract non-sealed class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
-    private final @NonNull String streamName;
+    private final @NonNull RestconfStream<?> stream;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
     private final @Nullable EventStreamFilter filter;
 
     private @NonNull SubscriptionState state;
 
-    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
+    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final RestconfStream<?> stream,
             final String receiverName, final SubscriptionState state, final TransportSession session,
             final @Nullable EventStreamFilter filter) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
         this.state = requireNonNull(state);
         this.session = requireNonNull(session);
-        this.streamName = requireNonNull(streamName);
+        this.stream = requireNonNull(stream);
         this.receiverName = requireNonNull(receiverName);
         this.filter = filter;
     }
@@ -54,8 +54,13 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     }
 
     @Override
+    public final RestconfStream<?> stream() {
+        return stream;
+    }
+
+    @Override
     public final String streamName() {
-        return streamName;
+        return stream.name();
     }
 
     @Override
@@ -91,7 +96,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
         return super.addToStringAttributes(helper
             .add("id", id)
             .add("encoding", encoding)
-            .add("stream", streamName)
+            .add("stream", stream)
             .add("filter", filter));
     }
 }
