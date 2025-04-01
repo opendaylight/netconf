@@ -86,8 +86,7 @@ public final class SubtreeFilter implements Immutable, PrettyTreeAware, SiblingS
 
     @Override
     public PrettyTree prettyTree() {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        return new SubtreeFilterPrettyTree(this);
     }
 
     /**
