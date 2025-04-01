@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -20,7 +21,6 @@ import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.transport.http.HTTPClient;
@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-@Disabled("Disabled until filtering is implemented in NETCONF-1436")
+//@Disabled("Disabled until filtering is implemented in NETCONF-1436")
 class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final NodeIdentifier BREAD_NODEID =
         NodeIdentifier.create(QName.create(ToasterRestocked.QNAME, "amountOfBread").intern());
@@ -185,5 +185,40 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                 }
               }
             }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    void filterReferenceTest() throws Exception {
+        // Establish subscription
+        final var response = invokeRequest(HttpMethod.POST,
+            "/restconf/data/ietf-subscribed-notifications:filters",
+            MediaTypes.APPLICATION_YANG_DATA_XML,
+            """
+                <stream-filter xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+                 <name>foo</name>
+                 <stream-subtree-filter>
+                  <toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/>
+                 </stream-subtree-filter>
+                </stream-filter>""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+        assertEquals(HttpResponseStatus.CREATED, response.status());
+
+        final var response1 = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            """
+                {
+                  "input": {
+                    "stream": "NETCONF",
+                    "encoding": "encode-json",
+                    "stream-filter-name" : "foo"
+                  }
+                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+
+
+        // FIXME: add some verification the filter was loaded/used correctly
+        final var response2 = invokeRequest(HttpMethod.GET,
+            "/restconf/data/ietf-subscribed-notifications:filters",
+            MediaTypes.APPLICATION_YANG_DATA_XML, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
+        assertEquals(HttpResponseStatus.OK, response2.status());
+        assertEquals("foo", response2.content().toString(StandardCharsets.UTF_8));
     }
 }
