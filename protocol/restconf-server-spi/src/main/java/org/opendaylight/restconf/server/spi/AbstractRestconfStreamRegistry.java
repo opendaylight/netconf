@@ -241,7 +241,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @NonNullByDefault
     protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
 
-    private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
+    // FIXME: revisit
+    protected void putFilter(final String name, final EventStreamFilter filter) {
+        filters.put(name, filter);
+    }
+
+    protected void removeFilter(final String name) {
+        filters.remove(name);
+    }
+
+
+    protected @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
             throws RequestException {
         return switch (filter) {
             case null -> null;
