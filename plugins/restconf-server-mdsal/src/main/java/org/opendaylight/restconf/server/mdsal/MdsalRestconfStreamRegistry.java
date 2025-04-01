@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
@@ -88,8 +87,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-            final ReceiverHolder.RecordType recordType) {
+    public ListenableFuture<Void> updateReceiver(final RestconfStream.Receiver receiver, final long counter,
+            final RestconfStream.Receiver.RecordType recordType) {
         // Now issue a merge operation
         final var tx = dataBroker.newWriteOnlyTransaction();
         final var subscriptionId = receiver.subscriptionId();
@@ -125,7 +124,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     protected ListenableFuture<RestconfStream.Subscription> createSubscription(
             final RestconfStream.Subscription subscription) {
         final var id = subscription.id();
-        final var receiver = subscription.receiverName();
+        final var receiverName = subscription.receiver().receiverName();
         final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
@@ -149,8 +148,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                         .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
                         .withChild(ImmutableNodes.newMapEntryBuilder()
                             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                QNAME_RECEIVER_NAME, receiver))
-                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiver))
+                                QNAME_RECEIVER_NAME, receiverName))
+                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiverName))
                             .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,

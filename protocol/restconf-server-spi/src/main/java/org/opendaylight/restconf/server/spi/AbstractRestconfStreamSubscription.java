@@ -25,21 +25,21 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
     private final @NonNull String streamName;
-    private final @NonNull String receiverName;
+    private final RestconfStream.@NonNull Receiver receiver;
     private final @NonNull TransportSession session;
     private final @Nullable EventStreamFilter filter;
 
     private @NonNull SubscriptionState state;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
-            final String receiverName, final SubscriptionState state, final TransportSession session,
+            final RestconfStream.Receiver receiver, final SubscriptionState state, final TransportSession session,
             final @Nullable EventStreamFilter filter) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
         this.state = requireNonNull(state);
         this.session = requireNonNull(session);
         this.streamName = requireNonNull(streamName);
-        this.receiverName = requireNonNull(receiverName);
+        this.receiver = requireNonNull(receiver);
         this.filter = filter;
     }
 
@@ -59,8 +59,8 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     }
 
     @Override
-    public final String receiverName() {
-        return receiverName;
+    public final RestconfStream.Receiver receiver() {
+        return receiver;
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
             .add("id", id)
             .add("encoding", encoding)
             .add("stream", streamName)
-            .add("receiver", receiverName)
+            .add("receiver", receiver.receiverName())
             .add("filter", filter));
     }
 }
