@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -62,16 +63,32 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
-        SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final SubscriptionState state, final TransportSession session,
-                final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, state, session, filter);
+        SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName,
+                final List<RestconfStream.Receiver> receiver, final SubscriptionState state,
+                final TransportSession session, final @Nullable EventStreamFilter filter) {
+            super(id, encoding, streamName, receiver, state, session, filter);
         }
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
+        }
+
+        @Override
+        public void updateSentEventRecord() {
+            // TODO
+        }
+
+        @Override
+        public void updateExcludedEventRecord() {
+            // TODO
+        }
+    }
+
+    private final class ReceiverImpl extends AbstractSubscriptionReceiver {
+        ReceiverImpl(final String name, final RestconfStream.ReceiverState state) {
+            super(name, state);
         }
     }
 
@@ -224,7 +241,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var subscription = new SubscriptionImpl(id, encoding, streamName,
             // FIXME: 'anonymous' instead of 'unknown' ?
-            principal != null ? principal.getName() : "<unknown>",
+            List.of(new ReceiverImpl(principal != null ? principal.getName() : "<unknown>",
+                RestconfStream.ReceiverState.ACTIVE)),
             SubscriptionState.START, request.session(),
             filterImpl);
 
@@ -260,7 +278,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
         final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
-            oldSubscription.receiverName(), SubscriptionState.ACTIVE, oldSubscription.session(), filterImpl);
+            oldSubscription.receiver(), SubscriptionState.ACTIVE, oldSubscription.session(), filterImpl);
 
         Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
             @Override
