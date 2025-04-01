@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.ArrayList;
+import java.util.List;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.OnCommitFutureCallback;
@@ -59,5 +61,14 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
                 request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public List<RestconfStream.Receiver> receiver() {
+        final var mdsalReceivers = new ArrayList<RestconfStream.Receiver>();
+        for (final var receiver : delegate.receiver()) {
+            mdsalReceivers.add(new MdsalSubscriptionReceiver<>(receiver, dataBroker));
+        }
+        return mdsalReceivers;
     }
 }
