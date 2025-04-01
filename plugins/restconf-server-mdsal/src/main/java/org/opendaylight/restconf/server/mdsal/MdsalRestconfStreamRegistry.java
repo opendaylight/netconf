@@ -22,10 +22,8 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.StreamFilter;
@@ -33,13 +31,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -88,46 +84,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-            final ReceiverHolder.RecordType recordType) {
-        // Now issue a merge operation
-        final var tx = dataBroker.newWriteOnlyTransaction();
-        final var subscriptionId = receiver.subscriptionId();
-        final var sentEventIid = YangInstanceIdentifier.builder()
-            .node(NodeIdentifier.create(Subscriptions.QNAME))
-            .node(NodeIdentifier.create(Subscription.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, Uint32.valueOf(subscriptionId)))
-            .node(NodeIdentifier.create(Receivers.QNAME))
-            .node(NodeIdentifier.create(Receiver.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME,
-                receiver.receiverName()));
-
-        final LeafNode<Uint64> counterValue;
-        switch (recordType) {
-            case SENT_EVENT_RECORDS -> {
-                sentEventIid.node(NodeIdentifier.create(QNAME_SENT_EVENT_RECORDS));
-                counterValue = ImmutableNodes.leafNode(
-                    QNAME_SENT_EVENT_RECORDS, Uint64.valueOf(receiver.sentEventCounter().get()));
-            }
-            case EXCLUDED_EVENT_RECORDS -> {
-                sentEventIid.node(NodeIdentifier.create(QNAME_EXCLUDED_EVENT_RECORDS));
-                counterValue = ImmutableNodes.leafNode(
-                    QNAME_EXCLUDED_EVENT_RECORDS, Uint64.valueOf(counter));
-            }
-            default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
-        }
-
-        tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), counterValue);
-        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
-    }
-
-    @Override
     protected ListenableFuture<RestconfStream.Subscription> createSubscription(
-            final RestconfStream.Subscription subscription) {
+        final RestconfStream.Subscription subscription) {
         final var id = subscription.id();
-        final var receiver = subscription.receiverName();
+        final var receiverName = subscription.receiver().name();
         final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
-
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
             ImmutableNodes.newMapEntryBuilder()
@@ -149,8 +110,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                         .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
                         .withChild(ImmutableNodes.newMapEntryBuilder()
                             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                QNAME_RECEIVER_NAME, receiver))
-                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiver))
+                                QNAME_RECEIVER_NAME, receiverName))
+                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiverName))
                             .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
