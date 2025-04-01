@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b685a00_2c7ada6e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-01T14:37:55Z",
+      "side": 1,
+      "message": "To prevent a permanent semaphore decrease in the case that the current session is null. The semaphore is released only after a reply is received. This will not happen if currentSession#sendMessage() is not called.",
+      "parentUuid": "cd6bff76_2bb62127",
+      "revId": "f93827e42e44158c88fba9a83ff8f4b66d5392f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5afb7288_9b1031b1",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfe0e4f3_8ab1b5ab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-01T14:37:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5afb7288_9b1031b1",
+      "revId": "f93827e42e44158c88fba9a83ff8f4b66d5392f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ff0a959_d1105679",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-04-01T13:56:59Z",
       "side": 1,
       "message": "JIRA ID?",
+      "revId": "f93827e42e44158c88fba9a83ff8f4b66d5392f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e82b782_aba4bcf5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-01T14:37:55Z",
+      "side": 1,
+      "message": "Found during the resolution of NETCONF-1458. But this change is not related to that task. I moved this change after the fix for NETCONF-1458. If required, I can create a separate task for this commit and also a separate task for the commit that follows after this change.",
+      "parentUuid": "8ff0a959_d1105679",
       "revId": "f93827e42e44158c88fba9a83ff8f4b66d5392f7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
