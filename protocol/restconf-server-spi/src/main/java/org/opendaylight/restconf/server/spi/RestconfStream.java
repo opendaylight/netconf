@@ -370,7 +370,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    public interface Receiver {
+    public sealed interface Receiver permits ReceiverHolder {
         /**
          * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
          */
