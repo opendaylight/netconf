@@ -20,19 +20,21 @@ import org.slf4j.LoggerFactory;
  * A custom receiver implementation that holds the subscription ID and receiver name.
  */
 @NonNullByDefault
-public final class ReceiverHolder {
+public final class ReceiverHolder implements RestconfStream.Receiver {
     private static final Logger LOG = LoggerFactory.getLogger(ReceiverHolder.class);
 
     private final String subscriptionId;
     private final String receiverName;
+    private State state;
     private final RestconfStream.Registry streamRegistry;
     private final AtomicLong sentEventCounter = new AtomicLong(0);
     private final AtomicLong excludedEventCounter = new AtomicLong(0);
 
-    public ReceiverHolder(final String subscriptionId, final String receiverName,
+    public ReceiverHolder(final String subscriptionId, final String receiverName, State state,
             final RestconfStream.Registry streamRegistry) {
         this.subscriptionId = Objects.requireNonNull(subscriptionId);
         this.receiverName = Objects.requireNonNull(receiverName);
+        this.state = state;
         this.streamRegistry = Objects.requireNonNull(streamRegistry);
     }
 
@@ -80,18 +82,32 @@ public final class ReceiverHolder {
             }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public State state() {
+        return state;
+    }
+
+    @Override
     public String subscriptionId() {
         return subscriptionId;
     }
 
+    @Override
+    public void setState(State newState) {
+        state = newState;
+    }
+
+    @Override
     public String receiverName() {
         return receiverName;
     }
 
+    @Override
     public AtomicLong sentEventCounter() {
         return sentEventCounter;
     }
 
+    @Override
     public AtomicLong excludedEventCounter() {
         return excludedEventCounter;
     }
