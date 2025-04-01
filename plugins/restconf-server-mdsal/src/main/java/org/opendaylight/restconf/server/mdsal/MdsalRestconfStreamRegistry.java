@@ -22,7 +22,7 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
+import org.opendaylight.restconf.server.spi.ReceiverImpl;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
@@ -88,8 +88,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-            final ReceiverHolder.RecordType recordType) {
+    public ListenableFuture<Void> updateReceiver(final ReceiverImpl receiver, final long counter,
+            final ReceiverImpl.RecordType recordType) {
         // Now issue a merge operation
         final var tx = dataBroker.newWriteOnlyTransaction();
         final var subscriptionId = receiver.subscriptionId();
