@@ -1,0 +1,150 @@
+/*
+ * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.databind.subtree;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.StringWriter;
+import java.util.List;
+import javax.xml.stream.XMLOutputFactory;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
+import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.subtree.NamespaceSelection.Exact;
+import org.opendaylight.netconf.databind.subtree.NamespaceSelection.Wildcard;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+
+class SubtreeFilterWriterTest {
+    private static final String NAMESPACE = "http://example.com/schema/1.2/config";
+    private static final String NAMESPACE2 = "http://example.com/schema/1.2/config2";
+    private static final NodeIdentifier TOP_ID = NodeIdentifier.create(QName.create(NAMESPACE, "top"));
+    private static final NodeIdentifier INTERFACES_ID = NodeIdentifier.create(QName
+        .create(NAMESPACE, "interfaces"));
+    private static final NodeIdentifier INTERFACE_ID = NodeIdentifier.create(QName
+        .create(NAMESPACE, "interface"));
+    private static final NodeIdentifier IFNAME_ID = NodeIdentifier.create(QName.create(NAMESPACE, "ifName"));
+    private static final NodeIdentifier USERS_ID = NodeIdentifier.create(QName.create(NAMESPACE, "users"));
+    private static final NodeIdentifier USER_ID = NodeIdentifier.create(QName.create(NAMESPACE, "user"));
+    private static final NodeIdentifier NAME_ID = NodeIdentifier.create(QName.create(NAMESPACE, "name"));
+
+    @BeforeEach
+    void setUp() {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testExamples(final String expectedString, final SubtreeFilter filter) throws Exception {
+        final var factory = XMLOutputFactory.newFactory();
+        final var stringWriter = new StringWriter();
+        final var xmlStreamWriter = factory.createXMLStreamWriter(stringWriter);
+        SubtreeFilterWriter.writeSubtreeFilter(xmlStreamWriter, filter);
+        xmlStreamWriter.close();
+        final var actualString = stringWriter.toString();  // ✅ contains the actual XML
+        // comparing xml strings
+        final var diff = XMLUnit.compareXML(expectedString, actualString);
+        assertTrue(diff.similar());
+    }
+
+    private static List<Arguments> testExamples() {
+        final var databindContext = Mockito.mock(DatabindContext.class);
+        return List.of(
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.1
+            Arguments.of("""
+                <filter type="subtree">
+                  <a:top xmlns:a="http://example.com/schema/1.2/config"/>
+                </filter>""", SubtreeFilter.builder(databindContext)
+                .add(SelectionNode.builder(new Exact(TOP_ID)).build())
+                .build()),
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.2
+            Arguments.of("""
+                <filter type="subtree">
+                  <a:top xmlns:a="http://example.com/schema/1.2/config">
+                    <a:interfaces>
+                      <a:interface a:ifName="eth0"/>
+                    </a:interfaces>
+                  </a:top>
+                </filter>""", SubtreeFilter.builder(databindContext)
+                .add(ContainmentNode.builder(new Exact(TOP_ID))
+                    .add(ContainmentNode.builder(new Exact(INTERFACES_ID))
+                        .add(SelectionNode.builder(new Exact(INTERFACE_ID))
+                            .add(new AttributeMatch(new Exact(IFNAME_ID),
+                                "eth0")).build())
+                        .build())
+                    .build())
+                .build()),
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.3
+            Arguments.of("""
+                <filter type="subtree">
+                  <a:top xmlns:a="http://example.com/schema/1.2/config">
+                    <a:users/>
+                  </a:top>
+                </filter>""", SubtreeFilter.builder(databindContext)
+                .add(ContainmentNode.builder(new Exact(TOP_ID))
+                    .add(SelectionNode.builder(new Exact(USERS_ID))
+                        .build())
+                    .build())
+                .build()),
+            // https://www.rfc-editor.org/rfc/rfc6241#section-6.2.5
+            Arguments.of("""
+                <filter type="subtree">
+                  <a:top xmlns:a="http://example.com/schema/1.2/config">
+                    <a:users>
+                      <a:user>
+                        <a:name>fred</a:name>
+                      </a:user>
+                    </a:users>
+                  </a:top>
+                </filter>""", SubtreeFilter.builder(databindContext)
+                .add(ContainmentNode.builder(new Exact(TOP_ID))
+                    .add(ContainmentNode.builder(new Exact(USERS_ID))
+                        .add(ContainmentNode.builder(new Exact(USER_ID))
+                            .add(new ContentMatchNode(new Exact(NAME_ID),
+                                "fred"))
+                            .build())
+                        .build())
+                    .build())
+                .build()),
+            // custom example to test wildcard namespace xml
+            Arguments.of("""
+                <filter type="subtree">
+                  <a:top xmlns:a="http://example.com/schema/1.2/config">
+                    <users xmlns=""/>
+                  </a:top>
+                </filter>""", SubtreeFilter.builder(databindContext)
+                .add(ContainmentNode.builder(new Exact(TOP_ID))
+                    .add(SelectionNode.builder(new Wildcard(UnresolvedQName.Unqualified.of("users"),
+                            List.of(USERS_ID, NodeIdentifier.create(QName.create(NAMESPACE2, "users")),
+                                NodeIdentifier.create(QName.create("", "users"))
+                            )))
+                        .build())
+                    .build())
+                .build()),
+            // custom example to test multiple namespaces xml
+            Arguments.of("""
+                <filter type="subtree">
+                  <a:top xmlns:a="http://example.com/schema/1.2/config"
+                         xmlns:b="http://example.com/schema/1.2/config2">
+                    <b:users/>
+                  </a:top>
+                </filter>""", SubtreeFilter.builder(databindContext)
+                .add(ContainmentNode.builder(new Exact(TOP_ID))
+                    .add(SelectionNode.builder(new Exact(NodeIdentifier.create(QName
+                            .create(NAMESPACE2, "users"))))
+                        .build())
+                    .build())
+                .build()));
+    }
+}
