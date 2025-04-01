@@ -354,6 +354,10 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message) {
         sessionLock.lock();
         try {
+            if (currentSession == null) {
+                LOG.warn("{}: Session is disconnected, failing RPC request {}", id, message);
+                return Futures.immediateFuture(createSessionDownRpcResult());
+            }
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
@@ -371,11 +375,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
-        }
-
-        if (currentSession == null) {
-            LOG.warn("{}: Session is disconnected, failing RPC request {}", id, message);
-            return Futures.immediateFuture(createSessionDownRpcResult());
         }
 
         final var req = new Request(new UncancellableFuture<>(), message);
