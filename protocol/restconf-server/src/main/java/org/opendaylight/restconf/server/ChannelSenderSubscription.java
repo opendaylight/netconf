@@ -7,16 +7,16 @@
  */
 package org.opendaylight.restconf.server;
 
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 
 /**
  * A {@link Sender} that manages subscription event streams over HTTP/1.
  */
 public final class ChannelSenderSubscription extends AbstractChannelSender {
-    private final ReceiverHolder receiver;
+    private final RestconfStream.Receiver receiver;
 
-    public ChannelSenderSubscription(final int sseMaximumFragmentLength, final ReceiverHolder receiver) {
+    public ChannelSenderSubscription(final int sseMaximumFragmentLength, final RestconfStream.Receiver receiver) {
         super(sseMaximumFragmentLength);
         this.receiver = receiver;
     }
