@@ -250,7 +250,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             if (LOG.isTraceEnabled()) {
                 LOG.trace("{}: Notification received: {}", id, message);
             }
-            remoteDevice.onNotification(message);
+            remoteDeviceLock.lock();
+            try {
+                remoteDevice.onNotification(message);
+            } finally {
+                remoteDeviceLock.unlock();
+            }
         } else {
             processMessage(message);
         }
