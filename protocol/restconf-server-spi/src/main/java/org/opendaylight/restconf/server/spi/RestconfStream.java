@@ -23,6 +23,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,8 +37,15 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.ReceiversBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -344,7 +352,6 @@ public final class RestconfStream<T> {
     /**
      * A handle to a RFC8639 subscription.
      */
-    // TODO: a .toOperational() should result in the equivalent MapEntryNode equivalent of a Binding Subscription
     @Beta
     public abstract static sealed class Subscription
             permits AbstractRestconfStreamSubscription, ForwardingRestconfStreamSubscription {
@@ -375,6 +382,14 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract QName encoding();
+
+        /**
+         * Returns the {@code stream name}.
+         *
+         * @return the {@code stream name}
+         */
+        @NonNullByDefault
+        public abstract RestconfStream<?> stream();
 
         /**
          * Returns the {@code stream name}.
@@ -425,6 +440,28 @@ public final class RestconfStream<T> {
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
         public abstract void channelClosed();
+
+        /**
+         * Return the equivalent of a rfc8639 binding generated class Subscription.
+         */
+        public final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+                .subscriptions.Subscription toOperational() {
+            final Encoding encoding;
+            if (encoding().getLocalName().equals(EncodeXml$I.QNAME.getLocalName())) {
+                encoding = EncodeXml$I.VALUE;
+            } else if (encoding().getLocalName().equals(EncodeJson$I.QNAME.getLocalName())) {
+                encoding = EncodeJson$I.VALUE;
+            } else {
+                throw new IllegalArgumentException("Invalid encoding: " + encoding());
+            }
+
+            return new SubscriptionBuilder()
+                .setId(new SubscriptionId(id()))
+                .setEncoding(encoding)
+                .setReceivers(new ReceiversBuilder()
+                    .setReceiver(Map.of(new ReceiverKey(receiverName()), stream().sink.toReceiver(id()))).build())
+                .build();
+        }
 
         @Override
         public final String toString() {

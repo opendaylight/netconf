@@ -43,6 +43,11 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
     }
 
     @Override
+    public final RestconfStream<?> stream() {
+        return delegate.stream();
+    }
+
+    @Override
     public final String streamName() {
         return delegate.streamName();
     }
