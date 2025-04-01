@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
@@ -33,7 +34,7 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
     }
 
     @Override
-    public RestconfStream.Receiver receiver() {
+    public List<RestconfStream.Receiver> receiver() {
         return delegate.receiver();
     }
 
