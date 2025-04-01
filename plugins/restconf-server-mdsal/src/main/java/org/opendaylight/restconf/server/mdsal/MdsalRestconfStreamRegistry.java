@@ -85,10 +85,24 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected ListenableFuture<RestconfStream.Subscription> createSubscription(
-        final RestconfStream.Subscription subscription) {
+            final RestconfStream.Subscription subscription) {
         final var id = subscription.id();
-        final var receiverName = subscription.receiver().name();
         final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
+
+        final var receiverList = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME));
+        for (final var receiver : subscription.receiver()) {
+            receiverList.withChild(ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
+                    QNAME_RECEIVER_NAME, receiver.name()))
+                .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiver.name()))
+                .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
+                .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
+                    Receiver.State.Active.getName()))
+                .build());
+        }
+
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
             ImmutableNodes.newMapEntryBuilder()
@@ -106,18 +120,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     .build())
                 .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
-                    .withChild(ImmutableNodes.newSystemMapBuilder()
-                        .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
-                        .withChild(ImmutableNodes.newMapEntryBuilder()
-                            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                QNAME_RECEIVER_NAME, receiverName))
-                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiverName))
-                            .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
-                                Receiver.State.Active.getName()))
-                            .build())
-                        .build())
+                    .withChild(receiverList.build())
                     .build())
                 .build());
         return tx.commit().transform(info -> {
