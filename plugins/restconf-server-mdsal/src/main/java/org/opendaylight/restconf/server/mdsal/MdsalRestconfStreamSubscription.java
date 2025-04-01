@@ -81,19 +81,17 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     @Override
     public void updateSentEventRecord() {
         delegate.updateSentEventRecord();
-        final var counterValue = receiver().sentEventRecords();
         Futures.addCallback(updateReceiverSentEventRecord(),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
-                    LOG.trace("Sent-event-records was updated {} for {} receiver on subscription {}",
-                        counterValue, receiver().name(), id());
+                    LOG.trace("Sent-event-records was updated for receivers of subscription {}", id());
                 }
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    LOG.warn("Failed update sent-event-records {} for {} receiver on subscription {}",
-                        counterValue, receiver().name(), id(), cause);
+                    LOG.warn("Failed to update sent-event-records for receivers of subscription {}",
+                        id(), cause);
                 }
             }, MoreExecutors.directExecutor());
     }
@@ -104,60 +102,61 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     @Override
     public void updateExcludedEventRecord() {
         delegate.updateExcludedEventRecord();
-        final var counterValue = receiver().excludedEventRecords();
         Futures.addCallback(updateReceiverExcludedEventRecord(),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
-                    LOG.trace("Excluded-event-records was updated {} for {} receiver on subscription {}",
-                        counterValue, receiver().name(), id());
+                    LOG.trace("Excluded-event-records was updated for receivers of subscription {}", id());
                 }
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    LOG.warn("Failed update excluded-event-records {} for {} receiver on subscription {}",
-                        counterValue, receiver().name(), id(), cause);
+                    LOG.warn("Failed to update excluded-event-records for receivers of subscription {}", id(), cause);
                 }
             }, MoreExecutors.directExecutor());
     }
 
     /**
-     * Writes updated SentEventRecord counter for the receiver in subscription into datastore via a merge
+     * Writes updated SentEventRecord counter for all the receivers in subscription into datastore via a merge
      * operation.
      * Method returns a {@link ListenableFuture} that completes when the commit succeeds or fails.
      */
     private ListenableFuture<Void> updateReceiverSentEventRecord() {
         final var tx = dataBroker.newWriteOnlyTransaction();
-        final var sentEventIid = YangInstanceIdentifier.builder()
-            .node(NodeIdentifier.create(Subscriptions.QNAME))
-            .node(NodeIdentifier.create(Subscription.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id()))
-            .node(NodeIdentifier.create(Receivers.QNAME))
-            .node(NodeIdentifier.create(Receiver.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME, receiver().name()))
-            .node(NodeIdentifier.create(QNAME_SENT_EVENT_RECORDS));
-        tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), ImmutableNodes.leafNode(
-            QNAME_SENT_EVENT_RECORDS, Uint64.valueOf(receiver().sentEventRecords())));
+        for (final var receiver : receiver()) {
+            final var sentEventIid = YangInstanceIdentifier.builder()
+                .node(NodeIdentifier.create(Subscriptions.QNAME))
+                .node(NodeIdentifier.create(Subscription.QNAME))
+                .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id()))
+                .node(NodeIdentifier.create(Receivers.QNAME))
+                .node(NodeIdentifier.create(Receiver.QNAME))
+                .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME, receiver.name()))
+                .node(NodeIdentifier.create(QNAME_SENT_EVENT_RECORDS));
+            tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), ImmutableNodes.leafNode(
+                QNAME_SENT_EVENT_RECORDS, Uint64.valueOf(receiver.sentEventRecords())));
+        }
         return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
     /**
-     * Writes updated ExcludedEventRecord counter for the receiver in subscription into datastore via a merge
+     * Writes updated ExcludedEventRecord counter for all the receivers in subscription into datastore via a merge
      * operation.
      * Method returns a {@link ListenableFuture} that completes when the commit succeeds or fails.
      */
     private ListenableFuture<Void> updateReceiverExcludedEventRecord() {
         final var tx = dataBroker.newWriteOnlyTransaction();
-        final var sentEventIid = YangInstanceIdentifier.builder()
-            .node(NodeIdentifier.create(Subscriptions.QNAME))
-            .node(NodeIdentifier.create(Subscription.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id()))
-            .node(NodeIdentifier.create(Receivers.QNAME))
-            .node(NodeIdentifier.create(Receiver.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME, receiver().name()))
-            .node(NodeIdentifier.create(QNAME_EXCLUDED_EVENT_RECORDS));
-        tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), ImmutableNodes.leafNode(
-            QNAME_EXCLUDED_EVENT_RECORDS, Uint64.valueOf(receiver().excludedEventRecords())));
+        for (final var receiver : receiver()) {
+            final var sentEventIid = YangInstanceIdentifier.builder()
+                .node(NodeIdentifier.create(Subscriptions.QNAME))
+                .node(NodeIdentifier.create(Subscription.QNAME))
+                .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id()))
+                .node(NodeIdentifier.create(Receivers.QNAME))
+                .node(NodeIdentifier.create(Receiver.QNAME))
+                .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME, receiver.name()))
+                .node(NodeIdentifier.create(QNAME_EXCLUDED_EVENT_RECORDS));
+            tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), ImmutableNodes.leafNode(
+                QNAME_EXCLUDED_EVENT_RECORDS, Uint64.valueOf(receiver.excludedEventRecords())));
+        }
         return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 }

@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
@@ -273,7 +274,7 @@ public final class RestconfStream<T> {
          * @return the {@code receiver}
          */
         @NonNullByDefault
-        public abstract Receiver receiver();
+        public abstract List<Receiver> receiver();
 
         /**
          * Returns the encoding.
