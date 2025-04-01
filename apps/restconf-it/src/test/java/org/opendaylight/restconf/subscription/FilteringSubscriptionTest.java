@@ -186,4 +186,59 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
               }
             }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
     }
+
+    @Test
+    void filterReferenceTest() throws Exception {
+        // Establish subscription
+        final var postFilterResponse = invokeRequest(HttpMethod.POST,
+            "/restconf/data/ietf-subscribed-notifications:filters",
+            MediaTypes.APPLICATION_YANG_DATA_XML,
+            """
+                <stream-filter xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+                 <name>foo</name>
+                 <stream-subtree-filter>
+                  <toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/>
+                 </stream-subtree-filter>
+                </stream-filter>""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+        assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
+
+        final var establishResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            """
+                {
+                  "input": {
+                    "stream": "NETCONF",
+                    "encoding": "encode-json",
+                    "stream-filter-name" : "foo"
+                  }
+                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+
+//        final var response2 = invokeRequest(HttpMethod.GET,
+//            "/restconf/data/ietf-subscribed-notifications:filters",
+//            MediaTypes.APPLICATION_YANG_DATA_XML, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
+//        assertEquals(HttpResponseStatus.OK, response2.status());
+//        assertEquals("foo", response2.content().toString(StandardCharsets.UTF_8));
+
+        assertEquals(HttpResponseStatus.OK, establishResponse.status());
+        final var id = extractSubscriptionId(establishResponse);
+        final var eventListener = startSubscriptionStream(String.valueOf(id));
+        publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
+
+        // verify notification is filtered out
+        assertNull(eventListener.readNext());
+
+        final var toasterOutOfBreadNotification = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(ToasterOutOfBread.QNAME))
+            .build();
+        publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterOutOfBreadNotification, EVENT_TIME));
+
+        // verify notification toasterOutOfBread is not filtered out
+        JSONAssert.assertEquals(String.format("""
+            {
+              "ietf-restconf:notification": {
+                "event-time": "%s",
+                "toaster:toasterOutOfBread": {}
+              }
+            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+    }
 }
