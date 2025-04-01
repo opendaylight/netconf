@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f69d5577_4a1a5d3d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-01T06:48:11Z",
+      "side": 1,
+      "message": "here we need to check, result of this call can be null, thus null checks are confused",
+      "revId": "d24d4d46e1881111141f64fd6af1de12b1173d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
