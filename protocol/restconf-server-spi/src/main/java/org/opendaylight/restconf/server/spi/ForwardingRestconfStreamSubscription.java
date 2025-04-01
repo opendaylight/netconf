@@ -33,8 +33,8 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
     }
 
     @Override
-    public final String receiverName() {
-        return delegate.receiverName();
+    public RestconfStream.Receiver receiver() {
+        return delegate.receiver();
     }
 
     @Override
