@@ -10,6 +10,7 @@ package org.opendaylight.restconf.subscription;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.time.Instant;
@@ -20,7 +21,6 @@ import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.transport.http.HTTPClient;
@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-@Disabled("Disabled until filtering is implemented in NETCONF-1436")
+//Disabled("Disabled until filtering is implemented in NETCONF-1436")
 class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final NodeIdentifier BREAD_NODEID =
         NodeIdentifier.create(QName.create(ToasterRestocked.QNAME, "amountOfBread").intern());
@@ -118,29 +118,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     void filterNotificationNotReceivedTest() throws Exception {
         final var response = establishFilteredSubscription(
             "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>", streamClient);
-
-        assertEquals(HttpResponseStatus.OK, response.status());
-        final var id = extractSubscriptionId(response);
-        final var eventListener = startSubscriptionStream(String.valueOf(id));
-
-        publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
-
-        // verify notification is filtered out
-        assertNull(eventListener.readNext());
-
-        final var toasterOutOfBreadNotification = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(ToasterOutOfBread.QNAME))
-            .build();
-        publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterOutOfBreadNotification, EVENT_TIME));
-
-        // verify notification toasterOutOfBread is not filtered out
-        JSONAssert.assertEquals(String.format("""
-            {
-              "ietf-restconf:notification": {
-                "event-time": "%s",
-                "toaster:toasterOutOfBread": {}
-              }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+        verifyToasterOutOfBreadFilter(response);
     }
 
     @Test
@@ -185,5 +163,62 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                 }
               }
             }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    void filterReferenceTest() throws Exception {
+        // Crate filter
+        final var postFilterResponse = invokeRequest(HttpMethod.POST,
+            "/restconf/data/ietf-subscribed-notifications:filters",
+            MediaTypes.APPLICATION_YANG_DATA_XML,
+            """
+                <stream-filter xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+                 <name>foo</name>
+                 <stream-subtree-filter>
+                  <toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/>
+                 </stream-subtree-filter>
+                </stream-filter>""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+        assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
+
+        // Establish subscription with filter reference
+        final var establishResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            """
+                {
+                  "input": {
+                    "stream": "NETCONF",
+                    "encoding": "encode-json",
+                    "stream-filter-name" : "foo"
+                  }
+                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+
+        verifyToasterOutOfBreadFilter(establishResponse);
+    }
+
+    /**
+     * Verifies if toasterOutOfBread filter works as expected.
+     */
+    private void verifyToasterOutOfBreadFilter(final FullHttpResponse establishResponse) throws Exception {
+        assertEquals(HttpResponseStatus.OK, establishResponse.status());
+        final var id = extractSubscriptionId(establishResponse);
+        final var eventListener = startSubscriptionStream(String.valueOf(id));
+        publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
+
+        // verify toasterRestocked notification is filtered out
+        assertNull(eventListener.readNext());
+
+        final var toasterOutOfBreadNotification = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(ToasterOutOfBread.QNAME))
+            .build();
+        publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterOutOfBreadNotification, EVENT_TIME));
+
+        // verify notification toasterOutOfBread is not filtered out
+        JSONAssert.assertEquals(String.format("""
+            {
+              "ietf-restconf:notification": {
+                "event-time": "%s",
+                "toaster:toasterOutOfBread": {}
+              }
+            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 }
