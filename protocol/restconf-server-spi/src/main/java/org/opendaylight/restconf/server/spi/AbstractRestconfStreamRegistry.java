@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -63,7 +64,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
         SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName,
-                final RestconfStream.Receiver receiver, final SubscriptionState state,
+                final List<RestconfStream.Receiver> receiver, final SubscriptionState state,
                 final TransportSession session, final @Nullable EventStreamFilter filter) {
             super(id, encoding, streamName, receiver, state, session, filter);
         }
@@ -76,12 +77,16 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         public void updateSentEventRecord() {
-            receiver().incrementSentEventRecords();
+            for (final var receiver : receiver()) {
+                receiver.incrementSentEventRecords();
+            }
         }
 
         @Override
         public void updateExcludedEventRecord() {
-            receiver().incrementExcludedEventRecords();
+            for (final var receiver : receiver()) {
+                receiver.incrementExcludedEventRecords();
+            }
         }
     }
 
@@ -240,8 +245,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var subscription = new SubscriptionImpl(id, encoding, streamName,
             // FIXME: 'anonymous' instead of 'unknown' ?
-            new ReceiverImpl(principal != null ? principal.getName() : "<unknown>",
-                RestconfStream.ReceiverState.ACTIVE),
+            List.of(new ReceiverImpl(principal != null ? principal.getName() : "<unknown>",
+                RestconfStream.ReceiverState.ACTIVE)),
             SubscriptionState.START, request.session(),
             filterImpl);
 
