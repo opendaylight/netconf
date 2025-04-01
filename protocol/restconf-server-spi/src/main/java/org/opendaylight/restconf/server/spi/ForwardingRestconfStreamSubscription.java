@@ -36,6 +36,11 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
     }
 
     @Override
+    public final RestconfStream.Receiver receiver(){
+        return delegate.receiver();
+    }
+
+    @Override
     public final QName encoding() {
         return delegate.encoding();
     }

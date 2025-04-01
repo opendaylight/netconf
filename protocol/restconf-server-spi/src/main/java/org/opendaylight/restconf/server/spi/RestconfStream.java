@@ -246,11 +246,11 @@ public final class RestconfStream<T> {
          * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
          * that completes when the commit succeeds or fails.
          *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
+         * @param receiver   the {@link ReceiverImpl} containing the subscription ID and receiver name
          * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
          */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
+        ListenableFuture<Void> updateReceiver(ReceiverImpl receiver, long counter,
+            ReceiverImpl.RecordType recordType);
     }
 
     /**
@@ -279,6 +279,14 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract String receiverName();
+
+        /**
+         * Returns the {@code receiver}.
+         *
+         * @return the {@code receiver}
+         */
+        @NonNullByDefault
+        public abstract Receiver receiver();
 
         /**
          * Returns the encoding.
@@ -367,7 +375,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    public interface Receiver {
+    public sealed interface Receiver permits ReceiverImpl {
         /**
          * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
          */
