@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
@@ -19,7 +20,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
@@ -31,10 +34,20 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.ReceiversBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -343,6 +356,47 @@ public final class RestconfStream<T> {
          * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
          */
         public abstract void updateExcludedEventRecord();
+
+        public final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .subscriptions.Subscription toOperational() {
+            Encoding encoding;
+            if (encoding().getLocalName().equals(EncodeXml$I.QNAME.getLocalName())) {
+                encoding = EncodeXml$I.VALUE;
+            } else if (encoding().getLocalName().equals(EncodeJson$I.QNAME.getLocalName())) {
+                encoding = EncodeJson$I.VALUE;
+            } else {
+                throw new IllegalArgumentException("Invalid encoding: " + encoding());
+            }
+
+            Map<ReceiverKey, org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications
+                .rev190909.subscriptions.subscription.receivers.Receiver> receiverList = new HashMap<>();
+            for (final var receiver : receiver()) {
+                final State state;
+                final var receiverState = receiver.state().name();
+                if (receiverState.equalsIgnoreCase(State.Active.getName())) {
+                    state = State.Active;
+                } else if (receiverState.equalsIgnoreCase(State.Suspended.getName())) {
+                    state = State.Suspended;
+                } else {
+                    throw new IllegalArgumentException("Invalid state: " + receiverState);
+                }
+
+                receiverList.put(new ReceiverKey(receiver.name()), new ReceiverBuilder()
+                    .setName(receiver.name())
+                    .setState(state)
+                    .setSentEventRecords(
+                        new ZeroBasedCounter64(Uint64.valueOf(receiver.sentEventRecords().longValue())))
+                    .setExcludedEventRecords(
+                        new ZeroBasedCounter64(Uint64.valueOf(receiver.excludedEventRecords().longValue())))
+                    .build());
+            }
+            return new SubscriptionBuilder()
+                .setId(new SubscriptionId(id()))
+                .setEncoding(encoding)
+                .setReceivers(new ReceiversBuilder()
+                    .setReceiver(receiverList).build())
+                .build();
+        }
 
         @Override
         public final String toString() {
