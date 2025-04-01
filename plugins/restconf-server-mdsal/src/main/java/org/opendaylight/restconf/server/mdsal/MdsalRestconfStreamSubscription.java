@@ -8,7 +8,14 @@
 package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_EXCLUDED_EVENT_RECORDS;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_ID;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_RECEIVER_NAME;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_SENT_EVENT_RECORDS;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -20,10 +27,17 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ForwardingRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint64;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,5 +73,92 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
                 request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public void updateSentEventRecord() {
+        for (final var element : receiver()) {
+            element.sentEventRecords().incrementAndGet();
+        }
+        Futures.addCallback(updateReceiver(RestconfStream.FilteredRecordType.SENT_EVENT_RECORDS),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.trace("Sent-event-records was updated for receivers of subscription {}", id());
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Failed to update sent-event-records for receivers of subscription {}",
+                        id(), cause);
+                }
+            }, MoreExecutors.directExecutor());
+    }
+
+    /**
+     * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+     */
+    @Override
+    public void updateExcludedEventRecord() {
+        for (final var element : receiver()) {
+            element.excludedEventRecords().incrementAndGet();
+        }
+        Futures.addCallback(updateReceiver(RestconfStream.FilteredRecordType.EXCLUDED_EVENT_RECORDS),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.trace("Excluded-event-records was updated for receivers of subscription {}", id());
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Failed to update excluded-event-records for receivers of subscription {}", id(), cause);
+                }
+            }, MoreExecutors.directExecutor());
+    }
+
+
+    /**
+     * Update the counter value for all receivers for subscription in the operational datastore.
+     *
+     * <p>This method writes an updated counter for all the receivers in subscription
+     * The type of counter to update is specified by the {@code recordType} parameter. The update is performed on
+     * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
+     * that completes when the commit succeeds or fails.
+     *
+     * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
+     */
+    public ListenableFuture<Void> updateReceiver(final RestconfStream.FilteredRecordType recordType) {
+        // Now issue a merge operation
+        final var tx = dataBroker.newWriteOnlyTransaction();
+
+        for (final var element : receiver()) {
+            final var sentEventIid = YangInstanceIdentifier.builder()
+                .node(YangInstanceIdentifier.NodeIdentifier.create(Subscriptions.QNAME))
+                .node(YangInstanceIdentifier.NodeIdentifier.create(Subscription.QNAME))
+                .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id()))
+                .node(YangInstanceIdentifier.NodeIdentifier.create(Receivers.QNAME))
+                .node(YangInstanceIdentifier.NodeIdentifier.create(Receiver.QNAME));
+            sentEventIid.node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Subscription.QNAME,
+                QNAME_RECEIVER_NAME, element.name()));
+
+            final LeafNode<Uint64> counterValue;
+            switch (recordType) {
+                case SENT_EVENT_RECORDS -> {
+                    sentEventIid.node(YangInstanceIdentifier.NodeIdentifier.create(QNAME_SENT_EVENT_RECORDS));
+                    counterValue = ImmutableNodes.leafNode(
+                        QNAME_SENT_EVENT_RECORDS, Uint64.valueOf(element.sentEventRecords().get()));
+                }
+                case EXCLUDED_EVENT_RECORDS -> {
+                    sentEventIid.node(YangInstanceIdentifier.NodeIdentifier.create(QNAME_EXCLUDED_EVENT_RECORDS));
+                    counterValue = ImmutableNodes.leafNode(
+                        QNAME_EXCLUDED_EVENT_RECORDS, Uint64.valueOf(element.excludedEventRecords().get()));
+                }
+                default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
+            }
+            tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), counterValue);
+        }
+
+        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 }
