@@ -25,4 +25,6 @@ module org.opendaylight.restconf.server.mdsal {
     requires static com.github.spotbugs.annotations;
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
+    requires static org.checkerframework.checker.qual;
+
 }
