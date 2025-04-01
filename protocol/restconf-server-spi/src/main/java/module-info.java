@@ -25,4 +25,6 @@ module org.opendaylight.restconf.server.spi {
     requires static transitive org.eclipse.jdt.annotation;
     requires static com.github.spotbugs.annotations;
     requires static org.osgi.annotation.bundle;
+    requires static org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
+    requires static org.opendaylight.yangtools.binding.spec;
 }
