@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -25,14 +26,14 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
     private final @NonNull String streamName;
-    private final RestconfStream.@NonNull Receiver receiver;
+    private final List<RestconfStream.@NonNull Receiver> receiver;
     private final @NonNull TransportSession session;
     private final @Nullable EventStreamFilter filter;
 
     private @NonNull SubscriptionState state;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
-            final RestconfStream.Receiver receiver, final SubscriptionState state, final TransportSession session,
+            final List<RestconfStream.Receiver> receiver, final SubscriptionState state, final TransportSession session,
             final @Nullable EventStreamFilter filter) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
@@ -59,7 +60,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     }
 
     @Override
-    public final RestconfStream.Receiver receiver() {
+    public final List<RestconfStream.Receiver> receiver() {
         return receiver;
     }
 
@@ -92,7 +93,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
             .add("id", id)
             .add("encoding", encoding)
             .add("stream", streamName)
-            .add("receiver", receiver.name())
+            .add("receiver", receiver)
             .add("filter", filter));
     }
 }
