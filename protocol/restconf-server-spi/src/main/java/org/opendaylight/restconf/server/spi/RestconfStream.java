@@ -212,8 +212,8 @@ public final class RestconfStream<T> {
          * Establish a new RFC8639 subscription to a stream.
          *
          * @param request {@link ServerRequest} for this invocation
-         * @param encoding requested encoding
          * @param streamName requested stream name
+         * @param encoding requested encoding
          * @param filter optional filter
          * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
          */
@@ -249,20 +249,6 @@ public final class RestconfStream<T> {
          * @return A {@link Subscription}, or {@code null} if the stream with specified name does not exist.
          */
         @Nullable Subscription lookupSubscription(Uint32 id);
-
-        /**
-         * Update the counter value for a specific receiver in the operational datastore.
-         *
-         * <p>This method writes an updated counter for the receiver identified by the provided {@code ReceiverHolder}.
-         * The type of counter to update is specified by the {@code recordType} parameter. The update is performed on
-         * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
-         * that completes when the commit succeeds or fails.
-         *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
-         * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
-         */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
     }
 
     /**
@@ -347,6 +333,17 @@ public final class RestconfStream<T> {
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+
+
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public abstract void updateSentEventRecord();
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public abstract void updateExcludedEventRecord();
 
         @Override
         public final String toString() {
@@ -465,7 +462,7 @@ public final class RestconfStream<T> {
         public abstract boolean canMoveTo(SubscriptionState newState);
     }
 
-    public interface Receiver {
+    public sealed interface Receiver permits AbstractSubscriptionReceiver {
         /**
          * Returns the {@code receiver name}.
          */
@@ -485,6 +482,7 @@ public final class RestconfStream<T> {
          * Returns the {@code excluded event counter}.
          */
         AtomicLong excludedEventRecords();
+
     }
 
     public enum ReceiverState {
