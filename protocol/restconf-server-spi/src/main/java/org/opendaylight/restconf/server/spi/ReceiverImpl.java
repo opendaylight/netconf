@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  * A custom receiver implementation that holds the subscription ID and receiver name.
  */
 @NonNullByDefault
-public final class ReceiverHolder {
-    private static final Logger LOG = LoggerFactory.getLogger(ReceiverHolder.class);
+public final class ReceiverImpl implements RestconfStream.Receiver {
+    private static final Logger LOG = LoggerFactory.getLogger(ReceiverImpl.class);
 
     private final String subscriptionId;
     private final String receiverName;
@@ -29,11 +29,14 @@ public final class ReceiverHolder {
     private final AtomicLong sentEventCounter = new AtomicLong(0);
     private final AtomicLong excludedEventCounter = new AtomicLong(0);
 
-    public ReceiverHolder(final String subscriptionId, final String receiverName,
+    private State state;
+
+    public ReceiverImpl(final String subscriptionId, final String receiverName,
             final RestconfStream.Registry streamRegistry) {
         this.subscriptionId = Objects.requireNonNull(subscriptionId);
         this.receiverName = Objects.requireNonNull(receiverName);
         this.streamRegistry = Objects.requireNonNull(streamRegistry);
+        this.state = State.ACTIVE;
     }
 
     /**
@@ -42,7 +45,7 @@ public final class ReceiverHolder {
     public void updateSentEventRecord() {
         final var counterValue = sentEventCounter.incrementAndGet();
         Futures.addCallback(streamRegistry.updateReceiver(this, counterValue,
-                ReceiverHolder.RecordType.SENT_EVENT_RECORDS),
+                ReceiverImpl.RecordType.SENT_EVENT_RECORDS),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
@@ -64,7 +67,7 @@ public final class ReceiverHolder {
     public void updateExcludedEventRecord() {
         final var counterValue = excludedEventCounter.incrementAndGet();
         Futures.addCallback(streamRegistry.updateReceiver(this, counterValue,
-                ReceiverHolder.RecordType.EXCLUDED_EVENT_RECORDS),
+                ReceiverImpl.RecordType.EXCLUDED_EVENT_RECORDS),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
@@ -80,18 +83,32 @@ public final class ReceiverHolder {
             }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public State state() {
+        return state;
+    }
+
+    @Override
     public String subscriptionId() {
         return subscriptionId;
     }
 
+    @Override
+    public void setState(State newState) {
+        state = newState;
+    }
+
+    @Override
     public String receiverName() {
         return receiverName;
     }
 
+    @Override
     public AtomicLong sentEventCounter() {
         return sentEventCounter;
     }
 
+    @Override
     public AtomicLong excludedEventCounter() {
         return excludedEventCounter;
     }
