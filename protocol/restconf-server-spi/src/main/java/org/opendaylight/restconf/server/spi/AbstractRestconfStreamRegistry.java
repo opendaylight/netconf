@@ -92,9 +92,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final ConcurrentMap<Uint32, Subscription> subscriptions = new ConcurrentHashMap<>();
-    // FIXME: DTCL-driven population of these
-    //    if (!mdsalService.exist(SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(
-    //        StreamFilter.QNAME, SubscriptionUtil.QNAME_STREAM_FILTER_NAME, filterName))).get()) {
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
 
     @Override
@@ -299,7 +296,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
         SubscriptionFilter filter);
 
-    private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
+    protected void putFilter(final String name, final EventStreamFilter filter) {
+        filters.put(name, filter);
+    }
+
+    protected void removeFilter(final String name) {
+        filters.remove(name);
+    }
+
+    protected @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
             throws RequestException {
         return switch (filter) {
             case null -> null;
