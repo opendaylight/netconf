@@ -17,18 +17,24 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.StreamFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
@@ -38,9 +44,14 @@ import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,14 +66,115 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
+    public static final YangInstanceIdentifier FILTERS = YangInstanceIdentifier.of(
+        YangInstanceIdentifier.NodeIdentifier.create(Filters.QNAME),
+        YangInstanceIdentifier.NodeIdentifier.create(StreamFilter.QNAME));
+    private static final YangInstanceIdentifier.NodeIdentifier FILTER_NAME =
+        YangInstanceIdentifier.NodeIdentifier.create(QName.create(StreamFilter.QNAME, "name").intern());
+
     private final DOMDataBroker dataBroker;
     private final List<StreamSupport> supports;
+    //private final DOMDataBroker.@Nullable DataTreeChangeExtension changeService;
+
+    public class FilterDataTreeChangeListener implements DOMDataTreeChangeListener {
+        final DOMDataBroker dataBroker;
+
+        public FilterDataTreeChangeListener(final DOMDataBroker dataBroker) {
+            this.dataBroker = dataBroker;
+        }
+
+        @Override
+        public void onDataTreeChanged(@NonNull List<DataTreeCandidate> changes) {
+            for (var change : changes) {
+                final var node = change.getRootNode();
+                switch (node.modificationType()) {
+                    case null -> throw new IllegalStateException("Modification type is null for node: " + node);
+                    case SUBTREE_MODIFIED, APPEARED, WRITE -> {
+                        final var data = (MapNode) node.dataAfter();
+                        processFilters(data);
+                    }
+                    case DELETE, DISAPPEARED -> {
+                        final var data = (MapNode) node.dataBefore();
+                        data.body().forEach(entry -> {
+                            final var name = extractFilterName(entry);
+                            removeFilter(name);
+                        });
+                    }
+                    case UNMODIFIED ->
+                        // no reason to do anything with an unmodified node
+                        LOG.debug("DataTreeCandidate for a filter is unmodified, nothing to change. Candidate: {}",
+                            node);
+                }
+            }
+        }
+
+        private static RestconfStream.SubscriptionFilter extractFilter(final ChoiceNode filterSpec) {
+            if (filterSpec == null) {
+                return null;
+            }
+            final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
+            if (subtree != null) {
+                return new RestconfStream.SubscriptionFilter.SubtreeDefinition(subtree);
+            }
+            if (filterSpec.childByArg(new NodeIdentifier(QName.create(FilterSpec.QNAME, "stream-xpath-filter")))
+                instanceof LeafNode<?> leafNode) {
+                if (leafNode.body() instanceof String xpath) {
+                    return new RestconfStream.SubscriptionFilter.XPathDefinition(xpath);
+                }
+                throw new IllegalArgumentException("Bad child " + leafNode.prettyTree());
+            }
+            return null;
+        }
+
+        private static @NonNull String extractFilterName(final MapEntryNode entry) {
+            if (entry.childByArg(FILTER_NAME) instanceof LeafNode<?> leafNode) {
+                if (leafNode.body() instanceof String filterName) {
+                    return filterName;
+                }
+            }
+            throw new IllegalStateException("Filter must have name: " + entry);
+        }
+
+        @Override
+        public void onInitialData() {
+            try {
+                final var node = (MapNode) dataBroker.newReadOnlyTransaction()
+                    .read(LogicalDatastoreType.CONFIGURATION, FILTERS).get().orElse(null);
+                processFilters(node);
+            } catch (InterruptedException | ExecutionException e) {
+                LOG.warn("Could not read filters form datastore");
+            }
+        }
+
+        private void processFilters(final MapNode node) {
+            if (node == null) {
+                return;
+            }
+            node.body().forEach(entry -> {
+                final var name = extractFilterName(entry);
+                final var filterSpec = (ChoiceNode) entry.childByArg(new NodeIdentifier(FilterSpec.QNAME));
+                final var subtree = extractFilter(filterSpec);
+                final EventStreamFilter filter;
+                try {
+                    filter = resolveFilter(subtree);
+                } catch (RequestException e) {
+                    throw new RuntimeException(e);
+                }
+                putFilter(name ,filter);
+            });
+        }
+    }
 
     @Inject
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
             @Reference final RestconfStream.LocationProvider locationProvider) {
         this.dataBroker = requireNonNull(dataBroker);
+        final var changeService = dataBroker.extension(DOMDataBroker.DataTreeChangeExtension.class);
+        if (changeService != null) {
+            changeService.registerTreeChangeListener(DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
+                FILTERS), new FilterDataTreeChangeListener(dataBroker));
+        }
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
     }
 
@@ -175,12 +287,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withNodeIdentifier(NodeIdentifier.create(FilterSpec.QNAME))
                     .withChild(ImmutableNodes.leafNode(StreamSubtreeFilter.QNAME, anydata))
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withNodeIdentifier(NodeIdentifier.create(FilterSpec.QNAME))
                     .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
                     .build();
         };
@@ -192,9 +304,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withNodeIdentifier(nodeId)
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
                 .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
                     .withChild(ImmutableNodes.newChoiceBuilder()
-                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(StreamFilter.QNAME))
+                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
                         .withChild(filterNode)
                         .build())
                     .build())
