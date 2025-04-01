@@ -124,6 +124,6 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
                 .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
                 .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))
                 .build();
-        }), streamName, encoding, filter);
+        }), streamRegistry, streamName, encoding, filter);
     }
 }

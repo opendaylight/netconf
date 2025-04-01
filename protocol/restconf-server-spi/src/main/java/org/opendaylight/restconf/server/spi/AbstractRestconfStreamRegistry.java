@@ -62,16 +62,30 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
-        SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
+        SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final RestconfStream.Receiver receiver,
                 final SubscriptionState state, final TransportSession session,
                 final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, state, session, filter);
+            super(id, encoding, streamName, receiver, state, session, filter);
         }
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
+        }
+    }
+
+    private final class ReceiverImpl extends AbstractRestconfStreamReceiver {
+        ReceiverImpl(String subscriptionId, String receiverName, RestconfStream.Registry streamRegistry) {
+            super(subscriptionId, receiverName, streamRegistry);
+        }
+
+        @Override
+        public void updateSentEventRecord() {
+        }
+
+        @Override
+        public void updateExcludedEventRecord() {
         }
     }
 
@@ -203,7 +217,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @Override
-    public final void establishSubscription(final ServerRequest<Subscription> request, final String streamName,
+    public final void establishSubscription(final ServerRequest<Subscription> request,
+            final RestconfStream.Registry streamRegistry, final String streamName,
             final QName encoding, final @Nullable SubscriptionFilter filter) {
         final var stream = lookupStream(streamName);
         if (stream == null) {
@@ -224,7 +239,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var subscription = new SubscriptionImpl(id, encoding, streamName,
             // FIXME: 'anonymous' instead of 'unknown' ?
-            principal != null ? principal.getName() : "<unknown>",
+            new ReceiverImpl(id.toString(), principal != null ? principal.getName() : "<unknown>", streamRegistry),
             SubscriptionState.START, request.session(),
             filterImpl);
 
@@ -260,7 +275,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
         final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
-            oldSubscription.receiverName(), SubscriptionState.ACTIVE, oldSubscription.session(), filterImpl);
+            oldSubscription.receiver(), SubscriptionState.ACTIVE, oldSubscription.session(), filterImpl);
 
         Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
             @Override

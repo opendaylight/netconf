@@ -217,8 +217,8 @@ public final class RestconfStream<T> {
          * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
          */
         @NonNullByDefault
-        void establishSubscription(ServerRequest<Subscription> request, String streamName, QName encoding,
-            @Nullable SubscriptionFilter filter);
+        void establishSubscription(ServerRequest<Subscription> request, RestconfStream.Registry streamRegistry,
+            String streamName, QName encoding, @Nullable SubscriptionFilter filter);
 
         /**
          * Modify existing RFC8639 subscription to a stream.
@@ -257,11 +257,11 @@ public final class RestconfStream<T> {
          * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
          * that completes when the commit succeeds or fails.
          *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
+         * @param receiver   the {@link AbstractRestconfStreamReceiver} containing the subscription ID and receiver name
          * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
          */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
+        ListenableFuture<Void> updateReceiver(Receiver receiver, long counter,
+            Receiver.RecordType recordType);
     }
 
     /**
@@ -284,12 +284,12 @@ public final class RestconfStream<T> {
         public abstract Uint32 id();
 
         /**
-         * Returns the {@code receiver name}.
+         * Returns the {@code receiver}.
          *
-         * @return the {@code receiver name}
+         * @return the {@code receiver}
          */
         @NonNullByDefault
-        public abstract String receiverName();
+        public abstract Receiver receiver();
 
         /**
          * Returns the encoding.
@@ -464,7 +464,7 @@ public final class RestconfStream<T> {
         public abstract boolean canMoveTo(SubscriptionState newState);
     }
 
-    public interface Receiver {
+    public sealed interface Receiver permits AbstractRestconfStreamReceiver {
         /**
          * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
          */
@@ -510,6 +510,11 @@ public final class RestconfStream<T> {
         enum State {
             ACTIVE,
             SUSPENDED,
+        }
+
+        enum RecordType {
+            SENT_EVENT_RECORDS,
+            EXCLUDED_EVENT_RECORDS
         }
     }
 
