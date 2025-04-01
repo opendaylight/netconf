@@ -212,8 +212,8 @@ public final class RestconfStream<T> {
          * Establish a new RFC8639 subscription to a stream.
          *
          * @param request {@link ServerRequest} for this invocation
-         * @param encoding requested encoding
          * @param streamName requested stream name
+         * @param encoding requested encoding
          * @param filter optional filter
          * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
          */
@@ -258,11 +258,10 @@ public final class RestconfStream<T> {
          * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
          * that completes when the commit succeeds or fails.
          *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
+         * @param receiver   the {@link Receiver} containing the receiver information.
          * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
          */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
+        ListenableFuture<Void> updateReceiver(Receiver receiver, long counter, FilteredRecordType recordType);
     }
 
     /**
@@ -285,16 +284,12 @@ public final class RestconfStream<T> {
         public abstract Uint32 id();
 
         /**
-         * Returns the {@code receiver name}.
+         * Returns the {@code receiver}.
          *
-         * @return the {@code receiver name}
+         * @return the {@code receiver}
          */
         @NonNullByDefault
-<<<<<<< Updated upstream
-        public abstract String receiverName();
-=======
         public abstract List<Receiver> receiver();
->>>>>>> Stashed changes
 
         /**
          * Returns the encoding.
@@ -323,7 +318,7 @@ public final class RestconfStream<T> {
         /**
          * Sets the {@code subscription state}.
          *
-         * @param the state to set
+         * @param newState the state to set
          * @throws IllegalStateException if the subscription cannot be moved to the new state
          */
         @NonNullByDefault
@@ -469,11 +464,8 @@ public final class RestconfStream<T> {
         public abstract boolean canMoveTo(SubscriptionState newState);
     }
 
-<<<<<<< Updated upstream
-    public interface Receiver {
-=======
-    public sealed interface Receiver {
->>>>>>> Stashed changes
+    public sealed interface Receiver permits AbstractSubscriptionReceiver, ForwardingSubscriptionReceiver {
+
         /**
          * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
          */
@@ -505,12 +497,6 @@ public final class RestconfStream<T> {
         AtomicLong excludedEventRecords();
     }
 
-<<<<<<< Updated upstream
-        enum State {
-            ACTIVE,
-            SUSPENDED,
-        }
-=======
     public enum ReceiverState {
         ACTIVE,
         SUSPENDED,
@@ -519,7 +505,6 @@ public final class RestconfStream<T> {
     public enum FilteredRecordType {
         SENT_EVENT_RECORDS,
         EXCLUDED_EVENT_RECORDS
->>>>>>> Stashed changes
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
