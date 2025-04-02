@@ -26,6 +26,13 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
  * A YANG Patch body.
  */
 public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody, XmlPatchBody {
+    static final String PATCH_ID = "patch-id";
+    static final String EDIT_ID = "edit-id";
+    static final String OPERATION = "operation";
+    static final String TARGET = "target";
+    static final String EDIT = "edit";
+    static final String VALUE = "value";
+
     /**
      * Resource context needed to completely resolve a {@link PatchBody}.
      */
