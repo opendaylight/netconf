@@ -157,7 +157,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         final var id = extractSubscriptionId(response);
         final var eventListener = startSubscriptionStream(String.valueOf(id));
 
-        final var toasterRestockedNotification = ImmutableNodes.newContainerBuilder()
+        final var exampleNotification = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(ExampleNotification.QNAME))
             .withChild(ImmutableNodes.newSystemMapBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Entry.QNAME))
@@ -169,7 +169,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                     .build())
                 .build())
             .build();
-        publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterRestockedNotification, EVENT_TIME));
+        publishService().putNotification(new DOMNotificationEvent.Rfc6020(exampleNotification, EVENT_TIME));
 
         // verify name was filtered out
         JSONAssert.assertEquals(String.format("""
