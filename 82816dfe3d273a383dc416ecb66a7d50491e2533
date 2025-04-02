@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b66cdcc_2d35246e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-02T12:21:05Z",
+      "side": 0,
+      "message": "IMO to fix this just move it from LOCK on session could help, even without introducing another lock, because what we call on keepalive is synchronized",
+      "revId": "82816dfe3d273a383dc416ecb66a7d50491e2533",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

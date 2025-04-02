@@ -70,6 +70,58 @@
       "parentUuid": "6b71b54c_bbbc995f",
       "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72489374_45a1f118",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-02T12:21:05Z",
+      "side": 1,
+      "message": "ACK, this solution means that: we just not do keepalive disable to allow disconnect to proceed, then the last keepalive fails with:\n```\nLOG.warn(\"{}: Session is disconnected, failing RPC request {}\", id, message);\n```\nAs last step we disable any further keepalives.",
+      "parentUuid": "7c9a0198_fec0c949",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd71cfac_eb6fe4fa",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-02T12:21:05Z",
+      "side": 1,
+      "message": "change locking here is IMO not needed and somehow \"not correct\" as we using remoteSessionCapabilities set by `session`",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a89190d_b13183f7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-02T12:21:05Z",
+      "side": 1,
+      "message": "if (currentSession \u003d null) an we can eliminate isCurrentSessionClosed?",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
