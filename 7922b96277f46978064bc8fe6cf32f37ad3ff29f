@@ -16,6 +16,24 @@
       "message": "IMO there seems to be no deadlock in RemoteDeviceCommunicator but in KeepaliveTask. Please investigate. A hint: there are probably more instances of KeepAlive task which may call different synchronized methods at the same time (disable and send keep alive).\n\nIIRC we wanted to rework this logic some time ago in https://lf-opendaylight.atlassian.net/browse/NETCONF-1335.",
       "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1492827_96dab302",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-02T09:01:26Z",
+      "side": 1,
+      "message": "Based on provided test and description, are there any doubts or uncertainties about the deadlock caused in RemoteDeviceCommunicator?\n\nThere are no multiple instances of KeepaliveTask per device. The KeepaliveTask is created only once when a new device is connected.\nhttps://github.com/opendaylight/netconf/blob/v8.0.7/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java#L134\n\nYou made the same conclusion here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/112268/comments/3e0513e1_1bdf65cf\n\nThere could be multiple planned instances of HashedWheelTimeout with scheduled execution for the same instance of KeepaliveTask at the same time. But this should be resolved with:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1318",
+      "parentUuid": "55880285_bd39ff69",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
