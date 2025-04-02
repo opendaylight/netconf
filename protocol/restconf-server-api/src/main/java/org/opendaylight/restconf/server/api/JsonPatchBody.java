@@ -276,7 +276,7 @@ public final class JsonPatchBody extends PatchBody {
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
         final var operation = requireNonNullValue(edit.getOperation(), OPERATION);
         final var target = requireNonNullValue(edit.getTarget(), TARGET);
-        if (edit.getTargetSchemaNode() != null && checkDataPresence(operation, edit.getData() != null)) {
+        if (checkDataPresence(operation, edit.getData() != null)) {
             final var editId = requireNonNullValue(edit.getId(), EDIT_ID);
             if (!requiresValue(operation)) {
                 return new PatchEntity(editId, operation, target);
