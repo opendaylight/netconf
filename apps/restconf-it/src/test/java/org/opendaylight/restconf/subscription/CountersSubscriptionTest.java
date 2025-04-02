@@ -52,7 +52,6 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
     @Test
     void counterNotificationTest() throws Exception {
-        streamClient = startStreamClient();
         // Establish subscription
         final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
@@ -91,7 +90,6 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Disabled("Disabled until filtering is implemented in NETCONF-1436")
     @Test
     void counterNotificationWithFilterTest() throws Exception {
-        streamClient = startStreamClient();
         final var response = establishFilteredSubscription("""
             <toasterRestocked xmlns="http://netconfcentral.org/ns/toaster">
               <amountOfBread/>
@@ -130,7 +128,6 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Disabled("Disabled until filtering is implemented in NETCONF-1436")
     @Test
     void excludedCounterNotificationTest() throws Exception {
-        streamClient = startStreamClient();
         final var response = establishFilteredSubscription(
             "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>", streamClient);
 
@@ -161,11 +158,11 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
-        final var receiversResponse =  invokeRequest(HttpMethod.GET,
+        final var receiversResponse = invokeRequest(HttpMethod.GET,
             "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
             MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.OK, receiversResponse.status());
-        // verify 2 notification were sent subscription-modified and ToasterRestocked and 1 excluded ToasterOutOfBread
+        // verify 2 notification were sent subscription-modified and ToasterOutOfBread and 1 excluded ToasterRestocked
         assertCounter(receiversResponse, "2", "1");
     }
 
