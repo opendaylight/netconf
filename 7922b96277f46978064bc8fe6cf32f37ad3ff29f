@@ -52,6 +52,24 @@
       "parentUuid": "c1492827_96dab302",
       "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c9a0198_fec0c949",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-02T09:58:09Z",
+      "side": 1,
+      "message": "Yes they are blocked in `KeepaliveTask` but also in `NetconfDeviceCommunicator`.\n\nBased on task description, two threads are blocked:\n1) `NetconfDeviceCommunicator#teardown` holds sessionLock and waits for `KeepaliveTask#sendKeepalive` to finish.\n\n2) `KeepaliveTask#sendKeepalive` holds the KeepaliveTask lock and waits for\nNetconfDeviceCommunicator#teardown to release sessionLock in `NetconfDeviceCommunicator#sendRequest` method.\n\n`The KeepaliveTask behavior is correct` because (Correct me if I am wrong):\nKeepaliveTask#disableKeepalive should be executed when KeepaliveTask#sendKeepalive is finished, and vice versa. There is no option for any part of either method to be executed while the other method is not finished yet.\n\nOn the other hand, `in NetconfDeviceCommunicator, the blocked methods are`:\nNetconfDeviceCommunicator#sendRequest and NetconfDeviceCommunicator#tearDown\n\nThese could be divided, and some parts of the code may be executed while the other method is running. This leads to the proposed solution to divide NetconfClientSession and RemoteDevice execution, which could be done in parallel. This will unblock execution of NetconfDeviceCommunicator#sendRequest method.",
+      "parentUuid": "6b71b54c_bbbc995f",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
