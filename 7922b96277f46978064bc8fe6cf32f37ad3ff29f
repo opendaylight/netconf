@@ -34,6 +34,24 @@
       "parentUuid": "55880285_bd39ff69",
       "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b71b54c_bbbc995f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-02T09:18:05Z",
+      "side": 1,
+      "message": "Yes, there are doubts: for me it seems both threads are blocked in KeepaliveTask...",
+      "parentUuid": "c1492827_96dab302",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
