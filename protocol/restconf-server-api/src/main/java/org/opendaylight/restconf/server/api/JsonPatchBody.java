@@ -47,7 +47,7 @@ public final class JsonPatchBody extends PatchBody {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
             final var resultList = read(jsonReader, resource, patchId);
-            final var id = requireNonNullValue(patchId.get(), "patch-id");
+            final var id = requireNonNullValue(patchId.get(), PATCH_ID);
             // Note: patchId side-effect of above
             return new PatchContext(id, resultList);
         }
@@ -161,7 +161,7 @@ public final class JsonPatchBody extends PatchBody {
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
             edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
-                requireNonNullValue(edit.getTargetSchemaNode(), "target"), codecs));
+                requireNonNullValue(edit.getTargetSchemaNode(), TARGET), codecs));
         }
     }
 
@@ -274,10 +274,10 @@ public final class JsonPatchBody extends PatchBody {
      * @throws RequestException if the {@link PatchEdit} is not consistent
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
-        final var operation = requireNonNullValue(edit.getOperation(), "operation");
-        final var target = requireNonNullValue(edit.getTarget(), "target");
+        final var operation = requireNonNullValue(edit.getOperation(), OPERATION);
+        final var target = requireNonNullValue(edit.getTarget(), TARGET);
         if (edit.getTargetSchemaNode() != null && checkDataPresence(operation, edit.getData() != null)) {
-            final var editId = requireNonNullValue(edit.getId(), "edit-id");
+            final var editId = requireNonNullValue(edit.getId(), EDIT_ID);
             if (!requiresValue(operation)) {
                 return new PatchEntity(editId, operation, target);
             }

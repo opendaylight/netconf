@@ -54,18 +54,18 @@ public final class XmlPatchBody extends PatchBody {
     private static @NonNull PatchContext parse(final ResourceContext resource, final Document doc)
             throws IOException, RequestException, XMLStreamException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
-        final var patchId = requireNonNullValue(doc.getElementsByTagName("patch-id").item(0), "patch-id")
+        final var patchId = requireNonNullValue(doc.getElementsByTagName(PATCH_ID).item(0), PATCH_ID)
             .getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
-            final String operation = requireNonNullValue(element.getElementsByTagName("operation").item(0), "operation")
+            final String operation = requireNonNullValue(element.getElementsByTagName(OPERATION).item(0), OPERATION)
                 .getFirstChild().getNodeValue();
             final Operation oper = Operation.ofName(operation);
-            final String editId = requireNonNullValue(element.getElementsByTagName("edit-id").item(0), "edit-id")
+            final String editId = requireNonNullValue(element.getElementsByTagName(EDIT_ID).item(0), EDIT_ID)
                 .getFirstChild().getNodeValue();
-            final String target = requireNonNullValue(element.getElementsByTagName("target").item(0), "target")
+            final String target = requireNonNullValue(element.getElementsByTagName(TARGET).item(0), TARGET)
                 .getFirstChild().getNodeValue();
             final List<Element> values = readValueNodes(element, oper);
             final Element firstValueElement = values != null ? values.get(0) : null;
