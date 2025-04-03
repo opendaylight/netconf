@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90d27e16_644ed462",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-03T11:15:05Z",
+      "side": 1,
+      "message": "is it really necessary to throw error on InterruptedException?",
+      "range": {
+        "startLine": 118,
+        "startChar": 22,
+        "endLine": 118,
+        "endChar": 43
+      },
+      "revId": "6ec77b1b13ba2c190e36bb55f971a1ea8f4b8286",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
