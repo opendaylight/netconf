@@ -22,6 +22,23 @@
       },
       "revId": "6ec77b1b13ba2c190e36bb55f971a1ea8f4b8286",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7960dc8_05076c36",
+        "filename": "restconf/restconf-notifications/src/main/java/org/opendaylight/restconf/notifications/SubscriptionResourceInstance.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-03T12:56:49Z",
+      "side": 1,
+      "message": "is it possible to have multiple Senders for one subscription?",
+      "revId": "6ec77b1b13ba2c190e36bb55f971a1ea8f4b8286",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
