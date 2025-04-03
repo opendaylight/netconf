@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee133c1f_67745376",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-03T11:01:48Z",
+      "side": 1,
+      "message": "... except it does not improve readability. It actually hinders it by hiding the literals.",
+      "revId": "38bfcce1b1d607c98250820a66948108b6640ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
