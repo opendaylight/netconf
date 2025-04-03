@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5fe5dcd_c59b3f22",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-03T12:36:57Z",
+      "side": 1,
+      "message": "We can get rid of this enum, when we rework `allocateStream` to use `containsKey` to generate unique name, and move corresponding logic to create/createLegacy stream.",
+      "revId": "6863a7f59f280c38f07f2d4975c9029f2a7de808",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
