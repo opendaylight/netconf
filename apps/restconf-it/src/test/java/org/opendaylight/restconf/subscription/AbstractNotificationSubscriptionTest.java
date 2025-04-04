@@ -201,7 +201,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
             new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
             new ModifySubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
             new DeleteSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
-            new KillSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine));
+            new KillSubscriptionRpc(streamRegistry, subscriptionStateService));
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
             domMountPointService, rpcImplementations);
 
@@ -217,7 +217,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         contextListener = new ContextListener(notificationService, schemaService, streamRegistry);
 
         // Register subscription web resource
-        final var provider = new SubscriptionResourceProvider(stateMachine, streamRegistry);
+        final var provider = new SubscriptionResourceProvider(streamRegistry);
         endpoint.registerWebResource(provider);
     }
 

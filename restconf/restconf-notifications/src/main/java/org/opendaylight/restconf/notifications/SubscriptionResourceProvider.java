@@ -26,14 +26,11 @@ import org.osgi.service.component.annotations.Reference;
 @NonNullByDefault
 @Component(immediate = true)
 public final class SubscriptionResourceProvider implements WebHostResourceProvider {
-    private final SubscriptionStateMachine machine;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public SubscriptionResourceProvider(@Reference final SubscriptionStateMachine machine,
-            @Reference final RestconfStream.Registry streamRegistry) {
-        this.machine = machine;
+    public SubscriptionResourceProvider(@Reference final RestconfStream.Registry streamRegistry) {
         this.streamRegistry = streamRegistry;
     }
 
@@ -45,7 +42,7 @@ public final class SubscriptionResourceProvider implements WebHostResourceProvid
     // FIXME Consider not hardcoding SSE maximum fragment length and heartbeat interval millis
     @Override
     public WebHostResourceInstance createInstance(final String path) {
-        return new SubscriptionResourceInstance(path, machine, streamRegistry, Uint16.ZERO.toJava(),
+        return new SubscriptionResourceInstance(path, streamRegistry, Uint16.ZERO.toJava(),
             Uint16.valueOf(10_000).toJava());
     }
 }
