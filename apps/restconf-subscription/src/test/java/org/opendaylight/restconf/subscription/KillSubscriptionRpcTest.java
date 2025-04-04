@@ -31,6 +31,7 @@ import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -64,6 +65,8 @@ class KillSubscriptionRpcTest {
     private CompletingServerRequest<ContainerNode> request;
     @Mock
     private RestconfStream.Registry streamRegistry;
+    @Mock
+    private RestconfStream.Subscription subscription;
     @Captor
     private ArgumentCaptor<RequestException> response;
 
@@ -71,7 +74,7 @@ class KillSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new KillSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
+        rpc = new KillSubscriptionRpc(streamRegistry, subscriptionStateService);
     }
 
     @Disabled
@@ -83,7 +86,8 @@ class KillSubscriptionRpcTest {
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL),
@@ -93,7 +97,7 @@ class KillSubscriptionRpcTest {
 
     @Test
     void killSubscriptionWrongIDTest() {
-        doReturn(null).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -102,7 +106,8 @@ class KillSubscriptionRpcTest {
 
     @Test
     void killSubscriptionAlreadyEndedTest() {
-        doReturn(SubscriptionState.END).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.END).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());

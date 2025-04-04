@@ -61,12 +61,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
         SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, filter);
+                final SubscriptionState state, final @Nullable EventStreamFilter filter) {
+            super(id, encoding, streamName, receiverName, state, filter);
         }
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
+            moveSubscriptionState(id(), SubscriptionState.END);
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
         }
@@ -222,6 +223,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var subscription = new SubscriptionImpl(id, encoding, streamName,
             // FIXME: 'anonymous' instead of 'unknown' ?
             principal != null ? principal.getName() : "<unknown>",
+            SubscriptionState.START,
             filterImpl);
 
         Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
@@ -256,7 +258,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
         final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
-            oldSubscription.receiverName(), filterImpl);
+            oldSubscription.receiverName(), SubscriptionState.ACTIVE, filterImpl);
 
         Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
             @Override
@@ -270,6 +272,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public void moveSubscriptionState(final Uint32 id, final SubscriptionState nextState) {
+        final var oldSubscription = (SubscriptionImpl) lookupSubscription(id);
+        final var subscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
+            oldSubscription.receiverName(), nextState, oldSubscription.filter());
+        subscriptions.replace(id, subscription);
     }
 
     @NonNullByDefault
