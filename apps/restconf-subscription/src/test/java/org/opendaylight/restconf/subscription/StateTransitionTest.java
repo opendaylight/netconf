@@ -9,85 +9,55 @@ package org.opendaylight.restconf.subscription;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.moveState;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.restconf.server.api.TransportSession;
-import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 
 @ExtendWith(MockitoExtension.class)
 class StateTransitionTest {
-    @Mock
-    private TransportSession session;
-
-    private final SubscriptionStateMachine stateMachine = new SubscriptionStateMachine();
 
     @BeforeEach
     void before() {
         // Checking default stating state
-        stateMachine.registerSubscription(session, Uint32.ONE);
-        assertEquals(SubscriptionState.START, stateMachine.lookupSubscriptionState(Uint32.ONE));
     }
 
     @ParameterizedTest
     @MethodSource
-    void moveFromStartValid(final SubscriptionState newState) {
-        assertMoveTo(newState);
+    void moveStateValid(final SubscriptionState oldState, final SubscriptionState newState) {
+        assertMoveTo(oldState, newState);
     }
 
-    private static List<Arguments> moveFromStartValid() {
-        return List.of(Arguments.of(SubscriptionState.ACTIVE), Arguments.of(SubscriptionState.END));
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void moveFromStartInvalid(final SubscriptionState newState) {
-        final var ex = assertThrows(IllegalStateException.class, () -> stateMachine.moveTo(Uint32.ONE, newState));
-        assertEquals("Subscription 1 cannot transition from START to " + newState, ex.getMessage());
-        assertEquals(SubscriptionState.START, stateMachine.lookupSubscriptionState(Uint32.ONE));
-    }
-
-    private static List<Arguments> moveFromStartInvalid() {
-        return List.of(Arguments.of(SubscriptionState.SUSPENDED), Arguments.of(SubscriptionState.SUSPENDED));
-    }
-
-    @Test
-    void moveFromActiveToEnd() {
-        assertMoveTo(SubscriptionState.ACTIVE);
-        assertMoveTo(SubscriptionState.END);
-    }
-
-    @Test
-    void moveFromActiveToSuspededToEnd() {
-        assertMoveTo(SubscriptionState.ACTIVE);
-        assertMoveTo(SubscriptionState.SUSPENDED);
-        assertMoveTo(SubscriptionState.END);
+    private static List<Arguments> moveStateValid() {
+        return List.of(Arguments.of(SubscriptionState.START, SubscriptionState.ACTIVE),
+            Arguments.of(SubscriptionState.ACTIVE, SubscriptionState.SUSPENDED),
+            Arguments.of(SubscriptionState.ACTIVE, SubscriptionState.END),
+            Arguments.of(SubscriptionState.SUSPENDED, SubscriptionState.ACTIVE),
+            Arguments.of(SubscriptionState.SUSPENDED, SubscriptionState.END));
     }
 
     @ParameterizedTest
     @MethodSource
-    void moveToInvalid(final SubscriptionState first, final SubscriptionState second) {
-        assertMoveTo(first);
-        final var ex = assertThrows(IllegalStateException.class, () -> stateMachine.moveTo(Uint32.ONE, second));
-        assertEquals("Subscription 1 cannot transition from " + first + " to " + second, ex.getMessage());
-        assertEquals(first, stateMachine.lookupSubscriptionState(Uint32.ONE));
+    void moveStateInvalid(final SubscriptionState oldState, final SubscriptionState newState) {
+        final var ex = assertThrows(IllegalStateException.class, () -> assertMoveTo(oldState, newState));
+        assertEquals("Cannot transition from %s to %s".formatted(oldState, newState), ex.getMessage());
     }
 
-    private static List<Arguments> moveToInvalid() {
-        return List.of(
+    private static List<Arguments> moveStateInvalid() {
+        return List.of(Arguments.of(SubscriptionState.SUSPENDED, SubscriptionState.START),
             Arguments.of(SubscriptionState.ACTIVE, SubscriptionState.START),
+            Arguments.of(SubscriptionState.END, SubscriptionState.START),
+            Arguments.of(SubscriptionState.END, SubscriptionState.ACTIVE),
             Arguments.of(SubscriptionState.END, SubscriptionState.SUSPENDED));
     }
 
-    private void assertMoveTo(final SubscriptionState newState) {
-        stateMachine.moveTo(Uint32.ONE, newState);
-        assertEquals(newState, stateMachine.lookupSubscriptionState(Uint32.ONE));
+    private void assertMoveTo(final SubscriptionState oldState, final SubscriptionState newState) {
+        assertEquals(newState, moveState(oldState, newState));
     }
 }

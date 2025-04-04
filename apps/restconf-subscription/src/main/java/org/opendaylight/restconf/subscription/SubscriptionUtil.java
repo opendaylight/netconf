@@ -9,6 +9,7 @@ package org.opendaylight.restconf.subscription;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
@@ -78,5 +79,21 @@ public final class SubscriptionUtil {
             throw new IllegalArgumentException("Bad child " + leafNode.prettyTree());
         }
         return null;
+    }
+
+    static SubscriptionState moveState(final SubscriptionState from, final SubscriptionState to) {
+        return switch (from) {
+            case START, SUSPENDED -> switch (to) {
+                case START, SUSPENDED -> throw new IllegalStateException("Cannot transition from %s to %s"
+                    .formatted(from, to));
+                case ACTIVE, END -> to;
+            };
+            case ACTIVE -> switch (to) {
+                case START, ACTIVE -> throw new IllegalStateException("Cannot transition from %s to %s".formatted(from,
+                    to));
+                case SUSPENDED, END -> to;
+            };
+            case END -> throw new IllegalStateException("Cannot transition from %s to %s".formatted(from, to));
+        };
     }
 }
