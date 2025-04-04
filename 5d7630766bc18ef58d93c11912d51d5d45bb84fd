@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a1e66f85_564ab558",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T11:54:54Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s true. Probably when Robert mentioned it he meant org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier - added value here would be path to the node. What do you think about that?",
+      "parentUuid": "6c06b19d_7697c1cf",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7f9ebcfd_f4ca3e5c",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 25
