@@ -33,7 +33,6 @@ import org.opendaylight.restconf.server.ChannelSenderSubscription;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.subscription.SubscriptionState;
 import org.opendaylight.restconf.subscription.SubscriptionStateMachine;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;

@@ -26,10 +26,13 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull String receiverName;
     private final @Nullable EventStreamFilter filter;
 
+    private @NonNull SubscriptionState state;
+
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
-            final String receiverName, final @Nullable EventStreamFilter filter) {
+            final String receiverName, final SubscriptionState state, final @Nullable EventStreamFilter filter) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
+        this.state = requireNonNull(state);
         this.streamName = requireNonNull(streamName);
         this.receiverName = requireNonNull(receiverName);
         this.filter = filter;
@@ -53,6 +56,15 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     @Override
     public final String receiverName() {
         return receiverName;
+    }
+
+    @Override
+    public final SubscriptionState state() {
+        return state;
+    }
+
+    public final void setState(final SubscriptionState newState) {
+        state = newState;
     }
 
     final @Nullable EventStreamFilter filter() {

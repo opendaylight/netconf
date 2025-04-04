@@ -295,6 +295,14 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         public abstract String streamName();
 
+        /**
+         * Returns the {@code subscription state}.
+         *
+         * @return the {@code subscription state}
+         */
+        @NonNullByDefault
+        public abstract SubscriptionState state();
+
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
