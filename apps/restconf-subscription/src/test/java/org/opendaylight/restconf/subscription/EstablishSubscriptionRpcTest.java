@@ -68,8 +68,6 @@ class EstablishSubscriptionRpcTest {
     @Mock
     private TransportSession session;
     @Mock
-    private SubscriptionStateMachine stateMachine;
-    @Mock
     private RestconfStream.Registry streamRegistry;
     @Mock
     private RestconfStream<?> restconfStream;
@@ -80,7 +78,7 @@ class EstablishSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
+        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService);
     }
 
     @Disabled

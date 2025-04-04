@@ -29,6 +29,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -230,6 +231,16 @@ public final class RestconfStream<T> {
         void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
 
         /**
+         * Modify state of RFC8639 subscription.
+         *
+         * @param subscription subscription
+         * @param newState new state
+         * @throws NullPointerException if {@code subscription} is {@code null}
+         */
+        @NonNullByDefault
+        void updateSubscriptionState(Subscription subscription, SubscriptionState newState);
+
+        /**
          * Lookup an existing subscription.
          *
          * @param id subscription ID
@@ -294,6 +305,31 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract String streamName();
+
+        /**
+         * Returns the {@code subscription state}.
+         *
+         * @return the {@code subscription state}
+         */
+        @NonNullByDefault
+        public abstract SubscriptionState state();
+
+        /**
+         * Sets the {@code subscription state}.
+         *
+         * @param the state to set
+         * @throws IllegalStateException if the subscription cannot be moved to the new state
+         */
+        @NonNullByDefault
+        abstract void setState(SubscriptionState newState);
+
+        /**
+         * Returns the {@code subscription session}.
+         *
+         * @return the {@code subscription session}
+         */
+        @NonNullByDefault
+        public abstract TransportSession session();
 
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
@@ -364,6 +400,67 @@ public final class RestconfStream<T> {
                 requireNonNull(xpath);
             }
         }
+    }
+
+    /**
+     * Logical state of a {@link Subscription}.
+     */
+    public enum SubscriptionState {
+        /**
+         * Default state assigned to the subscription upon creation. Should be changed to active state after successful
+         * subscription.
+         */
+        START {
+            @Override
+            public boolean canMoveTo(final SubscriptionState newState) {
+                return switch (newState) {
+                    case ACTIVE, END -> true;
+                    case START, SUSPENDED -> false;
+                };
+            }
+        },
+        /**
+         * State assigned upon successful subscription or after suspended state is lifted.
+         */
+        ACTIVE {
+            @Override
+            public boolean canMoveTo(final SubscriptionState newState) {
+                return switch (newState) {
+                    case SUSPENDED, END -> true;
+                    case ACTIVE, START -> false;
+                };
+            }
+        },
+        /**
+         * State assigned by the publisher when there is no sufficient CPU or bandwidth available to service the
+         * subscription.
+         */
+        SUSPENDED {
+            @Override
+            public boolean canMoveTo(final SubscriptionState newState) {
+                return switch (newState) {
+                    case ACTIVE, END -> true;
+                    case START, SUSPENDED -> false;
+                };
+            }
+        },
+        /**
+         * State assigned upon termination of subscription.
+         */
+        END {
+            @Override
+            public boolean canMoveTo(final SubscriptionState newState) {
+                return false;
+            }
+        };
+
+        /**
+         * Returns {@code true} if a subscription can move from this state to a propose new state.
+         *
+         * @param newState proposed new state
+         * @return {@code true} if the transition to {@code newState} is allowed
+         */
+        public abstract boolean canMoveTo(SubscriptionState newState);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);

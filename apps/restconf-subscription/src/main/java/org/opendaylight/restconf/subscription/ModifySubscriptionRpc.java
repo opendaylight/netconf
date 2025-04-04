@@ -19,6 +19,7 @@ import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionInput;
@@ -54,17 +55,14 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
     private final SubscriptionStateService subscriptionStateService;
-    private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
     public ModifySubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService,
-            @Reference final SubscriptionStateMachine stateMachine) {
+            @Reference final SubscriptionStateService subscriptionStateService) {
         super(ModifySubscription.QNAME);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
-        this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
 
@@ -85,19 +83,20 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var state = stateMachine.lookupSubscriptionState(id);
-        if (state == null) {
+        final var subscription = streamRegistry.lookupSubscription(id);
+        if (subscription == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
+        final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
 
-        if (stateMachine.lookupSubscriptionSession(id) != request.session()) {
+        if (subscription.session() != request.session()) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
@@ -118,11 +117,11 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        streamRegistry.modifySubscription(request.transform(subscription -> {
+        streamRegistry.modifySubscription(request.transform(modifiedSubscription -> {
             try {
                 // FIXME: pass correct filter once we extract if from input
-                subscriptionStateService.subscriptionModified(Instant.now(), id, subscription.streamName(),
-                    subscription.encoding(), null, null, null);
+                subscriptionStateService.subscriptionModified(Instant.now(), id, modifiedSubscription.streamName(),
+                    modifiedSubscription.encoding(), null, null, null);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Could not send subscription modify notification", e);

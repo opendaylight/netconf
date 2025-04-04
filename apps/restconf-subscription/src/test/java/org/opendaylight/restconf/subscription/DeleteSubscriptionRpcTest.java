@@ -30,8 +30,10 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -63,11 +65,11 @@ class DeleteSubscriptionRpcTest {
     @Mock
     private CompletingServerRequest<ContainerNode> request;
     @Mock
-    private SubscriptionStateMachine stateMachine;
-    @Mock
     private TransportSession session;
     @Mock
     private RestconfStream.Registry streamRegistry;
+    @Mock
+    private AbstractRestconfStreamSubscription subscription;
     @Captor
     private ArgumentCaptor<RequestException> response;
 
@@ -75,7 +77,7 @@ class DeleteSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new DeleteSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine);
+        rpc = new DeleteSubscriptionRpc(streamRegistry, subscriptionStateService);
     }
 
     @Disabled
@@ -88,8 +90,9 @@ class DeleteSubscriptionRpcTest {
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
-        doReturn(session).when(stateMachine).lookupSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(session).when(subscription).session();
+        doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL),
@@ -101,8 +104,8 @@ class DeleteSubscriptionRpcTest {
     void deleteSubscriptionWrongSessionTest() {
         doReturn(session).when(request).session();
         // return session different from request session
-        doReturn(null).when(stateMachine).lookupSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -111,7 +114,7 @@ class DeleteSubscriptionRpcTest {
 
     @Test
     void deleteSubscriptionWrongIDTest() {
-        doReturn(null).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());
@@ -120,7 +123,8 @@ class DeleteSubscriptionRpcTest {
 
     @Test
     void deleteSubscriptionAlreadyEndedTest() {
-        doReturn(SubscriptionState.END).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.END).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(response.capture());

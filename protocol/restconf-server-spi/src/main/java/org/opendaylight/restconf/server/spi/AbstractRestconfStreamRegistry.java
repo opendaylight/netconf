@@ -24,9 +24,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
+import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -61,8 +63,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
         SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
+                final SubscriptionState state, final TransportSession session,
                 final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, filter);
+            super(id, encoding, streamName, receiverName, state, session, filter);
         }
 
         @Override
@@ -222,6 +225,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var subscription = new SubscriptionImpl(id, encoding, streamName,
             // FIXME: 'anonymous' instead of 'unknown' ?
             principal != null ? principal.getName() : "<unknown>",
+            SubscriptionState.START, request.session(),
             filterImpl);
 
         Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
@@ -256,7 +260,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
         final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
-            oldSubscription.receiverName(), filterImpl);
+            oldSubscription.receiverName(), SubscriptionState.ACTIVE, oldSubscription.session(), filterImpl);
 
         Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
             @Override
@@ -270,6 +274,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 request.completeWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public void updateSubscriptionState(final Subscription subscription, final SubscriptionState newState) {
+        requireNonNull(subscription);
+        subscription.setState(newState);
+        subscriptions.replace(subscription.id(), subscription);
     }
 
     @NonNullByDefault
