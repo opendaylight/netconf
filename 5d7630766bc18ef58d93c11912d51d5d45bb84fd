@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d94bc370_ad2af32a",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T12:49:18Z",
+      "side": 1,
+      "message": "But at the same time SubtreeFilter itself is also essentially path so also not really useful...",
+      "parentUuid": "471020cc_58998d83",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7f9ebcfd_f4ca3e5c",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 25
