@@ -52,6 +52,24 @@
       "parentUuid": "41b69b5b_36db71c9",
       "revId": "ee22c7cfc7166a02f3602f1b56d86fd5d0d2a5ac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a62dc3fe_478f4b83",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1439Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T10:48:42Z",
+      "side": 1,
+      "message": "We would need to migrate tests when removing jaxrs in future releases.",
+      "parentUuid": "b84fcb09_dbc70570",
+      "revId": "ee22c7cfc7166a02f3602f1b56d86fd5d0d2a5ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
