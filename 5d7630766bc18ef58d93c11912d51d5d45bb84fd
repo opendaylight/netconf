@@ -110,6 +110,74 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "835c001a_e4ff6970",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T13:08:25Z",
+      "side": 1,
+      "message": "please describe the algorithm used, describe what is the purpose of each method",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b6f2050_67507a62",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T13:08:25Z",
+      "side": 1,
+      "message": "is this the following part?\n\u003cfilter type\u003d\"subtree\"\u003e\n\ncan you document it and verify its like that?",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87ad06f0_33cba4de",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T13:08:25Z",
+      "side": 1,
+      "message": "IMHO no, attribute match can be applied also for namespace wildcarded elements",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb859119_037eb505",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T13:08:25Z",
+      "side": 1,
+      "message": "this is for Wildcarded only?",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7f9ebcfd_f4ca3e5c",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 25
@@ -209,6 +277,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "787caaf5_5cd149d8",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a447585_dbfd41eb",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReaderTest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T13:08:25Z",
+      "side": 1,
+      "message": "can you add test for multiple subtrees?\n\nhttps://www.rfc-editor.org/rfc/rfc6241#section-6.4.7",
       "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
