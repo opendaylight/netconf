@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "074e54a4_edab0db4",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T12:43:34Z",
+      "side": 1,
+      "message": "No, this if here to check if we reached end of path iterator and decide to return QNames or go deeper down the SchemaTree.\nAlso pls see comment below.",
+      "parentUuid": "7f9ebcfd_f4ca3e5c",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e9d7861_74a21c79",
@@ -66,6 +84,24 @@
       "writtenOn": "2025-04-04T11:50:34Z",
       "side": 1,
       "message": "did you mean `while`? instead of using recursion?",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f606a14e_a2f05664",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T12:43:34Z",
+      "side": 1,
+      "message": "So I used `if` and recursion intentionally. Idea behind this was that each time we go into recursion it will deal with children of only one statement at the time then in the end on the last call in `else` it will collect QNames with the same local name we are looking for and on the way back put them into one list step by step. It was logical to me because here got down the schema tree to find node and then returning up with result.\n\nI could probably do the same using `while`, but after each loop I would have to update `found` - list of statements - to go down the schema tree. It looks less intuitive to me then recursion.",
+      "parentUuid": "7e9d7861_74a21c79",
       "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
