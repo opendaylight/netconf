@@ -125,6 +125,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0381cab4_c7cf2002",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T16:04:33Z",
+      "side": 1,
+      "message": "Added java doc to methods",
+      "parentUuid": "835c001a_e4ff6970",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b6f2050_67507a62",
@@ -138,6 +156,24 @@
       "writtenOn": "2025-04-04T13:08:25Z",
       "side": 1,
       "message": "is this the following part?\n\u003cfilter type\u003d\"subtree\"\u003e\n\ncan you document it and verify its like that?",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09c2d11a_f258e373",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T16:04:33Z",
+      "side": 1,
+      "message": "Added about it into comment and doc to the method",
+      "parentUuid": "9b6f2050_67507a62",
       "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -330,6 +366,24 @@
       "writtenOn": "2025-04-04T13:08:25Z",
       "side": 1,
       "message": "can you add test for multiple subtrees?\n\nhttps://www.rfc-editor.org/rfc/rfc6241#section-6.4.7",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00d52e1a_890d6f01",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReaderTest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T16:04:33Z",
+      "side": 1,
+      "message": "Added this case",
+      "parentUuid": "0a447585_dbfd41eb",
       "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
