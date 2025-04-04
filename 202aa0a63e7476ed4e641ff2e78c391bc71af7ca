@@ -16,6 +16,24 @@
       "message": "According to JIRA ticket https://lf-opendaylight.atlassian.net/browse/NETCONF-1454",
       "revId": "202aa0a63e7476ed4e641ff2e78c391bc71af7ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5318d1a7_b6186008",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 23
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd6a31f1_614c2c85",
+      "revId": "202aa0a63e7476ed4e641ff2e78c391bc71af7ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
