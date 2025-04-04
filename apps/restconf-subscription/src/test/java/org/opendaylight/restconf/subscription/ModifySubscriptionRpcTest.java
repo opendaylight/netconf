@@ -30,8 +30,10 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -65,6 +67,8 @@ class ModifySubscriptionRpcTest {
     private SubscriptionStateMachine stateMachine;
     @Mock
     private RestconfStream.Registry streamRegistry;
+    @Mock
+    private AbstractRestconfStreamSubscription subscription;
     @Captor
     private ArgumentCaptor<RequestException> responseCaptor;
 
@@ -92,7 +96,8 @@ class ModifySubscriptionRpcTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
         doReturn(session).when(stateMachine).lookupSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL),
@@ -105,8 +110,9 @@ class ModifySubscriptionRpcTest {
     void modifySubscriptionWrongSessionTest() {
         doReturn(session).when(request).session();
         // return session different from request session
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.ACTIVE).when(subscription).state();
         doReturn(null).when(stateMachine).lookupSubscriptionSession(ID);
-        doReturn(SubscriptionState.ACTIVE).when(stateMachine).lookupSubscriptionState(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(responseCaptor.capture());
@@ -116,7 +122,7 @@ class ModifySubscriptionRpcTest {
 
     @Test
     void modifySubscriptionWrongIDTest() {
-        doReturn(null).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(responseCaptor.capture());
@@ -125,7 +131,8 @@ class ModifySubscriptionRpcTest {
 
     @Test
     void modifySubscriptionAlreadyEndedTest() {
-        doReturn(SubscriptionState.END).when(stateMachine).lookupSubscriptionState(ID);
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.END).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(request).completeWith(responseCaptor.capture());

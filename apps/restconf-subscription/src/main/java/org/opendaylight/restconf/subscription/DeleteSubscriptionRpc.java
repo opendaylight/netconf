@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
@@ -79,12 +80,13 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
                 "No ID specified."));
             return;
         }
-        final var state = stateMachine.lookupSubscriptionState(id);
-        if (state == null) {
+        final var subscription = streamRegistry.lookupSubscription(id);
+        if (subscription == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
+        final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
@@ -97,15 +99,7 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var subscription = streamRegistry.lookupSubscription(id);
-        if (subscription == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
-                "There is no active or suspended subscription with given ID."));
-            return;
-        }
-
         subscription.terminate(request.transform(unused -> {
-            stateMachine.moveTo(id, SubscriptionState.END);
             try {
                 subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
             } catch (InterruptedException e) {
