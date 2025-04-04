@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionOutput;
@@ -51,17 +52,14 @@ public final class KillSubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(KillSubscriptionInput.QNAME, "id").intern());
 
     private final SubscriptionStateService subscriptionStateService;
-    private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
     public KillSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService,
-            @Reference final SubscriptionStateMachine stateMachine) {
+            @Reference final SubscriptionStateService subscriptionStateService) {
         super(KillSubscription.QNAME);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
-        this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
 
@@ -80,27 +78,22 @@ public final class KillSubscriptionRpc extends RpcImplementation {
                 "No id specified"));
             return;
         }
-        final var state = stateMachine.lookupSubscriptionState(id);
-        if (state == null) {
+
+        final var subscription = streamRegistry.lookupSubscription(id);
+        if (subscription == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
+        final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
 
-        final var subscription = streamRegistry.lookupSubscription(id);
-        if (subscription == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
-                "There is no active or suspended subscription with given ID."));
-            return;
-        }
-
+        streamRegistry.updateSubscriptionState(subscription, SubscriptionState.END);
         subscription.terminate(request.transform(unused -> {
-            stateMachine.moveTo(id, SubscriptionState.END);
             try {
                 subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
             } catch (InterruptedException e) {

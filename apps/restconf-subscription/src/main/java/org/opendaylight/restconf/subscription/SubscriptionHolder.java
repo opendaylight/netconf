@@ -10,7 +10,6 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -26,14 +25,12 @@ final class SubscriptionHolder extends AbstractRegistration {
 
     private final Uint32 id;
     private final SubscriptionStateService subscriptionStateService;
-    private final SubscriptionStateMachine stateMachine;
     private final RestconfStream.Registry streamRegistry;
 
     SubscriptionHolder(final Uint32 id, final SubscriptionStateService subscriptionStateService,
-            final SubscriptionStateMachine stateMachine, final RestconfStream.Registry streamRegistry) {
+            final RestconfStream.Registry streamRegistry) {
         this.id = requireNonNull(id);
         this.subscriptionStateService = requireNonNull(subscriptionStateService);
-        this.stateMachine = requireNonNull(stateMachine);
         this.streamRegistry =  requireNonNull(streamRegistry);
     }
 
@@ -42,12 +39,6 @@ final class SubscriptionHolder extends AbstractRegistration {
         final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
             // subscription is no longer registered, it was terminated from elsewhere
-            return;
-        }
-        try {
-            stateMachine.moveTo(id, SubscriptionState.END);
-        } catch (IllegalStateException | NoSuchElementException e) {
-            LOG.warn("Could not move subscription to END state", e);
             return;
         }
 

@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -24,12 +25,18 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     private final @NonNull QName encoding;
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
+    private final @NonNull TransportSession session;
     private final @Nullable EventStreamFilter filter;
 
+    private @NonNull SubscriptionState state;
+
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
-            final String receiverName, final @Nullable EventStreamFilter filter) {
+            final String receiverName, final SubscriptionState state, final TransportSession session,
+            final @Nullable EventStreamFilter filter) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
+        this.state = requireNonNull(state);
+        this.session = requireNonNull(session);
         this.streamName = requireNonNull(streamName);
         this.receiverName = requireNonNull(receiverName);
         this.filter = filter;
@@ -53,6 +60,21 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
     @Override
     public final String receiverName() {
         return receiverName;
+    }
+
+    @Override
+    public final SubscriptionState state() {
+        return state;
+    }
+
+    @Override
+    public void setState(SubscriptionState newState) {
+        state = newState;
+    }
+
+    @Override
+    public final TransportSession session() {
+        return session;
     }
 
     final @Nullable EventStreamFilter filter() {

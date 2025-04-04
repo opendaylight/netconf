@@ -29,6 +29,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -230,6 +231,16 @@ public final class RestconfStream<T> {
         void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
 
         /**
+         * Modify state of RFC8639 subscription.
+         *
+         * @param subscription subscription
+         * @param nextState new state
+         * @throws NullPointerException if {@code subscription} is {@code null}
+         */
+        @NonNullByDefault
+        void updateSubscriptionState(Subscription subscription, SubscriptionState nextState);
+
+        /**
          * Lookup an existing subscription.
          *
          * @param id subscription ID
@@ -294,6 +305,27 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract String streamName();
+
+        /**
+         * Returns the {@code subscription state}.
+         *
+         * @return the {@code subscription state}
+         */
+        @NonNullByDefault
+        public abstract SubscriptionState state();
+
+        /**
+         * Sets the {@code subscription state}.
+         */
+        abstract void setState(final SubscriptionState nextState);
+
+        /**
+         * Returns the {@code subscription session}.
+         *
+         * @return the {@code subscription session}
+         */
+        @NonNullByDefault
+        public abstract TransportSession session();
 
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
