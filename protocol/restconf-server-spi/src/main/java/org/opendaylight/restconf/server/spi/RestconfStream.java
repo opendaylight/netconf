@@ -230,6 +230,16 @@ public final class RestconfStream<T> {
         void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
 
         /**
+         * Modify state of RFC8639 subscription.
+         *
+         * @param id of subscription
+         * @param nextState new state
+         * @throws NullPointerException if {@code id} is {@code null}
+         */
+        @NonNullByDefault
+        void moveSubscriptionState(Uint32 id, SubscriptionState nextState);
+
+        /**
          * Lookup an existing subscription.
          *
          * @param id subscription ID
@@ -294,6 +304,14 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract String streamName();
+
+        /**
+         * Returns the {@code subscription state}.
+         *
+         * @return the {@code subscription state}
+         */
+        @NonNullByDefault
+        public abstract SubscriptionState state();
 
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {

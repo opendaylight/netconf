@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
@@ -85,12 +86,13 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var state = stateMachine.lookupSubscriptionState(id);
-        if (state == null) {
+        final var found = streamRegistry.lookupSubscription(id);
+        if (found == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
+        final var state = found.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
