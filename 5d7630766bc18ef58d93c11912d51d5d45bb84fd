@@ -159,6 +159,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7fa7cd0_d4d45ec6",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T14:17:49Z",
+      "side": 1,
+      "message": "Element itself can be wildcarded but attribute also has namespace. This exception here is for one reason - AttributeMatch accepts only NamespaceSelection.Exact and therefore attributes can\u0027t be wildcard. This is something that was laid down by Robert both for `api` and `databind`. To change it here also means we need to change `api` part.\nAlso if we don\u0027t have namespace there won\u0027t be anything tying attribute to the model.\n\nIMO lets leave it for now. Even if it is wrong and we can have wildcard attributes this is requires rework in separate patch with adaptations in `api` too.",
+      "parentUuid": "87ad06f0_33cba4de",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb859119_037eb505",
@@ -172,6 +190,24 @@
       "writtenOn": "2025-04-04T13:08:25Z",
       "side": 1,
       "message": "this is for Wildcarded only?",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ac07c1f_4005867f",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-04T14:17:49Z",
+      "side": 1,
+      "message": "No it is for both types. I\u0027ll add the comment. Exact namespace is returned when there are namespaces all the way in the path. It checks for first and last nodes namespace and if we have both trying to construct Exact namespace.\n\nIMO Yes in that case if there is wildcard somewhere in between it will throw the error - I checked for that. Reason for that is that such xml has no sense - skipping namespace for the element and then \"finding\" it for the children looks like something deliberate and not logical.",
+      "parentUuid": "bb859119_037eb505",
       "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
