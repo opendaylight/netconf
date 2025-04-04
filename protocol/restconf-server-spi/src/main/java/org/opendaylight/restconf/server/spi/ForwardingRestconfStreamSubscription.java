@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
@@ -43,6 +44,21 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
     @Override
     public final String streamName() {
         return delegate.streamName();
+    }
+
+    @Override
+    public final SubscriptionState state() {
+        return delegate.state();
+    }
+
+    @Override
+    public void setState(final SubscriptionState nextState) {
+        delegate.setState(nextState);
+    }
+
+    @Override
+    public final TransportSession session() {
+        return delegate.session();
     }
 
     protected final @NonNull T delegate() {
