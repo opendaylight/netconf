@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodingUnsupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
@@ -118,11 +119,11 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         streamRegistry.establishSubscription(request.transform(subscription -> {
             final var id = subscription.id();
-            final var holder = new SubscriptionHolder(id, subscriptionStateService, stateMachine, streamRegistry);
+            final var holder = new SubscriptionHolder(id, subscriptionStateService, streamRegistry);
             session.registerResource(holder);
             stateMachine.registerSubscription(session, id);
-            stateMachine.moveTo(id, SubscriptionState.ACTIVE);
-
+            // Move subscription to active state
+            streamRegistry.moveSubscriptionState(id, SubscriptionState.ACTIVE);
             return ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
                 .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))

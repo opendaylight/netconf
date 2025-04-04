@@ -45,6 +45,11 @@ public abstract non-sealed class ForwardingRestconfStreamSubscription<T extends 
         return delegate.streamName();
     }
 
+    @Override
+    public final SubscriptionState state() {
+        return delegate.state();
+    }
+
     protected final @NonNull T delegate() {
         return delegate;
     }
