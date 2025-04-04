@@ -33,7 +33,7 @@ import org.opendaylight.restconf.server.ChannelSenderSubscription;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.subscription.SubscriptionState;
+import org.opendaylight.restconf.server.spi.SubscriptionState;
 import org.opendaylight.restconf.subscription.SubscriptionStateMachine;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -111,20 +111,14 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
             LOG.debug("Invalid subscription id {}", subscriptionId, e);
             return new EmptyResponse(HttpResponseStatus.BAD_REQUEST);
         }
-        final var subscriptionState = machine.lookupSubscriptionState(id);
-        if (subscriptionState == null) {
+        final var subscription = streamRegistry.lookupSubscription(id);
+        if (subscription == null) {
             LOG.debug("Subscription for id {} not found", subscriptionId);
             return EmptyResponse.NOT_FOUND;
         }
-        if (subscriptionState != SubscriptionState.ACTIVE) {
+        if (subscription.state() != SubscriptionState.ACTIVE) {
             LOG.debug("Subscription for id {} is not active", subscriptionId);
             return new EmptyResponse(HttpResponseStatus.CONFLICT);
-        }
-
-        final var subscription = streamRegistry.lookupSubscription(id);
-        if (subscription == null) {
-            LOG.warn("Could not send event stream response: could not read subscription");
-            return EmptyResponse.NOT_FOUND;
         }
 
         final var streamName = subscription.streamName();

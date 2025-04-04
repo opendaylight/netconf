@@ -201,7 +201,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
             new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
             new ModifySubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
             new DeleteSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine),
-            new KillSubscriptionRpc(streamRegistry, subscriptionStateService, stateMachine));
+            new KillSubscriptionRpc(streamRegistry, subscriptionStateService));
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
             domMountPointService, rpcImplementations);
 
