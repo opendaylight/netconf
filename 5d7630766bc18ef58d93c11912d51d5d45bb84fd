@@ -16,6 +16,23 @@
       "message": "Using NodeIdentifier instead of QName has no added value as we always work with: identifier.getNodeType() what is QName.\n\nIt seems that we create NodeIdentifier when creating this object and here we again go to QName.",
       "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "787caaf5_5cd149d8",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T11:47:28Z",
+      "side": 1,
+      "message": "lase one?",
+      "revId": "5d7630766bc18ef58d93c11912d51d5d45bb84fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
