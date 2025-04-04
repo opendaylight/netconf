@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b6ef8bc_c9a0ea0a",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReaderTest.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-04T13:26:53Z",
+      "side": 1,
+      "message": "IMO name is the same namespace as user, see: https://www.rfc-editor.org/rfc/rfc6241#section-6.2.5",
+      "revId": "b47fa38cb20e1d9f9b745c70037aed9a40a4bff1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
