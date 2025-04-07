@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23521a50_3680d274",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T09:36:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "346634f9_5457e895",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ee2ec63_f1ac65de",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-04-04T13:37:23Z",
       "side": 1,
       "message": "Can you add test with multiple subtrees?\nhttps://www.rfc-editor.org/rfc/rfc6241#section-6.4.7",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04f61e75_4f44852d",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriterTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T09:36:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ee2ec63_f1ac65de",
       "revId": "dff52308c487566cb3503840b4428d5beca77121",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +122,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82a13825_3d5cae2c",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriterTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T09:36:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78e0e387_6ca099d2",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3cb1125d_a496f380",
@@ -99,6 +153,24 @@
       "writtenOn": "2025-04-04T13:37:23Z",
       "side": 1,
       "message": "can be in oneline",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58ee3004_271a0480",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriterTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T09:36:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cb1125d_a496f380",
       "revId": "dff52308c487566cb3503840b4428d5beca77121",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
