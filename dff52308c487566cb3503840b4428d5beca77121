@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fc9662e_675c96f5",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T10:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c25c3339_54086f1a",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97523780_c2eae9e6",
