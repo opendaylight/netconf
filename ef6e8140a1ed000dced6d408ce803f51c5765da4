@@ -16,6 +16,24 @@
       "message": "This method goes NOT down the schema tree recursively but it recursively iterates over iterator - for which pure while() is better",
       "revId": "ef6e8140a1ed000dced6d408ce803f51c5765da4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38bd081f_68916a69",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-07T21:23:09Z",
+      "side": 1,
+      "message": "This method was removed and logic reworked",
+      "parentUuid": "7224c168_7838068e",
+      "revId": "ef6e8140a1ed000dced6d408ce803f51c5765da4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
