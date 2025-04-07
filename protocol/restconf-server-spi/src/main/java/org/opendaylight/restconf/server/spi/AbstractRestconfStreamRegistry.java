@@ -311,12 +311,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    private static EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
-        // FIXME: parse SubtreeDefinition anydata filter, rfc6241
-        //        https://www.rfc-editor.org/rfc/rfc8650#name-filter-example
-        throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-            "Subtree filtering not implemented");
-    }
+    protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter);
 
     @NonNullByDefault
     private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
