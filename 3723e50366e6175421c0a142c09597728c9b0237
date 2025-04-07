@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ecbc88b_39b0ffc3",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:28:26Z",
+      "side": 1,
+      "message": "Fixed with message:\n\"Create operation requires \u0027value\u0027 element\"",
+      "parentUuid": "9e5c4d84_01f6e7b3",
+      "revId": "3723e50366e6175421c0a142c09597728c9b0237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dbf364cf_6b56b660",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-28T13:12:47Z",
       "side": 1,
       "message": "IDK: Create operation requires value would be better",
+      "revId": "3723e50366e6175421c0a142c09597728c9b0237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfccedc3_17483bc3",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:28:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dbf364cf_6b56b660",
       "revId": "3723e50366e6175421c0a142c09597728c9b0237",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
