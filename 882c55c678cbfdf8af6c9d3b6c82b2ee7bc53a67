@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06fa2082_4316fd8f",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:26:23Z",
+      "side": 1,
+      "message": "This check if a mandatory field was provided. This addresses use-case when a mandatory field is missing. For example this part is not provided:\n\n`\"patch-id\" : \"test patch id\",`\n\nhttps://github.com/opendaylight/mdsal/blob/master/model/ietf/rfc8072/src/main/yang/ietf-yang-patch%402017-02-22.yang#L99-L110",
+      "parentUuid": "4fa28dc1_6afe7208",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4c1d249_f57f1c03",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84f5b3e1_98d5bdcb",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:26:23Z",
+      "side": 1,
+      "message": "If \"patch-id\" is not provided, then this case is not evaluated.",
+      "parentUuid": "a4c1d249_f57f1c03",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce93906a_2108fea9",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-28T13:14:57Z",
       "side": 1,
       "message": "refactoring like this should be in separate patch, now there is a lot of occurrences of \"patch-id\" string around the code, and additionally we have also this constant 😄",
+      "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d830c4d_41690783",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/PatchBody.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:26:23Z",
+      "side": 1,
+      "message": "Done:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116138/2",
+      "parentUuid": "ce93906a_2108fea9",
       "revId": "882c55c678cbfdf8af6c9d3b6c82b2ee7bc53a67",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
