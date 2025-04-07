@@ -18,6 +18,7 @@ module org.opendaylight.restconf.server.spi {
     requires org.opendaylight.netconf.api;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
     requires org.opendaylight.yangtools.yang.data.spi;
+    requires org.opendaylight.yangtools.yang.data.impl;
     requires org.opendaylight.yangtools.yang.model.export;
     requires org.slf4j;
 
