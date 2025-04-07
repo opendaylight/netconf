@@ -158,6 +158,24 @@
       "parentUuid": "3a89190d_b13183f7",
       "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebccb3e9_1048a545",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-07T10:26:17Z",
+      "side": 1,
+      "message": "IMHO this variable is useless and test case full of mocking needs to be investigated to understand why this happens.",
+      "parentUuid": "e4a7d7ba_07a4b96c",
+      "revId": "7922b96277f46978064bc8fe6cf32f37ad3ff29f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
