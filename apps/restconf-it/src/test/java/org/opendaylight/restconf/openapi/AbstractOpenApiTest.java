@@ -188,7 +188,8 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"),
+            dataBindProvider);
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
             domMountPointService, List.of());
 
