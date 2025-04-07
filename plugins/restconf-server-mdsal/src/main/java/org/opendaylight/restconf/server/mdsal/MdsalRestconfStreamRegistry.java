@@ -12,19 +12,32 @@ import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_EXCL
 import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_ID;
 import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_RECEIVER_NAME;
 import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_SENT_EVENT_RECORDS;
+import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_STREAM_FILTER_NAME;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.netconf.databind.DatabindProvider;
+import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
@@ -38,8 +51,10 @@ import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -56,13 +71,16 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
     private final DOMDataBroker dataBroker;
+    private final DatabindProvider databindProvider;
     private final List<StreamSupport> supports;
 
     @Inject
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
-            @Reference final RestconfStream.LocationProvider locationProvider) {
+            @Reference final RestconfStream.LocationProvider locationProvider,
+            @Reference final DatabindProvider databindProvider) {
         this.dataBroker = requireNonNull(dataBroker);
+        this.databindProvider = databindProvider;
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
     }
 
@@ -123,42 +141,70 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected ListenableFuture<RestconfStream.Subscription> createSubscription(
-            final RestconfStream.Subscription subscription) {
+            final RestconfStream.Subscription subscription, final RestconfStream.SubscriptionFilter filter) {
         final var id = subscription.id();
         final var receiver = subscription.receiverName();
         final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
 
-        final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
-            ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(nodeId)
-                .withChild(ImmutableNodes.leafNode(QNAME_ID, id))
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
-                .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()))
-//                    .withChild(ImmutableNodes.newChoiceBuilder()
-//                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
-//                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
-//                            subscription.filterName()))
+        final DataContainerChild filterNode = switch (filter) {
+            // We don't write filter into subscription because it is not part of the model
+            // For already existing filter that referred by name there is nothing to update in datastore
+            case RestconfStream.SubscriptionFilter.Reference(var ignored) -> null;
+            // FIXME YANGTOOLS-1106 pass Anydata filter when yangtools is able to parse them
+            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var ignored) -> null;
+//                ImmutableNodes.newChoiceBuilder()
+//                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+//                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+//                        .withNodeIdentifier(NodeIdentifier.create(StreamSubtreeFilter.QNAME))
+//                        .withValue(anydata)
 //                        .build())
-                    .build())
-                .withChild(ImmutableNodes.newContainerBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
-                    .withChild(ImmutableNodes.newSystemMapBuilder()
-                        .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
-                        .withChild(ImmutableNodes.newMapEntryBuilder()
-                            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                QNAME_RECEIVER_NAME, receiver))
-                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiver))
-                            .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
-                                Receiver.State.Active.getName()))
-                            .build())
+//                    .build();
+            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
+                    .build();
+            case null -> null;
+        };
+
+        final var subscriptionNode = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(nodeId)
+            .withChild(ImmutableNodes.leafNode(QNAME_ID, id))
+            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
+            .withChild(ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()))
+                .build())
+            .withChild(ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
+                .withChild(ImmutableNodes.newSystemMapBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
+                    .withChild(ImmutableNodes.newMapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
+                            QNAME_RECEIVER_NAME, receiver))
+                        .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiver))
+                        .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
+                        .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
+                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
+                            Receiver.State.Active.getName()))
                         .build())
                     .build())
                 .build());
+
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId), subscriptionNode.build());
+        if (filterNode != null) {
+            final var filterName = NodeIdentifierWithPredicates.of(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns
+                .yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter.QNAME, QNAME_STREAM_FILTER_NAME,
+                    // TODO should be random name
+                    "should-be-random-name");
+            final var resultFilter = ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(filterName)
+                .withChild(ImmutableNodes.leafNode(QNAME_ID, id))
+                .withChild(filterNode)
+                .build();
+            tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.FILTERS.node(filterName), resultFilter);
+        }
         return tx.commit().transform(info -> {
             LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
             return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
@@ -176,7 +222,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
-                    .withChild(ImmutableNodes.leafNode(StreamSubtreeFilter.QNAME, anydata))
+                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+                        .withNodeIdentifier(NodeIdentifier.create(StreamSubtreeFilter.QNAME))
+                        .withValue(anydata)
+                        .build())
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
@@ -203,5 +252,27 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Modified subscription {} to operational datastore as of {}", id, info);
             return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) {
+        final SubtreeFilter databindFilter;
+        try {
+            final var databindContext = databindProvider.currentDatabind();
+            final var writer = new StringWriter();
+            final var xmlStreamWriter = XMLOutputFactory.newDefaultFactory().createXMLStreamWriter(writer);
+
+            final var xmlNormalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter,
+                databindContext.modelContext(), YangInstanceIdentifier.of(Filters.QNAME, StreamFilter.QNAME));
+            final var normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(xmlNormalizedNodeStreamWriter, null);
+            normalizedNodeWriter.write(filter);
+            normalizedNodeWriter.flush();
+
+            databindFilter = SubtreeFilter.readFrom(databindContext, XMLInputFactory.newDefaultFactory()
+                .createXMLStreamReader(new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8))));
+        } catch (IOException | XMLStreamException e) {
+            throw new IllegalStateException(e);
+        }
+        return new SubtreeEventStreamFilter(databindFilter);
     }
 }
