@@ -258,12 +258,14 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             }
         }
 
-        private synchronized void sendKeepalive(final long now) {
-            if (suppressed) {
-                LOG.debug("{}: Skipping keepalive while disabled", deviceId);
-                // suppressed -> unscheduled
-                suppressed = false;
-                return;
+        private void sendKeepalive(final long now) {
+            synchronized (this) {
+                if (suppressed) {
+                    LOG.debug("{}: Skipping keepalive while disabled", deviceId);
+                    // suppressed -> unscheduled
+                    suppressed = false;
+                    return;
+                }
             }
 
             LOG.trace("{}: Invoking keepalive RPC", deviceId);
