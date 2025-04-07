@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0328d61c_ffd88519",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/Prefixes.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T11:43:46Z",
+      "side": 1,
+      "message": "It was just a copy of https://git.opendaylight.org/gerrit/c/netconf/+/115759/34/protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/subtree/Prefixes.java. Cannot reuse it bc of the same name of SubtreeFilter in databind and netconf.api",
+      "parentUuid": "97523780_c2eae9e6",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "346634f9_5457e895",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
         "patchSetId": 6
