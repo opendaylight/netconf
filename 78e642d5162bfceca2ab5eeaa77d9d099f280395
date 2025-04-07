@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dc672f9_bb19069f",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a12b2f87_8a6b45b0",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5029396e_0bf2ac61",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05f63778_14f40efe",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "Added fixme to YANGTOOLS-1662 issue, which could reduce these exceptions.",
+      "parentUuid": "5029396e_0bf2ac61",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c53184e7_53016d97",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-03-28T13:07:34Z",
       "side": 1,
       "message": "which value is provided?\n\nhttps://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e8da3bb_015f8c35",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c53184e7_53016d97",
       "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b9ebce60_8c085e5f",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "I cannot change the error-info from the exception received from Yangtools:\nhttps://github.com/opendaylight/yangtools/blob/v14.0.11/binding/binding-spec/src/main/java/org/opendaylight/yangtools/binding/lib/CodeHelpers.java#L396\n\nWould you like to add all valid enum types to the error-message?\nhttps://github.com/opendaylight/mdsal/blob/master/model/ietf/rfc8072/src/main/yang/ietf-yang-patch%402017-02-22.yang#L147-L199",
+      "parentUuid": "fc92ff33_9a8d0540",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b66882f_d725e6a3",
         "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
         "patchSetId": 20
@@ -82,6 +154,24 @@
       "writtenOn": "2025-03-28T13:07:34Z",
       "side": 1,
       "message": "which are valid?",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfa0d34f_7f67fc33",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "https://github.com/opendaylight/mdsal/blob/master/model/ietf/rfc8072/src/main/yang/ietf-yang-patch%402017-02-22.yang#L147-L199",
+      "parentUuid": "6b66882f_d725e6a3",
       "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "066a7534_9ef8795a",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "The XML request was not affected. I have just added a test to keep track of what it actually produces.\nhttps://github.com/opendaylight/netconf/blob/v8.0.7/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java#L46-L49",
+      "parentUuid": "30feba30_3424d428",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "229a1a24_d9c99242",
@@ -116,6 +224,24 @@
       "writtenOn": "2025-03-28T13:07:34Z",
       "side": 1,
       "message": "not sure how this is malformed, maybe internal error? please check RFCs",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab832ac8_88e855fd",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:40:23Z",
+      "side": 1,
+      "message": "Based on https://www.rfc-editor.org/rfc/rfc6241 the malformed-message seems to be more like a general exception. \n\n\n\u003eA message could not be handled because it failed to be parsed correctly.  For example, the message is not well-formed XML or it uses an invalid character set.\n\n\nIn this case, I can tell exactly what the cause of the issue is.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115785/22/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#304\n\nIMO, the malformed-message is best suited for this case.\n\nHowever, based on the RFC, I have fixed other error-tag in this commit chain.",
+      "parentUuid": "229a1a24_d9c99242",
       "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
