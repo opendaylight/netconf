@@ -22,7 +22,7 @@ public final class SubtreeMatcher implements Immutable {
     private final SubtreeFilter filter;
     private final ContainerNode data;
 
-    SubtreeMatcher(final SubtreeFilter filter, final ContainerNode data) {
+    public SubtreeMatcher(final SubtreeFilter filter, final ContainerNode data) {
         this.filter = requireNonNull(filter);
         this.data = requireNonNull(data);
     }
