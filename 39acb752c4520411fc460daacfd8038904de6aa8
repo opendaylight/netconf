@@ -16,6 +16,24 @@
       "message": "this is maybe for a different ticket, probably its just works because JsonReader autoformat values to string when reading strings",
       "revId": "39acb752c4520411fc460daacfd8038904de6aa8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7676845_96a07fe6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-07T21:45:19Z",
+      "side": 1,
+      "message": "I have an issue with array, object and null. Did not notice that other types are converted to string. This may be a corner case, so I move it to the end of the patch chain. However, it still produces a 500 error if JSON like this is provided:\n`\"edit-id\" : [],`\n\n```\nCaused by: java.lang.IllegalStateException: Expected a string but was BEGIN_ARRAY at line 6 column 22 path $.ietf-yang-patch:yang-patch.edit[0].edit-id\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#adapter-not-null-safe\n\tat com.google.gson.stream.JsonReader.unexpectedTokenError(JsonReader.java:1768) ~[?:?]\n\tat com.google.gson.stream.JsonReader.nextString(JsonReader.java:917) ~[?:?]\n```",
+      "parentUuid": "02f81fa6_b972b990",
+      "revId": "39acb752c4520411fc460daacfd8038904de6aa8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
