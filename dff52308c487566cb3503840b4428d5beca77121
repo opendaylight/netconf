@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c25c3339_54086f1a",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-07T10:05:35Z",
+      "side": 1,
+      "message": "If you do not need it - revert it back.\n\nI would prefer a separate change with explanation why do we need identifier.",
+      "parentUuid": "c79357c1_5bdd11dd",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "97523780_c2eae9e6",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/Prefixes.java",
         "patchSetId": 6
