@@ -15,12 +15,19 @@ import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_SENT
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -28,10 +35,14 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
@@ -55,6 +66,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -81,6 +93,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
+    private final DatabindProvider databindProvider;
     private final List<StreamSupport> supports;
     private final Registration reg;
 
@@ -182,9 +195,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
             @Reference final DOMNotificationService notificationService,
             @Reference final DOMSchemaService schemaService,
-            @Reference final RestconfStream.LocationProvider locationProvider) {
+            @Reference final RestconfStream.LocationProvider locationProvider,
+            @Reference final DatabindProvider databindProvider) {
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
+        this.databindProvider = databindProvider;
         final var changeService = dataBroker.extension(DOMDataBroker.DataTreeChangeExtension.class);
         if (changeService != null) {
             changeService.registerTreeChangeListener(DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
@@ -353,5 +368,28 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Modified subscription {} to operational datastore as of {}", id, info);
             return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) {
+        final SubtreeFilter databindFilter;
+        try {
+            final var databindContext = databindProvider.currentDatabind();
+            final var writer = new StringWriter();
+            final var xmlStreamWriter = XMLOutputFactory.newDefaultFactory().createXMLStreamWriter(writer);
+
+            final var xmlNormalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter,
+                databindContext.modelContext(), YangInstanceIdentifier.of(Filters.QNAME, StreamFilter.QNAME));
+            final var normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(xmlNormalizedNodeStreamWriter, null);
+            normalizedNodeWriter.write(filter);
+            normalizedNodeWriter.flush();
+
+            databindFilter = SubtreeFilter.readFrom(databindContext, XMLInputFactory.newDefaultFactory()
+                .createXMLStreamReader(new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8))));
+        } catch (IOException | XMLStreamException e) {
+            LOG.error("Failed to parse anydata to subtree filter", e);
+            throw new IllegalStateException("Failed to parse anydata to subtree filter", e);
+        }
+        return new SubtreeEventStreamFilter(databindFilter);
     }
 }

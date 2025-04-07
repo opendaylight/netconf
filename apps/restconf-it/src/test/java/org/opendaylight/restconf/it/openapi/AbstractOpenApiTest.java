@@ -191,7 +191,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         domNotificationRouter = new DOMNotificationRouter(32);
 
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
-            schemaService, uri -> uri.resolve("streams"));
+            schemaService, uri -> uri.resolve("streams"), dataBindProvider);
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
             domRpcRouter.actionService(), domMountPointService, List.of());
 

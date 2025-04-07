@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -88,6 +89,11 @@ class CreateDataChangeEventSubscriptionRpcTest {
         @Override
         protected ListenableFuture<Subscription> modifySubscriptionFilter(final Subscription subscription,
                 final SubscriptionFilter filter) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) {
             throw new UnsupportedOperationException();
         }
     }
