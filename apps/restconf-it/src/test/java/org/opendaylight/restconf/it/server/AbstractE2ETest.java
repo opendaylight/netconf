@@ -196,7 +196,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         domNotificationRouter = new DOMNotificationRouter(32);
 
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
-            schemaService, uri -> uri.resolve("streams"));
+            schemaService, uri -> uri.resolve("streams"), dataBindProvider);
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
