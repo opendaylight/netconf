@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c79357c1_5bdd11dd",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-07T10:03:57Z",
+      "side": 1,
+      "message": "Just follow the instructions Robert gave Olexandr. The SubtreeFilterWriter uses the same instance of Exact as the SubtreeFilterReader. This is just to avoid merge conflicts in the future.",
+      "parentUuid": "01c99317_a705c766",
+      "revId": "dff52308c487566cb3503840b4428d5beca77121",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "97523780_c2eae9e6",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/Prefixes.java",
         "patchSetId": 6
