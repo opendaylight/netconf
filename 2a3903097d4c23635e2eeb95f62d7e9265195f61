@@ -52,6 +52,24 @@
       "parentUuid": "5d946d83_74a26b7e",
       "revId": "2a3903097d4c23635e2eeb95f62d7e9265195f61",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aa8f75a_b038c135",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/ContentMatchNode.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-08T09:41:40Z",
+      "side": 0,
+      "message": "reverted that part and enhanced test",
+      "parentUuid": "f6002602_93304c53",
+      "revId": "2a3903097d4c23635e2eeb95f62d7e9265195f61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
