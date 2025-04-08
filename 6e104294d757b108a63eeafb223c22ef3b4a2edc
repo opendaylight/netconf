@@ -52,6 +52,24 @@
       "parentUuid": "8a751d65_f6898c86",
       "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ec218c6_2bc88b7b",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-08T11:43:39Z",
+      "side": 1,
+      "message": "Like first thought would be add it into Subscription but it is wrong IMO. IIRC from our refinement session there was mentioned that checking session is not a good choice because sessions comes and goes - it make more sense to remember user that created subscription and allow him to do whatever he needs with subscription no matter what session he is on. However this is whole different topic so lets leave it for now.\nSession is only used in checks for DeleteRPC, ModifyRPC and notification streaming.\nSince by current logic we restrict access by session we still need that map. So I can think of moving it but this doesn\u0027t bring anything new - it will be same map in different place - also not.\nAlso from refinement session I recall some plans about task in our backlog that has to do with binding WebHostResource to session - may if that is done then we can just remove this map entirely and check session in different way.",
+      "parentUuid": "a0c74ac9_f6c7b06a",
+      "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
