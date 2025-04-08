@@ -70,6 +70,24 @@
       "parentUuid": "a0c74ac9_f6c7b06a",
       "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e35469ab_9b256566",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-08T11:48:54Z",
+      "side": 1,
+      "message": "That was just thoughts. In summary storing session in Subscription not good practice but will do if we want to stick to only allowing RPCs and streaming on one and only session.\nAlternative leave this map for now and consider switching to check by user. Storing user inside Subscription already looks better but that will require some refactoring to implement.",
+      "parentUuid": "7ec218c6_2bc88b7b",
+      "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
