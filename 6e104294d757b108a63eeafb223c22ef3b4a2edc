@@ -16,6 +16,24 @@
       "message": "the overall idea here is to get rid of this collection/list/map. etc..",
       "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a751d65_f6898c86",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-08T09:46:04Z",
+      "side": 1,
+      "message": "Then where do I get session from?",
+      "parentUuid": "abff85cf_3b7d6d3b",
+      "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
