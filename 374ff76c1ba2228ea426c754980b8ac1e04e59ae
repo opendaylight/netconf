@@ -16,6 +16,24 @@
       "message": "needs manual adaptation",
       "revId": "374ff76c1ba2228ea426c754980b8ac1e04e59ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6185272_d872c040",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-08T08:46:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9bc928b_2c54c8a0",
+      "revId": "374ff76c1ba2228ea426c754980b8ac1e04e59ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
