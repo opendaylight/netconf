@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b5ea893_11ae70b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-08T06:22:28Z",
+      "side": 1,
+      "message": "contain empty brackets - can you add more details?",
+      "revId": "318a19b6882390b101aa2ea821954fa048c3ea5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "36bdf9da_a41a1d09",
