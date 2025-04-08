@@ -88,6 +88,24 @@
       "parentUuid": "7ec218c6_2bc88b7b",
       "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf35cbfa_3d5336d6",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-08T11:52:36Z",
+      "side": 1,
+      "message": "stick for now and for the future - we can maybe use Receiver (stores in Subscription) instead of session",
+      "parentUuid": "e35469ab_9b256566",
+      "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
