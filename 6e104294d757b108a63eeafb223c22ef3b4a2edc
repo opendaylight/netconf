@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abff85cf_3b7d6d3b",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/SubscriptionStateMachine.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-08T08:55:32Z",
+      "side": 1,
+      "message": "the overall idea here is to get rid of this collection/list/map. etc..",
+      "revId": "6e104294d757b108a63eeafb223c22ef3b4a2edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
