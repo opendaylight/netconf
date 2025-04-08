@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d946d83_74a26b7e",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/ContentMatchNode.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-08T08:34:04Z",
+      "side": 0,
+      "message": "value is only one\n\ncan you add testcase?",
+      "revId": "2a3903097d4c23635e2eeb95f62d7e9265195f61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
