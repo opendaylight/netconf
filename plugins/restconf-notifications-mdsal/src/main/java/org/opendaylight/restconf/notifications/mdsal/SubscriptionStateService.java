@@ -211,11 +211,10 @@ public class SubscriptionStateService {
     private ListenableFuture<?> sendStateNotification(final Instant eventTime, final Uint32 id, final State state)
             throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {}", state, id);
-        var node = ImmutableNodes.newContainerBuilder()
+        return sendNotification(eventTime, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(state.nodeId)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
-            .build();
-        return sendNotification(eventTime, node);
+            .build());
     }
 
     /**
@@ -224,12 +223,11 @@ public class SubscriptionStateService {
     private ListenableFuture<?> sendErrorStateNotification(final Instant eventTime, final Uint32 id,
             final QName errorReason, final State state) throws InterruptedException {
         LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorReason);
-        var node = ImmutableNodes.newContainerBuilder()
+        return sendNotification(eventTime, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(state.nodeId)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
             .withChild(ImmutableNodes.leafNode(REASON_NODEID, errorReason))
-            .build();
-        return sendNotification(eventTime, node);
+            .build());
     }
 
     /**
@@ -237,7 +235,6 @@ public class SubscriptionStateService {
      */
     private ListenableFuture<?> sendNotification(final Instant eventTime, final ContainerNode node)
             throws InterruptedException {
-        final var notification = new DOMNotificationEvent.Rfc6020(node, eventTime);
-        return publishService.putNotification(notification);
+        return publishService.putNotification(new DOMNotificationEvent.Rfc6020(node, eventTime));
     }
 }
