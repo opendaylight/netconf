@@ -29,6 +29,8 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -214,6 +216,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @Override
     public final void establishSubscription(final ServerRequest<Subscription> request, final String streamName,
             final QName encoding, final @Nullable SubscriptionFilter filter) {
+        final var session = request.session();
+        if (session == null) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+                "This end point does not support dynamic subscriptions."));
+            return;
+        }
+
         final var stream = lookupStream(streamName);
         if (stream == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
@@ -240,6 +249,20 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
             @Override
             public void onSuccess(final Subscription result) {
+                final var id = subscription.id();
+                session.registerResource(new AbstractRegistration() {
+                    @Override
+                    protected void removeRegistration() {
+                        if (subscriptions.remove(subscription.id(), subscription)) {
+                            // FIXME: proper request
+                            subscription.terminate(null, NoSuchSubscription.QNAME);
+                        } else {
+                            LOG.debug("Subscription {} is no longer present", subscription);
+                        }
+                    }
+                });
+                // Move subscription to active state
+                subscription.setState(SubscriptionState.ACTIVE);
                 subscriptions.put(id, result);
                 request.completeWith(result);
             }
