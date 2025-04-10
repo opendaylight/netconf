@@ -94,6 +94,30 @@
       },
       "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcced2a1_a5358ab3",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-10T08:52:51Z",
+      "side": 1,
+      "message": "So for Exact namespace there is always one value - no problem. For wildcard there can be multiple value entries in the map. Each entry can have different type but not the value itself - it should be same.\nFor example SubtreeFilterReader parsed node \u003cid\u003e123\u003c/id\u003e and if there are two nodes on context with local name `id` - one with int value and other one with string - then map will have them stored as 123 and \"123\" - in this case we don\u0027t care what of those nodes write to string right?",
+      "parentUuid": "dd0f5427_f504f399",
+      "range": {
+        "startLine": 64,
+        "startChar": 46,
+        "endLine": 64,
+        "endChar": 61
+      },
+      "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
