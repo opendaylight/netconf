@@ -142,6 +142,30 @@
       },
       "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "071f055b_ad3fd9ab",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-10T10:56:22Z",
+      "side": 1,
+      "message": "What\u0027s the purpose of having a map instead of single Object/String value?",
+      "parentUuid": "9166c4ee_dfe35695",
+      "range": {
+        "startLine": 64,
+        "startChar": 46,
+        "endLine": 64,
+        "endChar": 61
+      },
+      "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
