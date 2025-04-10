@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bc86511c_74f5e9f3",
+        "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/StateTransitionTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-10T22:27:41Z",
+      "side": 1,
+      "message": "all entries are equal: this should be on a new line just as all other are",
+      "range": {
+        "startLine": 37,
+        "startChar": 23,
+        "endLine": 37,
+        "endChar": 35
+      },
+      "revId": "d679fad5ee507ee77c7b916293a8967b6d8ddb8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4c00a46_2bca9fe5",
         "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/StateTransitionTest.java",
         "patchSetId": 10
