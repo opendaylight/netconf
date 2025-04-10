@@ -46,6 +46,30 @@
       },
       "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e88ae0dd_192f9eab",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-10T08:00:00Z",
+      "side": 1,
+      "message": "Of course. It is possible only after that happened. Just noting that this part should be changed after that SubtreeFilterReader merged and before this patch is merged into master.",
+      "parentUuid": "5f3df9b0_25eaac02",
+      "range": {
+        "startLine": 64,
+        "startChar": 46,
+        "endLine": 64,
+        "endChar": 61
+      },
+      "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
