@@ -16,6 +16,24 @@
       "message": "this should be a separate patch - otherwise this patch blocks the other working on the project",
       "revId": "1ac5a9f5e603a06c55200bc199bb8626b67be51c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "360e9ef0_afee5df3",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/ContentMatchNode.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-10T08:05:26Z",
+      "side": 1,
+      "message": "Ok, will move to patch before this one in the few minutes",
+      "parentUuid": "45234ede_d18033a7",
+      "revId": "1ac5a9f5e603a06c55200bc199bb8626b67be51c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
