@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f766f8b5_03371cc0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubscriptionUtil.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-10T22:16:30Z",
+      "side": 1,
+      "message": "please stop introducing *Util classes.\n\nin this particular case the method should just live in SubscriptionState: Java enums *are not* C enums, they are fully-functional classes.",
+      "range": {
+        "startLine": 10,
+        "startChar": 7,
+        "endLine": 10,
+        "endChar": 35
+      },
+      "revId": "d679fad5ee507ee77c7b916293a8967b6d8ddb8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
