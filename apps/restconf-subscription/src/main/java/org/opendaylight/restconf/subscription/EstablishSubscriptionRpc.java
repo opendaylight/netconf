@@ -18,7 +18,6 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodingUnsupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
@@ -72,13 +71,6 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
     @Override
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
-        final var session = request.session();
-        if (session == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-                "This end point does not support dynamic subscriptions."));
-            return;
-        }
-
         final var body = input.input();
         var encoding = leaf(body, SUBSCRIPTION_ENCODING, QName.class);
         if (encoding == null) {
@@ -110,16 +102,9 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         final var filter = streamFilter == null ? null : SubscriptionUtil.extractFilter(streamFilter);
 
-        streamRegistry.establishSubscription(request.transform(subscription -> {
-            final var id = subscription.id();
-            final var holder = new SubscriptionHolder(id, streamRegistry);
-            session.registerResource(holder);
-            // Move subscription to active state
-            streamRegistry.updateSubscriptionState(subscription, SubscriptionState.ACTIVE);
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
-                .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))
-                .build();
-        }), streamName, encoding, filter);
+        streamRegistry.establishSubscription(request.transform(subscription -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
+            .withChild(ImmutableNodes.leafNode(OUTPUT_ID, subscription.id()))
+            .build()), streamName, encoding, filter);
     }
 }
