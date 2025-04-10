@@ -114,6 +114,52 @@
       },
       "revId": "d679fad5ee507ee77c7b916293a8967b6d8ddb8a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "882e1682_faf03033",
+        "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/StateTransitionTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-10T22:31:41Z",
+      "side": 1,
+      "message": "should\u0027ve been just moveState() and ...",
+      "range": {
+        "startLine": 47,
+        "startChar": 71,
+        "endLine": 47,
+        "endChar": 83
+      },
+      "revId": "d679fad5ee507ee77c7b916293a8967b6d8ddb8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "191b65d6_8600bc0d",
+        "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/StateTransitionTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-10T22:31:41Z",
+      "side": 1,
+      "message": "... this should\u0027ve been inlined to the single caller",
+      "range": {
+        "startLine": 59,
+        "startChar": 17,
+        "endLine": 59,
+        "endChar": 29
+      },
+      "revId": "d679fad5ee507ee77c7b916293a8967b6d8ddb8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
