@@ -166,6 +166,30 @@
       },
       "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e6d7624_2610212e",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-10T11:37:52Z",
+      "side": 1,
+      "message": "As I understood it:\n1. Reader should do the heavy lifting when constructing SubtreeFilter including parsing String from XML into one of the values that are supported.\n2. Matcher will do only matching with of data(i.e. notification) to SubtreeFilter and here lies the purpose of this map. Matcher will have its own logic that match data to structure of SubtreeFilter. Means we select only nodes/lits/leafs that have same name, namespace, revision and data inside including value and its type. Value should already be parsed so Matcher does ONLY matching.\nWildcard it this context means essentially OR statement. So when data is parsed it is matched to one of QNames in the Wildcard NamespaceSelection. And in case of ContentMatch Matcher checks if this data have one of the QNames that are in the filter and after it is matching it should match value. If value was written as string can\u0027t just match it to int, boolean and other supported types it should be parsed. Again matcher only match, it does no parsing. So since Matcher already matched leaf itself to one of the QNames in the filter same QName then used to get value from qnameValueMap. Already parsed to the type and ready for matching.\n3. Writer only writes SubtreeFilter to XML - it doesn\u0027t care how may different nodes and types there is in context because their string value should end up the same.",
+      "parentUuid": "071f055b_ad3fd9ab",
+      "range": {
+        "startLine": 64,
+        "startChar": 46,
+        "endLine": 64,
+        "endChar": 61
+      },
+      "revId": "e7006b48d99f913137e9831cb0eb66a4e29d63c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
