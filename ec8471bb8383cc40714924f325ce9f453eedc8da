@@ -16,6 +16,24 @@
       "message": "If edit is not present, the method read returns an empty list which is based on RFC correct.\nhttps://www.rfc-editor.org/rfc/rfc8072#section-2.2",
       "revId": "ec8471bb8383cc40714924f325ce9f453eedc8da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf1cd807_bcdf0c34",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-11T10:21:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57b64b3c_3aaae114",
+      "revId": "ec8471bb8383cc40714924f325ce9f453eedc8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
