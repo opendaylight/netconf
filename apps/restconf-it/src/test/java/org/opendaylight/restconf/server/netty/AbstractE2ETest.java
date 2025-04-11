@@ -183,8 +183,6 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
         final var domRpcRouter = new DOMRpcRouter(schemaService);
-        final var domRpcService = new RouterDOMRpcService(domRpcRouter);
-        final var domActionService = new RouterDOMActionService(domRpcRouter);
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         final var adapterFactory = new BindingAdapterFactory(adapterContext);
@@ -193,14 +191,15 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         actionProviderService.registerImplementation(
             ActionSpec.builder(Root.class).build(ExampleAction.class), new ExampleActionImpl());
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, null, schemaService,
+            uri -> uri.resolve("streams"));
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
             new SubscribeDeviceNotificationRpc(streamRegistry, domMountPointService)
         );
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
-            domMountPointService, rpcImplementations);
+        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
+            domRpcRouter.actionService(), domMountPointService, rpcImplementations);
 
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
