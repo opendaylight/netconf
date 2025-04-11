@@ -51,8 +51,6 @@ import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
-import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.SslContextFactory;
@@ -132,6 +130,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     @TempDir
     private File tmpDir;
+    private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
 
     @BeforeAll
@@ -182,15 +181,13 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var schemaContext = getRuntimeContext().modelContext();
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
-        final var domRpcRouter = new DOMRpcRouter(schemaService);
-        final var domRpcService = new RouterDOMRpcService(domRpcRouter);
-        final var domActionService = new RouterDOMActionService(domRpcRouter);
+        domRpcRouter = new DOMRpcRouter(schemaService);
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
         final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
-            domMountPointService, List.of());
+        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
+            domRpcRouter.actionService(), domMountPointService, List.of());
 
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
@@ -216,6 +213,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     @AfterEach
     void afterEach() throws Exception {
         endpoint.close();
+        domRpcRouter.close();
     }
 
     @AfterAll

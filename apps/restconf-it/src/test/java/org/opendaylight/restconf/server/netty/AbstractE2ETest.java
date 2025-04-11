@@ -61,8 +61,6 @@ import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
-import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.odl.device.notification.SubscribeDeviceNotificationRpc;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
@@ -123,6 +121,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected HttpClientStackGrouping clientStackGrouping;
     protected HttpClientStackGrouping invalidClientStackGrouping;
     protected DOMMountPointService domMountPointService;
+    private DOMRpcRouter domRpcRouter;
     protected RpcProviderService rpcProviderService;
     protected ActionProviderService actionProviderService;
 
@@ -182,9 +181,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var schemaContext = getRuntimeContext().modelContext();
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
-        final var domRpcRouter = new DOMRpcRouter(schemaService);
-        final var domRpcService = new RouterDOMRpcService(domRpcRouter);
-        final var domActionService = new RouterDOMActionService(domRpcRouter);
+        domRpcRouter = new DOMRpcRouter(schemaService);
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         final var adapterFactory = new BindingAdapterFactory(adapterContext);
@@ -199,8 +196,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
             new SubscribeDeviceNotificationRpc(streamRegistry, domMountPointService)
         );
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
-            domMountPointService, rpcImplementations);
+        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
+            domRpcRouter.actionService(), domMountPointService, rpcImplementations);
 
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
@@ -212,6 +209,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @AfterEach
     void afterEach() throws Exception {
         endpoint.close();
+        domRpcRouter.close();
     }
 
     @AfterAll
