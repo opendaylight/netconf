@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.openapi;
+package org.opendaylight.restconf.it.openapi;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,6 +68,9 @@ import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
+import org.opendaylight.restconf.it.server.TestRequestCallback;
+import org.opendaylight.restconf.it.server.TestTransportChannelListener;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.impl.OpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
@@ -79,9 +82,6 @@ import org.opendaylight.restconf.server.SimpleNettyEndpoint;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
-import org.opendaylight.restconf.server.netty.NullAAAEncryptionService;
-import org.opendaylight.restconf.server.netty.TestRequestCallback;
-import org.opendaylight.restconf.server.netty.TestTransportChannelListener;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
