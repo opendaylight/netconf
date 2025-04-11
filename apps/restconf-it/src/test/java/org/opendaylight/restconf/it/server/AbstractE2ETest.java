@@ -60,6 +60,7 @@ import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.odl.device.notification.SubscribeDeviceNotificationRpc;
@@ -130,6 +131,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     private SimpleNettyEndpoint endpoint;
     private String host;
+    private DOMNotificationRouter domNotificationRouter;
+    private MdsalRestconfStreamRegistry streamRegistry;
 
     @BeforeAll
     static void beforeAll() {
@@ -190,7 +193,10 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         actionProviderService.registerImplementation(
             ActionSpec.builder(Root.class).build(ExampleAction.class), new ExampleActionImpl());
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        domNotificationRouter = new DOMNotificationRouter(32);
+
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
+            schemaService, uri -> uri.resolve("streams"));
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
@@ -209,6 +215,8 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @AfterEach
     void afterEach() throws Exception {
         endpoint.close();
+        streamRegistry.close();
+        domNotificationRouter.close();
         domRpcRouter.close();
     }
 

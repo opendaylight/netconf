@@ -17,10 +17,13 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.util.List;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -32,6 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
@@ -41,8 +45,10 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,18 +58,48 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = RestconfStream.Registry.class)
-public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry {
+public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
     private final DOMDataBroker dataBroker;
+    private final DOMNotificationService notificationService;
     private final List<StreamSupport> supports;
+    private final Registration reg;
+
+    private DefaultNotificationSource notificationSource;
 
     @Inject
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
+            @Reference final DOMNotificationService notificationService,
+            @Reference final DOMSchemaService schemaService,
             @Reference final RestconfStream.LocationProvider locationProvider) {
         this.dataBroker = requireNonNull(dataBroker);
+        this.notificationService = requireNonNull(notificationService);
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
+
+        // FIXME: the source should be handling its own updates and we should only call start() once
+        notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
+        start(notificationSource);
+        reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
+    }
+
+    @PreDestroy
+    @Deactivate
+    @Override
+    public synchronized void close() {
+        reg.close();
+        if (notificationSource != null) {
+            notificationSource.close();
+        }
+    }
+
+    private synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+        if (notificationSource != null) {
+            notificationSource.close();
+        }
+        notificationSource = new DefaultNotificationSource(notificationService, context);
+        start(notificationSource);
     }
 
     @Override

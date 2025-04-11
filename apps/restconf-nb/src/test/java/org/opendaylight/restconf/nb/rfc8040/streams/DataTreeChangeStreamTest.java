@@ -27,12 +27,15 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.sal.remote.impl.DataTreeChangeSource;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
@@ -210,6 +213,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private final CompletingServerRequest<RestconfStream<List<DataTreeCandidate>>> request =
         new CompletingServerRequest<>();
 
+    @Mock
+    private DOMNotificationService notificationService;
+
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;
@@ -220,7 +226,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> AbstractInstanceIdentifierTest.IID_DATABIND;
-        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, x -> x);
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, notificationService,
+            new FixedDOMSchemaService(AbstractInstanceIdentifierTest.IID_SCHEMA), x -> x);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,

@@ -31,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.DatabindProvider;
@@ -100,6 +101,8 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
     @Mock
     private DOMDataBroker dataBroker;
+    @Mock
+    private DOMNotificationService notificationService;
     @Mock
     private DataTreeChangeExtension treeChange;
     @Mock
