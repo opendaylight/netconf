@@ -66,7 +66,6 @@ import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.SimpleNettyEndpoint;
-import org.opendaylight.restconf.server.mdsal.ContextListener;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
@@ -126,12 +125,12 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private HttpClientStackGrouping clientStackGrouping;
     private String host;
     private SimpleNettyEndpoint endpoint;
-    private ContextListener contextListener;
     private EventStreamService clientStreamService;
     private HTTPClient subscriptionStreamClient;
     private EventStreamService.StreamControl streamControl;
     private DOMNotificationRouter domNotificationRouter;
     private DOMRpcRouter domRpcRouter;
+    private MdsalRestconfStreamRegistry streamRegistry;
     private Registration reg;
 
     @Override
@@ -195,7 +194,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         domNotificationRouter = new DOMNotificationRouter(32);
         final var subscriptionStateService =
             new SubscriptionStateService(domNotificationRouter.notificationPublishService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
+            schemaService, uri -> uri.resolve("streams"));
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested
@@ -213,10 +213,6 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
-        // setup context listener to enable default NETCONF stream
-        contextListener = new ContextListener(domNotificationRouter.notificationService(), schemaService,
-            streamRegistry);
-
         // Register subscription web resource
         reg = endpoint.registerWebResource(new SubscriptionResourceProvider(streamRegistry));
     }
@@ -233,8 +229,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
             streamControl = null;
         }
         reg.close();
-        contextListener.close();
         endpoint.close();
+        streamRegistry.close();
         domRpcRouter.close();
         domNotificationRouter.close();
     }

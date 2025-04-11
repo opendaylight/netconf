@@ -35,6 +35,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.DatabindProvider;
@@ -74,9 +76,13 @@ class CreateDataChangeEventSubscriptionRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
+    private DOMNotificationService notificationService;
+    @Mock
     private DataTreeChangeExtension treeChange;
     @Mock
     private DOMDataTreeWriteTransaction tx;
+    @Mock
+    private DOMSchemaService schemaService;
     @Captor
     private ArgumentCaptor<YangInstanceIdentifier> pathCaptor;
     @Captor
@@ -91,9 +97,10 @@ class CreateDataChangeEventSubscriptionRpcTest {
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CTX);
 
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
+        doReturn(SCHEMA_CTX).when(schemaService).getGlobalContext();
         doCallRealMethod().when(dataBroker).extension(any());
-        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker,
-            restconfURI -> restconfURI.resolve(TEST_STREAMS)), databindProvider, dataBroker);
+        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker, notificationService,
+            schemaService, restconfURI -> restconfURI.resolve(TEST_STREAMS)), databindProvider, dataBroker);
     }
 
     @Test

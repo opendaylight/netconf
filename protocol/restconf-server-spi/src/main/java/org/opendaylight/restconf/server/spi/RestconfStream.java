@@ -196,17 +196,6 @@ public final class RestconfStream<T> {
             String description);
 
         /**
-         * Create default {@link RestconfStream} with a predefined name.
-         *
-         * <p>This method will create the corresponding instance and register it.
-         *
-         * @param <T> Stream type
-         * @param source Stream instance
-         * @throws NullPointerException if any argument is {@code null}
-         */
-        <T> void start(Source<T> source);
-
-        /**
          * Establish a new RFC8639 subscription to a stream.
          *
          * @param request {@link ServerRequest} for this invocation
