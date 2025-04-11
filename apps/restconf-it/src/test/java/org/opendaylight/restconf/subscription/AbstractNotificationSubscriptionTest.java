@@ -48,7 +48,6 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMPublishNotificationService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
@@ -67,7 +66,6 @@ import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.SimpleNettyEndpoint;
-import org.opendaylight.restconf.server.mdsal.ContextListener;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
@@ -125,11 +123,11 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private HttpClientStackGrouping clientStackGrouping;
     private String host;
     private SimpleNettyEndpoint endpoint;
-    private ContextListener contextListener;
     private EventStreamService clientStreamService;
     private HTTPClient subscriptionStreamClient;
     private EventStreamService.StreamControl streamControl;
     private DOMNotificationPublishService publishService;
+    private MdsalRestconfStreamRegistry streamRegistry;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
@@ -193,7 +191,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         final var router = new DOMNotificationRouter(32);
         publishService = new RouterDOMPublishNotificationService(router);
         final var subscriptionStateService = new SubscriptionStateService(publishService);
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, router.notificationService(), schemaService,
+            uri -> uri.resolve("streams"));
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested
@@ -211,10 +210,6 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
-        // setup context listener to enable default NETCONF stream
-        final var notificationService = new RouterDOMNotificationService(router);
-        contextListener = new ContextListener(notificationService, schemaService, streamRegistry);
-
         // Register subscription web resource
         final var provider = new SubscriptionResourceProvider(streamRegistry);
         endpoint.registerWebResource(provider);
@@ -222,6 +217,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
     @AfterEach
     void afterEach() throws Exception {
+        endpoint.close();
+
         if (clientStreamService != null) {
             clientStreamService = null;
         }
@@ -231,8 +228,9 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         if (streamControl != null) {
             streamControl = null;
         }
-        contextListener.close();
-        endpoint.close();
+        if (streamRegistry != null) {
+            streamRegistry.close();
+        }
     }
 
     @AfterAll

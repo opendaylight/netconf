@@ -128,13 +128,22 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @Override
+    @Deprecated(since = "9.0.0", forRemoval = true)
     public <T> void createLegacyStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
             final Source<T> source, final String description) {
         createStream(request, restconfURI, source, description);
     }
 
-    @Override
-    public <T> void start(final Source<T> source) {
+    /**
+     * Create default {@link RestconfStream} with a predefined name.
+     *
+     * <p>This method will create the corresponding instance and register it.
+     *
+     * @param <T> Stream type
+     * @param source Stream instance
+     * @throws NullPointerException if any argument is {@code null}
+     */
+    protected final <T> void start(final Source<T> source) {
         final var stream = new RestconfStream<>(this, source, DEFAULT_STREAM_NAME);
         streams.put(DEFAULT_STREAM_NAME, stream);
         Futures.addCallback(putStream(stream, DEFAULT_STREAM_DESCRIPTION, null), new FutureCallback<>() {

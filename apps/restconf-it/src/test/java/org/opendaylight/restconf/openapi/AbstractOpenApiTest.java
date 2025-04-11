@@ -133,6 +133,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     @TempDir
     private File tmpDir;
     private SimpleNettyEndpoint endpoint;
+    private MdsalRestconfStreamRegistry streamRegistry;
 
     @BeforeAll
     static void beforeAll() {
@@ -183,14 +184,13 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
         final var domRpcRouter = new DOMRpcRouter(schemaService);
-        final var domRpcService = new RouterDOMRpcService(domRpcRouter);
-        final var domActionService = new RouterDOMActionService(domRpcRouter);
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcService, domActionService,
-            domMountPointService, List.of());
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, null, schemaService,
+            uri -> uri.resolve("streams"));
+        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
+            domRpcRouter.actionService(), domMountPointService, List.of());
 
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
@@ -216,6 +216,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     @AfterEach
     void afterEach() throws Exception {
         endpoint.close();
+        streamRegistry.close();
     }
 
     @AfterAll
