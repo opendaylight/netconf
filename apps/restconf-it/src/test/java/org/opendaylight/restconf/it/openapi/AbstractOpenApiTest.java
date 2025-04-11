@@ -50,6 +50,7 @@ import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
@@ -132,6 +133,8 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private File tmpDir;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
+    private DOMNotificationRouter domNotificationRouter;
+    private MdsalRestconfStreamRegistry streamRegistry;
 
     @BeforeAll
     static void beforeAll() {
@@ -185,7 +188,10 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
-        final var streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, uri -> uri.resolve("streams"));
+        domNotificationRouter = new DOMNotificationRouter(32);
+
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
+            schemaService, uri -> uri.resolve("streams"));
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
             domRpcRouter.actionService(), domMountPointService, List.of());
 
@@ -213,6 +219,8 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     @AfterEach
     void afterEach() throws Exception {
         endpoint.close();
+        streamRegistry.close();
+        domNotificationRouter.close();
         domRpcRouter.close();
     }
 
