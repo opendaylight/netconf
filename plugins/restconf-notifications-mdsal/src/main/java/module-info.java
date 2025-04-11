@@ -10,10 +10,8 @@ module org.opendaylight.restconf.notifications.mdsal {
 
     requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.yangtools.yang.common;
-    requires transitive org.opendaylight.restconf.server.spi;
     requires org.opendaylight.netconf.common.mdsal;
-    requires org.opendaylight.restconf.mdsal.spi;
-    requires org.opendaylight.yang.gen.ietf.inet.types.rfc6991;
+    requires org.opendaylight.yang.gen.ietf.yang.types.rfc6991;
     requires org.opendaylight.yang.gen.ietf.restconf.subscribed.notifications.rfc8650;
     requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.opendaylight.yangtools.yang.data.spi;
