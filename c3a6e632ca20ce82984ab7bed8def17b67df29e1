@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f52ee135_fa9eb432",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T06:35:33Z",
+      "side": 1,
+      "message": "1. Do not introduce your own names - use that specified by YANG model using Java camelCase\n2. Receiver does not have subscription ID - subscription contains receiver\n3. It seems that all receiver logic could be a part of Subscription(Impl), Mdsal, etc., feel free to eliminate receiver classes to subscription ones\n4. Update counters on subscription as it was before but without ReceiverHolder but Receiver instead\n5. Do not rename - create new dedicated class a delete old one",
+      "revId": "c3a6e632ca20ce82984ab7bed8def17b67df29e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
