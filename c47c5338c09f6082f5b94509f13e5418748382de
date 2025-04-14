@@ -16,6 +16,24 @@
       "message": "Solution can be similar or different as well from this, use your own judgement.",
       "revId": "c47c5338c09f6082f5b94509f13e5418748382de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e7ddf08_126d3938",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-14T08:47:53Z",
+      "side": 1,
+      "message": "It can be. I just didn\u0027t give up on this approach yet.",
+      "parentUuid": "a2f6d3df_62c053cc",
+      "revId": "c47c5338c09f6082f5b94509f13e5418748382de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
