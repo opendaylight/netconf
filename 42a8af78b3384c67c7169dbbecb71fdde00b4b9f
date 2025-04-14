@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d276f9d0_9ff36397",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T08:16:17Z",
+      "side": 1,
+      "message": "this is used on one class? move it there?",
+      "revId": "42a8af78b3384c67c7169dbbecb71fdde00b4b9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
