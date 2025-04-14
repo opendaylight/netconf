@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9624587_b84ea2f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T08:27:03Z",
+      "side": 1,
+      "message": "We have subscriber:\nEmpty\nSingle\nMultiple\n\nWe interact with interface which should be able to deal with one or multiple subscribers, use provided methods to add and to remove.",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a25869d0_667d2108",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/KillSubscriptionRpc.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T08:27:03Z",
+      "side": 1,
+      "message": "Interrupted while ...",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a6ac085_008742f6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T08:27:03Z",
+      "side": 1,
+      "message": "we are on subscription, we do not want to cancel other subscription for the same stream",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6a4dc57_08e7e79d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T08:27:03Z",
+      "side": 1,
+      "message": "nullable? why do we need this here, subscription has its subscribers, not subscriber has its subscription",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810a662b_e74d593e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T08:27:03Z",
+      "side": 1,
+      "message": "formatter?",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
