@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "107c2bbb_49f40e81",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-14T09:04:52Z",
+      "side": 1,
+      "message": "You are trying to list registered senders for particular subscription and close them on subscription end.",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c9624587_b84ea2f5",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 15
