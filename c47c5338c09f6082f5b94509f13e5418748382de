@@ -34,6 +34,24 @@
       "parentUuid": "a2f6d3df_62c053cc",
       "revId": "c47c5338c09f6082f5b94509f13e5418748382de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18e04a3a_2a3dd69e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-14T18:51:25Z",
+      "side": 1,
+      "message": "Moved parsing to a different place so filter would be parsed only one time when establishing and modifying subscription. I didn\u0027t go through every example but reader seems working. From what I understood `test` method is Matcher\u0027s territory so I will need some rebasing if we need to test that.\n\nIMO Let\u0027s leave purpose of this patch only as interface implementation plus parsing of the filter. Next patch can deal with DOMInstanceNotificationListener as I understood it.",
+      "parentUuid": "9e7ddf08_126d3938",
+      "revId": "c47c5338c09f6082f5b94509f13e5418748382de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
