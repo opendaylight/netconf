@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a4d3d48_d4fcc34a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T08:11:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "107c2bbb_49f40e81",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ea9a53d_6028b7ef",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-14T09:07:13Z",
       "side": 1,
       "message": "Senders are registered when we start to listen on notification stream at *Resource (RFC 8040 and Subscribed).\n\nHow we can access them to close?",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6119635f_d8ffd0e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T08:11:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ea9a53d_6028b7ef",
       "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
