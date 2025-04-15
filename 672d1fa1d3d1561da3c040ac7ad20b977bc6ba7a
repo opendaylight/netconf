@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce9a3ad4_4ac9d0ff",
+        "filename": "protocol/databind/src/main/java/module-info.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T15:45:26Z",
+      "side": 1,
+      "message": "Annotation-only?",
+      "revId": "672d1fa1d3d1561da3c040ac7ad20b977bc6ba7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9586cd9_a406cc73",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T15:45:26Z",
+      "side": 1,
+      "message": "extract this in to a method to remove duplicity?",
+      "revId": "672d1fa1d3d1561da3c040ac7ad20b977bc6ba7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0de12247_69182af6",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterPrettyTreeTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T15:45:26Z",
+      "side": 1,
+      "message": "why extends utils?\nimo it\u0027s better to just use the constants without extending",
+      "revId": "672d1fa1d3d1561da3c040ac7ad20b977bc6ba7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c1df808_9aa8b511",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterWriterTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T15:45:26Z",
+      "side": 1,
+      "message": "don\u0027t extent utils",
+      "revId": "672d1fa1d3d1561da3c040ac7ad20b977bc6ba7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
