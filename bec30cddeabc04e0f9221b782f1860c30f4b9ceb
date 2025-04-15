@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d84272c_9178b2ff",
+        "filename": "protocol/databind/pom.xml",
+        "patchSetId": 49
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-15T13:41:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a0da56d_2454271e",
+      "revId": "bec30cddeabc04e0f9221b782f1860c30f4b9ceb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3c5e126_b566b667",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-15T13:17:03Z",
       "side": 1,
       "message": "Annotation-only?\nif can be static?",
+      "revId": "bec30cddeabc04e0f9221b782f1860c30f4b9ceb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b9288f9_81d491f5",
+        "filename": "protocol/databind/src/main/java/module-info.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-15T13:41:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3c5e126_b566b667",
       "revId": "bec30cddeabc04e0f9221b782f1860c30f4b9ceb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
