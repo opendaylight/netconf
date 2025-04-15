@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3397cafd_d8df4970",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T07:52:05Z",
+      "side": 1,
+      "message": "I only added logic so we know to which subscription is subscriber tied to by ID, and option to remove all subscribers of subscription with given ID",
+      "parentUuid": "c9624587_b84ea2f5",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a25869d0_667d2108",
         "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/KillSubscriptionRpc.java",
         "patchSetId": 15
@@ -86,6 +104,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "94fdfdff_99b6c798",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T07:52:05Z",
+      "side": 1,
+      "message": "yes we only remove subscribers tied to this subscription with ID.",
+      "parentUuid": "7a6ac085_008742f6",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6a4dc57_08e7e79d",
@@ -105,6 +141,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1395e0bf_b0fe25a9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T07:52:05Z",
+      "side": 1,
+      "message": "It decide to which subscription this subscriber belongs.\n\nI decided to use Subscribers to track relation between Subscriber and Subscription\nas it already exist. Other way around it seemed more complicated.",
+      "parentUuid": "c6a4dc57_08e7e79d",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "810a662b_e74d593e",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
         "patchSetId": 15
@@ -116,6 +170,24 @@
       "writtenOn": "2025-04-14T08:27:03Z",
       "side": 1,
       "message": "formatter?",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43b7516a_e3c6f032",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T07:52:05Z",
+      "side": 1,
+      "message": "I was trying to preserve this logic of reusing formatted messages, and we need this to decide if formatter has changed",
+      "parentUuid": "810a662b_e74d593e",
       "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
