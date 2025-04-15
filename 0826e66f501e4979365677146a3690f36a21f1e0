@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25d9bfaa_c7ae0ea5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-15T06:32:31Z",
+      "side": 1,
+      "message": "If we use only SubtreeMathcher, why do we need a path parameter?",
+      "revId": "0826e66f501e4979365677146a3690f36a21f1e0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
