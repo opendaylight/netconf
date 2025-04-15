@@ -9,11 +9,8 @@ package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
@@ -24,14 +21,11 @@ final class SubscriptionHolder extends AbstractRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionHolder.class);
 
     private final Uint32 id;
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
 
-    SubscriptionHolder(final Uint32 id, final SubscriptionStateService subscriptionStateService,
-            final RestconfStream.Registry streamRegistry) {
+    SubscriptionHolder(final Uint32 id, final RestconfStream.Registry streamRegistry) {
         this.id = requireNonNull(id);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
-        this.streamRegistry =  requireNonNull(streamRegistry);
+        this.streamRegistry = requireNonNull(streamRegistry);
     }
 
     @Override
@@ -41,16 +35,13 @@ final class SubscriptionHolder extends AbstractRegistration {
             // subscription is no longer registered, it was terminated from elsewhere
             return;
         }
-
-        try {
-            // FIXME: proper arguments
+        if (subscription.state() != RestconfStream.SubscriptionState.END) {
+            subscription.setState(RestconfStream.SubscriptionState.END);
+            subscription.channelClosed();
+        } else {
+            LOG.debug("Subscription id:{} already in END state during attempt to end it", id);
             subscription.terminate(null, null);
-        } finally {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
+
         }
     }
 }
