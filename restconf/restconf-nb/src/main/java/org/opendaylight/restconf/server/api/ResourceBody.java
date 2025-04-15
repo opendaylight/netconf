@@ -18,6 +18,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
@@ -67,6 +68,9 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
             // TODO: This is a weird special case: a PUT target cannot specify the entire map, but the body parser
             //       always produces a single-entry map for entries. We need to undo that damage here.
             data = map.body().iterator().next();
+        } else if (parsedData instanceof SystemLeafSetNode<?> leafSetNode) {
+            // Applying the same parser workaround logic as for MapNode above.
+            data = leafSetNode.body().iterator().next();
         } else {
             data = parsedData;
         }
