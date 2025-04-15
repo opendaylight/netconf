@@ -23,6 +23,7 @@ import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +40,21 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
     }
 
     @Override
+    public void channelClosed() {
+        final var id = id();
+        LOG.debug("{} terminated after channel was closed", id);
+        removeSubscription(id, null, null);
+    }
+
+    @Override
     protected void terminateImpl(final ServerRequest<Empty> request, final QName terminationReason) {
         final var id = id();
         LOG.debug("{} terminated with reason {}", id, terminationReason);
+        removeSubscription(id, request, terminationReason);
+    }
 
+    private void removeSubscription(final Uint32 id, final ServerRequest<Empty> request,
+            final QName terminationReason) {
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(
             NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id)));
@@ -50,13 +62,19 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
             @Override
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Removed subscription {} from operational datastore as of {}", id, result);
-                delegate.terminate(request.transform(ignored -> Empty.value()), terminationReason);
+                if (request != null) {
+                    delegate.terminate(request.transform(ignored -> Empty.value()), terminationReason);
+                } else {
+                    delegate.channelClosed();
+                }
             }
 
             @Override
             public void onFailure(final TransactionCommitFailedException cause) {
                 LOG.warn("Failed to remove subscription {} from operational datastore", id, cause);
-                request.completeWith(new RequestException(cause));
+                if (request != null) {
+                    request.completeWith(new RequestException(cause));
+                }
             }
         }, MoreExecutors.directExecutor());
     }

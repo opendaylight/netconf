@@ -306,11 +306,11 @@ public final class RestconfStream<T> {
         /**
          * Sets the {@code subscription state}.
          *
-         * @param the state to set
+         * @param newState the state to set
          * @throws IllegalStateException if the subscription cannot be moved to the new state
          */
         @NonNullByDefault
-        abstract void setState(SubscriptionState newState);
+        public abstract void setState(SubscriptionState newState);
 
         /**
          * Returns the {@code subscription session}.
@@ -334,6 +334,8 @@ public final class RestconfStream<T> {
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+
+        public abstract void channelClosed();
 
         @Override
         public final String toString() {
