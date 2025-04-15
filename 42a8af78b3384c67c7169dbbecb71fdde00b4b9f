@@ -16,6 +16,24 @@
       "message": "this is used on one class? move it there?",
       "revId": "42a8af78b3384c67c7169dbbecb71fdde00b4b9f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e4ef039_7dbdb6d9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-15T07:52:00Z",
+      "side": 1,
+      "message": "it is also used in RestconfStream.Sink.endOfStream()",
+      "parentUuid": "d276f9d0_9ff36397",
+      "revId": "42a8af78b3384c67c7169dbbecb71fdde00b4b9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
