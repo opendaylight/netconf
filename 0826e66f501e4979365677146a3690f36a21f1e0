@@ -34,6 +34,24 @@
       "parentUuid": "25d9bfaa_c7ae0ea5",
       "revId": "0826e66f501e4979365677146a3690f36a21f1e0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e4c7f9c_15f2862b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-15T10:29:18Z",
+      "side": 1,
+      "message": "path can be used to quickly reject data, we know that this will never match because path point to another module, root node, etc..",
+      "parentUuid": "c04cb849_6062e3ee",
+      "revId": "0826e66f501e4979365677146a3690f36a21f1e0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
