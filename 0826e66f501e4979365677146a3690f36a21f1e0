@@ -16,6 +16,24 @@
       "message": "If we use only SubtreeMathcher, why do we need a path parameter?",
       "revId": "0826e66f501e4979365677146a3690f36a21f1e0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c04cb849_6062e3ee",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-15T08:10:56Z",
+      "side": 1,
+      "message": "Oh yea. That part I\u0027m not sure how exactly it should look like but I suppose path should be compared to something. So it is related to: https://www.javadoc.io/doc/org.opendaylight.mdsal/mdsal-docs/latest/org/opendaylight/mdsal/dom/api/DOMInstanceNotificationListener.html .\nRoughly speaking test should be called from inside of this listener and limit number of notifications that we are listening to. Because NETCONF is everything in the system this step is required as \"quick check\" before doing heavier operations.\nBut this all is just how I see it at the moment",
+      "parentUuid": "25d9bfaa_c7ae0ea5",
+      "revId": "0826e66f501e4979365677146a3690f36a21f1e0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
