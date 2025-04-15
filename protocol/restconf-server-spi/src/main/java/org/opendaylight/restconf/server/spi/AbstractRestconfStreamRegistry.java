@@ -73,6 +73,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             subscriptions.remove(id(), this);
             request.completeWith(Empty.value());
         }
+
+        @Override
+        public void channelClosed() {
+            subscriptions.remove(id());
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamRegistry.class);
