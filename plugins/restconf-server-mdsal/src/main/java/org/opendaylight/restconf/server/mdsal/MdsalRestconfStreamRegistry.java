@@ -140,10 +140,37 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected ListenableFuture<RestconfStream.Subscription> createSubscription(
-            final RestconfStream.Subscription subscription) {
+            final RestconfStream.Subscription subscription, final RestconfStream.SubscriptionFilter filter) {
         final var id = subscription.id();
         final var receiver = subscription.receiverName();
         final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
+
+        final DataContainerChild filterNode = switch (filter) {
+            case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
+                ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
+            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+                        .withNodeIdentifier(NodeIdentifier.create(StreamSubtreeFilter.QNAME))
+                        .withValue(anydata)
+                        .build())
+                    .build();
+            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
+                ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
+                    .build();
+            case null -> null;
+        };
+
+        final var subscriptionTarget = ImmutableNodes.newChoiceBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()));
+
+        if (filterNode != null) {
+            subscriptionTarget.withChild(filterNode);
+        }
 
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
@@ -151,15 +178,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withNodeIdentifier(nodeId)
                 .withChild(ImmutableNodes.leafNode(QNAME_ID, id))
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
-                .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()))
-//                    .withChild(ImmutableNodes.newChoiceBuilder()
-//                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
-//                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
-//                            subscription.filterName()))
-//                        .build())
-                    .build())
+                .withChild(subscriptionTarget.build())
                 .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
                     .withChild(ImmutableNodes.newSystemMapBuilder()
@@ -192,7 +211,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
-                    .withChild(ImmutableNodes.leafNode(StreamSubtreeFilter.QNAME, anydata))
+                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+                        .withNodeIdentifier(NodeIdentifier.create(StreamSubtreeFilter.QNAME))
+                        .withValue(anydata)
+                        .build())
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
