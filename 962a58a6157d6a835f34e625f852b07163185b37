@@ -16,6 +16,75 @@
       "message": "recheck",
       "revId": "962a58a6157d6a835f34e625f852b07163185b37",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82077a03_cd82d2bf",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-16T20:17:34Z",
+      "side": 1,
+      "message": "@NonNullByDefault",
+      "range": {
+        "startLine": 467,
+        "startChar": 4,
+        "endLine": 467,
+        "endChar": 10
+      },
+      "revId": "962a58a6157d6a835f34e625f852b07163185b37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9e1c3ae_8d2cb4c6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-16T20:17:34Z",
+      "side": 1,
+      "message": "so this is mirroring Sink above?\n\nif there is a 1:1 correspondence, then actually we should follow the pattern we use here: https://github.com/opendaylight/netconf/blob/b1352cc6b574e91bbfa24b63377ad390e9352ec1/protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerSession.java#L113-L154\n\ni.e. a \u0027Sink.toReceiver()\u0027 method which returns a point-in-time snapshot.",
+      "range": {
+        "startLine": 467,
+        "startChar": 21,
+        "endLine": 467,
+        "endChar": 29
+      },
+      "revId": "962a58a6157d6a835f34e625f852b07163185b37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9714c77_550994d1",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-04-16T20:17:34Z",
+      "side": 1,
+      "message": "never leak mutable state, please",
+      "range": {
+        "startLine": 481,
+        "startChar": 8,
+        "endLine": 481,
+        "endChar": 18
+      },
+      "revId": "962a58a6157d6a835f34e625f852b07163185b37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
