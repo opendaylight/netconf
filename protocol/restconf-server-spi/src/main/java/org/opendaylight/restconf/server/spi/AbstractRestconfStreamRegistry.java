@@ -228,7 +228,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             SubscriptionState.START, request.session(),
             filterImpl);
 
-        Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
+        Futures.addCallback(createSubscription(subscription, filter), new FutureCallback<Subscription>() {
             @Override
             public void onSuccess(final Subscription result) {
                 subscriptions.put(id, result);
@@ -284,7 +284,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
+    protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription,
+        @Nullable SubscriptionFilter filter);
 
     @NonNullByDefault
     protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
