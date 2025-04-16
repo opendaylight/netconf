@@ -52,6 +52,24 @@
       "parentUuid": "9e7ddf08_126d3938",
       "revId": "c47c5338c09f6082f5b94509f13e5418748382de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7995fbc9_bf22fd32",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-16T18:56:40Z",
+      "side": 1,
+      "message": "Leaving this patch to deal with SubtreeFilter parsing only. Datastore writing will be separate.",
+      "parentUuid": "18e04a3a_2a3dd69e",
+      "revId": "c47c5338c09f6082f5b94509f13e5418748382de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
