@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f394d425_32fa180a",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/DeleteSubscriptionRpc.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T11:50:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "140a46ab_83773d23",
+      "range": {
+        "startLine": 118,
+        "startChar": 22,
+        "endLine": 118,
+        "endChar": 43
+      },
+      "revId": "6ec77b1b13ba2c190e36bb55f971a1ea8f4b8286",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7960dc8_05076c36",
