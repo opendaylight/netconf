@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "684becbd_b8d80bbe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T11:48:46Z",
+      "side": 1,
+      "message": "May be rebased on top of https://git.opendaylight.org/gerrit/c/netconf/+/116172 - that way it won\u0027t be failing when trying to parse filter.",
+      "revId": "ba574644fb080c84ae05f7619c120d200868fc22",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3abd5f90_bfd241b2",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
         "patchSetId": 9
