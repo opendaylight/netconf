@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32a5976b_2cb7d50b",
+        "filename": "protocol/databind/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T12:40:06Z",
+      "side": 1,
+      "message": "Also alphabetical order pls",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 87,
+        "endChar": 21
+      },
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59ea2b6d_6aea8d77",
+        "filename": "protocol/databind/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T12:40:06Z",
+      "side": 1,
+      "message": "I believe here, after empty line, should be only test scope dependencies, no?",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 87,
+        "endChar": 21
+      },
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69ed155d_de3acfb5",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterPrettyTreeTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T12:40:06Z",
+      "side": 1,
+      "message": "Pls add few more examples from https://git.opendaylight.org/gerrit/c/netconf/+/116053 - in particular: case when ContentMatchNode is Wildcard and have more than one node to match. Preferably is types for those nodes are different. Also case with mixed structure would be good to see how writer handles it.",
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82fde8b8_e79c7a5f",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterPrettyTreeTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T12:40:06Z",
+      "side": 1,
+      "message": "Use Qnames with namespaces here pls - they should be present in this list even if it doesn\u0027t affect writing in any way.",
+      "range": {
+        "startLine": 119,
+        "startChar": 28,
+        "endLine": 119,
+        "endChar": 51
+      },
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
