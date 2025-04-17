@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27fff106_a9975d4e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T08:55:04Z",
+      "side": 1,
+      "message": "Do not merge until writing anydata into datastore is supported - YANGTOOLS-1106. At the moment it goes through codec-binfmt that rejects anydata.",
+      "revId": "82b015b7f2ed944b5aa4c0d6040e2ca128d76d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
