@@ -28,6 +28,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
@@ -279,9 +280,10 @@ public final class JsonPatchBody extends PatchBody {
                 return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
 
-            // for lists allow to manipulate with list items through their parent
+            // for lists/leaf-list allow to manipulate with items through their parent
             final YangInstanceIdentifier targetNode;
-            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates
+                    || edit.getTarget().getLastPathArgument() instanceof NodeWithValue<?>) {
                 targetNode = edit.getTarget().getParent();
             } else {
                 targetNode = edit.getTarget();
