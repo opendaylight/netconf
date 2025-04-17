@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f891c20_63b4a4b4",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T15:31:54Z",
+      "side": 1,
+      "message": "Added logging error with message",
+      "parentUuid": "23232eef_9b11cb59",
+      "revId": "3a153beb3ffeeb634dadf195659441331313a9f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d096802_1c8b9d36",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-17T13:19:16Z",
       "side": 1,
       "message": "public final class",
+      "revId": "3a153beb3ffeeb634dadf195659441331313a9f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c69b95b_ebef5ac0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-17T15:31:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d096802_1c8b9d36",
       "revId": "3a153beb3ffeeb634dadf195659441331313a9f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
