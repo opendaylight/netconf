@@ -22,7 +22,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
@@ -83,12 +82,8 @@ public final class XmlPatchBody extends PatchBody {
                 xmlParser.traverse(new DOMSource(firstValueElement));
 
                 final var result = resultHolder.getResult().data();
-                // for lists allow to manipulate with list items through their parent
-                if (targetPath.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    entities.add(new PatchEntity(editId, oper, targetPath.getParent(), result));
-                } else {
-                    entities.add(new PatchEntity(editId, oper, targetPath, result));
-                }
+                final var targetNode = unwrapListNodes(result);
+                entities.add(new PatchEntity(editId, oper, targetPath, targetNode));
             } else {
                 entities.add(new PatchEntity(editId, oper, targetPath));
             }

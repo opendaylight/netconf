@@ -1,0 +1,16 @@
+module foo {
+  namespace "urn:foo";
+  prefix foo;
+
+  container foo {
+    leaf-list baz-list {
+      type string;
+    }
+    list bar-list {
+      key bar-key;
+      leaf bar-key {
+        type string;
+      }
+    }
+  }
+}

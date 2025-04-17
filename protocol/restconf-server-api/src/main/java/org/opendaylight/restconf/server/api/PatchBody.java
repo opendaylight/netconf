@@ -21,6 +21,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 
 /**
  * A YANG Patch body.
@@ -99,5 +102,17 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
             case Create, Insert, Merge, Replace -> true;
             case Delete, Move, Remove -> false;
         };
+    }
+
+    static final NormalizedNode unwrapListNodes(final NormalizedNode node) {
+        if (node instanceof MapNode map) {
+            // TODO: This is a weird special case: a YANG-PATCH target cannot specify the entire map, but the body
+            //       parser always produces a single-entry map for entries. We need to undo that damage here.
+            return map.body().iterator().next();
+        } else if (node instanceof SystemLeafSetNode<?> leafSetNode) {
+            // Applying the same parser workaround logic as for MapNode above.
+            return leafSetNode.body().iterator().next();
+        }
+        return node;
     }
 }

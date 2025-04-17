@@ -27,7 +27,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
@@ -278,16 +277,8 @@ public final class JsonPatchBody extends PatchBody {
             if (!requiresValue(edit.getOperation())) {
                 return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
-
-            // for lists allow to manipulate with list items through their parent
-            final YangInstanceIdentifier targetNode;
-            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                targetNode = edit.getTarget().getParent();
-            } else {
-                targetNode = edit.getTarget();
-            }
-
-            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+            final var targetNode = unwrapListNodes(edit.getData());
+            return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget(), targetNode);
         }
 
         throw new RequestException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
