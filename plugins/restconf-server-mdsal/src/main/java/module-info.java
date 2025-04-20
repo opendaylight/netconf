@@ -23,6 +23,7 @@ module org.opendaylight.restconf.server.mdsal {
     requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
     requires static com.github.spotbugs.annotations;
+    requires static org.checkerframework.checker.qual;
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
 }
