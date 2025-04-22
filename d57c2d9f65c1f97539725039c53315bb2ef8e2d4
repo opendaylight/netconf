@@ -47,6 +47,54 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a79e28ed_4760e3d9",
+        "filename": "protocol/databind/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-22T08:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32a5976b_2cb7d50b",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 87,
+        "endChar": 21
+      },
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02d7673a_335336a0",
+        "filename": "protocol/databind/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-22T08:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59ea2b6d_6aea8d77",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 87,
+        "endChar": 21
+      },
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69ed155d_de3acfb5",
@@ -77,6 +125,30 @@
       "writtenOn": "2025-04-17T12:40:06Z",
       "side": 1,
       "message": "Use Qnames with namespaces here pls - they should be present in this list even if it doesn\u0027t affect writing in any way.",
+      "range": {
+        "startLine": 119,
+        "startChar": 28,
+        "endLine": 119,
+        "endChar": 51
+      },
+      "revId": "d57c2d9f65c1f97539725039c53315bb2ef8e2d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52900c87_00838e03",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterPrettyTreeTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-22T08:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82fde8b8_e79c7a5f",
       "range": {
         "startLine": 119,
         "startChar": 28,
