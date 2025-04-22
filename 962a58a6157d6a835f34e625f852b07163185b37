@@ -90,6 +90,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "de43c2e8_3fd1eab6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-04-22T09:30:45Z",
+      "side": 1,
+      "message": "This is meant to be just a modeled receiver, so we can include the receiver as part of the subscription and get rid of ReceiverHolder. It shouldn\u0027t have anything to do with the sink.",
+      "parentUuid": "f9e1c3ae_8d2cb4c6",
+      "range": {
+        "startLine": 467,
+        "startChar": 21,
+        "endLine": 467,
+        "endChar": 29
+      },
+      "revId": "962a58a6157d6a835f34e625f852b07163185b37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e9714c77_550994d1",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
         "patchSetId": 17
