@@ -24,6 +24,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -59,12 +60,12 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
             throw new VerifyException("Unexpected root data contract " + data.contract());
         }
 
-        // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly.
-        // We need to point to a 'a parent inference' and provide an appropriate data entry. Unfortunately it is not
-        // quite defined what that actually means.
+        // RESTCONF allows returning one list item. We need to wrap it in MapNode/LeafSetNode node in order
+        // to serialize it properly. We need to point to a 'a parent inference' and provide an appropriate data entry.
+        // Unfortunately it is not quite defined what that actually means.
         //
-        // This is a tricky thing, as JSON and XML have different representations of a MapNode. In JSON it is the array
-        // containing individual objects. In XML it is transparent.
+        // This is a tricky thing, as JSON and XML have different representations of a MapEntryNode/LeafSetEntryNode.
+        // In JSON it is the array containing individual objects. In XML it is transparent.
         //
         // This means that for XML we could just move 'parent inference' to the MapNode and emit the MapEntryNode as
         // usual. For JSON that does not work, as we also need to wrap the MapEntryNode in a MapNode.
@@ -77,12 +78,7 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
         final var stack = inference.toSchemaInferenceStack();
         stack.exit();
 
-        return new DataFormattableBody<>(path.databind(), stack.toInference(), data instanceof MapEntryNode mapEntry
-            ? ImmutableNodes.newSystemMapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
-                .withChild(mapEntry)
-                .build()
-            : data, writerFactory);
+        return new DataFormattableBody<>(path.databind(), stack.toInference(), wrapListEntryNodes(data), writerFactory);
     }
 
     /**
@@ -142,5 +138,27 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("body", data.prettyTree());
+    }
+
+    /**
+     * Wrap the NormalizedNode with a parent node if it is a MapEntryNode or LeafSetEntryNode.
+     *
+     * @param data data
+     * @return {@link NormalizedNode}
+     */
+    private static NormalizedNode wrapListEntryNodes(final NormalizedNode data) {
+        if (data instanceof MapEntryNode mapEntry) {
+            return ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild(mapEntry)
+                .build();
+        } if (data instanceof LeafSetEntryNode leafSetNode) {
+            return ImmutableNodes.newSystemLeafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild(leafSetNode)
+                .build();
+        } else {
+            return data;
+        }
     }
 }
