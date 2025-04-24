@@ -83,6 +83,27 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     }
 
     /**
+     * Wrap the NormalizedNode with a parent node if it is a {@link MapEntryNode}Node or a {@link LeafSetEntryNode}.
+     *
+     * @param data data
+     * @return a {@link NormalizedNode}
+     */
+    @SuppressWarnings("unchecked")
+    private static NormalizedNode wrapListEntryNodes(final NormalizedNode data) {
+        return switch (data) {
+            case MapEntryNode mapEntry -> ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild(mapEntry)
+                .build();
+            case LeafSetEntryNode<?> leafSetNode -> ImmutableNodes.<Object>newSystemLeafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild((LeafSetEntryNode<Object>) leafSetNode)
+                .build();
+            default -> data;
+        };
+    }
+
+    /**
      * Return a {@link FormattableBody} corresponding to a {@code rpc} or {@code action} invocation.
      *
      * @param path invocation path
@@ -139,27 +160,5 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("body", data.prettyTree());
-    }
-
-    /**
-     * Wrap the NormalizedNode with a parent node if it is a MapEntryNode or LeafSetEntryNode.
-     *
-     * @param data data
-     * @return {@link NormalizedNode}
-     */
-    private static NormalizedNode wrapListEntryNodes(final NormalizedNode data) {
-        if (data instanceof MapEntryNode mapEntry) {
-            return ImmutableNodes.newSystemMapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
-                .withChild(mapEntry)
-                .build();
-        } if (data instanceof LeafSetEntryNode leafSetNode) {
-            return ImmutableNodes.newSystemLeafSetBuilder()
-                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
-                .withChild(leafSetNode)
-                .build();
-        } else {
-            return data;
-        }
     }
 }
