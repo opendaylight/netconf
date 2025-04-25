@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -26,12 +26,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -41,9 +37,13 @@ import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
-import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
+import org.opendaylight.restconf.server.spi.ReceiverHolder;
+import org.opendaylight.restconf.server.spi.ReceiverHolder.RecordType;
+import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
+import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -51,10 +51,8 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -63,11 +61,40 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class CreateDataChangeEventSubscriptionRpcTest {
+    private static final class TestRegistry extends AbstractRestconfStreamRegistry {
+        @Override
+        public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
+                final RecordType recordType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected ListenableFuture<Void> putStream(final RestconfStream<?> stream, final String description,
+                final URI restconfURI) {
+            return Futures.immediateVoidFuture();
+        }
+
+        @Override
+        protected ListenableFuture<Void> deleteStream(final String streamName) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected ListenableFuture<Subscription> createSubscription(final Subscription subscription) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected ListenableFuture<Subscription> modifySubscriptionFilter(final Subscription subscription,
+                final SubscriptionFilter filter) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private static final EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
     private static final URI RESTCONF_URI = URI.create("/rests/");
     private static final YangInstanceIdentifier TOASTER = YangInstanceIdentifier.of(
         QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"));
-    private static final String TEST_STREAMS = "test-streams";
 
     private final CompletingServerRequest<ContainerNode> request = new CompletingServerRequest<>();
 
@@ -77,10 +104,6 @@ class CreateDataChangeEventSubscriptionRpcTest {
     private DataTreeChangeExtension treeChange;
     @Mock
     private DOMDataTreeWriteTransaction tx;
-    @Captor
-    private ArgumentCaptor<YangInstanceIdentifier> pathCaptor;
-    @Captor
-    private ArgumentCaptor<NormalizedNode> dataCaptor;
 
     private DatabindProvider databindProvider;
 
@@ -92,16 +115,11 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         doCallRealMethod().when(dataBroker).extension(any());
-        rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker,
-            restconfURI -> restconfURI.resolve(TEST_STREAMS)), databindProvider, dataBroker);
+        rpc = new CreateDataChangeEventSubscriptionRpc(new TestRegistry(), databindProvider, dataBroker);
     }
 
     @Test
     void createStreamTest() throws Exception {
-        doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(tx).put(eq(LogicalDatastoreType.OPERATIONAL), pathCaptor.capture(), dataCaptor.capture());
-        doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-
         rpc.invoke(request, RESTCONF_URI, createInput("path", TOASTER));
 
         final var output = request.getResult();
@@ -115,38 +133,6 @@ class CreateDataChangeEventSubscriptionRpcTest {
         assertEquals(45, name.length());
         assertThat(name, startsWith("urn:uuid:"));
         assertNotNull(UUID.fromString(name.substring(9)));
-
-        final var rcStream = QName.create("urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring", "2017-01-26",
-            "stream");
-        final var rcName = QName.create(rcStream, "name");
-        final var streamId = NodeIdentifierWithPredicates.of(rcStream, rcName, name);
-        final var rcEncoding = QName.create(rcStream, "encoding");
-        final var rcLocation = QName.create(rcStream, "location");
-
-        assertEquals(YangInstanceIdentifier.of(
-            new NodeIdentifier(QName.create(rcStream, "restconf-state")),
-            new NodeIdentifier(QName.create(rcStream, "streams")),
-            new NodeIdentifier(rcStream),
-            streamId), pathCaptor.getValue());
-        assertEquals(ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(streamId)
-            .withChild(ImmutableNodes.leafNode(rcName, name))
-            .withChild(ImmutableNodes.leafNode(QName.create(rcStream, "description"),
-                "Events occuring in CONFIGURATION datastore under /toaster:toaster"))
-            .withChild(ImmutableNodes.newSystemMapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
-                .withChild(ImmutableNodes.newMapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "json"))
-                    .withChild(ImmutableNodes.leafNode(rcEncoding, "json"))
-                    .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/" + TEST_STREAMS + "/json/" + name))
-                    .build())
-                .withChild(ImmutableNodes.newMapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "xml"))
-                    .withChild(ImmutableNodes.leafNode(rcEncoding, "xml"))
-                    .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/" + TEST_STREAMS + "/xml/" + name))
-                    .build())
-                .build())
-            .build().prettyTree().toString(), dataCaptor.getValue().prettyTree().toString());
     }
 
     @Test
