@@ -543,11 +543,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>restconf-notifications</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>sal-restconf-broker</artifactId>
                 <version>${project.version}</version>
             </dependency>
