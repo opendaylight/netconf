@@ -88,6 +88,12 @@
             <artifactId>repackaged-shiro</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc8639</artifactId>
+            <!-- FIXME: this does not look right -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>databind</artifactId>
         </dependency>
