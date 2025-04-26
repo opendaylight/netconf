@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.notifications;
+package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
@@ -29,7 +29,6 @@ import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
 import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.restconf.server.ChannelSenderSubscription;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
