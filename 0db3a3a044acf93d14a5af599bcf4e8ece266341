@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1064b7e6_97a44b9b",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-28T10:16:37Z",
+      "side": 1,
+      "message": "so, adapt your tests",
+      "parentUuid": "7ab15599_e1698ca9",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1c9054ba_659a4318",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
         "patchSetId": 50
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "Ok, this might look a bit confusing because I am taking copy here and above too so this is essentially a copy of a copy but this has a purpose.\nBoth copies is used to make separate stack instance for each child that is being processed so when I save it in the children map this stack will represent path to the child node that is not changed anywhere here in cycle or down the recursion.\nIt also is needed to essentially make my life easier and not deal with exiting the stack for each child(exact and especially wildcards) and for each list node type(they have a bit different structure that has to be taken into account too).\n\nThat being said I\u0027ll still change this part to better represent what I just explained but copy still will be there.",
       "parentUuid": "a7d474b5_b095aa80",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "060a84e2_1d283c7f",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-28T10:16:37Z",
+      "side": 1,
+      "message": "IMHO. stack.enter, stack.exit is something what is expected",
+      "parentUuid": "95f56808_89c17538",
       "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
