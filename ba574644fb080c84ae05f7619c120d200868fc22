@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3692c51_c32b7f11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-28T07:34:44Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116053/comments/143a2a21_393f2705",
+      "parentUuid": "684becbd_b8d80bbe",
+      "revId": "ba574644fb080c84ae05f7619c120d200868fc22",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3abd5f90_bfd241b2",
@@ -65,6 +83,30 @@
       "writtenOn": "2025-04-17T09:40:32Z",
       "side": 1,
       "message": "Why is this not StreamXpathFilter.QNAME?",
+      "range": {
+        "startLine": 147,
+        "startChar": 57,
+        "endLine": 147,
+        "endChar": 110
+      },
+      "revId": "ba574644fb080c84ae05f7619c120d200868fc22",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64ee0b59_f81f4c25",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-28T07:34:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3abd5f90_bfd241b2",
       "range": {
         "startLine": 147,
         "startChar": 57,
