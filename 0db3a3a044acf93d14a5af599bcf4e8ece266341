@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "143a2a21_393f2705",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 50
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-28T07:30:31Z",
+      "side": 1,
+      "message": "can you please test this with notifications instead of juts container\nI had some problem with parsing filters when I tried to enable some filtering tests after https://git.opendaylight.org/gerrit/c/netconf/+/116172.",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2243711e_eb6aebf2",
