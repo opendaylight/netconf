@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6775159b_2380d10c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-04-28T11:31:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4bca996_6051954a",
+      "revId": "9a2b6c471842465ed24191dd8a59d9c278908c5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b0df486_6d460f5c",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "what confuses me here is where i should obtain request.\nthis originates in netty AbstractChannelHandlerContext.invokeChannelInactive() and flows to SubscriptionHolder.removeRegistration() but there is no request, as it started as result of channel being closed.\nShould I somehow create that request? but result will have no consequenes.\nor i can just pass null here and in removeSubscription() just use if (request !\u003d null)",
       "parentUuid": "52713240_7b382648",
+      "revId": "9a2b6c471842465ed24191dd8a59d9c278908c5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37231f8e_faeb4036",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamSubscription.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-04-28T11:31:44Z",
+      "side": 1,
+      "message": "for now I did it like I proposed with nullable request and nullcheck, this also removed Runnable/Consumer combo",
+      "parentUuid": "6c9568d0_c3a2f4b5",
       "revId": "9a2b6c471842465ed24191dd8a59d9c278908c5f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
