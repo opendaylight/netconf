@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35ece774_32a40b41",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-28T16:29:03Z",
+      "side": 1,
+      "message": "Yes they are similar but matches() is public without parameters used as an entry point for class and calls only ones. MatchContainerInstance is used for verifying children and can be used multiple times if there are a few layers of children.",
+      "parentUuid": "bd4224b5_98433d91",
+      "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23d1e7c5_7edf1e51",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-28T14:36:06Z",
       "side": 1,
       "message": "imo this if can be ommited",
+      "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "031e7d49_77017d75",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-28T16:29:03Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116088/13/protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java#123 is ommited instead",
+      "parentUuid": "23d1e7c5_7edf1e51",
       "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -58,6 +94,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a37582d_ea50e3ce",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-28T16:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd0f423c_bd1b848e",
+      "range": {
+        "startLine": 118,
+        "startChar": 23,
+        "endLine": 118,
+        "endChar": 32
+      },
+      "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00f7a8d3_2e6a1ca8",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-04-28T14:36:06Z",
       "side": 1,
       "message": "I think this class could use at least few comments what is happening",
+      "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99af5a08_fdec0e2e",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-28T16:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00f7a8d3_2e6a1ca8",
       "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -92,6 +170,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b949ad3_3a13d537",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcherTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-28T16:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2317289_cbeaee6c",
+      "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d708b3f0_07cb683f",
@@ -105,6 +201,24 @@
       "writtenOn": "2025-04-28T14:36:06Z",
       "side": 1,
       "message": "put on previous line?",
+      "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "212fc777_0bdc57bc",
+        "filename": "protocol/databind/src/test/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcherTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-04-28T16:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d708b3f0_07cb683f",
       "revId": "37bf02871c2fde76ba3013b2606111735f20d7de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
