@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "edef47f6_1b383621",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T12:53:51Z",
+      "side": 1,
+      "message": "Alternatively we can use Set\u003cQName\u003e instead of List\u003cQName\u003e - that way there is no need in overriding equals and hashCode. Other way equals is a must because I can\u0027t control order of children that I receive from node.",
+      "parentUuid": "b13f3c37_1c3a461f",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1c9054ba_659a4318",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
         "patchSetId": 50
