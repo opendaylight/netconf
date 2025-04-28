@@ -16,6 +16,24 @@
       "message": "unknown-attribute instead of invalid value?",
       "revId": "5ed73a06507281fb569543349835752c54a113ba",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "800d75db_db31b063",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2025-04-28T16:32:53Z",
+      "side": 1,
+      "message": "`missing-element` (`value` is required) and `unknown-element` (`value` should not exist) seem to be the most appropriate.\n\nhttps://datatracker.ietf.org/doc/html/rfc6241#appendix-A",
+      "parentUuid": "a8e51338_dcd2d7fd",
+      "revId": "5ed73a06507281fb569543349835752c54a113ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
