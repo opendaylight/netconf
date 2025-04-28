@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ab15599_e1698ca9",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T09:50:24Z",
+      "side": 1,
+      "message": "I had a random error in tests when I was comparing two wildcards that has same QNames but in different order. That is why I added this override to ignore order.",
+      "parentUuid": "2243711e_eb6aebf2",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c9054ba_659a4318",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-04-23T06:31:42Z",
       "side": 1,
       "message": "does this hashcode returning the same results as equals when there is the same/different order of elements in list?",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c318e4d6_aa4b3082",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T09:50:24Z",
+      "side": 1,
+      "message": "No, when order of items is different then hash is also different. This method not used right now when comparing so I\u0027ll remove it.",
+      "parentUuid": "1c9054ba_659a4318",
       "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95f56808_89c17538",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T09:50:24Z",
+      "side": 1,
+      "message": "Ok, this might look a bit confusing because I am taking copy here and above too so this is essentially a copy of a copy but this has a purpose.\nBoth copies is used to make separate stack instance for each child that is being processed so when I save it in the children map this stack will represent path to the child node that is not changed anywhere here in cycle or down the recursion.\nIt also is needed to essentially make my life easier and not deal with exiting the stack for each child(exact and especially wildcards) and for each list node type(they have a bit different structure that has to be taken into account too).\n\nThat being said I\u0027ll still change this part to better represent what I just explained but copy still will be there.",
+      "parentUuid": "a7d474b5_b095aa80",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ca10f2d_30c92c66",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-04-23T06:31:42Z",
       "side": 1,
       "message": "at least logging?",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d67dd32e_cb03d4af",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T09:50:24Z",
+      "side": 1,
+      "message": "Added logs here and in other places",
+      "parentUuid": "8ca10f2d_30c92c66",
       "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
