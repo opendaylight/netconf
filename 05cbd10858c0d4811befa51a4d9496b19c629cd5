@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e773fc6_f92fda19",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-28T14:36:06Z",
+      "side": 0,
+      "message": "why remove?",
+      "revId": "05cbd10858c0d4811befa51a4d9496b19c629cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
