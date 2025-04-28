@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b13f3c37_1c3a461f",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T12:37:19Z",
+      "side": 1,
+      "message": "Do you mean add test that compare Wildcards with different order of items in list?",
+      "parentUuid": "1064b7e6_97a44b9b",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1c9054ba_659a4318",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
         "patchSetId": 50
@@ -155,6 +173,24 @@
       "side": 1,
       "message": "IMHO. stack.enter, stack.exit is something what is expected",
       "parentUuid": "95f56808_89c17538",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14c4e151_aa8c201a",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-28T12:37:19Z",
+      "side": 1,
+      "message": "I did changed it to enter/exit when dealing with children here but I can\u0027t avoid saving copy",
+      "parentUuid": "060a84e2_1d283c7f",
       "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
