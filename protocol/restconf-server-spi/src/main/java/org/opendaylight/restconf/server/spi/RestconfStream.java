@@ -30,10 +30,14 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -90,7 +94,7 @@ public final class RestconfStream<T> {
     /**
      * A sink of events for a {@link RestconfStream}.
      */
-    public interface Sink<T> {
+    public abstract static class Sink<T> {
         /**
          * Publish a set of events generated from input data.
          *
@@ -99,12 +103,35 @@ public final class RestconfStream<T> {
          * @param now Current time
          * @throws NullPointerException if any argument is {@code null}
          */
-        void publish(EffectiveModelContext modelContext, T input, Instant now);
+        public abstract void publish(EffectiveModelContext modelContext, T input, Instant now);
 
         /**
          * Called when the stream has reached its end.
          */
-        void endOfStream();
+        public abstract void endOfStream();
+
+        private String receiverName;
+
+        private Long sentEventRecords;
+
+        private Long excludedEventRecords;
+
+        void updateSentEventRecords() {
+            sentEventRecords = sentEventRecords + 1L;
+        }
+
+        void updateExcludedEventRecords() {
+            excludedEventRecords = excludedEventRecords + 1L;
+        }
+
+        public Receiver toReceiver(){
+            return new ReceiverBuilder()
+                .setName(receiverName)
+                .setState(Receiver.State.Active)
+                .setSentEventRecords(new ZeroBasedCounter64(Uint64.fromLongBits(sentEventRecords)))
+                .setExcludedEventRecords(new ZeroBasedCounter64(Uint64.fromLongBits(excludedEventRecords)))
+                .build();
+        };
     }
 
     /**
@@ -466,7 +493,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    private final @NonNull Sink<T> sink = new Sink<>() {
+    public final @NonNull Sink<T> sink = new Sink<>() {
         @Override
         public void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             final var local = acquireSubscribers();
