@@ -88,6 +88,24 @@
       "parentUuid": "27d930ab_8023119b",
       "revId": "5ed73a06507281fb569543349835752c54a113ba",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8af30d2c_fd1bd800",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-04-29T12:56:33Z",
+      "side": 1,
+      "message": "Correct fixed, thanks. \n\nI have used INVALID_VALUE because this exception originated from a violation of the \u0027when\u0027 restriction constraint:\nhttps://github.com/opendaylight/mdsal/blob/master/model/ietf/rfc8072/src/main/yang/ietf-yang-patch%402017-02-22.yang#L264\n\nI misread that this is only for \"leaf type constraints\" and does not include other constraints.\nhttps://www.rfc-editor.org/rfc/rfc6020#section-8.3.1",
+      "parentUuid": "ddc4ef73_04b72688",
+      "revId": "5ed73a06507281fb569543349835752c54a113ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
