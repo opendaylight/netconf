@@ -25,7 +25,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
@@ -124,31 +123,29 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-            final ReceiverHolder.RecordType recordType) {
+    public ListenableFuture<Void> updateReceiver(final String receiverName, final Uint32 subscriptionId,
+            final Uint64 counter, final RestconfStream.Sink.RecordType recordType) {
         // Now issue a merge operation
         final var tx = dataBroker.newWriteOnlyTransaction();
-        final var subscriptionId = receiver.subscriptionId();
         final var sentEventIid = YangInstanceIdentifier.builder()
             .node(NodeIdentifier.create(Subscriptions.QNAME))
             .node(NodeIdentifier.create(Subscription.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, Uint32.valueOf(subscriptionId)))
+            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, subscriptionId))
             .node(NodeIdentifier.create(Receivers.QNAME))
             .node(NodeIdentifier.create(Receiver.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME,
-                receiver.receiverName()));
+            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME, receiverName));
 
         final LeafNode<Uint64> counterValue;
         switch (recordType) {
             case SENT_EVENT_RECORDS -> {
                 sentEventIid.node(NodeIdentifier.create(QNAME_SENT_EVENT_RECORDS));
                 counterValue = ImmutableNodes.leafNode(
-                    QNAME_SENT_EVENT_RECORDS, Uint64.valueOf(receiver.sentEventCounter().get()));
+                    QNAME_SENT_EVENT_RECORDS, counter);
             }
             case EXCLUDED_EVENT_RECORDS -> {
                 sentEventIid.node(NodeIdentifier.create(QNAME_EXCLUDED_EVENT_RECORDS));
                 counterValue = ImmutableNodes.leafNode(
-                    QNAME_EXCLUDED_EVENT_RECORDS, Uint64.valueOf(counter));
+                    QNAME_EXCLUDED_EVENT_RECORDS, counter);
             }
             default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
         }
