@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "8bda808666db9105fb1d7a9a2937381229eb85a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebf7d693_09c02267",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2025-04-29T14:54:16Z",
+      "side": 1,
+      "message": "Empty value may be effectively the same as missing but technically the element exists, so I guess \u0027invalid-value` is better.",
+      "revId": "8bda808666db9105fb1d7a9a2937381229eb85a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
