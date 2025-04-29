@@ -107,6 +107,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f9df905_d3ff63f4",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-29T12:27:42Z",
+      "side": 1,
+      "message": "Used List and sort Qnames for Wildcards",
+      "parentUuid": "edef47f6_1b383621",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c9054ba_659a4318",
@@ -209,6 +227,24 @@
       "side": 1,
       "message": "I did changed it to enter/exit when dealing with children here but I can\u0027t avoid saving copy",
       "parentUuid": "060a84e2_1d283c7f",
+      "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f50e4bf_65b73bac",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 50
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-29T12:27:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14c4e151_aa8c201a",
       "revId": "0db3a3a044acf93d14a5af599bcf4e8ece266341",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
