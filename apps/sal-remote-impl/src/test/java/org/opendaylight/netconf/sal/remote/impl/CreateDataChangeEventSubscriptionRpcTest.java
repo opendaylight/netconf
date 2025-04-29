@@ -40,8 +40,6 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
-import org.opendaylight.restconf.server.spi.ReceiverHolder.RecordType;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
@@ -50,6 +48,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
@@ -65,8 +65,8 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 class CreateDataChangeEventSubscriptionRpcTest {
     private static final class TestRegistry extends AbstractRestconfStreamRegistry {
         @Override
-        public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-                final RecordType recordType) {
+        public ListenableFuture<Void> updateReceiver(String receiverName, Uint32 subscriptionId, Uint64 counter,
+            RestconfStream.Sink.RecordType recordType) {
             throw new UnsupportedOperationException();
         }
 
