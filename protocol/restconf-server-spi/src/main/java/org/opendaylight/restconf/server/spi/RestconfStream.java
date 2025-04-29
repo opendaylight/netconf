@@ -13,7 +13,10 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -21,6 +24,9 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -30,10 +36,14 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -90,7 +100,7 @@ public final class RestconfStream<T> {
     /**
      * A sink of events for a {@link RestconfStream}.
      */
-    public interface Sink<T> {
+    public abstract static class Sink<T> {
         /**
          * Publish a set of events generated from input data.
          *
@@ -99,12 +109,89 @@ public final class RestconfStream<T> {
          * @param now Current time
          * @throws NullPointerException if any argument is {@code null}
          */
-        void publish(EffectiveModelContext modelContext, T input, Instant now);
+        public abstract void publish(EffectiveModelContext modelContext, T input, Instant now);
 
         /**
          * Called when the stream has reached its end.
          */
-        void endOfStream();
+        public abstract void endOfStream();
+
+        /**
+         * Receiver variables and methods.
+         */
+        private final ConcurrentMap<Uint32, String> receiverNames = new ConcurrentHashMap<>();
+        private final ConcurrentMap<Uint32, AtomicLong> sentEventRecords = new ConcurrentHashMap<>();
+        private final ConcurrentMap<Uint32, AtomicLong> excludedEventRecords = new ConcurrentHashMap<>();
+
+        public void addReceiver(final Uint32 subscriptionId, final String receiverName) {
+            receiverNames.put(subscriptionId, receiverName);
+            sentEventRecords.put(subscriptionId, new AtomicLong(0));
+            excludedEventRecords.put(subscriptionId, new AtomicLong(0));
+        }
+
+        private String receiverName(final Uint32 subscriptionId) {
+            return receiverNames.get(subscriptionId);
+        }
+
+        /**
+         * Increments the sent-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public void updateSentEventRecords(final Registry streamRegistry, final Uint32 subscriptionId) {
+            final var counterValue = Uint64.fromLongBits(sentEventRecords.get(subscriptionId).incrementAndGet());
+            Futures.addCallback(streamRegistry.updateReceiver(receiverName(subscriptionId), subscriptionId,
+                    counterValue, RecordType.SENT_EVENT_RECORDS),
+                new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(final Void result) {
+                        LOG.trace("Sent-event-records was updated {} for {} receiver on subscription {}",
+                            counterValue, receiverName(subscriptionId), subscriptionId);
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        LOG.warn("Failed update sent-event-records {} for {} receiver on subscription {}",
+                            counterValue, receiverName(subscriptionId), subscriptionId, cause);
+                    }
+                }, MoreExecutors.directExecutor());
+        }
+
+        /**
+         * Increments the excluded-event-records counter and writes the updated value to the MD-SAL datastore.
+         */
+        public void updateExcludedEventRecord(final Registry streamRegistry, final Uint32 subscriptionId) {
+            final var counterValue = Uint64.fromLongBits(excludedEventRecords.get(subscriptionId).incrementAndGet());
+            Futures.addCallback(streamRegistry.updateReceiver(receiverName(subscriptionId), subscriptionId,
+                    counterValue, RecordType.EXCLUDED_EVENT_RECORDS),
+                new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(final Void result) {
+                        LOG.trace("Excluded-event-records was updated {} for {} receiver on subscription {}",
+                            counterValue, receiverName(subscriptionId), subscriptionId);
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        LOG.warn("Failed update excluded-event-records {} for {} receiver on subscription {}",
+                            counterValue, receiverName(subscriptionId), subscriptionId, cause);
+                    }
+                }, MoreExecutors.directExecutor());
+        }
+
+        public enum RecordType {
+            SENT_EVENT_RECORDS,
+            EXCLUDED_EVENT_RECORDS
+        }
+
+        public Receiver toReceiver(final Uint32 subscriptionId) {
+            return new ReceiverBuilder()
+                .setName(receiverName(subscriptionId))
+                .setState(Receiver.State.Active)
+                .setSentEventRecords(
+                    new ZeroBasedCounter64(Uint64.fromLongBits(sentEventRecords.get(subscriptionId).get())))
+                .setExcludedEventRecords(
+                    new ZeroBasedCounter64(Uint64.fromLongBits(excludedEventRecords.get(subscriptionId).get())))
+                .build();
+        }
     }
 
     /**
@@ -245,11 +332,13 @@ public final class RestconfStream<T> {
          * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
          * that completes when the commit succeeds or fails.
          *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
-         * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
+         * @param receiverName the name of receiver
+         * @param subscriptionId subscription ID
+         * @param counter value of counter
+         * @param recordType the type of record to update (e.g., sent-event-records or excluded-event-records)
          */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
+        ListenableFuture<Void> updateReceiver(String receiverName, Uint32 subscriptionId, Uint64 counter,
+            Sink.RecordType recordType);
     }
 
     /**
@@ -345,6 +434,7 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return helper.add("terminated", terminated);
+
         }
     }
 
@@ -468,7 +558,7 @@ public final class RestconfStream<T> {
         }
     }
 
-    private final @NonNull Sink<T> sink = new Sink<>() {
+    public final @NonNull Sink<T> sink = new Sink<>() {
         @Override
         public void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             final var local = acquireSubscribers();

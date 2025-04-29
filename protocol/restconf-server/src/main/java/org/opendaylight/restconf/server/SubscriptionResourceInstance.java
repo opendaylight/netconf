@@ -30,7 +30,6 @@ import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -124,9 +123,9 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         }
         final var streamParams = EventStreamGetParams.of(QueryParameters.of());
 
-        final var receiverName = subscription.receiverName();
-        final var receiver = new ReceiverHolder(subscriptionId, receiverName, streamRegistry);
-        final var sender = new ChannelSenderSubscription(sseMaximumFragmentLength, receiver);
+        stream.sink.addReceiver(Uint32.valueOf(subscriptionId), subscription.receiverName());
+        final var sender = new ChannelSenderSubscription(sseMaximumFragmentLength, stream, streamRegistry,
+            Uint32.valueOf(subscriptionId));
         // Encoding is optional field and in case it is absent json encoding will be used by default
         final var encoding = encodingNameOf(subscription.encoding());
         final var registration = registerSender(stream, encoding, streamParams, sender);

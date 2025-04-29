@@ -92,7 +92,6 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
             .add("id", id)
             .add("encoding", encoding)
             .add("stream", streamName)
-            .add("receiver", receiverName)
             .add("filter", filter));
     }
 }
