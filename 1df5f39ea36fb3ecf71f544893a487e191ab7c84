@@ -16,6 +16,24 @@
       "message": "Rather investigate usage of `SchemaTreeInference` in List as stack is something mutable?",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b635f3e_ac59657a",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-04-30T10:35:28Z",
+      "side": 1,
+      "message": "Ideally, can we remove this list? Why is not enough list of QNames?",
+      "parentUuid": "ece1823a_428a49af",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
