@@ -34,6 +34,24 @@
       "parentUuid": "ece1823a_428a49af",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95ae0334_35c0db9a",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-30T12:37:19Z",
+      "side": 1,
+      "message": "This is list for one reason only - wildcards. So we have 2 cases:\n1. Exact filter - there will be always only 1 element in this list that will represent exact path - easy.\n2. Wildcard filter (full wildcard or partial doesn\u0027t matter) - here we need this list. Lets say there is this filter:\n  \u003cstream-subtree-filter\u003e\n    \u003ctoasterRestocked xmlns\u003d\"\"\u003e\n      \u003camount/\u003e\n    \u003c/toasterRestocked\u003e\n  \u003c/stream-subtree-filter\u003e\n\nWhen you look into schema you won\u0027t necessarily find \"toasterRestocked\" inside only one model. It can be present in two, three or more models, it can be augmented and so on. At this point we only have local name so there is no way to determine which one to use. Because of that every possible \"toasterRestocked\" from every model should be saved. Let say we had two this time: namespace1_toasterRestocked and namespace2_toasterRestocked now saved into wildcard. The children will have 2 stacks respectively. When got to \"amount\" then we will try look for it under each path: namespace1_toasterRestocked and namespace2_toasterRestocked and record and do things with them. So I need to know parentStack to then for each and try find child. Also parent can be choice - in that case I should make 2 steps - in case and in child. That\u0027s why only QName is not enough.",
+      "parentUuid": "3b635f3e_ac59657a",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
