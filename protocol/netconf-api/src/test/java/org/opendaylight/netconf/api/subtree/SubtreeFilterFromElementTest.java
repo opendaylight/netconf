@@ -111,7 +111,24 @@ class SubtreeFilterFromElementTest {
                     .add(SelectionNode.builder(new Exact(NAMESPACE2, "users"))
                         .build())
                     .build())
-                .build())
+                .build()),
+            // Characters unescaping
+            Arguments.of("""
+                <filter type="subtree">
+                  <t:top xmlns:t="http://example.com/schema/1.2/config">
+                    <t:interfaces>
+                      <t:interface t:ifName="eth0&apos;&lt;&gt;&quot;&amp;abc"/>
+                    </t:interfaces>
+                  </t:top>
+                </filter>""", SubtreeFilter.builder()
+                    .add(ContainmentNode.builder(new Exact(NAMESPACE, "top"))
+                        .add(ContainmentNode.builder(new Exact(NAMESPACE, "interfaces"))
+                            .add(SelectionNode.builder(new Exact(NAMESPACE, "interface"))
+                                .add(new AttributeMatch(new Exact(NAMESPACE, "ifName"),
+                                    "eth0'<>\"&abc")).build())
+                            .build())
+                        .build())
+                    .build())
         );
     }
 }
