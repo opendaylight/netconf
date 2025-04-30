@@ -124,7 +124,7 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         }
         final var streamParams = EventStreamGetParams.of(QueryParameters.of());
 
-        final var receiverName = streamRegistry.lookupSubscription(Uint32.valueOf(subscriptionId)).receiverName();
+        final var receiverName = subscription.receiverName();
         final var receiver = new ReceiverHolder(subscriptionId, receiverName, streamRegistry);
         final var sender = new ChannelSenderSubscription(sseMaximumFragmentLength, receiver);
         // Encoding is optional field and in case it is absent json encoding will be used by default
