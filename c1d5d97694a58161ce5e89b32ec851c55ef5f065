@@ -106,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0d47341_d16b6d58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-30T13:19:36Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3397cafd_d8df4970",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a25869d0_667d2108",
@@ -119,6 +137,24 @@
       "writtenOn": "2025-04-14T08:27:03Z",
       "side": 1,
       "message": "Interrupted while ...",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d9fc375_35d91068",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/KillSubscriptionRpc.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-30T13:19:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a25869d0_667d2108",
       "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -193,6 +229,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80269b26_239e98b4",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-30T13:19:36Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1395e0bf_b0fe25a9",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "810a662b_e74d593e",
@@ -224,6 +278,24 @@
       "side": 1,
       "message": "I was trying to preserve this logic of reusing formatted messages, and we need this to decide if formatter has changed",
       "parentUuid": "810a662b_e74d593e",
+      "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "532af670_eed75eb5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-04-30T13:19:36Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "43b7516a_e3c6f032",
       "revId": "c1d5d97694a58161ce5e89b32ec851c55ef5f065",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
