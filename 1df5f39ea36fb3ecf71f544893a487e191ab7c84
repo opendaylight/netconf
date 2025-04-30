@@ -106,6 +106,24 @@
       "parentUuid": "fb8ce2ba_cd400f28",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "937e87c7_d8674589",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-30T13:54:13Z",
+      "side": 1,
+      "message": "And QName contains all that - you right. But I can\u0027t take QName and find node in EffectiveModelContxt - it should be path and Qname. Path is coming from \"parents\" parameter and QName is created below depending on exact/wildcard. Then \"childrenQNames\" is something that is later used to create NamespaceSelection for SubtreeFilter. And \"children\" is new path that used in recursion if current element has children.",
+      "parentUuid": "8d1a0158_2f2380e0",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
