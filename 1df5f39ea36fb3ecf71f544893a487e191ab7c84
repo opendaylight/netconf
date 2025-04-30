@@ -70,6 +70,24 @@
       "parentUuid": "95ae0334_35c0db9a",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb8ce2ba_cd400f28",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-04-30T13:38:31Z",
+      "side": 1,
+      "message": "Yes but it is probably naming issue. This \"children\" is list of paths where we will be searching for children on the next step of recursion. Name is misleading - it rather should be called \"pathsToElementSchema\" - i.e. list that contains possible paths(or only one path in case with exact node) that are leading to current element we processing in schema tree. If current element has children then on next iteration have any children - then this list will be used to search for them.",
+      "parentUuid": "888ed566_a5ec91c7",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
