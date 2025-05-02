@@ -236,6 +236,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5a53ebc6_79e54b50",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-02T14:12:56Z",
+      "side": 1,
+      "message": "Pretty much yes.\n - exact - check if there is a module with given namespace. If yes - take module QName and based on it and element name creates proper QName with name, namespace and revision. Then use that QName to enterChild in stack.\n - wildcard - does same but for every module.",
+      "parentUuid": "3db84631_b929768d",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "09861925_86e6fab1",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 62
@@ -253,6 +271,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e70940d7_3faf0811",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-02T14:12:56Z",
+      "side": 1,
+      "message": "Yea. You right. But parentStack.enterSchemaTree will throw IllegalArgumentException if didn\u0027t find the child - so if we got to this line means child was found and it is already in the stack.",
+      "parentUuid": "09861925_86e6fab1",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "373a124c_3e53240b",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 62
@@ -264,6 +300,24 @@
       "writtenOn": "2025-05-02T12:23:39Z",
       "side": 1,
       "message": "error?",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25b61399_88e856ab",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-02T14:12:56Z",
+      "side": 1,
+      "message": "Not in this case. Ideally it should be and it was until I thought about \"What if parent of this exact node is wildcard?\". Then I can\u0027t throw error here if child was not found. I have to go through every parent. Of course having wildcard parent and them all of a sudden have namespace for the children is unlikely scenario that may happen only if someone deliberately create such filter - I agree. But if someone will do such thing then this method will still return usable SubtreeFilter.\n\nCheck for if any child(ren) was found is universal for exact and wildcard - line 201 with error thrown on line 212.",
+      "parentUuid": "373a124c_3e53240b",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
