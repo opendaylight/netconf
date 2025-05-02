@@ -16,6 +16,24 @@
       "message": "please add similar test with XML",
       "revId": "3681ba39ed76675e3c7e908f8199f333de209ce7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "281efb52_704d889d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-02T13:48:10Z",
+      "side": 1,
+      "message": "probably it wouldn\u0027t be so easy - this probably should be another issue/task",
+      "parentUuid": "94011e70_90d23124",
+      "revId": "3681ba39ed76675e3c7e908f8199f333de209ce7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
