@@ -196,6 +196,24 @@
       "parentUuid": "fddc2fa3_abe1c456",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "616622cd_2d6b4c3d",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-02T10:22:45Z",
+      "side": 1,
+      "message": "IMO I\u0027m pretty sure at exact part of this logic.\nIf thinking about improvements then maybe something can be done to wildcard - adding some logic when going back up from recursion to reject some of the wildcards if they does not match xml filter seems reasonable too me. Now reader searching for every matching node but doesn\u0027t account for what goes after that. So adding some conditions may make filter smaller. This is something that borderlines with Matcher so I only considered it and didn\u0027t implement. BUT it is not something that should affect Matcher or matching notification what should be rejected should work with this current implementation. It will in theory reduce number of checks by small amount that Matcher do for some types of wildcards filters and that\u0027s pretty much it.",
+      "parentUuid": "0429e461_90ec4fd6",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
