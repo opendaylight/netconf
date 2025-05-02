@@ -214,6 +214,23 @@
       "parentUuid": "0429e461_90ec4fd6",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09861925_86e6fab1",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-02T12:21:46Z",
+      "side": 1,
+      "message": "this fails is parentStack is empty",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
