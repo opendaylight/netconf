@@ -142,6 +142,24 @@
       "parentUuid": "937e87c7_d8674589",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c4bcf0e_b7e0f56d",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-02T08:09:02Z",
+      "side": 1,
+      "message": "Yes it is precisely what it used for. Each stack in the list is used to find child(ren) under parent. Because of wildcard there can be multiple parents. So I have to search under each. And for that I am storing path to each parent in \"parents\" list. This \"children\" list will become \"parents\" list when we get to line 223 - on next iteration of the recursion.\nEach iteration of this method is searching for child(ren) under every parent. I can\u0027t make it branch every time when there are multiple parent/child nodes in schema. Reason for that is we can go through XMLStreamReader events only one time. Because of that List\u003cSchemaInferenceStack\u003e.",
+      "parentUuid": "8d46f7ff_5fdf53ba",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
