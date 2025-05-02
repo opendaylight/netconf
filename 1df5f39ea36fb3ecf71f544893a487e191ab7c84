@@ -178,6 +178,24 @@
       "parentUuid": "9c4bcf0e_b7e0f56d",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0429e461_90ec4fd6",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-02T09:58:42Z",
+      "side": 1,
+      "message": "If filter is exact all the way (means there is namespace for every element) - one stack in this list on every iteration.\nIf wildcard is present - then there will be as many as matching nodes in schema context(matching by local name).\nUsing same example that I mentioned above it will be like this:\n1) At start - one empty stack\n2) On first iteration search will find two toasterRestocked in context - list will have two stacks: one \"/namespace1_toasterRestocked\" and second one \"/namespace2_toasterRestocked\"\n3) On second iteration search will look for \"amount\" under \"/namespace1_toasterRestocked\" and \"/namespace2_toasterRestocked\" - how many nodes was found - that many paths will be. Those then will be used on next iteration.\nOf course in this case they won\u0027t matter because \"amount\" does not have children in filter. Method will just return SelectionNode at that point.",
+      "parentUuid": "fddc2fa3_abe1c456",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
