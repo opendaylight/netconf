@@ -141,6 +141,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3009a59_fe268b80",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-02T11:46:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b9ebce60_8c085e5f",
+      "revId": "78e642d5162bfceca2ab5eeaa77d9d099f280395",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b66882f_d725e6a3",
