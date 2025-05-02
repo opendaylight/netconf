@@ -124,6 +124,24 @@
       "parentUuid": "8d1a0158_2f2380e0",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d46f7ff_5fdf53ba",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-02T05:55:26Z",
+      "side": 1,
+      "message": "I would expect that stack is there be to used to find child(ren) as we wish.",
+      "parentUuid": "937e87c7_d8674589",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
