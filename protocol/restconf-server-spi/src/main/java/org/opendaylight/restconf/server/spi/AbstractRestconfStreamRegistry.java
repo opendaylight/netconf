@@ -330,7 +330,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter);
+    protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
 
     @NonNullByDefault
     private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
