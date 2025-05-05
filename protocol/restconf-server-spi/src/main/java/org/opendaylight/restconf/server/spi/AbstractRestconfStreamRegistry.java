@@ -302,12 +302,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         SubscriptionFilter filter);
 
     @NonNullByDefault
-    protected void putFilter(final String name, final EventStreamFilter filter) {
+    protected final void addFilter(final String name, final EventStreamFilter filter) {
         filters.put(name, filter);
     }
 
     @NonNullByDefault
-    protected void removeFilter(final String name) {
+    protected final void removeFilter(final String name) {
         filters.remove(name);
     }
 
