@@ -17,7 +17,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -103,9 +102,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         NodeIdentifier.create(QName.create(FilterSpec.QNAME, "stream-xpath-filter").intern());
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET);
 
-    private static final YangInstanceIdentifier FILTERS =
-        YangInstanceIdentifier.of(FILTERS_NODEID, STREAM_FILTER_NODEID);
-
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
     private final DatabindProvider databindProvider;
@@ -116,12 +112,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private DefaultNotificationSource notificationSource;
 
     private class FilterDataTreeChangeListener implements DOMDataTreeChangeListener {
-        private final DOMDataBroker dataBroker;
-
-        FilterDataTreeChangeListener(final DOMDataBroker dataBroker) {
-            this.dataBroker = requireNonNull(dataBroker);
-        }
-
         @Override
         public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
             for (var change : changes) {
@@ -151,13 +141,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
         @Override
         public void onInitialData() {
-            try {
-                final var node = (MapNode) dataBroker.newReadOnlyTransaction()
-                    .read(LogicalDatastoreType.CONFIGURATION, FILTERS).get().orElse(null);
-                processFilters(node);
-            } catch (InterruptedException | ExecutionException e) {
-                LOG.warn("Could not read filters form datastore");
-            }
+            // No filters at all
         }
 
         private void processFilters(final MapNode node) {
@@ -230,8 +214,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         final var changeExtension = dataBroker.extension(DataTreeChangeExtension.class);
         if (changeExtension != null) {
             tclReg = changeExtension.registerTreeChangeListener(
-                DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, FILTERS),
-                new FilterDataTreeChangeListener(dataBroker));
+                DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(
+                    FILTERS_NODEID, STREAM_FILTER_NODEID)),
+                new FilterDataTreeChangeListener());
         } else {
             tclReg = null;
         }
