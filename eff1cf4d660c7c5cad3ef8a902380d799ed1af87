@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c8c0ce6_dac4f608",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-05T09:08:10Z",
+      "side": 1,
+      "message": "Please complete the patch @peter.suna.",
+      "revId": "eff1cf4d660c7c5cad3ef8a902380d799ed1af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
