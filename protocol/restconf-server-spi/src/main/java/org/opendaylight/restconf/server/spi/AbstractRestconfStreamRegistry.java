@@ -311,7 +311,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         filters.remove(name);
     }
 
-    protected @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
+    private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
             throws RequestException {
         return switch (filter) {
             case null -> null;
@@ -335,7 +335,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
 
     @NonNullByDefault
-    private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
+    protected static final EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
         // TODO: integrate yang-xpath-api and validate the propose xpath
         // TODO: implement XPath filter evaluation
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
