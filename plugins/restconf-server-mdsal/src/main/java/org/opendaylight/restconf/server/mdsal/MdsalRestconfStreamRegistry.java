@@ -82,14 +82,14 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
+    private static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
 
     private static final NodeIdentifier ENCODING_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING);
     private static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
         NodeIdentifier.create(SubscriptionUtil.QNAME_EXCLUDED_EVENT_RECORDS);
     private static final NodeIdentifier FILTERS_NODEID = NodeIdentifier.create(Filters.QNAME);
     private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
-    private static final NodeIdentifier NAME_NODEID =
-        NodeIdentifier.create(QName.create(StreamFilter.QNAME, "name").intern());
+    private static final NodeIdentifier NAME_NODEID = NodeIdentifier.create(NAME_QNAME);
     private static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
@@ -282,34 +282,24 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Override
     public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
             final ReceiverHolder.RecordType recordType) {
+        final var counterLeaf = switch (recordType) {
+            case SENT_EVENT_RECORDS ->
+                ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.valueOf(receiver.sentEventCounter().get()));
+            case EXCLUDED_EVENT_RECORDS ->
+                ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.valueOf(counter));
+        };
+
         // Now issue a merge operation
-        final var subscriptionId = receiver.subscriptionId();
-        final var sentEventIid = YangInstanceIdentifier.builder()
-            .node(SUBSCRIPTIONS_NODEID)
-            .node(SUBSCRIPTION_NODEID)
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID,
-                Uint32.valueOf(subscriptionId)))
-            .node(RECEIVERS_NODEID)
-            .node(RECEIVER_NODEID)
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_RECEIVER_NAME,
-                receiver.receiverName()));
-
-        final LeafNode<Uint64> counterValue;
-        switch (recordType) {
-            case SENT_EVENT_RECORDS -> {
-                sentEventIid.node(SENT_EVENT_RECORDS_NODEID);
-                counterValue = ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID,
-                    Uint64.valueOf(receiver.sentEventCounter().get()));
-            }
-            case EXCLUDED_EVENT_RECORDS -> {
-                sentEventIid.node(EXCLUDED_EVENT_RECORDS_NODEID);
-                counterValue = ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.valueOf(counter));
-            }
-            default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
-        }
-
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), counterValue);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(
+            SUBSCRIPTIONS_NODEID,
+            SUBSCRIPTION_NODEID,
+            NodeIdentifierWithPredicates.of(Subscription.QNAME,
+                SubscriptionUtil.QNAME_ID, Uint32.valueOf(receiver.subscriptionId())),
+            RECEIVERS_NODEID,
+            RECEIVER_NODEID,
+            NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiver.receiverName()),
+            counterLeaf.name()), counterLeaf);
         return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
