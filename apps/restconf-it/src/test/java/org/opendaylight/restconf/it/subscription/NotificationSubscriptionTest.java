@@ -16,12 +16,10 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-@Disabled
 class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final String APPLICATION_JSON = "application/json";
     private static final String APPLICATION_XML = "application/xml";
@@ -50,7 +48,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "stream": [
                   {
                     "name": "NETCONF",
-                    "description": "Stream for subscription state change notifications"
+                    "description": "Default XML encoded NETCONF stream"
                   }
                 ]
               }
@@ -79,10 +77,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     @Test
     void establishSubscriptionWithFilterTest() throws Exception {
-        final var response = establishSubscriptionWithFilter(NETCONF_STREAM, """
-            <filter type="subtree">
-              <top xmlns="http://example.com/schema/1.2/config"/>
-            </filter>""");
+        final var response = establishSubscriptionWithFilter(NETCONF_STREAM,
+            "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>");
         assertEquals(HttpResponseStatus.OK, response.status());
         final var content = response.content().toString(StandardCharsets.UTF_8);
         JSONAssert.assertEquals("""
@@ -104,9 +100,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
               <id>2147483648</id>
               <stream-subtree-filter>
-                <filter type="subtree">
-                  <top xmlns="http://example.com/schema/1.2/config"/>
-                </filter>
+                <toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/>
                </stream-subtree-filter>
             </input>""";
         final var request2 = buildRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_XML, modifyInput,
@@ -267,7 +261,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 %s
                </stream-subtree-filter>
             </input>""", stream, filter);
-        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, input, APPLICATION_XML);
+        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, input, APPLICATION_JSON);
     }
 
     private FullHttpRequest prepareEstablishRPCRequest() {
