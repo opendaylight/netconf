@@ -105,7 +105,6 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     /**
      * Tests receiving subscription modified notification.
      */
-    @Disabled("Disabled until filtering is implemented in NETCONF-1436 and modifySubscription works")
     @Test
     void testListenModifiedNotification() throws Exception {
         // Modify the subscription
