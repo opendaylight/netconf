@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-@Disabled("Disabled until filtering is implemented in NETCONF-1436")
 class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final NodeIdentifier BREAD_NODEID =
         NodeIdentifier.create(QName.create(ToasterRestocked.QNAME, "amountOfBread").intern());
@@ -127,7 +126,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     }
 
     @Test
-    void filterNotificationPartialTest() throws Exception {
+    void filteredOutNotificationTest() throws Exception {
         final var response = establishFilteredSubscription("""
             <example-notification xmlns="test:notification">
               <entry>
@@ -155,21 +154,10 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(exampleNotification, EVENT_TIME));
 
         // verify name was filtered out
-        JSONAssert.assertEquals(String.format("""
-            {
-              "ietf-restconf:notification" : {
-                "event-time" : "%s",
-                "notification-test:example-notification" : {
-                  "entry" : [
-                    {
-                      "id" : "ID"
-                    }
-                  ]
-                }
-              }
-            }""", FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
+        assertNull(eventListener.readNext());
     }
 
+    @Disabled("Will be disabled until YANGTOOLS-1670 has been resolved")
     @Test
     void filterReferenceTest() throws Exception {
         // create filter
