@@ -282,7 +282,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
             final ReceiverHolder.RecordType recordType) {
         // Now issue a merge operation
-        final var tx = dataBroker.newWriteOnlyTransaction();
         final var subscriptionId = receiver.subscriptionId();
         final var sentEventIid = YangInstanceIdentifier.builder()
             .node(SUBSCRIPTIONS_NODEID)
@@ -308,6 +307,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
         }
 
+        final var tx = dataBroker.newWriteOnlyTransaction();
         tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), counterValue);
         return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
