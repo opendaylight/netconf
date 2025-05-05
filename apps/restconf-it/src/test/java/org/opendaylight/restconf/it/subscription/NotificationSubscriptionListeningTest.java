@@ -105,22 +105,17 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     /**
      * Tests receiving subscription modified notification.
      */
-    @Disabled("Disabled until filtering is implemented in NETCONF-1436 and modifySubscription works")
+    @Disabled("Will be disabled until NETCONF-1466 has been resolved")
     @Test
     void testListenModifiedNotification() throws Exception {
         // Modify the subscription
         final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:modify-subscription",
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
-            """
-                {
-                  "input": {
-                    "id": 2147483648,
-                    "stream-subtree-filter": {
-                      "users" : {}
-                     },
-                  }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, """
+             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+               <id>2147483648</id>
+               <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
+             </input>""", MediaTypes.APPLICATION_YANG_DATA_JSON);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         JSONAssert.assertEquals("""
