@@ -387,8 +387,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             databindFilter = SubtreeFilter.readFrom(databindContext, XMLInputFactory.newDefaultFactory()
                 .createXMLStreamReader(new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8))));
         } catch (IOException | XMLStreamException e) {
-            LOG.error("Failed to parse anydata to subtree filter", e);
-            throw new RequestException("Failed to parse anydata filter {} to subtree filter", filter, e);
+            LOG.debug("Failed to parse anydata to subtree filter {}", filter.prettyTree(), e);
+            throw new RequestException("Failed to parse subtree filter", e);
         }
         return new SubtreeEventStreamFilter(databindFilter);
     }
