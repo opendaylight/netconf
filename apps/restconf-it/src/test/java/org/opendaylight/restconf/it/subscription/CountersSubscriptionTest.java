@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.transport.http.HTTPClient;
@@ -92,7 +91,6 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         });
     }
 
-    @Disabled("Disabled until filtering is implemented in NETCONF-1436")
     @Test
     void counterNotificationWithFilterTest() throws Exception {
         final var response = establishFilteredSubscription("""
@@ -130,7 +128,6 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertCounter(receiversResponse, "2", "0");
     }
 
-    @Disabled("Disabled until filtering is implemented in NETCONF-1436")
     @Test
     void excludedCounterNotificationTest() throws Exception {
         final var response = establishFilteredSubscription(
