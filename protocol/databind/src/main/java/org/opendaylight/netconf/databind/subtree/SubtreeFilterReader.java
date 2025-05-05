@@ -41,7 +41,9 @@ final class SubtreeFilterReader {
     }
 
     /**
-     * Read xml peeling off wrapper around filter elements(usually something like
+     * Read {@link XMLStreamReader} using {@link DataSchemaContext} to construct {@link SubtreeFilter}.
+     *
+     * <p>Read xml peeling off wrapper around filter elements(usually something like
      * {@code <filter type="subtree">}) to get to elements with filter data and construct subtree filter based
      * those elements.
      *
@@ -83,7 +85,9 @@ final class SubtreeFilterReader {
     }
 
     /**
-     * This method goes through XML elements that came from {@link XMLStreamReader} and looking for these elements
+     * Excursively build elements of {@code SubtreeFilter}.
+     *
+     * <p>This method goes through XML elements that came from {@link XMLStreamReader} and looking for these elements
      * inside the model context. Based on this data it creates sibling nodes and adding them into builder to form
      * {@link SubtreeFilter} structure. If element have children of its own then fills them the same way recursively.
      *
@@ -108,8 +112,6 @@ final class SubtreeFilterReader {
         final var childrenQNames = new ArrayList<QName>();
         final var children = new ArrayList<SchemaInferenceStack>();
         LOG.debug("Starting processing child node {}.", elementName);
-        // create NamespaceSelection based on element name and namespace
-        final NamespaceSelection namespace;
         for (final var parentStack : parents) {
             if (!elementNamespace.isEmpty()) {
                 LOG.debug("Processing {} node as exact.", elementName);
@@ -123,7 +125,7 @@ final class SubtreeFilterReader {
                     try {
                         // handle choice if parent is one
                         if (!parentStack.isEmpty()
-                            && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
+                                && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
                             LOG.debug("Searching through choice node {} for exact match {}.", choice.getQName(), qname);
                             for (final var caseNode : choice.getCases()) {
                                 final var child = caseNode.findDataTreeChild(qname);
@@ -150,10 +152,11 @@ final class SubtreeFilterReader {
                         // exact child was found under parents no need to continue looking
                         break;
                     } catch (IllegalArgumentException iae) {
-                        LOG.debug("Failed to find exact node for with name {}.", qname);
+                        LOG.error("Failed to find exact node for with name {}.", qname);
                     }
-                    LOG.debug("Failed to find exact node {} under {}.", qname, module.localQNameModule());
+                    LOG.error("Failed to find exact node {} under {}.", qname, module.localQNameModule());
                 } else {
+                    LOG.error("");
                     throw new XMLStreamException("Failed to lookup module with namespace %s."
                         .formatted(elementNamespace));
                 }
@@ -166,7 +169,7 @@ final class SubtreeFilterReader {
                     try {
                         // handle choice if parent is one
                         if (!parentStack.isEmpty()
-                            && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
+                                && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
                             LOG.debug("Searching through choice node {} by local name {}.", choice.getQName(),
                                 elementLocalName);
                             for (final var caseNode : choice.getCases()) {
@@ -183,6 +186,7 @@ final class SubtreeFilterReader {
                                     parentStack.exit();
                                     // exit case
                                     parentStack.exit();
+                                    break;
                                 }
                             }
                         } else {
@@ -193,16 +197,17 @@ final class SubtreeFilterReader {
                             parentStack.exit();
                         }
                     } catch (IllegalArgumentException iae) {
-                        LOG.debug("Failed to find any node with name {} under {}.", childName, module.getKey());
+                        LOG.error("Failed to find any node with name {} under {}.", childName, module.getKey());
                     }
                 }
             }
         }
+        final NamespaceSelection namespace;
         if (!childrenQNames.isEmpty()) {
             if (!elementNamespace.isEmpty()) {
                 // there have to be only one qname in the list if we have namespace
                 LOG.debug("Creating Exact NamespaceSelection for {} node.", elementName);
-                namespace = new Exact(childrenQNames.iterator().next());
+                namespace = new Exact(childrenQNames.getFirst());
             } else {
                 LOG.debug("Creating Wildcard NamespaceSelection for {} node.", elementName);
                 namespace = new Wildcard(UnresolvedQName.Unqualified.of(elementLocalName), childrenQNames.stream()
@@ -263,7 +268,7 @@ final class SubtreeFilterReader {
                                     LOG.debug("Successfully parsed value for {} node.", node.getQName());
                                 } catch (IllegalArgumentException e) {
                                     // ignore values that codec failed to parse
-                                    LOG.debug("Incompatible value for node {}. Ignoring.", node.getQName());
+                                    LOG.warn("Incompatible value for node {}. Ignoring.", node.getQName());
                                 }
                             }
                         }
@@ -281,10 +286,7 @@ final class SubtreeFilterReader {
                     // end element right after start means this is empty element - create selection
                     LOG.debug("Parsing SelectionNode under {} node.", elementName);
                     final var selection = SelectionNode.builder(namespace);
-                    // add attributes if there are some
-                    if (!attributes.isEmpty()) {
-                        attributes.forEach(selection::add);
-                    }
+                    attributes.forEach(selection::add);
                     builder.addSibling(selection.build());
                     LOG.debug("Adding new SelectionNode under {} node.", elementName);
                     return;
@@ -299,7 +301,7 @@ final class SubtreeFilterReader {
     }
 
     /**
-     * Checks if xml element has any attributes and if so - collects them into {@link AttributeMatch} list.
+     * Collect attributes into {@link AttributeMatch} list.
      *
      * @param reader reader that goes through xml elements
      * @param context model context
@@ -308,7 +310,7 @@ final class SubtreeFilterReader {
      */
     private static List<AttributeMatch> getAttributes(final XMLStreamReader reader, final EffectiveModelContext context)
             throws XMLStreamException {
-        LOG.debug("Parsing attributes for {} node.", reader.getName());
+        LOG.trace("Parsing attributes for {} node.", reader.getName());
         final var childAttributes = new ArrayList<AttributeMatch>();
         final var attrCount = reader.getAttributeCount();
         // go through attributes
@@ -325,15 +327,15 @@ final class SubtreeFilterReader {
             if (it.hasNext()) {
                 exactNamespace = new Exact(QName.create(it.next().localQNameModule(), attrName.getLocalPart()));
             } else {
-                throw new XMLStreamException("Failed to lookup module schema for namespace "
-                    + attrNamespace);
+                LOG.error("");
+                throw new XMLStreamException("Failed to lookup module schema for namespace " + attrNamespace);
             }
             // FIXME YANGTOOLS-1444 parse text and create object value from attribute text when we can parse propagate
             //  YANG-modeled annotations
             final var attrValue = reader.getAttributeValue(i);
             childAttributes.add(new AttributeMatch(exactNamespace, attrValue));
         }
-        LOG.debug("Found {} attributes for {} node.", childAttributes.size(), reader.getName());
+        LOG.trace("Found {} attributes for {} node.", childAttributes.size(), reader.getName());
         return childAttributes;
     }
 }
