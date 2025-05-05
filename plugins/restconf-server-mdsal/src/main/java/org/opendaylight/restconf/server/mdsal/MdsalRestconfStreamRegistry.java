@@ -62,7 +62,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -230,32 +229,23 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Override
     public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
             final ReceiverHolder.RecordType recordType) {
+        final var counterLeaf = switch (recordType) {
+            case SENT_EVENT_RECORDS ->
+                ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.valueOf(receiver.sentEventCounter().get()));
+            case EXCLUDED_EVENT_RECORDS ->
+                ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.valueOf(counter));
+        };
+
         // Now issue a merge operation
-        final var subscriptionId = receiver.subscriptionId();
-        final var sentEventIid = YangInstanceIdentifier.builder()
-            .node(SUBSCRIPTIONS_NODEID)
-            .node(SUBSCRIPTION_NODEID)
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, Uint32.valueOf(subscriptionId)))
-            .node(RECEIVERS_NODEID)
-            .node(RECEIVER_NODEID)
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, NAME_QNAME, receiver.receiverName()));
-
-        final LeafNode<Uint64> counterValue;
-        switch (recordType) {
-            case SENT_EVENT_RECORDS -> {
-                sentEventIid.node(SENT_EVENT_RECORDS_NODEID);
-                counterValue = ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID,
-                    Uint64.valueOf(receiver.sentEventCounter().get()));
-            }
-            case EXCLUDED_EVENT_RECORDS -> {
-                sentEventIid.node(EXCLUDED_EVENT_RECORDS_NODEID);
-                counterValue = ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.valueOf(counter));
-            }
-            default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
-        }
-
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.merge(LogicalDatastoreType.OPERATIONAL, sentEventIid.build(), counterValue);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(
+            SUBSCRIPTIONS_NODEID,
+            SUBSCRIPTION_NODEID,
+            NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, Uint32.valueOf(receiver.subscriptionId())),
+            RECEIVERS_NODEID,
+            RECEIVER_NODEID,
+            NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiver.receiverName()),
+            counterLeaf.name()), counterLeaf);
         return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
     }
 
@@ -286,8 +276,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     .withChild(ImmutableNodes.newSystemMapBuilder()
                         .withNodeIdentifier(RECEIVER_NODEID)
                         .withChild(ImmutableNodes.newMapEntryBuilder()
-                            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                NAME_QNAME, receiver))
+                            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiver))
                             .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiver))
                             .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.ZERO))
