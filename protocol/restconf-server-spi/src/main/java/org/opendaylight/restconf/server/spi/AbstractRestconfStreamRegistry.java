@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -39,6 +42,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
@@ -62,6 +66,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +89,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
-        private final ConcurrentMap<String, Subscriber<?>> receivers = new ConcurrentHashMap<>();
+        private final ConcurrentMap<String, Subscriber<DOMNotificationEvent>> receivers = new ConcurrentHashMap<>();
         private @Nullable EventStreamFilter filter;
 
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
@@ -123,9 +128,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 return;
             }
 
-            final Subscriber<?> newSubscriber;
+            final Subscriber<DOMNotificationEvent> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encodingName());
+                newSubscriber = (Subscriber<DOMNotificationEvent>) stream.addSubscriber(sender, encodingName());
             } catch (UnsupportedEncodingException e) {
                 request.completeWith(new RequestException(e));
                 return;
@@ -205,6 +210,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} terminated", id);
+//                    final var notificationBody = SubscriptionStateService.subscriptionTerminated(id,
+//                        SubscriptionTerminatedReason.QNAME);
+//                    publishMessage(null, new DOMNotificationEvent.Rfc6020(notificationBody, Instant.now()));
                     subscriptions.remove(id, DynSubscription.this);
                     request.completeWith(Empty.value());
                 }
@@ -256,6 +264,19 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        @SuppressWarnings("checkstyle:illegalCatch")
+        public void publishMessage(final EffectiveModelContext modelContext, final DOMNotificationEvent input) {
+            for (final var receiver : receivers.entrySet()) {
+                try {
+                    final var subscriber = receiver.getValue();
+                    subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
+                        ? subscriber.formatter().eventData(modelContext, input, input.getEventInstant()) : null);
+                } catch (Exception e) {
+                    LOG.error("Failed to send notification to {}", receiver.getKey());
+                }
+            }
         }
     }
 
@@ -310,7 +331,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Uint32, DynSubscription<DOMNotification>> subscriptions = new ConcurrentHashMap<>();
     // FIXME: This is not quite sufficient and should be split into two maps:
     //          1. filterSpecs, which is a HashMap<String, ChoiceNode> recording known filter-spec definitions
     //             access should be guarded by a lock
@@ -528,6 +549,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             @Override
             public void onSuccess(final Void result) {
                 subscription.setFilter(filterImpl);
+                // FIXME handle different filters we support
+//                final var notificationBody = SubscriptionStateService.subscriptionModified(subscription.id(),
+//                    subscription.streamName(), subscription.encoding(),  null, null, null);
+                // FIXME EffectiveModelContext should live here in abstract registry. Pass it when here to create msg
+//                subscription.publishMessage(null, new DOMNotificationEvent.Rfc6020(notificationBody, Instant.now()));
                 request.completeWith(subscription);
             }
 
