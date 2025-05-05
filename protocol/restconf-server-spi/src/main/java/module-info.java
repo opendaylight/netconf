@@ -15,7 +15,9 @@ module org.opendaylight.restconf.server.spi {
     requires transitive org.opendaylight.netconf.databind;
     requires transitive org.opendaylight.restconf.api;
     requires transitive org.opendaylight.restconf.server.api;
+    requires org.opendaylight.mdsal.dom.api;
     requires org.opendaylight.netconf.api;
+    requires org.opendaylight.netconf.common.mdsal;
     requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
     requires org.opendaylight.yangtools.yang.data.spi;

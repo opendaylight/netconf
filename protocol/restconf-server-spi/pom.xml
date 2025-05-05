@@ -63,6 +63,10 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-common-mdsal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-api</artifactId>
         </dependency>
         <dependency>
