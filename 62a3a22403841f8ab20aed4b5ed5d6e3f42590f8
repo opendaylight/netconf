@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baa0d3dd_7ba8c217",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-05-05T16:43:03Z",
+      "side": 1,
+      "message": "wait a minute: we have agreed that there is a 1:1 Subscription:Sink correspondence, so why do we need maps here?",
+      "range": {
+        "startLine": 122,
+        "startChar": 22,
+        "endLine": 122,
+        "endChar": 51
+      },
+      "revId": "62a3a22403841f8ab20aed4b5ed5d6e3f42590f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
