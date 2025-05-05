@@ -126,14 +126,12 @@ public final class JsonPatchBody extends PatchBody {
             switch (editDefinition) {
                 case "edit-id" -> edit.setId(in.nextString());
                 case "operation" -> {
-                    final Operation operation;
                     final var operationValue = in.nextString();
-                    try {
-                        operation = Operation.ofName(operationValue);
-                    } catch (IllegalArgumentException e) {
-                        LOG.error("Provided operation type {} does not match", operationValue, e);
+                    final var operation = Operation.forName(operationValue);
+                    if (operation == null) {
+                        LOG.error("Provided operation type {} is not recognized", operationValue);
                         throw new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-                            "Operation value is incorrect: " + e.getMessage(), e);
+                            "Operation value is incorrect: " + operationValue);
                     }
                     edit.setOperation(operation);
                 }
