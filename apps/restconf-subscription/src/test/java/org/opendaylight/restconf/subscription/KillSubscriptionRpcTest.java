@@ -26,8 +26,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -60,8 +60,6 @@ class KillSubscriptionRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private SubscriptionStateService subscriptionStateService;
-    @Mock
     private DatabindPath.Rpc operationPath;
     @Mock
     private DOMDataTreeWriteTransaction writeTx;
@@ -71,6 +69,8 @@ class KillSubscriptionRpcTest {
     private RestconfStream.Registry streamRegistry;
     @Mock
     private AbstractRestconfStreamSubscription subscription;
+    @Mock
+    private DatabindProvider databindProvider;
     @Captor
     private ArgumentCaptor<RequestException> response;
 
@@ -78,7 +78,7 @@ class KillSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new KillSubscriptionRpc(streamRegistry, subscriptionStateService);
+        rpc = new KillSubscriptionRpc(streamRegistry, databindProvider);
     }
 
     @Disabled
