@@ -55,8 +55,6 @@ class KillSubscriptionRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private SubscriptionStateService subscriptionStateService;
-    @Mock
     private DatabindPath.Rpc operationPath;
     @Mock
     private DOMDataTreeWriteTransaction writeTx;
@@ -73,7 +71,7 @@ class KillSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new KillSubscriptionRpc(streamRegistry, subscriptionStateService);
+        rpc = new KillSubscriptionRpc(streamRegistry);
     }
 
     @Disabled

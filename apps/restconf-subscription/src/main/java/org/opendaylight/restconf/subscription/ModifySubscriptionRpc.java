@@ -52,17 +52,12 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
-
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public ModifySubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService) {
+    public ModifySubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
         super(ModifySubscription.QNAME);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
 
@@ -117,19 +112,8 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        streamRegistry.modifySubscription(request.transform(modifiedSubscription -> {
-            try {
-                // FIXME: pass correct filter once we extract if from input
-                subscriptionStateService.subscriptionModified(Instant.now(), id, modifiedSubscription.streamName(),
-                    modifiedSubscription.encoding(), null, null, null);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IllegalStateException("Could not send subscription modify notification", e);
-            }
-
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
-                .build();
-        }), id, filter);
+        streamRegistry.modifySubscription(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
+            .build()), id, filter);
     }
 }

@@ -192,17 +192,15 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
         // setup notifications service
         domNotificationRouter = new DOMNotificationRouter(32);
-        final var subscriptionStateService =
-            new SubscriptionStateService(domNotificationRouter.notificationPublishService());
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
             schemaService, uri -> uri.resolve("streams"), dataBindProvider);
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested
             new EstablishSubscriptionRpc(streamRegistry),
-            new ModifySubscriptionRpc(streamRegistry, subscriptionStateService),
-            new DeleteSubscriptionRpc(streamRegistry, subscriptionStateService),
-            new KillSubscriptionRpc(streamRegistry, subscriptionStateService));
+            new ModifySubscriptionRpc(streamRegistry),
+            new DeleteSubscriptionRpc(streamRegistry),
+            new KillSubscriptionRpc(streamRegistry));
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
             domRpcRouter.actionService(), domMountPointService, rpcImplementations);
 

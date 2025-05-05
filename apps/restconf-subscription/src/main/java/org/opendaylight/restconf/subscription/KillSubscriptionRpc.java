@@ -46,20 +46,16 @@ import org.slf4j.LoggerFactory;
 @Component(service = RpcImplementation.class, enabled = false)
 @NonNullByDefault
 public final class KillSubscriptionRpc extends RpcImplementation {
-    private static final Logger LOG = LoggerFactory.getLogger(KillSubscriptionRpc.class);
 
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(KillSubscriptionInput.QNAME, "id").intern());
 
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public KillSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService) {
+    public KillSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
         super(KillSubscription.QNAME);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
 
@@ -93,15 +89,8 @@ public final class KillSubscriptionRpc extends RpcImplementation {
         }
 
         streamRegistry.updateSubscriptionState(subscription, SubscriptionState.END);
-        subscription.terminate(request.transform(unused -> {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
-                .build();
-        }), NoSuchSubscription.QNAME);
+        subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
+            .build()), NoSuchSubscription.QNAME);
     }
 }

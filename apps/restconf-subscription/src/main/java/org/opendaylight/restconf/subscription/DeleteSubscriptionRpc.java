@@ -45,21 +45,16 @@ import org.slf4j.LoggerFactory;
 @Component(service = RpcImplementation.class)
 @NonNullByDefault
 public final class DeleteSubscriptionRpc extends RpcImplementation {
-    private static final Logger LOG = LoggerFactory.getLogger(DeleteSubscriptionRpc.class);
-
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(DeleteSubscriptionInput.QNAME, "id").intern());
 
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public DeleteSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService) {
+    public DeleteSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
         super(DeleteSubscription.QNAME);
         this.streamRegistry = requireNonNull(streamRegistry);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
     }
 
     @Override
@@ -97,15 +92,8 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
         }
 
         streamRegistry.updateSubscriptionState(subscription, SubscriptionState.END);
-        subscription.terminate(request.transform(unused -> {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
-                .build();
-        }), NoSuchSubscription.QNAME);
+        subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
+            .build()), NoSuchSubscription.QNAME);
     }
 }

@@ -54,8 +54,6 @@ class ModifySubscriptionRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private SubscriptionStateService subscriptionStateService;
-    @Mock
     private DatabindPath.Rpc operationPath;
     @Mock
     private DOMDataTreeWriteTransaction writeTx;
@@ -74,7 +72,7 @@ class ModifySubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new ModifySubscriptionRpc(streamRegistry, subscriptionStateService);
+        rpc = new ModifySubscriptionRpc(streamRegistry);
     }
 
     @Disabled
