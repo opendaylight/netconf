@@ -371,7 +371,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) {
+    protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
         final SubtreeFilter databindFilter;
         try {
             final var databindContext = databindProvider.currentDatabind();
@@ -388,7 +388,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .createXMLStreamReader(new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8))));
         } catch (IOException | XMLStreamException e) {
             LOG.error("Failed to parse anydata to subtree filter", e);
-            throw new IllegalStateException("Failed to parse anydata to subtree filter", e);
+            throw new RequestException("Failed to parse anydata to subtree filter", e);
         }
         return new SubtreeEventStreamFilter(databindFilter);
     }
