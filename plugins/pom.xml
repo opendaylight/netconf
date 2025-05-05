@@ -36,6 +36,5 @@
         <module>netconf-server-mdsal</module>
         <module>restconf-mdsal-spi</module>
         <module>restconf-server-mdsal</module>
-        <module>restconf-notifications-mdsal</module>
     </modules>
 </project>
