@@ -338,20 +338,20 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Override
     protected synchronized ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
             final RestconfStream.SubscriptionFilter filter) {
-        final var filterNode = switch (filter) {
-            case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
-                ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
-            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
-                ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(FILTER_SPEC_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_SUBTREE_FILTER_NODEID, anydata))
-                    .build();
-            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
-                ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(FILTER_SPEC_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER_NODEID, xpath))
-                    .build();
-        };
+//        final var filterNode = switch (filter) {
+//            case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
+//                ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
+//            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
+//                ImmutableNodes.newChoiceBuilder()
+//                    .withNodeIdentifier(FILTER_SPEC_NODEID)
+//                    .withChild(ImmutableNodes.leafNode(STREAM_SUBTREE_FILTER_NODEID, anydata))
+//                    .build();
+//            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
+//                ImmutableNodes.newChoiceBuilder()
+//                    .withNodeIdentifier(FILTER_SPEC_NODEID)
+//                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER_NODEID, xpath))
+//                    .build();
+//        };
 
         final var pathArg = subscriptionArg(subscriptionId);
         final var tx = txChain.newWriteOnlyTransaction();
@@ -361,10 +361,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
-                    .withChild(ImmutableNodes.newChoiceBuilder()
-                        .withNodeIdentifier(STREAM_FILTER_NODEID)
-                        .withChild(filterNode)
-                        .build())
+//                    .withChild(ImmutableNodes.newChoiceBuilder()
+//                        .withNodeIdentifier(STREAM_FILTER_NODEID)
+//                        .withChild(filterNode)
+//                        .build())
                     .build())
                 .build());
         return tx.commit().transform(info -> {
