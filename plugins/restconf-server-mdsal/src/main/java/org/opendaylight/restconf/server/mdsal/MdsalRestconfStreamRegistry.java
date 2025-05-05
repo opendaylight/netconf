@@ -8,10 +8,6 @@
 package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_EXCLUDED_EVENT_RECORDS;
-import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_ID;
-import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_RECEIVER_NAME;
-import static org.opendaylight.restconf.subscription.SubscriptionUtil.QNAME_SENT_EVENT_RECORDS;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -63,7 +59,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -86,11 +81,29 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
-    private static final YangInstanceIdentifier FILTERS = YangInstanceIdentifier.of(
-        NodeIdentifier.create(Filters.QNAME),
-        NodeIdentifier.create(StreamFilter.QNAME));
-    private static final NodeIdentifier FILTER_NAME =
+
+    private static final NodeIdentifier ENCODING_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING);
+    private static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
+        NodeIdentifier.create(SubscriptionUtil.QNAME_EXCLUDED_EVENT_RECORDS);
+    private static final NodeIdentifier FILTERS_NODEID = NodeIdentifier.create(Filters.QNAME);
+    private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
+    private static final NodeIdentifier NAME_NODEID =
         NodeIdentifier.create(QName.create(StreamFilter.QNAME, "name").intern());
+    private static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
+    private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
+    private static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
+        NodeIdentifier.create(SubscriptionUtil.QNAME_SENT_EVENT_RECORDS);
+    private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
+    private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
+    private static final NodeIdentifier STATE_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_RECEIVER_STATE);
+    private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM);
+    private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
+    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID =
+        NodeIdentifier.create(QName.create(FilterSpec.QNAME, "stream-xpath-filter").intern());
+    private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET);
+
+    private static final YangInstanceIdentifier FILTERS =
+        YangInstanceIdentifier.of(FILTERS_NODEID, STREAM_FILTER_NODEID);
 
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
@@ -152,7 +165,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             }
             node.body().forEach(entry -> {
                 final var name = extractFilterName(entry);
-                final var filterSpec = (ChoiceNode) entry.childByArg(new NodeIdentifier(FilterSpec.QNAME));
+                final var filterSpec = (ChoiceNode) entry.childByArg(FILTER_SPEC_NODEID);
                 final var subtree = extractFilter(filterSpec);
                 final EventStreamFilter filter;
                 try {
@@ -183,7 +196,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }
 
         private static @NonNull String extractFilterName(final MapEntryNode entry) {
-            if (entry.childByArg(FILTER_NAME) instanceof LeafNode<?> leafNode) {
+            if (entry.childByArg(NAME_NODEID) instanceof LeafNode<?> leafNode) {
                 if (leafNode.body() instanceof String filterName) {
                     return filterName;
                 }
@@ -268,25 +281,25 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         final var tx = dataBroker.newWriteOnlyTransaction();
         final var subscriptionId = receiver.subscriptionId();
         final var sentEventIid = YangInstanceIdentifier.builder()
-            .node(NodeIdentifier.create(Subscriptions.QNAME))
-            .node(NodeIdentifier.create(Subscription.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, Uint32.valueOf(subscriptionId)))
-            .node(NodeIdentifier.create(Receivers.QNAME))
-            .node(NodeIdentifier.create(Receiver.QNAME))
-            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_RECEIVER_NAME,
+            .node(SUBSCRIPTIONS_NODEID)
+            .node(SUBSCRIPTION_NODEID)
+            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID,
+                Uint32.valueOf(subscriptionId)))
+            .node(RECEIVERS_NODEID)
+            .node(RECEIVER_NODEID)
+            .node(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_RECEIVER_NAME,
                 receiver.receiverName()));
 
         final LeafNode<Uint64> counterValue;
         switch (recordType) {
             case SENT_EVENT_RECORDS -> {
-                sentEventIid.node(NodeIdentifier.create(QNAME_SENT_EVENT_RECORDS));
-                counterValue = ImmutableNodes.leafNode(
-                    QNAME_SENT_EVENT_RECORDS, Uint64.valueOf(receiver.sentEventCounter().get()));
+                sentEventIid.node(SENT_EVENT_RECORDS_NODEID);
+                counterValue = ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID,
+                    Uint64.valueOf(receiver.sentEventCounter().get()));
             }
             case EXCLUDED_EVENT_RECORDS -> {
-                sentEventIid.node(NodeIdentifier.create(QNAME_EXCLUDED_EVENT_RECORDS));
-                counterValue = ImmutableNodes.leafNode(
-                    QNAME_EXCLUDED_EVENT_RECORDS, Uint64.valueOf(counter));
+                sentEventIid.node(EXCLUDED_EVENT_RECORDS_NODEID);
+                counterValue = ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.valueOf(counter));
             }
             default -> throw new IllegalArgumentException("Unknown record type: " + recordType);
         }
@@ -300,35 +313,34 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final RestconfStream.Subscription subscription) {
         final var id = subscription.id();
         final var receiver = subscription.receiverName();
-        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, QNAME_ID, id);
+        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(nodeId)
-                .withChild(ImmutableNodes.leafNode(QNAME_ID, id))
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, subscription.encoding()))
+                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, subscription.encoding()))
                 .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, subscription.streamName()))
+                    .withNodeIdentifier(TARGET_NODEID)
+                    .withChild(ImmutableNodes.leafNode(STREAM_NODEID, subscription.streamName()))
 //                    .withChild(ImmutableNodes.newChoiceBuilder()
-//                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
+//                        .withNodeIdentifier(STREAM_FILTER_NODEID)
 //                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
 //                            subscription.filterName()))
 //                        .build())
                     .build())
                 .withChild(ImmutableNodes.newContainerBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(Receivers.QNAME))
+                    .withNodeIdentifier(RECEIVERS_NODEID)
                     .withChild(ImmutableNodes.newSystemMapBuilder()
-                        .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
+                        .withNodeIdentifier(RECEIVER_NODEID)
                         .withChild(ImmutableNodes.newMapEntryBuilder()
                             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                QNAME_RECEIVER_NAME, receiver))
-                            .withChild(ImmutableNodes.leafNode(QNAME_RECEIVER_NAME, receiver))
-                            .withChild(ImmutableNodes.leafNode(QNAME_SENT_EVENT_RECORDS, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(QNAME_EXCLUDED_EVENT_RECORDS, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
-                                Receiver.State.Active.getName()))
+                                SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
+                            .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiver))
+                            .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.ZERO))
+                            .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.ZERO))
+                            .withChild(ImmutableNodes.leafNode(STATE_NODEID, Receiver.State.Active.getName()))
                             .build())
                         .build())
                     .build())
@@ -344,18 +356,18 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final RestconfStream.Subscription subscription, final RestconfStream.SubscriptionFilter filter) {
         final var id = subscription.id();
 
-        final DataContainerChild filterNode = switch (filter) {
+        final var filterNode = switch (filter) {
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
                 ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(FilterSpec.QNAME))
+                    .withNodeIdentifier(FILTER_SPEC_NODEID)
                     .withChild(ImmutableNodes.leafNode(StreamSubtreeFilter.QNAME, anydata))
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(FilterSpec.QNAME))
-                    .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
+                    .withNodeIdentifier(FILTER_SPEC_NODEID)
+                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER_NODEID, xpath))
                     .build();
         };
 
@@ -366,9 +378,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withNodeIdentifier(nodeId)
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
                 .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withNodeIdentifier(TARGET_NODEID)
                     .withChild(ImmutableNodes.newChoiceBuilder()
-                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
+                        .withNodeIdentifier(STREAM_FILTER_NODEID)
                         .withChild(filterNode)
                         .build())
                     .build())
@@ -388,7 +400,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final var xmlStreamWriter = XMLOutputFactory.newDefaultFactory().createXMLStreamWriter(writer);
 
             final var xmlNormalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter,
-                databindContext.modelContext(), YangInstanceIdentifier.of(Filters.QNAME, StreamFilter.QNAME));
+                databindContext.modelContext(), YangInstanceIdentifier.of(FILTERS_NODEID, STREAM_FILTER_NODEID));
             final var normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(xmlNormalizedNodeStreamWriter, null);
             normalizedNodeWriter.write(filter);
             normalizedNodeWriter.flush();
