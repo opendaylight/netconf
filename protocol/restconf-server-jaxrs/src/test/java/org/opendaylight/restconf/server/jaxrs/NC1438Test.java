@@ -405,9 +405,8 @@ class NC1438Test extends AbstractRestconfTest {
             <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
               <error>
                 <error-type>application</error-type>
-                <error-message>Operation value is incorrect: "WRONG" is not a valid name</error-message>
+                <error-message>Operation value: [WRONG] is incorrect.</error-message>
                 <error-tag>invalid-value</error-tag>
-                <error-info>"WRONG" is not a valid name</error-info>
               </error>
             </errors>
             """, body::formatToXML, true);
@@ -442,8 +441,7 @@ class NC1438Test extends AbstractRestconfTest {
                 "error": [
                   {
                     "error-tag": "invalid-value",
-                    "error-info": "\\"wrong\\" is not a valid name",
-                    "error-message": "Operation value is incorrect: \\"wrong\\" is not a valid name",
+                    "error-message": "Operation value: [wrong] is incorrect.",
                     "error-type": "application"
                   }
                 ]

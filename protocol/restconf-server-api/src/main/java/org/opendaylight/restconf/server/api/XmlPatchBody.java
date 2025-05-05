@@ -62,13 +62,11 @@ public final class XmlPatchBody extends PatchBody {
             final Element element = (Element) editNodes.item(i);
             final String operation = requireNonNullValue(element.getElementsByTagName("operation").item(0), "operation")
                 .getFirstChild().getNodeValue();
-            final Operation oper;
-            try {
-                oper = Operation.ofName(operation);
-            } catch (IllegalArgumentException e) {
-                LOG.error("Provided operation type {} does not match", operation, e);
+            final Operation oper = Operation.forName(operation);
+            if (oper == null) {
+                LOG.error("Provided operation type {} does not match", operation);
                 throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-                    "Operation value is incorrect: " + e.getMessage(), e);
+                    "Operation value: [" + operation + "] is incorrect.");
             }
             final String editId = requireNonNullValue(element.getElementsByTagName("edit-id").item(0), "edit-id")
                 .getFirstChild().getNodeValue();
