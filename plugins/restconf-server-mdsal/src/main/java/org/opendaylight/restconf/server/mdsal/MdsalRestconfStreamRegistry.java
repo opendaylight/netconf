@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -95,7 +96,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private final DOMNotificationService notificationService;
     private final DatabindProvider databindProvider;
     private final List<StreamSupport> supports;
-    private final Registration reg;
+    private final Registration sclReg;
+    private final Registration tclReg;
 
     private DefaultNotificationSource notificationSource;
 
@@ -200,24 +202,31 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);
-        final var changeService = dataBroker.extension(DOMDataBroker.DataTreeChangeExtension.class);
-        if (changeService != null) {
-            changeService.registerTreeChangeListener(DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
-                FILTERS), new FilterDataTreeChangeListener(dataBroker));
-        }
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
 
         // FIXME: the source should be handling its own updates and we should only call start() once
         notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
         start(notificationSource);
-        reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
+        sclReg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
+
+        final var changeExtension = dataBroker.extension(DataTreeChangeExtension.class);
+        if (changeExtension != null) {
+            tclReg = changeExtension.registerTreeChangeListener(
+                DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, FILTERS),
+                new FilterDataTreeChangeListener(dataBroker));
+        } else {
+            tclReg = null;
+        }
     }
 
     @PreDestroy
     @Deactivate
     @Override
     public synchronized void close() {
-        reg.close();
+        if (tclReg != null) {
+            tclReg.close();
+        }
+        sclReg.close();
         if (notificationSource != null) {
             notificationSource.close();
         }
