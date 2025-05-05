@@ -34,6 +34,24 @@
       "parentUuid": "94011e70_90d23124",
       "revId": "3681ba39ed76675e3c7e908f8199f333de209ce7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "033a970e_ee7a4824",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-05T17:24:09Z",
+      "side": 1,
+      "message": "This is an issue only for JSON requests. If there is some unknown element, it will break our parsing logic. In the while loop, we iterate through JsonReader:\n `while (in.hasNext()) { `\nhttps://github.com/opendaylight/netconf/blob/master/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#L124\n\nIn case of an unknown element like `\"wrong\" : \"create data\"` the \"wrong\" will be skipped, and next processed element will be \"create data\", which will produce:\n\n```\njava.lang.IllegalStateException: \nExpected a name but was STRING at line 7 column 19 path $.ietf-yang-patch:yang-patch.edit[0].wrong\n```\n\nXML parser doesn\u0027t have this issue.\n\nFixed this by better clarifying this in commit message",
+      "parentUuid": "281efb52_704d889d",
+      "revId": "3681ba39ed76675e3c7e908f8199f333de209ce7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
