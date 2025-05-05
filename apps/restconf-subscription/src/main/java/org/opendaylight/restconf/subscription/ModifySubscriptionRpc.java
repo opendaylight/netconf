@@ -10,12 +10,11 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -35,8 +34,6 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * RESTCONF implementation of {@link ModifySubscription}.
@@ -52,18 +49,16 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
-
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
+    private final DatabindProvider databindProvider;
 
     @Inject
     @Activate
     public ModifySubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService) {
+            @Reference final DatabindProvider databindProvider) {
         super(ModifySubscription.QNAME);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.databindProvider = requireNonNull(databindProvider);
     }
 
     @Override
@@ -117,19 +112,8 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        streamRegistry.modifySubscription(request.transform(modifiedSubscription -> {
-            try {
-                // FIXME: pass correct filter once we extract if from input
-                subscriptionStateService.subscriptionModified(Instant.now(), id, modifiedSubscription.streamName(),
-                    modifiedSubscription.encoding(), null, null, null);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IllegalStateException("Could not send subscription modify notification", e);
-            }
-
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
-                .build();
-        }), id, filter);
+        streamRegistry.modifySubscription(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
+            .build()), id, filter, databindProvider);
     }
 }
