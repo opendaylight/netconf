@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -82,7 +81,6 @@ class EstablishSubscriptionRpcTest {
         rpc = new EstablishSubscriptionRpc(streamRegistry);
     }
 
-    @Disabled
     @Test
     void establishSubscriptionTest() {
         final var nameLeaf = QName.create(Receiver.QNAME, "name");
@@ -128,7 +126,6 @@ class EstablishSubscriptionRpcTest {
         verify(request).completeWith(eq(responseBuilder));
     }
 
-    @Disabled
     @Test
     void establishSubscriptionWrongStreamTest() {
         doReturn(null).when(streamRegistry).lookupStream("NETCONF");
@@ -150,7 +147,6 @@ class EstablishSubscriptionRpcTest {
         assertEquals("No stream specified", response.getValue().getMessage());
     }
 
-    @Disabled
     @Test
     void establishSubscriptionWrongFilterTest() {
         final var input = ImmutableNodes.newContainerBuilder()

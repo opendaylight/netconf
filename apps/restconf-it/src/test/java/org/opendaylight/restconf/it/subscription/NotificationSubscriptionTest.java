@@ -16,12 +16,10 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-@Disabled
 class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final String APPLICATION_JSON = "application/json";
     private static final String APPLICATION_XML = "application/xml";
