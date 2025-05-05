@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server.mdsal;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -59,8 +60,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -80,14 +79,15 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
+    private static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
 
     private static final NodeIdentifier ENCODING_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING);
     private static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
         NodeIdentifier.create(SubscriptionUtil.QNAME_EXCLUDED_EVENT_RECORDS);
     private static final NodeIdentifier FILTERS_NODEID = NodeIdentifier.create(Filters.QNAME);
     private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
-    private static final NodeIdentifier NAME_NODEID =
-        NodeIdentifier.create(QName.create(StreamFilter.QNAME, "name").intern());
+    private static final NodeIdentifier NAME_NODEID = NodeIdentifier.create(NAME_QNAME);
+
     private static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
@@ -110,39 +110,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     private DefaultNotificationSource notificationSource;
 
-    private class FilterDataTreeChangeListener implements DOMDataTreeChangeListener {
-        @Override
-        public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
-            for (var change : changes) {
-                final var node = change.getRootNode();
-                switch (node.modificationType()) {
-                    case null -> throw new NullPointerException();
-                    case SUBTREE_MODIFIED, APPEARED, WRITE -> {
-                        onFiltersUpdated((MapNode) node.dataAfter());
-                    }
-                    case DELETE, DISAPPEARED -> {
-                        final var data = (MapNode) node.dataBefore();
-                        if (data != null) {
-                            data.body().forEach(entry -> {
-                                final var name = extractFilterName(entry);
-                                removeFilter(name);
-                            });
-                        }
-                    }
-                    case UNMODIFIED ->
-                        // no reason to do anything with an unmodified node
-                        LOG.debug("DataTreeCandidate for a filter is unmodified, nothing to change. Candidate: {}",
-                            node);
-                }
-            }
-        }
-
-        @Override
-        public void onInitialData() {
-            // No filters at all
-        }
-    }
-
     @Inject
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
@@ -164,8 +131,22 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         if (changeExtension != null) {
             tclReg = changeExtension.registerTreeChangeListener(
                 DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(
-                    FILTERS_NODEID, STREAM_FILTER_NODEID)),
-                new FilterDataTreeChangeListener());
+                    FILTERS_NODEID,
+                    STREAM_FILTER_NODEID,
+                    // wildcard: any filter
+                    STREAM_FILTER_NODEID,
+                    FILTER_SPEC_NODEID)),
+                new DOMDataTreeChangeListener() {
+                    @Override
+                    public void onInitialData() {
+                        // No filters at all
+                    }
+
+                    @Override
+                    public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
+                        onFiltersUpdated(changes);
+                    }
+                });
         } else {
             tclReg = null;
         }
@@ -192,31 +173,39 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         start(notificationSource);
     }
 
-    private void onFiltersUpdated(final MapNode filters) {
-        if (filters == null) {
-            return;
+    private void onFiltersUpdated(final List<DataTreeCandidate> filterSpecChanges) {
+        for (var candidate : filterSpecChanges) {
+            // candidate root points to the the filter-spec itself, parent path identifies the filter that changed
+            final var filterId = verifyNotNull((NodeIdentifierWithPredicates)
+                candidate.getRootPath().coerceParent().getLastPathArgument());
+            final var name = verifyNotNull((String) filterId.getValue(NAME_QNAME));
+
+            final var node = candidate.getRootNode();
+            switch (node.modificationType()) {
+                case null -> throw new IllegalStateException("Modification type is null for node: " + node);
+                case APPEARED, SUBTREE_MODIFIED, WRITE -> {
+                    final var filterSpec = (ChoiceNode) node.getDataBefore();
+                    final EventStreamFilter filter;
+                    try {
+                        filter = parseFilter(filterSpec);
+                    } catch (RequestException e) {
+                        LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
+                        removeFilter(name);
+                        return;
+                    }
+
+                    addFilter(name, filter);
+                    LOG.debug("Updated filter {} to {}", name, filter);
+                }
+                case DELETE, DISAPPEARED -> {
+                    removeFilter(name);
+                    LOG.debug("Removed filter {} without specification", name);
+                }
+                case UNMODIFIED -> {
+                    // No-op
+                }
+            }
         }
-        filters.body().forEach(entry -> {
-            final var name = extractFilterName(entry);
-            final var filterSpec = (ChoiceNode) entry.childByArg(FILTER_SPEC_NODEID);
-            if (filterSpec == null) {
-                removeFilter(name);
-                LOG.debug("Removed filter {} without specification", name);
-                return;
-            }
-
-            final EventStreamFilter filter;
-            try {
-                filter = parseFilter(filterSpec);
-            } catch (RequestException e) {
-                LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
-                removeFilter(name);
-                return;
-            }
-
-            putFilter(name, filter);
-            LOG.debug("Updated filter {} to {}", name, filter);
-        });
     }
 
     @NonNullByDefault
@@ -230,16 +219,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             return parseXpathFilter((String) xpath.body());
         }
         throw new RequestException("Unsupported filter %s", filterSpec);
-    }
-
-    @NonNullByDefault
-    private static String extractFilterName(final MapEntryNode entry) {
-        if (entry.childByArg(NAME_NODEID) instanceof LeafNode<?> leafNode) {
-            if (leafNode.body() instanceof String filterName) {
-                return filterName;
-            }
-        }
-        throw new IllegalStateException("Filter must have name: " + entry);
     }
 
     @Override
