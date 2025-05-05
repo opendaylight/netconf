@@ -301,10 +301,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
         SubscriptionFilter filter);
 
+    @NonNullByDefault
     protected void putFilter(final String name, final EventStreamFilter filter) {
         filters.put(name, filter);
     }
 
+    @NonNullByDefault
     protected void removeFilter(final String name) {
         filters.remove(name);
     }
