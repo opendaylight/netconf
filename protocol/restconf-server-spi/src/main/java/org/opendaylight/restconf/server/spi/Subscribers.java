@@ -16,6 +16,7 @@ import com.google.common.collect.ListMultimap;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,20 +54,28 @@ abstract sealed class Subscribers<T> {
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             // No-op
         }
+
+        @Override
+        void publishForSubscription(final Uint32 id, final EffectiveModelContext modelContext, final T input,
+                final Instant now) {
+            // No-op
+        }
     }
 
     private static final class Single<T> extends Subscribers<T> {
         private final Subscriber<T> subscriber;
+        private final Uint32 subscriptionId;
 
         Single(final Subscriber<T> subscriber) {
             this.subscriber = requireNonNull(subscriber);
+            this.subscriptionId = subscriber.subscriptionId();
         }
 
         @Override
         Subscribers<T> add(final Subscriber<T> toAdd) {
             return new Multiple<>(ImmutableListMultimap.of(
-                subscriber.formatter(), subscriber,
-                toAdd.formatter(), toAdd));
+                subscriptionId, subscriber,
+                toAdd.subscriptionId(), toAdd));
         }
 
         @Override
@@ -86,26 +95,35 @@ abstract sealed class Subscribers<T> {
                 subscriber.sender().sendDataMessage(formatted);
             }
         }
+
+        @Override
+        void publishForSubscription(final Uint32 id, final EffectiveModelContext modelContext, final T input,
+                final Instant now) {
+            if (!subscriptionId.equals(id)) {
+                return;
+            }
+            publish(modelContext, input, now);
+        }
     }
 
     private static final class Multiple<T> extends Subscribers<T> {
-        private final ImmutableListMultimap<EventFormatter<T>, Subscriber<T>> subscribers;
+        private final ImmutableListMultimap<Uint32, Subscriber<T>> subscribers;
 
-        Multiple(final ListMultimap<EventFormatter<T>, Subscriber<T>> subscribers) {
+        Multiple(final ListMultimap<Uint32, Subscriber<T>> subscribers) {
             this.subscribers = ImmutableListMultimap.copyOf(subscribers);
         }
 
         @Override
         Subscribers<T> add(final Subscriber<T> toAdd) {
             final var newSubscribers = ArrayListMultimap.create(subscribers);
-            newSubscribers.put(toAdd.formatter(), toAdd);
+            newSubscribers.put(toAdd.subscriptionId(), toAdd);
             return new Multiple<>(newSubscribers);
         }
 
         @Override
         Subscribers<T> remove(final Subscriber<?> toRemove) {
             final var newSubscribers = ArrayListMultimap.create(subscribers);
-            return newSubscribers.remove(toRemove.formatter(), toRemove) ? switch (newSubscribers.size()) {
+            return newSubscribers.remove(toRemove.subscriptionId(), toRemove) ? switch (newSubscribers.size()) {
                 case 0 -> throw new VerifyException("Unexpected empty subscribers");
                 case 1 -> new Single<>(newSubscribers.values().iterator().next());
                 default -> new Multiple<>(newSubscribers);
@@ -119,17 +137,42 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
+            String formatted = null;
+            EventFormatter<T> formatter = null;
             for (var entry : subscribers.asMap().entrySet()) {
-                final var formatted = format(entry.getKey(), modelContext, input, now);
-                if (formatted != null) {
-                    for (var subscriber : entry.getValue()) {
+                for (var subscriber : entry.getValue()) {
+                    if (formatter != subscriber.formatter()) {
+                        // Format only when formatter changes
+                        formatted = format(subscriber.formatter(), modelContext, input, now);
+                        formatter = subscriber.formatter();
+                    }
+                    if (formatted != null) {
                         subscriber.sender().sendDataMessage(formatted);
                     }
                 }
             }
         }
-    }
 
+        @Override
+        void publishForSubscription(final Uint32 id, final EffectiveModelContext modelContext, final T input,
+                final Instant now) {
+            //FIXME: resolve duplicate
+            String formatted = null;
+            EventFormatter<T> formatter = null;
+            for (var subscriber : subscribers.get(id)) {
+                if (formatter != subscriber.formatter()) {
+                    // Format only when formatter changes
+                    formatted = format(subscriber.formatter(), modelContext, input, now);
+                    formatter = subscriber.formatter();
+                }
+                if (formatted != null) {
+                    subscriber.sender().sendDataMessage(formatted);
+                }
+            }
+        }
+
+
+    }
     private static final Logger LOG = LoggerFactory.getLogger(Subscribers.class);
 
     private Subscribers() {
@@ -180,6 +223,16 @@ abstract sealed class Subscribers<T> {
      * @throws NullPointerException if any argument is {@code null}
      */
     abstract void publish(EffectiveModelContext modelContext, T input, Instant now);
+
+    /**
+     * Publish an event to all {@link Subscriber}s in this file.
+     *
+     * @param modelContext An {@link EffectiveModelContext} used to format the input
+     * @param input Input data
+     * @param now Current time
+     * @throws NullPointerException if any argument is {@code null}
+     */
+    abstract void publishForSubscription(Uint32 id, EffectiveModelContext modelContext, T input, Instant now);
 
     @SuppressWarnings("checkstyle:illegalCatch")
     private static <T> @Nullable String format(final EventFormatter<T> formatter,
