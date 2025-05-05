@@ -86,10 +86,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
     private static final YangInstanceIdentifier FILTERS = YangInstanceIdentifier.of(
-        YangInstanceIdentifier.NodeIdentifier.create(Filters.QNAME),
-        YangInstanceIdentifier.NodeIdentifier.create(StreamFilter.QNAME));
-    private static final YangInstanceIdentifier.NodeIdentifier FILTER_NAME =
-        YangInstanceIdentifier.NodeIdentifier.create(QName.create(StreamFilter.QNAME, "name").intern());
+        NodeIdentifier.create(Filters.QNAME),
+        NodeIdentifier.create(StreamFilter.QNAME));
+    private static final NodeIdentifier FILTER_NAME =
+        NodeIdentifier.create(QName.create(StreamFilter.QNAME, "name").intern());
 
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
@@ -340,12 +340,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withNodeIdentifier(NodeIdentifier.create(FilterSpec.QNAME))
                     .withChild(ImmutableNodes.leafNode(StreamSubtreeFilter.QNAME, anydata))
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(FilterSpec.QNAME))
+                    .withNodeIdentifier(NodeIdentifier.create(FilterSpec.QNAME))
                     .withChild(ImmutableNodes.leafNode(QName.create(FilterSpec.QNAME, "stream-xpath-filter"), xpath))
                     .build();
         };
@@ -357,9 +357,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withNodeIdentifier(nodeId)
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
                 .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
+                    .withNodeIdentifier(NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET))
                     .withChild(ImmutableNodes.newChoiceBuilder()
-                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(StreamFilter.QNAME))
+                        .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
                         .withChild(filterNode)
                         .build())
                     .build())
