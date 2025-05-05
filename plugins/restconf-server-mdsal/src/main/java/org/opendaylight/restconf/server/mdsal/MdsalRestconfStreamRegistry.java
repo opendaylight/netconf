@@ -25,6 +25,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
@@ -167,33 +168,35 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 final var filterSpec = (ChoiceNode) entry.childByArg(FILTER_SPEC_NODEID);
                 if (filterSpec == null) {
                     removeFilter(name);
+                    LOG.debug("Removed filter {} without specification", name);
                     return;
                 }
 
-                final var subtree = extractFilter(filterSpec);
                 final EventStreamFilter filter;
                 try {
-                    filter = resolveFilter(subtree);
+                    filter = parseFilter(filterSpec);
                 } catch (RequestException e) {
-                    LOG.error("Failed to parse subtree {} filter", subtree, e);
-                    throw new RuntimeException(e);
+                    LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
+                    removeFilter(name);
+                    return;
                 }
+
                 putFilter(name, filter);
+                LOG.debug("Updated filter {} to {}", name, filter);
             });
         }
 
-        private static RestconfStream.SubscriptionFilter extractFilter(final ChoiceNode filterSpec) {
+        @NonNullByDefault
+        private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
             final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
             if (subtree != null) {
-                return new RestconfStream.SubscriptionFilter.SubtreeDefinition(subtree);
+                return parseSubtreeFilter(subtree);
             }
-            if (filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME)) instanceof LeafNode<?> leafNode) {
-                if (leafNode.body() instanceof String xpath) {
-                    return new RestconfStream.SubscriptionFilter.XPathDefinition(xpath);
-                }
-                throw new IllegalArgumentException("Bad child " + leafNode.prettyTree());
+            final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
+            if (xpath != null) {
+                return parseXpathFilter((String) xpath.body());
             }
-            return null;
+            throw new RequestException("Unsupported filter %s", filterSpec);
         }
 
         private static @NonNull String extractFilterName(final MapEntryNode entry) {
