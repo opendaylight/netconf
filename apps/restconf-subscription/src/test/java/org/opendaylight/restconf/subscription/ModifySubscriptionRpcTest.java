@@ -27,7 +27,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamSubscription;
@@ -54,8 +53,6 @@ class ModifySubscriptionRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private SubscriptionStateService subscriptionStateService;
-    @Mock
     private DatabindPath.Rpc operationPath;
     @Mock
     private DOMDataTreeWriteTransaction writeTx;
@@ -74,7 +71,7 @@ class ModifySubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new ModifySubscriptionRpc(streamRegistry, subscriptionStateService);
+        rpc = new ModifySubscriptionRpc(streamRegistry);
     }
 
     @Disabled

@@ -10,12 +10,10 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -35,8 +33,6 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * RESTCONF implementation of {@link KillSubscription}.
@@ -46,20 +42,16 @@ import org.slf4j.LoggerFactory;
 @Component(service = RpcImplementation.class, enabled = false)
 @NonNullByDefault
 public final class KillSubscriptionRpc extends RpcImplementation {
-    private static final Logger LOG = LoggerFactory.getLogger(KillSubscriptionRpc.class);
 
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(KillSubscriptionInput.QNAME, "id").intern());
 
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public KillSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService) {
+    public KillSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
         super(KillSubscription.QNAME);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
 
@@ -93,15 +85,8 @@ public final class KillSubscriptionRpc extends RpcImplementation {
         }
 
         streamRegistry.updateSubscriptionState(subscription, SubscriptionState.END);
-        subscription.terminate(request.transform(unused -> {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
-                .build();
-        }), NoSuchSubscription.QNAME);
+        subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
+            .build()), NoSuchSubscription.QNAME);
     }
 }
