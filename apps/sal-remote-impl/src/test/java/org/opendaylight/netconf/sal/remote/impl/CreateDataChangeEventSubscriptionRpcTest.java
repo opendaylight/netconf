@@ -93,7 +93,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
         }
 
         @Override
-        protected EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) {
+        protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
             throw new UnsupportedOperationException();
         }
     }
