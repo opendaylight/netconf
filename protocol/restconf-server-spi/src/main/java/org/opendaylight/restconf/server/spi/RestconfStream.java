@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -218,7 +219,7 @@ public final class RestconfStream<T> {
          * @throws NullPointerException if {@code request}, {@code id} or {@code filter} is {@code null}
          */
         @NonNullByDefault
-        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
+        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter, DatabindProvider provider);
 
         /**
          * Lookup an existing subscription.
@@ -306,7 +307,8 @@ public final class RestconfStream<T> {
         public abstract void addReceiver(ServerRequest<Registration> request, Sender sender);
 
         @NonNullByDefault
-        public final void terminate(final ServerRequest<Empty> request, final QName reason) {
+        public final void terminate(final ServerRequest<Empty> request, final QName reason,
+                final DatabindProvider provider) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
             if (witness != null) {
                 request.completeWith(new RequestException("Subscription already terminated with " + witness));
@@ -314,11 +316,11 @@ public final class RestconfStream<T> {
             }
 
             LOG.debug("Terminating subscription {} due to {}", id(), reason);
-            terminateImpl(request, reason);
+            terminateImpl(request, reason, provider);
         }
 
         @NonNullByDefault
-        protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+        protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason, DatabindProvider provider);
 
         @Override
         public final String toString() {

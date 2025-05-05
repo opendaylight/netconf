@@ -5,18 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.notifications.mdsal;
+package org.opendaylight.restconf.server.spi;
 
-import static java.util.Objects.requireNonNull;
-
-import com.google.common.util.concurrent.ListenableFuture;
-import java.time.Instant;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
-import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionCompleted;
@@ -38,18 +30,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedAnydata;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Service for managing subscription state notifications.
- */
-@Singleton
-@Component(service = SubscriptionStateService.class)
-public class SubscriptionStateService {
+// FIXME this class is reduced to util and ideally should be integrated into Abstractand removed
+public final class SubscriptionStateService {
     /**
      * Subscription states. Each is backed by a notification in {@code ietf-subscribed-notifications}.
      */
@@ -111,18 +96,12 @@ public class SubscriptionStateService {
         org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117
             .YangModuleInfoImpl.qnameOf("uri"));
 
-    private final DOMNotificationPublishService publishService;
-
-    @Inject
-    @Activate
-    public SubscriptionStateService(@Reference final DOMNotificationPublishService publishService) {
-        this.publishService = requireNonNull(publishService);
+    private SubscriptionStateService() {
     }
 
     /**
      * Sends a notification indicating the subscription was modified.
      *
-     * @param eventTime  the event timestamp
      * @param id         the subscription ID
      * @param streamName the subscription stream name
      * @param encoding   the optional subscription encoding
@@ -131,9 +110,9 @@ public class SubscriptionStateService {
      * @param uri        the optional subscription uri
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionModified(final Instant eventTime, final Uint32 id, final String streamName,
+    public static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
             final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
-            final @Nullable String stopTime, final @Nullable String uri) throws InterruptedException {
+            final @Nullable String stopTime, final @Nullable String uri) {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
         var body = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(State.MODIFIED.nodeId)
@@ -154,89 +133,72 @@ public class SubscriptionStateService {
         if (uri != null) {
             body.withChild(ImmutableNodes.leafNode(URI_NODEID, uri));
         }
-        return sendNotification(eventTime, body.build());
+        return body.build();
     }
 
     /**
      * Sends a notification indicating the subscription was completed.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionCompleted(final Instant eventTime, final Uint32 id)
-            throws InterruptedException {
-        return sendStateNotification(eventTime, id, State.COMPLETED);
+    public static ContainerNode subscriptionCompleted(final Uint32 id) {
+        return getStateNotification(id, State.COMPLETED);
     }
 
     /**
      * Sends a notification indicating the subscription was resumed.
      *
-     * @param eventTime the event timestamp
      * @param id        the subscription ID
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionResumed(final Instant eventTime, final Uint32 id)
-            throws InterruptedException {
-        return sendStateNotification(eventTime, id, State.RESUMED);
+    public static ContainerNode subscriptionResumed(final Uint32 id) {
+        return getStateNotification(id, State.RESUMED);
     }
 
     /**
      * Sends a notification indicating the subscription was terminated.
      *
-     * @param eventTime the event timestamp
-     * @param id        the subscription ID
-     * @param errorReason   the error ID associated with termination
+     * @param id          the subscription ID
+     * @param errorReason the error ID associated with termination
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionTerminated(final Instant eventTime, final Uint32 id, final QName errorReason)
-            throws InterruptedException {
-        return sendErrorStateNotification(eventTime, id, errorReason, State.TERMINATED);
+    public static ContainerNode subscriptionTerminated(final Uint32 id, final QName errorReason) {
+        return getErrorStateNotification(id, errorReason, State.TERMINATED);
     }
 
     /**
      * Sends a notification indicating the subscription was suspended.
      *
-     * @param eventTime the event timestamp
-     * @param id        the subscription ID
-     * @param errorReason   the error ID associated with suspension
+     * @param id          the subscription ID
+     * @param errorReason the error ID associated with suspension
      * @return a listenable future outcome of the notification
      */
-    public ListenableFuture<?> subscriptionSuspended(final Instant eventTime, final Uint32 id, final QName errorReason)
-            throws InterruptedException {
-        return sendErrorStateNotification(eventTime, id, errorReason, State.SUSPENDED);
+    public static ContainerNode subscriptionSuspended(final Uint32 id, final QName errorReason) {
+        return getErrorStateNotification(id, errorReason, State.SUSPENDED);
     }
 
     /**
      * Builds and sends a generic state notification.
      */
-    private ListenableFuture<?> sendStateNotification(final Instant eventTime, final Uint32 id, final State state)
-            throws InterruptedException {
-        LOG.info("Publishing {} notification for ID: {}", state, id);
-        return sendNotification(eventTime, ImmutableNodes.newContainerBuilder()
+    private static ContainerNode getStateNotification(final Uint32 id, final State state) {
+        LOG.info("Creating {} notification for ID: {}", state, id);
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(state.nodeId)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
-            .build());
+            .build();
     }
 
     /**
      * Builds and sends an error state notification.
      */
-    private ListenableFuture<?> sendErrorStateNotification(final Instant eventTime, final Uint32 id,
-            final QName errorReason, final State state) throws InterruptedException {
-        LOG.info("Publishing {} notification for ID: {} with error ID: {}", state, id, errorReason);
-        return sendNotification(eventTime, ImmutableNodes.newContainerBuilder()
+    private static ContainerNode getErrorStateNotification(final Uint32 id,
+            final QName errorReason, final State state) {
+        LOG.info("Creating {} notification for ID: {} with error ID: {}", state, id, errorReason);
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(state.nodeId)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
             .withChild(ImmutableNodes.leafNode(REASON_NODEID, errorReason))
-            .build());
-    }
-
-    /**
-     * Sends the notification through the publishing service.
-     */
-    private ListenableFuture<?> sendNotification(final Instant eventTime, final ContainerNode node)
-            throws InterruptedException {
-        return publishService.putNotification(new DOMNotificationEvent.Rfc6020(node, eventTime));
+            .build();
     }
 }

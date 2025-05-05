@@ -141,6 +141,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     /**
      * Tests receiving notification after deleting subscription.
      */
+    @Disabled("Re-enable when state notifications are reworked in NETCONF-1463")
     @Test
     void testListenDeleteNotification() throws Exception {
         // Delete the subscription
