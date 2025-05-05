@@ -144,7 +144,7 @@ abstract sealed class Subscribers<T> {
      * @return An empty {@link Subscribers} file
      */
     @SuppressWarnings("unchecked")
-    static <T> org.opendaylight.restconf.server.spi.Subscribers<T> empty() {
+    static <T> Subscribers<T> empty() {
         return (Subscribers<T>) Empty.INSTANCE;
     }
 
