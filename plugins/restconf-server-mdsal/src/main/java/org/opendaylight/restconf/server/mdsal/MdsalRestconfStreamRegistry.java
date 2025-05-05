@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -116,10 +115,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             for (var change : changes) {
                 final var node = change.getRootNode();
                 switch (node.modificationType()) {
-                    case null -> throw new IllegalStateException("Modification type is null for node: " + node);
+                    case null -> throw new NullPointerException();
                     case SUBTREE_MODIFIED, APPEARED, WRITE -> {
-                        final var data = (MapNode) node.dataAfter();
-                        processFilters(data);
+                        onFiltersUpdated((MapNode) node.dataAfter());
                     }
                     case DELETE, DISAPPEARED -> {
                         final var data = (MapNode) node.dataBefore();
@@ -141,55 +139,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         @Override
         public void onInitialData() {
             // No filters at all
-        }
-
-        private void processFilters(final MapNode node) {
-            if (node == null) {
-                return;
-            }
-            node.body().forEach(entry -> {
-                final var name = extractFilterName(entry);
-                final var filterSpec = (ChoiceNode) entry.childByArg(FILTER_SPEC_NODEID);
-                if (filterSpec == null) {
-                    removeFilter(name);
-                    LOG.debug("Removed filter {} without specification", name);
-                    return;
-                }
-
-                final EventStreamFilter filter;
-                try {
-                    filter = parseFilter(filterSpec);
-                } catch (RequestException e) {
-                    LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
-                    removeFilter(name);
-                    return;
-                }
-
-                putFilter(name, filter);
-                LOG.debug("Updated filter {} to {}", name, filter);
-            });
-        }
-
-        @NonNullByDefault
-        private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
-            final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
-            if (subtree != null) {
-                return parseSubtreeFilter(subtree);
-            }
-            final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
-            if (xpath != null) {
-                return parseXpathFilter((String) xpath.body());
-            }
-            throw new RequestException("Unsupported filter %s", filterSpec);
-        }
-
-        private static @NonNull String extractFilterName(final MapEntryNode entry) {
-            if (entry.childByArg(NAME_NODEID) instanceof LeafNode<?> leafNode) {
-                if (leafNode.body() instanceof String filterName) {
-                    return filterName;
-                }
-            }
-            throw new IllegalStateException("Filter must have name: " + entry);
         }
     }
 
@@ -240,6 +189,56 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }
         notificationSource = new DefaultNotificationSource(notificationService, context);
         start(notificationSource);
+    }
+
+    private void onFiltersUpdated(final MapNode filters) {
+        if (filters == null) {
+            return;
+        }
+        filters.body().forEach(entry -> {
+            final var name = extractFilterName(entry);
+            final var filterSpec = (ChoiceNode) entry.childByArg(FILTER_SPEC_NODEID);
+            if (filterSpec == null) {
+                removeFilter(name);
+                LOG.debug("Removed filter {} without specification", name);
+                return;
+            }
+
+            final EventStreamFilter filter;
+            try {
+                filter = parseFilter(filterSpec);
+            } catch (RequestException e) {
+                LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
+                removeFilter(name);
+                return;
+            }
+
+            putFilter(name, filter);
+            LOG.debug("Updated filter {} to {}", name, filter);
+        });
+    }
+
+    @NonNullByDefault
+    private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
+        final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
+        if (subtree != null) {
+            return parseSubtreeFilter(subtree);
+        }
+        final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
+        if (xpath != null) {
+            return parseXpathFilter((String) xpath.body());
+        }
+        throw new RequestException("Unsupported filter %s", filterSpec);
+    }
+
+    @NonNullByDefault
+    private static String extractFilterName(final MapEntryNode entry) {
+        if (entry.childByArg(NAME_NODEID) instanceof LeafNode<?> leafNode) {
+            if (leafNode.body() instanceof String filterName) {
+                return filterName;
+            }
+        }
+        throw new IllegalStateException("Filter must have name: " + entry);
     }
 
     @Override
