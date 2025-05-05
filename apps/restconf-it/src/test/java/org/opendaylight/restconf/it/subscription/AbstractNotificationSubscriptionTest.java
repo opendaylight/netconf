@@ -396,7 +396,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     FullHttpResponse establishFilteredSubscription(final String filter, final HTTPClient streamHttpClient) {
         final var input = String.format("""
              <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
-               <stream>"NETCONF"</stream>
+               <stream>NETCONF</stream>
                <encoding>encode-json</encoding>
                <stream-subtree-filter>%s</stream-subtree-filter>
              </establish-subscription>
