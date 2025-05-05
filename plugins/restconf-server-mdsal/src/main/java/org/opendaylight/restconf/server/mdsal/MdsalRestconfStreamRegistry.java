@@ -166,6 +166,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             node.body().forEach(entry -> {
                 final var name = extractFilterName(entry);
                 final var filterSpec = (ChoiceNode) entry.childByArg(FILTER_SPEC_NODEID);
+                if (filterSpec == null) {
+                    removeFilter(name);
+                    return;
+                }
+
                 final var subtree = extractFilter(filterSpec);
                 final EventStreamFilter filter;
                 try {
@@ -174,14 +179,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     LOG.error("Failed to parse subtree {} filter", subtree, e);
                     throw new RuntimeException(e);
                 }
-                putFilter(name ,filter);
+                putFilter(name, filter);
             });
         }
 
         private static RestconfStream.SubscriptionFilter extractFilter(final ChoiceNode filterSpec) {
-            if (filterSpec == null) {
-                return null;
-            }
             final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
             if (subtree != null) {
                 return new RestconfStream.SubscriptionFilter.SubtreeDefinition(subtree);
