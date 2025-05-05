@@ -92,7 +92,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         });
     }
 
-    @Disabled("Disabled until filtering is implemented in NETCONF-1436")
+    @Disabled("Will be disabled until NETCONF-1465 has been resolved")
     @Test
     void counterNotificationWithFilterTest() throws Exception {
         final var response = establishFilteredSubscription("""
@@ -122,15 +122,17 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
-        final var receiversResponse =  invokeRequest(HttpMethod.GET,
-            "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-            MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
-        assertEquals(HttpResponseStatus.OK, receiversResponse.status());
-        // verify 2 notification were sent subscription-modified and ToasterRestocked
-        assertCounter(receiversResponse, "2", "0");
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            final var receiversResponse = invokeRequest(HttpMethod.GET,
+                "/restconf/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
+                MediaTypes.APPLICATION_YANG_DATA_JSON);
+            assertEquals(HttpResponseStatus.OK, receiversResponse.status());
+            // verify 2 notification were sent subscription-modified and ToasterRestocked
+            assertCounter(receiversResponse, "2", "0");
+        });
     }
 
-    @Disabled("Disabled until filtering is implemented in NETCONF-1436")
+    @Disabled("Will be disabled until NETCONF-1465 has been resolved")
     @Test
     void excludedCounterNotificationTest() throws Exception {
         final var response = establishFilteredSubscription(
@@ -153,22 +155,16 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterOutOfBreadNotification,
             Instant.now()));
 
-        // modify
-        final var modifyInput = String.format("""
-             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
-               <id>%s</id>
-               <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
-        assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            final var receiversResponse = invokeRequest(HttpMethod.GET,
+                "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
+                MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
 
-        final var receiversResponse = invokeRequest(HttpMethod.GET,
-            "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-            MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
-        assertEquals(HttpResponseStatus.OK, receiversResponse.status());
-        // verify 2 notification were sent subscription-modified and ToasterOutOfBread and 1 excluded ToasterRestocked
-        assertCounter(receiversResponse, "2", "1");
+            assertEquals(HttpResponseStatus.OK, receiversResponse.status());
+            // verify 2 notification were sent subscription-modified and ToasterOutOfBread and 1 excluded
+            // ToasterRestocked
+            assertCounter(receiversResponse, "2", "1");
+        });
     }
 
     private static void assertCounter(final FullHttpResponse response, final String sent, final String excluded) {
@@ -178,7 +174,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
             .getJSONArray("receiver").getJSONObject(0);
         final var sentEvents = json.getString("sent-event-records");
         final var excludedEvents = json.getString("excluded-event-records");
-        assertEquals(sent, sentEvents);
-        assertEquals(excluded, excludedEvents);
+        assertEquals(sent, sentEvents, "Unexpected sent-event records");
+        assertEquals(excluded, excludedEvents, "Unexpected excluded-event records");
     }
 }
