@@ -7,34 +7,23 @@
  */
 package org.opendaylight.restconf.subscription;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 
-public final class SubscriptionUtil {
-    public static final QName QNAME_ID = QName.create(Subscription.QNAME, "id");
-    public static final QName QNAME_STREAM = QName.create(Subscription.QNAME, "stream");
-    public static final QName QNAME_STREAM_FILTER = QName.create(Subscription.QNAME, "stream-filter-name");
-    public static final QName QNAME_ENCODING = QName.create(Subscription.QNAME, "encoding");
-    public static final QName QNAME_STREAM_NAME = QName.create(Stream.QNAME, "name");
-    public static final QName QNAME_STREAM_FILTER_NAME = QName.create(StreamFilter.QNAME, "name");
-    public static final QName QNAME_RECEIVER_NAME = QName.create(Receiver.QNAME, "name");
-    public static final QName QNAME_RECEIVER_STATE = QName.create(Receiver.QNAME, "state");
-    public static final QName QNAME_TARGET = QName.create(Subscription.QNAME, "target");
-    public static final QName QNAME_SENT_EVENT_RECORDS = QName.create(Receiver.QNAME, "sent-event-records");
-    public static final QName QNAME_EXCLUDED_EVENT_RECORDS = QName
-        .create(Receiver.QNAME, "excluded-event-records");
+final class SubscriptionUtil {
+    @VisibleForTesting
+    static final QName QNAME_ID = QName.create(Subscription.QNAME, "id");
+
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER_NAME =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
 

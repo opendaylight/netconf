@@ -42,12 +42,14 @@ import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
-import org.opendaylight.restconf.subscription.SubscriptionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.Target;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
@@ -79,26 +81,31 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
+    private static final QName ID_QNAME = QName.create(Subscription.QNAME, "id").intern();
     private static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
 
-    private static final NodeIdentifier ENCODING_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_ENCODING);
+    private static final NodeIdentifier ENCODING_NODEID =
+        NodeIdentifier.create(QName.create(Subscription.QNAME, "encoding").intern());
     private static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(SubscriptionUtil.QNAME_EXCLUDED_EVENT_RECORDS);
+        NodeIdentifier.create(QName.create(Receiver.QNAME, "excluded-event-records"));
     private static final NodeIdentifier FILTERS_NODEID = NodeIdentifier.create(Filters.QNAME);
     private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
+    private static final NodeIdentifier ID_NODEID = NodeIdentifier.create(ID_QNAME);
     private static final NodeIdentifier NAME_NODEID = NodeIdentifier.create(NAME_QNAME);
     private static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(SubscriptionUtil.QNAME_SENT_EVENT_RECORDS);
+        NodeIdentifier.create(QName.create(Receiver.QNAME, "sent-event-records").intern());
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
-    private static final NodeIdentifier STATE_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_RECEIVER_STATE);
-    private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_STREAM);
+    private static final NodeIdentifier STATE_NODEID =
+        NodeIdentifier.create(QName.create(Receiver.QNAME, "state").intern());
+    private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
-    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID =
-        NodeIdentifier.create(QName.create(FilterSpec.QNAME, "stream-xpath-filter").intern());
-    private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(SubscriptionUtil.QNAME_TARGET);
+    private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
+        NodeIdentifier.create(QName.create(Subscription.QNAME, "stream-filter-name").intern());
+    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
+    private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
 
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
@@ -233,8 +240,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         tx.merge(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(
             SUBSCRIPTIONS_NODEID,
             SUBSCRIPTION_NODEID,
-            NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                SubscriptionUtil.QNAME_ID, Uint32.valueOf(receiver.subscriptionId())),
+            subscriptionArg(Uint32.valueOf(receiver.subscriptionId())),
             RECEIVERS_NODEID,
             RECEIVER_NODEID,
             NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiver.receiverName()),
@@ -253,7 +259,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         tx.put(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
                 .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, subscription.encoding()))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
@@ -270,7 +276,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                         .withNodeIdentifier(RECEIVER_NODEID)
                         .withChild(ImmutableNodes.newMapEntryBuilder()
                             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                                SubscriptionUtil.QNAME_RECEIVER_NAME, receiver))
+                                NAME_QNAME, receiver))
                             .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiver))
                             .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.ZERO))
@@ -292,7 +298,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
         final var filterNode = switch (filter) {
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
-                ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, filterName);
+                ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(FILTER_SPEC_NODEID)
@@ -310,7 +316,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
+                .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
                     .withChild(ImmutableNodes.newChoiceBuilder()
@@ -360,6 +366,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @NonNullByDefault
     private static NodeIdentifierWithPredicates subscriptionArg(final Uint32 subscriptionId) {
-        return NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, subscriptionId);
+        return NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, subscriptionId);
     }
 }
