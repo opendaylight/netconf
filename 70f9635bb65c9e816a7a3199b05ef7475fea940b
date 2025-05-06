@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4504c47a_d085be64",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T12:27:05Z",
+      "side": 1,
+      "message": "we would no more have sseHandlerFactory",
+      "revId": "70f9635bb65c9e816a7a3199b05ef7475fea940b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdb47e82_0a04811b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfTransportChannelListener.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T12:27:05Z",
+      "side": 1,
+      "message": "this class would probably have no changes",
+      "revId": "70f9635bb65c9e816a7a3199b05ef7475fea940b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
