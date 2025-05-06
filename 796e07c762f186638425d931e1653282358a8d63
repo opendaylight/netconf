@@ -94,6 +94,30 @@
       },
       "revId": "796e07c762f186638425d931e1653282358a8d63",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5a00306_cfda0fd6",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-06T09:19:02Z",
+      "side": 1,
+      "message": "To put is simple - for wildcard we never stop checking children midway because any of them may have matching local name.",
+      "parentUuid": "76ffc2b5_e703cbd5",
+      "range": {
+        "startLine": 186,
+        "startChar": 36,
+        "endLine": 186,
+        "endChar": 42
+      },
+      "revId": "796e07c762f186638425d931e1653282358a8d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
