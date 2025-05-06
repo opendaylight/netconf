@@ -85,6 +85,7 @@ class EstablishSubscriptionRpcTest {
     @Disabled
     @Test
     void establishSubscriptionTest() {
+        final var idLeaf = QName.create(Subscription.QNAME, "id");
         final var nameLeaf = QName.create(Receiver.QNAME, "name");
 
         final var nodeTarget = ImmutableNodes.newChoiceBuilder()
@@ -104,8 +105,8 @@ class EstablishSubscriptionRpcTest {
                 .build())
             .build();
         final var expectedNode = ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, ID))
-            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, idLeaf, ID))
+            .withChild(ImmutableNodes.leafNode(idLeaf, ID))
             .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "encoding"), EncodeJson$I.QNAME))
             .withChild(nodeReceivers)
             .withChild(nodeTarget)
