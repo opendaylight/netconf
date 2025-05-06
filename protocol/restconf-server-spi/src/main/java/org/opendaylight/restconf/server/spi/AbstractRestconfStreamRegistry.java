@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -29,14 +30,19 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +103,22 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final ConcurrentMap<Uint32, Subscription> subscriptions = new ConcurrentHashMap<>();
+    // FIXME: This is not quite sufficient and should be split into two maps:
+    //          1. filterSpecs, which is a HashMap<String, ChoiceNode> recording known filter-spec definitions
+    //             access should be guarded by a lock
+    //          2. filters, which is a volatile ImmutableMap<String, EventStreamFilter>
+    //             - lookups should go through getAcquire()
+    //             - updates should hold a lock and publish new versions via setRelease()
+    //        The distinction is crucial, as we need to recompile filters when EffectiveModelContext changes and update
+    //        filters accordingly.
+    // FIXME: There is also a missing piece: we are not populating the operational datastore. This needs to be addressed
+    //        after we address the above, so that anytime we update filters, we issue a callout to subclass to update
+    //        oper so that it contains those filterSpecs for which we have EventStreamFilters. Those that failed to
+    //        parse need to be removed.
+    //        The end result should be that for given *configured* filters we report *operational* filters that are
+    //        really in use.
+    //        Note: the MD-SAL implementation needs to use a Cluster Singleton Service to ensure oper updates are
+    //              happening from a single node only.
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
 
     @Override
@@ -301,14 +323,47 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
         SubscriptionFilter filter);
 
+    /**
+     * Bulk-update the known filter definitions.
+     *
+     * @param nameToSpec the update map, {@code null} values indicate removals
+     */
     @NonNullByDefault
-    protected final void addFilter(final String name, final EventStreamFilter filter) {
-        filters.put(name, filter);
+    protected final void updateFilterDefinitions(final Map<String, @Nullable ChoiceNode> nameToSpec) {
+        for (var entry : nameToSpec.entrySet()) {
+            final var filterName = entry.getKey();
+            final var filterSpec = entry.getValue();
+            if (filterSpec == null) {
+                filters.remove(filterName);
+                LOG.debug("Removed filter {} without specification", filterName);
+                continue;
+            }
+
+            final EventStreamFilter filter;
+            try {
+                filter = parseFilter(filterSpec);
+            } catch (RequestException e) {
+                filters.remove(filterName);
+                LOG.warn("Removed filter {} due to parse failure", filterSpec.prettyTree(), e);
+                continue;
+            }
+
+            filters.put(filterName, filter);
+            LOG.debug("Updated filter {} to {}", filterName, filter);
+        }
     }
 
     @NonNullByDefault
-    protected final void removeFilter(final String name) {
-        filters.remove(name);
+    private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
+        final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
+        if (subtree != null) {
+            return parseSubtreeFilter(subtree);
+        }
+        final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
+        if (xpath != null) {
+            return parseXpathFilter((String) xpath.body());
+        }
+        throw new RequestException("Unsupported filter %s", filterSpec);
     }
 
     private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
@@ -335,7 +390,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
 
     @NonNullByDefault
-    protected static final EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
+    private static final EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
         // TODO: integrate yang-xpath-api and validate the propose xpath
         // TODO: implement XPath filter evaluation
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,

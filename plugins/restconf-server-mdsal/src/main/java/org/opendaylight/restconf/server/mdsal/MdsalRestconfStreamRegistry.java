@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -25,6 +26,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
@@ -46,7 +48,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
@@ -59,7 +60,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -172,7 +172,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         start(notificationSource);
     }
 
+    @NonNullByDefault
     private void onFiltersUpdated(final List<DataTreeCandidate> filterSpecChanges) {
+        final var nameToSpec = new HashMap<String, @Nullable ChoiceNode>();
+
         for (var candidate : filterSpecChanges) {
             // candidate root points to the the filter-spec itself, parent path identifies the filter that changed
             final var filterId = verifyNotNull((NodeIdentifierWithPredicates)
@@ -182,42 +185,16 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final var node = candidate.getRootNode();
             switch (node.modificationType()) {
                 case null -> throw new IllegalStateException("Modification type is null for node: " + node);
-                case APPEARED, SUBTREE_MODIFIED, WRITE -> {
-                    final var filterSpec = (ChoiceNode) node.getDataBefore();
-                    final EventStreamFilter filter;
-                    try {
-                        filter = parseFilter(filterSpec);
-                    } catch (RequestException e) {
-                        LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
-                        removeFilter(filterName);
-                        continue;
-                    }
-
-                    addFilter(filterName, filter);
-                    LOG.debug("Updated filter {} to {}", filterName, filter);
-                }
-                case DELETE, DISAPPEARED -> {
-                    removeFilter(filterName);
-                    LOG.debug("Removed filter {} without specification", filterName);
-                }
+                case APPEARED, SUBTREE_MODIFIED, WRITE ->
+                    nameToSpec.put(filterName, (ChoiceNode) node.getDataBefore());
+                case DELETE, DISAPPEARED -> nameToSpec.put(filterName, null);
                 case UNMODIFIED -> {
                     // No-op
                 }
             }
         }
-    }
 
-    @NonNullByDefault
-    private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
-        final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
-        if (subtree != null) {
-            return parseSubtreeFilter(subtree);
-        }
-        final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
-        if (xpath != null) {
-            return parseXpathFilter((String) xpath.body());
-        }
-        throw new RequestException("Unsupported filter %s", filterSpec);
+        updateFilterDefinitions(nameToSpec);
     }
 
     @Override
