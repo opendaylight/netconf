@@ -35,6 +35,8 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.Target;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -42,6 +44,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -117,8 +120,8 @@ class EstablishSubscriptionRpcTest {
         doReturn(session).when(request).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput()));
-        verify(writeTx).put(eq(LogicalDatastoreType.OPERATIONAL),
-            eq(SubscriptionUtil.SUBSCRIPTIONS.node(expectedNode.name())),
+        verify(writeTx).put(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
+            new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), expectedNode.name())),
             eq(expectedNode));
         verify(request).completeWith(eq(responseBuilder));
     }
@@ -163,8 +166,11 @@ class EstablishSubscriptionRpcTest {
         doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
         doReturn(restconfStream).when(streamRegistry).lookupStream("NETCONF");
         doReturn(FluentFutures.immediateFalseFluentFuture()).when(readTx).exists(LogicalDatastoreType.OPERATIONAL,
-            SubscriptionUtil.FILTERS.node(NodeIdentifierWithPredicates.of(StreamFilter.QNAME,
-                SubscriptionUtil.QNAME_STREAM_FILTER_NAME, "filter")));
+            YangInstanceIdentifier.of(
+                new NodeIdentifier(Filters.QNAME),
+                new NodeIdentifier(StreamFilter.QNAME),
+                NodeIdentifierWithPredicates.of(StreamFilter.QNAME,
+                    SubscriptionUtil.QNAME_STREAM_FILTER_NAME, "filter")));
         doReturn(session).when(request).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
