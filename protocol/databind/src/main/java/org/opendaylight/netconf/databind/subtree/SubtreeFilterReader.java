@@ -183,6 +183,7 @@ final class SubtreeFilterReader {
                                     parentStack.exit();
                                     // exit case
                                     parentStack.exit();
+                                    break;
                                 }
                             }
                         } else {
