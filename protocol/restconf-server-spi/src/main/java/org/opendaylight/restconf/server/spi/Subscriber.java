@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 
@@ -20,11 +22,14 @@ final class Subscriber<T> extends AbstractRegistration {
     private final @NonNull RestconfStream<T> stream;
     private final @NonNull Sender sender;
     private final @NonNull EventFormatter<T> formatter;
+    private final @Nullable EventStreamFilter filter;
 
-    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter) {
+    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
+            final EventStreamFilter filter) {
         this.stream = requireNonNull(stream);
         this.sender = requireNonNull(sender);
         this.formatter = requireNonNull(formatter);
+        this.filter = filter;
     }
 
     @NonNull EventFormatter<T> formatter() {
@@ -33,6 +38,10 @@ final class Subscriber<T> extends AbstractRegistration {
 
     @NonNull Sender sender() {
         return sender;
+    }
+
+    @Nullable EventStreamFilter filter() {
+        return filter;
     }
 
     @Override

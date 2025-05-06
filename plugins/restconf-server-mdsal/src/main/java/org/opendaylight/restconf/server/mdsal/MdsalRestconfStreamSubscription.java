@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.MoreExecutors;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.OnCommitFutureCallback;
@@ -17,6 +18,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ForwardingRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.subscription.SubscriptionUtil;
@@ -44,6 +46,11 @@ final class MdsalRestconfStreamSubscription<T extends RestconfStream.Subscriptio
         final var id = id();
         LOG.debug("{} terminated after channel was closed", id);
         removeSubscription(id, null, null);
+    }
+
+    @Override
+    public AbstractRestconfStreamRegistry.@Nullable EventStreamFilter filter() {
+        return null;
     }
 
     @Override

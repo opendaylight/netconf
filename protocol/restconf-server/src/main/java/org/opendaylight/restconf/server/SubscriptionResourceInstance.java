@@ -30,6 +30,7 @@ import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
@@ -129,7 +130,7 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
         final var sender = new ChannelSenderSubscription(sseMaximumFragmentLength, receiver);
         // Encoding is optional field and in case it is absent json encoding will be used by default
         final var encoding = encodingNameOf(subscription.encoding());
-        final var registration = registerSender(stream, encoding, streamParams, sender);
+        final var registration = registerSender(stream, encoding, streamParams, sender, subscription.filter());
 
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;
@@ -142,10 +143,10 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
 
     private static @Nullable Registration registerSender(final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params,
-            final RestconfStream.Sender sender) {
+            final RestconfStream.Sender sender, final EventStreamFilter filter) {
         final Registration reg;
         try {
-            reg = stream.addSubscriber(sender, encoding, params);
+            reg = stream.addSubscriber(sender, encoding, params, filter);
         } catch (UnsupportedEncodingException | XPathExpressionException e) {
             // FIXME: report an error
             return null;
