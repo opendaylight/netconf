@@ -38,9 +38,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
@@ -49,8 +51,8 @@ class ModifySubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
     private static final ContainerNode INPUT = ImmutableNodes.newContainerBuilder()
-        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
-        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
+        .withNodeIdentifier(new NodeIdentifier(EstablishSubscriptionInput.QNAME))
+        .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "id"), ID))
         .build();
 
     @Mock
@@ -82,14 +84,15 @@ class ModifySubscriptionRpcTest {
     @Disabled
     @Test
     void modifySubscriptionTest() {
+        final var idLeaf = QName.create(Subscription.QNAME, "id");
+
         final var expectedNode = ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                SubscriptionUtil.QNAME_ID, ID))
-            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, idLeaf, ID))
+            .withChild(ImmutableNodes.leafNode(idLeaf, ID))
             .build();
 
         final var response = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
+            .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
             .build();
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
