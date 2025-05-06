@@ -110,7 +110,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
-        final var filter = streamFilter == null ? null : SubscriptionUtil.extractFilter(streamFilter);
+        final var filter = streamFilter == null ? null : EstablishSubscriptionRpc.extractFilter(streamFilter);
         if (filter == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No filter specified"));
