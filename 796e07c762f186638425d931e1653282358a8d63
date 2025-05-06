@@ -70,6 +70,30 @@
       },
       "revId": "796e07c762f186638425d931e1653282358a8d63",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76ffc2b5_e703cbd5",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-06T09:17:14Z",
+      "side": 1,
+      "message": "If you wonder why this change did not broke any test then the answer is there is no test case for it. You added break only when we are dealing with choices and test model doesn\u0027t contain augmented choice or choice with same structure but different revision. I did not add it because we already have test for those but using simpler structure - containers and leaves.",
+      "parentUuid": "6f683c6c_b00b77ca",
+      "range": {
+        "startLine": 186,
+        "startChar": 36,
+        "endLine": 186,
+        "endChar": 42
+      },
+      "revId": "796e07c762f186638425d931e1653282358a8d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
