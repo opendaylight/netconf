@@ -50,6 +50,23 @@
       "message": "if (valueNode.getChildNodes().getLength() \u003d\u003d 0) ?",
       "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c04a493_9aee7ac1",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T13:46:11Z",
+      "side": 1,
+      "message": "do we really need to use hamcrest?",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
