@@ -16,6 +16,40 @@
       "message": "what if in.peek \u003d\u003d BEGIN_ARRAY?",
       "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e2cbe06_cc7305be",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T13:41:23Z",
+      "side": 1,
+      "message": "again, ISE?, again checking the same condition?",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ddd28a9_a7634d29",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T13:41:23Z",
+      "side": 1,
+      "message": "if (valueNode.getChildNodes().getLength() \u003d\u003d 0) ?",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
