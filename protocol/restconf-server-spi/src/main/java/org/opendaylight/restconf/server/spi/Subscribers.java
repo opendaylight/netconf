@@ -16,6 +16,7 @@ import com.google.common.collect.ListMultimap;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,12 @@ abstract sealed class Subscribers<T> {
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             // No-op
         }
+
+        @Override
+        void publishForSubscription(final Uint32 id, final EffectiveModelContext modelContext, final T input,
+                final Instant now) {
+            // No-op
+        }
     }
 
     private static final class Single<T> extends Subscribers<T> {
@@ -85,6 +92,15 @@ abstract sealed class Subscribers<T> {
             if (formatted != null) {
                 subscriber.sender().sendDataMessage(formatted);
             }
+        }
+
+        @Override
+        void publishForSubscription(final Uint32 id, final EffectiveModelContext modelContext, final T input,
+                final Instant now) {
+            if (!id.equals(subscriber.subscriptionId())) {
+                return;
+            }
+            publish(modelContext, input, now);
         }
     }
 
@@ -124,6 +140,21 @@ abstract sealed class Subscribers<T> {
                 if (formatted != null) {
                     for (var subscriber : entry.getValue()) {
                         subscriber.sender().sendDataMessage(formatted);
+                    }
+                }
+            }
+        }
+
+        @Override
+        void publishForSubscription(final Uint32 id, final EffectiveModelContext modelContext, final T input,
+                final Instant now) {
+            for (var entry : subscribers.asMap().entrySet()) {
+                final var formatted = format(entry.getKey(), modelContext, input, now);
+                if (formatted != null) {
+                    for (var subscriber : entry.getValue()) {
+                        if (id.equals(subscriber.subscriptionId())) {
+                            subscriber.sender().sendDataMessage(formatted);
+                        }
                     }
                 }
             }
@@ -180,6 +211,17 @@ abstract sealed class Subscribers<T> {
      * @throws NullPointerException if any argument is {@code null}
      */
     abstract void publish(EffectiveModelContext modelContext, T input, Instant now);
+
+    /**
+     * Publish an event to all {@link Subscriber}s of RFC8639 Subscription with given ID.
+     *
+     * @param id ID of Subscription to which subscribers we want to send the input
+     * @param modelContext An {@link EffectiveModelContext} used to format the input
+     * @param input Input data
+     * @param now Current time
+     * @throws NullPointerException if any argument is {@code null}
+     */
+    abstract void publishForSubscription(Uint32 id, EffectiveModelContext modelContext, T input, Instant now);
 
     @SuppressWarnings("checkstyle:illegalCatch")
     private static <T> @Nullable String format(final EventFormatter<T> formatter,
