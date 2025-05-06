@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3daacdf_d72e9969",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T07:22:03Z",
+      "side": 1,
+      "message": "private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID \u003d NodeIdentifier.create(StreamXpathFilter.QNAME);\n    private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID \u003d NodeIdentifier.create(StreamSubtreeFilter.QNAME);",
+      "revId": "827187a2a20ce5fc7aa605f66c5232e92ea0eb69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
