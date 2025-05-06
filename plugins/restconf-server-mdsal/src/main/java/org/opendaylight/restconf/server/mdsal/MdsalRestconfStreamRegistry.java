@@ -247,12 +247,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final RestconfStream.Subscription subscription) {
         final var id = subscription.id();
         final var receiver = subscription.receiverName();
-        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
+        final var pathArg = subscriptionArg(id);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+        tx.put(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(nodeId)
+                .withNodeIdentifier(pathArg)
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
                 .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, subscription.encoding()))
                 .withChild(ImmutableNodes.newChoiceBuilder()
@@ -305,11 +305,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     .build();
         };
 
+        final var pathArg = subscriptionArg(id);
         final var tx = dataBroker.newWriteOnlyTransaction();
-        final var nodeId = NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, id);
-        tx.merge(LogicalDatastoreType.OPERATIONAL, SubscriptionUtil.SUBSCRIPTIONS.node(nodeId),
+        tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(nodeId)
+                .withNodeIdentifier(pathArg)
                 .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, id))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
@@ -346,5 +346,20 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             throw new RequestException("Failed to parse subtree filter", e);
         }
         return new SubtreeEventStreamFilter(databindFilter);
+    }
+
+    @NonNullByDefault
+    static YangInstanceIdentifier subscriptionPath(final Uint32 subscriptionId) {
+        return subscriptionPath(subscriptionArg(subscriptionId));
+    }
+
+    @NonNullByDefault
+    private static YangInstanceIdentifier subscriptionPath(final NodeIdentifierWithPredicates pathArg) {
+        return YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID, pathArg);
+    }
+
+    @NonNullByDefault
+    private static NodeIdentifierWithPredicates subscriptionArg(final Uint32 subscriptionId) {
+        return NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, subscriptionId);
     }
 }
