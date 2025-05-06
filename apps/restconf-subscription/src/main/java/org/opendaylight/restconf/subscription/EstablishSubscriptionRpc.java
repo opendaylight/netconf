@@ -26,8 +26,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.stream.subtree.filter.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.Target;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -48,20 +52,19 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = RpcImplementation.class)
 @NonNullByDefault
 public final class EstablishSubscriptionRpc extends RpcImplementation {
-    private static final NodeIdentifier SUBSCRIPTION_STREAM =
-        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream").intern());
-    private static final NodeIdentifier SUBSCRIPTION_TARGET =
-            NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
-    private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
-        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter").intern());
-    private static final NodeIdentifier SUBSCRIPTION_ENCODING =
+    private static final NodeIdentifier ENCODING_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "encoding").intern());
-    private static final NodeIdentifier ESTABLISH_SUBSCRIPTION_OUTPUT =
-        NodeIdentifier.create(EstablishSubscriptionOutput.QNAME);
-    private static final NodeIdentifier OUTPUT_ID =
+    private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
+    private static final NodeIdentifier ID_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionOutput.QNAME, "id").intern());
-    private static final NodeIdentifier STREAM_FILTER_NAME =
+    private static final NodeIdentifier OUTPUT_NODEID = NodeIdentifier.create(EstablishSubscriptionOutput.QNAME);
+    private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
+    private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
+    private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
+    private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
+    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
+    private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
 
     private static final Set<QName> SUPPORTED_ENCODINGS = Set.of(
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
@@ -88,7 +91,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
 
         final var body = input.input();
-        var encoding = leaf(body, SUBSCRIPTION_ENCODING, QName.class);
+        var encoding = leaf(body, ENCODING_NODEID, QName.class);
         if (encoding == null) {
             // FIXME: derive from request
             encoding =  org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
@@ -98,7 +101,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             return;
         }
 
-        final var target = (ChoiceNode) body.childByArg(SUBSCRIPTION_TARGET);
+        final var target = (ChoiceNode) body.childByArg(TARGET_NODEID);
         if (target == null) {
             // means there is no stream information present
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
@@ -107,7 +110,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
 
         // check stream name
-        final var streamName = leaf(target, SUBSCRIPTION_STREAM, String.class);
+        final var streamName = leaf(target, STREAM_NODEID, String.class);
         if (streamName == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No stream specified"));
@@ -115,7 +118,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
 
         // check stream filter
-        final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
+        final var streamFilter = (ChoiceNode) target.childByArg(STREAM_FILTER_NODEID);
         final var filter = streamFilter == null ? null : extractFilter(streamFilter);
 
         streamRegistry.establishSubscription(request.transform(subscription -> {
@@ -125,33 +128,28 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             // Move subscription to active state
             streamRegistry.updateSubscriptionState(subscription, SubscriptionState.ACTIVE);
             return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
-                .withChild(ImmutableNodes.leafNode(OUTPUT_ID, id))
+                .withNodeIdentifier(OUTPUT_NODEID)
+                .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
                 .build();
         }), streamName, encoding, filter);
     }
 
     static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
-        if (streamFilter.childByArg(STREAM_FILTER_NAME) instanceof LeafNode<?> leafNode) {
-            if (leafNode.body() instanceof String filterName) {
-                return new SubscriptionFilter.Reference(filterName);
-            }
-            throw new IllegalArgumentException("Bad child " + leafNode.prettyTree());
+        final var streamFilterName = (LeafNode<?>) streamFilter.childByArg(STREAM_FILTER_NAME_NODEID);
+        if (streamFilterName != null) {
+            return new SubscriptionFilter.Reference((String) streamFilterName.body());
         }
-        final var filterSpec = (ChoiceNode) streamFilter.childByArg(new NodeIdentifier(FilterSpec.QNAME));
+        final var filterSpec = (ChoiceNode) streamFilter.childByArg(FILTER_SPEC_NODEID);
         if (filterSpec == null) {
             return null;
         }
-        final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
+        final var subtree = (AnydataNode<?>) filterSpec.childByArg(STREAM_SUBTREE_FILTER_NODEID);
         if (subtree != null) {
             return new SubscriptionFilter.SubtreeDefinition(subtree);
         }
-        if (filterSpec.childByArg(new NodeIdentifier(QName.create(FilterSpec.QNAME, "stream-xpath-filter")))
-            instanceof LeafNode<?> leafNode) {
-            if (leafNode.body() instanceof String xpath) {
-                return new SubscriptionFilter.XPathDefinition(xpath);
-            }
-            throw new IllegalArgumentException("Bad child " + leafNode.prettyTree());
+        final var xpath = (LeafNode<?>) filterSpec.childByArg(STREAM_XPATH_FILTER_NODEID);
+        if (xpath != null) {
+            return new SubscriptionFilter.XPathDefinition((String) xpath.body());
         }
         return null;
     }
