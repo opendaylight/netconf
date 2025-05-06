@@ -46,6 +46,30 @@
       },
       "revId": "796e07c762f186638425d931e1653282358a8d63",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f683c6c_b00b77ca",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-06T09:12:29Z",
+      "side": 1,
+      "message": "Break above is in case for exact namespace - means there is only one node with matching QName and one only - when it is found there is no point in searching further.\nBreak here however is wildcard case - means that XML contains only local name and no namespace. There can be multiple child nodes in schema right next to each other that have same local name. It is possible as long as they have different namespace and/or revision. So in this case we can\u0027t be sure what statement to use in filter, hence - loop here should not be stopped here because there is possibility that next child(ren) may have matching local name (i.e. should be also added into wildcard NamespaceSelection).",
+      "parentUuid": "2dba6717_27b35c97",
+      "range": {
+        "startLine": 186,
+        "startChar": 36,
+        "endLine": 186,
+        "endChar": 42
+      },
+      "revId": "796e07c762f186638425d931e1653282358a8d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
