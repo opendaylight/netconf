@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -25,6 +26,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
@@ -175,6 +177,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @NonNullByDefault
     private void onFilterSpecsUpdated(final List<DataTreeCandidate> changes) {
+        final var nameToSpec = new HashMap<String, @Nullable ChoiceNode>();
+
         for (var change : changes) {
             // candidate root points to the the filter-spec itself, parent path identifies the filter that changed
             final var filterId = verifyNotNull((NodeIdentifierWithPredicates)
@@ -183,43 +187,17 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
             final var node = change.getRootNode();
             switch (node.modificationType()) {
-                case null -> throw new NullPointerException();
-                case APPEARED, SUBTREE_MODIFIED, WRITE -> {
-                    final var filterSpec = (ChoiceNode) node.getDataAfter();
-                    final EventStreamFilter filter;
-                    try {
-                        filter = parseFilter(filterSpec);
-                    } catch (RequestException e) {
-                        LOG.warn("Failed to parse subtree {} filter, removing it", filterSpec.prettyTree(), e);
-                        removeFilter(filterName);
-                        continue;
-                    }
-
-                    addFilter(filterName, filter);
-                    LOG.debug("Updated filter {} to {}", filterName, filter);
-                }
-                case DELETE, DISAPPEARED -> {
-                    removeFilter(filterName);
-                    LOG.debug("Removed filter {} without specification", filterName);
-                }
+                case null -> throw new NullPointerException("Modification type is null for node: " + node);
+                case APPEARED, SUBTREE_MODIFIED, WRITE ->
+                    nameToSpec.put(filterName, (ChoiceNode) node.getDataBefore());
+                case DELETE, DISAPPEARED -> nameToSpec.put(filterName, null);
                 case UNMODIFIED -> {
                     // No-op
                 }
             }
         }
-    }
 
-    @NonNullByDefault
-    private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
-        final var subtree = (AnydataNode<?>) filterSpec.childByArg(STREAM_SUBTREE_FILTER_NODEID);
-        if (subtree != null) {
-            return parseSubtreeFilter(subtree);
-        }
-        final var xpath = (LeafNode<?>) filterSpec.childByArg(STREAM_XPATH_FILTER_NODEID);
-        if (xpath != null) {
-            return parseXpathFilter((String) xpath.body());
-        }
-        throw new RequestException("Unsupported filter %s", filterSpec);
+        updateFilterDefinitions(nameToSpec);
     }
 
     @NonNullByDefault
@@ -341,7 +319,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(FILTER_SPEC_NODEID)
-                    .withChild(ImmutableNodes.leafNode(StreamSubtreeFilter.QNAME, anydata))
+                    .withChild(ImmutableNodes.leafNode(STREAM_SUBTREE_FILTER_NODEID, anydata))
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
