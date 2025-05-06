@@ -20,10 +20,15 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
+import org.opendaylight.netconf.databind.subtree.SubtreeMatcher;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
@@ -65,6 +70,19 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public interface EventStreamFilter {
 
         boolean test(YangInstanceIdentifier path, ContainerNode body);
+    }
+
+    @NonNullByDefault
+    private record SubtreeEventStreamFilter(SubtreeFilter filter) implements EventStreamFilter {
+        SubtreeEventStreamFilter {
+            requireNonNull(filter);
+        }
+
+        @Override
+        public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
+            // FIXME add conditions to reject data by path when implementing filtering
+            return new SubtreeMatcher(filter, body).matches();
+        }
     }
 
     private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
@@ -387,7 +405,23 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
+    private EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
+        // FIXME: expand this once we have YANGTOOLS-1106
+        return switch (filter.body()) {
+            case DOMSource domSource -> {
+                try {
+                    yield new SubtreeEventStreamFilter(parseSubtreeFilter(new DOMSourceXMLStreamReader(domSource)));
+                } catch (XMLStreamException e) {
+                    throw new RequestException("Failed to parse filter", e);
+                }
+            }
+            default -> throw new RequestException("Unsupported filter object model "
+                + filter.bodyObjectModel().getName());
+        };
+    }
+
+    @NonNullByDefault
+    protected abstract SubtreeFilter parseSubtreeFilter(XMLStreamReader reader) throws XMLStreamException;
 
     @NonNullByDefault
     private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {

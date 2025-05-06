@@ -12,19 +12,14 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -35,13 +30,10 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindProvider;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
@@ -60,9 +52,7 @@ import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -332,26 +322,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
-        final SubtreeFilter databindFilter;
-        try {
-            final var databindContext = databindProvider.currentDatabind();
-            final var writer = new StringWriter();
-            final var xmlStreamWriter = XMLOutputFactory.newDefaultFactory().createXMLStreamWriter(writer);
-
-            final var xmlNormalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter,
-                databindContext.modelContext(), YangInstanceIdentifier.of(FILTERS_NODEID, STREAM_FILTER_NODEID));
-            final var normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(xmlNormalizedNodeStreamWriter, null);
-            normalizedNodeWriter.write(filter);
-            normalizedNodeWriter.flush();
-
-            databindFilter = SubtreeFilter.readFrom(databindContext, XMLInputFactory.newDefaultFactory()
-                .createXMLStreamReader(new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8))));
-        } catch (IOException | XMLStreamException e) {
-            LOG.debug("Failed to parse anydata to subtree filter {}", filter.prettyTree(), e);
-            throw new RequestException("Failed to parse subtree filter", e);
-        }
-        return new SubtreeEventStreamFilter(databindFilter);
+    protected SubtreeFilter parseSubtreeFilter(final XMLStreamReader reader) throws XMLStreamException {
+        return SubtreeFilter.readFrom(databindProvider.currentDatabind(), reader);
     }
 
     @NonNullByDefault
