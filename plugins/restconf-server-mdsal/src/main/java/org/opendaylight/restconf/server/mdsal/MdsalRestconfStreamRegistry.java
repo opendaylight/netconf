@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.mdsal;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -83,13 +84,12 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
 
-    private static final QName ID_QNAME = QName.create(Subscription.QNAME, "id").intern();
-    private static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
+    private static final QName ID_QNAME = qnameOf("id");
+    private static final QName NAME_QNAME = qnameOf("name");
 
-    private static final NodeIdentifier ENCODING_NODEID =
-        NodeIdentifier.create(QName.create(Subscription.QNAME, "encoding").intern());
+    private static final NodeIdentifier ENCODING_NODEID = NodeIdentifier.create(qnameOf("encoding"));
     private static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "excluded-event-records"));
+        NodeIdentifier.create(qnameOf("excluded-event-records"));
     private static final NodeIdentifier FILTERS_NODEID = NodeIdentifier.create(Filters.QNAME);
     private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
     private static final NodeIdentifier ID_NODEID = NodeIdentifier.create(ID_QNAME);
@@ -97,15 +97,14 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "sent-event-records").intern());
+        NodeIdentifier.create(qnameOf("sent-event-records"));
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
-    private static final NodeIdentifier STATE_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "state").intern());
+    private static final NodeIdentifier STATE_NODEID = NodeIdentifier.create(qnameOf("state"));
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
-        NodeIdentifier.create(QName.create(Subscription.QNAME, "stream-filter-name").intern());
+        NodeIdentifier.create(qnameOf("stream-filter-name"));
     private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
     private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
