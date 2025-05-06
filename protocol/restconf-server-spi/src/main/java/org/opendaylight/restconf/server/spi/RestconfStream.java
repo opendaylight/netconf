@@ -30,6 +30,7 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -320,6 +321,8 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         public abstract TransportSession session();
 
+        public abstract @Nullable EventStreamFilter filter();
+
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
@@ -526,6 +529,12 @@ public final class RestconfStream<T> {
         return source.encodings.keySet();
     }
 
+    // keeps the original signature for RFC-8040 GET streams
+    public @Nullable Registration addSubscriber(Sender handler, EncodingName encoding, EventStreamGetParams params)
+            throws UnsupportedEncodingException, XPathExpressionException {
+        return addSubscriber(handler, encoding, params, null);
+    }
+
     /**
      * Registers {@link Sender} subscriber.
      *
@@ -538,7 +547,8 @@ public final class RestconfStream<T> {
      * @throws XPathExpressionException if requested filter is not valid
      */
     public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
-            final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
+            final EventStreamGetParams params, final EventStreamFilter eventStreamFilter)
+            throws UnsupportedEncodingException, XPathExpressionException {
         final var factory = source.encodings.get(requireNonNull(encoding));
         if (factory == null) {
             throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
@@ -564,7 +574,7 @@ public final class RestconfStream<T> {
 
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
-        final var toAdd = new Subscriber<>(this, handler, formatter);
+        final var toAdd = new Subscriber<>(this, handler, formatter, eventStreamFilter);
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.add(toAdd);
