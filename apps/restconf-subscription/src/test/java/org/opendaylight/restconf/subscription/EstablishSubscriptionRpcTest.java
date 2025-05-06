@@ -54,6 +54,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 class EstablishSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
+    private static final QName STREAM_QNAME = QName.create(Subscription.QNAME, "stream");
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -84,19 +85,20 @@ class EstablishSubscriptionRpcTest {
     @Disabled
     @Test
     void establishSubscriptionTest() {
-        final var nodeTarget = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(NodeIdentifier
-                .create(SubscriptionUtil.QNAME_TARGET))
-            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
+        final var nameLeaf = QName.create(Receiver.QNAME, "name");
+
+        final var nodeTarget = ImmutableNodes.newChoiceBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create(Subscription.QNAME, "target")))
+            .withChild(ImmutableNodes.leafNode(STREAM_QNAME, "NETCONF"))
             .build();
         final var nodeReceivers = ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier
                 .create(QName.create(Subscription.QNAME, "receivers").intern()))
             .withChild(ImmutableNodes.newSystemMapBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Receiver.QNAME))
                 .withChild(ImmutableNodes.newMapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME,
-                        SubscriptionUtil.QNAME_RECEIVER_NAME, "unknown"))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_NAME, "unknown"))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_RECEIVER_STATE,
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, nameLeaf, "unknown"))
+                    .withChild(ImmutableNodes.leafNode(nameLeaf, "unknown"))
+                    .withChild(ImmutableNodes.leafNode(QName.create(Receiver.QNAME, "state"),
                         Receiver.State.Active.getName()))
                     .build())
                 .build())
@@ -104,7 +106,7 @@ class EstablishSubscriptionRpcTest {
         final var expectedNode = ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, ID))
             .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
-            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, EncodeJson$I.QNAME))
+            .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "encoding"), EncodeJson$I.QNAME))
             .withChild(nodeReceivers)
             .withChild(nodeTarget)
             .build();
@@ -156,10 +158,10 @@ class EstablishSubscriptionRpcTest {
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
             .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Target.QNAME))
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
+                .withChild(ImmutableNodes.leafNode(STREAM_QNAME, "NETCONF"))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(NodeIdentifier.create(StreamFilter.QNAME))
-                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER, "filter"))
+                    .withChild(ImmutableNodes.leafNode(QName.create(Target.QNAME, "stream-filter-name"), "filter"))
                     .build())
                 .build())
             .build();
@@ -170,7 +172,7 @@ class EstablishSubscriptionRpcTest {
                 new NodeIdentifier(Filters.QNAME),
                 new NodeIdentifier(StreamFilter.QNAME),
                 NodeIdentifierWithPredicates.of(StreamFilter.QNAME,
-                    SubscriptionUtil.QNAME_STREAM_FILTER_NAME, "filter")));
+                    QName.create(StreamFilter.QNAME, "name"), "filter")));
         doReturn(session).when(request).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
@@ -182,10 +184,10 @@ class EstablishSubscriptionRpcTest {
     private static ContainerNode getInput() {
         return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
-            .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ENCODING, EncodeJson$I.QNAME))
+            .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "encoding"), EncodeJson$I.QNAME))
             .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Target.QNAME))
-                .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM, "NETCONF"))
+                .withChild(ImmutableNodes.leafNode(STREAM_QNAME, "NETCONF"))
                 .build())
             .build();
     }
