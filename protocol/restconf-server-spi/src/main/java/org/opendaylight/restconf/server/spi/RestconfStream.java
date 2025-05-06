@@ -539,6 +539,23 @@ public final class RestconfStream<T> {
      */
     public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
             final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
+        return addSubscriber(handler, encoding, params, null);
+    }
+    /**
+     * Registers {@link Sender} subscriber.
+     *
+     * @param handler SSE session handler.
+     * @param encoding Requested event stream encoding
+     * @param params Reception parameters
+     * @param subscriptionId id of subscription to which this subscriber belongs
+     * @return A new {@link Registration}, or {@code null} if the subscriber cannot be added
+     * @throws NullPointerException if any argument is {@code null}
+     * @throws UnsupportedEncodingException if {@code encoding} is not supported
+     * @throws XPathExpressionException if requested filter is not valid
+     */
+    public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
+            final EventStreamGetParams params, final Uint32 subscriptionId)
+        throws UnsupportedEncodingException, XPathExpressionException {
         final var factory = source.encodings.get(requireNonNull(encoding));
         if (factory == null) {
             throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
@@ -564,7 +581,7 @@ public final class RestconfStream<T> {
 
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
-        final var toAdd = new Subscriber<>(this, handler, formatter);
+        final var toAdd = new Subscriber<>(subscriptionId, this, handler, formatter);
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.add(toAdd);
