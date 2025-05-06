@@ -38,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -49,11 +50,12 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 class DeleteSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
+    private static final QName ID_QNAME = QName.create(Subscription.QNAME, "id");
     private static final NodeIdentifierWithPredicates IDENTIFIER =
-        NodeIdentifierWithPredicates.of(Subscription.QNAME, SubscriptionUtil.QNAME_ID, ID);
+        NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, ID);
     private static final ContainerNode INPUT = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionInput.QNAME))
-        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_ID, ID))
+        .withChild(ImmutableNodes.leafNode(ID_QNAME, ID))
         .build();
 
     @Mock
