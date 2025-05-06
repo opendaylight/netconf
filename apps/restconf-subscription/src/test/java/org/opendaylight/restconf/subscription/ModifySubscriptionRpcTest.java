@@ -36,9 +36,11 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
@@ -98,8 +100,8 @@ class ModifySubscriptionRpcTest {
         doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL),
-            eq(SubscriptionUtil.SUBSCRIPTIONS.node(expectedNode.name())),
+        verify(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
+            new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), expectedNode.name())),
             eq(expectedNode));
         verify(request).completeWith(eq(response));
     }
