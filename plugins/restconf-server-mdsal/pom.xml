@@ -94,10 +94,6 @@
             <artifactId>restconf-server-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-subscription</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>concepts</artifactId>
         </dependency>
