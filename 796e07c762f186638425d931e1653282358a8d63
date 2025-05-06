@@ -118,6 +118,30 @@
       },
       "revId": "796e07c762f186638425d931e1653282358a8d63",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2726a8bc_9e3263a1",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-06T10:07:20Z",
+      "side": 1,
+      "message": "I disagree, for exact you search in one model, for wildcard you go over all models. It has no sense to not break it here or it has no sense to iterate over all models? In the end we would have one case added multiple times by iterating over other models?",
+      "parentUuid": "f5a00306_cfda0fd6",
+      "range": {
+        "startLine": 186,
+        "startChar": 36,
+        "endLine": 186,
+        "endChar": 42
+      },
+      "revId": "796e07c762f186638425d931e1653282358a8d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
