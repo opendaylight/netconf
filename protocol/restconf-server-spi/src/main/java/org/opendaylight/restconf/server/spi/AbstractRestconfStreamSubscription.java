@@ -82,17 +82,19 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
         return session;
     }
 
-    final @Nullable EventStreamFilter filter() {
+    public final @Nullable EventStreamFilter filter() {
         return filter;
     }
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return super.addToStringAttributes(helper
-            .add("id", id)
+        helper.add("id", id)
             .add("encoding", encoding)
             .add("stream", streamName)
-            .add("receiver", receiverName)
-            .add("filter", filter));
+            .add("receiver", receiverName);
+        if (filter != null) {
+            helper.add("filter", filter);
+        }
+        return super.addToStringAttributes(helper);
     }
 }

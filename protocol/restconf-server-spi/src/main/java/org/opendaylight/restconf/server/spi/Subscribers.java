@@ -82,6 +82,7 @@ abstract sealed class Subscribers<T> {
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             final var formatted = format(subscriber.formatter(), modelContext, input, now);
+            // TODO: appy filter
             if (formatted != null) {
                 subscriber.sender().sendDataMessage(formatted);
             }
@@ -120,6 +121,7 @@ abstract sealed class Subscribers<T> {
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             for (var entry : subscribers.asMap().entrySet()) {
+                // TODO: appy filter
                 final var formatted = format(entry.getKey(), modelContext, input, now);
                 if (formatted != null) {
                     for (var subscriber : entry.getValue()) {
