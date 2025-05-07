@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.server;
 
-import static java.util.Objects.requireNonNull;
-
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -27,7 +25,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.EventStreamResponse;
-import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -46,57 +43,33 @@ import org.slf4j.LoggerFactory;
  * <p>This class is created and initialized as part of Netty based RESTCONF northbound.
  */
 @NonNullByDefault
-final class StreamsResource extends AbstractLeafResource {
+final class StreamsResource extends AbstractEventStreamResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamsResource.class);
     private static final AsciiString STREAM_ID = HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text();
 
-    private final RestconfStream.Registry streamRegistry;
-    private final int sseHeartbeatIntervalMillis;
-    private final int sseMaximumFragmentLength;
     private final Map<Integer, Registration> senders = new HashMap<>();
 
     StreamsResource(final EndpointInvariants invariants, final RestconfStream.Registry streamRegistry,
             final int sseHeartbeatIntervalMillis, final int sseMaximumFragmentLength) {
-        super(invariants);
-        this.streamRegistry = requireNonNull(streamRegistry);
-        this.sseHeartbeatIntervalMillis = sseHeartbeatIntervalMillis;
-        this.sseMaximumFragmentLength = sseMaximumFragmentLength;
+        super(invariants, streamRegistry, sseHeartbeatIntervalMillis, sseMaximumFragmentLength);
     }
 
     @Override
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
-            final HttpHeaders headers, final @Nullable Principal principal, final String path) {
-        return switch (method) {
-            case GET -> prepareGet(targetUri, headers, principal, path, true);
-            case HEAD -> prepareGet(targetUri, headers, principal, path, false);
-            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
-            default -> METHOD_NOT_ALLOWED_READ_ONLY;
-        };
-    }
-
-    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final String path, final boolean startStream) {
-        if (!startStream) {
-            return HeadersResponse.of(HttpResponseStatus.OK, HttpHeaderNames.CONTENT_TYPE,
-                HttpHeaderValues.TEXT_EVENT_STREAM);
-        }
-        final var peeler = new SegmentPeeler(path);
-
-        if (!peeler.hasNext()) {
-            return EmptyResponse.NOT_FOUND;
-        }
-        final var encodingName = peeler.next();
+            final HttpHeaders headers, final @Nullable Principal principal, final String firstSegment,
+            final SegmentPeeler peeler) {
         final RestconfStream.EncodingName encoding;
         try {
-            encoding = new RestconfStream.EncodingName(encodingName);
+            encoding = new RestconfStream.EncodingName(firstSegment);
         } catch (IllegalArgumentException e) {
-            LOG.debug("Stream encoding name '{}' is invalid", encodingName, e);
+            LOG.debug("Stream encoding name '{}' is invalid", firstSegment, e);
             return EmptyResponse.NOT_FOUND;
         }
 
         if (!peeler.hasNext()) {
             return EmptyResponse.NOT_FOUND;
         }
+
         final var streamName = peeler.next();
         final var stream = streamRegistry.lookupStream(streamName);
         if (stream == null) {
@@ -104,6 +77,17 @@ final class StreamsResource extends AbstractLeafResource {
             return EmptyResponse.NOT_FOUND;
         }
 
+        return switch (method) {
+            case GET -> prepareGet(targetUri, headers, principal, encoding, stream);
+            case HEAD -> EVENT_STREAM_HEAD;
+            case OPTIONS -> AbstractPendingOptions.READ_ONLY;
+            default -> METHOD_NOT_ALLOWED_READ_ONLY;
+        };
+    }
+
+    private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
+            final @Nullable Principal principal, final RestconfStream.EncodingName encoding,
+            final RestconfStream<?> stream) {
         if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
@@ -116,12 +100,9 @@ final class StreamsResource extends AbstractLeafResource {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
 
-        Integer streamId = headers.getInt(STREAM_ID);
-        if (streamId != null) {
-            return addEventStream(streamId, stream, encoding, streamParams);
-        } else {
-            return switchToEventStream(stream, encoding, streamParams);
-        }
+        final var streamId = headers.getInt(STREAM_ID);
+        return streamId != null ? addEventStream(streamId, stream, encoding, streamParams)
+            : switchToEventStream(stream, encoding, streamParams);
     }
 
     // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
@@ -129,8 +110,7 @@ final class StreamsResource extends AbstractLeafResource {
     private PreparedRequest switchToEventStream(final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
         final var sender = new ChannelSender(sseMaximumFragmentLength);
-        final Registration registration = registerSender(stream, encoding, params, sender);
-
+        final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;
         }
@@ -166,7 +146,7 @@ final class StreamsResource extends AbstractLeafResource {
         return reg;
     }
 
-    public Boolean exceptionCaught(Http2Exception.StreamException se) {
+    public Boolean exceptionCaught(final Http2Exception.StreamException se) {
         final var sender = senders.remove(se.streamId());
         if (sender != null) {
             sender.close();
