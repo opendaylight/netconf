@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0412983_a5f6fbfb",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-07T11:54:53Z",
+      "side": 1,
+      "message": "Sorry, I don\u0027t understand. Can you please give me an example of JSON which could create inability to parse array of values?\n\nThis code expect that next JsonReader element must be a JsonToken.NAME. I am only switched IllegalStateException, which produce 500 Server error response, to RequestException with 400 error.",
+      "parentUuid": "d570004b_d1275049",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e2cbe06_cc7305be",
         "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
         "patchSetId": 30
