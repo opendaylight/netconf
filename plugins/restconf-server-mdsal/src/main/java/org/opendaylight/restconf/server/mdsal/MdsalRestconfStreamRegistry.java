@@ -250,10 +250,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    protected ListenableFuture<RestconfStream.Subscription> createSubscription(
-            final RestconfStream.Subscription subscription) {
-        final var id = subscription.id();
-        final var receiverName = subscription.receiverName();
+    protected ListenableFuture<SubscriptionControl> createSubscription(final Uint32 id, final String streamName,
+            final QName encoding, final String receiverName) {
         final var pathArg = subscriptionArg(id);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
@@ -261,10 +259,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
                 .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
-                .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, subscription.encoding()))
+                .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_NODEID, subscription.streamName()))
+                    .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName))
 //                    .withChild(ImmutableNodes.newChoiceBuilder()
 //                        .withNodeIdentifier(STREAM_FILTER_NODEID)
 //                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
@@ -287,14 +285,13 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
         return tx.commit().transform(info -> {
             LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
-            return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
+            return new MdsalSubscriptionControl(dataBroker, id);
         }, MoreExecutors.directExecutor());
     }
 
     @Override
-    protected ListenableFuture<RestconfStream.Subscription> modifySubscriptionFilter(
-            final RestconfStream.Subscription subscription, final RestconfStream.SubscriptionFilter filter) {
-        final var id = subscription.id();
+    protected ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
+            final RestconfStream.SubscriptionFilter filter) {
 
         final var filterNode = switch (filter) {
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
@@ -311,12 +308,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     .build();
         };
 
-        final var pathArg = subscriptionArg(id);
+        final var pathArg = subscriptionArg(subscriptionId);
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
-                .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+                .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
                     .withChild(ImmutableNodes.newChoiceBuilder()
@@ -326,8 +323,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     .build())
                 .build());
         return tx.commit().transform(info -> {
-            LOG.debug("Modified subscription {} to operational datastore as of {}", id, info);
-            return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
+            LOG.debug("Modified subscription {} to operational datastore as of {}", subscriptionId, info);
+            return null;
         }, MoreExecutors.directExecutor());
     }
 
@@ -357,6 +354,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @NonNullByDefault
     private static NodeIdentifierWithPredicates receiverArg(final String receiverName) {
         return NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiverName);
+    }
+
+    @NonNullByDefault
+    static YangInstanceIdentifier streamFilterPath(final Uint32 subscriptionId) {
+        return YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID, subscriptionArg(subscriptionId),
+            TARGET_NODEID, STREAM_FILTER_NODEID);
     }
 
     @NonNullByDefault

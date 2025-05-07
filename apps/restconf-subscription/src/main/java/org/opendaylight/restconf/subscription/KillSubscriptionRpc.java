@@ -85,14 +85,15 @@ public final class KillSubscriptionRpc extends RpcImplementation {
                 "No subscription with given ID."));
             return;
         }
+
+        // FIXME: DynamicSubscription.kill()
         final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
-
-        streamRegistry.updateSubscriptionState(subscription, SubscriptionState.END);
+        subscription.setState(SubscriptionState.END);
         subscription.terminate(request.transform(unused -> {
             try {
                 subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);

@@ -21,26 +21,23 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 /**
  * Abstract base class for {@link RestconfStream.Subscription}s.
  */
-public abstract non-sealed class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
+public abstract class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
-    private final @Nullable EventStreamFilter filter;
 
     private @NonNull SubscriptionState state;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
-            final String receiverName, final SubscriptionState state, final TransportSession session,
-            final @Nullable EventStreamFilter filter) {
+            final String receiverName, final SubscriptionState state, final TransportSession session) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
         this.state = requireNonNull(state);
         this.session = requireNonNull(session);
         this.streamName = requireNonNull(streamName);
         this.receiverName = requireNonNull(receiverName);
-        this.filter = filter;
     }
 
     @Override
@@ -82,9 +79,7 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
         return session;
     }
 
-    final @Nullable EventStreamFilter filter() {
-        return filter;
-    }
+    protected abstract @Nullable EventStreamFilter filter();
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
@@ -93,6 +88,6 @@ public abstract non-sealed class AbstractRestconfStreamSubscription extends Rest
             .add("encoding", encoding)
             .add("stream", streamName)
             .add("receiver", receiverName)
-            .add("filter", filter));
+            .add("filter", filter()));
     }
 }

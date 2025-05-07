@@ -221,16 +221,6 @@ public final class RestconfStream<T> {
         void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
 
         /**
-         * Modify state of RFC8639 subscription.
-         *
-         * @param subscription subscription
-         * @param newState new state
-         * @throws NullPointerException if {@code subscription} is {@code null}
-         */
-        @NonNullByDefault
-        void updateSubscriptionState(Subscription subscription, SubscriptionState newState);
-
-        /**
          * Lookup an existing subscription.
          *
          * @param id subscription ID
@@ -258,8 +248,7 @@ public final class RestconfStream<T> {
      */
     // TODO: a .toOperational() should result in the equivalent MapEntryNode equivalent of a Binding Subscription
     @Beta
-    public abstract static sealed class Subscription
-            permits AbstractRestconfStreamSubscription, ForwardingRestconfStreamSubscription {
+    public abstract static class Subscription {
         @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
             justification = "https://github.com/spotbugs/spotbugs/issues/2749")
         private volatile QName terminated;
@@ -335,8 +324,6 @@ public final class RestconfStream<T> {
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
-
-        public abstract void channelClosed();
 
         @Override
         public final String toString() {
