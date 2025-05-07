@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http2.Http2Exception;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,15 +68,23 @@ final class RestconfSession extends HTTPServerSession implements TransportSessio
         }
     }
 
-    private final EndpointRoot root;
+    private final @NonNull Description description;
+    private final @NonNull EndpointRoot root;
 
     @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
         justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile Resources resources;
 
-    RestconfSession(final HTTPScheme scheme, final EndpointRoot root) {
+    @NonNullByDefault
+    RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
         super(scheme);
         this.root = requireNonNull(root);
+        description = new HttpDescription(scheme, remoteAddress);
+    }
+
+    @Override
+    public Description description() {
+        return description;
     }
 
     @Override
