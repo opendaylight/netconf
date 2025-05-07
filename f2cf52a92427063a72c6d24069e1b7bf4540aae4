@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8586318_b2ead062",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-07T11:08:14Z",
+      "side": 1,
+      "message": "Then it will throw:\n RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,\n                \"Empty \u0027value\u0027 element is not allowed\n\nGuess that Invalid JSON is the corner case:\n```\n \"value\" : {\n              {}\n           }\n```\n\nWithout this condition, it will fail with an IllegalStateException on the next line:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115878/30/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java#196",
+      "parentUuid": "fac67d2f_8c50b8ce",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e2cbe06_cc7305be",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-06T13:41:23Z",
       "side": 1,
       "message": "again, ISE?, again checking the same condition?",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6822278e_fa05861e",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-07T11:08:14Z",
+      "side": 1,
+      "message": "It is Not the same check for ISE. If there is no data, resultHolder.getResult() throws ISE.\n\nhttps://github.com/opendaylight/yangtools/blob/v14.0.13/data/yang-data-impl/src/main/java/org/opendaylight/yangtools/yang/data/impl/schema/NormalizationResultHolder.java#L37",
+      "parentUuid": "8e2cbe06_cc7305be",
       "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05433e28_e64ac09f",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-07T11:08:14Z",
+      "side": 1,
+      "message": "This will not work. If the \u0027value\u0027 element is empty, the ChildNodes are not empty and contain one non Element object of instance \"DeferredTextImpl\". \n\nThen it will fail with an IndexOutOfBoundsException here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115878/30/protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/XmlPatchBody.java#79",
+      "parentUuid": "6ddd28a9_a7634d29",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c04a493_9aee7ac1",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-05-06T13:46:11Z",
       "side": 1,
       "message": "do we really need to use hamcrest?",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5fa68b0_1a9c330f",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/NC1438Test.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-07T11:08:14Z",
+      "side": 1,
+      "message": "I used it to verify \"requestError.info()\". We can omit it since the message provided by Yangtools is not very descriptive and contains the class hashcode, which changes.",
+      "parentUuid": "6c04a493_9aee7ac1",
       "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
