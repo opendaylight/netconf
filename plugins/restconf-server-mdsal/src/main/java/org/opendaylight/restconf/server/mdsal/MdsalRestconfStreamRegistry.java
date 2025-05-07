@@ -18,8 +18,6 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -30,7 +28,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindProvider;
-import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -100,7 +97,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
-    private final DatabindProvider databindProvider;
     private final List<StreamSupport> supports;
     private final Registration sclReg;
     private final Registration tclReg;
@@ -114,9 +110,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final DOMSchemaService schemaService,
             @Reference final RestconfStream.LocationProvider locationProvider,
             @Reference final DatabindProvider databindProvider) {
+        super(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
-        this.databindProvider = requireNonNull(databindProvider);
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
 
         // FIXME: the source should be handling its own updates and we should only call start() once
@@ -319,11 +315,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Modified subscription {} to operational datastore as of {}", id, info);
             return new MdsalRestconfStreamSubscription<>(subscription, dataBroker);
         }, MoreExecutors.directExecutor());
-    }
-
-    @Override
-    protected SubtreeFilter parseSubtreeFilter(final XMLStreamReader reader) throws XMLStreamException {
-        return SubtreeFilter.readFrom(databindProvider.currentDatabind(), reader);
     }
 
     @NonNullByDefault
