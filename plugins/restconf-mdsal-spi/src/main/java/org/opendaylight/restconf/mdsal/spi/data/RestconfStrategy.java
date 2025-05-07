@@ -160,7 +160,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "MERGE", instance));
+                request.completeWith(decodeException(cause, "MERGE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -176,26 +176,26 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             return;
         }
 
-        completePutData(request, instance, exists, replaceAndCommit(prepareWriteExecution(), instance, data));
+        completePutData(request, path, exists, replaceAndCommit(prepareWriteExecution(), instance, data));
     }
 
     @Override
-    public final void putData(final ServerRequest<DataPutResult> request, final Data tmp, final Insert insert,
+    public final void putData(final ServerRequest<DataPutResult> request, final Data path, final Insert insert,
             final NormalizedNode data) {
-        final var path = tmp.instance();
+        final var instance = path.instance();
         final Boolean exists;
         try {
-            exists = syncAccess(exists(path), path);
+            exists = syncAccess(exists(instance), instance);
         } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
-        final var parentPath = path.coerceParent();
+        final var parentPath = instance.coerceParent();
         try {
             checkListAndOrderedType(parentPath);
-            commitFuture = insertAndCommitPut(path, data, insert, parentPath);
+            commitFuture = insertAndCommitPut(instance, data, insert, parentPath);
         } catch (RequestException e) {
             request.completeWith(e);
             return;
@@ -203,7 +203,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         completePutData(request, path, exists, commitFuture);
     }
 
-    private void completePutData(final ServerRequest<DataPutResult> request, final YangInstanceIdentifier path,
+    private void completePutData(final ServerRequest<DataPutResult> request, final Data path,
             final boolean exists, final ListenableFuture<? extends CommitInfo> future) {
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
@@ -331,34 +331,34 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
     @Override
     protected final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
-            final YangInstanceIdentifier parentPath, final NormalizedNode data) {
+            final NormalizedNode data) {
         final var tx = prepareWriteExecution();
         try {
-            tx.create(parentPath, data);
+            tx.create(path.instance(), data);
         } catch (RequestException e) {
             tx.cancel();
             request.completeWith(e);
             return;
         }
-        completeCreateData(request, parentPath, data, tx.commit());
+        completeCreateData(request, path, data, tx.commit());
     }
 
     @Override
     protected final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
-            final Insert insert, final YangInstanceIdentifier parentPath, final NormalizedNode data) {
+            final Insert insert, final NormalizedNode data) {
         final ListenableFuture<? extends CommitInfo> future;
         try {
-            checkListAndOrderedType(parentPath);
-            future = insertAndCommit(parentPath, data, insert);
+            checkListAndOrderedType(path.instance());
+            future = insertAndCommit(path.instance(), data, insert);
         } catch (RequestException e) {
             request.completeWith(e);
             return;
         }
-        completeCreateData(request, parentPath, data, future);
+        completeCreateData(request, path, data, future);
     }
 
     private void completeCreateData(final ServerRequest<? super CreateResourceResult> request,
-            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Data path, final NormalizedNode data,
             final ListenableFuture<? extends CommitInfo> future) {
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
@@ -367,7 +367,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                 try {
                     apiPath = new ApiPathCanonizer(databind).dataToApiPath(
                         data instanceof MapNode mapData && !mapData.isEmpty()
-                        ? path.node(mapData.body().iterator().next().name()) : path);
+                        ? path.instance().node(mapData.body().iterator().next().name()) : path.instance());
                 } catch (RequestException e) {
                     // This should never happen
                     request.completeWith(e);
@@ -457,7 +457,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         boolean noError = true;
         for (var patchEntity : patch.entities()) {
             if (noError) {
-                final var targetNode = patchEntity.getTargetNode();
+                final var targetNode = patchEntity.getDataPath().instance();
                 final var editId = patchEntity.getEditId();
 
                 switch (patchEntity.getOperation()) {
@@ -1038,9 +1038,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
     }
 
-    // FIXME: require DatabindPath.Data here
-    final @NonNull RequestException decodeException(final Throwable ex, final String txType,
-            final YangInstanceIdentifier path) {
+    final @NonNull RequestException decodeException(final Throwable ex, final String txType, final Data dataPath) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
@@ -1052,13 +1050,15 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                 if (error instanceof DocumentedException documentedError) {
                     final var errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
-                        LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
+                        LOG.trace("Operation via Restconf was not executed because data at {} already exists",
+                            dataPath != null ? dataPath.instance() : null);
                         return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
-                            path != null ? new ErrorPath(databind, path) : null, ex);
+                            dataPath != null ? dataPath.toErrorPath() : null, ex);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
-                        LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+                        LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
+                            dataPath != null ? dataPath.instance() : null);
                         return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                            "Data does not exist", path != null ? new ErrorPath(databind, path) : null, ex);
+                            "Data does not exist", dataPath != null ? dataPath.toErrorPath() : null, ex);
                     }
                 }
             }
