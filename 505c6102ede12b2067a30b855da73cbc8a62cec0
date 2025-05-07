@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06bccb77_df080805",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-07T08:10:02Z",
+      "side": 1,
+      "message": "- remove unnecessary comments",
+      "revId": "505c6102ede12b2067a30b855da73cbc8a62cec0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be55b3d9_f0ef9c86",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-07T08:10:02Z",
+      "side": 1,
+      "message": "revert logic here",
+      "revId": "505c6102ede12b2067a30b855da73cbc8a62cec0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dfbefd3_e15f2785",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-07T08:10:02Z",
+      "side": 1,
+      "message": "revert this back 😄",
+      "revId": "505c6102ede12b2067a30b855da73cbc8a62cec0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
