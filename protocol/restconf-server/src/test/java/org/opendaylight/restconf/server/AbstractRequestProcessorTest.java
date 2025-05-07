@@ -16,6 +16,7 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import java.net.InetSocketAddress;
@@ -84,7 +85,7 @@ class AbstractRequestProcessorTest {
 
     @BeforeEach
     void beforeEach() {
-        session = new RestconfSession(HTTPScheme.HTTP,
+        session = new RestconfSession(HTTPScheme.HTTP, new LocalAddress("test"),
             new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
                 new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT,
                     1000, Integer.MAX_VALUE, streamRegistry)));

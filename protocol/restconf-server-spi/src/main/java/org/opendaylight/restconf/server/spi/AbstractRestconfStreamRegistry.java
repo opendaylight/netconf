@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,13 +52,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRestconfStreamRegistry implements RestconfStream.Registry {
     /**
-     * Default NETCONF stream. We follow
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.3.1">RFC 8040</a>.
-     */
-    private static final String DEFAULT_STREAM_NAME = "NETCONF";
-    private static final String DEFAULT_STREAM_DESCRIPTION = "Default XML encoded NETCONF stream";
-
-    /**
      * An Event Stream Filter.
      */
     @Beta
@@ -67,11 +61,31 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         boolean test(YangInstanceIdentifier path, ContainerNode body);
     }
 
-    private final class SubscriptionImpl extends AbstractRestconfStreamSubscription {
-        SubscriptionImpl(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final SubscriptionState state, final TransportSession session,
+    /**
+     * Internal implementation
+     * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
+     */
+    private final class DynSubscription extends AbstractRestconfStreamSubscription {
+        DynSubscription(final Uint32 id, final QName encoding, final String streamName,
+                final TransportSession session, final @Nullable Principal principal,
                 final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, state, session, filter);
+            super(id, encoding, streamName, initialReceiverName(session.description(), principal),
+                SubscriptionState.START, session, filter);
+        }
+
+        // FIXME: Only used by modifySubscription(). We should not be instantiating a new subscription, but rather have
+        //        a Subscription.modify() method which does the trick. That method should be hidden by default, and
+        //        exposed in a separate interface:
+        //        - we can invoke modify() from AbstractRestconfStreamRegistry for configured subscriptions
+        //        - modify-subscription RPC can gain access via a check for 'DynamicSubscription', properly rejecting
+        //          attempts to modify non-dynamic subscriptions
+        @NonNullByDefault
+        DynSubscription(final Subscription prev, final @Nullable EventStreamFilter filter) {
+            super(prev.id(), prev.encoding(), prev.streamName(), prev.receiverName(),
+                // Note: RFC8639 mandates that an updated subscription is automatically active, but perhaps we want to
+                //       do that via explicit transition as we are free to immediately suspend, for example -- in which
+                //       case we do not want to, for example, go SUSPENDED -> ACTIVE -> SUSPENDED.
+                SubscriptionState.ACTIVE, prev.session(), filter);
         }
 
         @Override
@@ -84,9 +98,22 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         public void channelClosed() {
             subscriptions.remove(id());
         }
+
+        @NonNullByDefault
+        private static String initialReceiverName(final TransportSession.Description description,
+                final @Nullable Principal principal) {
+            final var receiverName = description.toFriendlyString();
+            return principal == null ? receiverName : principal.getName() + " via " + receiverName;
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamRegistry.class);
+    /**
+     * Default NETCONF stream. We follow
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.3.1">RFC 8040</a>.
+     */
+    private static final String DEFAULT_STREAM_NAME = "NETCONF";
+    private static final String DEFAULT_STREAM_DESCRIPTION = "Default XML encoded NETCONF stream";
 
     /**
      * Previous dynamic subscription ID. We follow
@@ -253,12 +280,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        final var principal = request.principal();
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
-        final var subscription = new SubscriptionImpl(id, encoding, streamName,
-            // FIXME: 'anonymous' instead of 'unknown' ?
-            principal != null ? principal.getName() : "<unknown>",
-            SubscriptionState.START, request.session(),
+        final var subscription = new DynSubscription(id, encoding, streamName, request.session(), request.principal(),
             filterImpl);
 
         Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
@@ -292,8 +315,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             request.completeWith(e);
             return;
         }
-        final var newSubscription = new SubscriptionImpl(id, oldSubscription.encoding(), oldSubscription.streamName(),
-            oldSubscription.receiverName(), SubscriptionState.ACTIVE, oldSubscription.session(), filterImpl);
+        final var newSubscription = new DynSubscription(oldSubscription, filterImpl);
 
         Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
             @Override
