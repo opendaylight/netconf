@@ -11,7 +11,6 @@ import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
@@ -21,26 +20,28 @@ public abstract class AbstractServerDataOperations implements ServerDataOperatio
     @Override
     public final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final PrefixAndBody data) {
-        createData(request, path, parentPath(path, data), data.body());
+        createData(request, parentPath(path, data), data.body());
     }
 
     protected abstract void createData(ServerRequest<? super CreateResourceResult> request, Data path,
-        YangInstanceIdentifier parentPath, NormalizedNode data);
+        NormalizedNode data);
 
     @Override
     public final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final Insert insert, final PrefixAndBody data) {
-        createData(request, path, insert, parentPath(path, data), data.body());
+        createData(request, parentPath(path, data), insert, data.body());
     }
 
     protected abstract void createData(ServerRequest<? super CreateResourceResult> request, Data path, Insert insert,
-        YangInstanceIdentifier parentPath, NormalizedNode data);
+        NormalizedNode data);
 
-    private static YangInstanceIdentifier parentPath(final Data path, final PrefixAndBody prefixAndBody) {
+    private static Data parentPath(final Data path, final PrefixAndBody prefixAndBody) {
         var ret = path.instance();
+        final var schemaInferenceStack = path.inference().toSchemaInferenceStack();
         for (var arg : prefixAndBody.prefix()) {
             ret = ret.node(arg);
+            schemaInferenceStack.enterDataTree(arg.getNodeType());
         }
-        return ret;
+        return new Data(path.databind(), schemaInferenceStack.toInference(), ret, path.schema());
     }
 }
