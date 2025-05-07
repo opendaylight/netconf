@@ -250,10 +250,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    protected ListenableFuture<RestconfStream.Subscription> createSubscription(
-            final RestconfStream.Subscription subscription) {
-        final var id = subscription.id();
-        final var receiverName = subscription.receiverName();
+    protected ListenableFuture<SubscriptionControl> createSubscription(final Uint32 id, final String streamName,
+            final QName encoding, final String receiverName) {
         final var pathArg = subscriptionArg(id);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
@@ -261,10 +259,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
                 .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
-                .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, subscription.encoding()))
+                .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_NODEID, subscription.streamName()))
+                    .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName))
 //                    .withChild(ImmutableNodes.newChoiceBuilder()
 //                        .withNodeIdentifier(STREAM_FILTER_NODEID)
 //                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
@@ -357,6 +355,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @NonNullByDefault
     private static NodeIdentifierWithPredicates receiverArg(final String receiverName) {
         return NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiverName);
+    }
+
+    @NonNullByDefault
+    static YangInstanceIdentifier streamFilterPath(final Uint32 subscriptionId) {
+        return YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID, subscriptionArg(subscriptionId),
+            TARGET_NODEID, STREAM_FILTER_NODEID);
     }
 
     @NonNullByDefault
