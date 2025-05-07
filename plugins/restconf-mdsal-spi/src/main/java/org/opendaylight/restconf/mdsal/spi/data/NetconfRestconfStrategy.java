@@ -93,7 +93,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "DELETE", instance));
+                request.completeWith(decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
     }
