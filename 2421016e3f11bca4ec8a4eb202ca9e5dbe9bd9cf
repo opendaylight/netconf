@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d17a89f1_c9ba15c3",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-07T08:08:17Z",
+      "side": 1,
+      "message": "just node",
+      "revId": "2421016e3f11bca4ec8a4eb202ca9e5dbe9bd9cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
