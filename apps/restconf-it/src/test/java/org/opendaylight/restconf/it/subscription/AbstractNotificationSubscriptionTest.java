@@ -65,7 +65,6 @@ import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.SimpleNettyEndpoint;
-import org.opendaylight.restconf.server.SubscriptionResourceProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
@@ -84,7 +83,6 @@ import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.yangtools.binding.runtime.api.DefaultBindingRuntimeContext;
 import org.opendaylight.yangtools.binding.runtime.spi.ModuleInfoSnapshotBuilder;
-import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
@@ -131,7 +129,6 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private DOMNotificationRouter domNotificationRouter;
     private DOMRpcRouter domRpcRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
-    private Registration reg;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
@@ -212,9 +209,6 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
             MessageEncoding.JSON, serverStackGrouping);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
-
-        // Register subscription web resource
-        reg = endpoint.registerWebResource(new SubscriptionResourceProvider(streamRegistry));
     }
 
     @AfterEach
@@ -228,7 +222,6 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         if (streamControl != null) {
             streamControl = null;
         }
-        reg.close();
         endpoint.close();
         streamRegistry.close();
         domRpcRouter.close();
