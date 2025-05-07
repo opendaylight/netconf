@@ -74,6 +74,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
          * @return A {@link ListenableFuture} signalling the result of termination process
          */
         ListenableFuture<Void> terminate();
+
+        ListenableFuture<Void> updateFilter(@Nullable SubscriptionFilter newFilter);
     }
 
     /**
