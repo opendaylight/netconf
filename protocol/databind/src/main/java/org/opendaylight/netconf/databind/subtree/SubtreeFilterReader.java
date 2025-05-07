@@ -152,7 +152,6 @@ final class SubtreeFilterReader {
                     } catch (IllegalArgumentException iae) {
                         LOG.debug("Failed to find exact node for with name {}.", qname);
                     }
-                    LOG.debug("Failed to find exact node {} under {}.", qname, module.localQNameModule());
                 } else {
                     throw new XMLStreamException("Failed to lookup module with namespace %s."
                         .formatted(elementNamespace));
