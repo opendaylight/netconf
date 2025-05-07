@@ -70,6 +70,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public interface SubscriptionControl {
 
         ListenableFuture<Void> terminate();
+
+        ListenableFuture<Void> updateFilter(@Nullable SubscriptionFilter newFilter);
     }
 
     /**
