@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d570004b_d1275049",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-07T11:25:50Z",
+      "side": 1,
+      "message": "this means inability to parse array of values",
+      "parentUuid": "c8586318_b2ead062",
+      "revId": "f2cf52a92427063a72c6d24069e1b7bf4540aae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e2cbe06_cc7305be",
         "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/JsonPatchBody.java",
         "patchSetId": 30
