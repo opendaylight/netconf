@@ -86,7 +86,6 @@ final class APIResource extends AbstractResource {
     // FIXME: we are rejecting requests to '{+restconf}', which matches JAX-RS server behaviour, but is not correct:
     //        we should be reporting the entire API Resource, as described in
     //        https://www.rfc-editor.org/rfc/rfc8040#section-3.3
-    @NonNullByDefault
     private static PreparedRequest prepare(final TransportSession session, final ImplementedMethod method,
             final URI targetUri, final HttpHeaders headers, final @Nullable Principal principal) {
         LOG.debug("Not servicing root request");
