@@ -227,7 +227,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         tx.merge(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(
             SUBSCRIPTIONS_NODEID,
             SUBSCRIPTION_NODEID,
-            subscriptionArg(Uint32.valueOf(receiver.subscriptionId())),
+            subscriptionArg(receiver.subscriptionId()),
             RECEIVERS_NODEID,
             RECEIVER_NODEID,
             receiverArg(receiver.receiverName()),
