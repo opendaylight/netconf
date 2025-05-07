@@ -10,9 +10,8 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http2.HttpConversionUtil;
-import io.netty.util.AsciiString;
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -56,24 +55,21 @@ final class EndpointRoot {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRoot.class);
-    private static final AsciiString STREAM_ID = HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text();
 
     private final ConcurrentHashMap<String, WebHostResource> resources = new ConcurrentHashMap<>();
     private final PrincipalService principalService;
     // FIXME: at some point this should just be 'XRD xrd'
     private final WellKnownResources wellKnown;
-    // FIXME: at some point these two fields should be integrated into 'providers' Map with a coherent resource access
+    // FIXME: at some point this should be integrated into 'providers' Map with a coherent resource access
     //        API across the three classes of resources we have today
-    private final APIResource apiResource;
-    private final String apiSegment;
+    private final Map<String, AbstractResource> fixedResources;
 
     @NonNullByDefault
     EndpointRoot(final PrincipalService principalService, final WellKnownResources wellKnown,
-            final String apiSegment, final APIResource apiResource) {
+            final Map<String, AbstractResource> fixedResources) {
         this.principalService = requireNonNull(principalService);
         this.wellKnown = requireNonNull(wellKnown);
-        this.apiSegment = requireNonNull(apiSegment);
-        this.apiResource = requireNonNull(apiResource);
+        this.fixedResources = requireNonNull(fixedResources);
     }
 
     @NonNullByDefault
@@ -105,11 +101,12 @@ final class EndpointRoot {
         final var segment = peeler.next();
         if (segment.equals(".well-known")) {
             return wellKnown.request(peeler, method, headers);
-        } else if (segment.equals(apiSegment)) {
-            return apiResource.prepare(peeler, session, method, targetUri, headers,
+        }
+        final var fixedResource = fixedResources.get(segment);
+        if (fixedResource != null) {
+            return fixedResource.prepare(peeler, session, method, targetUri, headers,
                 principalService.acquirePrincipal(headers));
         }
-
         final var resource = resources.get(segment);
         return resource == null ? EmptyResponse.NOT_FOUND
             : resource.prepare(method, targetUri, headers, peeler, wellKnown);
