@@ -360,6 +360,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @NonNullByDefault
+    static YangInstanceIdentifier streamFilterPath(final Uint32 subscriptionId) {
+        return YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID, subscriptionArg(subscriptionId),
+            TARGET_NODEID, STREAM_FILTER_NODEID);
+    }
+
+    @NonNullByDefault
     static YangInstanceIdentifier subscriptionPath(final Uint32 subscriptionId) {
         return subscriptionPath(subscriptionArg(subscriptionId));
     }

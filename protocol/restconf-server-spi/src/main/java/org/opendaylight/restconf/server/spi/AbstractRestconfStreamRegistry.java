@@ -64,6 +64,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     /**
+     * Control interface for the backend of a subscription.
+     */
+    @NonNullByDefault
+    public interface SubscriptionControl {
+
+        ListenableFuture<Void> terminate();
+    }
+
+    /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
