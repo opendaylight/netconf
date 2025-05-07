@@ -128,4 +128,14 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
         }
         return value;
     }
+
+    static final Data getDataParent(final Data data) {
+        final var stackParent = data.inference().toSchemaInferenceStack();
+        if (!stackParent.isEmpty()) {
+            stackParent.exit();
+        }
+        final var targetPath = data.instance();
+        final var parentPath = targetPath.getParent() == null ? targetPath : targetPath.getParent();
+        return new Data(data.databind(), stackParent.toInference(), parentPath, data.schema());
+    }
 }
