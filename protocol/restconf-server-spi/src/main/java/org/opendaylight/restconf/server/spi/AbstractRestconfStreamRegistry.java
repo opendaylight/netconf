@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -64,81 +65,114 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     /**
+     * Control interface for the backend of a subscription.
+     */
+    @NonNullByDefault
+    public interface SubscriptionControl {
+        /**
+         * Terminate the subscription.
+         *
+         * @return A {@link ListenableFuture} signalling the result of termination process
+         */
+        FluentFuture<Void> terminate();
+    }
+
+    /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
-        DynSubscription(final Uint32 id, final QName encoding, final String streamName,
-                final TransportSession session, final @Nullable Principal principal,
-                final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, initialReceiverName(session.description(), principal),
-                SubscriptionState.ACTIVE, session, filter);
-        }
+        private final SubscriptionControl control;
 
-        // FIXME: Only used by modifySubscription(). We should not be instantiating a new subscription, but rather have
-        //        a Subscription.modify() method which does the trick. That method should be hidden by default, and
-        //        exposed in a separate interface:
-        //        - we can invoke modify() from AbstractRestconfStreamRegistry for configured subscriptions
-        //        - modify-subscription RPC can gain access via a check for 'DynamicSubscription', properly rejecting
-        //          attempts to modify non-dynamic subscriptions
-        @NonNullByDefault
-        DynSubscription(final Subscription prev, final @Nullable EventStreamFilter filter) {
-            super(prev.id(), prev.encoding(), prev.streamName(), prev.receiverName(),
-                // Note: RFC8639 mandates that an updated subscription is automatically active, but perhaps we want to
-                //       do that via explicit transition as we are free to immediately suspend, for example -- in which
-                //       case we do not want to, for example, go SUSPENDED -> ACTIVE -> SUSPENDED.
-                SubscriptionState.ACTIVE, prev.session(), filter);
+        private @Nullable EventStreamFilter filter;
+
+        DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
+                final TransportSession session, final SubscriptionControl control,
+                final @Nullable EventStreamFilter filter) {
+            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session);
+            this.control = requireNonNull(control);
+            this.filter = filter;
         }
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
-            subscriptions.remove(id(), this);
-            request.completeWith(Empty.value());
+            final var id = id();
+            LOG.debug("Terminating subscription {} reason {}", id, reason);
+
+            control.terminate().addCallback(new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.debug("Subscription {} terminated", id);
+                    subscriptions.remove(id, DynSubscription.this);
+                    request.completeWith(Empty.value());
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Cannot terminate subscription {}", id, cause);
+                    request.completeWith(new RequestException(cause));
+                }
+            }, MoreExecutors.directExecutor());
         }
 
         @Override
         public void channelClosed() {
-            subscriptions.remove(id());
+            final var id = id();
+            LOG.debug("Subscription {} terminated due to transport session going down", id);
+
+            control.terminate().addCallback(new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.debug("Subscription {} cleaned up", id);
+                    subscriptions.remove(id);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Subscription {} failed to clean up", id, cause);
+                    subscriptions.remove(id);
+                }
+            }, MoreExecutors.directExecutor());
         }
 
-        @NonNullByDefault
-        private static String initialReceiverName(final TransportSession.Description description,
-                final @Nullable Principal principal) {
-            final var receiverName = description.toFriendlyString();
-            return principal == null ? receiverName : principal.getName() + " via " + receiverName;
-        }
-    }
-
-    // FIXME: merge into DynSubscription
-    @NonNullByDefault
-    private final class DynSubscriptionResource extends AbstractRegistration {
-        private final Uint32 subscriptionId;
-
-        DynSubscriptionResource(final Uint32 subscriptionId) {
-            this.subscriptionId = requireNonNull(subscriptionId);
-        }
-
-        @Override
-        protected void removeRegistration() {
-            // check if the subscription is still registered or was terminated from elsewhere
-            final var subscription = lookupSubscription(subscriptionId);
-            if (subscription != null) {
-                switch (subscription.state()) {
-                    case END -> {
-                        LOG.debug("Subscription id:{} already in END state during attempt to end it", subscriptionId);
-                        subscription.terminate(null, null);
-                    }
-                    default -> {
-                        subscription.setState(RestconfStream.SubscriptionState.END);
-                        subscription.channelClosed();
-                    }
+        void controlSessionClosed() {
+            switch (state()) {
+                case END -> {
+                    LOG.debug("Subscription id:{} already in END state during attempt to end it", id());
+                    terminate(null, null);
+                }
+                default -> {
+                    setState(RestconfStream.SubscriptionState.END);
+                    channelClosed();
                 }
             }
         }
 
+        void setFilter(final EventStreamFilter newFilter) {
+            filter = newFilter;
+        }
+
+        @Override
+        protected @Nullable EventStreamFilter filter() {
+            return filter;
+        }
+    }
+
+    private static final class DynSubscriptionResource extends AbstractRegistration {
+        private final DynSubscription subscription;
+
+        DynSubscriptionResource(final DynSubscription subscription) {
+            this.subscription = requireNonNull(subscription);
+        }
+
+        @Override
+        protected void removeRegistration() {
+            subscription.controlSessionClosed();
+        }
+
         @Override
         protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
-            return super.addToStringAttributes(toStringHelper.add("subscription", subscriptionId));
+            return super.addToStringAttributes(toStringHelper.add("subscription", subscription.id()));
         }
     }
 
@@ -164,7 +198,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Uint32, Subscription> subscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
     // FIXME: This is not quite sufficient and should be split into two maps:
     //          1. filterSpecs, which is a HashMap<String, ChoiceNode> recording known filter-spec definitions
     //             access should be guarded by a lock
@@ -323,14 +357,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
-        final var subscription = new DynSubscription(id, encoding, streamName, request.session(), request.principal(),
-            filterImpl);
+        final var receiverName = newReceiverName(session.description(), request.principal());
 
-        Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
+        Futures.addCallback(createSubscription(id, streamName, encoding, receiverName), new FutureCallback<>() {
             @Override
-            public void onSuccess(final Subscription result) {
-                subscriptions.put(id, result);
-                session.registerResource(new DynSubscriptionResource(id));
+            public void onSuccess(final SubscriptionControl result) {
+                final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session, result,
+                    filterImpl);
+                subscriptions.put(id, subscription);
+                session.registerResource(new DynSubscriptionResource(subscription));
                 request.completeWith(id);
             }
 
@@ -341,11 +376,18 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
+    @NonNullByDefault
+    private static String newReceiverName(final TransportSession.Description description,
+            final @Nullable Principal principal) {
+        final var receiverName = description.toFriendlyString();
+        return principal == null ? receiverName : principal.getName() + " via " + receiverName;
+    }
+
     @Override
     public void modifySubscription(final ServerRequest<Subscription> request, final Uint32 id,
             final SubscriptionFilter filter) {
-        final var oldSubscription = lookupSubscription(id);
-        if (oldSubscription == null) {
+        final var subscription = subscriptions.get(id);
+        if (subscription == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no subscription with given ID."));
             return;
@@ -358,13 +400,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             request.completeWith(e);
             return;
         }
-        final var newSubscription = new DynSubscription(oldSubscription, filterImpl);
 
-        Futures.addCallback(modifySubscriptionFilter(newSubscription, filter), new FutureCallback<>() {
+        Futures.addCallback(modifySubscriptionFilter(id, filter), new FutureCallback<>() {
             @Override
-            public void onSuccess(final Subscription result) {
-                subscriptions.put(id, result);
-                request.completeWith(result);
+            public void onSuccess(final Void result) {
+                subscription.setFilter(filterImpl);
+                request.completeWith(subscription);
             }
 
             @Override
@@ -374,18 +415,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }, MoreExecutors.directExecutor());
     }
 
-    @Override
-    public void updateSubscriptionState(final Subscription subscription, final SubscriptionState newState) {
-        requireNonNull(subscription);
-        subscription.setState(newState);
-        subscriptions.replace(subscription.id(), subscription);
-    }
+    @NonNullByDefault
+    protected abstract ListenableFuture<SubscriptionControl> createSubscription(Uint32 subscriptionId,
+        String streamName, QName encoding, String receiverName);
 
     @NonNullByDefault
-    protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
-
-    @NonNullByDefault
-    protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
+    protected abstract ListenableFuture<Void> modifySubscriptionFilter(Uint32 subscriptionId,
         SubscriptionFilter filter);
 
     /**

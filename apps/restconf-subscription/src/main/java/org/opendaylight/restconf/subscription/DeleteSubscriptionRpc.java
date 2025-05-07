@@ -83,20 +83,20 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
                 "No subscription with given ID."));
             return;
         }
+
+        // FIXME: DynamicSubscription.delete()
         final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
-
         if (subscription.session() != request.session()) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
         }
-
-        streamRegistry.updateSubscriptionState(subscription, SubscriptionState.END);
+        subscription.setState(SubscriptionState.END);
         subscription.terminate(request.transform(unused -> {
             try {
                 subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);

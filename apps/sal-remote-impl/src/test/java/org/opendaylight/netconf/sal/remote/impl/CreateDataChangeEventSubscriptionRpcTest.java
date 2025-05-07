@@ -43,13 +43,13 @@ import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.ReceiverHolder.RecordType;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
@@ -82,12 +82,13 @@ class CreateDataChangeEventSubscriptionRpcTest {
         }
 
         @Override
-        protected ListenableFuture<Subscription> createSubscription(final Subscription subscription) {
+        protected ListenableFuture<SubscriptionControl> createSubscription(final Uint32 subscriptionId,
+                final String streamName, final QName encoding, final String receiverName) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        protected ListenableFuture<Subscription> modifySubscriptionFilter(final Subscription subscription,
+        protected ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
                 final SubscriptionFilter filter) {
             throw new UnsupportedOperationException();
         }
