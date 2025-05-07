@@ -7,13 +7,16 @@
  */
 package org.opendaylight.restconf.server;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +44,20 @@ final class RestconfTransportChannelListener implements TransportChannelListener
         final var firstSegment = apiRootPath.getFirst();
         final var otherSegments = apiRootPath.stream().skip(1).collect(Collectors.toUnmodifiableList());
 
-        root = new EndpointRoot(principalService, new WellKnownResources(restconf), firstSegment,
-            new APIResource(server, otherSegments, sb.append('/').toString(), configuration.errorTagMapping(),
-                configuration.defaultEncoding(), configuration.prettyPrint(),
-                configuration.sseHeartbeatIntervalMillis().intValue(),
-                configuration.sseMaximumFragmentLength().intValue(), streamRegistry));
+        final var invariants = new EndpointInvariants(server, configuration.prettyPrint(),
+            configuration.errorTagMapping(), configuration.defaultEncoding(), URI.create(sb.append('/').toString()));
+
+        // FIXME: unsafe conversion from Uint32 to 'int'
+        final int heartbeatIntervalMillis = configuration.sseHeartbeatIntervalMillis().intValue();
+        final int maximumFragmentLength = configuration.sseMaximumFragmentLength().intValue();
+
+        // TODO: yes, this can explode, if the user chooses '/subscriptions' or similar for apiRootPath, but that is
+        //       something we do not worry about right now.
+        root = new EndpointRoot(principalService, new WellKnownResources(restconf), Map.of(
+            firstSegment,
+            new APIResource(invariants, otherSegments, heartbeatIntervalMillis, maximumFragmentLength, streamRegistry),
+            "subscriptions",
+            new SubscriptionsResource(invariants, streamRegistry, heartbeatIntervalMillis, maximumFragmentLength)));
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,

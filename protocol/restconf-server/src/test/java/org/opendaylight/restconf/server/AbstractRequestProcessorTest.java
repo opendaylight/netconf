@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,6 +36,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,9 +88,10 @@ class AbstractRequestProcessorTest {
     @BeforeEach
     void beforeEach() {
         session = new RestconfSession(HTTPScheme.HTTP, new LocalAddress("test"),
-            new EndpointRoot(principalService, WELL_KNOWN, BASE_PATH.substring(1),
-                new APIResource(server, List.of(), "/rests/", ERROR_TAG_MAPPING, MessageEncoding.JSON, PRETTY_PRINT,
-                    1000, Integer.MAX_VALUE, streamRegistry)));
+            new EndpointRoot(principalService, WELL_KNOWN, Map.of(BASE_PATH.substring(1),
+                new APIResource(new EndpointInvariants(server, PRETTY_PRINT, ERROR_TAG_MAPPING, MessageEncoding.JSON,
+                    URI.create("/rests/")),
+                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))));
         doReturn(channel).when(ctx).channel();
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         session.handlerAdded(ctx);
