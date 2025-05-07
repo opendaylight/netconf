@@ -24,7 +24,7 @@ import org.opendaylight.netconf.transport.http.EventStreamResponse;
 import org.opendaylight.netconf.transport.http.HeadersResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.LinkRelation;
-import org.opendaylight.netconf.transport.http.Response;
+import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
@@ -70,7 +70,7 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
     }
 
     @Override
-    public Response prepare(final ImplementedMethod method, final URI targetUri,
+    public PreparedRequest prepare(final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final SegmentPeeler peeler, final XRD xrd) {
         final var restconf = xrd.lookupLink(LinkRelation.RESTCONF);
         if (restconf == null) {
@@ -80,37 +80,43 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
             return optionsOnlyResponse(method);
         }
 
-        final var subscriptionId = peeler.next();
         return switch (method) {
-            case GET -> prepareEventStream(targetUri, headers, subscriptionId, true);
-            case HEAD -> prepareEventStream(targetUri, headers, subscriptionId, false);
+            case GET -> prepare(headers, peeler, false);
+            case HEAD -> prepare(headers, peeler, true);
             case OPTIONS -> OPTIONS_RESPONSE;
             default -> EmptyResponse.NOT_FOUND;
         };
     }
 
-    private Response prepareEventStream(final URI targetUri, final HttpHeaders headers, final String subscriptionId,
-            final boolean startStream) {
-        if (!startStream) {
-            return HeadersResponse.of(HttpResponseStatus.OK, HttpHeaderNames.CONTENT_TYPE,
-                HttpHeaderValues.TEXT_EVENT_STREAM);
-        }
-        if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
-            return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
+    private PreparedRequest prepare(final HttpHeaders headers, final SegmentPeeler peeler, final boolean headOnly) {
+        final var subscriptionIdStr = peeler.next();
+        final Uint32 subscriptionId;
+        try {
+            subscriptionId = Uint32.valueOf(subscriptionIdStr);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Invalid subscription id {}", subscriptionIdStr, e);
+            return new EmptyResponse(HttpResponseStatus.NOT_FOUND);
         }
 
-        final Uint32 id;
-        try {
-            id = Uint32.valueOf(subscriptionId);
-        } catch (IllegalArgumentException e) {
-            LOG.debug("Invalid subscription id {}", subscriptionId, e);
-            return new EmptyResponse(HttpResponseStatus.BAD_REQUEST);
-        }
-        final var subscription = streamRegistry.lookupSubscription(id);
+        final var subscription = streamRegistry.lookupSubscription(subscriptionId);
         if (subscription == null) {
             LOG.debug("Subscription for id {} not found", subscriptionId);
             return EmptyResponse.NOT_FOUND;
         }
+
+        // HEAD requests stop here
+        if (headOnly) {
+            return HeadersResponse.of(HttpResponseStatus.OK, HttpHeaderNames.CONTENT_TYPE,
+                HttpHeaderValues.TEXT_EVENT_STREAM);
+        }
+
+        if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
+            return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
+        }
+
+        // FIXME: the rest of this processing should be encapsulated in a PreparedRequest, which talks to the
+        //        Subscription only.
+
         if (subscription.state() != SubscriptionState.ACTIVE) {
             LOG.debug("Subscription for id {} is not active", subscriptionId);
             return new EmptyResponse(HttpResponseStatus.CONFLICT);
@@ -122,6 +128,8 @@ final class SubscriptionResourceInstance extends WebHostResourceInstance {
             LOG.debug("Stream '{}' not found", streamName);
             return EmptyResponse.NOT_FOUND;
         }
+
+        // FIXME: this is bogus: all of this is already specified in subscription
         final var streamParams = EventStreamGetParams.of(QueryParameters.of());
 
         final var receiverName = subscription.receiverName();
