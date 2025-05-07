@@ -7,12 +7,14 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,17 +25,17 @@ import org.slf4j.LoggerFactory;
 public final class ReceiverHolder {
     private static final Logger LOG = LoggerFactory.getLogger(ReceiverHolder.class);
 
-    private final String subscriptionId;
+    private final Uint32 subscriptionId;
     private final String receiverName;
     private final RestconfStream.Registry streamRegistry;
     private final AtomicLong sentEventCounter = new AtomicLong(0);
     private final AtomicLong excludedEventCounter = new AtomicLong(0);
 
-    public ReceiverHolder(final String subscriptionId, final String receiverName,
+    public ReceiverHolder(final Uint32 subscriptionId, final String receiverName,
             final RestconfStream.Registry streamRegistry) {
-        this.subscriptionId = Objects.requireNonNull(subscriptionId);
-        this.receiverName = Objects.requireNonNull(receiverName);
-        this.streamRegistry = Objects.requireNonNull(streamRegistry);
+        this.subscriptionId = requireNonNull(subscriptionId);
+        this.receiverName = requireNonNull(receiverName);
+        this.streamRegistry = requireNonNull(streamRegistry);
     }
 
     /**
@@ -69,18 +71,18 @@ public final class ReceiverHolder {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.trace("Excluded-event-records was updated {} for {} receiver on subscription {}",
-                        counterValue, receiverName(), subscriptionId());
+                        counterValue, receiverName, subscriptionId);
                 }
 
                 @Override
                 public void onFailure(final Throwable cause) {
                     LOG.warn("Failed update excluded-event-records {} for {} receiver on subscription {}",
-                        counterValue, receiverName(), subscriptionId(), cause);
+                        counterValue, receiverName, subscriptionId, cause);
                 }
             }, MoreExecutors.directExecutor());
     }
 
-    public String subscriptionId() {
+    public Uint32 subscriptionId() {
         return subscriptionId;
     }
 
