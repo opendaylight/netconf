@@ -28,6 +28,7 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,42 +117,7 @@ final class SubtreeFilterReader {
                 // try to find exact module if we know namespace of the node
                 final var childModule = context.findModuleStatements(XMLNamespace.of(elementNamespace)).iterator();
                 if (childModule.hasNext()) {
-                    final var module = childModule.next();
-                    final var qname = QName.create(module.localQNameModule(), elementLocalName);
-                    // try to enter child schema
-                    LOG.debug("Trying to find exact node {} under {}.", qname, module.localQNameModule());
-                    try {
-                        // handle choice if parent is one
-                        if (!parentStack.isEmpty()
-                            && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
-                            LOG.debug("Searching through choice node {} for exact match {}.", choice.getQName(), qname);
-                            for (final var caseNode : choice.getCases()) {
-                                final var child = caseNode.findDataTreeChild(qname);
-                                if (child.isPresent()) {
-                                    // enter case
-                                    parentStack.enterSchemaTree(caseNode.getQName());
-                                    // enter node
-                                    final var exact = parentStack.enterSchemaTree(qname);
-                                    childrenQNames.add(exact.argument());
-                                    children.add(parentStack.copy());
-                                    // exit node
-                                    parentStack.exit();
-                                    // exit case
-                                    parentStack.exit();
-                                    break;
-                                }
-                            }
-                        } else {
-                            final var exact = parentStack.enterSchemaTree(qname);
-                            childrenQNames.add(exact.argument());
-                            children.add(parentStack.copy());
-                            parentStack.exit();
-                        }
-                        // exact child was found under parents no need to continue looking
-                        break;
-                    } catch (IllegalArgumentException iae) {
-                        LOG.debug("Failed to find exact node for with name {}.", qname);
-                    }
+                    findNodeInModule(elementLocalName, childModule.next(), parentStack, children, childrenQNames);
                 } else {
                     throw new XMLStreamException("Failed to lookup module with namespace %s."
                         .formatted(elementNamespace));
@@ -160,41 +126,8 @@ final class SubtreeFilterReader {
                 LOG.debug("Processing {} node as wildcard.", elementName);
                 // if we don't have namespace to search for exact match then we have to search for child nodes with
                 // every possible namespace because children not necessarily have same namespace as parent
-                for (final var module : context.getModuleStatements().entrySet()) {
-                    final var childName = QName.create(module.getKey(), elementLocalName);
-                    try {
-                        // handle choice if parent is one
-                        if (!parentStack.isEmpty()
-                            && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
-                            LOG.debug("Searching through choice node {} by local name {}.", choice.getQName(),
-                                elementLocalName);
-                            for (final var caseNode : choice.getCases()) {
-                                final var child = caseNode.findDataTreeChild(childName);
-                                if (child.isPresent()) {
-                                    // enter case
-                                    parentStack.enterSchemaTree(caseNode.getQName());
-                                    // enter node
-                                    final var exact = parentStack.enterSchemaTree(childName);
-                                    childrenQNames.add(exact.argument());
-                                    children.add(parentStack.copy());
-                                    LOG.debug("Found {} node in case {}.", exact.argument(), caseNode.getQName());
-                                    // exit node
-                                    parentStack.exit();
-                                    // exit case
-                                    parentStack.exit();
-                                    break;
-                                }
-                            }
-                        } else {
-                            final var childStmt = parentStack.enterSchemaTree(childName);
-                            childrenQNames.add(childStmt.argument());
-                            children.add(parentStack.copy());
-                            LOG.debug("Found {} node.", childStmt.argument());
-                            parentStack.exit();
-                        }
-                    } catch (IllegalArgumentException iae) {
-                        LOG.debug("Failed to find any node with name {} under {}.", childName, module.getKey());
-                    }
+                for (final var module : context.getModuleStatements().values()) {
+                    findNodeInModule(elementLocalName, module, parentStack, children, childrenQNames);
                 }
             }
         }
@@ -296,6 +229,50 @@ final class SubtreeFilterReader {
             }
         }
         throw new XMLStreamException("Unexpected end of the document");
+    }
+
+    /**
+     * Find element by its local name {@code elementLocalName} in a module {@code module}.
+     *
+     * <p>We are searching for presence of a node in some parent stack and selected module, when we find it
+     * we add its Qname to collection of QNames and currents stack position to collection of children stacks
+     * which will be used as parents when searching for children of this node.
+     *
+     * @param elementLocalName the local name of element we are looking for
+     * @param module module we are processing
+     * @param parentStack all possible parent of searching node
+     * @param children collection of stacks
+     * @param childrenQNames collection of QNames
+     */
+    private static void findNodeInModule(final String elementLocalName, final ModuleEffectiveStatement module,
+            final SchemaInferenceStack parentStack, final ArrayList<SchemaInferenceStack> children,
+            final ArrayList<QName> childrenQNames) {
+        final var qname = QName.create(module.localQNameModule(), elementLocalName);
+        LOG.debug("Trying to find node {} under {}.", qname, module.localQNameModule());
+        try {
+            if (!parentStack.isEmpty() && parentStack.currentStatement() instanceof ChoiceSchemaNode choice) {
+                LOG.debug("Searching through choice node {} for match {}.", choice.getQName(), qname);
+                for (final var caseNode : choice.getCases()) {
+                    final var child = caseNode.findDataTreeChild(qname);
+                    if (child.isPresent()) {
+                        parentStack.enterSchemaTree(caseNode.getQName());
+                        final var exact = parentStack.enterSchemaTree(qname);
+                        childrenQNames.add(exact.argument());
+                        children.add(parentStack.copy());
+                        parentStack.exit();
+                        parentStack.exit();
+                        break;
+                    }
+                }
+            } else {
+                final var exact = parentStack.enterSchemaTree(qname);
+                childrenQNames.add(exact.argument());
+                children.add(parentStack.copy());
+                parentStack.exit();
+            }
+        } catch (IllegalArgumentException iae) {
+            LOG.debug("Failed to find exact node for with name {}.", qname);
+        }
     }
 
     /**
