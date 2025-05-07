@@ -23,7 +23,7 @@ import org.opendaylight.restconf.server.impl.EndpointInvariants;
  */
 @NonNullByDefault
 abstract sealed class AbstractLeafResource extends AbstractResource
-        permits DataResource, OperationsResource, StreamsResource, YLVResource, ModulesResource {
+        permits AbstractEventStreamResource, DataResource, ModulesResource, OperationsResource, YLVResource {
     AbstractLeafResource(final EndpointInvariants invariants) {
         super(invariants);
     }

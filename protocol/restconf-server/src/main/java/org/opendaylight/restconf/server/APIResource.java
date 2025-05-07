@@ -20,11 +20,8 @@ import org.opendaylight.netconf.transport.http.EmptyResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
-import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +37,10 @@ final class APIResource extends AbstractResource {
     private final Map<String, AbstractResource> resources;
     private final List<String> otherSegments;
 
-    APIResource(final RestconfServer server, final List<String> otherSegments, final String restconfPath,
-                final ErrorTagMapping errorTagMapping, final MessageEncoding defaultEncoding,
-                final PrettyPrintParam defaultPrettyPrint, final int sseHeartbeatIntervalMillis,
-                final int sseMaximumFragmentLength, final RestconfStream.Registry streamRegistry) {
-        super(new EndpointInvariants(server, defaultPrettyPrint, errorTagMapping, defaultEncoding,
-            URI.create(requireNonNull(restconfPath))));
+    APIResource(final EndpointInvariants invariants, final List<String> otherSegments,
+            final int sseHeartbeatIntervalMillis, final int sseMaximumFragmentLength,
+            final RestconfStream.Registry streamRegistry) {
+        super(invariants);
         this.otherSegments = requireNonNull(otherSegments);
 
         resources = Map.of(
