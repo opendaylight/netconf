@@ -96,12 +96,12 @@ public final class XmlPatchBody extends PatchBody {
                 // for lists/leaf-list allow to manipulate with items through their parent
                 if (targetPath.getLastPathArgument() instanceof NodeIdentifierWithPredicates
                         || targetPath.getLastPathArgument() instanceof NodeWithValue<?>) {
-                    entities.add(new PatchEntity(editId, oper, targetPath.getParent(), result));
+                    entities.add(new PatchEntity(editId, oper, getDataParent(targetData), result));
                 } else {
-                    entities.add(new PatchEntity(editId, oper, targetPath, result));
+                    entities.add(new PatchEntity(editId, oper, targetData, result));
                 }
             } else {
-                entities.add(new PatchEntity(editId, oper, targetPath));
+                entities.add(new PatchEntity(editId, oper, targetData));
             }
         }
 
