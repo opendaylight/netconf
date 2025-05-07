@@ -21,11 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.netconf.databind.subtree.SubtreeMatcher;
@@ -138,6 +139,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     //        Note: the MD-SAL implementation needs to use a Cluster Singleton Service to ensure oper updates are
     //              happening from a single node only.
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
+    private final DatabindProvider databindProvider;
+
+    protected AbstractRestconfStreamRegistry(final DatabindProvider databindProvider) {
+        this.databindProvider = requireNonNull(databindProvider);
+    }
 
     @Override
     public final RestconfStream<?> lookupStream(final String name) {
@@ -348,6 +354,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     @NonNullByDefault
     protected final void updateFilterDefinitions(final Map<String, @Nullable ChoiceNode> nameToSpec) {
+        final var databind = databindProvider.currentDatabind();
+
         for (var entry : nameToSpec.entrySet()) {
             final var filterName = entry.getKey();
             final var filterSpec = entry.getValue();
@@ -359,7 +367,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             final EventStreamFilter filter;
             try {
-                filter = parseFilter(filterSpec);
+                filter = parseFilter(databind, filterSpec);
             } catch (RequestException e) {
                 filters.remove(filterName);
                 LOG.warn("Removed filter {} due to parse failure", filterSpec.prettyTree(), e);
@@ -372,14 +380,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
+    private static EventStreamFilter parseFilter(final DatabindContext databind, final ChoiceNode filterSpec)
+            throws RequestException {
         final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
         if (subtree != null) {
-            return parseSubtreeFilter(subtree);
+            return parseSubtreeFilter(databind, subtree);
         }
         final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
         if (xpath != null) {
-            return parseXpathFilter((String) xpath.body());
+            return parseXpathFilter(databind, (String) xpath.body());
         }
         throw new RequestException("Unsupported filter %s", filterSpec);
     }
@@ -389,8 +398,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         return switch (filter) {
             case null -> null;
             case SubscriptionFilter.Reference(var filterName) -> getFilter(filterName);
-            case SubscriptionFilter.SubtreeDefinition(var anydata) -> parseSubtreeFilter(anydata);
-            case SubscriptionFilter.XPathDefinition(final var xpath) -> parseXpathFilter(xpath);
+            case SubscriptionFilter.SubtreeDefinition(var anydata) ->
+                parseSubtreeFilter(databindProvider.currentDatabind(), anydata);
+            case SubscriptionFilter.XPathDefinition(final var xpath) ->
+                parseXpathFilter(databindProvider.currentDatabind(), xpath);
         };
     }
 
@@ -405,12 +416,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    private EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
+    private static EventStreamFilter parseSubtreeFilter(final DatabindContext databind, final AnydataNode<?> filter)
+            throws RequestException {
         // FIXME: expand this once we have YANGTOOLS-1106
         return switch (filter.body()) {
             case DOMSource domSource -> {
                 try {
-                    yield new SubtreeEventStreamFilter(parseSubtreeFilter(new DOMSourceXMLStreamReader(domSource)));
+                    yield new SubtreeEventStreamFilter(SubtreeFilter.readFrom(databind,
+                        new DOMSourceXMLStreamReader(domSource)));
                 } catch (XMLStreamException e) {
                     throw new RequestException("Failed to parse filter", e);
                 }
@@ -421,10 +434,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract SubtreeFilter parseSubtreeFilter(XMLStreamReader reader) throws XMLStreamException;
-
-    @NonNullByDefault
-    private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
+    private static EventStreamFilter parseXpathFilter(final DatabindContext databind, final String xpath)
+            throws RequestException {
         // TODO: integrate yang-xpath-api and validate the propose xpath
         // TODO: implement XPath filter evaluation
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
