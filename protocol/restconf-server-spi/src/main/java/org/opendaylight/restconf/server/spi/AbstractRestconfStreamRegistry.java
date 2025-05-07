@@ -64,6 +64,19 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     /**
+     * Control interface for the backend of a subscription.
+     */
+    @NonNullByDefault
+    public interface SubscriptionControl {
+        /**
+         * Terminate the subscription.
+         *
+         * @return A {@link ListenableFuture} signalling the result of termination process
+         */
+        ListenableFuture<Void> terminate();
+    }
+
+    /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
@@ -323,10 +336,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
-        final var subscription = new DynSubscription(id, encoding, streamName, request.session(), request.principal(),
+        final var subscription = new DynSubscription(id, encoding, streamName, session, request.principal(),
             filterImpl);
 
-        Futures.addCallback(createSubscription(subscription), new FutureCallback<Subscription>() {
+        Futures.addCallback(createSubscription(id, streamName, encoding), new FutureCallback<Subscription>() {
             @Override
             public void onSuccess(final Subscription result) {
                 subscriptions.put(id, result);
@@ -382,7 +395,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract ListenableFuture<Subscription> createSubscription(Subscription subscription);
+    protected abstract ListenableFuture<SubscriptionControl> createSubscription(Uint32 subscriptionId,
+        String streamName, QName encoding, String receiverName);
 
     @NonNullByDefault
     protected abstract ListenableFuture<Subscription> modifySubscriptionFilter(Subscription subscription,
