@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState.ACTIVE;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState.END;
-import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState.START;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState.SUSPENDED;
 
 import java.util.List;
@@ -33,7 +32,6 @@ class SubscriptionStateTest {
 
     private static List<Arguments> moveStateValid() {
         return List.of(
-            arguments(START, ACTIVE),
             arguments(ACTIVE, SUSPENDED),
             arguments(ACTIVE, END),
             arguments(SUSPENDED, ACTIVE),
@@ -47,11 +45,6 @@ class SubscriptionStateTest {
     }
 
     private static List<Arguments> moveStateInvalid() {
-        return List.of(
-            arguments(SUSPENDED, START),
-            arguments(ACTIVE, START),
-            arguments(END, START),
-            arguments(END, ACTIVE),
-            arguments(END, SUSPENDED));
+        return List.of(arguments(END, ACTIVE), arguments(END, SUSPENDED));
     }
 }
