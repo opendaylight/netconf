@@ -144,7 +144,6 @@ class EstablishSubscriptionRpcTest {
         final var input = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
             .build();
-        doReturn(session).when(request).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
         verify(request).completeWith(response.capture());
