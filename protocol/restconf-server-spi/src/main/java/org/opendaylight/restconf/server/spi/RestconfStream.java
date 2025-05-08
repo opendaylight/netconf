@@ -205,7 +205,7 @@ public final class RestconfStream<T> {
          * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
          */
         @NonNullByDefault
-        void establishSubscription(ServerRequest<Subscription> request, String streamName, QName encoding,
+        void establishSubscription(ServerRequest<Uint32> request, String streamName, QName encoding,
             @Nullable SubscriptionFilter filter);
 
         /**
@@ -398,27 +398,14 @@ public final class RestconfStream<T> {
      */
     public enum SubscriptionState {
         /**
-         * Default state assigned to the subscription upon creation. Should be changed to active state after successful
-         * subscription.
-         */
-        START {
-            @Override
-            public boolean canMoveTo(final SubscriptionState newState) {
-                return switch (newState) {
-                    case ACTIVE, END -> true;
-                    case START, SUSPENDED -> false;
-                };
-            }
-        },
-        /**
          * State assigned upon successful subscription or after suspended state is lifted.
          */
         ACTIVE {
             @Override
             public boolean canMoveTo(final SubscriptionState newState) {
                 return switch (newState) {
-                    case SUSPENDED, END -> true;
-                    case ACTIVE, START -> false;
+                    case ACTIVE -> false;
+                    case END, SUSPENDED -> true;
                 };
             }
         },
@@ -431,7 +418,7 @@ public final class RestconfStream<T> {
             public boolean canMoveTo(final SubscriptionState newState) {
                 return switch (newState) {
                     case ACTIVE, END -> true;
-                    case START, SUSPENDED -> false;
+                    case SUSPENDED -> false;
                 };
             }
         },

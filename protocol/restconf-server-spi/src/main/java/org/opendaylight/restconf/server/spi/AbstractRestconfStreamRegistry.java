@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -33,6 +34,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -70,7 +72,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 final TransportSession session, final @Nullable Principal principal,
                 final @Nullable EventStreamFilter filter) {
             super(id, encoding, streamName, initialReceiverName(session.description(), principal),
-                SubscriptionState.START, session, filter);
+                SubscriptionState.ACTIVE, session, filter);
         }
 
         // FIXME: Only used by modifySubscription(). We should not be instantiating a new subscription, but rather have
@@ -104,6 +106,38 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 final @Nullable Principal principal) {
             final var receiverName = description.toFriendlyString();
             return principal == null ? receiverName : principal.getName() + " via " + receiverName;
+        }
+    }
+
+    // FIXME: merge into DynSubscription
+    private final class DynSubscriptionResource extends AbstractRegistration {
+        private final Uint32 subscriptionId;
+
+        DynSubscriptionResource(final Uint32 subscriptionId) {
+            this.subscriptionId = requireNonNull(subscriptionId);
+        }
+
+        @Override
+        protected void removeRegistration() {
+            // check if the subscription is still registered or was terminated from elsewhere
+            final var subscription = lookupSubscription(subscriptionId);
+            if (subscription != null) {
+                switch (subscription.state()) {
+                    case END -> {
+                        LOG.debug("Subscription id:{} already in END state during attempt to end it", subscriptionId);
+                        subscription.terminate(null, null);
+                    }
+                    default -> {
+                        subscription.setState(RestconfStream.SubscriptionState.END);
+                        subscription.channelClosed();
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
+            return super.addToStringAttributes(toStringHelper.add("subscription", subscriptionId));
         }
     }
 
@@ -263,8 +297,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @Override
-    public final void establishSubscription(final ServerRequest<Subscription> request, final String streamName,
+    public final void establishSubscription(final ServerRequest<Uint32> request, final String streamName,
             final QName encoding, final @Nullable SubscriptionFilter filter) {
+        final var session = request.session();
+        if (session == null) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+                "This end point does not support dynamic subscriptions."));
+            return;
+        }
+
         final var stream = lookupStream(streamName);
         if (stream == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
@@ -288,7 +329,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             @Override
             public void onSuccess(final Subscription result) {
                 subscriptions.put(id, result);
-                request.completeWith(result);
+                session.registerResource(new DynSubscriptionResource(id));
+                request.completeWith(id);
             }
 
             @Override
