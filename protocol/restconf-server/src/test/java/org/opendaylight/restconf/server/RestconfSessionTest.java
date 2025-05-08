@@ -82,7 +82,7 @@ class RestconfSessionTest {
         session.handlerAdded(ctx);
 
         // register resource
-        session.registerResource(registration);
+        session.transportSession().registerResource(registration);
         // bring the channel down
         session.channelInactive(ctx);
         // verify resource was closed on channel close
