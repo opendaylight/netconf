@@ -314,8 +314,7 @@ class NC1438Test extends AbstractRestconfTest {
               </edit>
             </yang-patch>"""), uriInfo, ar));
 
-        assertEquals("Operation value is incorrect: \"WRONG\" is not a valid name", restconfError.getErrorMessage());
-        assertEquals("\"WRONG\" is not a valid name", restconfError.getErrorInfo());
+        assertEquals("Operation value: [WRONG] is incorrect.", restconfError.getErrorMessage());
         assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
@@ -343,8 +342,7 @@ class NC1438Test extends AbstractRestconfTest {
               }
             }"""), uriInfo, ar));
 
-        assertEquals("Operation value is incorrect: \"wrong\" is not a valid name", restconfError.getErrorMessage());
-        assertEquals("\"wrong\" is not a valid name", restconfError.getErrorInfo());
+        assertEquals("Operation value: [wrong] is incorrect.", restconfError.getErrorMessage());
         assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
