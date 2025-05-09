@@ -13,7 +13,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -228,20 +227,6 @@ public final class RestconfStream<T> {
          * @return A {@link Subscription}, or {@code null} if the stream with specified name does not exist.
          */
         @Nullable Subscription lookupSubscription(Uint32 id);
-
-        /**
-         * Update the counter value for a specific receiver in the operational datastore.
-         *
-         * <p>This method writes an updated counter for the receiver identified by the provided {@code ReceiverHolder}.
-         * The type of counter to update is specified by the {@code recordType} parameter. The update is performed on
-         * the operational datastore via a merge operation, and the method returns a {@link ListenableFuture}
-         * that completes when the commit succeeds or fails.
-         *
-         * @param receiver   the {@link ReceiverHolder} containing the subscription ID and receiver name
-         * @param recordType the type of counter record to update (e.g. sent-event-records or excluded-event-records)
-         */
-        ListenableFuture<Void> updateReceiver(ReceiverHolder receiver, long counter,
-            ReceiverHolder.RecordType recordType);
     }
 
     /**
@@ -310,6 +295,15 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract TransportSession session();
+
+        /**
+         * Add a new receiver with this subscription, forwarding events to the specified {@link Sender}.
+         *
+         * @param request a {@link ServerRequest} completing with a {@link Registration} of the receiver
+         * @param sender the {@link Sender} backing the new receiver
+         */
+        @NonNullByDefault
+        public abstract void addReceiver(ServerRequest<Registration> request, Sender sender);
 
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
@@ -502,6 +496,14 @@ public final class RestconfStream<T> {
         return source.encodings.keySet();
     }
 
+    @NonNull EventFormatterFactory<T> getFactory(final EncodingName encoding) throws UnsupportedEncodingException {
+        final var factory = source.encodings.get(requireNonNull(encoding));
+        if (factory == null) {
+            throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
+        }
+        return factory;
+    }
+
     /**
      * Registers {@link Sender} subscriber.
      *
@@ -513,13 +515,10 @@ public final class RestconfStream<T> {
      * @throws UnsupportedEncodingException if {@code encoding} is not supported
      * @throws XPathExpressionException if requested filter is not valid
      */
+    @NonNullByDefault
     public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
             final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
-        final var factory = source.encodings.get(requireNonNull(encoding));
-        if (factory == null) {
-            throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
-        }
-
+        final var factory = getFactory(encoding);
         final var startTime = params.startTime();
         if (startTime != null) {
             throw new IllegalArgumentException("Stream " + name + " does not support replay");
@@ -540,18 +539,29 @@ public final class RestconfStream<T> {
 
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
-        final var toAdd = new Subscriber<>(this, handler, formatter, filter);
+        return addSubscriber(new Subscriber<>(this, handler, formatter, filter));
+    }
+
+    @NonNullByDefault
+    @Nullable Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding)
+            throws UnsupportedEncodingException {
+        return addSubscriber(new Subscriber<>(this, handler, getFactory(encoding).getFormatter(TextParameters.EMPTY),
+            // FIXME: receive filter
+            AcceptingEventFilter.instance()));
+    }
+
+    private @Nullable Subscriber<T> addSubscriber(final @NonNull Subscriber<T> subscriber) {
         var observed = acquireSubscribers();
         while (observed != null) {
-            final var next = observed.add(toAdd);
+            final var next = observed.add(subscriber);
             final var witness = (Subscribers<T>) SUBSCRIBERS_VH.compareAndExchangeRelease(this, observed, next);
             if (witness == observed) {
-                LOG.debug("Subscriber {} is added.", handler);
+                LOG.debug("Subscriber {} is added.", subscriber.sender());
                 if (observed instanceof Subscribers.Empty) {
                     // We have became non-empty, start the source
                     startSource();
                 }
-                return toAdd;
+                return subscriber;
             }
 
             // We have raced: retry the operation

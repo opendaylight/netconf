@@ -77,17 +77,13 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void endOfStream() {
-            subscriber.sender().endOfStream();
+            subscriber.endOfStream();
         }
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
-            if (subscriber.filter().matches(modelContext, input)) {
-                final var formatted = format(subscriber.formatter(), modelContext, input, now);
-                if (formatted != null) {
-                    subscriber.sender().sendDataMessage(formatted);
-                }
-            }
+            subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
+                ? format(subscriber.formatter(), modelContext, input, now) : null);
         }
     }
 
@@ -117,19 +113,15 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void endOfStream() {
-            subscribers.forEach((formatter, subscriber) -> subscriber.sender().endOfStream());
+            subscribers.forEach((formatter, subscriber) -> subscriber.endOfStream());
         }
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
             for (var entry : subscribers.asMap().entrySet()) {
                 final var formatted = format(entry.getKey(), modelContext, input, now);
-                if (formatted != null) {
-                    for (var subscriber : entry.getValue()) {
-                        if (subscriber.filter().matches(modelContext, input)) {
-                            subscriber.sender().sendDataMessage(formatted);
-                        }
-                    }
+                for (var subscriber : entry.getValue()) {
+                    subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input) ? formatted : null);
                 }
             }
         }
