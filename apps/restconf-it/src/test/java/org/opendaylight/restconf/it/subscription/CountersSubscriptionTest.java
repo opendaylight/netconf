@@ -7,12 +7,14 @@
  */
 package org.opendaylight.restconf.it.subscription;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
@@ -35,6 +37,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
     private static HTTPClient streamClient;
 
+    @Override
     @BeforeEach
     void beforeEach() throws Exception {
         super.beforeEach();
@@ -79,12 +82,14 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterOutOfBreadNotification,
             Instant.now()));
 
-        final var receiversResponse =  invokeRequest(HttpMethod.GET,
-            "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-            MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
-        assertEquals(HttpResponseStatus.OK, receiversResponse.status());
-        // verify 2 notification were sent ToasterRestocked and ToasterOutOfBread
-        assertCounter(receiversResponse, "2", "0");
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            final var receiversResponse =  invokeRequest(HttpMethod.GET,
+                "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
+                MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            assertEquals(HttpResponseStatus.OK, receiversResponse.status());
+            // verify 2 notification were sent ToasterRestocked and ToasterOutOfBread
+            assertCounter(receiversResponse, "2", "0");
+        });
     }
 
     @Disabled("Disabled until filtering is implemented in NETCONF-1436")

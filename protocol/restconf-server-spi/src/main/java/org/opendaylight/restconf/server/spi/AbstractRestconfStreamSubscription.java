@@ -14,6 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
+import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -24,16 +25,19 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 public abstract class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
+    private final @NonNull EncodingName encodingName;
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
 
     private @NonNull SubscriptionState state;
 
-    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
-            final String receiverName, final SubscriptionState state, final TransportSession session) {
+    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
+            final String streamName, final String receiverName, final SubscriptionState state,
+            final TransportSession session) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
+        this.encodingName = requireNonNull(encodingName);
         this.state = requireNonNull(state);
         this.session = requireNonNull(session);
         this.streamName = requireNonNull(streamName);
@@ -80,6 +84,10 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     }
 
     protected abstract @Nullable EventStreamFilter filter();
+
+    protected final @NonNull EncodingName encodingName() {
+        return encodingName;
+    }
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
