@@ -15,8 +15,11 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,24 +31,37 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,13 +84,116 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
-
+        private final ConcurrentMap<String, Subscriber<?>> receivers = new ConcurrentHashMap<>();
         private @Nullable EventStreamFilter filter;
 
-        DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session);
+        DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
+                final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter) {
+            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session);
             this.filter = filter;
+        }
+
+        @Override
+        public void addReceiver(final ServerRequest<Registration> request, final Sender sender) {
+            if (state() == SubscriptionState.END) {
+                LOG.debug("Subscription for id {} is not active", id());
+                // TODO: this should be mapped to 404 Not Found
+                request.completeWith(new RequestException("Subscription terminated"));
+                return;
+            }
+
+            final var streamName = streamName();
+            final var stream = streams.get(streamName);
+            if (stream == null) {
+                // TODO: this should never happen, really
+                LOG.debug("Stream '{}' not found", streamName);
+                request.completeWith(new RequestException("Subscription stream not found"));
+                return;
+            }
+
+            final var session = request.session();
+            if (session == null) {
+                request.completeWith(new RequestException("This endpoint does not support dynamic subscriptions"));
+                return;
+            }
+
+            final var receiverName = newReceiverName(session.description(), request.principal());
+            if (receivers.containsKey(receiverName)) {
+                request.completeWith(new RequestException("Receiver named '%s' already exists", receiverName));
+                return;
+            }
+
+            final Subscriber<?> newSubscriber;
+            try {
+                newSubscriber = stream.addSubscriber(sender, encodingName());
+            } catch (UnsupportedEncodingException e) {
+                request.completeWith(new RequestException(e));
+                return;
+            }
+
+            if (newSubscriber == null) {
+                request.completeWith(new RequestException("Subscription stream terminated"));
+                return;
+            }
+
+            receivers.put(receiverName, newSubscriber);
+            Futures.addCallback(updateOperationalDatastore(), new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    request.completeWith(new AbstractRegistration() {
+                        @Override
+                        protected void removeRegistration() {
+                            removeReceiver(receiverName, newSubscriber);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    receivers.remove(receiverName, newSubscriber);
+                    newSubscriber.close();
+                    request.completeWith(new RequestException(cause));
+                }
+            }, MoreExecutors.directExecutor());
+        }
+
+        private void removeReceiver(final String receiverName, final Subscriber<?> subscriber) {
+            receivers.remove(receiverName, subscriber);
+            subscriber.close();
+            updateOperationalDatastore();
+        }
+
+        private ListenableFuture<Void> updateOperationalDatastore() {
+            return updateSubscriptionReceivers(id(), createReceivers());
+        }
+
+        @NonNullByDefault
+        MapNode createReceivers() {
+            final var list = new ArrayList<MapEntryNode>();
+            for (var entry : receivers.entrySet()) {
+                final var subscriber = entry.getValue();
+                list.add(receiverNode(entry.getKey(), State.Active, subscriber.sentEventRecords(),
+                    subscriber.excludedEventRecords()));
+            }
+            if (list.isEmpty()) {
+                list.add(receiverNode(receiverName(), State.Suspended, 0, 0));
+            }
+
+            final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(RECEIVER_NODEID);
+            list.forEach(builder::withChild);
+            return builder.build();
+        }
+
+        @NonNullByDefault
+        private static MapEntryNode receiverNode(final String receiverName, final State state, final long sentEvents,
+                final long excludedEvents) {
+            return ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(receiverArg(receiverName))
+                .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiverName))
+                .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.fromLongBits(sentEvents)))
+                .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.fromLongBits(excludedEvents)))
+                .withChild(ImmutableNodes.leafNode(STATE_NODEID, state.getName()))
+                .build();
         }
 
         @Override
@@ -82,7 +201,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final var id = id();
             LOG.debug("Terminating subscription {} reason {}", id, reason);
 
-            Futures.addCallback(removeSubscription(id()), new FutureCallback<Void>() {
+            Futures.addCallback(removeSubscription(id()), new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} terminated", id);
@@ -102,7 +221,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
 
-            Futures.addCallback(removeSubscription(id()), new FutureCallback<Void>() {
+            Futures.addCallback(removeSubscription(id()), new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} cleaned up", id);
@@ -165,6 +284,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private static final String DEFAULT_STREAM_NAME = "NETCONF";
     private static final String DEFAULT_STREAM_DESCRIPTION = "Default XML encoded NETCONF stream";
+
+    protected static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
+
+    protected static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
+        NodeIdentifier.create(QName.create(Receiver.QNAME, "excluded-event-records"));
+    protected static final NodeIdentifier NAME_NODEID = NodeIdentifier.create(NAME_QNAME);
+    protected static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
+    protected static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
+        NodeIdentifier.create(QName.create(Receiver.QNAME, "sent-event-records").intern());
+    protected static final NodeIdentifier STATE_NODEID =
+        NodeIdentifier.create(QName.create(Receiver.QNAME, "state").intern());
 
     /**
      * Previous dynamic subscription ID. We follow
@@ -330,6 +460,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
+        final EncodingName encodingName;
+        if (encoding.equals(EncodeJson$I.QNAME)) {
+            encodingName = EncodingName.RFC8040_JSON;
+        } else if (encoding.equals(EncodeXml$I.QNAME)) {
+            encodingName = EncodingName.RFC8040_XML;
+        } else {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Encoding %s not supported", encoding));
+            return;
+        }
+
         final EventStreamFilter filterImpl;
         try {
             filterImpl = resolveFilter(filter);
@@ -344,8 +485,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName), new FutureCallback<>() {
             @Override
             public void onSuccess(final Void result) {
-                final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                    filterImpl);
+                final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
+                    session, filterImpl);
                 subscriptions.put(id, subscription);
                 session.registerResource(new DynSubscriptionResource(subscription));
                 request.completeWith(id);
@@ -398,15 +539,35 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract ListenableFuture<Void> createSubscription(Uint32 subscriptionId, String streamName,
+    protected abstract ListenableFuture<@Nullable Void> createSubscription(Uint32 subscriptionId, String streamName,
         QName encoding, String receiverName);
 
     @NonNullByDefault
-    protected abstract ListenableFuture<Void> removeSubscription(Uint32 subscriptionId);
+    protected abstract ListenableFuture<@Nullable Void> removeSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
-    protected abstract ListenableFuture<Void> modifySubscriptionFilter(Uint32 subscriptionId,
+    protected abstract ListenableFuture<@Nullable Void> modifySubscriptionFilter(Uint32 subscriptionId,
         SubscriptionFilter filter);
+
+    @NonNullByDefault
+    protected abstract ListenableFuture<@Nullable Void> updateSubscriptionReceivers(Uint32 subscriptionId,
+        MapNode receivers);
+
+    @NonNullByDefault
+    protected final Map<Uint32, MapNode> currentReceivers() {
+        final var result = new HashMap<Uint32, MapNode>();
+        for (var subscription : subscriptions.values()) {
+            if (subscription.state() != SubscriptionState.END) {
+                result.put(subscription.id(), subscription.createReceivers());
+            }
+        }
+        return result;
+    }
+
+    @NonNullByDefault
+    protected static final NodeIdentifierWithPredicates receiverArg(final String receiverName) {
+        return NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiverName);
+    }
 
     /**
      * Bulk-update the known filter definitions.

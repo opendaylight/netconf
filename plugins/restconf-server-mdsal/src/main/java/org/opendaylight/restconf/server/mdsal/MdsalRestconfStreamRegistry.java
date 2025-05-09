@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -20,28 +21,35 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.OnCommitFutureCallback;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
@@ -56,6 +64,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
@@ -64,6 +73,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -82,26 +92,18 @@ import org.slf4j.LoggerFactory;
 @Component(service = RestconfStream.Registry.class)
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
+    private static final ThreadFactory TF = Thread.ofVirtual().name("mdsal-subscription-counters", 0).factory();
 
     private static final QName ID_QNAME = QName.create(Subscription.QNAME, "id").intern();
-    private static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
 
     private static final NodeIdentifier ENCODING_NODEID =
         NodeIdentifier.create(QName.create(Subscription.QNAME, "encoding").intern());
-    private static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "excluded-event-records"));
     private static final NodeIdentifier FILTERS_NODEID = NodeIdentifier.create(Filters.QNAME);
     private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
     private static final NodeIdentifier ID_NODEID = NodeIdentifier.create(ID_QNAME);
-    private static final NodeIdentifier NAME_NODEID = NodeIdentifier.create(NAME_QNAME);
-    private static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
-    private static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "sent-event-records").intern());
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
-    private static final NodeIdentifier STATE_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "state").intern());
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
@@ -110,6 +112,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
 
+    private final ScheduledExecutorService updateCounters;
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
     private final DatabindProvider databindProvider;
@@ -118,6 +121,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private final Registration tclReg;
 
     private DefaultNotificationSource notificationSource;
+    private DOMTransactionChain txChain;
 
     @Inject
     @Activate
@@ -130,6 +134,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
+        allocateTxChain();
+        updateCounters = Executors.newSingleThreadScheduledExecutor(TF);
 
         // FIXME: the source should be handling its own updates and we should only call start() once
         notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
@@ -159,6 +165,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         } else {
             tclReg = null;
         }
+
+        updateCounters.scheduleWithFixedDelay(this::updateSubscriptionCounters, 0, 2, TimeUnit.SECONDS);
     }
 
     @PreDestroy
@@ -172,6 +180,53 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         if (notificationSource != null) {
             notificationSource.close();
         }
+        updateCounters.shutdownNow();
+        txChain.close();
+    }
+
+    private void allocateTxChain() {
+        txChain = dataBroker.createMergingTransactionChain();
+        txChain.addCallback(new FutureCallback<Empty>() {
+            @Override
+            public void onSuccess(final Empty result) {
+                onTxChainCompleted();
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                onTxChainFailed(cause);
+            }
+        });
+    }
+
+    private synchronized void onTxChainCompleted() {
+        LOG.debug("Tranaction chain completed");
+        txChain = null;
+    }
+
+    private synchronized void onTxChainFailed(final Throwable cause) {
+        LOG.warn("Transaction chain failed, creating a new one", cause);
+        allocateTxChain();
+    }
+
+    private synchronized void updateSubscriptionCounters() {
+        final var receivers = currentReceivers();
+        final var tx = txChain.newWriteOnlyTransaction();
+        for (var entry : receivers.entrySet()) {
+            tx.put(LogicalDatastoreType.OPERATIONAL,
+                subscriptionPath(entry.getKey()).node(RECEIVERS_NODEID).node(RECEIVER_NODEID), entry.getValue());
+        }
+        tx.commit(new OnCommitFutureCallback() {
+            @Override
+            public void onSuccess(final CommitInfo commitInfo) {
+                LOG.debug("Subscription receivers updated successfully");
+            }
+
+            @Override
+            public void onFailure(final TransactionCommitFailedException cause) {
+                // No-op, failure will be logged via onTxChainFailed()
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     private synchronized void onModelContextUpdated(final EffectiveModelContext context) {
@@ -229,34 +284,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-            final ReceiverHolder.RecordType recordType) {
-        final var counterLeaf = switch (recordType) {
-            case SENT_EVENT_RECORDS ->
-                ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.valueOf(receiver.sentEventCounter().get()));
-            case EXCLUDED_EVENT_RECORDS ->
-                ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.valueOf(counter));
-        };
-
-        // Now issue a merge operation
-        final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.merge(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(
-            SUBSCRIPTIONS_NODEID,
-            SUBSCRIPTION_NODEID,
-            subscriptionArg(receiver.subscriptionId()),
-            RECEIVERS_NODEID,
-            RECEIVER_NODEID,
-            receiverArg(receiver.receiverName()),
-            counterLeaf.name()), counterLeaf);
-        return tx.commit().transform(unused -> null, MoreExecutors.directExecutor());
-    }
-
-    @Override
-    protected ListenableFuture<Void> createSubscription(final Uint32 subscriptionId, final String streamName,
-            final QName encoding, final String receiverName) {
+    protected synchronized ListenableFuture<Void> createSubscription(final Uint32 subscriptionId,
+            final String streamName, final QName encoding, final String receiverName) {
         final var pathArg = subscriptionArg(subscriptionId);
 
-        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var tx = txChain.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
@@ -280,7 +312,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                             .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiverName))
                             .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.ZERO))
                             .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(STATE_NODEID, Receiver.State.Active.getName()))
+                            .withChild(ImmutableNodes.leafNode(STATE_NODEID, Receiver.State.Suspended.getName()))
                             .build())
                         .build())
                     .build())
@@ -292,20 +324,20 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
-        final var tx = dataBroker.newWriteOnlyTransaction();
+    public synchronized ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
+        final var tx = txChain.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
         return mapFuture(tx.commit());
     }
 
-    private static ListenableFuture<@Nullable Void> mapFuture(final ListenableFuture<? extends CommitInfo> future) {
+    private static @NonNull ListenableFuture<@Nullable Void> mapFuture(
+            final ListenableFuture<? extends CommitInfo> future) {
         return Futures.transform(future, unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
-    protected ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
+    protected synchronized ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
             final RestconfStream.SubscriptionFilter filter) {
-
         final var filterNode = switch (filter) {
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
                 ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
@@ -322,7 +354,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         };
 
         final var pathArg = subscriptionArg(subscriptionId);
-        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var tx = txChain.newWriteOnlyTransaction();
         tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
@@ -339,6 +371,15 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Modified subscription {} to operational datastore as of {}", subscriptionId, info);
             return null;
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    protected synchronized ListenableFuture<Void> updateSubscriptionReceivers(final Uint32 subscriptionId,
+            final MapNode receiver) {
+        final var tx = txChain.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.OPERATIONAL,
+            subscriptionPath(subscriptionId).node(RECEIVERS_NODEID).node(RECEIVER_NODEID), receiver);
+        return mapFuture(tx.commit());
     }
 
     @Override
@@ -362,11 +403,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             throw new RequestException("Failed to parse subtree filter", e);
         }
         return new SubtreeEventStreamFilter(databindFilter);
-    }
-
-    @NonNullByDefault
-    private static NodeIdentifierWithPredicates receiverArg(final String receiverName) {
-        return NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiverName);
     }
 
     @NonNullByDefault
