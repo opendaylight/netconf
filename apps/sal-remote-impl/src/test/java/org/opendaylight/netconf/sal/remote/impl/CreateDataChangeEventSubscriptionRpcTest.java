@@ -40,8 +40,6 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.ReceiverHolder;
-import org.opendaylight.restconf.server.spi.ReceiverHolder.RecordType;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
@@ -55,6 +53,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -64,12 +63,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @ExtendWith(MockitoExtension.class)
 class CreateDataChangeEventSubscriptionRpcTest {
     private static final class TestRegistry extends AbstractRestconfStreamRegistry {
-        @Override
-        public ListenableFuture<Void> updateReceiver(final ReceiverHolder receiver, final long counter,
-                final RecordType recordType) {
-            throw new UnsupportedOperationException();
-        }
-
         @Override
         protected ListenableFuture<Void> putStream(final RestconfStream<?> stream, final String description,
                 final URI restconfURI) {
@@ -100,6 +93,12 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
         @Override
         protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected ListenableFuture<Void> updateSubscriptionReceivers(final Uint32 subscriptionId,
+                final MapNode receivers) {
             throw new UnsupportedOperationException();
         }
     }
