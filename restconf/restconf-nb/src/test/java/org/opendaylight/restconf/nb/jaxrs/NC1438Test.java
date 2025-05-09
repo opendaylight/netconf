@@ -96,4 +96,202 @@ class NC1438Test extends AbstractRestconfTest {
         assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
+
+    @Test
+    void testXmlPatchMissingEditIdData() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'edit-id'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchMissingEditIdData() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'edit-id'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testXmlPatchMissingPatchIdData() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'patch-id'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchMissingPatchIdData() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'patch-id'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testXmlPatchMissingOperation() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'operation'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchMissingOperation() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'operation'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testXmlPatchMissingTarget() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'target'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchMissingTarget() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Missing required element 'target'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
 }

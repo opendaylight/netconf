@@ -100,4 +100,20 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
             case Delete, Move, Remove -> false;
         };
     }
+
+    /**
+     * Check if provided value is not null.
+     *
+     * @param value node value
+     * @param elementName element name
+     * @return provided value if it is not null, otherwise throws ServerException
+     * @throws ServerException if the value is null
+     */
+    static final <T> T requireNonNullValue(final T value, final String elementName) throws ServerException {
+        if (value == null) {
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+                "Missing required element '" + elementName + "'");
+        }
+        return value;
+    }
 }
