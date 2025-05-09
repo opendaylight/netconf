@@ -497,4 +497,32 @@ class NC1438Test extends AbstractRestconfTest {
         assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
+
+    @Test
+    void testIncorrectEditIdValue() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "edit" : [
+                  {
+                    "edit-id" : [1],
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Expected STRING for value of 'edit-id', but received BEGIN_ARRAY",
+            restconfError.getErrorMessage());
+        assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
 }

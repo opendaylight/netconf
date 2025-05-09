@@ -128,6 +128,7 @@ public final class JsonPatchBody extends PatchBody {
 
                 break;
             case "patch-id":
+                verifyStringValueType(in.peek(), name);
                 patchId.set(in.nextString());
                 break;
             default:
@@ -147,9 +148,11 @@ public final class JsonPatchBody extends PatchBody {
             final String editDefinition = in.nextName();
             switch (editDefinition) {
                 case "edit-id":
+                    verifyStringValueType(in.peek(), editDefinition);
                     edit.setId(in.nextString());
                     break;
                 case "operation":
+                    verifyStringValueType(in.peek(), editDefinition);
                     final Operation operation;
                     final var operationValue = in.nextString();
                     try {
@@ -162,6 +165,7 @@ public final class JsonPatchBody extends PatchBody {
                     edit.setOperation(operation);
                     break;
                 case "target":
+                    verifyStringValueType(in.peek(), editDefinition);
                     // target can be specified completely in request URI
                     final var target = parsePatchTarget(resource, in.nextString());
                     edit.setTarget(target.instance());
@@ -204,6 +208,21 @@ public final class JsonPatchBody extends PatchBody {
             // read saved data to normalized node when target schema is already known
             edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)),
                 requireNonNullValue(edit.getTargetSchemaNode(), "target"), codecs));
+        }
+    }
+
+    /**
+     * Check if provided {@link JsonToken} is a STRING type. If not throws {@link ServerException}.
+     *
+     * @param token {@link JsonToken}
+     * @param editDefinition Node name from {@link Edit} list
+     * @throws ServerException if provided {@link JsonToken} is not equals to {@link JsonToken#STRING}
+     */
+    private static void verifyStringValueType(final JsonToken token, final String editDefinition)
+            throws ServerException {
+        if (token != JsonToken.STRING) {
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Expected STRING for value of '" + editDefinition + "', but received " + token);
         }
     }
 
