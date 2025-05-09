@@ -310,6 +310,15 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         public abstract TransportSession session();
 
+        /**
+         * Add a new receiver with this subscription, forwarding events to the specified {@link Sender}.
+         *
+         * @param request a {@link ServerRequest} completing with a {@link Registration} of the receiver
+         * @param sender the {@link Sender} backing the new receiver
+         */
+        @NonNullByDefault
+        public abstract void addReceiver(ServerRequest<Registration> request, Sender sender);
+
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
