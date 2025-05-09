@@ -12,7 +12,6 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
-import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.server.spi.TextParameters;
@@ -29,12 +28,6 @@ final class JSONNotificationFormatter extends NotificationFormatter {
 
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
         @Override
-        public JSONNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
-                throws XPathExpressionException {
-            return new JSONNotificationFormatter(textParams, xpathFilter);
-        }
-
-        @Override
         public JSONNotificationFormatter newFormatter(final TextParameters textParams) {
             return new JSONNotificationFormatter(textParams);
         }
@@ -42,11 +35,6 @@ final class JSONNotificationFormatter extends NotificationFormatter {
 
     private JSONNotificationFormatter(final TextParameters textParams) {
         super(textParams);
-    }
-
-    private JSONNotificationFormatter(final TextParameters textParams, final String xpathFilter)
-            throws XPathExpressionException {
-        super(textParams, xpathFilter);
     }
 
     @Override

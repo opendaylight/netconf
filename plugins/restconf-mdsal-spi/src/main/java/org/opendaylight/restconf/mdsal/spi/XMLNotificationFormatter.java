@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -27,21 +26,10 @@ final class XMLNotificationFormatter extends NotificationFormatter {
         public XMLNotificationFormatter newFormatter(final TextParameters textParams) {
             return new XMLNotificationFormatter(textParams);
         }
-
-        @Override
-        public XMLNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
-                throws XPathExpressionException {
-            return new XMLNotificationFormatter(textParams, xpathFilter);
-        }
     };
 
     XMLNotificationFormatter(final TextParameters textParams) {
         super(textParams);
-    }
-
-    XMLNotificationFormatter(final TextParameters textParams, final String xpathFilter)
-            throws XPathExpressionException {
-        super(textParams, xpathFilter);
     }
 
     @Override

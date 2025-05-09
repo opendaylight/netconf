@@ -90,6 +90,7 @@ public final class RestconfStream<T> {
     /**
      * A sink of events for a {@link RestconfStream}.
      */
+    @NonNullByDefault
     public interface Sink<T> {
         /**
          * Publish a set of events generated from input data.
@@ -531,15 +532,15 @@ public final class RestconfStream<T> {
 
         final var textParams = new TextParameters(leafNodes, skipData, changedLeafNodes, childNodes);
 
-        final var filter = params.filter();
-        final var filterValue = filter == null ? null : filter.paramValue();
-        final var formatter = filterValue == null || filterValue.isEmpty() ? factory.getFormatter(textParams)
-            : factory.getFormatter(textParams, filterValue);
-
+        final var filterParam = params.filter();
+        final var filterValue = filterParam == null ? null : filterParam.paramValue();
+        final var filter = filterValue == null || filterValue.isEmpty() ? AcceptingEventFilter.<T>instance()
+            : factory.newXPathFilter(filterValue);
+        final var formatter = factory.getFormatter(textParams);
 
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
-        final var toAdd = new Subscriber<>(this, handler, formatter);
+        final var toAdd = new Subscriber<>(this, handler, formatter, filter);
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.add(toAdd);

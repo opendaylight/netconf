@@ -9,29 +9,37 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 
 /**
  * A single subscriber to an {@link RestconfStream}.
  */
+@NonNullByDefault
 final class Subscriber<T> extends AbstractRegistration {
-    private final @NonNull RestconfStream<T> stream;
-    private final @NonNull Sender sender;
-    private final @NonNull EventFormatter<T> formatter;
+    private final RestconfStream<T> stream;
+    private final EventFormatter<T> formatter;
+    private final EventFilter<T> filter;
+    private final Sender sender;
 
-    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter) {
+    Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
+            final EventFilter<T> filter) {
         this.stream = requireNonNull(stream);
         this.sender = requireNonNull(sender);
         this.formatter = requireNonNull(formatter);
+        this.filter = requireNonNull(filter);
     }
 
-    @NonNull EventFormatter<T> formatter() {
+    EventFilter<T> filter() {
+        return filter;
+    }
+
+    EventFormatter<T> formatter() {
         return formatter;
     }
 
-    @NonNull Sender sender() {
+    Sender sender() {
         return sender;
     }
 

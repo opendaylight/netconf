@@ -81,9 +81,11 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
-            final var formatted = format(subscriber.formatter(), modelContext, input, now);
-            if (formatted != null) {
-                subscriber.sender().sendDataMessage(formatted);
+            if (subscriber.filter().matches(modelContext, input)) {
+                final var formatted = format(subscriber.formatter(), modelContext, input, now);
+                if (formatted != null) {
+                    subscriber.sender().sendDataMessage(formatted);
+                }
             }
         }
     }
@@ -123,7 +125,9 @@ abstract sealed class Subscribers<T> {
                 final var formatted = format(entry.getKey(), modelContext, input, now);
                 if (formatted != null) {
                     for (var subscriber : entry.getValue()) {
-                        subscriber.sender().sendDataMessage(formatted);
+                        if (subscriber.filter().matches(modelContext, input)) {
+                            subscriber.sender().sendDataMessage(formatted);
+                        }
                     }
                 }
             }
