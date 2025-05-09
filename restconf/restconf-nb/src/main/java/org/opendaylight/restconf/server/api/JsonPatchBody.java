@@ -213,8 +213,12 @@ public final class JsonPatchBody extends PatchBody {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private static String readValueNode(final @NonNull JsonReader in) throws IOException {
+    private static String readValueNode(final @NonNull JsonReader in) throws IOException, ServerException {
         in.beginObject();
+        if (in.peek() != JsonToken.NAME) {
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Empty 'value' element is not allowed");
+        }
         final StringBuilder sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
 
         switch (in.peek()) {
@@ -319,7 +323,12 @@ public final class JsonPatchBody extends PatchBody {
             LOG.error("Failed to parse provided JSON data", e);
             throw new ServerException(ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, e);
         }
-        return resultHolder.getResult().data();
+        try {
+            return resultHolder.getResult().data();
+        } catch (IllegalStateException e) {
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Empty 'value' element is not allowed", e);
+        }
     }
 
     /**

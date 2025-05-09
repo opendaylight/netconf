@@ -432,4 +432,69 @@ class NC1438Test extends AbstractRestconfTest {
         assertEquals(ErrorTag.UNKNOWN_ELEMENT, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
+
+    @Test
+    void testPatchEmptyValue() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Empty 'value' element is not allowed", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testXmlPatchEmptyValue() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Empty 'value' element is not allowed", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchEmptyDeferredValue() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "value" : {
+                    }
+                    "target" : "/example-jukebox:jukebox",
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Empty 'value' element is not allowed", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
 }
