@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
 import java.util.List;
-import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
@@ -33,21 +32,10 @@ final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
         public DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
             return new JSONDataTreeCandidateFormatter(textParams);
         }
-
-        @Override
-        public DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
-                throws XPathExpressionException {
-            return new JSONDataTreeCandidateFormatter(textParams, xpathFilter);
-        }
     };
 
     private JSONDataTreeCandidateFormatter(final TextParameters textParams) {
         super(textParams);
-    }
-
-    private JSONDataTreeCandidateFormatter(final TextParameters textParams, final String xpathFilter)
-            throws XPathExpressionException {
-        super(textParams, xpathFilter);
     }
 
     @Override

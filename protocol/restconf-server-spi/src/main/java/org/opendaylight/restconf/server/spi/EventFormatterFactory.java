@@ -10,21 +10,28 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import javax.xml.xpath.XPathExpressionException;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
+@NonNullByDefault
 public abstract class EventFormatterFactory<T> {
-    private final @NonNull EventFormatter<T> emptyFormatter;
+    private final EventFormatter<T> emptyFormatter;
 
     protected EventFormatterFactory(final EventFormatter<T> emptyFormatter) {
         this.emptyFormatter = requireNonNull(emptyFormatter);
     }
 
-    public final @NonNull EventFormatter<T> getFormatter(final @NonNull TextParameters textParamaters) {
+    public final EventFormatter<T> getFormatter(final TextParameters textParamaters) {
         return textParamaters.equals(TextParameters.EMPTY) ? emptyFormatter : newFormatter(textParamaters);
     }
 
-    public abstract @NonNull EventFormatter<T> getFormatter(@NonNull TextParameters textParamaters, String xpathFilter)
-        throws XPathExpressionException;
+    public abstract EventFormatter<T> newFormatter(TextParameters textParamaters);
 
-    public abstract @NonNull EventFormatter<T> newFormatter(@NonNull TextParameters textParamaters);
+    /**
+     * Create a new {@link XPathEventFilter}.
+     *
+     * @param expression XPath expression
+     * @return a new {@link XPathEventFilter}
+     * @throws XPathExpressionException when the expression fails to compile
+     */
+    public abstract XPathEventFilter<T> newXPathFilter(String expression) throws XPathExpressionException;
 }

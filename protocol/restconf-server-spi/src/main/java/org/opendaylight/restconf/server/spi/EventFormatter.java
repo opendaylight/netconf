@@ -16,90 +16,28 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public abstract class EventFormatter<T> implements Immutable {
-    private static final XPathFactory XPF = XPathFactory.newInstance();
-
-    // FIXME: NETCONF-369: XPath operates without namespace context, therefore we need an namespace-unaware builder.
-    //        Once it is fixed we can use UntrustedXML instead.
-    private static final @NonNull DocumentBuilderFactory DBF;
-
-    static {
-        final DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-        f.setCoalescing(true);
-        f.setExpandEntityReferences(false);
-        f.setIgnoringElementContentWhitespace(true);
-        f.setIgnoringComments(true);
-        f.setXIncludeAware(false);
-        try {
-            f.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            f.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            f.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        } catch (final ParserConfigurationException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-        DBF = f;
-    }
-
-    protected static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-
     private final TextParameters textParams;
-    private final XPathExpression filter;
 
     protected EventFormatter(final TextParameters textParams)  {
         this.textParams = requireNonNull(textParams);
-        filter = null;
-    }
-
-    protected EventFormatter(final TextParameters params, final String xpathFilter) throws XPathExpressionException {
-        textParams = requireNonNull(params);
-
-        final XPath xpath;
-        synchronized (XPF) {
-            xpath = XPF.newXPath();
-        }
-        // FIXME: NETCONF-369: we need to bind the namespace context here and for that we need the SchemaContext
-        filter = xpath.compile(xpathFilter);
     }
 
     @VisibleForTesting
     public final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input,
             final Instant now) throws Exception {
-        return filterMatches(schemaContext, input, now) ? createText(textParams, schemaContext, input, now) : null;
+        return createText(textParams, schemaContext, input, now);
     }
-
-    /**
-     * Export the provided input into the provided document so we can verify whether a filter matches the content.
-     *
-     * @param doc the document to fill
-     * @param schemaContext context to use for the export
-     * @param input data to export
-     * @throws IOException if any IOException occurs during export to the document
-     */
-    protected abstract void fillDocument(Document doc, EffectiveModelContext schemaContext, T input) throws IOException;
 
     /**
      * Format the input data into string representation of the data provided.
@@ -114,30 +52,6 @@ public abstract class EventFormatter<T> implements Immutable {
     protected abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input,
         Instant now) throws Exception;
 
-    private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)
-            throws IOException {
-        if (filter == null) {
-            return true;
-        }
-
-        final Document doc;
-        try {
-            doc = DBF.newDocumentBuilder().newDocument();
-        } catch (final ParserConfigurationException e) {
-            throw new IOException("Failed to create a new document", e);
-        }
-        fillDocument(doc, schemaContext, input);
-
-        final Boolean eval;
-        try {
-            eval = (Boolean) filter.evaluate(doc, XPathConstants.BOOLEAN);
-        } catch (final XPathExpressionException e) {
-            throw new IllegalStateException("Failed to evaluate expression " + filter, e);
-        }
-
-        return eval;
-    }
-
     /**
      * Formats data specified by RFC3339.
      *
@@ -148,17 +62,10 @@ public abstract class EventFormatter<T> implements Immutable {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(now, ZoneId.systemDefault()));
     }
 
-    protected static final @NonNull Element createNotificationElement(final Document doc, final Instant now) {
-        final var notificationElement = doc.createElementNS(NamespaceURN.NOTIFICATION, "notification");
-        final var eventTimeElement = doc.createElement("eventTime");
-        eventTimeElement.setTextContent(toRFC3339(now));
-        notificationElement.appendChild(eventTimeElement);
-        return notificationElement;
-    }
-
-    protected static final @NonNull XMLStreamWriter createStreamWriterWithNotification(final Writer writer,
-            final Instant now) throws XMLStreamException {
-        final var xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
+    @NonNullByDefault
+    protected static final XMLStreamWriter createStreamWriterWithNotification(final Writer writer, final Instant now)
+            throws XMLStreamException {
+        final var xmlStreamWriter = XPathEventFilter.XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
         xmlStreamWriter.setDefaultNamespace(NamespaceURN.NOTIFICATION);
 
         xmlStreamWriter.writeStartElement(NamespaceURN.NOTIFICATION, "notification");
@@ -170,10 +77,9 @@ public abstract class EventFormatter<T> implements Immutable {
         return xmlStreamWriter;
     }
 
+    @NonNullByDefault
     protected static final void writeBody(final NormalizedNodeStreamWriter writer, final NormalizedNode body)
             throws IOException {
-        try (var nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
-            nodeWriter.write(body);
-        }
+        XPathEventFilter.writeBody(writer, body);
     }
 }

@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -81,9 +82,11 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
-            final var formatted = format(subscriber.formatter(), modelContext, input, now);
-            if (formatted != null) {
-                subscriber.sender().sendDataMessage(formatted);
+            if (subscriber.filter().matches(modelContext, input)) {
+                final var formatted = format(subscriber.formatter(), modelContext, input, now);
+                if (formatted != null) {
+                    subscriber.sender().sendDataMessage(formatted);
+                }
             }
         }
     }
@@ -123,7 +126,9 @@ abstract sealed class Subscribers<T> {
                 final var formatted = format(entry.getKey(), modelContext, input, now);
                 if (formatted != null) {
                     for (var subscriber : entry.getValue()) {
-                        subscriber.sender().sendDataMessage(formatted);
+                        if (subscriber.filter().matches(modelContext, input)) {
+                            subscriber.sender().sendDataMessage(formatted);
+                        }
                     }
                 }
             }
@@ -179,6 +184,7 @@ abstract sealed class Subscribers<T> {
      * @param now Current time
      * @throws NullPointerException if any argument is {@code null}
      */
+    @NonNullByDefault
     abstract void publish(EffectiveModelContext modelContext, T input, Instant now);
 
     @SuppressWarnings("checkstyle:illegalCatch")
