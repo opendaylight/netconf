@@ -326,19 +326,12 @@ public final class JsonPatchBody extends PatchBody {
 
             return new PatchEntity(editId, operation, targetNode, edit.getData());
         }
-
-        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Error parsing input");
-    }
-
-    /**
-     * Check if data is present when operation requires it and not present when operation data is not allowed.
-     * @param operation Name of operation
-     * @param hasData Data in edit are present/not present
-     * @return true if data is present when operation requires it or if there are no data when operation does not
-     *     allow it, false otherwise
-     */
-    private static boolean checkDataPresence(final @NonNull Operation operation, final boolean hasData) {
-        return requiresValue(operation)  == hasData;
+        if (requiresValue(operation)) {
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, operation
+                + " operation requires 'value' element");
+        }
+        throw new ServerException(ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT, operation
+            + " operation can not have 'value' element");
     }
 
     /**
