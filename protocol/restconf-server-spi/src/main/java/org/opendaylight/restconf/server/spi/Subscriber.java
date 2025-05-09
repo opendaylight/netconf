@@ -9,7 +9,9 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 
@@ -18,6 +20,8 @@ import org.opendaylight.yangtools.concepts.AbstractRegistration;
  */
 @NonNullByDefault
 final class Subscriber<T> extends AbstractRegistration {
+    private final AtomicInteger excludedEventRecords = new AtomicInteger();
+    private final AtomicInteger sentEventRecords = new AtomicInteger();
     private final RestconfStream<T> stream;
     private final EventFormatter<T> formatter;
     private final EventFilter<T> filter;
@@ -41,6 +45,27 @@ final class Subscriber<T> extends AbstractRegistration {
 
     Sender sender() {
         return sender;
+    }
+
+    void sendDataMessage(final @Nullable String data) {
+        if (data != null) {
+            sender.sendDataMessage(data);
+            sentEventRecords.incrementAndGet();
+        } else {
+            excludedEventRecords.incrementAndGet();
+        }
+    }
+
+    void endOfStream() {
+        sender.endOfStream();
+    }
+
+    int excludedEventRecords() {
+        return excludedEventRecords.get();
+    }
+
+    int sentEventRecords() {
+        return sentEventRecords.get();
     }
 
     @Override

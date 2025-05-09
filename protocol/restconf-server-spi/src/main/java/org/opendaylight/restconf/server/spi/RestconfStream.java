@@ -311,6 +311,15 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         public abstract TransportSession session();
 
+        /**
+         * Add a new receiver with this subscription, forwarding events to the specified {@link Sender}.
+         *
+         * @param request a {@link ServerRequest} completing with a {@link Registration} of the receiver
+         * @param sender the {@link Sender} backing the new receiver
+         */
+        @NonNullByDefault
+        public abstract void addReceiver(ServerRequest<Registration> request, Sender sender);
+
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
@@ -513,6 +522,7 @@ public final class RestconfStream<T> {
      * @throws UnsupportedEncodingException if {@code encoding} is not supported
      * @throws XPathExpressionException if requested filter is not valid
      */
+    @NonNullByDefault
     public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
             final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
         final var factory = source.encodings.get(requireNonNull(encoding));
@@ -540,10 +550,10 @@ public final class RestconfStream<T> {
 
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
-        final var toAdd = new Subscriber<>(this, handler, formatter, filter);
+        final var subscriber = new Subscriber<>(this, handler, formatter, filter);
         var observed = acquireSubscribers();
         while (observed != null) {
-            final var next = observed.add(toAdd);
+            final var next = observed.add(subscriber);
             final var witness = (Subscribers<T>) SUBSCRIBERS_VH.compareAndExchangeRelease(this, observed, next);
             if (witness == observed) {
                 LOG.debug("Subscriber {} is added.", handler);
@@ -551,7 +561,7 @@ public final class RestconfStream<T> {
                     // We have became non-empty, start the source
                     startSource();
                 }
-                return toAdd;
+                return subscriber;
             }
 
             // We have raced: retry the operation

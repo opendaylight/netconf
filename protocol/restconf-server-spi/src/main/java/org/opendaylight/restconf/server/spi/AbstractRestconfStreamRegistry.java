@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.util.Map;
@@ -22,12 +23,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
@@ -35,6 +40,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -91,6 +97,39 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session);
             this.control = requireNonNull(control);
             this.filter = filter;
+        }
+
+        @Override
+        public void addReceiver(final ServerRequest<Registration> request, final Sender sender) {
+            if (state() == SubscriptionState.END) {
+                LOG.debug("Subscription for id {} is not active", id());
+                // TODO: this should be mapped to 404 Not Found
+                request.completeWith(new RequestException("Subscription terminated"));
+                return;
+            }
+
+            final var streamName = streamName();
+            final var stream = streams.get(streamName);
+            if (stream == null) {
+                // TODO: this should never happen, really
+                LOG.debug("Stream '{}' not found", streamName);
+                request.completeWith(new RequestException("Subscription stream not found"));
+                return;
+            }
+
+            // Encoding is optional field and in case it is absent json encoding will be used by default
+            final var encoding = encodingNameOf(encoding());
+
+            final Registration reg;
+            try {
+                // FIXME: this is bogus: all of this is already specified in subscription
+                reg = stream.addSubscriber(sender, encoding, EventStreamGetParams.of(QueryParameters.of()));
+            } catch (UnsupportedEncodingException | XPathExpressionException e) {
+                request.completeWith(new RequestException(e));
+                return;
+            }
+
+            request.completeWith(reg);
         }
 
         @Override
@@ -153,6 +192,18 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        private static RestconfStream.EncodingName encodingNameOf(final QName identity) {
+            if (identity.equals(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications
+                .rev190909.EncodeJson$I.QNAME)) {
+                return RestconfStream.EncodingName.RFC8040_JSON;
+            }
+            if (identity.equals(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications
+                .rev190909.EncodeXml$I.QNAME)) {
+                return RestconfStream.EncodingName.RFC8040_XML;
+            }
+            throw new IllegalArgumentException("Unsupported encoding " + identity);
         }
     }
 
