@@ -193,8 +193,8 @@ public final class JsonPatchBody extends PatchBody {
                     }
                     break;
                 default:
-                    // FIXME: this does not look right, as it can wreck our logic
-                    break;
+                    throw new ServerException(ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT,
+                        "Provided unknown element '" + editDefinition + "'");
             }
         }
 

@@ -404,4 +404,32 @@ class NC1438Test extends AbstractRestconfTest {
         assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
+
+    @Test
+    void testPatchWrongEditSchemaNode() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "wrong" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Provided unknown element 'wrong'", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.UNKNOWN_ELEMENT, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
 }
