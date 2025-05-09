@@ -294,4 +294,114 @@ class NC1438Test extends AbstractRestconfTest {
         assertEquals(ErrorTag.MISSING_ELEMENT, restconfError.getErrorTag());
         assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
     }
+
+    @Test
+    void testXmlPatchWrongOperationData() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>WRONG</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <gap>0.2</gap>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Operation value is incorrect: \"WRONG\" is not a valid name", restconfError.getErrorMessage());
+        assertEquals("\"WRONG\" is not a valid name", restconfError.getErrorInfo());
+        assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchWrongOperationData() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "wrong",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "gap" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Operation value is incorrect: \"wrong\" is not a valid name", restconfError.getErrorMessage());
+        assertEquals("\"wrong\" is not a valid name", restconfError.getErrorInfo());
+        assertEquals(ErrorTag.INVALID_VALUE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:LineLength")
+    void testXmlPatchWrongLeafData() {
+        final var restconfError = assertError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <edit>
+                <edit-id>create data</edit-id>
+                <operation>create</operation>
+                <target>/example-jukebox:jukebox</target>
+                <value>
+                  <jukebox xmlns="http://example.com/ns/example-jukebox">
+                    <player>
+                      <WRONG>0.2</WRONG>
+                    </player>
+                  </jukebox>
+                </value>
+              </edit>
+            </yang-patch>"""), uriInfo, ar));
+
+        assertEquals("Error parsing YANG Patch XML: ParseError at [row,col]:[-1,-1]\nMessage: Schema for node"
+                + " with name WRONG and namespace http://example.com/ns/example-jukebox does not exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=2015-04-04)player}",
+            restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
+    }
+
+    @Test
+    void testPatchWrongLeafData() {
+        final var restconfError = assertError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test patch id",
+                "edit" : [
+                  {
+                    "edit-id" : "create data",
+                    "operation" : "create",
+                    "target" : "/example-jukebox:jukebox",
+                    "value" : {
+                      "jukebox" : {
+                        "player" : {
+                          "wrong" : "0.2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""), uriInfo, ar));
+
+        assertEquals("Schema node with name wrong was not found under"
+            + " (http://example.com/ns/example-jukebox?revision=2015-04-04)player.", restconfError.getErrorMessage());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, restconfError.getErrorType());
+    }
 }
