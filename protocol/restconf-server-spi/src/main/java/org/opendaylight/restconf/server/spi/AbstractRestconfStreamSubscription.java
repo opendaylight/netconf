@@ -98,6 +98,16 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     }
 
     @Override
+    void stopTimeReached()  {
+        if (state != SubscriptionState.END) {
+            setState(SubscriptionState.END);
+            stopTimeRemoveSubscription();
+        }
+    }
+
+    abstract void stopTimeRemoveSubscription();
+
+    @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper
             .add("id", id)
