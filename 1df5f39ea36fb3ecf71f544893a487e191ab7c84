@@ -307,6 +307,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f64b27d8_9fcb5238",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T08:47:39Z",
+      "side": 1,
+      "message": "no, here, there is nothing to break, it just if, not while",
+      "parentUuid": "0c0df046_5edeefe4",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "29de43c5_84596ef0",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 62
@@ -318,6 +336,24 @@
       "writtenOn": "2025-05-12T08:39:54Z",
       "side": 1,
       "message": "This one is unnecessary - line 153 is enough.",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edb771ee_b00267c4",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T08:47:39Z",
+      "side": 1,
+      "message": "lol, I have already fixed it: https://git.opendaylight.org/gerrit/c/netconf/+/116469/3/protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+      "parentUuid": "29de43c5_84596ef0",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
