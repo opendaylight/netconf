@@ -414,14 +414,33 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     public synchronized ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
+        return deleteSubscription(subscriptionId, State.TERMINATED);
+    }
+
+    @Override
+    public synchronized ListenableFuture<@Nullable Void> completeSubscription(final Uint32 subscriptionId) {
+        return deleteSubscription(subscriptionId, State.COMPLETED);
+    }
+
+    private ListenableFuture<@Nullable Void> deleteSubscription(final Uint32 subscriptionId,
+            final State type) {
         final var tx = txChain.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
-        return tx.commit().transform(info -> {
+        return tx.commit().transform(unused -> {
             final var subscription = lookupSubscription(subscriptionId);
             final var eventFormatter = getEventFormatter(subscription.encoding());
-            final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionTerminated(subscriptionId),
-                    Instant.now());
-            LOG.debug("Publishing terminated state notification for subscription with ID: {}", subscriptionId);
+
+            final var notificationBody = new DOMNotificationEvent.Rfc6020(
+                switch (type) {
+                    case TERMINATED -> subscriptionTerminated(subscriptionId);
+                    // FIXME: notification is not send when subscriptionCompleted() is used,
+                    //        replace by subscription-completed, when it works
+                    case COMPLETED -> subscriptionTerminated(subscriptionId);
+                    default -> throw new IllegalArgumentException("Unsupported state for remove");
+                }, Instant.now());
+
+            LOG.debug("Publishing {} state notification for subscription with ID: {}",
+                type.name(), subscriptionId);
             subscription.publishMessage(formatNotification(eventFormatter, notificationBody));
             return null;
         }, MoreExecutors.directExecutor());

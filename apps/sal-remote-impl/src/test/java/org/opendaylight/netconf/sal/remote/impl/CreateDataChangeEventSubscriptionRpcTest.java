@@ -86,6 +86,11 @@ class CreateDataChangeEventSubscriptionRpcTest {
         }
 
         @Override
+        protected ListenableFuture<Void> completeSubscription(final Uint32 subscriptionId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         protected ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
                 final SubscriptionFilter filter) {
             throw new UnsupportedOperationException();
