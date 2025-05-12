@@ -64,32 +64,16 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     /**
-     * Control interface for the backend of a subscription.
-     */
-    @NonNullByDefault
-    public interface SubscriptionControl {
-        /**
-         * Terminate the subscription.
-         *
-         * @return A {@link ListenableFuture} signalling the result of termination process
-         */
-        ListenableFuture<Void> terminate();
-    }
-
-    /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
-        private final SubscriptionControl control;
 
         private @Nullable EventStreamFilter filter;
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final SubscriptionControl control,
-                final @Nullable EventStreamFilter filter) {
+                final TransportSession session, final @Nullable EventStreamFilter filter) {
             super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session);
-            this.control = requireNonNull(control);
             this.filter = filter;
         }
 
@@ -98,7 +82,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final var id = id();
             LOG.debug("Terminating subscription {} reason {}", id, reason);
 
-            Futures.addCallback(control.terminate(), new FutureCallback<Void>() {
+            Futures.addCallback(removeSubscription(id()), new FutureCallback<Void>() {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} terminated", id);
@@ -118,7 +102,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
 
-            Futures.addCallback(control.terminate(), new FutureCallback<Void>() {
+            Futures.addCallback(removeSubscription(id()), new FutureCallback<Void>() {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} cleaned up", id);
@@ -359,8 +343,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName), new FutureCallback<>() {
             @Override
-            public void onSuccess(final SubscriptionControl result) {
-                final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session, result,
+            public void onSuccess(final Void result) {
+                final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
                     filterImpl);
                 subscriptions.put(id, subscription);
                 session.registerResource(new DynSubscriptionResource(subscription));
@@ -414,8 +398,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract ListenableFuture<SubscriptionControl> createSubscription(Uint32 subscriptionId,
-        String streamName, QName encoding, String receiverName);
+    protected abstract ListenableFuture<Void> createSubscription(Uint32 subscriptionId, String streamName,
+        QName encoding, String receiverName);
+
+    @NonNullByDefault
+    protected abstract ListenableFuture<Void> removeSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
     protected abstract ListenableFuture<Void> modifySubscriptionFilter(Uint32 subscriptionId,

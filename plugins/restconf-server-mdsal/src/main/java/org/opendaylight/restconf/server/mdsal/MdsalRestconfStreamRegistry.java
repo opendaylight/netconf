@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.ByteArrayInputStream;
@@ -27,6 +28,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
@@ -250,15 +252,15 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    protected ListenableFuture<SubscriptionControl> createSubscription(final Uint32 id, final String streamName,
+    protected ListenableFuture<Void> createSubscription(final Uint32 subscriptionId, final String streamName,
             final QName encoding, final String receiverName) {
-        final var pathArg = subscriptionArg(id);
+        final var pathArg = subscriptionArg(subscriptionId);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
             ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(pathArg)
-                .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+                .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
                 .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
@@ -284,9 +286,20 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     .build())
                 .build());
         return tx.commit().transform(info -> {
-            LOG.debug("Added subscription {} to operational datastore as of {}", id, info);
-            return new MdsalSubscriptionControl(dataBroker, id);
+            LOG.debug("Added subscription {} to operational datastore as of {}", subscriptionId, info);
+            return null;
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
+        return mapFuture(tx.commit());
+    }
+
+    private static ListenableFuture<@Nullable Void> mapFuture(final ListenableFuture<? extends CommitInfo> future) {
+        return Futures.transform(future, unused -> null, MoreExecutors.directExecutor());
     }
 
     @Override
