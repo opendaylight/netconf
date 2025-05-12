@@ -122,10 +122,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Inject
     @Activate
     public MdsalRestconfStreamRegistry(@Reference final DOMDataBroker dataBroker,
-            @Reference final DOMNotificationService notificationService,
-            @Reference final DOMSchemaService schemaService,
-            @Reference final RestconfStream.LocationProvider locationProvider,
-            @Reference final DatabindProvider databindProvider) {
+        @Reference final DOMNotificationService notificationService,
+        @Reference final DOMSchemaService schemaService,
+        @Reference final RestconfStream.LocationProvider locationProvider,
+        @Reference final DatabindProvider databindProvider) {
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);

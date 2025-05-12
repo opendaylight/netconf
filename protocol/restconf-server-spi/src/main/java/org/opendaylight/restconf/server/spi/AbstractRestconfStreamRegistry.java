@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
@@ -89,8 +90,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
                 final TransportSession session, final SubscriptionControl control,
-                final @Nullable EventStreamFilter filter, final @Nullable Instant stopTime) {
-            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
+                final @Nullable EventStreamFilter filter, final SubscriptionStateService stateService,
+                final @Nullable Instant stopTime) {
+            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session, stateService, stopTime);
             this.control = requireNonNull(control);
             this.filter = filter;
             this.stopTime = stopTime;
@@ -98,6 +100,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
+            stopTimerTask();
             final var id = id();
             LOG.debug("Terminating subscription {} reason {}", id, reason);
 
@@ -118,6 +121,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         private void channelClosed() {
+            stopTimerTask();
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
 
@@ -339,7 +343,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final void establishSubscription(final ServerRequest<Uint32> request, final String streamName,
-            final QName encoding, final @Nullable SubscriptionFilter filter, final @Nullable Instant stopTime) {
+            final QName encoding, final @Nullable SubscriptionFilter filter,
+            final SubscriptionStateService stateService, final @Nullable Instant stopTime) {
         final var session = request.session();
         if (session == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
@@ -370,7 +375,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onSuccess(final SubscriptionControl result) {
                     final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                        result, filterImpl, stopTime);
+                        result, filterImpl, stateService, stopTime);
                     subscriptions.put(id, subscription);
                     session.registerResource(new DynSubscriptionResource(subscription));
                     request.completeWith(id);
