@@ -198,8 +198,8 @@ class EstablishSubscriptionRpcTest {
             .build();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
-        verify(streamRegistry)
-            .establishSubscription(any(),  eq("NETCONF"),  eq(EncodeJson$I.QNAME), isNull(), eq(time));
+        verify(streamRegistry).establishSubscription(any(),  eq("NETCONF"),  eq(EncodeJson$I.QNAME), isNull(),
+            eq(time));
     }
 
     @Test
