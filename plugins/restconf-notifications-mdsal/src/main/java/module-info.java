@@ -18,7 +18,7 @@ module org.opendaylight.restconf.notifications.mdsal {
     requires org.slf4j;
 
     // Annotations
-    requires static transitive javax.inject;
+    requires static javax.inject;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.annotation.bundle;
 }
