@@ -94,7 +94,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable Instant stopTime) {
-            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
+            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session,
+                    stopTime);
+            if (stopTime != null) {
+                startStopTimeTask();
+            }
             this.filter = filter;
         }
 
@@ -197,6 +201,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
+            terminateStopTimeTask();
             final var id = id();
             LOG.debug("Terminating subscription {} reason {}", id, reason);
 
@@ -224,6 +229,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         private void channelClosed() {
+            terminateStopTimeTask();
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
 
@@ -262,6 +268,26 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        @Override
+        protected void stopTimeRemoveSubscription() {
+            final var id = id();
+            LOG.debug("Subscription {} suspended after configured stop-time was reached", id);
+
+            Futures.addCallback(completeSubscription(id()), new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.debug("Subscription {} cleaned up", id);
+                    subscriptions.remove(id);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Subscription {} failed to clean up", id, cause);
+                    subscriptions.remove(id);
+                }
+            }, MoreExecutors.directExecutor());
         }
     }
 
@@ -551,6 +577,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> removeSubscription(Uint32 subscriptionId);
+
+    @NonNullByDefault
+    protected abstract ListenableFuture<@Nullable Void> completeSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> modifySubscriptionFilter(Uint32 subscriptionId,
