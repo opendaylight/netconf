@@ -104,6 +104,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(Subscription.QNAME, "stop-time").intern());
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
@@ -285,38 +287,42 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected synchronized ListenableFuture<Void> createSubscription(final Uint32 subscriptionId,
-            final String streamName, final QName encoding, final String receiverName) {
+            final String streamName, final QName encoding, final String receiverName, final String stopTime) {
         final var pathArg = subscriptionArg(subscriptionId);
 
-        final var tx = txChain.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
-            ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(pathArg)
-                .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
-                .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding))
-                .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(TARGET_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName))
-//                    .withChild(ImmutableNodes.newChoiceBuilder()
-//                        .withNodeIdentifier(STREAM_FILTER_NODEID)
-//                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
-//                            subscription.filterName()))
-//                        .build())
-                    .build())
-                .withChild(ImmutableNodes.newContainerBuilder()
-                    .withNodeIdentifier(RECEIVERS_NODEID)
-                    .withChild(ImmutableNodes.newSystemMapBuilder()
-                        .withNodeIdentifier(RECEIVER_NODEID)
-                        .withChild(ImmutableNodes.newMapEntryBuilder()
-                            .withNodeIdentifier(receiverArg(receiverName))
-                            .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiverName))
-                            .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.ZERO))
-                            .withChild(ImmutableNodes.leafNode(STATE_NODEID, Receiver.State.Suspended.getName()))
-                            .build())
+        final var node = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(pathArg)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
+            .withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding))
+            .withChild(ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(TARGET_NODEID)
+                .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName))
+//                .withChild(ImmutableNodes.newChoiceBuilder()
+//                    .withNodeIdentifier(STREAM_FILTER_NODEID)
+//                    .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
+//                        subscription.filterName()))
+//                    .build())
+                .build())
+            .withChild(ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(RECEIVERS_NODEID)
+                .withChild(ImmutableNodes.newSystemMapBuilder()
+                    .withNodeIdentifier(RECEIVER_NODEID)
+                    .withChild(ImmutableNodes.newMapEntryBuilder()
+                        .withNodeIdentifier(receiverArg(receiverName))
+                        .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiverName))
+                        .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.ZERO))
+                        .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.ZERO))
+                        .withChild(ImmutableNodes.leafNode(STATE_NODEID, Receiver.State.Suspended.getName()))
                         .build())
                     .build())
                 .build());
+
+        if (stopTime != null) {
+            node.withChild(ImmutableNodes.leafNode(STOP_TIME, stopTime));
+        }
+
+        final var tx = txChain.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg), node.build());
         return tx.commit().transform(info -> {
             LOG.debug("Added subscription {} to operational datastore as of {}", subscriptionId, info);
             return null;
