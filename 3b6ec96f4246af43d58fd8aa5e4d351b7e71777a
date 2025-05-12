@@ -22,6 +22,30 @@
       },
       "revId": "3b6ec96f4246af43d58fd8aa5e4d351b7e71777a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "871f7ce9_79221615",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T08:14:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cacd9126_49b39e20",
+      "range": {
+        "startLine": 274,
+        "startChar": 23,
+        "endLine": 274,
+        "endChar": 59
+      },
+      "revId": "3b6ec96f4246af43d58fd8aa5e4d351b7e71777a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
