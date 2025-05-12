@@ -10,6 +10,7 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -51,6 +52,8 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "encoding").intern());
     private static final NodeIdentifier ESTABLISH_SUBSCRIPTION_OUTPUT =
         NodeIdentifier.create(EstablishSubscriptionOutput.QNAME);
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
     private static final NodeIdentifier OUTPUT_ID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionOutput.QNAME, "id").intern());
 
@@ -102,10 +105,12 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         final var filter = streamFilter == null ? null : SubscriptionUtil.extractFilter(streamFilter);
 
+        // check stop-time
+        final var stopTime = leaf(target, STOP_TIME, String.class);
         streamRegistry.establishSubscription(request.transform(subscriptionId -> ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
             .withChild(ImmutableNodes.leafNode(OUTPUT_ID, subscriptionId))
             .build()
-        ), streamName, encoding, filter);
+        ), streamName, encoding, filter, stopTime == null ? null : Instant.parse(stopTime));
     }
 }
