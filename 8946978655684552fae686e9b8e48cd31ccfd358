@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "8946978655684552fae686e9b8e48cd31ccfd358",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58f84e00_af19eda5",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-12T10:18:54Z",
+      "side": 1,
+      "message": "If exact node was found under first parentStack then this will continue search under other parents - is it necessary?",
+      "range": {
+        "startLine": 120,
+        "startChar": 20,
+        "endLine": 120,
+        "endChar": 36
+      },
+      "revId": "8946978655684552fae686e9b8e48cd31ccfd358",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
