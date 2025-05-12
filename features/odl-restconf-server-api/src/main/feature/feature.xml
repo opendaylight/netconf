@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf-server-api">
     <feature name="odl-restconf-server-api" version="${project.version}">
+        <feature version="[11,12)">odl-mdsal-broker</feature>
         <feature version="[14,15)">odl-mdsal-model-rfc8040-ietf-restconf-monitoring</feature>
         <feature version="[14,15)">odl-mdsal-model-rfc8072</feature>
         <feature version="[14,15)">odl-mdsal-model-rfc8639</feature>
