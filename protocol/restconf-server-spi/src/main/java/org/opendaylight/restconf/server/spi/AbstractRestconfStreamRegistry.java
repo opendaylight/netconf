@@ -18,14 +18,20 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -205,6 +211,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} terminated", id);
                     subscriptions.remove(id, DynSubscription.this);
+                    subscriptionRemoved(id);
                     request.completeWith(Empty.value());
                 }
 
@@ -226,8 +233,27 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private void channelClosed() {
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
+            Futures.addCallback(removeSubscription(id), new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.debug("Subscription {} cleaned up", id);
+                    subscriptions.remove(id);
+                    subscriptionRemoved(id);
+                }
 
-            Futures.addCallback(removeSubscription(id()), new FutureCallback<>() {
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Subscription {} failed to clean up", id, cause);
+                    subscriptions.remove(id);
+                }
+            }, MoreExecutors.directExecutor());
+        }
+
+        @Override
+        void stopTimeRemoveSubscription() {
+            final var id = id();
+            LOG.debug("Subscription {} terminated after configured stop-time was reached", id);
+            Futures.addCallback(removeSubscription(id), new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} cleaned up", id);
@@ -284,6 +310,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamRegistry.class);
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     /**
      * Default NETCONF stream. We follow
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.3.1">RFC 8040</a>.
@@ -334,6 +361,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     //        Note: the MD-SAL implementation needs to use a Cluster Singleton Service to ensure oper updates are
     //              happening from a single node only.
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
+
+    private @Nullable ScheduledFuture<?> stopTimeTask = null;
+    private @Nullable Uint32 nextSubscriptionToStop = null;
 
     @Override
     public final RestconfStream<?> lookupStream(final String name) {
@@ -495,6 +525,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                     final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
                         session, filterImpl, stopTime);
                     subscriptions.put(id, subscription);
+                    if (stopTime != null) {
+                        initiateStopTime(id, stopTime);
+                    }
                     session.registerResource(new DynSubscriptionResource(subscription));
                     request.completeWith(id);
                 }
@@ -544,6 +577,96 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             }
         }, MoreExecutors.directExecutor());
     }
+
+    /**
+     * Schedule stop task if none is running or if the given stopTime is earlier than the current one.
+     *
+     * @param id the subscription ID for which the stop time is being scheduled
+     * @param stopTime the stop time of the subscription
+     */
+    @NonNullByDefault
+    private synchronized void initiateStopTime(Uint32 id, Instant stopTime) {
+        if (stopTimeTask == null) {
+            nextSubscriptionToStop = id;
+            scheduleStopTimeTask(stopTime);
+        } else {
+            final var currentSubscription = lookupSubscription(nextSubscriptionToStop);
+            if (currentSubscription != null) {
+                final var currentStopTime = currentSubscription.stopTime();
+                if (currentStopTime == null || stopTime.isBefore(currentStopTime)) {
+                    nextSubscriptionToStop = id;
+                    scheduleStopTimeTask(stopTime);
+                }
+            } else {
+                scheduleNextStopTimeTask();
+            }
+        }
+    }
+
+    /**
+     * Cancel any existing scheduled stop task and schedule a new stop task for the given stop time.
+     *
+     * @param stopTime the time at which the stop task should be executed
+     */
+    private void scheduleStopTimeTask(Instant stopTime) {
+        if (stopTimeTask != null) {
+            stopTimeTask.cancel(false);
+            stopTimeTask = null;
+        }
+
+        stopTimeTask = SCHEDULER.schedule(this::executeStopTimeTask,
+            Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
+    }
+
+    /**
+     * The task executed when the scheduled stop time is reached.
+     */
+    private synchronized void executeStopTimeTask() {
+        final var sub = lookupSubscription(nextSubscriptionToStop);
+        if (sub != null) {
+            sub.stopTimeReached();
+        }
+        nextSubscriptionToStop = null;
+        scheduleNextStopTimeTask();
+    }
+
+    /**
+     * Finds the subscription with the earliest stop time and schedules the stop task for it.
+     */
+    private void scheduleNextStopTimeTask() {
+        Instant minimalTime = null;
+        Uint32 id = null;
+        for (final var subscription : subscriptions.entrySet()) {
+            final var stopTime = subscription.getValue().stopTime();
+            if (stopTime != null && (minimalTime == null || minimalTime.isAfter(stopTime))) {
+                minimalTime = stopTime;
+                id = subscription.getKey();
+            }
+        }
+        if (id != null) {
+            nextSubscriptionToStop = id;
+            scheduleStopTimeTask(minimalTime);
+        } else {
+            nextSubscriptionToStop = null;
+            if (stopTimeTask != null) {
+                stopTimeTask.cancel(false);
+                stopTimeTask = null;
+            }
+        }
+    }
+
+    /**
+     * Called when a subscription is removed.
+     * If the removed subscription was the next scheduled to stop, reschedules the stop task.
+     *
+     * @param id the ID of the subscription that was removed
+     */
+    synchronized void subscriptionRemoved(final Uint32 id) {
+        if (Objects.equals(nextSubscriptionToStop, id)) {
+            scheduleNextStopTimeTask();
+        }
+    }
+
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> createSubscription(Uint32 subscriptionId, String streamName,
