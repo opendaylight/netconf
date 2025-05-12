@@ -374,6 +374,23 @@
       "parentUuid": "25b61399_88e856ab",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32f0813d_200c86a6",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T07:26:28Z",
+      "side": 1,
+      "message": "attribute must have some namespace - why? it can be wildcarded as well?",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
