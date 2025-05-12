@@ -15,6 +15,7 @@ module org.opendaylight.restconf.server.spi {
     requires transitive org.opendaylight.netconf.databind;
     requires transitive org.opendaylight.restconf.api;
     requires transitive org.opendaylight.restconf.server.api;
+    requires transitive org.opendaylight.restconf.notifications.mdsal;
     requires org.opendaylight.netconf.api;
     requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
@@ -24,6 +25,7 @@ module org.opendaylight.restconf.server.spi {
     requires org.slf4j;
 
     // Annotation-only dependencies
+    requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
     requires static com.github.spotbugs.annotations;
     requires static org.osgi.annotation.bundle;
