@@ -5,5 +5,6 @@
         <feature version="[14,15)">odl-mdsal-model-rfc8072</feature>
         <feature version="[14,15)">odl-mdsal-model-rfc8639</feature>
         <feature version="[14,15)">odl-yangtools-export</feature>
+        <feature version="[11,12)">odl-mdsal-broker</feature>
     </feature>
 </features>
