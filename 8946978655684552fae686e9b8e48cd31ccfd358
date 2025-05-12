@@ -63,6 +63,30 @@
       },
       "revId": "8946978655684552fae686e9b8e48cd31ccfd358",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14216a7e_3b8e2b37",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T10:42:18Z",
+      "side": 1,
+      "message": "done https://git.opendaylight.org/gerrit/c/netconf/+/116519",
+      "parentUuid": "10e13cdf_50934b0c",
+      "range": {
+        "startLine": 120,
+        "startChar": 20,
+        "endLine": 120,
+        "endChar": 36
+      },
+      "revId": "8946978655684552fae686e9b8e48cd31ccfd358",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
