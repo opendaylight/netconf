@@ -38,6 +38,11 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jdt</groupId>
             <artifactId>org.eclipse.jdt.annotation</artifactId>
         </dependency>
@@ -64,6 +69,11 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-notifications-mdsal</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
