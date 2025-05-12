@@ -95,6 +95,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable Instant stopTime) {
             super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
+            if (stopTime != null) {
+                startStopTimeTask();
+            }
             this.filter = filter;
         }
 
@@ -197,6 +200,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
+            terminateStopTimeTask();
             final var id = id();
             LOG.debug("Terminating subscription {} reason {}", id, reason);
 
@@ -224,10 +228,21 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         private void channelClosed() {
+            terminateStopTimeTask();
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
+            cleanSubscription(id);
+        }
 
-            Futures.addCallback(removeSubscription(id()), new FutureCallback<>() {
+        @Override
+        void stopTimeRemoveSubscription() {
+            final var id = id();
+            LOG.debug("Subscription {} suspended after configured stop-time was reached", id);
+            cleanSubscription(id);
+        }
+
+        private void cleanSubscription(final Uint32 id) {
+            Futures.addCallback(removeSubscription(id), new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} cleaned up", id);
