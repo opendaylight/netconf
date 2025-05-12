@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,13 +85,16 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private final SubscriptionControl control;
 
         private @Nullable EventStreamFilter filter;
+        @Nullable
+        private final Instant stopTime;
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
                 final TransportSession session, final SubscriptionControl control,
-                final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session);
+                final @Nullable EventStreamFilter filter, final @Nullable Instant stopTime) {
+            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
             this.control = requireNonNull(control);
             this.filter = filter;
+            this.stopTime = stopTime;
         }
 
         @Override
@@ -153,6 +157,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        @Override
+        public @Nullable Instant stopTime() {
+            return stopTime;
         }
     }
 
@@ -331,7 +340,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final void establishSubscription(final ServerRequest<Uint32> request, final String streamName,
-            final QName encoding, final @Nullable SubscriptionFilter filter) {
+            final QName encoding, final @Nullable SubscriptionFilter filter, final @Nullable Instant stopTime) {
         final var session = request.session();
         if (session == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
@@ -361,7 +370,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             @Override
             public void onSuccess(final SubscriptionControl result) {
                 final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session, result,
-                    filterImpl);
+                    filterImpl, stopTime);
                 subscriptions.put(id, subscription);
                 session.registerResource(new DynSubscriptionResource(subscription));
                 request.completeWith(id);
