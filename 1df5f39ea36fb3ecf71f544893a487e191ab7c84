@@ -376,6 +376,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f9e6e34_889004d4",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-12T10:15:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "edb771ee_b00267c4",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09861925_86e6fab1",
