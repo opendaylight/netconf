@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -51,7 +52,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_STREAM =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream").intern());
     private static final NodeIdentifier SUBSCRIPTION_TARGET =
-            NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter").intern());
     private static final NodeIdentifier SUBSCRIPTION_ENCODING =
@@ -72,12 +73,15 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             .EncodeXml$I.QNAME);
 
     private final RestconfStream.Registry streamRegistry;
+    private final SubscriptionStateService subscriptionStateService;
 
     @Inject
     @Activate
-    public EstablishSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
+    public EstablishSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
+            @Reference final SubscriptionStateService subscriptionStateService) {
         super(EstablishSubscription.QNAME);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.subscriptionStateService = subscriptionStateService;
     }
 
     @Override
@@ -119,7 +123,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             .withNodeIdentifier(ESTABLISH_SUBSCRIPTION_OUTPUT)
             .withChild(ImmutableNodes.leafNode(OUTPUT_ID, subscriptionId))
             .build()
-        ), streamName, encoding, filter, stopTime == null ? null : Instant.parse(stopTime));
+        ), streamName, encoding, filter,subscriptionStateService, stopTime == null ? null : Instant.parse(stopTime));
     }
 
     static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
