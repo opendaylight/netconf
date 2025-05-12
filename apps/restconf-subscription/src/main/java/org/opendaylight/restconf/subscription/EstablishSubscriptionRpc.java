@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -75,12 +76,15 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             .EncodeXml$I.QNAME);
 
     private final RestconfStream.Registry streamRegistry;
+    private final SubscriptionStateService subscriptionStateService;
 
     @Inject
     @Activate
-    public EstablishSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
+    public EstablishSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
+            @Reference final SubscriptionStateService subscriptionStateService) {
         super(EstablishSubscription.QNAME);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.subscriptionStateService = subscriptionStateService;
     }
 
     @Override
@@ -118,12 +122,19 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         // check stop-time
         final var stopTime = leaf(body, STOP_TIME, String.class);
+        final var stopTimeInst = stopTime == null ? null : Instant.parse(stopTime);
+
+        if (stopTimeInst != null && !stopTimeInst.isAfter(Instant.now())) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Stop-time must be in future!"));
+            return;
+        }
 
         streamRegistry.establishSubscription(request.transform(subscriptionId -> ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
             .build()
-        ), streamName, encoding, filter, stopTime == null ? null : Instant.parse(stopTime));
+        ), streamName, encoding, filter, subscriptionStateService, stopTimeInst);
     }
 
     static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {

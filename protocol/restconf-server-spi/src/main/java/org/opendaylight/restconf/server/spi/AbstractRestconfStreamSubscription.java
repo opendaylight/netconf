@@ -10,34 +10,48 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for {@link RestconfStream.Subscription}s.
  */
 public abstract class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamSubscription.class);
+
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
     private final @NonNull EncodingName encodingName;
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
+    private final @NonNull SubscriptionStateService stateService;
     private final @Nullable Instant stopTime;
 
     private @NonNull SubscriptionState state;
+    private @Nullable ScheduledFuture<?> stopTimeTask;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
-            final String streamName, final String receiverName, final SubscriptionState state,
-            final TransportSession session,
-            @Nullable Instant stopTime) {
+            finalString streamName,
+            final String receiverName, final SubscriptionState state, final TransportSession session,
+            final SubscriptionStateService stateService, @Nullable Instant stopTime) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
         this.encodingName = requireNonNull(encodingName);
@@ -45,7 +59,9 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         this.session = requireNonNull(session);
         this.streamName = requireNonNull(streamName);
         this.receiverName = requireNonNull(receiverName);
+        this.stateService = stateService;
         this.stopTime = stopTime;
+        stopTimeTask = null;
     }
 
     @Override
@@ -96,6 +112,33 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     @Override
     public @Nullable Instant stopTime() {
         return stopTime;
+    }
+
+    void startStopTimeTask() {
+        stopTimeTask = SCHEDULER.schedule(this::stopTimeReached,
+            Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
+    }
+
+    private void stopTimeReached()  {
+        if (state != SubscriptionState.END) {
+            try {
+                // FIXME: replace by subscription-completed, when it works
+                stateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
+            } catch (InterruptedException e) {
+                LOG.warn("Could not send subscription completed notification", e);
+            }
+            setState(SubscriptionState.END);
+            stopTimeRemoveSubscription();
+        }
+        stopTimerTask();
+    }
+
+    abstract void stopTimeRemoveSubscription();
+
+    protected final void stopTimerTask() {
+        if (stopTimeTask != null) {
+            stopTimeTask.cancel(false);
+        }
     }
 
     @Override
