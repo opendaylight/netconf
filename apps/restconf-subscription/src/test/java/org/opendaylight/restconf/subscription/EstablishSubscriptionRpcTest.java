@@ -33,6 +33,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -68,6 +69,8 @@ class EstablishSubscriptionRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
+    private SubscriptionStateService subscriptionStateService;
+    @Mock
     private DatabindPath.Rpc operationPath;
     @Mock
     private DOMDataTreeWriteTransaction writeTx;
@@ -88,7 +91,7 @@ class EstablishSubscriptionRpcTest {
 
     @BeforeEach
     void before() {
-        rpc = new EstablishSubscriptionRpc(streamRegistry);
+        rpc = new EstablishSubscriptionRpc(streamRegistry, subscriptionStateService);
     }
 
     @Disabled
@@ -198,8 +201,8 @@ class EstablishSubscriptionRpcTest {
             .build();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
-        verify(streamRegistry)
-            .establishSubscription(any(),  eq("NETCONF"),  eq(EncodeJson$I.QNAME), isNull(), eq(time));
+        verify(streamRegistry).establishSubscription(any(),  eq("NETCONF"),  eq(EncodeJson$I.QNAME), isNull(),
+            eq(subscriptionStateService), eq(time));
     }
 
     @Test

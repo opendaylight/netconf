@@ -31,6 +31,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
@@ -93,8 +94,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
-                final @Nullable Instant stopTime) {
-            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
+                final SubscriptionStateService stateService, final @Nullable Instant stopTime) {
+            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stateService,
+                    stopTime);
+            if (stopTime != null) {
+                startStopTimeTask();
+            }
             this.filter = filter;
         }
 
@@ -197,6 +202,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         protected void terminateImpl(final ServerRequest<Empty> request, final QName reason) {
+            terminateStopTimeTask();
             final var id = id();
             LOG.debug("Terminating subscription {} reason {}", id, reason);
 
@@ -217,6 +223,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         private void channelClosed() {
+            terminateStopTimeTask();
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
 
@@ -255,6 +262,26 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        @Override
+        protected void stopTimeRemoveSubscription() {
+            final var id = id();
+            LOG.debug("Subscription {} suspended after configured stop-time was reached", id);
+
+            Futures.addCallback(removeSubscription(id()), new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    LOG.debug("Subscription {} cleaned up", id);
+                    subscriptions.remove(id);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Subscription {} failed to clean up", id, cause);
+                    subscriptions.remove(id);
+                }
+            }, MoreExecutors.directExecutor());
         }
     }
 
@@ -444,7 +471,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final void establishSubscription(final ServerRequest<Uint32> request, final String streamName,
-            final QName encoding, final @Nullable SubscriptionFilter filter, final @Nullable Instant stopTime) {
+            final QName encoding, final @Nullable SubscriptionFilter filter,
+            final SubscriptionStateService stateService, final @Nullable Instant stopTime) {
         final var session = request.session();
         if (session == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
@@ -486,7 +514,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onSuccess(final Void result) {
                     final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
-                        session, filterImpl, stopTime);
+                        session, filterImpl, stateService, stopTime);
                     subscriptions.put(id, subscription);
                     session.registerResource(new DynSubscriptionResource(subscription));
                     request.completeWith(id);
