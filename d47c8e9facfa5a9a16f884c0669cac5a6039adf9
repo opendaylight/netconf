@@ -50,6 +50,23 @@
       "message": "recheck",
       "revId": "d47c8e9facfa5a9a16f884c0669cac5a6039adf9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e75fdfb7_360d9a3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T08:09:34Z",
+      "side": 1,
+      "message": "Missing error format assertions.",
+      "revId": "d47c8e9facfa5a9a16f884c0669cac5a6039adf9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
