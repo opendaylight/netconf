@@ -412,15 +412,30 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     public synchronized ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
-        final var subscription = lookupSubscription(subscriptionId);
-        final var eventFormatter = getEventFormatter(subscription.encoding());
         final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionTerminated(subscriptionId),
             Instant.now());
+        return deleteSubscriptionFromDatastore(subscriptionId, notificationBody);
+    }
+
+    @Override
+    public synchronized ListenableFuture<@Nullable Void> completeSubscription(final Uint32 subscriptionId) {
+        // FIXME: notification is not send when subscriptionCompleted() is used,
+        //        replace by subscription-completed, when it works
+        final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionTerminated(subscriptionId),
+            Instant.now());
+        return deleteSubscriptionFromDatastore(subscriptionId, notificationBody);
+    }
+
+    private ListenableFuture<@Nullable Void> deleteSubscriptionFromDatastore(final Uint32 subscriptionId,
+        final DOMNotificationEvent.Rfc6020 notificationBody) {
+        final var subscription = lookupSubscription(subscriptionId);
+        final var eventFormatter = getEventFormatter(subscription.encoding());
         subscription.publishMessage(formatNotification(eventFormatter, notificationBody));
         final var tx = txChain.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
         return mapFuture(tx.commit());
     }
+
 
     @SuppressWarnings("checkstyle:illegalCatch")
     private @Nullable String formatNotification(final EventFormatter<DOMNotification> eventFormatter,

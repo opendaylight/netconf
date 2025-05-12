@@ -10,7 +10,12 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -19,11 +24,16 @@ import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for {@link RestconfStream.Subscription}s.
  */
 public abstract class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamSubscription.class);
+
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
     private final @NonNull EncodingName encodingName;
@@ -33,6 +43,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private final @Nullable Instant stopTime;
 
     private @NonNull SubscriptionState state;
+    private @Nullable ScheduledFuture<?> stopTimeTask;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
             final String streamName, final String receiverName, final SubscriptionState state,
@@ -45,6 +56,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         this.streamName = requireNonNull(streamName);
         this.receiverName = requireNonNull(receiverName);
         this.stopTime = stopTime;
+        stopTimeTask = null;
     }
 
     @Override
@@ -96,6 +108,28 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     public @Nullable Instant stopTime() {
         return stopTime;
     }
+
+    void startStopTimeTask() {
+        stopTimeTask = SCHEDULER.schedule(this::stopTimeReached,
+            Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
+    }
+
+    final void terminateStopTimeTask() {
+        if (stopTimeTask != null) {
+            stopTimeTask.cancel(true);
+            stopTimeTask = null;
+        }
+    }
+
+    private void stopTimeReached()  {
+        if (state != SubscriptionState.END) {
+            setState(SubscriptionState.END);
+            stopTimeRemoveSubscription();
+        }
+        terminateStopTimeTask();
+    }
+
+    abstract void stopTimeRemoveSubscription();
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
