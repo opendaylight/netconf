@@ -8,11 +8,16 @@
 package org.opendaylight.restconf.subscription;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -48,6 +53,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +61,9 @@ class EstablishSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
     private static final QName STREAM_QNAME = QName.create(Subscription.QNAME, "stream");
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
+
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -122,7 +131,7 @@ class EstablishSubscriptionRpcTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
 
-        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput()));
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput().build()));
         verify(writeTx).put(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
             new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), expectedNode.name())),
             eq(expectedNode));
@@ -135,7 +144,7 @@ class EstablishSubscriptionRpcTest {
         doReturn(null).when(streamRegistry).lookupStream("NETCONF");
         doReturn(session).when(request).session();
 
-        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput()));
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput().build()));
         verify(request).completeWith(response.capture());
         assertEquals("NETCONF refers to an unknown stream", response.getValue().getMessage());
     }
@@ -181,14 +190,36 @@ class EstablishSubscriptionRpcTest {
         assertEquals("filter refers to an unknown stream filter", response.getValue().getMessage());
     }
 
-    private static ContainerNode getInput() {
+    @Test
+    void establishSubscriptionWithStopTimeTest() {
+        final var time = Instant.now().plus(Duration.ofDays(5));
+        final var input = getInput()
+            .withChild(ImmutableNodes.leafNode(STOP_TIME, time.toString()))
+            .build();
+
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
+        verify(streamRegistry)
+            .establishSubscription(any(),  eq("NETCONF"),  eq(EncodeJson$I.QNAME), isNull(), eq(time));
+    }
+
+    @Test
+    void establishSubscriptionPastStopTimeTest() {
+        final var input = getInput()
+            .withChild(ImmutableNodes.leafNode(STOP_TIME,"1996-02-03T10:30:30+02:00"))
+            .build();
+
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
+        verify(request).completeWith(response.capture());
+        assertEquals("Stop-time must be in future.", response.getValue().getMessage());
+    }
+
+    private static @NonNull DataContainerNodeBuilder<NodeIdentifier, ContainerNode> getInput() {
         return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "encoding"), EncodeJson$I.QNAME))
             .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Target.QNAME))
                 .withChild(ImmutableNodes.leafNode(STREAM_QNAME, "NETCONF"))
-                .build())
-            .build();
+                .build());
     }
 }
