@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -207,7 +208,7 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         void establishSubscription(ServerRequest<Uint32> request, String streamName, QName encoding,
-            @Nullable SubscriptionFilter filter, @Nullable Instant stopTime);
+            @Nullable SubscriptionFilter filter, SubscriptionStateService stateService, @Nullable Instant stopTime);
 
         /**
          * Modify existing RFC8639 subscription to a stream.
