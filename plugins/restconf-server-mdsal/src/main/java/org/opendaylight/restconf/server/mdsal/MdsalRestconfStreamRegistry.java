@@ -104,6 +104,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(Subscription.QNAME, "stop-time").intern());
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
@@ -285,7 +287,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected synchronized ListenableFuture<Void> createSubscription(final Uint32 subscriptionId,
-            final String streamName, final QName encoding, final String receiverName) {
+            final String streamName, final QName encoding, final String receiverName, final String stopTime) {
         final var pathArg = subscriptionArg(subscriptionId);
 
         final var tx = txChain.newWriteOnlyTransaction();
@@ -316,6 +318,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                             .build())
                         .build())
                     .build())
+                .withChild(ImmutableNodes.leafNode(STOP_TIME, stopTime))
                 .build());
         return tx.commit().transform(info -> {
             LOG.debug("Added subscription {} to operational datastore as of {}", subscriptionId, info);
