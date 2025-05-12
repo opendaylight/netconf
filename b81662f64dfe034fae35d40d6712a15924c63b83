@@ -16,6 +16,24 @@
       "message": "Missing error format assertions.",
       "revId": "b81662f64dfe034fae35d40d6712a15924c63b83",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6eb8dda3_f259d066",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T10:30:57Z",
+      "side": 1,
+      "message": "See: https://git.opendaylight.org/gerrit/c/netconf/+/116508/comments/e75fdfb7_360d9a3d",
+      "parentUuid": "eb7f93fe_c519e835",
+      "revId": "b81662f64dfe034fae35d40d6712a15924c63b83",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
