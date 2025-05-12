@@ -208,7 +208,7 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         void establishSubscription(ServerRequest<Uint32> request, String streamName, QName encoding,
-            @Nullable SubscriptionFilter filter);
+            @Nullable SubscriptionFilter filter, @Nullable Instant stopTime);
 
         /**
          * Modify existing RFC8639 subscription to a stream.
@@ -310,6 +310,8 @@ public final class RestconfStream<T> {
          */
         @NonNullByDefault
         public abstract TransportSession session();
+
+        public abstract @Nullable Instant stopTime();
 
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
