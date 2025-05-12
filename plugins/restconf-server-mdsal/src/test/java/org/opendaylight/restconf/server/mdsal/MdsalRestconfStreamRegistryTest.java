@@ -102,7 +102,7 @@ class MdsalRestconfStreamRegistryTest {
     void establishSubscriptionTest() {
         when(session.description()).thenReturn(sessionDesc);
         when(sessionDesc.toFriendlyString()).thenReturn("session");
-        registry.establishSubscription(request, "NETCONF", EncodeJson$I.QNAME, null);
+        registry.establishSubscription(request, "NETCONF", EncodeJson$I.QNAME, null, null);
 
         final var idCap = ArgumentCaptor.forClass(Uint32.class);
         verify(request).completeWith(idCap.capture());
@@ -129,7 +129,7 @@ class MdsalRestconfStreamRegistryTest {
 
     @Test
     void establishSubscriptionUnknownStreamTest() {
-        registry.establishSubscription(request, "TEST", EncodeJson$I.QNAME, null);
+        registry.establishSubscription(request, "TEST", EncodeJson$I.QNAME, null, null);
         final var errCap = ArgumentCaptor.forClass(RequestException.class);
         verify(request).completeWith(errCap.capture());
         assertEquals("TEST refers to an unknown stream", errCap.getValue().getMessage());
