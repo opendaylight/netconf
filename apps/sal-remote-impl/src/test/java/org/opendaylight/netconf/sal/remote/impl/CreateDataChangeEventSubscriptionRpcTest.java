@@ -20,6 +20,7 @@ import static org.mockito.Mockito.doReturn;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.jdt.annotation.Nullable;
@@ -76,7 +77,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
         @Override
         protected ListenableFuture<Void> createSubscription(final Uint32 subscriptionId,
-                final String streamName, final QName encoding, final String receiverName) {
+                final String streamName, final QName encoding, final String receiverName, final Instant stopTime) {
             throw new UnsupportedOperationException();
         }
 
