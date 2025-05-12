@@ -8,15 +8,24 @@
 package org.opendaylight.restconf.subscription;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.stream.Stream;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -48,6 +57,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +65,9 @@ class EstablishSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
     private static final QName STREAM_QNAME = QName.create(Subscription.QNAME, "stream");
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
+
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -122,7 +135,7 @@ class EstablishSubscriptionRpcTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
 
-        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput()));
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput().build()));
         verify(writeTx).put(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
             new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), expectedNode.name())),
             eq(expectedNode));
@@ -135,7 +148,7 @@ class EstablishSubscriptionRpcTest {
         doReturn(null).when(streamRegistry).lookupStream("NETCONF");
         doReturn(session).when(request).session();
 
-        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput()));
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, getInput().build()));
         verify(request).completeWith(response.capture());
         assertEquals("NETCONF refers to an unknown stream", response.getValue().getMessage());
     }
@@ -181,14 +194,51 @@ class EstablishSubscriptionRpcTest {
         assertEquals("filter refers to an unknown stream filter", response.getValue().getMessage());
     }
 
-    private static ContainerNode getInput() {
+    @Test
+    void establishSubscriptionWithStopTimeTest() {
+        final var time = Instant.now().plus(Duration.ofDays(5));
+        final var input = getInput()
+            .withChild(ImmutableNodes.leafNode(STOP_TIME, time.toString()))
+            .build();
+
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
+        verify(streamRegistry).establishSubscription(any(),  eq("NETCONF"),  eq(EncodeJson$I.QNAME), isNull(),
+            eq(time));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidStopTimeProvider")
+    void establishSubscriptionIncorrectStopTimeTest(String stopTime, String expectedMessage) {
+        final var input = getInput()
+            .withChild(ImmutableNodes.leafNode(STOP_TIME, stopTime))
+            .build();
+
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
+        verify(request).completeWith(response.capture());
+        assertEquals(expectedMessage, response.getValue().getMessage());
+    }
+
+    static Stream<Arguments> invalidStopTimeProvider() {
+        return Stream.of(
+            Arguments.of("1996-02-03T10:30:30+02:00", "Stop-time must be in future."), // correct time but in the past
+            Arguments.of("2020-02-03T10:30:30+19:00",
+                "Unable to parse time: java.time.format.DateTimeParseException:"
+                + " Text '2020-02-03T10:30:30+19:00' could not be parsed at index 0"),  // offset out of range
+            Arguments.of("2020-02-03T10:30:30+19:00[Europe/Paris]",
+                "Unable to parse time: java.time.format.DateTimeParseException: Text '2020-02-03T10:30:30+19:00"
+                + "[Europe/Paris]' could not be parsed at index 0"),  // time with specified time zone
+            Arguments.of("just.some.text", "Unable to parse time: java.time.format.DateTimeParseException:"
+                + " Text 'just.some.text' could not be parsed at index 0") // incorrect input
+        );
+    }
+
+    private static @NonNull DataContainerNodeBuilder<NodeIdentifier, ContainerNode> getInput() {
         return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(EstablishSubscriptionInput.QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "encoding"), EncodeJson$I.QNAME))
             .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Target.QNAME))
                 .withChild(ImmutableNodes.leafNode(STREAM_QNAME, "NETCONF"))
-                .build())
-            .build();
+                .build());
     }
 }
