@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,8 +89,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private @Nullable EventStreamFilter filter;
 
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
-                final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter) {
-            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session);
+                final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
+                final @Nullable Instant stopTime) {
+            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
             this.filter = filter;
         }
 
@@ -445,7 +447,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final void establishSubscription(final ServerRequest<Uint32> request, final String streamName,
-            final QName encoding, final @Nullable SubscriptionFilter filter) {
+            final QName encoding, final @Nullable SubscriptionFilter filter, final @Nullable Instant stopTime) {
         final var session = request.session();
         if (session == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
@@ -482,21 +484,22 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
 
-        Futures.addCallback(createSubscription(id, streamName, encoding, receiverName), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final Void result) {
-                final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
-                    session, filterImpl);
-                subscriptions.put(id, subscription);
-                session.registerResource(new DynSubscriptionResource(subscription));
-                request.completeWith(id);
-            }
+        Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, String.valueOf(stopTime)),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
+                        session, filterImpl, stopTime);
+                    subscriptions.put(id, subscription);
+                    session.registerResource(new DynSubscriptionResource(subscription));
+                    request.completeWith(id);
+                }
 
-            @Override
-            public void onFailure(final Throwable cause) {
-                request.completeWith(new RequestException(cause));
-            }
-        }, MoreExecutors.directExecutor());
+                @Override
+                public void onFailure(final Throwable cause) {
+                    request.completeWith(new RequestException(cause));
+                }
+            }, MoreExecutors.directExecutor());
     }
 
     @NonNullByDefault
@@ -540,7 +543,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> createSubscription(Uint32 subscriptionId, String streamName,
-        QName encoding, String receiverName);
+        QName encoding, String receiverName, @Nullable String stopTime);
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> removeSubscription(Uint32 subscriptionId);
