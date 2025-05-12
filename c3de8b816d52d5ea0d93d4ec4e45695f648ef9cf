@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4734392_1198b34c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-12T07:35:55Z",
+      "side": 1,
+      "message": "Assuming we have https://git.opendaylight.org/gerrit/c/netconf/+/111728 in 7.0.x this should be OK as well.",
+      "revId": "c3de8b816d52d5ea0d93d4ec4e45695f648ef9cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
