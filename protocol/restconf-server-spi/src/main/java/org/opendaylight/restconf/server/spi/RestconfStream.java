@@ -333,6 +333,8 @@ public final class RestconfStream<T> {
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
+        abstract void stopTimeReached();
+
         @Override
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
