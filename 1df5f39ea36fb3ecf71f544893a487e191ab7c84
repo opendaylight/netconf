@@ -289,6 +289,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c0df046_5edeefe4",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-12T08:32:38Z",
+      "side": 1,
+      "message": "I think it is line 113. Because at this point node was found so checking other parents does not make sense.\nYes this part is looking for Exact node but this does not means parent node also Exact - it may be wildcard - in that case there may be two or more parent stacks",
+      "parentUuid": "11615c40_87492643",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "09861925_86e6fab1",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 62
@@ -336,6 +354,24 @@
       "side": 1,
       "message": "It means that checking if stack is not empty is useless?",
       "parentUuid": "e70940d7_3faf0811",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73dd1b99_4d661660",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-12T08:32:38Z",
+      "side": 1,
+      "message": "After enterSchemaTree - yes. (See https://www.javadoc.io/static/org.opendaylight.yangtools/yangtools-docs/11.0.0/org/opendaylight/yangtools/yang/model/util/SchemaInferenceStack.html#enterSchemaTree(org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier))\nCatching IllegalArgumentException is checking if something was found.",
+      "parentUuid": "53e0fee8_573f5b2b",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -395,6 +431,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6471e614_cd1fc7a3",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-12T08:32:38Z",
+      "side": 1,
+      "message": "Mm.. I\u0027m not sure if I can agree just yet with that. As I said above, if parent is wildcard(and there is two or more parent stacks) and we are looking for Exact match then node we are looking for is one and only under one of the parent stacks, right? It may not be under first parent - then this log is normal situation when we checked one of the possible parents and node was not there.\nIs this an error in this case? I think no - if node was not found under one parent then it is under other.\nIs this irregular situation? Not likely because such XML(I mean when there is wildcard and under wildcard there is exact node) has valid structure. May be not something logical from user to create such filter but why not. As long as there is one node that match to exact namespace then it is ok filter IMO.\nThis log is here just to note where we looked and didn\u0027t find it - that is normal.\nError is thrown below when we looked for node in how many parents we have and still didn\u0027t find it.",
+      "parentUuid": "eb4e2b2a_eacea46c",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32f0813d_200c86a6",
         "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
         "patchSetId": 62
@@ -406,6 +460,24 @@
       "writtenOn": "2025-05-12T07:26:28Z",
       "side": 1,
       "message": "attribute must have some namespace - why? it can be wildcarded as well?",
+      "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e37ee7f2_b0e88b5e",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilterReader.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-12T08:32:38Z",
+      "side": 1,
+      "message": "Current implementation of attribute nodes expect only Exact namespace selection. Because of that this check. When I asked why only Exact namespace I was told to leave Attributes until yang definitions is done - after that this method is object to refactor. Related FIXME is few lines below - line 331",
+      "parentUuid": "32f0813d_200c86a6",
       "revId": "1df5f39ea36fb3ecf71f544893a487e191ab7c84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
