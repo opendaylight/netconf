@@ -40,6 +40,12 @@
             <classifier>features</classifier>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-dom-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-api</artifactId>
             <type>xml</type>
