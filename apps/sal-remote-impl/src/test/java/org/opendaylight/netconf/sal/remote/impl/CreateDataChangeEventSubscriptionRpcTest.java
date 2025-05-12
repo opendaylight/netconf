@@ -83,7 +83,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
         @Override
         protected ListenableFuture<SubscriptionControl> createSubscription(final Uint32 subscriptionId,
-                final String streamName, final QName encoding, final String receiverName) {
+                final String streamName, final QName encoding, final String receiverName, final String stopTime) {
             throw new UnsupportedOperationException();
         }
 
