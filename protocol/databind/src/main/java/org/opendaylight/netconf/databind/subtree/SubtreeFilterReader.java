@@ -108,8 +108,9 @@ final class SubtreeFilterReader {
         final var childrenQNames = new ArrayList<QName>();
         final var children = new ArrayList<SchemaInferenceStack>();
         LOG.debug("Starting processing child node {}.", elementName);
+        final var wildcard = elementNamespace.isEmpty();
         for (final var parentStack : parents) {
-            if (elementNamespace.isEmpty()) {
+            if (wildcard) {
                 LOG.debug("Processing {} node as wildcard.", elementName);
                 // if we don't have namespace to search for exact match then we have to search for child nodes with
                 // every possible namespace because children not necessarily have same namespace as parent
@@ -127,10 +128,15 @@ final class SubtreeFilterReader {
                         .formatted(elementNamespace));
                 }
             }
+            // when we find at least one child with desired name - we are done for exact case
+            // for wildcard collect them all
+            if (!wildcard && !childrenQNames.isEmpty()) {
+                break;
+            }
         }
         final NamespaceSelection namespace;
         if (!childrenQNames.isEmpty()) {
-            if (elementNamespace.isEmpty()) {
+            if (wildcard) {
                 LOG.debug("Creating Wildcard NamespaceSelection for {} node.", elementName);
                 namespace = new Wildcard(UnresolvedQName.Unqualified.of(elementLocalName), childrenQNames.stream()
                     .sorted().toList());
