@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,11 +71,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
 
         private @Nullable EventStreamFilter filter;
+        private @Nullable final Instant stopTime;
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter) {
-            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session);
+                final TransportSession session, final @Nullable EventStreamFilter filter, final @Nullable Instant stopTime) {
+            super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
             this.filter = filter;
+            this.stopTime = stopTime;
         }
 
         @Override
@@ -137,6 +140,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        @Override
+        public @Nullable Instant stopTime() {
+            return stopTime;
         }
     }
 
@@ -315,7 +323,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public final void establishSubscription(final ServerRequest<Uint32> request, final String streamName,
-            final QName encoding, final @Nullable SubscriptionFilter filter) {
+            final QName encoding, final @Nullable SubscriptionFilter filter, final @Nullable Instant stopTime) {
         final var session = request.session();
         if (session == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
@@ -341,15 +349,16 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
 
-        Futures.addCallback(createSubscription(id, streamName, encoding, receiverName), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final Void result) {
-                final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                    filterImpl);
-                subscriptions.put(id, subscription);
-                session.registerResource(new DynSubscriptionResource(subscription));
-                request.completeWith(id);
-            }
+        Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, String.valueOf(stopTime)),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
+                         filterImpl, stopTime);
+                    subscriptions.put(id, subscription);
+                    session.registerResource(new DynSubscriptionResource(subscription));
+                    request.completeWith(id);
+                }
 
             @Override
             public void onFailure(final Throwable cause) {
@@ -399,7 +408,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @NonNullByDefault
     protected abstract ListenableFuture<Void> createSubscription(Uint32 subscriptionId, String streamName,
-        QName encoding, String receiverName);
+        QName encoding, String receiverName, String stopTime);
 
     @NonNullByDefault
     protected abstract ListenableFuture<Void> removeSubscription(Uint32 subscriptionId);
