@@ -67,6 +67,24 @@
       "message": "Missing error format assertions.",
       "revId": "d47c8e9facfa5a9a16f884c0669cac5a6039adf9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59924183_d714977a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-12T09:03:20Z",
+      "side": 1,
+      "message": "In 7.0.x it replied with RestconfDocumentedException, which does not contain an Entity object that can be used to verify format.\nhttps://github.com/opendaylight/netconf/blob/v7.0.11/restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/AbstractRestconfTest.java#L147\n\nIn 8.0.x and higher, it uses a Response as a reply, which can be verified with a format:\nhttps://github.com/opendaylight/netconf/blob/v7.0.11/restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/AbstractRestconfTest.java#L158",
+      "parentUuid": "e75fdfb7_360d9a3d",
+      "revId": "d47c8e9facfa5a9a16f884c0669cac5a6039adf9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
