@@ -125,11 +125,11 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void filterNotificationPartialTest() throws Exception {
         final var response = establishFilteredSubscription("""
-            <test-notification xmlns="test:notification">
+            <example-notification xmlns="test:notification">
               <entry>
                 <id/>
               </entry>
-            </test-notification>
+            </example-notification>
             """, streamClient);
 
         assertEquals(HttpResponseStatus.OK, response.status());
