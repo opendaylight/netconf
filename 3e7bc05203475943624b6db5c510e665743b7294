@@ -34,6 +34,24 @@
       "parentUuid": "8f3d1a5c_eaac29e3",
       "revId": "3e7bc05203475943624b6db5c510e665743b7294",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fb638b8_32fe10c6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-13T13:45:38Z",
+      "side": 1,
+      "message": "Or should it be NETCONF-1459 - one of NETCONF-1436 subtasks where this logic was implemented?",
+      "parentUuid": "8bd04b78_d48e0582",
+      "revId": "3e7bc05203475943624b6db5c510e665743b7294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
