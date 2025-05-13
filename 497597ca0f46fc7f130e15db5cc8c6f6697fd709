@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f644a52_0996272e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-13T13:07:07Z",
+      "side": 1,
+      "message": "comparing",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ac592c4_c17717d6",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-13T13:07:07Z",
+      "side": 1,
+      "message": "can we have just one formatted constant?",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc87f583_5b4e55cf",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-13T13:07:07Z",
+      "side": 1,
+      "message": "please check if this ZoneId.systemDefault() should not be something UTC related?",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
