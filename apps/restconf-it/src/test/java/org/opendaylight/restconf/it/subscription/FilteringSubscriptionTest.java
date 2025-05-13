@@ -17,7 +17,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +93,8 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                   "amountOfBread": 1
                 }
               }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""", EVENT_TIME.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+                eventListener.readNext(), JSONCompareMode.LENIENT);
 
         final var modifyInput = String.format("""
              <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
@@ -163,7 +166,8 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                   ]
                 }
               }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
+            }""", EVENT_TIME.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+                eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -220,6 +224,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                 "event-time": "%s",
                 "toaster:toasterOutOfBread": {}
               }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""", EVENT_TIME.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+                eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 }
