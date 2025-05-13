@@ -196,7 +196,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             switch (node.modificationType()) {
                 case null -> throw new NullPointerException("Modification type is null for node: " + node);
                 case APPEARED, SUBTREE_MODIFIED, WRITE ->
-                    nameToSpec.put(filterName, (ChoiceNode) node.getDataBefore());
+                    nameToSpec.put(filterName, (ChoiceNode) node.getDataAfter());
                 case DELETE, DISAPPEARED -> nameToSpec.put(filterName, null);
                 case UNMODIFIED -> {
                     // No-op
