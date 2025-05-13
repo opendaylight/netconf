@@ -17,7 +17,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +48,8 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final QName QNAME_PROPERTY_NAME = QName.create(Entry.QNAME, "name");
     private static final Instant EVENT_TIME =
         OffsetDateTime.of(LocalDateTime.of(2024, Month.OCTOBER, 30, 12, 34, 56), ZoneOffset.UTC).toInstant();
+    private static final String FORMATTED_EVENT_TIME = EVENT_TIME.atZone(ZoneId.systemDefault())
+        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     private static final ContainerNode TOASTER_RESTOCKED_NOTIFICATION = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(NodeIdentifier.create(ToasterRestocked.QNAME))
         .withChild(ImmutableNodes.leafNode(BREAD_NODEID, 1))
@@ -91,7 +95,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                   "amountOfBread": 1
                 }
               }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""", FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
 
         final var modifyInput = String.format("""
              <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
@@ -163,7 +167,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                   ]
                 }
               }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
+            }""", FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -220,6 +224,6 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                 "event-time": "%s",
                 "toaster:toasterOutOfBread": {}
               }
-            }""", EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""", FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 }
