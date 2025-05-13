@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d922ecce_4172dbd0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-13T10:11:54Z",
+      "side": 1,
+      "message": "we can use again @Ignore in https://git.opendaylight.org/gerrit/c/netconf/+/116430 instead 😄",
+      "revId": "76c45e7ca1148466bc575b20b2869d2716a3c992",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
