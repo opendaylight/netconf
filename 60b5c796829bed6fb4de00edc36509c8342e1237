@@ -34,6 +34,24 @@
       "parentUuid": "8aeffdc8_deeae0f0",
       "revId": "60b5c796829bed6fb4de00edc36509c8342e1237",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4114554_4f27e0b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-13T15:30:24Z",
+      "side": 1,
+      "message": "Also this: https://git.opendaylight.org/gerrit/c/netconf/+/116527.",
+      "parentUuid": "0e9cd2f5_7c8c4223",
+      "revId": "60b5c796829bed6fb4de00edc36509c8342e1237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
