@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1fb815c0_41796293",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-13T15:15:46Z",
+      "side": 1,
+      "message": "Yes. We can have formatted constant and parse it every time Instant is required. Like this: Instant.parse(FORMATTED_EVENT_TIME). But why create it 3 times for every time we need it - I thought constants are created in this case?",
+      "parentUuid": "9ac592c4_c17717d6",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc87f583_5b4e55cf",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
         "patchSetId": 2
@@ -66,6 +84,24 @@
       "writtenOn": "2025-05-13T13:07:07Z",
       "side": 1,
       "message": "please check if this ZoneId.systemDefault() should not be something UTC related?",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "493feec2_583ec218",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-13T15:15:46Z",
+      "side": 1,
+      "message": "I\u0027m not sure if I understood you about UTC related, but this ZoneId.systemDefault() has to be here to get local time. This is because something similar is done somewhere when notifications are sent - that caused issue when comparing to Instant in first place - different format. Also time zone can\u0027t be hardcoded - formatted time will be different depending on system\u0027s time zone. If you change your local time on PC and run test then event time in notification will be different.",
+      "parentUuid": "bc87f583_5b4e55cf",
       "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
