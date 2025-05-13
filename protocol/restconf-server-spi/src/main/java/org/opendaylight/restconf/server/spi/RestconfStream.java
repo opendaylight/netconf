@@ -20,6 +20,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
@@ -30,6 +31,14 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.ReceiversBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -325,6 +334,31 @@ public final class RestconfStream<T> {
 
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+
+        public final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .subscriptions.Subscription toOperational() {
+            final Encoding encoding;
+            final var encodingName = encoding().getLocalName();
+            if (encodingName.equals(EncodeXml$I.QNAME.getLocalName())) {
+                encoding = EncodeXml$I.VALUE;
+            } else if (encodingName.equals(EncodeJson$I.QNAME.getLocalName())) {
+                encoding = EncodeJson$I.VALUE;
+            } else {
+                throw new IllegalArgumentException("Invalid encoding: " + encodingName);
+            }
+            return new SubscriptionBuilder()
+                .setId(new SubscriptionId(id()))
+                .setEncoding(encoding)
+                .setReceivers(new ReceiversBuilder()
+                    .setReceiver(Map.of(
+                        new ReceiverKey(receiverName()),
+                        // FIXME: Add receiver state and counters
+                        new ReceiverBuilder()
+                            .setName(receiverName())
+                            .build()))
+                    .build())
+                .build();
+        }
 
         @Override
         public final String toString() {
