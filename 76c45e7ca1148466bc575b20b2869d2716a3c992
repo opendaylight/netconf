@@ -16,6 +16,24 @@
       "message": "we can use again @Ignore in https://git.opendaylight.org/gerrit/c/netconf/+/116430 instead 😄",
       "revId": "76c45e7ca1148466bc575b20b2869d2716a3c992",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9448d468_c71f46e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-13T10:26:58Z",
+      "side": 1,
+      "message": "Yes. Patch will be abandoned after I check all tests. This also to show that except filtering parts other things works.",
+      "parentUuid": "d922ecce_4172dbd0",
+      "revId": "76c45e7ca1148466bc575b20b2869d2716a3c992",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
