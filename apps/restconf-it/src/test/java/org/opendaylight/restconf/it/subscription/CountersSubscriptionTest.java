@@ -109,10 +109,10 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         // modify
         final var modifyInput = String.format("""
-             <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </establish-subscription>""", id);
+             </input>""", id);
         final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
@@ -150,10 +150,10 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         // modify
         final var modifyInput = String.format("""
-             <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
+             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </establish-subscription>""", id);
+             </input>""", id);
         final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
