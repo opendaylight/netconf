@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8aeffdc8_deeae0f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-13T06:31:45Z",
+      "side": 1,
+      "message": "09:44:22 [ERROR]   CountersSubscriptionTest.counterNotificationWithFilterTest:116 expected: \u003c204 No Content\u003e but was: \u003c500 Internal Server Error\u003e\n09:44:22 [ERROR]   CountersSubscriptionTest.excludedCounterNotificationTest:156 expected: \u003c204 No Content\u003e but was: \u003c500 Internal Server Error\u003e\n09:44:22 [ERROR]   FilteringSubscriptionTest.filterNotificationNotReceivedTest:120-\u003everifyToasterOutOfBreadFilter:207 expected: \u003cnull\u003e but was: \u003c{\"ietf-restconf:notification\":{\"event-time\":\"2024-10-30T12:34:56Z\",\"toaster:toasterRestocked\":{\"amountOfBread\":1}}}\u003e\n09:44:22 [ERROR]   FilteringSubscriptionTest.filterNotificationPartialTest:133 expected: \u003c200 OK\u003e but was: \u003c500 Internal Server Error\u003e\n09:44:22 [ERROR]   FilteringSubscriptionTest.filterNotificationReceivedTest:101 expected: \u003c204 No Content\u003e but was: \u003c500 Internal Server Error\u003e\n09:44:22 [ERROR]   FilteringSubscriptionTest.filterReferenceTest:194-\u003everifyToasterOutOfBreadFilter:201 expected: \u003c200 OK\u003e but was: \u003c400 Bad Request\u003e\n09:44:22 [ERROR]   NotificationSubscriptionListeningTest.testListenModifiedNotification:124 expected: \u003c204 No Content\u003e but was: \u003c500 Internal Server Error\u003e",
+      "revId": "60b5c796829bed6fb4de00edc36509c8342e1237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
