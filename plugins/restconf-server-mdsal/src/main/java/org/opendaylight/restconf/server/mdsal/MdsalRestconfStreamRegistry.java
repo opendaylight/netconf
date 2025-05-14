@@ -342,6 +342,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     protected synchronized ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
             final RestconfStream.SubscriptionFilter filter) {
         final var filterNode = switch (filter) {
+            case null -> null;
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
                 ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->

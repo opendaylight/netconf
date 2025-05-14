@@ -538,7 +538,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public void modifySubscription(final ServerRequest<Subscription> request, final Uint32 id,
-            final SubscriptionFilter filter) {
+            final SubscriptionFilter filter, final Instant stopTime) {
         final var subscription = subscriptions.get(id);
         if (subscription == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
@@ -547,17 +547,26 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         final EventStreamFilter filterImpl;
-        try {
-            filterImpl = resolveFilter(filter);
-        } catch (RequestException e) {
-            request.completeWith(e);
-            return;
+        if (filter != null) {
+            try {
+                filterImpl = resolveFilter(filter);
+            } catch (RequestException e) {
+                request.completeWith(e);
+                return;
+            }
+        } else {
+            filterImpl = null;
         }
 
         Futures.addCallback(modifySubscriptionFilter(id, filter), new FutureCallback<>() {
             @Override
             public void onSuccess(final Void result) {
-                subscription.setFilter(filterImpl);
+                if (filter != null) {
+                    subscription.setFilter(filterImpl);
+                }
+                if (stopTime != null) {
+                    subscription.updateStopTime(stopTime);
+                }
                 request.completeWith(subscription);
             }
 
@@ -577,7 +586,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> modifySubscriptionFilter(Uint32 subscriptionId,
-        SubscriptionFilter filter);
+        @Nullable SubscriptionFilter filter);
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> updateSubscriptionReceivers(Uint32 subscriptionId,
