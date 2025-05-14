@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 @ExtendWith(MockitoExtension.class)
 class MdsalRestconfStreamRegistryTest {
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
-    private static final String STOP_TIME = "2024-10-30T12:34:56Z";
+    private static final Instant STOP_TIME = Instant.parse("2024-10-30T12:34:56Z");
     private static final String STREAM_NAME = "NETCONF";
     private static final String URI = "http://example.com";
     private static final NodeIdentifier URI_NODEID = NodeIdentifier.create(
@@ -94,7 +95,6 @@ class MdsalRestconfStreamRegistryTest {
     @BeforeEach
     void setUp() {
         when(dataBroker.createMergingTransactionChain()).thenReturn(txChain);
-        when(txChain.newWriteOnlyTransaction()).thenReturn(writeTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTx);
         when(schemaService.registerSchemaContextListener(any())).thenReturn(regMock);
@@ -115,6 +115,7 @@ class MdsalRestconfStreamRegistryTest {
         when(request.session()).thenReturn(session);
         when(session.description()).thenReturn(sessionDesc);
         when(sessionDesc.toFriendlyString()).thenReturn("session");
+        when(txChain.newWriteOnlyTransaction()).thenReturn(writeTx);
         registry.establishSubscription(request, "NETCONF", EncodeJson$I.QNAME, null, null);
 
         final var idCap = ArgumentCaptor.forClass(Uint32.class);
