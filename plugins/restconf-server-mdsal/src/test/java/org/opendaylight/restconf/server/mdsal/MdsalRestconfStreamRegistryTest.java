@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 @ExtendWith(MockitoExtension.class)
 class MdsalRestconfStreamRegistryTest {
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
-    private static final String STOP_TIME = "2024-10-30T12:34:56Z";
+    private static final Instant STOP_TIME = Instant.parse("2024-10-30T12:34:56Z");
     private static final String STREAM_NAME = "NETCONF";
     private static final String URI = "http://example.com";
     private static final NodeIdentifier URI_NODEID = NodeIdentifier.create(
