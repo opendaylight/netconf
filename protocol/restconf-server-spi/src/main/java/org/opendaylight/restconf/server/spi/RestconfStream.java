@@ -220,7 +220,8 @@ public final class RestconfStream<T> {
          * @throws NullPointerException if {@code request}, {@code id} or {@code filter} is {@code null}
          */
         @NonNullByDefault
-        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
+        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, @Nullable SubscriptionFilter filter,
+                @Nullable Instant stopTime);
 
         /**
          * Lookup an existing subscription.
