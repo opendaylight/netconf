@@ -549,7 +549,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @Override
     public void modifySubscription(final ServerRequest<Subscription> request, final Uint32 id,
-            final SubscriptionFilter filter) {
+            final SubscriptionFilter filter, final Instant stopTime) {
         final var subscription = subscriptions.get(id);
         if (subscription == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
@@ -565,10 +565,21 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        Futures.addCallback(modifySubscriptionFilter(id, filter), new FutureCallback<>() {
+        if (stopTime != null && !stopTime.isAfter(Instant.now())) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Stop-time must be in future."));
+            return;
+        }
+
+        Futures.addCallback(modifySubscriptionParameters(id, filter, stopTime), new FutureCallback<>() {
             @Override
             public void onSuccess(final Void result) {
                 subscription.setFilter(filterImpl);
+                if (stopTime != null) {
+                    subscription.updateStopTime(stopTime);
+                    subscriptionModified(id, stopTime);
+                }
+
                 request.completeWith(subscription);
             }
 
@@ -669,6 +680,25 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
     }
 
+
+    /**
+     * Handle updates to a subscription's stop time.
+     *
+     * <p>If there is no scheduled task, this method schedules a new one.
+     * If a task is already scheduled, it decides whether to reschedule based on the new stop time.
+     *
+     * @param id the ID of the subscription being modified
+     * @param newStopTime the updated stop time of the subscription; must not be null
+     */
+    @NonNullByDefault
+    private synchronized void subscriptionModified(final Uint32 id, final Instant newStopTime) {
+        if (stopTimeTask == null || nextStopTime == null || newStopTime.isBefore(nextStopTime)) {
+            scheduleStopTimeTask(id, newStopTime);
+        } else if (id.equals(nextSubscriptionToStop) && newStopTime.isAfter(nextStopTime)) {
+            scheduleNextStopTimeTask();
+        }
+    }
+
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> createSubscription(Uint32 subscriptionId, String streamName,
         QName encoding, String receiverName, @Nullable Instant stopTime);
@@ -677,8 +707,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract ListenableFuture<@Nullable Void> removeSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
-    protected abstract ListenableFuture<@Nullable Void> modifySubscriptionFilter(Uint32 subscriptionId,
-        SubscriptionFilter filter);
+    protected abstract ListenableFuture<@Nullable Void> modifySubscriptionParameters(Uint32 subscriptionId,
+        @Nullable SubscriptionFilter filter, @Nullable Instant stopTime);
 
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> updateSubscriptionReceivers(Uint32 subscriptionId,
