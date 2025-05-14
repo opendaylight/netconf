@@ -30,9 +30,9 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
-    private final @Nullable Instant stopTime;
 
     private @NonNull SubscriptionState state;
+    private @Nullable Instant stopTime;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
             final String streamName, final String receiverName, final SubscriptionState state,
@@ -103,6 +103,10 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
             setState(SubscriptionState.END);
             stopTimeRemoveSubscription();
         }
+    }
+
+    public void updateStopTime(final Instant newStopTime) {
+        stopTime = newStopTime;
     }
 
     abstract void stopTimeRemoveSubscription();
