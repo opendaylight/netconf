@@ -133,7 +133,7 @@ public class SubscriptionStateService {
      */
     public ListenableFuture<?> subscriptionModified(final Instant eventTime, final Uint32 id, final String streamName,
             final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
-            final @Nullable String stopTime, final @Nullable String uri) throws InterruptedException {
+            final @Nullable Instant stopTime, final @Nullable String uri) throws InterruptedException {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
         var body = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(State.MODIFIED.nodeId)
@@ -149,7 +149,7 @@ public class SubscriptionStateService {
                 .build());
         }
         if (stopTime != null) {
-            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime));
+            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
         }
         if (uri != null) {
             body.withChild(ImmutableNodes.leafNode(URI_NODEID, uri));

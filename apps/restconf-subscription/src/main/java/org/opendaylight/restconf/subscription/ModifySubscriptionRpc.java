@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -51,6 +52,8 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stop-time").intern());
 
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
@@ -109,6 +112,21 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                 "No filter specified"));
             return;
         }
+        final var stopTime = leaf(body, STOP_TIME, String.class);
+        Instant stopTimeInst;
+        try {
+            stopTimeInst = stopTime == null ? null : Instant.parse(stopTime);
+        } catch (DateTimeParseException e) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+                "Unable to parse time: " + e));
+            return;
+        }
+        if (stopTimeInst != null && !stopTimeInst.isAfter(Instant.now())) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Stop-time must be in future."));
+            return;
+        }
+
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         final var filter = streamFilter == null ? null : EstablishSubscriptionRpc.extractFilter(streamFilter);
         if (filter == null) {
@@ -121,7 +139,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             try {
                 // FIXME: pass correct filter once we extract if from input
                 subscriptionStateService.subscriptionModified(Instant.now(), id, modifiedSubscription.streamName(),
-                    modifiedSubscription.encoding(), null, null, null);
+                    modifiedSubscription.encoding(), null, stopTimeInst,null);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Could not send subscription modify notification", e);
@@ -130,6 +148,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
                 .build();
-        }), id, filter);
+        }), id, filter, stopTimeInst);
     }
 }
