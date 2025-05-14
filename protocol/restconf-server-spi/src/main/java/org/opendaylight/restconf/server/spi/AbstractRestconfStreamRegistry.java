@@ -74,7 +74,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private @Nullable final Instant stopTime;
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter, final @Nullable Instant stopTime) {
+                final TransportSession session, final @Nullable EventStreamFilter filter,
+                final @Nullable Instant stopTime) {
             super(id, encoding, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
             this.filter = filter;
             this.stopTime = stopTime;
@@ -354,17 +355,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onSuccess(final Void result) {
                     final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                         filterImpl, stopTime);
+                        filterImpl, stopTime);
                     subscriptions.put(id, subscription);
                     session.registerResource(new DynSubscriptionResource(subscription));
                     request.completeWith(id);
                 }
 
-            @Override
-            public void onFailure(final Throwable cause) {
-                request.completeWith(new RequestException(cause));
-            }
-        }, MoreExecutors.directExecutor());
+                @Override
+                public void onFailure(final Throwable cause) {
+                    request.completeWith(new RequestException(cause));
+                }
+            }, MoreExecutors.directExecutor());
     }
 
     @NonNullByDefault
