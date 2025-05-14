@@ -311,7 +311,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 }""")));
 
         // Counting how many times we insert items in list
-        verify(spyTx, times(3)).replace(any(), any());
+        verify(spyTx, times(3)).replaceImpl(any(), any());
     }
 
     /**
@@ -371,7 +371,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 }""")));
 
         // Counting how many times we insert items in list
-        verify(spyTx, times(3)).replace(any(), any());
+        verify(spyTx, times(3)).replaceImpl(any(), any());
     }
 
     @Test
