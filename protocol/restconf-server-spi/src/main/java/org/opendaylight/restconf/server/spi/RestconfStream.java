@@ -222,7 +222,8 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * @throws NullPointerException if {@code request}, {@code id} or {@code filter} is {@code null}
          */
         @NonNullByDefault
-        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter);
+        void modifySubscription(ServerRequest<Subscription> request, Uint32 id, SubscriptionFilter filter,
+                @Nullable Instant stopTime);
 
         /**
          * Lookup an existing subscription.

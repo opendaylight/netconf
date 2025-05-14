@@ -10,6 +10,7 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -49,6 +50,8 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stop-time").intern());
 
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
@@ -104,6 +107,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
                 "No filter specified"));
             return;
         }
+
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         final var filter = streamFilter == null ? null : EstablishSubscriptionRpc.extractFilter(streamFilter);
         if (filter == null) {
@@ -112,8 +116,12 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return;
         }
 
+        // check stop-time
+        final var stopTime = leaf(body, STOP_TIME, String.class);
+        final var stopTimeInst = stopTime == null ? null : Instant.parse(stopTime);
+
         streamRegistry.modifySubscription(request.transform(modifiedSubscription -> ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
-            .build()), id, filter);
+            .build()), id, filter, stopTimeInst);
     }
 }
