@@ -41,9 +41,9 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
     private final @NonNull SubscriptionStateService stateService;
-    private final @Nullable Instant stopTime;
-    private final @Nullable ScheduledFuture<?> stopTimeTask;
 
+    private @Nullable Instant stopTime;
+    private @Nullable ScheduledFuture<?> stopTimeTask;
     private @NonNull SubscriptionState state;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
@@ -58,10 +58,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         this.stateService = stateService;
         this.stopTime = stopTime;
         if (stopTime != null) {
-            stopTimeTask = SCHEDULER.schedule(this::stopTimeReached,
-                Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
-        } else {
-            stopTimeTask = null;
+            initializeStopTime();
         }
     }
 
@@ -111,6 +108,11 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         return stopTime;
     }
 
+    private void initializeStopTime() {
+        stopTimeTask = SCHEDULER.schedule(this::stopTimeReached,
+            Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
+    }
+
     private void stopTimeReached()  {
         if (state != SubscriptionState.END) {
             try {
@@ -125,14 +127,19 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         stopTimerTask();
     }
 
+    void updateStopTime(@NonNull final Instant newStopTime) {
+        stopTime = newStopTime;
+        stopTimerTask();
+        initializeStopTime();
+    }
+
     abstract void stopTimeRemoveSubscription();
 
-    protected final void stopTimerTask() {
+    final void stopTimerTask() {
         if (stopTimeTask != null) {
             stopTimeTask.cancel(false);
         }
     }
-
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
