@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -340,8 +341,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected synchronized ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
-            final RestconfStream.SubscriptionFilter filter) {
+            final RestconfStream.SubscriptionFilter filter, Instant stopTime) {
         final var filterNode = switch (filter) {
+            case null -> null;
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
                 ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
@@ -358,18 +360,25 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
         final var pathArg = subscriptionArg(subscriptionId);
         final var tx = txChain.newWriteOnlyTransaction();
-        tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg),
-            ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(pathArg)
-                .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
+        final var node = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(pathArg)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId));
+
+        if (filterNode != null) {
+            node.withChild(ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(TARGET_NODEID)
                 .withChild(ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(TARGET_NODEID)
-                    .withChild(ImmutableNodes.newChoiceBuilder()
-                        .withNodeIdentifier(STREAM_FILTER_NODEID)
-                        .withChild(filterNode)
-                        .build())
+                    .withNodeIdentifier(STREAM_FILTER_NODEID)
+                    .withChild(filterNode)
                     .build())
                 .build());
+        }
+
+        if (stopTime != null) {
+            node.withChild(ImmutableNodes.leafNode(STOP_TIME, stopTime));
+        }
+
+        tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg), node.build());
         return tx.commit().transform(info -> {
             LOG.debug("Modified subscription {} to operational datastore as of {}", subscriptionId, info);
             return null;
