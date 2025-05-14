@@ -34,6 +34,24 @@
       "parentUuid": "0f8c646b_896f8679",
       "revId": "0f471a5cda9fd26736f91c3752805aecaf6a695d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d647a81_c5d5fe33",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-14T07:59:38Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "577d02b9_12a0d5af",
+      "revId": "0f471a5cda9fd26736f91c3752805aecaf6a695d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
