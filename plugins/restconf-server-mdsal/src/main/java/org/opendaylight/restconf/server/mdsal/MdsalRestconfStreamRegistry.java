@@ -310,6 +310,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final RestconfStream.SubscriptionFilter filter) {
 
         final var filterNode = switch (filter) {
+            case null -> null;
             case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
                 ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->

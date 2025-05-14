@@ -21,6 +21,7 @@ import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
@@ -51,6 +52,8 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "target").intern());
     private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
+    private static final NodeIdentifier STOP_TIME =
+        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stop-time").intern());
 
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
@@ -111,9 +114,19 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         }
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         final var filter = streamFilter == null ? null : EstablishSubscriptionRpc.extractFilter(streamFilter);
-        if (filter == null) {
+
+        final var stopTime = leaf(body, STOP_TIME, String.class);
+        final var stopTimeInst = stopTime == null ? null : Instant.parse(stopTime);
+
+        if (stopTimeInst != null && !stopTimeInst.isAfter(Instant.now())) {
+            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Stop-time must be in future!"));
+            return;
+        }
+
+        if (filter == null || stopTime == null) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No filter specified"));
+                "No modifications specified"));
             return;
         }
 
@@ -121,7 +134,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             try {
                 // FIXME: pass correct filter once we extract if from input
                 subscriptionStateService.subscriptionModified(Instant.now(), id, modifiedSubscription.streamName(),
-                    modifiedSubscription.encoding(), null, null, null);
+                    modifiedSubscription.encoding(), null, stopTime, null);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Could not send subscription modify notification", e);
@@ -130,6 +143,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             return ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
                 .build();
-        }), id, filter);
+        }), id, filter, stopTimeInst);
     }
 }
