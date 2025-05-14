@@ -41,9 +41,9 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
     private final @NonNull SubscriptionStateService stateService;
-    private final @Nullable Instant stopTime;
-    private final @Nullable ScheduledFuture<?> stopTimeTask;
 
+    private @Nullable Instant stopTime;
+    private @Nullable ScheduledFuture<?> stopTimeTask;
     private @NonNull SubscriptionState state;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
@@ -58,16 +58,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         this.stateService = stateService;
         this.stopTime = stopTime;
         if (stopTime != null) {
-            final var delay = Duration.between(Instant.now(), stopTime).toSeconds();
-            if (delay > 0){
-                stopTimeTask = SCHEDULER.schedule(this::stopTimeReached, delay, TimeUnit.SECONDS);
-            }
-            else {
-                this.state = SubscriptionState.END;
-                stopTimeTask = null;
-            }
-        } else {
-            stopTimeTask = null;
+            initializeStopTime();
         }
     }
 
@@ -117,6 +108,11 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         return stopTime;
     }
 
+    private void initializeStopTime() {
+            stopTimeTask = SCHEDULER.schedule(this::stopTimeReached,
+                Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
+    }
+
     private void stopTimeReached()  {
         if (state != SubscriptionState.END){
             try {
@@ -131,9 +127,15 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
         stopTimerTask();
     }
 
-    protected abstract void stopTimeRemoveSubscription();
+    void updateStopTime(@NonNull final Instant newStopTime){
+        stopTime = newStopTime;
+        stopTimerTask();
+        initializeStopTime();
+    }
 
-    protected final void stopTimerTask() {
+    abstract void stopTimeRemoveSubscription();
+
+    final void stopTimerTask() {
         if (stopTimeTask != null) {
             stopTimeTask.cancel(false);
         }
