@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.it.subscription;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -22,6 +23,7 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
@@ -52,23 +54,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
      */
     @Test
     void subscriptionStopTimeTerminationTest() throws Exception {
-        final var stopTime = Instant.now().plus(Duration.ofSeconds(2));
-        // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
-            String.format("""
-                {
-                  "input": {
-                    "stream": "NETCONF",
-                    "encoding": "encode-json",
-                    "stop-time": "%s"
-                  }
-                }""", stopTime), MediaTypes.APPLICATION_YANG_DATA_JSON);
-        assertEquals(HttpResponseStatus.OK, response.status());
-
-        // Extract subscription ID from response
-        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
-        final var subscriptionId = jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
+        final var subscriptionId = establishSubscription(Instant.now().plus(Duration.ofSeconds(2)));
 
         // Start listening on notifications
         final var eventListener = startSubscriptionStream(String.valueOf(subscriptionId));
@@ -89,5 +75,85 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
 
         // Assert exception when try to listen to subscription after it should be terminated
         assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream(String.valueOf(subscriptionId)));
+    }
+
+    /**
+     * Tests that modifying a subscription's stop-time to an earlier value correctly updates its lifecycle.
+     * Initially, the first subscription has a later stop-time than the second.
+     * After modification, it should terminate before the second one.
+     */
+    @Disabled("Disabled until filtering is implemented in NETCONF-1436")
+    @Test
+    void subscriptionStopModifiedTest() throws Exception {
+
+        final var subscriptionId1 = establishSubscription(Instant.now().plus(Duration.ofHours(1)));
+        final var subscriptionId2 = establishSubscription(Instant.now().plus(Duration.ofSeconds(8)));
+
+        // Start listening on notifications
+        final var eventListener1 = startSubscriptionStream(String.valueOf(subscriptionId1));
+        final var eventListener2 = startSubscriptionStream(String.valueOf(subscriptionId2));
+
+        // modify the first subscription to have earlier stop time than the second one
+        final var modifyInput = String.format("""
+            {
+              "input": {
+                "id": "%s",
+                "stream-subtree-filter": {
+                  "toasterOutOfBread": {
+                  }
+                },
+                "stop-time": "%s"
+              }
+            }""", subscriptionId1, Instant.now().plus(Duration.ofSeconds(2)));
+        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+
+        assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
+
+        final var notification1 = Awaitility.await().atMost(3, TimeUnit.SECONDS).until(eventListener1::readNext,
+            Objects::nonNull);
+
+        JSONAssert.assertEquals(String.format("""
+            {
+              "ietf-restconf:notification": {
+                "ietf-subscribed-notifications:subscription-terminated": {
+                  "id": "%s",
+                  "reason" : "ietf-subscribed-notifications:no-such-subscription"
+                }
+              }
+            }
+            """, subscriptionId1), notification1, JSONCompareMode.LENIENT);
+
+        assertNull(eventListener2.readNext()); // there should be no notification for second subscription for now
+
+        final var notification2 = Awaitility.await().atMost(10, TimeUnit.SECONDS).until(eventListener2::readNext,
+            Objects::nonNull);
+
+        JSONAssert.assertEquals(String.format("""
+            {
+              "ietf-restconf:notification": {
+                "ietf-subscribed-notifications:subscription-terminated": {
+                  "id": "%s",
+                  "reason" : "ietf-subscribed-notifications:no-such-subscription"
+                }
+              }
+            }
+            """, subscriptionId2), notification2, JSONCompareMode.LENIENT);
+    }
+
+    private String establishSubscription(Instant stopTime) throws Exception {
+        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            String.format("""
+            {
+              "input": {
+                "stream": "NETCONF",
+                "encoding": "encode-json",
+                "stop-time": "%s"
+              }
+            }""", stopTime), MediaTypes.APPLICATION_YANG_DATA_JSON);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        return new JSONObject(response.content().toString(StandardCharsets.UTF_8))
+            .getJSONObject("ietf-subscribed-notifications:output").getString("id");
     }
 }
