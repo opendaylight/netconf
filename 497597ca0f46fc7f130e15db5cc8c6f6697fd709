@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1be89bc_ab44b880",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-14T06:08:55Z",
+      "side": 1,
+      "message": "EVENT_TIME  is used when publishing notification, FORMATTED_EVENT_TIME when we assert result. Tx.",
+      "parentUuid": "1fb815c0_41796293",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc87f583_5b4e55cf",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "I\u0027m not sure if I understood you about UTC related, but this ZoneId.systemDefault() has to be here to get local time. This is because something similar is done somewhere when notifications are sent - that caused issue when comparing to Instant in first place - different format. Also time zone can\u0027t be hardcoded - formatted time will be different depending on system\u0027s time zone. If you change your local time on PC and run test then event time in notification will be different.",
       "parentUuid": "bc87f583_5b4e55cf",
+      "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed9c6340_9adea039",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-14T06:08:55Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "493feec2_583ec218",
       "revId": "497597ca0f46fc7f130e15db5cc8c6f6697fd709",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
