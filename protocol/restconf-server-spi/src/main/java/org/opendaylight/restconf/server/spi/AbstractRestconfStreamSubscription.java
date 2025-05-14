@@ -43,9 +43,9 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
     private final @NonNull SubscriptionStateService stateService;
-    private final @Nullable Instant stopTime;
 
     private @NonNull SubscriptionState state;
+    private @Nullable Instant stopTime;
     private @Nullable ScheduledFuture<?> stopTimeTask;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
@@ -117,6 +117,12 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     void startStopTimeTask() {
         stopTimeTask = SCHEDULER.schedule(this::stopTimeReached,
             Duration.between(Instant.now(), stopTime).toSeconds(), TimeUnit.SECONDS);
+    }
+
+    void updateStopTime(@NonNull final Instant newStopTime) {
+        stopTime = newStopTime;
+        terminateStopTimeTask();
+        startStopTimeTask();
     }
 
     final void terminateStopTimeTask() {
