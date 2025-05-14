@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,7 +95,6 @@ class MdsalRestconfStreamRegistryTest {
     @BeforeEach
     void setUp() {
         when(dataBroker.createMergingTransactionChain()).thenReturn(txChain);
-        when(txChain.newWriteOnlyTransaction()).thenReturn(writeTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTx);
         when(schemaService.registerSchemaContextListener(any())).thenReturn(regMock);
@@ -115,6 +115,7 @@ class MdsalRestconfStreamRegistryTest {
         when(request.session()).thenReturn(session);
         when(session.description()).thenReturn(sessionDesc);
         when(sessionDesc.toFriendlyString()).thenReturn("session");
+        when(txChain.newWriteOnlyTransaction()).thenReturn(writeTx);
         registry.establishSubscription(request, "NETCONF", EncodeJson$I.QNAME, null, null);
 
         final var idCap = ArgumentCaptor.forClass(Uint32.class);
@@ -154,7 +155,7 @@ class MdsalRestconfStreamRegistryTest {
     void testSubscriptionStateEventsXml(final MdsalRestconfStreamRegistry.State type) {
         final var notification = switch (type) {
             case MODIFIED -> MdsalRestconfStreamRegistry.subscriptionModified(ID, STREAM_NAME, EncodeXml$I.QNAME, null,
-                STOP_TIME, URI);
+                Instant.parse(STOP_TIME), URI);
             case RESUMED -> MdsalRestconfStreamRegistry.subscriptionResumed(ID);
             case TERMINATED -> MdsalRestconfStreamRegistry.subscriptionTerminated(ID,
                 SubscriptionTerminatedReason.QNAME);
