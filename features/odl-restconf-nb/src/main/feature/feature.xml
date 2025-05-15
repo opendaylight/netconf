@@ -12,6 +12,7 @@
         <feature version="[14,15)">odl-mdsal-model-rfc7317-iana-crypt-hash</feature>
         <feature version="[14,15)">odl-mdsal-model-rfc7407-ietf-x509-cert-to-name</feature>
         <feature version="[14,15)">odl-mdsal-model-rfc8341</feature>
+        <feature version="[14,15)">odl-mdsal-model-rfc8650</feature>
         <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.cfg">
             mvn:org.opendaylight.netconf/restconf-nb/${project.version}/cfg/config
         </configfile>
