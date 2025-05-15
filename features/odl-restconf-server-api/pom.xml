@@ -23,13 +23,19 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8040-ietf-restconf-monitoring</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>odl-mdsal-model-rfc8072</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-rfc8040-ietf-restconf-monitoring</artifactId>
+            <artifactId>odl-mdsal-model-rfc8639</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
