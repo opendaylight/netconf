@@ -138,12 +138,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-notification</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-restconf</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
