@@ -9,7 +9,7 @@ package org.opendaylight.netconf.databind.subtree;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.commons.text.StringEscapeUtils;
+import com.google.common.xml.XmlEscapers;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 
@@ -119,6 +119,6 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
     }
 
     private static void appendAttributeData(final StringBuilder sb, final String str) {
-        sb.append('"').append(StringEscapeUtils.escapeXml10(str)).append('"');
+        sb.append('"').append(XmlEscapers.xmlAttributeEscaper().escape(str)).append('"');
     }
 }
