@@ -63,6 +63,30 @@
       },
       "revId": "37db811e4656cde5ba66bf9d898757fb54fbc644",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23439524_3a368d8a",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-15T18:45:03Z",
+      "side": 1,
+      "message": "Done in previous patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116542/1",
+      "parentUuid": "52097592_304a444f",
+      "range": {
+        "startLine": 1051,
+        "startChar": 24,
+        "endLine": 1051,
+        "endChar": 100
+      },
+      "revId": "37db811e4656cde5ba66bf9d898757fb54fbc644",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
