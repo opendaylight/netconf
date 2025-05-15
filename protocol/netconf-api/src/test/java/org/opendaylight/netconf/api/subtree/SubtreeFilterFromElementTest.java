@@ -117,7 +117,7 @@ class SubtreeFilterFromElementTest {
                 <filter type="subtree">
                   <t:top xmlns:t="http://example.com/schema/1.2/config">
                     <t:interfaces>
-                      <t:interface t:ifName="eth0&apos;&lt;&gt;&quot;&amp;abc"/>
+                      <t:interface t:ifName="eth0&apos;&lt;&gt;&quot;&amp;apos;"/>
                     </t:interfaces>
                   </t:top>
                 </filter>""", SubtreeFilter.builder()
@@ -125,7 +125,7 @@ class SubtreeFilterFromElementTest {
                         .add(ContainmentNode.builder(new Exact(NAMESPACE, "interfaces"))
                             .add(SelectionNode.builder(new Exact(NAMESPACE, "interface"))
                                 .add(new AttributeMatch(new Exact(NAMESPACE, "ifName"),
-                                    "eth0'<>\"&abc")).build())
+                                    "eth0'<>\"&apos;")).build())
                             .build())
                         .build())
                     .build())
