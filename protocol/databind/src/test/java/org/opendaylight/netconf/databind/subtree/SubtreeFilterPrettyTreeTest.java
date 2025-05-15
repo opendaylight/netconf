@@ -140,7 +140,7 @@ class SubtreeFilterPrettyTreeTest {
                 <filter type="subtree">
                   <a:top xmlns:a="http://example.com/schema/1.2/config">
                     <a:interfaces>
-                      <a:interface a:ifName="eth0&apos;&lt;&gt;&quot;&amp;abc"/>
+                      <a:interface a:ifName="eth0&apos;&lt;&gt;&quot;&amp;apos;"/>
                     </a:interfaces>
                   </a:top>
                 </filter>""", SubtreeFilter.builder(databindContext)
@@ -148,7 +148,7 @@ class SubtreeFilterPrettyTreeTest {
                     .add(ContainmentNode.builder(new NamespaceSelection.Exact(INTERFACES_QNAME))
                         .add(SelectionNode.builder(new NamespaceSelection.Exact(INTERFACE_QNAME))
                             .add(new AttributeMatch(new NamespaceSelection.Exact(IFNAME_QNAME),
-                                "eth0'<>\"&abc")).build())
+                                "eth0'<>\"&apos;")).build())
                         .build())
                     .build())
                 .build()),

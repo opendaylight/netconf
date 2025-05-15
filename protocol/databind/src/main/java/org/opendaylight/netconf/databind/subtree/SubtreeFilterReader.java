@@ -15,7 +15,6 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.subtree.NamespaceSelection.Exact;
@@ -192,9 +191,7 @@ final class SubtreeFilterReader {
                                         .currentStatement())));
                             if (node instanceof TypedDataSchemaNode typed) {
                                 try {
-                                    // unescape characters before parsing them
-                                    final var unescaped = StringEscapeUtils.unescapeXml(text);
-                                    final var value = codec.codecFor(typed, entry).parseValue(nsContext, unescaped);
+                                    final var value = codec.codecFor(typed, entry).parseValue(nsContext, text);
                                     nameValueMap.put(node.getQName(), value);
                                     LOG.debug("Successfully parsed value for {} node.", node.getQName());
                                 } catch (IllegalArgumentException e) {
