@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6440a5a7_72be490d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-15T09:53:19Z",
+      "side": 1,
+      "message": "shouldn\u0027t subscriber.removeRegistration() be also called here?\n\nI don\u0027t see subscriber being removed when created by addReceiver() otherwise.",
+      "revId": "081f57041f6124416168ec85fdafa42d09452876",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
