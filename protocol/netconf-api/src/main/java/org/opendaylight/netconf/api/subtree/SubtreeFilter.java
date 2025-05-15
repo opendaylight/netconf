@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.subtree.NamespaceSelection.Exact;
@@ -90,8 +89,7 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
                     subtreeFilterBuilder.add(fillSelection(domXml));
                 } else {
                     // add content
-                    subtreeFilterBuilder.add(new ContentMatchNode(getNamespaceSelection(domXml), StringEscapeUtils
-                        .unescapeXml(content)));
+                    subtreeFilterBuilder.add(new ContentMatchNode(getNamespaceSelection(domXml), content));
                 }
             } else {
                 // create containment
@@ -125,8 +123,7 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
                     builder.add(fillSelection(child.getDomElement()));
                 } else {
                     // add content
-                    builder.add(new ContentMatchNode(getNamespaceSelection(domChild), StringEscapeUtils
-                        .unescapeXml(content))).build();
+                    builder.add(new ContentMatchNode(getNamespaceSelection(domChild), content)).build();
                 }
             } else {
                 // add containment
@@ -167,7 +164,7 @@ public final class SubtreeFilter implements Immutable, SiblingSet, PrettyTreeAwa
                 }
                 // add attribute
                 attributeMatches.add(new AttributeMatch(new Exact(attribute.getNamespaceURI(),
-                    attribute.getLocalName()), StringEscapeUtils.unescapeXml(attribute.getNodeValue())));
+                    attribute.getLocalName()), attribute.getNodeValue()));
             }
         }
         return attributeMatches;

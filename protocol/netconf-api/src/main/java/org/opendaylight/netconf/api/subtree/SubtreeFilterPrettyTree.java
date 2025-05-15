@@ -9,7 +9,7 @@ package org.opendaylight.netconf.api.subtree;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.commons.text.StringEscapeUtils;
+import com.google.common.xml.XmlEscapers;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 
 /**
@@ -46,7 +46,7 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
             final ContentMatchNode node) {
         startSibling(sb, depth, prefixes, node);
         appendIndent(sb.append(">\n"), depth + 1);
-        sb.append(node.value()).append('\n');
+        sb.append(XmlEscapers.xmlContentEscaper().escape(node.value())).append('\n');
         endSibling(sb, depth, prefixes, node);
     }
 
@@ -122,6 +122,6 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
 
     private static void appendAttributeData(final StringBuilder sb, final String str) {
         // Escape special characters in string and append it
-        sb.append('"').append(StringEscapeUtils.escapeXml10(str)).append('"');
+        sb.append('"').append(XmlEscapers.xmlAttributeEscaper().escape(str)).append('"');
     }
 }
