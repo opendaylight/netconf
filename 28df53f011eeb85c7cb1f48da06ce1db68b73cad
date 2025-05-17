@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d50ab89_70e56537",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 1041,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-05-17T08:40:58Z",
+      "side": 1,
+      "message": "remove fixme",
+      "range": {
+        "startLine": 1041,
+        "startChar": 6,
+        "endLine": 1041,
+        "endChar": 12
+      },
+      "revId": "28df53f011eeb85c7cb1f48da06ce1db68b73cad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce39af98_36bfb5af",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 1058,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-05-17T08:40:58Z",
+      "side": 1,
+      "message": "implied to be non-null",
+      "range": {
+        "startLine": 1058,
+        "startChar": 28,
+        "endLine": 1058,
+        "endChar": 44
+      },
+      "revId": "28df53f011eeb85c7cb1f48da06ce1db68b73cad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
