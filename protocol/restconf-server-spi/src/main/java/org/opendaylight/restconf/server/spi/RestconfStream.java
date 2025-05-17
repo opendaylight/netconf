@@ -29,6 +29,8 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
+import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -539,18 +541,20 @@ public final class RestconfStream<T> {
 
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
-        return addSubscriber(new Subscriber<>(this, handler, formatter, filter));
+        return addSubscriber(new Rfc8040Subscriber<>(this, handler, formatter, filter));
     }
 
     @NonNullByDefault
-    @Nullable Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding)
-            throws UnsupportedEncodingException {
-        return addSubscriber(new Subscriber<>(this, handler, getFactory(encoding).getFormatter(TextParameters.EMPTY),
+    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
+            final String receiverName) throws UnsupportedEncodingException {
+        return addSubscriber(new Rfc8639Subscriber<>(this, handler,
+            getFactory(encoding).getFormatter(TextParameters.EMPTY),
             // FIXME: receive filter
-            AcceptingEventFilter.instance()));
+            AcceptingEventFilter.instance(),
+            receiverName));
     }
 
-    private @Nullable Subscriber<T> addSubscriber(final @NonNull Subscriber<T> subscriber) {
+    private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.add(subscriber);

@@ -16,22 +16,94 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.yang.common.Uint64;
 
 /**
  * A single subscriber to an {@link RestconfStream}.
+ *
+ * @param <T> event type
  */
 @NonNullByDefault
-final class Subscriber<T> extends AbstractRegistration {
-    private static final VarHandle EER_VH;
-    private static final VarHandle SER_VH;
+abstract sealed class Subscriber<T> extends AbstractRegistration {
+    /**
+     * A {@link Subscriber} established via the <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.3">RFC8040</a>
+     * mechanism.
+     *
+     * @param <T> event type
+     */
+    static final class Rfc8040Subscriber<T> extends Subscriber<T> {
+        Rfc8040Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
+                final EventFilter<T> filter) {
+            super(stream, sender, formatter, filter);
+        }
 
-    static {
-        final var lookup = MethodHandles.lookup();
-        try {
-            EER_VH = lookup.findVarHandle(Subscriber.class, "excludedEventRecords", long.class);
-            SER_VH = lookup.findVarHandle(Subscriber.class, "sentEventRecords", long.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new ExceptionInInitializerError(e);
+        @Override
+        void sendDataMessage(final @Nullable String data) {
+            if (data != null) {
+                sender().sendDataMessage(data);
+            }
+        }
+    }
+
+    /**
+     * A {@link Subscriber} established via the <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.6">RFC8639</a>
+     * mechanism.
+     *
+     * @param <T> event type
+     */
+    static final class Rfc8639Subscriber<T> extends Subscriber<T> {
+        private static final VarHandle EER_VH;
+        private static final VarHandle SER_VH;
+
+        static {
+            final var lookup = MethodHandles.lookup();
+            try {
+                EER_VH = lookup.findVarHandle(Rfc8639Subscriber.class, "excludedEventRecords", long.class);
+                SER_VH = lookup.findVarHandle(Rfc8639Subscriber.class, "sentEventRecords", long.class);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new ExceptionInInitializerError(e);
+            }
+        }
+
+        private final String receiverName;
+
+        @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
+        private long excludedEventRecords;
+        @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
+        private long sentEventRecords;
+
+        Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
+                final EventFilter<T> filter, final String receiverName) {
+            super(stream, sender, formatter, filter);
+            this.receiverName = requireNonNull(receiverName);
+        }
+
+        @Override
+        void sendDataMessage(final @Nullable String data) {
+            final VarHandle vh;
+            if (data != null) {
+                sender().sendDataMessage(data);
+                vh = SER_VH;
+            } else {
+                vh = EER_VH;
+            }
+            vh.getAndAdd(this, 1L);
+        }
+
+        String receiverName() {
+            return receiverName;
+        }
+
+        Uint64 excludedEventRecords() {
+            return readCounter(EER_VH);
+        }
+
+        Uint64 sentEventRecords() {
+            return readCounter(SER_VH);
+        }
+
+        private Uint64 readCounter(final VarHandle vh) {
+            return Uint64.fromLongBits((long) vh.getAcquire(this));
         }
     }
 
@@ -39,11 +111,6 @@ final class Subscriber<T> extends AbstractRegistration {
     private final EventFormatter<T> formatter;
     private final EventFilter<T> filter;
     private final Sender sender;
-
-    @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
-    private long excludedEventRecords;
-    @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
-    private long sentEventRecords;
 
     Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
             final EventFilter<T> filter) {
@@ -53,41 +120,26 @@ final class Subscriber<T> extends AbstractRegistration {
         this.filter = requireNonNull(filter);
     }
 
-    EventFilter<T> filter() {
+    final EventFilter<T> filter() {
         return filter;
     }
 
-    EventFormatter<T> formatter() {
+    final EventFormatter<T> formatter() {
         return formatter;
     }
 
-    Sender sender() {
+    final Sender sender() {
         return sender;
     }
 
-    void sendDataMessage(final @Nullable String data) {
-        if (data != null) {
-            sender.sendDataMessage(data);
-            SER_VH.getAndAdd(this, 1L);
-        } else {
-            EER_VH.getAndAdd(this, 1L);
-        }
-    }
+    abstract void sendDataMessage(@Nullable String data);
 
-    void endOfStream() {
+    final void endOfStream() {
         sender.endOfStream();
     }
 
-    long excludedEventRecords() {
-        return (long) EER_VH.getAcquire(this);
-    }
-
-    long sentEventRecords() {
-        return (long) SER_VH.getAcquire(this);
-    }
-
     @Override
-    protected void removeRegistration() {
+    protected final void removeRegistration() {
         stream.removeSubscriber(this);
     }
 }

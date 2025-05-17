@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,6 +38,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
+import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
@@ -84,7 +86,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
-        private final ConcurrentMap<String, Subscriber<?>> receivers = new ConcurrentHashMap<>();
+        private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
+
         private @Nullable EventStreamFilter filter;
 
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
@@ -117,15 +120,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 return;
             }
 
-            final var receiverName = newReceiverName(session.description(), request.principal());
-            if (receivers.containsKey(receiverName)) {
-                request.completeWith(new RequestException("Receiver named '%s' already exists", receiverName));
-                return;
-            }
-
-            final Subscriber<?> newSubscriber;
+            final Rfc8639Subscriber<?> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encodingName());
+                newSubscriber = stream.addSubscriber(sender, encodingName(),
+                    newReceiverName(session.description(), request.principal()));
             } catch (UnsupportedEncodingException e) {
                 request.completeWith(new RequestException(e));
                 return;
@@ -136,29 +134,29 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 return;
             }
 
-            receivers.put(receiverName, newSubscriber);
+            receivers.add(newSubscriber);
             Futures.addCallback(updateOperationalDatastore(), new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
                     request.completeWith(new AbstractRegistration() {
                         @Override
                         protected void removeRegistration() {
-                            removeReceiver(receiverName, newSubscriber);
+                            removeReceiver(newSubscriber);
                         }
                     });
                 }
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    receivers.remove(receiverName, newSubscriber);
+                    receivers.remove(newSubscriber);
                     newSubscriber.close();
                     request.completeWith(new RequestException(cause));
                 }
             }, MoreExecutors.directExecutor());
         }
 
-        private void removeReceiver(final String receiverName, final Subscriber<?> subscriber) {
-            receivers.remove(receiverName, subscriber);
+        private void removeReceiver(final Rfc8639Subscriber<?> subscriber) {
+            receivers.remove(subscriber);
             subscriber.close();
             updateOperationalDatastore();
         }
@@ -170,13 +168,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @NonNullByDefault
         MapNode createReceivers() {
             final var list = new ArrayList<MapEntryNode>();
-            for (var entry : receivers.entrySet()) {
-                final var subscriber = entry.getValue();
-                list.add(receiverNode(entry.getKey(), State.Active, subscriber.sentEventRecords(),
+            for (var subscriber : receivers) {
+                list.add(receiverNode(subscriber.receiverName(), State.Active, subscriber.sentEventRecords(),
                     subscriber.excludedEventRecords()));
             }
             if (list.isEmpty()) {
-                list.add(receiverNode(receiverName(), State.Suspended, 0, 0));
+                list.add(receiverNode(receiverName(), State.Suspended, Uint64.ZERO, Uint64.ZERO));
             }
 
             final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(RECEIVER_NODEID);
@@ -185,13 +182,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         @NonNullByDefault
-        private static MapEntryNode receiverNode(final String receiverName, final State state, final long sentEvents,
-                final long excludedEvents) {
+        private static MapEntryNode receiverNode(final String receiverName, final State state, final Uint64 sentEvents,
+                final Uint64 excludedEvents) {
             return ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(receiverArg(receiverName))
                 .withChild(ImmutableNodes.leafNode(NAME_NODEID, receiverName))
-                .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, Uint64.fromLongBits(sentEvents)))
-                .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, Uint64.fromLongBits(excludedEvents)))
+                .withChild(ImmutableNodes.leafNode(SENT_EVENT_RECORDS_NODEID, sentEvents))
+                .withChild(ImmutableNodes.leafNode(EXCLUDED_EVENT_RECORDS_NODEID, excludedEvents))
                 .withChild(ImmutableNodes.leafNode(STATE_NODEID, state.getName()))
                 .build();
         }
