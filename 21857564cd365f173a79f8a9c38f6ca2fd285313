@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a2b10e3_6ebc83e9",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-05-19T07:53:04Z",
+      "side": 0,
+      "message": "we should not be losing this test, but rather should have a test which asserts that resolveStrategy() picks up the DOMServerStrategy if it is present",
+      "range": {
+        "startLine": 503,
+        "startChar": 9,
+        "endLine": 503,
+        "endChar": 51
+      },
+      "revId": "21857564cd365f173a79f8a9c38f6ca2fd285313",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
