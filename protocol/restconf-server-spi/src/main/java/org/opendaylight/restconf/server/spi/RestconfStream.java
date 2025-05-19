@@ -322,6 +322,10 @@ public abstract sealed class RestconfStream<T> permits LegacyRestconfStream, Def
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
+        @Nullable QName terminated() {
+            return (QName) TERMINATED_VH.getVolatile(this);
+        }
+
         @Override
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
