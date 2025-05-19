@@ -7,13 +7,18 @@
  */
 package org.opendaylight.restconf.it.subscription;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
+import org.awaitility.core.ConditionTimeoutException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -151,6 +156,12 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         JSONAssert.assertEquals(TERMINATED_NOTIFICATION, eventListener.readNext(), JSONCompareMode.LENIENT);
+
+        // Assert exception when try to listen to subscription after it should be terminated
+        assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream("2147483648"));
+        // Verify notification listening ended
+        await().atMost(Duration.ofSeconds(5)).until(eventListener::ended);
+        assertTrue(eventListener.ended());
     }
 
     /**
