@@ -206,6 +206,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} terminated", id);
                     subscriptions.remove(id, DynSubscription.this);
+                    DynSubscription.this.receivers.values().forEach(subscriber -> {
+                        subscriber.endOfStream();
+                        subscriber.close();
+                    });
                     request.completeWith(Empty.value());
                 }
 
