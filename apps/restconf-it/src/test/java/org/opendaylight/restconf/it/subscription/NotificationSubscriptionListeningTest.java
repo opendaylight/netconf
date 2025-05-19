@@ -7,11 +7,14 @@
  */
 package org.opendaylight.restconf.it.subscription;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
@@ -151,6 +154,8 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         JSONAssert.assertEquals(TERMINATED_NOTIFICATION, eventListener.readNext(), JSONCompareMode.LENIENT);
+        await().atMost(Duration.ofSeconds(5)).until(eventListener::ended);
+        assertTrue(eventListener.ended());
     }
 
     /**
