@@ -336,6 +336,10 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
 
         protected abstract void stopTimeReached();
 
+        @Nullable QName terminated() {
+            return (QName) TERMINATED_VH.getVolatile(this);
+        }
+
         @Override
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();

@@ -7,8 +7,10 @@
  */
 package org.opendaylight.restconf.it.subscription;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -120,5 +122,9 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
 
         // Assert exception when try to listen to subscription after it should be terminated
         assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream(String.valueOf(subscriptionId)));
+
+        // Verify notification listening ended
+        await().atMost(Duration.ofSeconds(5)).until(eventListener::ended);
+        assertTrue(eventListener.ended());
     }
 }
