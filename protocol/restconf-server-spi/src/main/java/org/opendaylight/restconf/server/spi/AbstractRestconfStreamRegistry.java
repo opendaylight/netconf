@@ -164,6 +164,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         private ListenableFuture<Void> updateOperationalDatastore() {
+            if (terminated != null) {
+                // it is possible this Subscription was already terminated, in which case we don't want to
+                // update datastore as whole subscription should already be deleted.
+                return Futures.immediateVoidFuture();
+            }
             return updateSubscriptionReceivers(id(), createReceivers());
         }
 
@@ -206,6 +211,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onSuccess(final Void result) {
                     LOG.debug("Subscription {} terminated", id);
                     subscriptions.remove(id, DynSubscription.this);
+                    DynSubscription.this.receivers.values().forEach(Subscriber::endOfStream);
                     request.completeWith(Empty.value());
                 }
 
