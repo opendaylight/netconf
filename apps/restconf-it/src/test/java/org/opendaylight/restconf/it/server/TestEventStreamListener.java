@@ -44,7 +44,7 @@ public final class TestEventStreamListener implements EventStreamListener {
         ended = true;
     }
 
-    boolean ended() {
+    public boolean ended() {
         return ended;
     }
 }
