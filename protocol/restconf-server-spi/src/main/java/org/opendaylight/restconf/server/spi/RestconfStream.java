@@ -239,7 +239,7 @@ public abstract sealed class RestconfStream<T> permits LegacyRestconfStream, Def
     public abstract static class Subscription {
         @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
             justification = "https://github.com/spotbugs/spotbugs/issues/2749")
-        private volatile QName terminated;
+        volatile QName terminated;
 
         /**
          * Returns the {@code subscription id}.
