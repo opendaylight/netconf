@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48678cb3_3c5ea7f6",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-20T10:55:17Z",
+      "side": 1,
+      "message": "indent\nor one line?",
+      "revId": "48135a6518d3bd8315d9969c0183d8f0269c0351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a481a6da_4a9531c1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-20T10:55:17Z",
+      "side": 1,
+      "message": "assertThrows?",
+      "revId": "48135a6518d3bd8315d9969c0183d8f0269c0351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ee9da99_8bde98d5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-20T10:55:17Z",
+      "side": 1,
+      "message": "indent",
+      "revId": "48135a6518d3bd8315d9969c0183d8f0269c0351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
