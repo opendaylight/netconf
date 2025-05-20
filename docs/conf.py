@@ -14,4 +14,5 @@ from docs_conf.conf import *
 
 linkcheck_ignore = [
     'http://localhost',
+    r'https://git\.opendaylight\.org/gerrit/admin/repos/.*',
 ]
