@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -27,6 +28,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,6 +66,7 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
+import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -72,12 +75,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
 @ExtendWith(MockitoExtension.class)
-final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
+final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(
         YangParserTestUtils.parseYangResourceDirectory("/modules"));
     private static final YangInstanceIdentifier CONT_IID = YangInstanceIdentifier.of(CONT_QNAME);
@@ -95,18 +100,23 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private DOMMountPointService mountPointService;
     @Mock
     private DOMMountPoint mountPoint;
+    @Mock
+    private EffectiveModelContext mockSchemaContext;
 
-    @Override
-    RestconfStrategy newDataOperations(final DatabindContext databind) {
-        return new MdsalRestconfStrategy(databind, dataBroker);
+    private @NonNull MdsalRestconfStrategy modulesStrategy() {
+        return new MdsalRestconfStrategy(MODULES_DATABIND, dataBroker);
     }
 
-    private @NonNull RestconfStrategy modulesStrategy() {
-        return newDataOperations(MODULES_DATABIND);
+    private MdsalRestconfStrategy jukeboxDataOperations() {
+        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, dataBroker);
+    }
+
+    private MdsalRestconfStrategy mockDataOperations() {
+        return new MdsalRestconfStrategy(DatabindContext.ofModel(mockSchemaContext), dataBroker);
     }
 
     @Override
-    RestconfStrategy testDeleteDataStrategy() {
+    ServerDataOperations testDeleteDataStrategy() {
         // assert that data to delete exists
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
@@ -116,7 +126,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testNegativeDeleteDataStrategy() {
+    ServerDataOperations testNegativeDeleteDataStrategy() {
         // assert that data to delete does NOT exist
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
@@ -125,7 +135,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
+    ServerDataOperations testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
@@ -134,7 +144,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
+    ServerDataOperations testPostDataFailStrategy(final DOMException domException) {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateFailedFluentFuture(domException)).when(readWrite).commit();
@@ -222,7 +232,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPostContainerDataStrategy() {
+    ServerDataOperations testPostContainerDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
@@ -231,35 +241,35 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchContainerDataStrategy() {
+    ServerDataOperations testPatchContainerDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxDataOperations();
     }
 
     @Override
-    RestconfStrategy testPatchLeafDataStrategy() {
+    ServerDataOperations testPatchLeafDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxDataOperations();
     }
 
     @Override
-    RestconfStrategy testPatchListDataStrategy() {
+    ServerDataOperations testPatchListDataStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxDataOperations();
     }
 
     @Override
-    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy(final MapNode artistList) {
+    ServerDataOperations testPatchDataReplaceMergeAndRemoveStrategy(final MapNode artistList) {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxDataOperations();
     }
 
     @Override
-    RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
+    ServerDataOperations testPatchDataCreateAndDeleteStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
@@ -268,14 +278,14 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchMergePutContainerStrategy() {
+    ServerDataOperations testPatchMergePutContainerStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxDataOperations();
     }
 
     @Override
-    RestconfStrategy deleteNonexistentDataTestStrategy() {
+    ServerDataOperations deleteNonexistentDataTestStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         return jukeboxDataOperations();
@@ -293,7 +303,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataConfigTestStrategy() {
+    ServerDataOperations readDataConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -301,7 +311,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
+    ServerDataOperations readAllHavingOnlyConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -311,7 +321,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
+    ServerDataOperations readAllHavingOnlyNonConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
@@ -321,7 +331,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataNonConfigTestStrategy() {
+    ServerDataOperations readDataNonConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
@@ -329,7 +339,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readContainerDataAllTestStrategy() {
+    ServerDataOperations readContainerDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -339,7 +349,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
+    ServerDataOperations readContainerDataConfigNoValueOfContentTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -349,7 +359,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readListDataAllTestStrategy() {
+    ServerDataOperations readListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
@@ -359,7 +369,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readOrderedListDataAllTestStrategy() {
+    ServerDataOperations readOrderedListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
@@ -369,7 +379,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readUnkeyedListDataAllTestStrategy() {
+    ServerDataOperations readUnkeyedListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
@@ -379,7 +389,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readLeafListDataAllTestStrategy() {
+    ServerDataOperations readLeafListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, LEAF_SET_NODE_PATH);
@@ -389,7 +399,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readOrderedLeafListDataAllTestStrategy() {
+    ServerDataOperations readOrderedLeafListDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, LEAF_SET_NODE_PATH);
@@ -399,10 +409,25 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
+    ServerDataOperations readDataWrongPathOrNoContentTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.empty())).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH_2);
         return mockDataOperations();
+    }
+
+    @Override
+    NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations dataOperations) {
+        if (dataOperations instanceof MdsalRestconfStrategy mdsalRestconfStrategy) {
+            try {
+                mdsalRestconfStrategy.readData(getServerRequest, content, path, null);
+                return getServerRequest.getResult().orElse(null);
+            } catch (TimeoutException | InterruptedException | RequestException e) {
+                throw new AssertionError(e);
+            }
+        } else {
+            fail("Wrong ServerDataOperations type" + dataOperations);
+            return null;
+        }
     }
 
     @Test
