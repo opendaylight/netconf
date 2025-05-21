@@ -14,7 +14,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYang;
 
 import com.google.common.util.concurrent.Futures;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -24,11 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -98,13 +99,11 @@ class NC1495Test {
 
     @Test
     void testListOrderInNetconfRestconfStrategy() throws Exception {
-        final var restconfStrategy = new NetconfRestconfStrategy(DATABIND, netconfService);
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).getConfig(CONTAINER_INSTANCE,
-            List.of());
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).get(CONTAINER_INSTANCE,
-            List.of());
-        final var optionalNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_PATH, null, List.of())
-            .get(2, TimeUnit.SECONDS);
+        final var dataOperations = new NetconfDataOperations(netconfService);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).getConfig(CONTAINER_INSTANCE);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).get(CONTAINER_INSTANCE);
+        final var optionalNode = dataOperations.readData(CONTAINER_PATH,
+                DataGetParams.of(QueryParameters.of(ContentParam.ALL))).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
