@@ -16,7 +16,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYang;
 
 import com.google.common.util.concurrent.Futures;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -108,6 +109,7 @@ class NC1495Test {
         .build();
     private static final YangInstanceIdentifier CONTAINER_INSTANCE = YangInstanceIdentifier.of(CONTAINER_QNAME);
     private static final Data CONTAINER_PATH = ROOT.enterPath(CONTAINER_INSTANCE);
+    private static final DataGetParams ALL_PARAMS = DataGetParams.of(QueryParameters.of(ContentParam.ALL));
 
     @Mock
     private NetconfDataTreeService netconfService;
@@ -117,14 +119,12 @@ class NC1495Test {
     private DOMDataTreeReadTransaction readTransaction;
 
     @Test
-    void testListOrderInNetconfRestconfStrategy() throws Exception {
-        final var restconfStrategy = new NetconfRestconfStrategy(DATABIND, netconfService);
+    void testListOrderInNetconfDataOperation() throws Exception {
+        final var dataOperations = new NetconfDataOperations(netconfService);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService)
-            .getConfig(CONTAINER_INSTANCE, List.of());
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService).get(CONTAINER_INSTANCE,
-            List.of());
-        final var optionalNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_PATH, null, List.of())
-            .get(2, TimeUnit.SECONDS);
+            .getConfig(CONTAINER_INSTANCE);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService).get(CONTAINER_INSTANCE);
+        final var optionalNode = dataOperations.readData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
@@ -133,14 +133,13 @@ class NC1495Test {
     }
 
     @Test
-    void testLeafListOrderInNetconfRestconfStrategy() throws Exception {
-        final var restconfStrategy = new NetconfRestconfStrategy(DATABIND, netconfService);
+    void testLeafListOrderInNetconfDataOperation() throws Exception {
+        final var dataOperations = new NetconfDataOperations(netconfService);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
-            .getConfig(CONTAINER_INSTANCE, List.of());
+            .getConfig(CONTAINER_INSTANCE);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
-            .get(CONTAINER_INSTANCE, List.of());
-        final var optionalNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_PATH, null, List.of())
-            .get(2, TimeUnit.SECONDS);
+            .get(CONTAINER_INSTANCE);
+        final var optionalNode = dataOperations.readData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
