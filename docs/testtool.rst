@@ -59,7 +59,7 @@ Building testtool
 ^^^^^^^^^^^^^^^^^
 
 1. Check out latest NETCONF repository from
-   `git clone <https://git.opendaylight.org/gerrit/admin/repos/netconf>`__
+   `git clone <https://git.opendaylight.org/gerrit/netconf>`__
 
 2. Move into the ``opendaylight/netconf/tools/netconf-testtool/`` folder
 
