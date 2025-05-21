@@ -19,12 +19,14 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -35,7 +37,9 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -507,6 +511,40 @@ public final class RestconfStream<T> {
     }
 
     /**
+     * Bridges a registry-level {@link AbstractRestconfStreamRegistry.EventStreamFilter}
+     * to the per-receiver {@link EventFilter} API.  The current notification streams
+     * publish {@link ContainerNode} payloads, so that is the concrete type we bind to.
+     */
+    static final class EventStreamFilterAdapter<T> extends EventFilter<T> {
+        private final AbstractRestconfStreamRegistry.EventStreamFilter delegate;
+
+        EventStreamFilterAdapter(final AbstractRestconfStreamRegistry.EventStreamFilter delegate) {
+            this.delegate = requireNonNull(delegate);
+        }
+
+        @Override
+        boolean matches(final EffectiveModelContext ctx, final T event) {
+           //– Notification streams: event is DOMNotification
+            final ContainerNode body;
+            if (event instanceof DOMNotification notif) {
+                body = notif.getBody();
+            } else if (event instanceof ContainerNode cn) {
+                body = cn;
+            } else {
+                // Unknown payload -> let it through
+                return true;
+            }
+            // Path-aware filtering will come later → empty() for now
+            return delegate.test(YangInstanceIdentifier.empty(), body);
+        }
+
+        @Override
+        protected ToStringHelper addToStringAttributes(final ToStringHelper h) {
+            return h.add("delegate", delegate);
+        }
+    }
+
+    /**
      * Registers {@link Sender} subscriber.
      *
      * @param handler SSE session handler.
@@ -546,12 +584,19 @@ public final class RestconfStream<T> {
 
     @NonNullByDefault
     @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
-            final String receiverName) throws UnsupportedEncodingException {
+            final String receiverName, final EventFilter<T> filter) throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
-            getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            // FIXME: receive filter
-            AcceptingEventFilter.instance(),
+            getFactory(encoding).getFormatter(TextParameters.EMPTY), filter,
             receiverName));
+    }
+
+    // 3-argument convenience overload – delegates to the one above
+    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler,
+        final EncodingName encoding,
+        final String receiverName) throws UnsupportedEncodingException {
+
+        return addSubscriber(handler, encoding, receiverName,
+            AcceptingEventFilter.instance());
     }
 
     private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
