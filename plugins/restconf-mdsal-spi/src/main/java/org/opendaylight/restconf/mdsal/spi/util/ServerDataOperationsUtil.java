@@ -84,6 +84,15 @@ public final class ServerDataOperationsUtil {
 
     public static @NonNull RequestException decodeException(final Throwable ex, final String txType,
             final Data dataPath) {
+        if (ex instanceof RequestException requestException) {
+            LOG.trace("Operation via Restconf transaction {} at path {} was not executed because of: {}",
+                txType, dataPath.instance(), requestException.getMessage());
+            return requestException;
+        }
+        if (ex instanceof NetconfDocumentedException netconfError) {
+            return new RequestException(netconfError.getErrorType(), netconfError.getErrorTag(),
+                netconfError.getMessage(), dataPath.toErrorPath(), ex);
+        }
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
