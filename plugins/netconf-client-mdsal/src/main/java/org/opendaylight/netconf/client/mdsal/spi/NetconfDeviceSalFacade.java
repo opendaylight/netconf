@@ -18,6 +18,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +60,12 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
         final var databind = deviceSchema.databind();
         final var deviceRpc = services.rpcs();
 
-        final var netconfDataTree = AbstractNetconfDataTreeService.of(id, databind, deviceRpc, sessionPreferences,
-            lockDatastore);
         final var netconfDataBroker = new NetconfDeviceDataBroker(id, databind, deviceRpc, sessionPreferences,
             lockDatastore);
-
-        mount.onDeviceConnected(databind.modelContext(), new NetconfRestconfStrategy(databind, netconfDataTree),
-            services, netconfDataBroker, netconfDataTree);
+        final var netconfDataOperations = NetconfDataOperations.of(id, databind, deviceRpc, sessionPreferences,
+            lockDatastore);
+        mount.onDeviceConnected(databind.modelContext(), netconfDataOperations,
+            services, netconfDataBroker, null);
     }
 
     @Override
