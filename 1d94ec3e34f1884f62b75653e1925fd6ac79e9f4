@@ -22,6 +22,30 @@
       },
       "revId": "1d94ec3e34f1884f62b75653e1925fd6ac79e9f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "115eafe3_cce4f0c7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-21T16:14:15Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0671c995_9d359970",
+      "range": {
+        "startLine": 203,
+        "startChar": 32,
+        "endLine": 203,
+        "endChar": 69
+      },
+      "revId": "1d94ec3e34f1884f62b75653e1925fd6ac79e9f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
