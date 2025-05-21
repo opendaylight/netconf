@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "002e5a9d_bba0746a",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 1041,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-21T12:34:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d50ab89_70e56537",
+      "range": {
+        "startLine": 1041,
+        "startChar": 6,
+        "endLine": 1041,
+        "endChar": 12
+      },
+      "revId": "28df53f011eeb85c7cb1f48da06ce1db68b73cad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce39af98_36bfb5af",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-05-17T08:40:58Z",
       "side": 1,
       "message": "implied to be non-null",
+      "range": {
+        "startLine": 1058,
+        "startChar": 28,
+        "endLine": 1058,
+        "endChar": 44
+      },
+      "revId": "28df53f011eeb85c7cb1f48da06ce1db68b73cad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a984e009_b676502b",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 1058,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-21T12:34:50Z",
+      "side": 1,
+      "message": "The patchData method sending here null in the DataBindPath parameter:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116542/5/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java#532\n\nTo resolve it, I have used first option:\n\n1)\nWe can use global PATH from the URI, which does not match the path provided in the PatchEntity. However, we are creating a global exception in every case because we cannot tell which PatchEntity fails.\n\n2)\nWe can keep this check here for non-null (patch-set 5):\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116542/5/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java#1054\n\nUntil we will be able to tell error-path for PatchEntity which fails. For example, with this fix:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115378/19/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java#557",
+      "parentUuid": "ce39af98_36bfb5af",
       "range": {
         "startLine": 1058,
         "startChar": 28,
