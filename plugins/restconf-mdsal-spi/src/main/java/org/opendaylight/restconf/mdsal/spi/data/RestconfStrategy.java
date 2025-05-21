@@ -596,7 +596,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
     }
 
-    private static void checkListAndOrderedType(final Data path) throws RequestException {
+    public static void checkListAndOrderedType(final Data path) throws RequestException {
         final var dataSchemaNode = path.schema().dataSchemaNode();
         if (dataSchemaNode instanceof ListSchemaNode listSchema) {
             if (!listSchema.isUserOrdered()) {
