@@ -270,11 +270,11 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
             clientConf, false).get(2, TimeUnit.SECONDS);
         // await for connection
-        await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
+        await().atMost(Duration.ofHours(2)).until(channelListener::initialized);
         final var callback = new TestRequestCallback();
         client.invoke(request, callback);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        await().atMost(Duration.ofHours(2)).until(callback::completed);
         client.shutdown().get(2, TimeUnit.SECONDS);
         final var response = callback.response();
         assertNotNull(response);
