@@ -54,6 +54,15 @@ public record RequestError(
             extractErrorInfo(rpcError));
     }
 
+    public static RequestError ofRpcError(final RpcError rpcError, final ErrorPath path) {
+        final var tag = rpcError.getTag();
+        final var errorTag = tag != null ? tag : ErrorTag.OPERATION_FAILED;
+        final var errorMessage = rpcError.getMessage();
+        return new RequestError(rpcError.getErrorType(), errorTag,
+            errorMessage != null ? new ErrorMessage(errorMessage) : null, rpcError.getApplicationTag(), path,
+            extractErrorInfo(rpcError));
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).omitNullValues()
