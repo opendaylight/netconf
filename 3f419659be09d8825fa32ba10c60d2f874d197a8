@@ -34,6 +34,24 @@
       "parentUuid": "9af34ba7_d733f558",
       "revId": "3f419659be09d8825fa32ba10c60d2f874d197a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33b01ffa_731f29bd",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-21T12:23:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c769da61_23c3f1f6",
+      "revId": "3f419659be09d8825fa32ba10c60d2f874d197a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
