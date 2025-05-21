@@ -18,7 +18,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @param <T> the type of events
  */
 @NonNullByDefault
-public abstract sealed class EventFilter<T> permits AcceptingEventFilter, XPathEventFilter {
+public abstract sealed class EventFilter<T> permits AcceptingEventFilter, RestconfStream.EventStreamFilterAdapter,
+        XPathEventFilter {
 
     abstract boolean matches(EffectiveModelContext modelContext, T event);
 

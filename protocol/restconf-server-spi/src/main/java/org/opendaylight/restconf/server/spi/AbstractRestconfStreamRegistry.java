@@ -122,8 +122,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             final Rfc8639Subscriber<?> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encodingName(),
-                    newReceiverName(session.description(), request.principal()));
+                final var eventFilter = filter() == null ? AcceptingEventFilter.instance()
+                    : new RestconfStream.EventStreamFilterAdapter(filter());
+
+                newSubscriber = stream.addSubscriber(sender, encodingName(), newReceiverName(session.description(),
+                    request.principal()), eventFilter);
             } catch (UnsupportedEncodingException e) {
                 request.completeWith(new RequestException(e));
                 return;
