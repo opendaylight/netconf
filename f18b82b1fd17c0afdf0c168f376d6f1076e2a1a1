@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe83ab4e_f01c9ec6",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-21T12:24:47Z",
+      "side": 1,
+      "message": "and this one :)",
+      "revId": "f18b82b1fd17c0afdf0c168f376d6f1076e2a1a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
