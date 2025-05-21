@@ -16,6 +16,24 @@
       "message": "no more valid path, should be ``opendaylight/netconf/usecase/netconf-testtool/``",
       "revId": "3f419659be09d8825fa32ba10c60d2f874d197a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c769da61_23c3f1f6",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-21T12:22:53Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116574",
+      "parentUuid": "9af34ba7_d733f558",
+      "revId": "3f419659be09d8825fa32ba10c60d2f874d197a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
