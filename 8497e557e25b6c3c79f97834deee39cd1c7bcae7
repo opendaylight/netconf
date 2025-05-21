@@ -52,6 +52,24 @@
       "parentUuid": "6094b4aa_07a31a99",
       "revId": "8497e557e25b6c3c79f97834deee39cd1c7bcae7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "689780a7_0e8a7da5",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-05-21T07:38:44Z",
+      "side": 1,
+      "message": "Probably this is not an option for:\nhttps://git.opendaylight.org/gerrit/admin/repos/coretutorials\n\ndeveloper-guide: line   40) broken    https://git.opendaylight.org/gerrit/admin/repos/coretutorials - 403 Client Error: Forbidden for url: https://git.opendaylight.org/gerrit/admin/repos/coretutorials\n\nCould be this issue related to \"ongoing infrastructure improvements\" with a new bot protection mechanisms?",
+      "parentUuid": "6b66aa81_03c36569",
+      "revId": "8497e557e25b6c3c79f97834deee39cd1c7bcae7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
