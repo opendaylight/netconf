@@ -61,7 +61,7 @@ Building testtool
 1. Check out latest NETCONF repository from
    `git clone <https://git.opendaylight.org/gerrit/admin/repos/netconf>`__
 
-2. Move into the ``opendaylight/netconf/tools/netconf-testtool/`` folder
+2. Move into the ``netconf/usecase/netconf-testtool/`` folder
 
 3. Build testtool using the ``mvn clean install`` command
 
@@ -77,7 +77,7 @@ Running testtool
 ^^^^^^^^^^^^^^^^
 
 1. After successfully building or downloading, move into the
-   ``opendaylight/netconf/tools/netconf-testtool/target/`` folder and
+   ``netconf/usecase/netconf-testtool/target/`` folder and
    there is file ``netconf-testtool-[VERSION]-executable.jar`` (or
    if downloaded from nexus just take that \*-executable.jar file)
 
