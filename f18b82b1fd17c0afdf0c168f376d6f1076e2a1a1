@@ -16,6 +16,24 @@
       "message": "and this one :)",
       "revId": "f18b82b1fd17c0afdf0c168f376d6f1076e2a1a1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48301cb2_ae411d5c",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-21T12:38:59Z",
+      "side": 1,
+      "message": "The maven artifact location is the same (group/artifact id).",
+      "parentUuid": "fe83ab4e_f01c9ec6",
+      "revId": "f18b82b1fd17c0afdf0c168f376d6f1076e2a1a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
