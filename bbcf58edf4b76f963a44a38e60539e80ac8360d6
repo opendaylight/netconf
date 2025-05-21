@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "601e154b_0a7d588a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-21T12:21:31Z",
+      "side": 1,
+      "message": "This provider and similar usages are temporary and will be removed",
+      "range": {
+        "startLine": 224,
+        "startChar": 105,
+        "endLine": 224,
+        "endChar": 132
+      },
+      "revId": "bbcf58edf4b76f963a44a38e60539e80ac8360d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
