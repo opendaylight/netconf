@@ -86,7 +86,6 @@ public class NetconfDeviceMount implements AutoCloseable {
 
         final var rpcs = services.rpcs();
         mountBuilder.addService(NetconfRpcService.class, rpcs);
-
         final ServerRpcOperations rpcOps;
         if (rpcs instanceof Rpcs.Normalized normalized) {
             mountBuilder.addService(DOMRpcService.class, normalized.domRpcService());
@@ -107,6 +106,10 @@ public class NetconfDeviceMount implements AutoCloseable {
             actionOps = NotSupportedServerActionOperations.INSTANCE;
         }
 
+        if (dataTreeService != null) {
+            mountBuilder.addService(NetconfDataTreeService.class, dataTreeService);
+        }
+
         mountBuilder.addService(DOMServerStrategy.class, new DOMServerStrategy(new CompositeServerStrategy(databind,
             NotSupportedServerMountPointResolver.INSTANCE, actionOps, dataOps,
             NotSupportedServerModulesOperations.INSTANCE, rpcOps)));
@@ -114,9 +117,7 @@ public class NetconfDeviceMount implements AutoCloseable {
         if (broker != null) {
             mountBuilder.addService(DOMDataBroker.class, broker);
         }
-        if (dataTreeService != null) {
-            mountBuilder.addService(NetconfDataTreeService.class, dataTreeService);
-        }
+
         mountBuilder.addService(DOMNotificationService.class, newNotificationService);
         notificationService = newNotificationService;
 
