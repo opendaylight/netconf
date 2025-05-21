@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b66aa81_03c36569",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-21T06:07:35Z",
+      "side": 1,
+      "message": "maybe we can use anonymous https in this case:\ngit clone \"https://git.opendaylight.org/gerrit/netconf\"",
+      "revId": "8497e557e25b6c3c79f97834deee39cd1c7bcae7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
