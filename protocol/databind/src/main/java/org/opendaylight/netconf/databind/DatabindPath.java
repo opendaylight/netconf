@@ -110,6 +110,21 @@ public sealed interface DatabindPath {
             this(databind, Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of(),
                 databind.schemaTree().getRoot());
         }
+
+        /**
+         * Retrieves the parent non-null {@link Data} object.
+         *
+         * @return The parent {@link Data} object, in case of Datastore (root value) return this object.
+         * @throws IllegalArgumentException If the parent path exists but cannot be resolved within the schema tree.
+         */
+        public Data parent() {
+            final var parentPath = instance.getParent();
+            if (parentPath == null) {
+                return this;
+            }
+            final var childAndStack = databind.schemaTree().enterPath(parentPath).orElseThrow();
+            return new Data(databind, childAndStack.stack().toInference(), parentPath, childAndStack.node());
+        }
     }
 
     /**

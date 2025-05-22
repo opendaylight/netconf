@@ -76,9 +76,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     @Override
     public void deleteData(final ServerRequest<Empty> request, final Data path) {
         final var tx = prepareWriteExecution();
-        final var instance = path.instance();
         try {
-            tx.delete(instance);
+            tx.delete(path.instance());
         } catch (RequestException e) {
             tx.cancel();
             request.completeWith(e);
@@ -93,7 +92,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "DELETE", instance));
+                request.completeWith(decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -115,12 +114,13 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             fieldPaths = null;
         }
 
+        final var instance = path.instance();
         final NormalizedNode node;
         try {
             if (fieldPaths != null) {
-                node = readData(params.content(), path.instance(), params.withDefaults(), fieldPaths);
+                node = readData(params.content(), instance, params.withDefaults(), fieldPaths);
             } else {
-                node = readData(params.content(), path.instance(), params.withDefaults());
+                node = readData(params.content(), instance, params.withDefaults());
             }
         } catch (RequestException e) {
             request.completeWith(e);
