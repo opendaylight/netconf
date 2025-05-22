@@ -84,24 +84,23 @@ public final class XmlPatchBody extends PatchBody {
                 stack.exit();
             }
 
-            final var targetPath = targetData.instance();
-
             if (requiresValue(oper)) {
                 final var resultHolder = new NormalizationResultHolder();
                 final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final var xmlParser = XmlParserStream.create(writer, resource.path.databind().xmlCodecs(), inference);
                 xmlParser.traverse(new DOMSource(firstValueElement));
 
+                final var targetPath = targetData.instance();
                 final var result = resultHolder.getResult().data();
                 // for lists/leaf-list allow to manipulate with items through their parent
                 if (targetPath.getLastPathArgument() instanceof NodeIdentifierWithPredicates
                         || targetPath.getLastPathArgument() instanceof NodeWithValue<?>) {
-                    entities.add(new PatchEntity(editId, oper, targetPath.getParent(), result));
+                    entities.add(new PatchEntity(editId, oper, targetData.parent(), result));
                 } else {
-                    entities.add(new PatchEntity(editId, oper, targetPath, result));
+                    entities.add(new PatchEntity(editId, oper, targetData, result));
                 }
             } else {
-                entities.add(new PatchEntity(editId, oper, targetPath));
+                entities.add(new PatchEntity(editId, oper, targetData));
             }
         }
 
