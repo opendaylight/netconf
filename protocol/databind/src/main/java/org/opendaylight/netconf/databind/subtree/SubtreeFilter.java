@@ -21,6 +21,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**
@@ -97,6 +98,30 @@ public final class SubtreeFilter implements Immutable, PrettyTreeAware, SiblingS
      */
     public void writeTo(final XMLStreamWriter writer) throws XMLStreamException {
         SubtreeFilterWriter.writeSubtreeFilter(writer, this);
+    }
+
+    public boolean permitsQName(final QName qname) {
+        return permitsQName(qname, this);
+    }
+
+    private static boolean permitsQName(final QName qname, final SiblingSet node) {
+        for (var contentMatch : node.contentMatches()) {
+            if (contentMatch.selection().matches(qname)) {
+                return true;
+            }
+        }
+        for (var selection : node.selections()) {
+            if (selection.selection().matches(qname)) {
+                return true;
+            }
+        }
+        // first check the node itself, then recurse
+        for (var containment : node.containments()) {
+            if (containment.selection().matches(qname) || permitsQName(qname, containment)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public DatabindContext databind() {
