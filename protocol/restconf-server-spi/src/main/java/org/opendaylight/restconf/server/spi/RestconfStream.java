@@ -320,6 +320,9 @@ public final class RestconfStream<T> {
         }
 
         @NonNullByDefault
+        public abstract void publishStateNotif(String message);
+
+        @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
         @Override

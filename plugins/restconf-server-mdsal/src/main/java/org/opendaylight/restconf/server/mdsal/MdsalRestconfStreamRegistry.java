@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -43,17 +44,32 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
+import org.opendaylight.restconf.mdsal.spi.NotificationSource;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
+import org.opendaylight.restconf.server.spi.TextParameters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionResumed;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspended;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspendedReason;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminated;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
@@ -64,6 +80,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.Receivers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -74,7 +91,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedAnydata;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -112,6 +131,42 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
     private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
+    /**
+     * {@link NodeIdentifier} of {@code leaf reason} in {@link SubscriptionSuspended} and
+     * {@link SubscriptionTerminated}. Value domains are identities derived from {@link SubscriptionSuspendedReason} and
+     * {@link SubscriptionTerminatedReason}.
+     */
+    private static final NodeIdentifier REASON_NODEID =
+        NodeIdentifier.create(QName.create(Subscription.QNAME, "reason").intern());
+    /**
+     * {@link NodeIdentifier} of {@code leaf stop-time} in {@link SubscriptionModified}. Value domain is
+     * {@link String} as expressed in {@link DateAndTime}.
+     */
+    private static final NodeIdentifier STOP_TIME_NODEID =
+        NodeIdentifier.create(QName.create(Subscription.QNAME, "stop-time").intern());
+    /**
+     * {@link NodeIdentifier} of {@link Subscription1#getUri()}.
+     */
+    private static final NodeIdentifier URI_NODEID = NodeIdentifier.create(
+        org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117
+            .YangModuleInfoImpl.qnameOf("uri"));
+
+    /**
+     * Subscription states. Each is backed by a notification in {@code ietf-subscribed-notifications}.
+     */
+    @NonNullByDefault
+    private enum State {
+        RESUMED(SubscriptionResumed.QNAME),
+        MODIFIED(SubscriptionModified.QNAME),
+        TERMINATED(SubscriptionTerminated.QNAME),
+        SUSPENDED(SubscriptionSuspended.QNAME);
+
+        final NodeIdentifier nodeId;
+
+        State(final QName qname) {
+            nodeId = NodeIdentifier.create(qname);
+        }
+    }
 
     private final ScheduledExecutorService updateCounters;
     private final DOMDataBroker dataBroker;
@@ -329,7 +384,67 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     public synchronized ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
         final var tx = txChain.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
-        return mapFuture(tx.commit());
+        return tx.commit().transform(info -> {
+            final var subscription = lookupSubscription(subscriptionId);
+            final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(subscription.encoding()),
+                "Error getting formatter for encoding {}", subscription.encoding());
+            final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionTerminated(subscriptionId,
+                NoSuchSubscription.QNAME), Instant.now());
+            LOG.debug("Publishing terminated state notification for subscription with ID: {}", subscriptionId);
+            final var formattedNotification = formatStateNotification(eventFormatter, notificationBody);
+            if (formattedNotification != null && !formattedNotification.isEmpty()) {
+                subscription.publishStateNotif(formattedNotification);
+            }
+            return null;
+        }, MoreExecutors.directExecutor());
+    }
+
+    /**
+     * Used to format {@link DOMNotification} into XML or JSON string ready to be sent to receivers.
+     *
+     * <p>Separate instance of formatter is used because subscription encoding is related to subscription itself and
+     * applied to all subscribers that will receive state notification. This means formatting of state notification can
+     * be done once and resulting string message then sent directly to all receivers.
+     *
+     * <p>Reusing {@link EventFormatter} stored inside receivers are not recommended because subscribing to
+     * DataTreeChange will result in different formatter for different notifications that overcomplicates logic without
+     * added value. For that reason separate formatter instance is used.
+     *
+     * @param eventFormatter formatter that transforms notification into {@link String} message
+     * @param notificationBody notification to format
+     * @return {@link String} state notification already formatted according to encoding
+     */
+    @SuppressWarnings("checkstyle:illegalCatch")
+    private @Nullable String formatStateNotification(final EventFormatter<DOMNotification> eventFormatter,
+            final DOMNotificationEvent notificationBody) {
+        try {
+            return eventFormatter.eventData(databindProvider.currentDatabind().modelContext(), notificationBody,
+                notificationBody.getEventInstant());
+        } catch (Exception e) {
+            LOG.error("Failed to format state notification", e);
+            return null;
+        }
+    }
+
+    /**
+     * Get separate instance of {@link EventFormatter} from {@link NotificationSource} to format {@link DOMNotification}
+     * into string message according to encoding.
+     *
+     * @param encoding formatter encoding
+     * @return {@link EventFormatter} formatter used to format state notifications
+     */
+    private static EventFormatter<DOMNotification> getStateNotifEventFormatter(final QName encoding) {
+        if (EncodeJson$I.QNAME.equals(encoding)) {
+            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_JSON)
+                .newFormatter(TextParameters.EMPTY);
+        } else if (EncodeXml$I.QNAME.equals(encoding)) {
+            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_XML)
+                .newFormatter(TextParameters.EMPTY);
+        } else {
+            // this should not happen
+            LOG.error("", encoding);
+            return null;
+        }
     }
 
     private static @NonNull ListenableFuture<@Nullable Void> mapFuture(
@@ -377,6 +492,16 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
         return tx.commit().transform(info -> {
             LOG.debug("Modified subscription {} to operational datastore as of {}", subscriptionId, info);
+            final var subscription = lookupSubscription(subscriptionId);
+            final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(subscription.encoding()),
+                "Error getting formatter for encoding {}", subscription.encoding());
+            final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionModified(subscriptionId,
+                    subscription.streamName(), subscription.encoding(), null, null, null), Instant.now());
+            LOG.debug("Publishing modified state notification for subscription with ID: {}", subscriptionId);
+            final var formattedNotification = formatStateNotification(eventFormatter, notificationBody);
+            if (formattedNotification != null && !formattedNotification.isEmpty()) {
+                subscription.publishStateNotif(formattedNotification);
+            }
             return null;
         }, MoreExecutors.directExecutor());
     }
@@ -432,5 +557,106 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @NonNullByDefault
     private static NodeIdentifierWithPredicates subscriptionArg(final Uint32 subscriptionId) {
         return NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, subscriptionId);
+    }
+
+    /**
+     * Builds a notification body for subscription modified state notification.
+     *
+     * @param id         the subscription ID
+     * @param streamName the subscription stream name
+     * @param encoding   the optional subscription encoding
+     * @param filter     the optional subscription filter
+     * @param stopTime   the optional subscription stop time
+     * @param uri        the optional subscription uri
+     * @return {@link ContainerNode} notification body
+     */
+    private static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
+            final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
+            final @Nullable String stopTime, final @Nullable String uri) {
+        LOG.debug("Publishing subscription modified notification for ID: {}", id);
+        final var body = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(State.MODIFIED.nodeId)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+            .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName));
+        if (encoding != null) {
+            body.withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding));
+        }
+        // FIXME handle filter properly
+        if (filter != null) {
+            body.withChild(ImmutableNodes.newAnydataBuilder(NormalizedAnydata.class)
+                .withNodeIdentifier(STREAM_SUBTREE_FILTER_NODEID)
+                .withValue(filter)
+                .build());
+        }
+        if (stopTime != null) {
+            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime));
+        }
+        if (uri != null) {
+            body.withChild(ImmutableNodes.leafNode(URI_NODEID, uri));
+        }
+        return body.build();
+    }
+
+    /**
+     * Creates body for state notification indicating the subscription was terminated.
+     *
+     * @param id        the subscription ID
+     * @return {@link ContainerNode} notification body for terminated subscription state
+     */
+    private static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
+        return buildErrorStateNotification(id, reason, State.TERMINATED);
+    }
+
+    /**
+     * Creates body for state notification indicating the subscription was suspended.
+     *
+     * @param id        the subscription ID
+     * @return {@link ContainerNode} state notification body for suspended subscription
+     */
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
+    private static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
+        return buildErrorStateNotification(id, reason, State.TERMINATED);
+    }
+
+    /**
+     * Builds an error state notification body.
+     *
+     * @param id          the subscription ID
+     * @param errorReason reason for the error
+     * @param state       subscription state
+     * @return {@link ContainerNode} error state notification body
+     */
+    private static ContainerNode buildErrorStateNotification(final Uint32 id,
+            final QName errorReason, final State state) {
+        return ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(state.nodeId)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+            .withChild(ImmutableNodes.leafNode(REASON_NODEID, errorReason))
+            .build();
+    }
+
+    /**
+     * Creates body for state notification indicating the subscription was resumed.
+     *
+     * @param id        the subscription ID
+     * @return {@link ContainerNode} state notification body for resumed subscription
+     */
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
+    private static ContainerNode subscriptionResumed(final Uint32 id) {
+        return buildStateNotification(id, State.RESUMED);
+    }
+
+    /**
+     * Builds generic state notification body.
+     *
+     * @param id          the subscription ID
+     * @param state       subscription state
+     * @return {@link ContainerNode} generic state notification body
+     */
+    private static ContainerNode buildStateNotification(final Uint32 id, final State state) {
+        return ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(state.nodeId)
+            .withChild(ImmutableNodes.leafNode(ID_NODEID, id))
+            .build();
     }
 }
