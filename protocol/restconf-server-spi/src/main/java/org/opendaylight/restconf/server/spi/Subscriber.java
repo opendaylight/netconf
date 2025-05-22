@@ -66,6 +66,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         }
 
         private final String receiverName;
+        private final AbstractRestconfStreamRegistry.EventStreamFilter eventStreamFilter;
 
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long excludedEventRecords;
@@ -73,9 +74,11 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         private long sentEventRecords;
 
         Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
-                final EventFilter<T> filter, final String receiverName) {
+                final EventFilter<T> filter, final String receiverName,
+                final AbstractRestconfStreamRegistry.EventStreamFilter eventStreamFilter) {
             super(stream, sender, formatter, filter);
             this.receiverName = requireNonNull(receiverName);
+            this.eventStreamFilter = eventStreamFilter;
         }
 
         @Override
@@ -104,6 +107,10 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         private Uint64 readCounter(final VarHandle vh) {
             return Uint64.fromLongBits((long) vh.getAcquire(this));
+        }
+
+        public AbstractRestconfStreamRegistry.EventStreamFilter eventStreamFilter() {
+            return eventStreamFilter;
         }
     }
 

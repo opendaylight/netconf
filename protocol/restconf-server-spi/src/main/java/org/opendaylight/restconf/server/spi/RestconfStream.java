@@ -546,12 +546,11 @@ public final class RestconfStream<T> {
 
     @NonNullByDefault
     @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
-            final String receiverName) throws UnsupportedEncodingException {
+            final String receiverName, AbstractRestconfStreamRegistry.EventStreamFilter eventStreamFilter)
+            throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
             getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            // FIXME: receive filter
-            AcceptingEventFilter.instance(),
-            receiverName));
+            AcceptingEventFilter.instance(), receiverName, eventStreamFilter));
     }
 
     private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {

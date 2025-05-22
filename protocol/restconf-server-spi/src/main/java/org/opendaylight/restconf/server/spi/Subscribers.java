@@ -17,6 +17,8 @@ import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +84,16 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
-            subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
-                ? format(subscriber.formatter(), modelContext, input, now) : null);
+            if (subscriber instanceof Subscriber.Rfc8639Subscriber<T> rfc8639Subscriber
+                && rfc8639Subscriber.eventStreamFilter() != null) {
+                if (input instanceof DOMNotification domNotification) {
+                    subscriber.sendDataMessage(rfc8639Subscriber.eventStreamFilter().test(YangInstanceIdentifier.of(),
+                        domNotification.getBody()) ? format(subscriber.formatter(), modelContext, input, now) : null);
+                }
+            } else {
+                subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
+                    ? format(subscriber.formatter(), modelContext, input, now) : null);
+            }
         }
     }
 
@@ -121,7 +131,17 @@ abstract sealed class Subscribers<T> {
             for (var entry : subscribers.asMap().entrySet()) {
                 final var formatted = format(entry.getKey(), modelContext, input, now);
                 for (var subscriber : entry.getValue()) {
-                    subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input) ? formatted : null);
+                    if (subscriber instanceof Subscriber.Rfc8639Subscriber<T> rfc8639Subscriber
+                        && rfc8639Subscriber.eventStreamFilter() != null) {
+                        if (input instanceof DOMNotification domNotification) {
+                            subscriber.sendDataMessage(rfc8639Subscriber.eventStreamFilter()
+                                .test(YangInstanceIdentifier.of(), domNotification.getBody())
+                                ? format(subscriber.formatter(), modelContext, input, now) : null);
+                        }
+                    } else {
+                        subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
+                            ? formatted : null);
+                    }
                 }
             }
         }
