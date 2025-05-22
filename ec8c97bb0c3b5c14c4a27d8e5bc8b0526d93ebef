@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e41babdb_1c29ff88",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-22T07:03:20Z",
+      "side": 1,
+      "message": "NC1440Test",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "038e92ad_6c4eed6b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-22T07:03:20Z",
+      "side": 1,
+      "message": "Comment what is purpose of this test.",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3c3da71_68b53400",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-22T07:03:20Z",
+      "side": 1,
+      "message": "we need to close client, probably we can also reuse only one client for both tests",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "596c5fc9_dd25cd1d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-22T07:03:20Z",
+      "side": 1,
+      "message": "Comment what is purpose of this test.",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa5dd211_5fb17113",
+        "filename": "apps/restconf-it/src/test/resources/leafref-deviated/leafref-deviation@2025-05-13.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-22T07:03:20Z",
+      "side": 1,
+      "message": ".. that is defined/declared? .. in leafref-source model ...",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
