@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
@@ -546,12 +547,11 @@ public final class RestconfStream<T> {
 
     @NonNullByDefault
     @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
-            final String receiverName) throws UnsupportedEncodingException {
+            final String receiverName, @Nullable final EventStreamFilter eventStreamFilter)
+            throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
             getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            // FIXME: receive filter
-            AcceptingEventFilter.instance(),
-            receiverName));
+            AcceptingEventFilter.instance(), receiverName, eventStreamFilter));
     }
 
     private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {

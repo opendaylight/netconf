@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -14,9 +14,16 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.time.Instant;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,9 +89,44 @@ abstract sealed class Subscribers<T> {
 
         @Override
         void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
-            subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
-                ? format(subscriber.formatter(), modelContext, input, now) : null);
+            if (subscriber instanceof Subscriber.Rfc8639Subscriber<T> rfc8639Subscriber
+                    && rfc8639Subscriber.eventStreamFilter() != null) {
+                subscriber.sendDataMessage(applyStreamFilter(rfc8639Subscriber, modelContext, input, now));
+            } else {
+                subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
+                    ? format(subscriber.formatter(), modelContext, input, now) : null);
+            }
         }
+    }
+
+    private static <T> @Nullable String applyStreamFilter(final Subscriber.Rfc8639Subscriber<T> subscriber,
+            final EffectiveModelContext ctx, final T input, final Instant now) {
+        // Extract body for subtree evaluation
+        final ContainerNode body;
+        if (input instanceof DOMNotification notification) {
+            // notification comes from AbstractNotificationSource
+            body = notification.getBody();
+        } else if (input instanceof List<?> list && !list.isEmpty() && list.getFirst() instanceof DataTreeCandidate) {
+            // notification comes from DataTreeChangeSource
+            body = parseDataTreeCandidates((List<DataTreeCandidate>) list);
+        } else {
+            // unknown payload type → treat as filtered out
+            return null;
+        }
+        return subscriber.eventStreamFilter().test(YangInstanceIdentifier.of(), body)
+            ? format(subscriber.formatter(), ctx, input, now)
+            : null;
+    }
+
+    private static ContainerNode parseDataTreeCandidates(final List<DataTreeCandidate> candidates) {
+        final var firstArg = candidates.getFirst().getRootPath().getLastPathArgument();
+        final var rootId = firstArg instanceof NodeIdentifier nip ? nip : NodeIdentifier.create(firstArg.getNodeType());
+        final var builder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(rootId);
+
+        for (final DataTreeCandidate cand : candidates) {
+            builder.withChild((ContainerNode) cand.getRootNode().dataAfter());
+        }
+        return builder.build();
     }
 
     private static final class Multiple<T> extends Subscribers<T> {
@@ -121,7 +163,13 @@ abstract sealed class Subscribers<T> {
             for (var entry : subscribers.asMap().entrySet()) {
                 final var formatted = format(entry.getKey(), modelContext, input, now);
                 for (var subscriber : entry.getValue()) {
-                    subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input) ? formatted : null);
+                    if (subscriber instanceof Subscriber.Rfc8639Subscriber<T> rfc8639Subscriber
+                            && rfc8639Subscriber.eventStreamFilter() != null) {
+                        subscriber.sendDataMessage(applyStreamFilter(rfc8639Subscriber, modelContext, input, now));
+                    } else {
+                        subscriber.sendDataMessage(subscriber.filter().matches(modelContext, input)
+                            ? formatted : null);
+                    }
                 }
             }
         }
