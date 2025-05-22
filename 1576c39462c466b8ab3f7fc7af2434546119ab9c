@@ -34,6 +34,24 @@
       "parentUuid": "6dbbf825_e5d147b5",
       "revId": "1576c39462c466b8ab3f7fc7af2434546119ab9c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4388452c_4129e103",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:44:10Z",
+      "side": 1,
+      "message": "Also there is always other way but I did bot consider it because it involves exposing receivers collection to be able sendMessage to them outside of subscription class.",
+      "parentUuid": "6a9acab1_2a765b6d",
+      "revId": "1576c39462c466b8ab3f7fc7af2434546119ab9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
