@@ -528,11 +528,6 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>restconf-notifications-mdsal</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-server-spi</artifactId>
                 <version>${project.version}</version>
             </dependency>
