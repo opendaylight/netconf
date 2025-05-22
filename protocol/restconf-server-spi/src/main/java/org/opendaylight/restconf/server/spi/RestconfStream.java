@@ -331,6 +331,9 @@ public final class RestconfStream<T> {
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return helper.add("terminated", terminated);
         }
+
+        @NonNullByDefault
+        public abstract void publishMessage(@Nullable String message);
     }
 
     /**
