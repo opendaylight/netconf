@@ -16,6 +16,24 @@
       "message": "Is this bale to work or not?",
       "revId": "1576c39462c466b8ab3f7fc7af2434546119ab9c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a9acab1_2a765b6d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:41:45Z",
+      "side": 1,
+      "message": "This will work if subscribed to DOMNotifications. I commented it out for now because of possibility of subscription to data tree change which will lead to cast type exception. This means I can\u0027t depend on formatter inside subscribers and have to create separate one for state notifications. Currently there are two ways to do it - \n1)reuse one we already have(and it works) - inside restconf.mdsal.spi.NotificationSource or \n2)create one(but it will be copy/paste on 99%).\nFirst approach has one issue with circular dependency meaning those should be moved to restconf-server-spi.",
+      "parentUuid": "6dbbf825_e5d147b5",
+      "revId": "1576c39462c466b8ab3f7fc7af2434546119ab9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
