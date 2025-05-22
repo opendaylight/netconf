@@ -123,7 +123,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final Rfc8639Subscriber<?> newSubscriber;
             try {
                 newSubscriber = stream.addSubscriber(sender, encodingName(),
-                    newReceiverName(session.description(), request.principal()));
+                    newReceiverName(session.description(), request.principal()), filter());
             } catch (UnsupportedEncodingException e) {
                 request.completeWith(new RequestException(e));
                 return;
