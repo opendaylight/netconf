@@ -10,29 +10,29 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 @Beta
 public class PatchEntity {
     private final Operation operation;
     private final String editId;
-    private final YangInstanceIdentifier targetNode;
+    private final Data dataPath;
     private final NormalizedNode node;
 
     /**
      * Constructor to create PatchEntity for Patch operations which require value leaf representing data to be present.
      * @param editId Id of Patch edit
      * @param operation Patch edit operation
-     * @param targetNode Target node for Patch edit operation
+     * @param dataPath Target node for Patch edit operation
      * @param node Data defined by value leaf used by edit operation
      */
-    public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode,
+    public PatchEntity(final String editId, final Operation operation, final Data dataPath,
                        final NormalizedNode node) {
         this.editId = requireNonNull(editId);
         this.operation = requireNonNull(operation);
-        this.targetNode = requireNonNull(targetNode);
+        this.dataPath = requireNonNull(dataPath);
         this.node = requireNonNull(node);
     }
 
@@ -41,12 +41,12 @@ public class PatchEntity {
      * present. <code>node</code> is set to <code>null</code> meaning that data are not allowed for edit operation.
      * @param editId Id of Patch edit
      * @param operation Patch edit operation
-     * @param targetNode Target node for Patch edit operation
+     * @param dataPath Target node for Patch edit operation
      */
-    public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode) {
+    public PatchEntity(final String editId, final Operation operation, final Data dataPath) {
         this.editId = requireNonNull(editId);
         this.operation = requireNonNull(operation);
-        this.targetNode = requireNonNull(targetNode);
+        this.dataPath = requireNonNull(dataPath);
         node = null;
     }
 
@@ -58,8 +58,8 @@ public class PatchEntity {
         return editId;
     }
 
-    public YangInstanceIdentifier getTargetNode() {
-        return targetNode;
+    public Data getDataPath() {
+        return dataPath;
     }
 
     public NormalizedNode getNode() {
