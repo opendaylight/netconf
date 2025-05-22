@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.EventFormatter.toRFC3339;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -15,9 +16,13 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +31,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -41,6 +53,9 @@ import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminated;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
@@ -201,6 +216,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             Futures.addCallback(removeSubscription(id()), new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
+                    final var privateNotification = getTerminatedStateMessage(encoding(), id());
+                    publishMessage(privateNotification);
                     LOG.debug("Subscription {} terminated", id);
                     subscriptions.remove(id, DynSubscription.this);
                     request.completeWith(Empty.value());
@@ -253,6 +270,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        public void publishMessage(final String notificationMessage) {
+            for(final var subscriber : receivers) {
+                subscriber.sendDataMessage(notificationMessage);
+            }
         }
     }
 
@@ -524,6 +547,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         Futures.addCallback(modifySubscriptionFilter(id, filter), new FutureCallback<>() {
             @Override
             public void onSuccess(final Void result) {
+                final var privateNotification = getModifiedStateMessage(subscription.encoding(), subscription.id(),
+                    subscription.streamName());
+                subscription.publishMessage(privateNotification);
                 subscription.setFilter(filterImpl);
                 request.completeWith(subscription);
             }
@@ -638,5 +664,121 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         // TODO: implement XPath filter evaluation
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             "XPath filtering not implemented");
+    }
+
+    private String getModifiedStateMessage(final @NonNull QName encoding, final Uint32 id,
+            final String streamName) {
+        if (encoding.equals(EncodeJson$I.QNAME)) {
+            try (final var writer = new StringWriter()) {
+                try (final var jsonWriter = new JsonWriter(writer)) {
+                    jsonWriter.beginObject()
+                        .name("ietf-restconf:notification").beginObject()
+                        .name("eventTime").value(toRFC3339(Instant.now()))
+                        .name("ietf-subscribed-notifications:" + SubscriptionModified.QNAME.getLocalName())
+                            .beginObject()
+                            .name("id").value(id)
+//                            .name("uri").value("")
+//                            .name("filter").value("")
+                            .name("stream").value(streamName)
+                            .name("encoding").value("ietf-subscribed-notifications:" + encoding.getLocalName());
+                    jsonWriter.endObject().endObject().endObject();
+                }
+                return writer.toString();
+            } catch (IOException e) {
+                LOG.error("Failed to generate JSON state notification to modified subscription");
+                return null;
+            }
+        } else if (encoding.equals(EncodeXml$I.QNAME)) {
+            try (final var writer = new StringWriter()) {
+                final var factory = DocumentBuilderFactory.newInstance();
+                final var builder = factory.newDocumentBuilder();
+                final var doc = builder.newDocument();
+                final var notification = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
+                    "notification");
+                doc.appendChild(notification);
+                final var eventTime = doc.createElement("eventTime");
+                eventTime.appendChild(doc.createTextNode(toRFC3339(Instant.now())));
+                notification.appendChild(eventTime);
+                final var body = doc.createElementNS("urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications",
+                    SubscriptionModified.QNAME.getLocalName());
+                final var subscriptionId = doc.createElement("id");
+                subscriptionId.appendChild(doc.createTextNode(id.toString()));
+                body.appendChild(subscriptionId);
+//                final var subscriptionUri = doc.createElement("uri");
+//                final var subscriptionFilter = doc.createElement("filter");
+                final var subscriptionStream = doc.createElement("stream");
+                subscriptionStream.appendChild(doc.createTextNode(streamName));
+                body.appendChild(subscriptionStream);
+                final var subscriptionEncoding = doc.createElement("encoding");
+                subscriptionEncoding.appendChild(doc.createTextNode(encoding.getLocalName()));
+                body.appendChild(subscriptionEncoding);
+                notification.appendChild(body);
+
+                final var source = new DOMSource(doc);
+                final var result = new StreamResult(writer);
+                final var transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                transformer.transform(source, result);
+                return writer.toString();
+            } catch (ParserConfigurationException | IOException | TransformerException e) {
+                LOG.error("Failed to generate XML state notification to modified subscription");
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private String getTerminatedStateMessage(final @NonNull QName encoding, final Uint32 id) {
+        if (encoding.equals(EncodeJson$I.QNAME)) {
+            try (final var writer = new StringWriter()) {
+                try (final var jsonWriter = new JsonWriter(writer)) {
+                    jsonWriter.beginObject()
+                        .name("ietf-restconf:notification").beginObject()
+                        .name("eventTime").value(toRFC3339(Instant.now()))
+                        .name("ietf-subscribed-notifications:" + SubscriptionTerminated.QNAME.getLocalName())
+                            .beginObject()
+                            .name("id").value(id)
+                            .name("reason").value("ietf-subscribed-notifications:" +NoSuchSubscription.QNAME
+                                .getLocalName());
+                    jsonWriter.endObject().endObject().endObject();
+                }
+                return writer.toString();
+            } catch (IOException e) {
+                LOG.error("Failed to generate JSON state notification to terminated subscription");
+                return null;
+            }
+        } else if (encoding.equals(EncodeXml$I.QNAME)) {
+            try (final var writer = new StringWriter()) {
+                final var factory = DocumentBuilderFactory.newInstance();
+                final var builder = factory.newDocumentBuilder();
+                final var doc = builder.newDocument();
+                final var notification = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
+                    "notification");
+                doc.appendChild(notification);
+                final var eventTime = doc.createElement("eventTime");
+                eventTime.appendChild(doc.createTextNode(toRFC3339(Instant.now())));
+                notification.appendChild(eventTime);
+                final var body = doc.createElementNS("urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications",
+                    SubscriptionTerminated.QNAME.getLocalName());
+                final var subscriptionId = doc.createElement("id");
+                subscriptionId.appendChild(doc.createTextNode(id.toString()));
+                body.appendChild(subscriptionId);
+                final var reason = doc.createElement("reason");
+                reason.appendChild(doc.createTextNode("no-such-subscription"));
+                body.appendChild(reason);
+                notification.appendChild(body);
+
+                final var source = new DOMSource(doc);
+                final var result = new StreamResult(writer);
+                final var transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                transformer.transform(source, result);
+                return writer.toString();
+            } catch (ParserConfigurationException | IOException | TransformerException e) {
+                LOG.error("Failed to generate XML state notification to terminated subscription");
+                return null;
+            }
+        }
+        return null;
     }
 }
