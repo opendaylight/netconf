@@ -319,6 +319,8 @@ public final class RestconfStream<T> {
             terminateImpl(request, reason);
         }
 
+        public abstract void publishMessage(@Nullable String message);
+
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
 
