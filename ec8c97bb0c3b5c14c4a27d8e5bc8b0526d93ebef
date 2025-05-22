@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "944cbf32_068c4510",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e41babdb_1c29ff88",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "038e92ad_6c4eed6b",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-22T07:03:20Z",
       "side": 1,
       "message": "Comment what is purpose of this test.",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e97569f2_183b4eee",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "038e92ad_6c4eed6b",
       "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33ebc529_0c7bd16e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3c3da71_68b53400",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "596c5fc9_dd25cd1d",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-05-22T07:03:20Z",
       "side": 1,
       "message": "Comment what is purpose of this test.",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46d9931d_f710b0a8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/LeafrefTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "596c5fc9_dd25cd1d",
       "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c279be03_639703a9",
+        "filename": "apps/restconf-it/src/test/resources/leafref-deviated/leafref-deviation@2025-05-13.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa5dd211_5fb17113",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0bff1f0f_ad73d5b6",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-05-22T07:05:53Z",
       "side": 1,
       "message": "apps/restconf-it/src/test/resources/nc1440/leafref-source@2025-05-13.yang",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38f6270e_30a23cd7",
+        "filename": "apps/restconf-it/src/test/resources/leafref/leafref-source@2025-05-13.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T08:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bff1f0f_ad73d5b6",
       "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
