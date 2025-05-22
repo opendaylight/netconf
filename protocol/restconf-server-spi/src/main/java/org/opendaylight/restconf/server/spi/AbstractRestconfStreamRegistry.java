@@ -214,6 +214,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             }, MoreExecutors.directExecutor());
         }
 
+        @Override
+        public void publishMessage(final String message) {
+            for (final var subscriber : receivers) {
+                subscriber.sendDataMessage(message);
+            }
+        }
+
         private void channelClosed() {
             final var id = id();
             LOG.debug("Subscription {} terminated due to transport session going down", id);
