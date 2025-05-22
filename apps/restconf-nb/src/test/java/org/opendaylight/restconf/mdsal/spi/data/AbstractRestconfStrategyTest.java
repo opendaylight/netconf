@@ -99,8 +99,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .node(ARTIST_QNAME)
         .nodeWithKey(ARTIST_QNAME, NAME_QNAME, "name of artist")
         .build();
-    // FIXME: this looks weird
-    static final YangInstanceIdentifier CREATE_AND_DELETE_TARGET = GAP_IID.node(PLAYER_QNAME).node(GAP_QNAME);
+
+    private static final Data ARTIST_DATA = jukeboxPath(ARTIST_IID);
+    private static final Data PLAYER_DATA = jukeboxPath(PLAYER_IID);
 
     // Read mock data
     static final QName BASE = QName.create("ns", "2016-02-28", "base");
@@ -320,9 +321,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build();
 
         patch(new PatchContext("patchRMRm",
-            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit3", Operation.Remove, ARTIST_IID))),
+            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
+                new PatchEntity("edit2", Operation.Merge, ARTIST_DATA, buildArtistList),
+                new PatchEntity("edit3", Operation.Remove, ARTIST_DATA))),
             testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
 
@@ -331,8 +332,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     final void testPatchDataCreateAndDelete() {
         patch(new PatchContext("patchCD", List.of(
-            new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
-            new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET))),
+            new PatchEntity("edit1", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX),
+            new PatchEntity("edit2", Operation.Delete, GAP_PATH))),
             testPatchDataCreateAndDeleteStrategy(), true);
     }
 
@@ -340,8 +341,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void testPatchMergePutContainer() {
-        patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
-            testPatchMergePutContainerStrategy(), false);
+        patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_DATA,
+            EMPTY_JUKEBOX))), testPatchMergePutContainerStrategy(), false);
     }
 
     abstract @NonNull RestconfStrategy testPatchMergePutContainerStrategy();
@@ -349,7 +350,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     final void testDeleteNonexistentData() throws Exception {
         deleteNonexistentDataTestStrategy().patchData(dataYangPatchRequest, new Data(JUKEBOX_DATABIND),
-            new PatchContext("patchD", List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))));
+            new PatchContext("patchD", List.of(new PatchEntity("edit", Operation.Delete, GAP_PATH))));
 
         final var status = dataYangPatchRequest.getResult().status();
         assertEquals("patchD", status.patchId());
