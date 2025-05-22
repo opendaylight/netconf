@@ -11,8 +11,10 @@ module org.opendaylight.restconf.server.mdsal {
     requires transitive org.opendaylight.restconf.mdsal.spi;
     requires transitive org.opendaylight.restconf.server.api;
     requires transitive org.opendaylight.restconf.server.spi;
+    requires org.opendaylight.netconf.common.mdsal;
     requires org.opendaylight.netconf.dom.api;
     requires org.opendaylight.yang.gen.ietf.restconf.monitoring.rfc8040;
+    requires org.opendaylight.yang.gen.ietf.restconf.subscribed.notifications.rfc8650;
     requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.opendaylight.yangtools.yang.data.spi;
     requires org.slf4j;
