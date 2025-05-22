@@ -21,7 +21,9 @@ public final class SubtreeEventStreamFilter implements AbstractRestconfStreamReg
 
     @Override
     public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
-        // FIXME add conditions to reject data by path when implementing filtering
+        if (!path.isEmpty() && filter.permitsQName(path.getLastPathArgument().getNodeType())) {
+            return false;
+        }
         return new SubtreeMatcher(filter, body).matches();
     }
 }
