@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "81b77d13_74e8f358",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T19:21:48Z",
+      "side": 1,
+      "message": "This will fit good with patch that stops event stream on subscription termination",
+      "revId": "bc66a62102cb58298cece1916598088e0cfe2083",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fed351c8_9cc9e151",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 1
