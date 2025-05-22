@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.api;
 
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.databind.DatabindPath.Data;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -27,7 +28,6 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -146,7 +146,7 @@ public final class JsonPatchBody extends PatchBody {
                     verifyStringValueType(in.peek(), editDefinition);
                     // target can be specified completely in request URI
                     final var target = parsePatchTarget(resource, in.nextString());
-                    edit.setTarget(target.instance());
+                    edit.setTargetPath(target);
                     final var stack = target.inference().toSchemaInferenceStack();
                     if (!stack.isEmpty()) {
                         stack.exit();
@@ -329,7 +329,7 @@ public final class JsonPatchBody extends PatchBody {
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RequestException {
         final var operation = requireNonNullValue(edit.getOperation(), "operation");
-        final var target = requireNonNullValue(edit.getTarget(), "target");
+        final var target = requireNonNullValue(edit.getTargetPath(), "target");
         if (checkDataPresence(operation, edit.getData() != null)) {
             final var editId = requireNonNullValue(edit.getId(), "edit-id");
             if (!requiresValue(operation)) {
@@ -337,15 +337,15 @@ public final class JsonPatchBody extends PatchBody {
             }
 
             // for lists/leaf-list allow to manipulate with items through their parent
-            final YangInstanceIdentifier targetNode;
-            if (target.getLastPathArgument() instanceof NodeIdentifierWithPredicates
-                    || edit.getTarget().getLastPathArgument() instanceof NodeWithValue<?>) {
-                targetNode = target.getParent();
+            final Data dataPath;
+            if (target.instance().getLastPathArgument() instanceof NodeIdentifierWithPredicates
+                    || target.instance().getLastPathArgument() instanceof NodeWithValue<?>) {
+                dataPath = getDataParent(target);
             } else {
-                targetNode = target;
+                dataPath = target;
             }
 
-            return new PatchEntity(editId, operation, targetNode, edit.getData());
+            return new PatchEntity(editId, operation, dataPath, edit.getData());
         }
         if (requiresValue(operation)) {
             throw new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, operation
@@ -361,7 +361,7 @@ public final class JsonPatchBody extends PatchBody {
     private static final class PatchEdit {
         private String id;
         private Operation operation;
-        private YangInstanceIdentifier target;
+        private Data targetPath;
         private Inference targetSchemaNode;
         private NormalizedNode data;
 
@@ -381,12 +381,12 @@ public final class JsonPatchBody extends PatchBody {
             this.operation = requireNonNull(operation);
         }
 
-        YangInstanceIdentifier getTarget() {
-            return target;
+        Data getTargetPath() {
+            return targetPath;
         }
 
-        void setTarget(final YangInstanceIdentifier target) {
-            this.target = requireNonNull(target);
+        void setTargetPath(final Data targetPath) {
+            this.targetPath = requireNonNull(targetPath);
         }
 
         Inference getTargetSchemaNode() {
@@ -408,7 +408,7 @@ public final class JsonPatchBody extends PatchBody {
         void clear() {
             id = null;
             operation = null;
-            target = null;
+            targetPath = null;
             targetSchemaNode = null;
             data = null;
         }

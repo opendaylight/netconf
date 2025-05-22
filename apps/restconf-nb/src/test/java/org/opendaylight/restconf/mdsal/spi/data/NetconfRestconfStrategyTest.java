@@ -409,7 +409,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
+            .delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         return jukeboxDataOperations();
     }
 
@@ -429,7 +429,7 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 new NetconfDocumentedException("id", ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))))
             .when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
+            .delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         return jukeboxDataOperations();
     }
 

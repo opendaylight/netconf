@@ -259,8 +259,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
-        doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
-            CREATE_AND_DELETE_TARGET);
+        doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         return jukeboxDataOperations();
     }
 
@@ -274,8 +273,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Override
     RestconfStrategy deleteNonexistentDataTestStrategy() {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
-            CREATE_AND_DELETE_TARGET);
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         return jukeboxDataOperations();
     }
 
