@@ -84,6 +84,23 @@
       "message": ".. that is defined/declared? .. in leafref-source model ...",
       "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bff1f0f_ad73d5b6",
+        "filename": "apps/restconf-it/src/test/resources/leafref/leafref-source@2025-05-13.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-22T07:05:53Z",
+      "side": 1,
+      "message": "apps/restconf-it/src/test/resources/nc1440/leafref-source@2025-05-13.yang",
+      "revId": "ec8c97bb0c3b5c14c4a27d8e5bc8b0526d93ebef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
