@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f60d934_21458b25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T18:08:55Z",
+      "side": 1,
+      "message": "Demo patch!",
+      "revId": "bc66a62102cb58298cece1916598088e0cfe2083",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e734e8d5_a7cf892e",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T18:08:55Z",
+      "side": 1,
+      "message": "Done to make modify subscription work and not fail on datastore writing. Just so modify state notification can be checked.",
+      "revId": "bc66a62102cb58298cece1916598088e0cfe2083",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fed351c8_9cc9e151",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 550,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T18:08:55Z",
+      "side": 1,
+      "message": "IMO this is best place to send state notification after datastore operation is successful.",
+      "revId": "bc66a62102cb58298cece1916598088e0cfe2083",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07df1ec3_10e56c28",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-22T18:08:55Z",
+      "side": 1,
+      "message": "This and next is mimicking of what XML/JSON EventFormatter does(see https://github.com/opendaylight/netconf/blob/f18b82b1fd17c0afdf0c168f376d6f1076e2a1a1/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/NotificationSource.java#L29C82-L29C91 - ENCODINGS map has both formatters). I can\u0027t reuse it here because of circular dependency. If formatter is available - this will transform into SubscriptionStateService methods that creates ContainerNode which will go into formatter to transform into string message of given encoding. So said notification in Abstract registry only happens if there is something to format messages.",
+      "revId": "bc66a62102cb58298cece1916598088e0cfe2083",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
