@@ -10,12 +10,10 @@ package org.opendaylight.restconf.subscription;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.restconf.notifications.mdsal.SubscriptionStateService;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -50,16 +48,13 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(DeleteSubscriptionInput.QNAME, "id").intern());
 
-    private final SubscriptionStateService subscriptionStateService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public DeleteSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final SubscriptionStateService subscriptionStateService) {
+    public DeleteSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
         super(DeleteSubscription.QNAME);
         this.streamRegistry = requireNonNull(streamRegistry);
-        this.subscriptionStateService = requireNonNull(subscriptionStateService);
     }
 
     @Override
@@ -97,15 +92,8 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
             return;
         }
         subscription.setState(SubscriptionState.END);
-        subscription.terminate(request.transform(unused -> {
-            try {
-                subscriptionStateService.subscriptionTerminated(Instant.now(), id, NoSuchSubscription.QNAME);
-            } catch (InterruptedException e) {
-                LOG.warn("Could not send subscription terminated notification", e);
-            }
-            return ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
-                .build();
-        }), NoSuchSubscription.QNAME);
+        subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
+            .build()), NoSuchSubscription.QNAME);
     }
 }
