@@ -118,7 +118,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
         final NormalizedNode data;
         try {
-            data = readData(params.content(), path.instance(), params.withDefaults());
+            data = readData(params.content(), path, params.withDefaults());
         } catch (RequestException e) {
             request.completeWith(e);
             return;

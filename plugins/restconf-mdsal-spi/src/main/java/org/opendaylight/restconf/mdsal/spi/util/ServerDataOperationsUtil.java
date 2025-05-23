@@ -22,9 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -74,10 +72,16 @@ public final class ServerDataOperationsUtil {
         // Hide on purpose
     }
 
-    public static DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path,
-            final DatabindContext databind) throws RequestException {
-        // FIXME: we have this available in InstanceIdentifierContext
-        final var dataSchemaNode = databind.schemaTree().findChild(path).orElseThrow().dataSchemaNode();
+    public static Data getConceptualParent(final Data data) {
+        final var targetPath = data.instance();
+        final var parentPath = targetPath.coerceParent();
+        final var databind = data.databind();
+        final var childAndStack = databind.schemaTree().enterPath(parentPath).orElseThrow();
+        return new Data(data.databind(), childAndStack.stack().toInference(), parentPath, childAndStack.node());
+    }
+
+    public static DataSchemaNode checkListAndOrderedType(final Data path) throws RequestException {
+        final var dataSchemaNode = path.schema().dataSchemaNode();
 
         final String message;
         if (dataSchemaNode instanceof ListSchemaNode listSchema) {
@@ -113,8 +117,7 @@ public final class ServerDataOperationsUtil {
     }
 
     public static NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData,
-            final YangInstanceIdentifier path, final DatabindContext databind, final WithDefaultsMode defaultsMode)
-            throws RequestException {
+            final Data path, final WithDefaultsMode defaultsMode) throws RequestException {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;
@@ -122,8 +125,7 @@ public final class ServerDataOperationsUtil {
                 throw new RequestException("Unsupported with-defaults value %s", defaultsMode.getName());
         };
 
-        // FIXME: we have this readily available in InstanceIdentifierContext
-        final var ctxNode = databind.schemaTree().findChild(path).orElseThrow();
+        final var ctxNode = path.schema();
         if (readData instanceof ContainerNode container) {
             final var builder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(container.name());
             buildCont(builder, container.body(), ctxNode, trim);
@@ -134,8 +136,7 @@ public final class ServerDataOperationsUtil {
             }
 
             final var builder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(mapEntry.name());
-            buildMapEntryBuilder(builder, mapEntry.body(), ctxNode, trim,
-                listSchema.getKeyDefinition());
+            buildMapEntryBuilder(builder, mapEntry.body(), ctxNode, trim, listSchema.getKeyDefinition());
             return builder.build();
         } else {
             throw new IllegalStateException("Unhandled data contract " + readData.contract());
