@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b820e9f_b777929c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-23T12:18:10Z",
+      "side": 1,
+      "message": "body of this if could be extracted in to method right? it\u0027s same as at line 159",
+      "revId": "acd0ef7563ab2f5b337ac2da73b8939cf817bf34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "358e0c27_26e037e0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-23T12:18:10Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "acd0ef7563ab2f5b337ac2da73b8939cf817bf34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
