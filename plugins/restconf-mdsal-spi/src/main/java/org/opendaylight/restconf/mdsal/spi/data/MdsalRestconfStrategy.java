@@ -25,6 +25,7 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.mdsal.spi.util.ServerDataOperationsUtil;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -123,7 +124,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             return;
         }
 
-        completeDataGET(request, data, path, writerFactory, null);
+        ServerDataOperationsUtil.completeDataGET(request, data, path, writerFactory, null);
     }
 
     @Override
