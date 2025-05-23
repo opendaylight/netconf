@@ -54,7 +54,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
@@ -155,10 +154,10 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
-        final var parentPath = instance.coerceParent();
+        final var parentPath = getConceptualParent(path);
         try {
             checkListAndOrderedType(parentPath);
-            commitFuture = insertAndCommitPut(instance, data, insert, parentPath);
+            commitFuture = insertAndCommitPut(instance, data, insert, parentPath.instance());
         } catch (RequestException e) {
             request.completeWith(e);
             return;
@@ -271,27 +270,6 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         return tx.commit();
     }
 
-    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) throws RequestException {
-        // FIXME: we have this available in InstanceIdentifierContext
-        final var dataSchemaNode = databind.schemaTree().findChild(path).orElseThrow().dataSchemaNode();
-
-        final String message;
-        if (dataSchemaNode instanceof ListSchemaNode listSchema) {
-            if (listSchema.isUserOrdered()) {
-                return listSchema;
-            }
-            message = "Insert parameter can be used only with ordered-by user list.";
-        } else if (dataSchemaNode instanceof LeafListSchemaNode leafListSchema) {
-            if (leafListSchema.isUserOrdered()) {
-                return leafListSchema;
-            }
-            message = "Insert parameter can be used only with ordered-by user leaf-list.";
-        } else {
-            message = "Insert parameter can be used only with list or leaf-list";
-        }
-        throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, message);
-    }
-
     @Override
     protected final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final NormalizedNode data) {
@@ -311,8 +289,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final Insert insert, final NormalizedNode data) {
         final ListenableFuture<? extends CommitInfo> future;
         try {
-            checkListAndOrderedType(path.instance());
-            future = insertAndCommit(path.instance(), data, insert);
+            checkListAndOrderedType(path);
+            future = insertAndCommit(path, data, insert);
         } catch (RequestException e) {
             request.completeWith(e);
             return;
@@ -347,21 +325,21 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }, MoreExecutors.directExecutor());
     }
 
-    private ListenableFuture<? extends CommitInfo> insertAndCommit(final YangInstanceIdentifier path,
+    private ListenableFuture<? extends CommitInfo> insertAndCommit(final Data path,
             final NormalizedNode data, final @NonNull Insert insert) throws RequestException {
         final var tx = prepareWriteExecution();
-
+        final var instance = path.instance();
         return switch (insert.insert()) {
             case FIRST -> {
                 try {
-                    final var readData = tx.readList(path);
+                    final var readData = tx.readList(instance);
                     if (readData == null || readData.isEmpty()) {
-                        tx.replace(path, data);
+                        tx.replace(instance, data);
                     } else {
                         checkListDataDoesNotExist(path, data);
-                        tx.remove(path);
-                        tx.replace(path, data);
-                        tx.replace(path, readData);
+                        tx.remove(instance);
+                        tx.replace(instance, data);
+                        tx.replace(instance, readData);
                     }
                 } catch (RequestException e) {
                     tx.cancel();
@@ -371,7 +349,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
             case LAST -> {
                 try {
-                    tx.create(path, data);
+                    tx.create(instance, data);
                 } catch (RequestException e) {
                     tx.cancel();
                     throw e;
@@ -380,12 +358,12 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
             case BEFORE -> {
                 try {
-                    final var readData = tx.readList(path);
+                    final var readData = tx.readList(instance);
                     if (readData == null || readData.isEmpty()) {
-                        tx.replace(path, data);
+                        tx.replace(instance, data);
                     } else {
                         checkListDataDoesNotExist(path, data);
-                        insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
+                        insertWithPointPost(tx, instance, data, verifyNotNull(insert.pointArg()), readData, true);
                     }
                 } catch (RequestException e) {
                     tx.cancel();
@@ -395,12 +373,12 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
             case AFTER -> {
                 try {
-                    final var readData = tx.readList(path);
+                    final var readData = tx.readList(instance);
                     if (readData == null || readData.isEmpty()) {
-                        tx.replace(path, data);
+                        tx.replace(instance, data);
                     } else {
                         checkListDataDoesNotExist(path, data);
-                        insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
+                        insertWithPointPost(tx, instance, data, verifyNotNull(insert.pointArg()), readData, false);
                     }
                 } catch (RequestException e) {
                     tx.cancel();
@@ -537,11 +515,11 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param path Path to be checked
      * @throws RequestException if data already exists.
      */
-    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data)
+    private void checkListDataDoesNotExist(final Data path, final NormalizedNode data)
             throws RequestException {
         if (data instanceof NormalizedNodeContainer<?> dataNode) {
             for (final var node : dataNode.body()) {
-                final var nodePath = path.node(node.name());
+                final var nodePath = path.instance().node(node.name());
                 checkItemDoesNotExists(databind, exists(nodePath), nodePath);
             }
         } else {
@@ -618,7 +596,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
     }
 
-    protected final @NonNull RequestException decodeException(final Throwable ex, final String txType,
+    protected static final @NonNull RequestException decodeException(final Throwable ex, final String txType,
             final Data dataPath) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
@@ -649,5 +627,25 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
 
         return new RequestException("Transaction(" + txType + ") failed", ex);
+    }
+
+    private static void checkListAndOrderedType(final Data path) throws RequestException {
+        final var dataSchemaNode = path.schema().dataSchemaNode();
+        if (dataSchemaNode instanceof ListSchemaNode listSchema) {
+            if (!listSchema.isUserOrdered()) {
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
+                    "Insert parameter can be used only with ordered-by user list.");
+            }
+            // Verified ordered-by ListSchemaNode.
+        } else if (dataSchemaNode instanceof LeafListSchemaNode leafListSchema) {
+            if (!leafListSchema.isUserOrdered()) {
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
+                    "Insert parameter can be used only with ordered-by user leaf-list.");
+            }
+            // Verified ordered-by LeafListSchemaNode.
+        } else {
+            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
+                "Insert parameter can be used only with list or leaf-list");
+        }
     }
 }
