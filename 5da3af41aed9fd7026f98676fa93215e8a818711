@@ -209,6 +209,24 @@
       "message": "NonNullByDefault has no sense in the case of one Nullable parameter",
       "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30c8a18f_615437f9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-23T19:01:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a81f8836_1032ae74",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
