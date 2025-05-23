@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac93be09_e462a48f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T16:05:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b820e9f_b777929c",
+      "revId": "acd0ef7563ab2f5b337ac2da73b8939cf817bf34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "358e0c27_26e037e0",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-23T12:18:10Z",
       "side": 1,
       "message": "remove?",
+      "revId": "acd0ef7563ab2f5b337ac2da73b8939cf817bf34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e8c9243_018af368",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T16:05:21Z",
+      "side": 1,
+      "message": "That was a comment, but it looks like more confusing than helpful",
+      "parentUuid": "358e0c27_26e037e0",
       "revId": "acd0ef7563ab2f5b337ac2da73b8939cf817bf34",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
