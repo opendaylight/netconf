@@ -9,6 +9,7 @@ module org.opendaylight.restconf.mdsal.spi {
     exports org.opendaylight.restconf.mdsal.spi;
     // FIXME: do not export this
     exports org.opendaylight.restconf.mdsal.spi.data;
+    exports org.opendaylight.restconf.mdsal.spi.util;
 
     requires transitive org.opendaylight.mdsal.common.api;
     requires transitive org.opendaylight.mdsal.dom.api;

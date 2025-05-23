@@ -37,6 +37,7 @@ import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfTransaction;
+import org.opendaylight.restconf.mdsal.spi.util.ServerDataOperationsUtil;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -97,7 +98,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "DELETE", path));
+                request.completeWith(ServerDataOperationsUtil.decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -130,7 +131,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             request.completeWith(e);
             return;
         }
-        completeDataGET(request, node, path, NormalizedNodeWriterFactory.of(params.depth()), null);
+        ServerDataOperationsUtil.completeDataGET(request, node, path, NormalizedNodeWriterFactory.of(params.depth()),
+            null);
     }
 
     @Override
@@ -172,12 +174,14 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
                 // PREPARE CONFIG DATA NODE
                 final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
 
-                yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
-                    : prepareDataByParamWithDef(configDataNode, path, withDefa.mode()));
+                yield ServerDataOperationsUtil.mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null
+                    ? configDataNode : ServerDataOperationsUtil.prepareDataByParamWithDef(configDataNode, path,
+                    databind, withDefa.mode()));
             }
             case CONFIG -> {
                 final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa.mode());
+                yield withDefa == null ? read : ServerDataOperationsUtil.prepareDataByParamWithDef(read, path,
+                    databind, withDefa.mode());
             }
             case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
         };
@@ -196,7 +200,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
             final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields)
                 throws RequestException {
-        return syncAccess(read(store, path, fields), path).orElse(null);
+        return ServerDataOperationsUtil.syncAccess(read(store, path, fields), path).orElse(null);
     }
 
     @Override
