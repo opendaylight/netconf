@@ -150,10 +150,10 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
-        final var parentPath = instance.coerceParent();
+        final var parentPath = ServerDataOperationsUtil.getConceptualParent(path);
         try {
-            ServerDataOperationsUtil.checkListAndOrderedType(parentPath, path.databind());
-            commitFuture = insertAndCommitPut(instance, data, insert, parentPath);
+            ServerDataOperationsUtil.checkListAndOrderedType(parentPath);
+            commitFuture = insertAndCommitPut(instance, data, insert, parentPath.instance());
         } catch (RequestException e) {
             request.completeWith(e);
             return;
@@ -285,8 +285,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final Insert insert, final NormalizedNode data) {
         final ListenableFuture<? extends CommitInfo> future;
         try {
-            ServerDataOperationsUtil.checkListAndOrderedType(path.instance(), path.databind());
-            future = insertAndCommit(path.instance(), data, insert);
+            ServerDataOperationsUtil.checkListAndOrderedType(path);
+            future = insertAndCommit(path, data, insert);
         } catch (RequestException e) {
             request.completeWith(e);
             return;
@@ -321,21 +321,21 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }, MoreExecutors.directExecutor());
     }
 
-    private ListenableFuture<? extends CommitInfo> insertAndCommit(final YangInstanceIdentifier path,
+    private ListenableFuture<? extends CommitInfo> insertAndCommit(final Data path,
             final NormalizedNode data, final @NonNull Insert insert) throws RequestException {
         final var tx = prepareWriteExecution();
-
+        final var instance = path.instance();
         return switch (insert.insert()) {
             case FIRST -> {
                 try {
-                    final var readData = tx.readList(path);
+                    final var readData = tx.readList(instance);
                     if (readData == null || readData.isEmpty()) {
-                        tx.replace(path, data);
+                        tx.replace(instance, data);
                     } else {
                         checkListDataDoesNotExist(path, data);
-                        tx.remove(path);
-                        tx.replace(path, data);
-                        tx.replace(path, readData);
+                        tx.remove(instance);
+                        tx.replace(instance, data);
+                        tx.replace(instance, readData);
                     }
                 } catch (RequestException e) {
                     tx.cancel();
@@ -345,7 +345,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
             case LAST -> {
                 try {
-                    tx.create(path, data);
+                    tx.create(instance, data);
                 } catch (RequestException e) {
                     tx.cancel();
                     throw e;
@@ -354,12 +354,12 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
             case BEFORE -> {
                 try {
-                    final var readData = tx.readList(path);
+                    final var readData = tx.readList(instance);
                     if (readData == null || readData.isEmpty()) {
-                        tx.replace(path, data);
+                        tx.replace(instance, data);
                     } else {
                         checkListDataDoesNotExist(path, data);
-                        insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
+                        insertWithPointPost(tx, instance, data, verifyNotNull(insert.pointArg()), readData, true);
                     }
                 } catch (RequestException e) {
                     tx.cancel();
@@ -369,12 +369,12 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
             case AFTER -> {
                 try {
-                    final var readData = tx.readList(path);
+                    final var readData = tx.readList(instance);
                     if (readData == null || readData.isEmpty()) {
-                        tx.replace(path, data);
+                        tx.replace(instance, data);
                     } else {
                         checkListDataDoesNotExist(path, data);
-                        insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
+                        insertWithPointPost(tx, instance, data, verifyNotNull(insert.pointArg()), readData, false);
                     }
                 } catch (RequestException e) {
                     tx.cancel();
@@ -511,11 +511,11 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param path Path to be checked
      * @throws RequestException if data already exists.
      */
-    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data)
+    private void checkListDataDoesNotExist(final Data path, final NormalizedNode data)
         throws RequestException {
         if (data instanceof NormalizedNodeContainer<?> dataNode) {
             for (final var node : dataNode.body()) {
-                final var nodePath = path.node(node.name());
+                final var nodePath = path.instance().node(node.name());
                 checkItemDoesNotExists(databind, exists(nodePath), nodePath);
             }
         } else {
@@ -551,7 +551,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      */
     // FIXME: NETCONF-1155: this method should asynchronous
     protected final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) throws RequestException {
+            final @NonNull Data path, final WithDefaultsParam defaultsMode) throws RequestException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -561,20 +561,21 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
                 yield ServerDataOperationsUtil.mergeConfigAndSTateDataIfNeeded(stateDataNode, defaultsMode == null
                     ? configDataNode : ServerDataOperationsUtil.prepareDataByParamWithDef(configDataNode, path,
-                    databind, defaultsMode.mode()));
+                    defaultsMode.mode()));
             }
             case CONFIG -> {
                 final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path);
                 yield defaultsMode == null ? read
-                    : ServerDataOperationsUtil.prepareDataByParamWithDef(read, path, databind, defaultsMode.mode());
+                    : ServerDataOperationsUtil.prepareDataByParamWithDef(read, path, defaultsMode.mode());
             }
             case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path);
         };
     }
 
     private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) throws RequestException {
-        return ServerDataOperationsUtil.syncAccess(read(store, path), path).orElse(null);
+            final Data path) throws RequestException {
+        final var instance = path.instance();
+        return ServerDataOperationsUtil.syncAccess(read(store, instance), instance).orElse(null);
     }
 
     /**

@@ -123,9 +123,9 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         final NormalizedNode node;
         try {
             if (fieldPaths != null) {
-                node = readData(params.content(), path.instance(), params.withDefaults(), fieldPaths);
+                node = readData(params.content(), path, params.withDefaults(), fieldPaths);
             } else {
-                node = readData(params.content(), path.instance(), params.withDefaults());
+                node = readData(params.content(), path, params.withDefaults());
             }
         } catch (RequestException e) {
             request.completeWith(e);
@@ -165,25 +165,26 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      */
     // FIXME: NETCONF-1155: this method should asynchronous
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
+            final @NonNull Data path, final @Nullable WithDefaultsParam withDefa,
             final @NonNull List<YangInstanceIdentifier> fields) throws RequestException {
+        final var instance = path.instance();
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
-                final var stateDataNode = readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
+                final var stateDataNode = readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, instance, fields);
                 // PREPARE CONFIG DATA NODE
-                final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
+                final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, instance, fields);
 
                 yield ServerDataOperationsUtil.mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null
                     ? configDataNode : ServerDataOperationsUtil.prepareDataByParamWithDef(configDataNode, path,
-                    databind, withDefa.mode()));
+                        withDefa.mode()));
             }
             case CONFIG -> {
-                final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
+                final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, instance, fields);
                 yield withDefa == null ? read : ServerDataOperationsUtil.prepareDataByParamWithDef(read, path,
-                    databind, withDefa.mode());
+                    withDefa.mode());
             }
-            case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
+            case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, instance, fields);
         };
     }
 

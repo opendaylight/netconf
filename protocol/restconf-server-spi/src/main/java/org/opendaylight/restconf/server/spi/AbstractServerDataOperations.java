@@ -7,10 +7,12 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import java.util.List;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
@@ -20,7 +22,7 @@ public abstract class AbstractServerDataOperations implements ServerDataOperatio
     @Override
     public final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final PrefixAndBody data) {
-        createData(request, childPath(path, data), data.body());
+        createData(request, childPath(path, data.prefix()), data.body());
     }
 
     protected abstract void createData(ServerRequest<? super CreateResourceResult> request, Data path,
@@ -29,15 +31,15 @@ public abstract class AbstractServerDataOperations implements ServerDataOperatio
     @Override
     public final void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final Insert insert, final PrefixAndBody data) {
-        createData(request, childPath(path, data), insert, data.body());
+        createData(request, childPath(path, data.prefix()), insert, data.body());
     }
 
     protected abstract void createData(ServerRequest<? super CreateResourceResult> request, Data path, Insert insert,
         NormalizedNode data);
 
-    private static Data childPath(final Data path, final PrefixAndBody prefixAndBody) {
+    protected static Data childPath(final Data path, final List<PathArgument> prefixAndBody) {
         var ret = path.instance();
-        for (var arg : prefixAndBody.prefix()) {
+        for (var arg : prefixAndBody) {
             ret = ret.node(arg);
         }
         final var databind = path.databind();
