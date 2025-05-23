@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a8fb078_ce39d716",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-23T14:37:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43eb14f7_a74cce84",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1cf21a66_cc812e19",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85aee94f_560ac963",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-23T14:37:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1cf21a66_cc812e19",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "126a08ce_928ab88f",
@@ -65,6 +101,24 @@
       "writtenOn": "2025-05-23T12:53:46Z",
       "side": 1,
       "message": "LOG.debug",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f3f3162_499df541",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-23T14:37:22Z",
+      "side": 1,
+      "message": "Deleted. This will be sent where it is actually publishing notification. Like with modify and delete.",
+      "parentUuid": "126a08ce_928ab88f",
       "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
