@@ -55,6 +55,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d9b7b16_0dea8e0d",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T14:37:23Z",
+      "side": 1,
+      "message": "Most of new methods can be static",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1cf21a66_cc812e19",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
         "patchSetId": 3
@@ -83,6 +100,24 @@
       "writtenOn": "2025-05-23T14:37:22Z",
       "side": 1,
       "message": "Done",
+      "parentUuid": "1cf21a66_cc812e19",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "651440fd_11b32b77",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T14:37:23Z",
+      "side": 1,
+      "message": "also can be static",
       "parentUuid": "1cf21a66_cc812e19",
       "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
