@@ -25,6 +25,7 @@ import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.mdsal.spi.data.ExistenceCheck.Conflict;
 import org.opendaylight.restconf.mdsal.spi.data.ExistenceCheck.Result;
+import org.opendaylight.restconf.mdsal.spi.util.ServerDataOperationsUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -56,7 +57,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     protected void deleteImpl(final YangInstanceIdentifier path) throws RequestException {
-        if (RestconfStrategy.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
+        if (ServerDataOperationsUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             rwTx.delete(CONFIGURATION, path);
         } else {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
@@ -99,7 +100,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
                     new ErrorPath(databind, conflict.path()));
             }
         } else {
-            RestconfStrategy.checkItemDoesNotExists(databind, verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
+            RestconfStrategy.checkItemDoesNotExists(databind, verifyNotNull(rwTx).exists(CONFIGURATION, path),
+                path);
             ensureParentsByMerge(path);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
@@ -164,6 +166,6 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     protected NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws RequestException {
-        return (NormalizedNodeContainer<?>) RestconfStrategy.syncAccess(read(path), path).orElse(null);
+        return (NormalizedNodeContainer<?>) ServerDataOperationsUtil.syncAccess(read(path), path).orElse(null);
     }
 }

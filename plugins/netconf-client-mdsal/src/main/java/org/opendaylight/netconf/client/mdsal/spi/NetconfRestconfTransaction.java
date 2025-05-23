@@ -37,8 +37,8 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfTransaction;
+import org.opendaylight.restconf.mdsal.spi.util.ServerDataOperationsUtil;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -132,7 +132,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     protected @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws RequestException {
         // reading list is mainly invoked for subsequent removal,
         // cache data to avoid extra read invocation on delete/remove
-        final var result =  RestconfStrategy.syncAccess(read(path), path);
+        final var result =  ServerDataOperationsUtil.syncAccess(read(path), path);
         readListCache.put(path, result.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of()));
         return (NormalizedNodeContainer<?>) result.orElse(null);
     }
@@ -150,7 +150,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             // on building get-config filter
             : netconfService.getConfig(
                 path.node(NodeIdentifierWithPredicates.of(path.getLastPathArgument().getNodeType())), keyFields);
-        final var retrieved = RestconfStrategy.syncAccess(future, path);
+        final var retrieved = ServerDataOperationsUtil.syncAccess(future, path);
         return retrieved.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of());
     }
 
