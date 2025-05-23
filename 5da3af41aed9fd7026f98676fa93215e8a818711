@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43eb14f7_a74cce84",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T12:53:46Z",
+      "side": 1,
+      "message": "Looks like we send a notification even if the transaction commit failed",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cf21a66_cc812e19",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T12:53:46Z",
+      "side": 1,
+      "message": "sendStateNotification() only builds a ContainerNode. IMO `buildStateNotification` will be better name.",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "126a08ce_928ab88f",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-23T12:53:46Z",
+      "side": 1,
+      "message": "LOG.debug",
+      "revId": "5da3af41aed9fd7026f98676fa93215e8a818711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
