@@ -44,6 +44,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
@@ -91,6 +92,11 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private DOMMountPointService mountPointService;
     @Mock
     private DOMMountPoint mountPoint;
+
+    static Data modulesPath(final YangInstanceIdentifier path) {
+        final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(path).orElseThrow();
+        return new Data(MODULES_DATABIND, childAndStack.stack().toInference(), path, childAndStack.node());
+    }
 
     @Override
     RestconfStrategy newDataOperations(final DatabindContext databind) {
@@ -413,8 +419,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
+        final var dataPath = modulesPath(path);
 
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM));
     }
 
     @Test
@@ -443,8 +450,8 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
-
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var dataPath = modulesPath(path);
+        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM));
     }
 
     @Test
@@ -466,8 +473,8 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
-
-        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var dataPath = modulesPath(path);
+        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM));
     }
 
     @Test
