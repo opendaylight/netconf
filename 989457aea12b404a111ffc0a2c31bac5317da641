@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d76999c5_f03d6d25",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "there is @NonNullByDefault but we expect eventStreamFilter can be null?",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fe272b7_2a2eb335",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "final",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce86d9a3_ec5e22fe",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "there is @NonNullByDefault but we expect eventStreamFilter can be null?",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c264859_a60bce3c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "also current @annotations seem to indicate this should be always true",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2df5dc1b_860d82c2",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "indent",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc82d605_2b737b17",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "doesn\u0027t seem correct?\n\nmaybe some fix me if this logic is not fully finished?",
+      "range": {
+        "startLine": 117,
+        "startChar": 74,
+        "endLine": 117,
+        "endChar": 79
+      },
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c747add9_35dc05ab",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-26T10:38:10Z",
+      "side": 1,
+      "message": "subscriber.sendDataMessage missing?",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
