@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef6df924_9f1932b5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fe272b7_2a2eb335",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df46aa3d_babd6bd3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d76999c5_f03d6d25",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce86d9a3_ec5e22fe",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-05-26T10:38:10Z",
       "side": 1,
       "message": "there is @NonNullByDefault but we expect eventStreamFilter can be null?",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b062bab_93ad58ad",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce86d9a3_ec5e22fe",
       "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b09a9368_0df5e475",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c264859_a60bce3c",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2df5dc1b_860d82c2",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-05-26T10:38:10Z",
       "side": 1,
       "message": "indent",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "509d7be6_64367bb1",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2df5dc1b_860d82c2",
       "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -133,6 +223,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "935198c9_6e267a74",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "For now, it is not clear where to get the path. This issue is documented in SubtreeEventStreamFilter#test FIXME",
+      "parentUuid": "cc82d605_2b737b17",
+      "range": {
+        "startLine": 117,
+        "startChar": 74,
+        "endLine": 117,
+        "endChar": 79
+      },
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c747add9_35dc05ab",
@@ -146,6 +260,24 @@
       "writtenOn": "2025-05-26T10:38:10Z",
       "side": 1,
       "message": "subscriber.sendDataMessage missing?",
+      "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77dfc9e4_fbd5c136",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-05-26T11:30:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c747add9_35dc05ab",
       "revId": "989457aea12b404a111ffc0a2c31bac5317da641",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
