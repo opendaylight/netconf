@@ -33,6 +33,24 @@
       "message": "First sentence.\nempty line\n\u003cp\u003eParagraph\nempty line\n\u003cp\u003eParagraph",
       "revId": "159e8bedfb4d583fbd5f048260eb87c5c1645eb0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a82a6b83_665e837c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/NC1440Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-26T11:13:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50f7c09c_0c587ef2",
+      "revId": "159e8bedfb4d583fbd5f048260eb87c5c1645eb0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
