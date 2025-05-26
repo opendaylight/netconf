@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "27c9b8273817bbcf5005e53855291d79598b38a3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89489f36_811573c3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-26T09:10:48Z",
+      "side": 1,
+      "message": "I believe instead of making it not private TERMINATED_VH should be used. Or if you do use it then SuppressFBWarnings is not longer required",
+      "revId": "27c9b8273817bbcf5005e53855291d79598b38a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
