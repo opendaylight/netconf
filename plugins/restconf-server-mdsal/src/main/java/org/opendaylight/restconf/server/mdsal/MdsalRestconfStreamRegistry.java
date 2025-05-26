@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -297,6 +298,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
                     .withChild(ImmutableNodes.leafNode(STREAM_NODEID, streamName))
+                    // FIXME: Uncomment once YANGTOOLS-1670 has been resolved.
 //                    .withChild(ImmutableNodes.newChoiceBuilder()
 //                        .withNodeIdentifier(STREAM_FILTER_NODEID)
 //                        .withChild(ImmutableNodes.leafNode(SubscriptionUtil.QNAME_STREAM_FILTER,
@@ -335,6 +337,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         return Futures.transform(future, unused -> null, MoreExecutors.directExecutor());
     }
 
+    @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE",
+        justification = "filterNode kept for future use until YANGTOOLS-1670 is fixed")
     @Override
     protected synchronized ListenableFuture<Void> modifySubscriptionFilter(final Uint32 subscriptionId,
             final RestconfStream.SubscriptionFilter filter) {
@@ -364,10 +368,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
                 .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(TARGET_NODEID)
-                    .withChild(ImmutableNodes.newChoiceBuilder()
-                        .withNodeIdentifier(STREAM_FILTER_NODEID)
-                        .withChild(filterNode)
-                        .build())
+                    // FIXME: Uncomment once YANGTOOLS-1670 has been resolved.
+//                    .withChild(ImmutableNodes.newChoiceBuilder()
+//                        .withNodeIdentifier(STREAM_FILTER_NODEID)
+//                        .withChild(filterNode)
+//                        .build())
                     .build())
                 .build());
         return tx.commit().transform(info -> {
