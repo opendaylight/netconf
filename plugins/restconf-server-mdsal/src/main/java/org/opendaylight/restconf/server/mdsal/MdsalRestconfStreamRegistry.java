@@ -344,7 +344,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(FILTER_SPEC_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_SUBTREE_FILTER_NODEID, anydata))
+                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+                        .withNodeIdentifier(STREAM_SUBTREE_FILTER_NODEID)
+                        .withValue(anydata)
+                        .build())
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
