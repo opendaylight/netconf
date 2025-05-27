@@ -327,6 +327,9 @@ public final class RestconfStream<T> {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
         }
 
+        public abstract org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .subscriptions.Subscription toOperational();
+
         @NonNullByDefault
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return helper.add("terminated", terminated);
