@@ -466,7 +466,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final var subscription = lookupSubscription(subscriptionId);
             final var eventFormatter = getEventFormatter(subscription.encoding());
             final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionModified(subscriptionId,
-                subscription.streamName(), subscription.encoding(), null, null, null), Instant.now());
+                subscription.streamName(), subscription.encoding(), filter, null, null), Instant.now());
             LOG.debug("Publishing modified state notification for subscription with ID: {}", subscriptionId);
             subscription.publishMessage(formatNotification(eventFormatter, notificationBody));
             return null;
@@ -538,7 +538,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @return {@link ContainerNode} notification body
      */
     private static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
-            final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
+            final @Nullable QName encoding, final RestconfStream.SubscriptionFilter filter,
             final @Nullable String stopTime, final @Nullable String uri) {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
         var body = ImmutableNodes.newContainerBuilder()
@@ -548,12 +548,19 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         if (encoding != null) {
             body.withChild(ImmutableNodes.leafNode(ENCODING_NODEID, encoding));
         }
-        // FIXME handle filter properly
         if (filter != null) {
-            body.withChild(ImmutableNodes.newAnydataBuilder(NormalizedAnydata.class)
-                .withNodeIdentifier(STREAM_SUBTREE_FILTER_NODEID)
-                .withValue(filter)
-                .build());
+            final var filterNode = switch (filter) {
+                case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
+                    ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
+                case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
+                    ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+                        .withNodeIdentifier(STREAM_SUBTREE_FILTER_NODEID)
+                        .withValue(anydata)
+                        .build();
+                case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
+                    ImmutableNodes.leafNode(STREAM_XPATH_FILTER_NODEID, xpath);
+            };
+            body.withChild(filterNode);
         }
         if (stopTime != null) {
             body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime));
