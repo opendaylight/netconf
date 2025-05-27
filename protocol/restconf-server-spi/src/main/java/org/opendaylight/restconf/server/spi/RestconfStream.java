@@ -20,6 +20,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
@@ -237,7 +238,6 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     /**
      * A handle to a RFC8639 subscription.
      */
-    // TODO: a .toOperational() should result in the equivalent MapEntryNode equivalent of a Binding Subscription
     @Beta
     public abstract static class Subscription {
         @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
@@ -309,6 +309,13 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         public abstract @Nullable Instant stopTime();
 
         /**
+         * Returns the list of receivers names.
+         *
+         * @return the list of receivers
+         */
+        public abstract List<String> receiversNames();
+
+        /**
          * Add a new receiver with this subscription, forwarding events to the specified {@link Sender}.
          *
          * @param request a {@link ServerRequest} completing with a {@link Registration} of the receiver
@@ -345,6 +352,9 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
         }
+
+        public abstract org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .subscriptions.Subscription toOperational();
 
         @NonNullByDefault
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
