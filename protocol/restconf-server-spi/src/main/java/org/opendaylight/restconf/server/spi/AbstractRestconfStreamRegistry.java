@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -32,6 +33,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -47,11 +49,19 @@ import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.ReceiversBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.ReceiverBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter64;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -282,6 +292,45 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
+        }
+
+        @Override
+        public List<String> receiversNames() {
+            return receivers.stream()
+                .map(Rfc8639Subscriber::receiverName)
+                .collect(Collectors.toList());
+        }
+
+        @Override
+        public org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+                .subscriptions.Subscription toOperational() {
+            final Encoding encoding;
+            if (EncodeXml$I.QNAME.equals(encoding())) {
+                encoding = EncodeXml$I.VALUE;
+            } else if (EncodeJson$I.QNAME.equals(encoding())) {
+                encoding = EncodeJson$I.VALUE;
+            } else {
+                throw new IllegalArgumentException("Invalid encoding: " + encoding().getLocalName());
+            }
+
+            final var subscriptionBuilder = new SubscriptionBuilder()
+                .setId(new SubscriptionId(id()))
+                .setEncoding(encoding)
+                .setReceivers(new ReceiversBuilder()
+                    .setReceiver(receivers.stream()
+                        .map(receiver -> new ReceiverBuilder()
+                            .setName(receiver.receiverName())
+                            .setState(State.Active)
+                            .setSentEventRecords(new ZeroBasedCounter64(receiver.sentEventRecords()))
+                            .setExcludedEventRecords(new ZeroBasedCounter64(receiver.excludedEventRecords()))
+                            .build())
+                        .collect(BindingMap.toMap()))
+                    .build());
+
+            if (stopTime() != null) {
+                subscriptionBuilder.setStopTime(new DateAndTime(stopTime().toString()));
+            }
+            return subscriptionBuilder.build();
         }
     }
 
