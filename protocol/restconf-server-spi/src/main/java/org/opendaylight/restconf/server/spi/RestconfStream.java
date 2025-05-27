@@ -235,7 +235,6 @@ public final class RestconfStream<T> {
     /**
      * A handle to a RFC8639 subscription.
      */
-    // TODO: a .toOperational() should result in the equivalent MapEntryNode equivalent of a Binding Subscription
     @Beta
     public abstract static class Subscription {
         @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD",
@@ -339,6 +338,9 @@ public final class RestconfStream<T> {
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
         }
+
+        public abstract org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
+            .subscriptions.Subscription toOperational();
 
         @NonNullByDefault
         protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
