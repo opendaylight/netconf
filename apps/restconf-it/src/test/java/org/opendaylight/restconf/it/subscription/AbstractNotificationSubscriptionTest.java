@@ -135,6 +135,10 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
     }
 
+    MdsalRestconfStreamRegistry getStreamRegistry() {
+        return streamRegistry;
+    }
+
     @BeforeAll
     static void beforeAll() {
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
