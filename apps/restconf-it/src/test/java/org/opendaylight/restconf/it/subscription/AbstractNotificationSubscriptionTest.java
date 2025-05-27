@@ -403,4 +403,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
         return jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
     }
+
+    public MdsalRestconfStreamRegistry getStreamRegistry() {
+        return streamRegistry;
+    }
 }
