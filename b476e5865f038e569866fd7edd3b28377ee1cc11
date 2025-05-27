@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8471ba21_5b7b4d90",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-27T13:30:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0184b33b_6ffc8a1f",
+      "revId": "b476e5865f038e569866fd7edd3b28377ee1cc11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96f81c7f_19954392",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-05-27T12:43:57Z",
       "side": 1,
       "message": "Usually, public methods are collocated in a file.",
+      "revId": "b476e5865f038e569866fd7edd3b28377ee1cc11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f4c7d33_aae43a8a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-27T13:30:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96f81c7f_19954392",
       "revId": "b476e5865f038e569866fd7edd3b28377ee1cc11",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
