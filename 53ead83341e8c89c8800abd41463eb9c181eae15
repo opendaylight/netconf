@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63083447_369efddf",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:05:02Z",
+      "side": 1,
+      "message": "subscription.publishStateNotif()",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6953172_e082a625",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:05:02Z",
+      "side": 1,
+      "message": "This needs an explanation why do we need another formatter",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3d2aba4_51053119",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:05:02Z",
+      "side": 1,
+      "message": "IMO error, state notification cannot be null as it cannot be counted as excluded by sender logic, as its going to happen this way (prohibited by RFC)",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5df7b733_df2199ab",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:05:02Z",
+      "side": 1,
+      "message": "else if XML {\n} else {\n// this should not happen and log\n}",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0415228c_bca0f202",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:05:02Z",
+      "side": 1,
+      "message": "Are we sure that state notification can be counted by sent counter?",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbb686b1_bb2474ee",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:05:02Z",
+      "side": 1,
+      "message": "This will maybe really be nonnull as we should check if message is formatted (not null) - because we cannot exclude state messages from delivery.",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
