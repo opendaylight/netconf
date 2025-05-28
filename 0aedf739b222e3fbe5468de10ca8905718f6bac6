@@ -16,6 +16,24 @@
       "message": "maybe, would be better if Rfc8639Subscriber contains EventStreamFilter as additional field?",
       "revId": "0aedf739b222e3fbe5468de10ca8905718f6bac6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3711b21b_c967b8f7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T07:24:10Z",
+      "side": 1,
+      "message": "Done in https://git.opendaylight.org/gerrit/c/netconf/+/116579/6/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java#70",
+      "parentUuid": "2d113072_8cb9727e",
+      "revId": "0aedf739b222e3fbe5468de10ca8905718f6bac6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
