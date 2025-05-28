@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f3786a8_be670f74",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 56
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:16:57Z",
+      "side": 1,
+      "message": "Yes, subscription-terminated is correct, https://www.rfc-editor.org/rfc/rfc8639.html#section-2.7.3",
+      "revId": "f7bcd3ef0c8e6f2f2eda9a292de4c3d5fdc0648f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fb62a82e_d80a7c9a",
@@ -31,6 +48,23 @@
       "writtenOn": "2025-05-28T11:59:09Z",
       "side": 1,
       "message": "recheck",
+      "revId": "f7bcd3ef0c8e6f2f2eda9a292de4c3d5fdc0648f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a78d3fa_595e900c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 56
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-28T12:16:57Z",
+      "side": 1,
+      "message": "there is a service scheduled to terminate subscription when stop time applies (only one service for all subscriptions)",
       "revId": "f7bcd3ef0c8e6f2f2eda9a292de4c3d5fdc0648f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
