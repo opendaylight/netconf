@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "289f3d60_8b556c41",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T08:21:29Z",
+      "side": 1,
+      "message": "IMO Consider making it into \u0027if\u0027 statement to Log in else case that notification was rejected by path. \"format\" itself also can return null but there has logging that states \"Failed to format\". This way logs will tell exactly why null was returned - because of path or because of formatting.",
+      "revId": "6b8440278616a16c2f7182db74b3ecbe6f0b85fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
