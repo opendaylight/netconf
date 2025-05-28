@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43cec8fc_3d4efe3b",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T15:28:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63083447_369efddf",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6953172_e082a625",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-28T12:05:02Z",
       "side": 1,
       "message": "This needs an explanation why do we need another formatter",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fe4e6b7_1c9e3e78",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T15:28:59Z",
+      "side": 1,
+      "message": "Added java doc",
+      "parentUuid": "c6953172_e082a625",
       "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47238cc4_06c134d1",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T15:28:59Z",
+      "side": 1,
+      "message": "Will log error now",
+      "parentUuid": "a3d2aba4_51053119",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5df7b733_df2199ab",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-05-28T12:05:02Z",
       "side": 1,
       "message": "else if XML {\n} else {\n// this should not happen and log\n}",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7116847_6c15193a",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T15:28:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5df7b733_df2199ab",
       "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25504235_82dfacf9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T15:28:59Z",
+      "side": 1,
+      "message": "Yes. I am sure. You can see it if you establish subscriptions, start listen to it and then send some modify RPCs. By using simple GET on subscription and checking sent-event-records you may notice that after each modify RPC counter is incremented by 2. This happens because 2 state notifications are sent - one by logic added in this patch and second one by not-yet-removed SubscriptionStateService.\nExample of GET request:\ncurl --location \u0027http://127.0.0.1:8182/restconf/data/ietf-subscribed-notifications:subscriptions/subscription\u003d2147483648\u0027 \\\n--header \u0027Accept: application/xml\u0027 \\\n--header \u0027Content-Type: application/xml\u0027 \\\n--header \u0027Authorization: Basic YWRtaW46YWRtaW4\u003d\u0027",
+      "parentUuid": "0415228c_bca0f202",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbb686b1_bb2474ee",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-05-28T12:05:02Z",
       "side": 1,
       "message": "This will maybe really be nonnull as we should check if message is formatted (not null) - because we cannot exclude state messages from delivery.",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54006ac9_c812e8f7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-28T15:28:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbb686b1_bb2474ee",
       "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
