@@ -39,6 +39,9 @@ class SubtreeMatcherTest {
     private static final QName TYPE_QNAME = QName.create(NAMESPACE, "type");
     private static final QName ID_QNAME = QName.create(NAMESPACE, "id");
     private static final QName DEPT_QNAME = QName.create(NAMESPACE, "dept");
+    private static final QName EXAMPLE_NOTIFICATION_QNAME = QName.create(NAMESPACE, "example-notification");
+    private static final QName QNAME_PROPERTY_ID = QName.create(NAMESPACE, "id");
+    private static final QName ENTRY_QNAME = QName.create(NAMESPACE, "entry");
 
     @Mock
     private DatabindContext mockedContext;
@@ -376,6 +379,41 @@ class SubtreeMatcherTest {
 
         final var matcher = new SubtreeMatcher(filter, top);
         assertFalse(matcher.matches(), "Non-matching content should fail");
+    }
+
+    @Test
+    void testExtraLeafInsideConstrainedContainer() {
+        /* Filter structure:
+        * <example-notification>
+        *   <entry>
+        *       <id/>
+        *   </entry>
+        * </example-notification>
+        */
+        final var filter = SubtreeFilter.builder(mockedContext)
+            .add(ContainmentNode.builder(new NamespaceSelection.Exact(EXAMPLE_NOTIFICATION_QNAME))
+                .add(ContainmentNode.builder(new NamespaceSelection.Exact(ENTRY_QNAME))
+                    .add(SelectionNode.builder(new NamespaceSelection.Exact(QNAME_PROPERTY_ID)).build())
+                    .build())
+                .build())
+            .build();
+
+        // data entry contains <id>ID</id>  and  <name>name</name>  (extra leaf)
+        final var notif = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(EXAMPLE_NOTIFICATION_QNAME))
+            .withChild(ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(ENTRY_QNAME))
+                .withChild(ImmutableNodes.newMapEntryBuilder()
+                    .withNodeIdentifier(
+                        YangInstanceIdentifier.NodeIdentifierWithPredicates
+                            .of(ENTRY_QNAME, QNAME_PROPERTY_ID, "ID"))
+                    .withChild(ImmutableNodes.leafNode(QNAME_PROPERTY_ID, "ID"))
+                    .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name"))  // extra
+                    .build())
+                .build())
+            .build();
+
+        assertFalse(new SubtreeMatcher(filter, notif).matches(), "Extra <name> leaf must cause mismatch");
     }
 }
 
