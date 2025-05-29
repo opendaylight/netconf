@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79b8e95e_a96c4bc4",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-29T11:01:59Z",
+      "side": 1,
+      "message": "remove extra empty line",
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dc05762_95e1f8e9",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-29T11:01:59Z",
+      "side": 1,
+      "message": "move one line above method",
+      "range": {
+        "startLine": 36,
+        "startChar": 8,
+        "endLine": 36,
+        "endChar": 18
+      },
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb8931ba_8dae90d2",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-29T11:01:59Z",
+      "side": 1,
+      "message": "Move to line above",
+      "range": {
+        "startLine": 53,
+        "startChar": 9,
+        "endLine": 53,
+        "endChar": 17
+      },
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9c1dbd4_528360b7",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-29T11:01:59Z",
+      "side": 1,
+      "message": "Hmm. This looks like surface check. How does it holds up with more complicated filter structure. For example example filters from RFC?",
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
