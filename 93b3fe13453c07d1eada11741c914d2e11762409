@@ -16,6 +16,24 @@
       "message": "no, we will not always terminate",
       "revId": "93b3fe13453c07d1eada11741c914d2e11762409",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a59f8119_69422de9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-05-29T07:48:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec3705e5_5a639db3",
+      "revId": "93b3fe13453c07d1eada11741c914d2e11762409",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
