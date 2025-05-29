@@ -16,6 +16,24 @@
       "message": "ByteBufResponse together with ByteStreamRequestResponse which were using #toReadyResponse method (writing all body at once) were replaced by ResponseOutput and ResponseBodyOutputStream.\n\nResponseOutput#start creates ResponseBodyOutputStream. ResponseOutput is used in replacement of #toReadyResponse #writeTo - see AbstractFiniteResponse and FiniteResponse.\n\nWe need a way how to run streaming from here?\nWhat\u0027s the purpose of ResponseWriter?",
       "revId": "f6396a08c32746938137109e90dc0be4489c65be",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1f87251_9afca7d2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-29T07:58:22Z",
+      "side": 1,
+      "message": "ResponseOutput#start creates ResponseBodyoutputStream which is implementation of java’s OutpustStream. Its implementation of #write uses HTTPServerSession #sendResponseStart and #sendResponsePart methods. This would require implementing these methods in HTTPServerSession  and chnages in its ServerRequestExecutor (mainly #format). I expect that HTTPServerSession#sendResponseStart and HTTPServerSession#sendResponsePart are going to use ResponseWriter\u0027 similar named methods to implement this.",
+      "parentUuid": "91f92458_e842e91c",
+      "revId": "f6396a08c32746938137109e90dc0be4489c65be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
