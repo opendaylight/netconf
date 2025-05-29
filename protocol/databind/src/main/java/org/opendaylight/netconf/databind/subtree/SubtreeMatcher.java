@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -59,26 +60,29 @@ public final class SubtreeMatcher implements Immutable {
      */
     private static boolean matchContainment(final ContainmentNode filter, final DataContainerNode parent) {
         // First attempt to match the parent node itself.
-        if (checkSelection(filter.selection(), parent.name().getNodeType())
-                && matchContainerInstance(filter, parent)) {
-            return true;
+        boolean matched = false;
+        if (checkSelection(filter.selection(), parent.name().getNodeType())) {
+            if (!matchContainerInstance(filter, parent)) {
+                return false;
+            }
+            matched = true;
         }
         // Otherwise iterate over direct children with matching QName.
         for (final var child : parent.body()) {
             if (!checkSelection(filter.selection(), child.name().getNodeType())) {
                 continue;
             }
-            if (child instanceof MapNode map) {
-                if (matchMapNode(filter, map)) {
-                    return true;
-                }
-            } else if (child instanceof DataContainerNode dc) {
-                if (matchContainerInstance(filter, dc)) {
-                    return true;
-                }
+            if (switch (child) {
+                    case MapNode map -> matchMapNode(filter, map);
+                    case DataContainerNode dc -> matchContainerInstance(filter, dc);
+                    default -> false;
+                }) {
+                matched = true;
+            } else {
+                return false;
             }
         }
-        return false;
+        return matched;
     }
 
     /**
@@ -99,6 +103,14 @@ public final class SubtreeMatcher implements Immutable {
         for (final var selection : filter.selections()) {
             if (!matchSelectionNode(selection, data)) {
                 return false;
+            }
+        }
+        if (!(filter.contentMatches().isEmpty() && filter.selections().isEmpty() && filter.containments().isEmpty())) {
+            for (final var ch : data.body()) {
+                if (!isCovered(ch, filter)) {
+                    // extra leaf / container found
+                    return false;
+                }
             }
         }
         return true;
@@ -137,6 +149,13 @@ public final class SubtreeMatcher implements Immutable {
                     return false;
                 }
             }
+            if (!filter.contentMatches().isEmpty() || !filter.selections().isEmpty()) {
+                for (var ch : entry.body()) {
+                    if (!isCovered(ch, filter)) {
+                        return false;
+                    }
+                }
+            }
         }
         return true;
     }
@@ -162,6 +181,31 @@ public final class SubtreeMatcher implements Immutable {
             }
             if (child instanceof DataContainerNode containerNode && matchAttributeSet(sel.attributeMatches(),
                 containerNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isCovered(final DataContainerChild child, final ContainmentNode filter) {
+        final var qn = child.name().getNodeType();
+        // leaf covered by ContentMatch?
+        if (child instanceof LeafNode<?>) {
+            for (var cm : filter.contentMatches()) {
+                if (cm.qnameValueMap().containsKey(qn)) {
+                    return true;
+                }
+            }
+        }
+        // leaf or container selected?
+        for (var sel : filter.selections()) {
+            if (checkSelection(sel.selection(), qn)) {
+                return true;
+            }
+        }
+        // container / map / choice matched by nested Containment?
+        for (var c : filter.containments()) {
+            if (checkSelection(c.selection(), qn)) {
                 return true;
             }
         }
