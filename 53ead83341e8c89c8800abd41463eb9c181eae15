@@ -176,6 +176,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9459e36f_d657bcd6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-29T06:04:07Z",
+      "side": 1,
+      "message": "The question is if its OK by RFC - but seems OK.",
+      "parentUuid": "25504235_82dfacf9",
+      "revId": "53ead83341e8c89c8800abd41463eb9c181eae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbb686b1_bb2474ee",
