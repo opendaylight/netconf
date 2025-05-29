@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ddd06df_ca95627e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2025-05-29T06:30:49Z",
+      "side": 1,
+      "message": "no reply for a long time, so I assume it is good as is - marking as resolved",
+      "parentUuid": "166166ec_de01e2d7",
+      "revId": "49fb1b23e184ec3bf7cc535ca4e68127d3cae606",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da4f7a4f_fdfc624f",
