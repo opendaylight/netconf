@@ -85,6 +85,24 @@
       "message": "there is a service scheduled to terminate subscription when stop time applies (only one service for all subscriptions)",
       "revId": "f7bcd3ef0c8e6f2f2eda9a292de4c3d5fdc0648f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddce15f5_aafa0b17",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 56
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-05-29T12:57:53Z",
+      "side": 1,
+      "message": "Now only one task is created that will terminate subscription with earliest stop-time. After removal or when adding new subscription with earlier stop-time, task is rescheduled.",
+      "parentUuid": "1a78d3fa_595e900c",
+      "revId": "f7bcd3ef0c8e6f2f2eda9a292de4c3d5fdc0648f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
