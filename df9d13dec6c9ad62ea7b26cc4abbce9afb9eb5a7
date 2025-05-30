@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c926cc7_01b2ee0c",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-05-30T11:44:43Z",
+      "side": 0,
+      "message": "Do we have this test replicated somewhere?",
+      "revId": "df9d13dec6c9ad62ea7b26cc4abbce9afb9eb5a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
