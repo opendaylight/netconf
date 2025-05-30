@@ -16,6 +16,24 @@
       "message": "Do we have this test replicated somewhere?",
       "revId": "df9d13dec6c9ad62ea7b26cc4abbce9afb9eb5a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3aabbde_cc42dcf5",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-05-30T12:47:52Z",
+      "side": 0,
+      "message": "For every possible event - no because suspended and resumed are not invoked anywhere. Because it is not service anymore I can\u0027t invoke these notifications like in this test. But you can see modify and delete notifications now in tests that are listening to subscription - like NotificationSubscriptionListeningTest.",
+      "parentUuid": "7c926cc7_01b2ee0c",
+      "revId": "df9d13dec6c9ad62ea7b26cc4abbce9afb9eb5a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
