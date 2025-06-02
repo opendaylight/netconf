@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c9b2aa97_6f96a3f2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T16:42:05Z",
+      "side": 1,
+      "message": "There can be one more test case, when stop-time is reached and user wants to listen subscription",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cf8cf353_128552ae",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
         "patchSetId": 68
