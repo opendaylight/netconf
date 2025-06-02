@@ -46,6 +46,30 @@
       },
       "revId": "737dc1dee808c304efaa69127510d1eedd1c4af8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb3c405_f91bcab2",
+        "filename": "plugins/restconf-server-mdsal/src/test/java/org/opendaylight/restconf/server/mdsal/StateNotificationFormattingTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-06-02T16:36:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8686da7d_6f1b9f8f",
+      "range": {
+        "startLine": 40,
+        "startChar": 73,
+        "endLine": 40,
+        "endChar": 95
+      },
+      "revId": "737dc1dee808c304efaa69127510d1eedd1c4af8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
