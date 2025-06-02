@@ -156,7 +156,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * Subscription states. Each is backed by a notification in {@code ietf-subscribed-notifications}.
      */
     @NonNullByDefault
-    private enum State {
+    enum State {
         RESUMED(SubscriptionResumed.QNAME),
         MODIFIED(SubscriptionModified.QNAME),
         TERMINATED(SubscriptionTerminated.QNAME),
@@ -497,6 +497,19 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }, MoreExecutors.directExecutor());
     }
 
+    static String getFormattedNotification(final Uint32 subscriptionId, final QName encoding,
+            final ContainerNode notificationNode, final State state, final Instant now,
+            final EffectiveModelContext context) {
+        final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(encoding),
+            "Error getting formatter for encoding {}", encoding);
+        final var notification = new DOMNotificationEvent.Rfc6020(notificationNode, now);
+        LOG.debug("Publishing {} state notification for subscription with ID: {}", state.nodeId.getNodeType()
+            .getLocalName(), subscriptionId);
+        final var formattedNotification = formatStateNotification(eventFormatter, context, notification);
+        verify(formattedNotification != null && !formattedNotification.isBlank(), "Notification message is empty");
+        return formattedNotification;
+    }
+
     @Override
     protected synchronized ListenableFuture<Void> updateSubscriptionReceivers(final Uint32 subscriptionId,
             final MapNode receiver) {
@@ -561,7 +574,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @param uri        the optional subscription uri
      * @return {@link ContainerNode} notification body
      */
-    private static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
+    static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
             final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
             final @Nullable String stopTime, final @Nullable String uri) {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
@@ -591,22 +604,21 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     /**
      * Creates body for state notification indicating the subscription was terminated.
      *
-     * @param id        the subscription ID
+     * @param id the subscription ID
      * @return {@link ContainerNode} notification body for terminated subscription state
      */
-    private static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
+    static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
         return buildErrorStateNotification(id, reason, State.TERMINATED);
     }
 
     /**
      * Creates body for state notification indicating the subscription was suspended.
      *
-     * @param id        the subscription ID
+     * @param id the subscription ID
      * @return {@link ContainerNode} state notification body for suspended subscription
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
-    private static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
-        return buildErrorStateNotification(id, reason, State.TERMINATED);
+    static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
+        return buildErrorStateNotification(id, reason, State.SUSPENDED);
     }
 
     /**
@@ -629,19 +641,18 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     /**
      * Creates body for state notification indicating the subscription was resumed.
      *
-     * @param id        the subscription ID
+     * @param id the subscription ID
      * @return {@link ContainerNode} state notification body for resumed subscription
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
-    private static ContainerNode subscriptionResumed(final Uint32 id) {
+    static ContainerNode subscriptionResumed(final Uint32 id) {
         return buildStateNotification(id, State.RESUMED);
     }
 
     /**
      * Builds generic state notification body.
      *
-     * @param id          the subscription ID
-     * @param state       subscription state
+     * @param id    the subscription ID
+     * @param state subscription state
      * @return {@link ContainerNode} generic state notification body
      */
     private static ContainerNode buildStateNotification(final Uint32 id, final State state) {
