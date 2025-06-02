@@ -22,6 +22,30 @@
       },
       "revId": "737dc1dee808c304efaa69127510d1eedd1c4af8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8686da7d_6f1b9f8f",
+        "filename": "plugins/restconf-server-mdsal/src/test/java/org/opendaylight/restconf/server/mdsal/StateNotificationFormattingTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-06-02T15:11:47Z",
+      "side": 1,
+      "message": "You mean I should take formatted notification, get time from it and go to UTC to compare them? Or something else?",
+      "parentUuid": "b29132a1_f2e47284",
+      "range": {
+        "startLine": 40,
+        "startChar": 73,
+        "endLine": 40,
+        "endChar": 95
+      },
+      "revId": "737dc1dee808c304efaa69127510d1eedd1c4af8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
