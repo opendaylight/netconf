@@ -50,6 +50,57 @@
       "message": "Has to be 5 seconds?",
       "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff096b79_4838ec6c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T18:12:12Z",
+      "side": 1,
+      "message": "Looks same, can be extracted in separate method? Alternatively, can it be limited to one method since only logs differences?",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e357593_95fb75d2",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T18:12:12Z",
+      "side": 1,
+      "message": "explicit null is redundant here",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c75b4fe5_17c3cb16",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T18:12:12Z",
+      "side": 1,
+      "message": "Why not just id.equals(nextSubscriptionToStop)?",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
