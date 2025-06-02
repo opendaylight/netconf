@@ -16,6 +16,63 @@
       "message": "recheck",
       "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89cabe24_e92103b9",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T17:19:56Z",
+      "side": 1,
+      "message": "Instant.parse(stopTime) has to be wrapped in a try-catch, in case DateTimeParseException sends RequestException",
+      "range": {
+        "startLine": 121,
+        "startChar": 59,
+        "endLine": 121,
+        "endChar": 82
+      },
+      "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "075424ca_4c5d441c",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T17:19:56Z",
+      "side": 1,
+      "message": "Can be extended with an invalid time zone test case",
+      "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8004d762_52b9a502",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T17:19:56Z",
+      "side": 1,
+      "message": "time \u003d\u003d null, and we write \"null\" into DS?\n`\"stop-time\": \"null\"`",
+      "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
