@@ -21,6 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,7 +39,9 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Streams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionTerminatedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -45,38 +49,47 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
 class MdsalRestconfStreamRegistryTest {
+    private static final Uint32 ID = Uint32.valueOf(2147483648L);
+    private static final String STOP_TIME = "2024-10-30T12:34:56Z";
+    private static final String STREAM_NAME = "NETCONF";
+    private static final String URI = "http://example.com";
+    private static final NodeIdentifier URI_NODEID = NodeIdentifier.create(
+        org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117
+            .YangModuleInfoImpl.qnameOf("uri"));
+
     @Mock
-    DOMDataBroker dataBroker;
+    private DOMDataBroker dataBroker;
     @Mock
-    DOMNotificationService notifService;
+    private DOMNotificationService notifService;
     @Mock
-    DOMSchemaService schemaService;
+    private DOMSchemaService schemaService;
     @Mock
-    DatabindProvider databindProvider;
+    private DatabindProvider databindProvider;
     @Mock
-    RestconfStream.LocationProvider locProvider;
+    private RestconfStream.LocationProvider locProvider;
     @Mock
-    DOMDataBroker.DataTreeChangeExtension dtxExt;
+    private DOMDataBroker.DataTreeChangeExtension dtxExt;
     @Mock
-    DOMTransactionChain txChain;
+    private DOMTransactionChain txChain;
     @Mock
-    DOMDataTreeWriteTransaction writeTx;
+    private DOMDataTreeWriteTransaction writeTx;
     @Mock
-    Registration regMock;
+    private Registration regMock;
     @Mock
     private CompletingServerRequest<Uint32> request;
     @Mock
-    TransportSession session;
+    private TransportSession session;
     @Mock
-    TransportSession.Description sessionDesc;
+    private TransportSession.Description sessionDesc;
     @Mock
-    EffectiveModelContext effectiveModelContext;
+    private EffectiveModelContext effectiveModelContext;
 
-    MdsalRestconfStreamRegistry registry;
+    private MdsalRestconfStreamRegistry registry;
 
     @BeforeEach
     void setUp() {
@@ -84,7 +97,6 @@ class MdsalRestconfStreamRegistryTest {
         when(txChain.newWriteOnlyTransaction()).thenReturn(writeTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTx);
-        when(request.session()).thenReturn(session);
         when(schemaService.registerSchemaContextListener(any())).thenReturn(regMock);
         when(dataBroker.extension(DOMDataBroker.DataTreeChangeExtension.class)).thenReturn(dtxExt);
         when(dtxExt.registerTreeChangeListener(any(), any())).thenReturn(regMock);
@@ -100,6 +112,7 @@ class MdsalRestconfStreamRegistryTest {
 
     @Test
     void establishSubscriptionTest() {
+        when(request.session()).thenReturn(session);
         when(session.description()).thenReturn(sessionDesc);
         when(sessionDesc.toFriendlyString()).thenReturn("session");
         registry.establishSubscription(request, "NETCONF", EncodeJson$I.QNAME, null);
@@ -129,9 +142,48 @@ class MdsalRestconfStreamRegistryTest {
 
     @Test
     void establishSubscriptionUnknownStreamTest() {
+        when(request.session()).thenReturn(session);
         registry.establishSubscription(request, "TEST", EncodeJson$I.QNAME, null);
         final var errCap = ArgumentCaptor.forClass(RequestException.class);
         verify(request).completeWith(errCap.capture());
         assertEquals("TEST refers to an unknown stream", errCap.getValue().getMessage());
+    }
+
+    @ParameterizedTest
+    @EnumSource(MdsalRestconfStreamRegistry.State.class)
+    void testSubscriptionStateEventsXml(final MdsalRestconfStreamRegistry.State type) {
+        final var notification = switch (type) {
+            case MODIFIED -> MdsalRestconfStreamRegistry.subscriptionModified(ID, STREAM_NAME, EncodeXml$I.QNAME, null,
+                STOP_TIME, URI);
+            case RESUMED -> MdsalRestconfStreamRegistry.subscriptionResumed(ID);
+            case TERMINATED -> MdsalRestconfStreamRegistry.subscriptionTerminated(ID,
+                SubscriptionTerminatedReason.QNAME);
+            case SUSPENDED -> MdsalRestconfStreamRegistry.subscriptionSuspended(ID,
+                SubscriptionTerminatedReason.QNAME);
+        };
+
+        final var eventQName = type.nodeId.getNodeType();
+        assertNotNull(notification);
+        assertEquals(ID, notification.getChildByArg(
+            new NodeIdentifier(QName.create(eventQName, "id"))).body());
+
+        switch (type) {
+            case null -> throw new NullPointerException();
+            case MODIFIED -> {
+                assertEquals(EncodeXml$I.QNAME, notification.getChildByArg(
+                    new NodeIdentifier(QName.create(eventQName, "encoding"))).body());
+                assertEquals(STREAM_NAME, notification.getChildByArg(
+                    new NodeIdentifier(QName.create(eventQName, "stream"))).body());
+                assertEquals(STOP_TIME, notification.getChildByArg(
+                    new NodeIdentifier(QName.create(eventQName, "stop-time"))).body());
+                assertEquals(URI, notification.getChildByArg(URI_NODEID).body());
+            }
+            case SUSPENDED, TERMINATED ->
+                assertEquals(SubscriptionTerminatedReason.QNAME, notification.getChildByArg(
+                    new NodeIdentifier(QName.create(eventQName, "reason"))).body());
+            case RESUMED -> {
+                // Nothing else
+            }
+        }
     }
 }
