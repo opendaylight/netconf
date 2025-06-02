@@ -34,6 +34,24 @@
       "parentUuid": "7c926cc7_01b2ee0c",
       "revId": "df9d13dec6c9ad62ea7b26cc4abbce9afb9eb5a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63c6f8e8_e5ebf316",
+        "filename": "plugins/restconf-notifications-mdsal/src/test/java/org/opendaylight/restconf/notifications/mdsal/SubscriptionStateServiceTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2025-06-02T12:20:09Z",
+      "side": 0,
+      "message": "Added test here: https://git.opendaylight.org/gerrit/c/netconf/+/116662\nSeparate patch in case of comments only to test.",
+      "parentUuid": "b3aabbde_cc42dcf5",
+      "revId": "df9d13dec6c9ad62ea7b26cc4abbce9afb9eb5a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
