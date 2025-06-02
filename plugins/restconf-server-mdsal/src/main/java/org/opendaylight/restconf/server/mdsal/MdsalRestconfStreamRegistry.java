@@ -11,6 +11,7 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -156,7 +157,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * Subscription states. Each is backed by a notification in {@code ietf-subscribed-notifications}.
      */
     @NonNullByDefault
-    private enum State {
+    enum State {
         RESUMED(SubscriptionResumed.QNAME),
         MODIFIED(SubscriptionModified.QNAME),
         TERMINATED(SubscriptionTerminated.QNAME),
@@ -561,7 +562,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @param uri        the optional subscription uri
      * @return {@link ContainerNode} notification body
      */
-    private static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
+    @VisibleForTesting
+    static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
             final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
             final @Nullable String stopTime, final @Nullable String uri) {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
@@ -594,7 +596,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @param id        the subscription ID
      * @return {@link ContainerNode} notification body for terminated subscription state
      */
-    private static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
+    @VisibleForTesting
+    static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
         return buildErrorStateNotification(id, reason, State.TERMINATED);
     }
 
@@ -604,9 +607,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @param id        the subscription ID
      * @return {@link ContainerNode} state notification body for suspended subscription
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
-    private static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
-        return buildErrorStateNotification(id, reason, State.TERMINATED);
+    @VisibleForTesting
+    static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
+        return buildErrorStateNotification(id, reason, State.SUSPENDED);
     }
 
     /**
@@ -632,8 +635,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @param id        the subscription ID
      * @return {@link ContainerNode} state notification body for resumed subscription
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
-    private static ContainerNode subscriptionResumed(final Uint32 id) {
+    @VisibleForTesting
+    static ContainerNode subscriptionResumed(final Uint32 id) {
         return buildStateNotification(id, State.RESUMED);
     }
 
