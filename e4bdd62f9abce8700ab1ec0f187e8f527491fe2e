@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b0ca172_119f3307",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T07:42:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79b8e95e_a96c4bc4",
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8dc05762_95e1f8e9",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-05-29T11:01:59Z",
       "side": 1,
       "message": "move one line above method",
+      "range": {
+        "startLine": 36,
+        "startChar": 8,
+        "endLine": 36,
+        "endChar": 18
+      },
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf76e13d_be1cbfea",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T07:42:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8dc05762_95e1f8e9",
       "range": {
         "startLine": 36,
         "startChar": 8,
@@ -64,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "567320ff_5621d75b",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/NamespaceSelection.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T07:42:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb8931ba_8dae90d2",
+      "range": {
+        "startLine": 53,
+        "startChar": 9,
+        "endLine": 53,
+        "endChar": 17
+      },
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9c1dbd4_528360b7",
@@ -77,6 +143,24 @@
       "writtenOn": "2025-05-29T11:01:59Z",
       "side": 1,
       "message": "Hmm. This looks like surface check. How does it holds up with more complicated filter structure. For example example filters from RFC?",
+      "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6417571a_17ff0297",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T07:42:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9c1dbd4_528360b7",
       "revId": "e4bdd62f9abce8700ab1ec0f187e8f527491fe2e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
