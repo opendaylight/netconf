@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b29132a1_f2e47284",
+        "filename": "plugins/restconf-server-mdsal/src/test/java/org/opendaylight/restconf/server/mdsal/StateNotificationFormattingTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-06-02T15:00:38Z",
+      "side": 1,
+      "message": "nope, we should be always formatting to UTC",
+      "range": {
+        "startLine": 40,
+        "startChar": 73,
+        "endLine": 40,
+        "endChar": 95
+      },
+      "revId": "737dc1dee808c304efaa69127510d1eedd1c4af8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
