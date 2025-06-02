@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07caf570_59045d47",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 62
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-02T15:38:56Z",
+      "side": 0,
+      "message": "IMO better to keep testing stop-time feature in corresponding class StopTimeTest, toOperational can be tested in a separate class",
+      "revId": "aac61dc16e35f91c9b85b97e5d0a904d5428ccd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
