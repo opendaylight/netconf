@@ -156,7 +156,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * Subscription states. Each is backed by a notification in {@code ietf-subscribed-notifications}.
      */
     @NonNullByDefault
-    private enum State {
+    enum State {
         RESUMED(SubscriptionResumed.QNAME),
         MODIFIED(SubscriptionModified.QNAME),
         TERMINATED(SubscriptionTerminated.QNAME),
@@ -387,13 +387,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
         return tx.commit().transform(info -> {
             final var subscription = lookupSubscription(subscriptionId);
-            final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(subscription.encoding()),
-                "Error getting formatter for encoding {}", subscription.encoding());
-            final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionTerminated(subscriptionId,
-                NoSuchSubscription.QNAME), Instant.now());
-            LOG.debug("Publishing terminated state notification for subscription with ID: {}", subscriptionId);
-            final var formattedNotification = formatStateNotification(eventFormatter, notificationBody);
-            verify(formattedNotification != null && !formattedNotification.isBlank(), "Notification message is empty");
+            final var notificationNode = subscriptionTerminated(subscriptionId, NoSuchSubscription.QNAME);
+            final var formattedNotification = getFormattedNotification(subscriptionId, subscription.encoding(),
+                notificationNode, State.TERMINATED, Instant.now(), databindProvider.currentDatabind().modelContext());
             subscription.publishStateNotif(formattedNotification);
             return null;
         }, MoreExecutors.directExecutor());
@@ -415,11 +411,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @return {@link String} state notification already formatted according to encoding
      */
     @SuppressWarnings("checkstyle:illegalCatch")
-    private @Nullable String formatStateNotification(final EventFormatter<DOMNotification> eventFormatter,
-            final DOMNotificationEvent notificationBody) {
+    private static @Nullable String formatStateNotification(final EventFormatter<DOMNotification> eventFormatter,
+            final EffectiveModelContext context, final DOMNotificationEvent notificationBody) {
         try {
-            return eventFormatter.eventData(databindProvider.currentDatabind().modelContext(), notificationBody,
-                notificationBody.getEventInstant());
+            return eventFormatter.eventData(context, notificationBody, notificationBody.getEventInstant());
         } catch (Exception e) {
             LOG.error("Failed to format state notification", e);
             return null;
@@ -492,16 +487,27 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         return tx.commit().transform(info -> {
             LOG.debug("Modified subscription {} to operational datastore as of {}", subscriptionId, info);
             final var subscription = lookupSubscription(subscriptionId);
-            final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(subscription.encoding()),
-                "Error getting formatter for encoding {}", subscription.encoding());
-            final var notificationBody = new DOMNotificationEvent.Rfc6020(subscriptionModified(subscriptionId,
-                subscription.streamName(), subscription.encoding(), null, null, null), Instant.now());
-            LOG.debug("Publishing modified state notification for subscription with ID: {}", subscriptionId);
-            final var formattedNotification = formatStateNotification(eventFormatter, notificationBody);
-            verify(formattedNotification != null && !formattedNotification.isBlank(), "Notification message is empty");
+            // FIXME pass correct filter here
+            final var notificationNode = subscriptionModified(subscriptionId, subscription.streamName(),
+                subscription.encoding(), null, null, null);
+            final var formattedNotification = getFormattedNotification(subscriptionId, subscription.encoding(),
+                notificationNode, State.MODIFIED, Instant.now(), databindProvider.currentDatabind().modelContext());
             subscription.publishStateNotif(formattedNotification);
             return null;
         }, MoreExecutors.directExecutor());
+    }
+
+    static String getFormattedNotification(final Uint32 subscriptionId, final QName encoding,
+            final ContainerNode notificationNode, final State state, final Instant now,
+            final EffectiveModelContext context) {
+        final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(encoding),
+            "Error getting formatter for encoding {}", encoding);
+        final var notification = new DOMNotificationEvent.Rfc6020(notificationNode, now);
+        LOG.debug("Publishing {} state notification for subscription with ID: {}", state.nodeId.getNodeType()
+            .getLocalName(), subscriptionId);
+        final var formattedNotification = formatStateNotification(eventFormatter, context, notification);
+        verify(formattedNotification != null && !formattedNotification.isBlank(), "Notification message is empty");
+        return formattedNotification;
     }
 
     @Override
@@ -568,7 +574,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @param uri        the optional subscription uri
      * @return {@link ContainerNode} notification body
      */
-    private static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
+    static ContainerNode subscriptionModified(final Uint32 id, final String streamName,
             final @Nullable QName encoding, final @Nullable NormalizedAnydata filter,
             final @Nullable String stopTime, final @Nullable String uri) {
         LOG.debug("Publishing subscription modified notification for ID: {}", id);
@@ -598,22 +604,21 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     /**
      * Creates body for state notification indicating the subscription was terminated.
      *
-     * @param id        the subscription ID
+     * @param id the subscription ID
      * @return {@link ContainerNode} notification body for terminated subscription state
      */
-    private static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
+    static ContainerNode subscriptionTerminated(final Uint32 id, final QName reason) {
         return buildErrorStateNotification(id, reason, State.TERMINATED);
     }
 
     /**
      * Creates body for state notification indicating the subscription was suspended.
      *
-     * @param id        the subscription ID
+     * @param id the subscription ID
      * @return {@link ContainerNode} state notification body for suspended subscription
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
-    private static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
-        return buildErrorStateNotification(id, reason, State.TERMINATED);
+    static ContainerNode subscriptionSuspended(final Uint32 id, final QName reason) {
+        return buildErrorStateNotification(id, reason, State.SUSPENDED);
     }
 
     /**
@@ -636,19 +641,18 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     /**
      * Creates body for state notification indicating the subscription was resumed.
      *
-     * @param id        the subscription ID
+     * @param id the subscription ID
      * @return {@link ContainerNode} state notification body for resumed subscription
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "This state change not implemented yet")
-    private static ContainerNode subscriptionResumed(final Uint32 id) {
+    static ContainerNode subscriptionResumed(final Uint32 id) {
         return buildStateNotification(id, State.RESUMED);
     }
 
     /**
      * Builds generic state notification body.
      *
-     * @param id          the subscription ID
-     * @param state       subscription state
+     * @param id    the subscription ID
+     * @param state subscription state
      * @return {@link ContainerNode} generic state notification body
      */
     private static ContainerNode buildStateNotification(final Uint32 id, final State state) {
