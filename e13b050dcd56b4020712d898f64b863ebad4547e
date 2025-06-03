@@ -16,6 +16,24 @@
       "message": "We don\u0027t yet support the subtree filter for JSON. \nAnd probably we can avoid using filtering in StopTime test cases",
       "revId": "e13b050dcd56b4020712d898f64b863ebad4547e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89c77540_9a67acd0",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T14:46:44Z",
+      "side": 1,
+      "message": "for modifySubscriptionRpc filter is mandatory, so have to use it",
+      "parentUuid": "3cb950e7_59baf891",
+      "revId": "e13b050dcd56b4020712d898f64b863ebad4547e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
