@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2110fcb3_8ecb343a",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:34:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89cabe24_e92103b9",
+      "range": {
+        "startLine": 121,
+        "startChar": 59,
+        "endLine": 121,
+        "endChar": 82
+      },
+      "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "075424ca_4c5d441c",
@@ -58,6 +82,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5b622c2_2c8328af",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:34:35Z",
+      "side": 1,
+      "message": "All time zones except Zulu are invalid, Yang DateAndTime same as Instant doesnt support timezones, only offset.\nI assume you mean test which invoke DateTimeParseException, - input with timezone, ofset out of range, or wrong text as input.\nreworked it into parametrized test",
+      "parentUuid": "075424ca_4c5d441c",
+      "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8004d762_52b9a502",
@@ -71,6 +113,24 @@
       "writtenOn": "2025-06-02T17:19:56Z",
       "side": 1,
       "message": "time \u003d\u003d null, and we write \"null\" into DS?\n`\"stop-time\": \"null\"`",
+      "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f5857c3_f02c53e5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:34:35Z",
+      "side": 1,
+      "message": "that supposed to be Instant from begining as in createSubscription it is checked for null value",
+      "parentUuid": "8004d762_52b9a502",
       "revId": "1743eb5f9d59604af45e81f86edc546f659b89d6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
