@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b83b1c8c_4a49f8bb",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:40:06Z",
+      "side": 1,
+      "message": "I added this check to existing test as new test would do mostly the same thing, and it is just one assertion\n\nIn this case ConditionTimeoutException is thrown from startSubscriptionStream() as it fails on await().atMost() while starting listener",
+      "parentUuid": "c9b2aa97_6f96a3f2",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf8cf353_128552ae",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-06-02T15:01:43Z",
       "side": 1,
       "message": "Has to be 5 seconds?",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b98638a_95679acf",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:40:06Z",
+      "side": 1,
+      "message": "set it to 2 seconds, 1 was unstable locally",
+      "parentUuid": "cf8cf353_128552ae",
       "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ee5190b_2b88faff",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff096b79_4838ec6c",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e357593_95fb75d2",
@@ -86,6 +140,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "153df248_9b5cde53",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0e357593_95fb75d2",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c75b4fe5_17c3cb16",
@@ -99,6 +171,24 @@
       "writtenOn": "2025-06-02T18:12:12Z",
       "side": 1,
       "message": "Why not just id.equals(nextSubscriptionToStop)?",
+      "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ba100a6_6a6e8903",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 68
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T09:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c75b4fe5_17c3cb16",
       "revId": "ec58f5e519df293e9db4065eaf258cfdd60b3e38",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
