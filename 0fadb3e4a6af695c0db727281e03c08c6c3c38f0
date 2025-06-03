@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a4538f_facb3a09",
+        "filename": "plugins/restconf-server-mdsal/src/test/java/org/opendaylight/restconf/server/mdsal/StateNotificationFormattingTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T14:03:41Z",
+      "side": 1,
+      "message": "there is a constant for this created\nalso consider creating constants for other repeating hard-coded strings",
+      "range": {
+        "startLine": 130,
+        "startChar": 28,
+        "endLine": 130,
+        "endChar": 34
+      },
+      "revId": "0fadb3e4a6af695c0db727281e03c08c6c3c38f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
