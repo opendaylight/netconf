@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cb950e7_59baf891",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-03T14:40:08Z",
+      "side": 1,
+      "message": "We don\u0027t yet support the subtree filter for JSON. \nAnd probably we can avoid using filtering in StopTime test cases",
+      "revId": "e13b050dcd56b4020712d898f64b863ebad4547e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
