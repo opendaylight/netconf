@@ -34,6 +34,24 @@
       "parentUuid": "3cb950e7_59baf891",
       "revId": "e13b050dcd56b4020712d898f64b863ebad4547e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "496773cb_e22e32d7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-03T15:19:28Z",
+      "side": 1,
+      "message": "changed it to xml",
+      "parentUuid": "89c77540_9a67acd0",
+      "revId": "e13b050dcd56b4020712d898f64b863ebad4547e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
