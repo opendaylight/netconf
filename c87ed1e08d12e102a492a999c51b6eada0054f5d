@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e21e71df_19a85ef1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-04T06:30:40Z",
+      "side": 1,
+      "message": "Just unit test (similar to State...Test) was enough.",
+      "revId": "c87ed1e08d12e102a492a999c51b6eada0054f5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
