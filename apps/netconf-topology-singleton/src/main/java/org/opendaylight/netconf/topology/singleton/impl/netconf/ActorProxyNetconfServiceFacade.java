@@ -288,7 +288,8 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
             ? NetconfTopologyUtils.createMasterIsDownException(id, (Exception) failure) : failure;
     }
 
-    // FIXME: this is being used in contexts where we should be waiting for a reply
+    // FIXME: this is being used in contexts where we should be waiting for a reply.
+    //        If editConfig fails, this override it reply with empty success future.
     private static ListenableFuture<? extends DOMRpcResult> createResult() {
         return Futures.immediateFuture(new DefaultDOMRpcResult());
     }
