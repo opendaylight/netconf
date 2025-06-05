@@ -27,7 +27,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
 import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
@@ -67,15 +66,13 @@ public class NetconfDeviceMount implements AutoCloseable {
             // FIXME: ServerActionOperations and ServerRpcOperations instead
             final RemoteDeviceServices services,
             // FIXME: not passed in: implemented on top of ServerDataOperations
-            final DOMDataBroker broker, final NetconfDataTreeService dataTreeService) {
-        onDeviceConnected(initialCtx, dataOps, services, new NetconfDeviceNotificationService(), broker,
-            dataTreeService);
+            final DOMDataBroker broker) {
+        onDeviceConnected(initialCtx, dataOps, services, new NetconfDeviceNotificationService(), broker);
     }
 
     public synchronized void onDeviceConnected(final EffectiveModelContext initialCtx,
             final ServerDataOperations dataOps, final RemoteDeviceServices services,
-            final NetconfDeviceNotificationService newNotificationService, final DOMDataBroker broker,
-            final NetconfDataTreeService dataTreeService) {
+            final NetconfDeviceNotificationService newNotificationService, final DOMDataBroker broker) {
         requireNonNull(mountService, "Closed");
         checkState(topologyRegistration == null, "Already initialized");
 
@@ -113,9 +110,6 @@ public class NetconfDeviceMount implements AutoCloseable {
 
         if (broker != null) {
             mountBuilder.addService(DOMDataBroker.class, broker);
-        }
-        if (dataTreeService != null) {
-            mountBuilder.addService(NetconfDataTreeService.class, dataTreeService);
         }
         mountBuilder.addService(DOMNotificationService.class, newNotificationService);
         notificationService = newNotificationService;
