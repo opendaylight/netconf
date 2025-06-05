@@ -172,8 +172,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             deviceServices,
             // We need to create ProxyDOMDataBroker so accessing mountpoint
             // on leader node would be same as on follower node
-            new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime),
-            proxyNetconfService);
+            new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime));
     }
 
     protected DOMDataBroker newDeviceDataBroker(final DatabindContext databind,
