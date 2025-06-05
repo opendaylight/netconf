@@ -29,7 +29,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,7 +83,7 @@ class NetconfDeviceSalFacadeTest {
             new NetconfDeviceSchema(DatabindContext.ofModel(modelContext), NetconfDeviceCapabilities.empty()),
             netconfSessionPreferences, deviceServices);
         verify(mountInstance, times(0)).onDeviceConnected(eq(modelContext), any(), eq(deviceServices),
-            any(DOMDataBroker.class), any(NetconfDataTreeService.class));
+            any(DOMDataBroker.class));
 
         // Verify that onDeviceDisconnected is not called after close.
         deviceFacade.onDeviceDisconnected();
@@ -103,7 +102,7 @@ class NetconfDeviceSalFacadeTest {
             new NetconfDeviceSchema(DatabindContext.ofModel(modelContext), NetconfDeviceCapabilities.empty()),
             netconfSessionPreferences, deviceServices);
 
-        verify(mountInstance, times(1)).onDeviceConnected(eq(modelContext), any(), eq(deviceServices), any(), any());
+        verify(mountInstance, times(1)).onDeviceConnected(eq(modelContext), any(), eq(deviceServices), any());
     }
 
     @Test

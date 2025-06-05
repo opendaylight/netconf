@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -29,7 +32,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
+import org.opendaylight.restconf.server.spi.CompositeServerStrategy;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
@@ -47,8 +51,6 @@ class MountInstanceTest {
     private DOMDataBroker broker;
     @Mock
     private DOMRpcService domRpcService;
-    @Mock
-    private NetconfDataTreeService netconfService;
     @Mock
     private Rpcs.Normalized rpcService;
     @Mock
@@ -83,7 +85,7 @@ class MountInstanceTest {
     @Test
     void testOnTopologyDeviceConnected() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
-            notificationService, broker, null);
+            notificationService, broker);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
@@ -93,27 +95,32 @@ class MountInstanceTest {
     @Test
     void testOnTopologyDeviceConnectedWithNetconfService() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
-            notificationService, null, netconfService);
+            notificationService, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
-        verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
+        final var strategyCaptor = ArgumentCaptor.forClass(DOMServerStrategy.class);
+        verify(mountPointBuilder).addService(eq(DOMServerStrategy.class), strategyCaptor.capture());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
+
+        final var serverStrategy = strategyCaptor.getValue();
+        final var compositeStrategy = assertInstanceOf(CompositeServerStrategy.class, serverStrategy.serverStrategy());
+        assertEquals(dataOperarions, compositeStrategy.data());
     }
 
     @Test
     void testOnTopologyDeviceDisconnected() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
-            notificationService, broker, null);
+            notificationService, broker);
         mountInstance.onDeviceDisconnected();
         verify(registration).close();
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
-            notificationService, broker, null);
+            notificationService, broker);
     }
 
     @Test
     void testClose() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
-            notificationService, broker, null);
+            notificationService, broker);
         mountInstance.close();
         verify(registration).close();
     }
@@ -121,7 +128,7 @@ class MountInstanceTest {
     @Test
     void testPublishNotification() {
         mountInstance.onDeviceConnected(SCHEMA_CONTEXT, dataOperarions, new RemoteDeviceServices(rpcService, null),
-            notificationService, broker, null);
+            notificationService, broker);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
         mountInstance.publish(notification);
