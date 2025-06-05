@@ -289,6 +289,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     // FIXME: this is being used in contexts where we should be waiting for a reply
+    //        If editConfig fails this override it and continue with commit.
     private static ListenableFuture<? extends DOMRpcResult> createResult() {
         return Futures.immediateFuture(new DefaultDOMRpcResult());
     }

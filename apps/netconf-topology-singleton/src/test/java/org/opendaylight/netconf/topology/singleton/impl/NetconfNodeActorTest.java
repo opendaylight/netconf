@@ -30,13 +30,10 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharSource;
 import com.google.common.net.InetAddresses;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -47,6 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Props;
@@ -85,6 +83,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
@@ -97,6 +96,14 @@ import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.api.query.ContentParam;
+import org.opendaylight.restconf.api.query.DepthParam;
+import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
+import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.JsonResourceBody;
+import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -627,7 +634,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    void testSlaveNewNetconfDataTreeServiceRequest() {
+    void testSlaveNewNetconfGetDataTreeServiceRequest() {
         doReturn(mockMountPointBuilder).when(mockMountPointService).createMountPoint(any());
         doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
         doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
@@ -637,44 +644,106 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(List.of());
         registerSlaveMountPoint();
 
-        ArgumentCaptor<NetconfDataTreeService> netconfCaptor = ArgumentCaptor.forClass(NetconfDataTreeService.class);
-        verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), netconfCaptor.capture());
+        ArgumentCaptor<DOMServerStrategy> netconfCaptor = ArgumentCaptor.forClass(DOMServerStrategy.class);
+        verify(mockMountPointBuilder).addService(eq(DOMServerStrategy.class), netconfCaptor.capture());
 
-        final NetconfDataTreeService slaveNetconfService = netconfCaptor.getValue();
-        assertInstanceOf(ProxyNetconfDataTreeService.class, slaveNetconfService);
-
+        final DOMServerStrategy slaveNetconfService = netconfCaptor.getValue();
+        assertInstanceOf(DOMServerStrategy.class, slaveNetconfService);
+        final var serverStrategy = slaveNetconfService.serverStrategy();
         final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
-        final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
+
+        doReturn(Futures.immediateFuture(Optional.empty())).when(netconfService).get(PATH);
+        doReturn(Futures.immediateFuture(Optional.empty())).when(netconfService).getConfig(PATH);
+
+        final var queryParameters = QueryParameters.of(ContentParam.ALL, DepthParam.of(10));
+        final var serverRequest = new CompletingServerRequest<DataGetResult>(queryParameters);
+        serverStrategy.dataGET(serverRequest);
+
+        verify(netconfService, timeout(1000)).get(PATH);
+        verify(netconfService, timeout(1000)).getConfig(PATH);
+    }
+
+    @Test
+    void testSlaveNewNetconfPUTDataTreeServiceRequest() throws Exception {
+        doReturn(mockMountPointBuilder).when(mockMountPointService).createMountPoint(any());
+        doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
+        doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
+        doReturn(mockSchemaContextFactory).when(mockSchemaRepository).createEffectiveModelContextFactory();
+        doReturn(mockDOMRpcService).when(mockRpc).domRpcService();
+
+        initializeMaster(List.of());
+        registerSlaveMountPoint();
+
+        ArgumentCaptor<DOMServerStrategy> netconfCaptor = ArgumentCaptor.forClass(DOMServerStrategy.class);
+        verify(mockMountPointBuilder).addService(eq(DOMServerStrategy.class), netconfCaptor.capture());
+
+        final DOMServerStrategy slaveNetconfService = netconfCaptor.getValue();
+        assertInstanceOf(DOMServerStrategy.class, slaveNetconfService);
+        final var serverStrategy = slaveNetconfService.serverStrategy();
+        final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
         final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
             .build();
 
-        final FluentFuture<Optional<Object>> result = immediateFluentFuture(Optional.of(NODE));
-        doReturn(result).when(netconfService).get(PATH);
-        doReturn(result).when(netconfService).getConfig(PATH);
-        doReturn(emptyFluentFuture()).when(netconfService).commit();
-
-        slaveNetconfService.get(PATH);
-        slaveNetconfService.getConfig(PATH);
-        slaveNetconfService.lock();
-        slaveNetconfService.merge(STORE, PATH, NODE, Optional.empty());
-        slaveNetconfService.replace(STORE, PATH, NODE, Optional.empty());
-        slaveNetconfService.create(STORE, PATH, NODE, Optional.empty());
-        slaveNetconfService.delete(STORE, PATH);
-        slaveNetconfService.remove(STORE, PATH);
-        slaveNetconfService.discardChanges();
-        slaveNetconfService.commit();
-
-        verify(netconfService, timeout(1000)).get(PATH);
-        verify(netconfService, timeout(1000)).getConfig(PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(Optional.empty())).when(netconfService).getConfig(PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).replace(
+            LogicalDatastoreType.CONFIGURATION, PATH, NODE, Optional.empty());
+        final var serverRequest = new CompletingServerRequest<DataPutResult>();
+        final var mockJsonResource = mock(JsonResourceBody.class);
+        doReturn(NODE).when(mockJsonResource).toNormalizedNode(any());
+        serverStrategy.dataPUT(serverRequest, mockJsonResource);
+        serverRequest.getResult();
         verify(netconfService, timeout(1000)).lock();
-        verify(netconfService, timeout(1000)).merge(STORE, PATH, NODE, Optional.empty());
-        verify(netconfService, timeout(1000)).replace(STORE, PATH, NODE, Optional.empty());
-        verify(netconfService, timeout(1000)).create(STORE, PATH, NODE, Optional.empty());
-        verify(netconfService, timeout(1000)).delete(STORE, PATH);
-        verify(netconfService, timeout(1000)).remove(STORE, PATH);
-        verify(netconfService, timeout(1000)).discardChanges();
+        verify(netconfService, timeout(1000)).getConfig(PATH);
+        verify(netconfService, timeout(1000)).replace(
+            LogicalDatastoreType.CONFIGURATION, PATH, NODE, Optional.empty());
         verify(netconfService, timeout(1000)).commit();
+        verify(netconfService, timeout(1000)).unlock();
+    }
+
+    @Test
+    void testSlaveNewNetconfFailedPUTDataTreeServiceRequest()
+        throws RequestException, InterruptedException, TimeoutException {
+        doReturn(mockMountPointBuilder).when(mockMountPointService).createMountPoint(any());
+        doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
+        doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
+        doReturn(mockSchemaContextFactory).when(mockSchemaRepository).createEffectiveModelContextFactory();
+        doReturn(mockDOMRpcService).when(mockRpc).domRpcService();
+
+        initializeMaster(List.of());
+        registerSlaveMountPoint();
+
+        ArgumentCaptor<DOMServerStrategy> netconfCaptor = ArgumentCaptor.forClass(DOMServerStrategy.class);
+        verify(mockMountPointBuilder).addService(eq(DOMServerStrategy.class), netconfCaptor.capture());
+
+        final DOMServerStrategy slaveNetconfService = netconfCaptor.getValue();
+        assertInstanceOf(DOMServerStrategy.class, slaveNetconfService);
+        final var serverStrategy = slaveNetconfService.serverStrategy();
+        final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
+
+        final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
+            .build();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(Optional.empty())).when(netconfService).getConfig(PATH);
+        doReturn(Futures.immediateFailedFuture(new Exception("Test failure"))).when(netconfService).replace(
+            LogicalDatastoreType.CONFIGURATION, PATH, NODE, Optional.empty());
+
+        final var serverRequest = new CompletingServerRequest<DataPutResult>();
+        final var mockJsonResource = mock(JsonResourceBody.class);
+        doReturn(NODE).when(mockJsonResource).toNormalizedNode(any());
+        serverStrategy.dataPUT(serverRequest, mockJsonResource);
+        serverRequest.getResult();
+        verify(netconfService, timeout(1000)).lock();
+        verify(netconfService, timeout(1000)).getConfig(PATH);
+        verify(netconfService, timeout(1000)).replace(
+            LogicalDatastoreType.CONFIGURATION, PATH, NODE, Optional.empty());
+        verify(netconfService, timeout(1000)).unlock();
     }
 
     private ActorRef registerSlaveMountPoint() {
@@ -697,7 +766,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockMountPointBuilder, timeout(5000)).register();
         verify(mockMountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
-        verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), any());
+        verify(mockMountPointBuilder).addService(eq(DOMServerStrategy.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
 
