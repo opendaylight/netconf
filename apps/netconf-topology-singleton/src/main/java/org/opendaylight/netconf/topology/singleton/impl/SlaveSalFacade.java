@@ -55,7 +55,7 @@ public class SlaveSalFacade {
 
         mount.onDeviceConnected(remoteSchemaContext,
             new NetconfRestconfStrategy(DatabindContext.ofModel(remoteSchemaContext), proxyNetconfService),
-            services, netconfDeviceDataBroker, proxyNetconfService);
+            services, netconfDeviceDataBroker);
         LOG.info("{}: Slave mount point registered.", id);
     }
 
