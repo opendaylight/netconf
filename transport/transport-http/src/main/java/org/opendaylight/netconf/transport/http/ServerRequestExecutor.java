@@ -128,10 +128,21 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
             final FiniteResponse response) {
         try {
-            respExecutor.execute(
-                () -> HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version)));
+            respExecutor.execute(() -> writeResponse(ctx, streamId, version, response));
         } catch (RejectedExecutionException e) {
             LOG.trace("Session shut down, dropping response {}", response, e);
+        }
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    @NonNullByDefault
+    private void writeResponse(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final HttpVersion version, final FiniteResponse response) {
+        try {
+            HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version));
+        } catch (RuntimeException e) {
+            LOG.warn("Internal error while processing response {}", response, e);
+            HTTPServerSession.respond(ctx, streamId, formatException(e, version));
         }
     }
 
