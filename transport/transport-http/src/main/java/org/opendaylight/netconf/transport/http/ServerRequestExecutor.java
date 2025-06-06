@@ -153,7 +153,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
         final var content = message.content();
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
-        ByteBufUtil.writeUtf8(content, cause.getMessage());
+        ByteBufUtil.writeUtf8(content, cause.getMessage() != null ? cause.getMessage() : "");
         HttpUtil.setContentLength(message, content.readableBytes());
         return message;
     }
