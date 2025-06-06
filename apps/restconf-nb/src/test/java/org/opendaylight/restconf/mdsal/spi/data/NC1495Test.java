@@ -16,6 +16,7 @@ import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.pars
 import com.google.common.util.concurrent.Futures;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,6 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -39,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 @ExtendWith(MockitoExtension.class)
 class NC1495Test {
     private static final DatabindContext DATABIND = DatabindContext.ofModel(parseYangResourceDirectory("/nc1495"));
+    private static final Data ROOT = new Data(DATABIND);
     private static final QName MODULE_QNAME = QName.create("urn:userOrderList", "userOrderList");
     private static final QName CONTAINER_QNAME = QName.create(MODULE_QNAME, "container");
     private static final QName LIST_QNAME = QName.create(CONTAINER_QNAME, "orderedList");
@@ -71,7 +74,7 @@ class NC1495Test {
         .withChild(LIST)
         .build();
     private static final YangInstanceIdentifier CONTAINER_INSTANCE = YangInstanceIdentifier.of(CONTAINER_QNAME);
-
+    private static final Data CONTAINER_PATH = ROOT.enterPath(CONTAINER_INSTANCE);
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
@@ -86,7 +89,9 @@ class NC1495Test {
             List.of());
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).get(CONTAINER_INSTANCE,
             List.of());
-        final var normalizedNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_INSTANCE, null, List.of());
+        final var optionalNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_PATH, null, List.of())
+            .get(2, TimeUnit.SECONDS);
+        final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
         assertEquals(1, containerNode.body().size());
@@ -101,7 +106,9 @@ class NC1495Test {
             LogicalDatastoreType.CONFIGURATION, CONTAINER_INSTANCE);
         doReturn(immediateFluentFuture(Optional.of(CONTAINER))).when(readTransaction).read(
             LogicalDatastoreType.OPERATIONAL, CONTAINER_INSTANCE);
-        final var normalizedNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_INSTANCE, null);
+        final var optionalNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_PATH, null)
+            .get(2, TimeUnit.SECONDS);
+        final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
         assertEquals(1, containerNode.body().size());
