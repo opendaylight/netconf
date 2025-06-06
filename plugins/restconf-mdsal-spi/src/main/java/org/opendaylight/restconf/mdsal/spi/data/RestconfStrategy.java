@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -549,33 +548,25 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param defaultsMode value of with-defaults parameter
      * @return {@link NormalizedNode}
      */
-    // FIXME: NETCONF-1155: this method should asynchronous
-    protected final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull Data path, final WithDefaultsParam defaultsMode) throws RequestException {
+    protected final ListenableFuture<Optional<NormalizedNode>> readData(final @NonNull ContentParam content,
+            final @NonNull Data path, final WithDefaultsParam defaultsMode) {
+        final var processor = new AsyncWithDefaultsProcessor(path, defaultsMode);
+        final var instance = path.instance();
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
-                final var stateDataNode = readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path);
+                final var stateDataNode = read(LogicalDatastoreType.OPERATIONAL, instance);
                 // PREPARE CONFIG DATA NODE
-                final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path);
+                final var configDataNode = read(LogicalDatastoreType.CONFIGURATION, instance);
 
-                yield ServerDataOperationsUtil.mergeConfigAndSTateDataIfNeeded(stateDataNode, defaultsMode == null
-                    ? configDataNode : ServerDataOperationsUtil.prepareDataByParamWithDef(configDataNode, path,
-                    defaultsMode.mode()));
+                yield processor.all(configDataNode, stateDataNode);
             }
             case CONFIG -> {
-                final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path);
-                yield defaultsMode == null ? read
-                    : ServerDataOperationsUtil.prepareDataByParamWithDef(read, path, defaultsMode.mode());
+                final var configDataNode = read(LogicalDatastoreType.CONFIGURATION, instance);
+                yield processor.config(configDataNode);
             }
-            case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path);
+            case NONCONFIG -> processor.nonConfig(read(LogicalDatastoreType.OPERATIONAL, instance));
         };
-    }
-
-    private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
-            final Data path) throws RequestException {
-        final var instance = path.instance();
-        return ServerDataOperationsUtil.syncAccess(read(store, instance), instance).orElse(null);
     }
 
     /**

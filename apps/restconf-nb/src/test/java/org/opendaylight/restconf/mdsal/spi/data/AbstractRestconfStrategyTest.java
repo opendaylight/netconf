@@ -17,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -506,8 +508,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     private static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final Data path, final @NonNull RestconfStrategy strategy) {
         try {
-            return strategy.readData(content, path, null);
-        } catch (RequestException e) {
+            return strategy.readData(content, path, null).get(2, TimeUnit.SECONDS).orElse(null);
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new AssertionError(e);
         }
     }

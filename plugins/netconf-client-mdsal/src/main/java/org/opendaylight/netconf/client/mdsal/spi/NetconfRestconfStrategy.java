@@ -35,12 +35,14 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.mdsal.spi.data.AsyncWithDefaultsProcessor;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfTransaction;
 import org.opendaylight.restconf.mdsal.spi.util.ServerDataOperationsUtil;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -120,19 +122,33 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             fieldPaths = null;
         }
 
-        final NormalizedNode node;
-        try {
-            if (fieldPaths != null) {
-                node = readData(params.content(), path, params.withDefaults(), fieldPaths);
-            } else {
-                node = readData(params.content(), path, params.withDefaults());
-            }
-        } catch (RequestException e) {
-            request.completeWith(e);
-            return;
+        final ListenableFuture<Optional<NormalizedNode>> node;
+        if (fieldPaths != null) {
+            node = readData(params.content(), path, params.withDefaults(), fieldPaths);
+        } else {
+            node = readData(params.content(), path, params.withDefaults());
         }
-        ServerDataOperationsUtil.completeDataGET(request, node, path, NormalizedNodeWriterFactory.of(params.depth()),
-            null);
+
+        Futures.addCallback(node, new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Optional<NormalizedNode> result) {
+                // Non-existing data
+                if (result.isEmpty()) {
+                    request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                        "Request could not be completed because the relevant data model content does not exist"));
+                    return;
+                }
+                final var normalizedNode = result.orElseThrow();
+                final var writerFactory = NormalizedNodeWriterFactory.of(params.depth());
+                final var body = NormalizedFormattableBody.of(path, normalizedNode, writerFactory);
+                request.completeWith(new DataGetResult(body));
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                request.completeWith(ServerDataOperationsUtil.decodeException(cause, "GET", path));
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -160,48 +176,27 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @param path     the parent path to read
      * @param withDefa value of with-defaults parameter
      * @param fields   paths to selected subtrees which should be read, relative to the parent path
-     * @return {@link NormalizedNode}
-     * @throws RequestException when an error occurs
+     * @return {@link NormalizedNode}s
      */
-    // FIXME: NETCONF-1155: this method should asynchronous
-    public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    public ListenableFuture<Optional<NormalizedNode>> readData(final @NonNull ContentParam content,
             final @NonNull Data path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull List<YangInstanceIdentifier> fields) throws RequestException {
+            final @NonNull List<YangInstanceIdentifier> fields) {
         final var instance = path.instance();
+        final var processor = new AsyncWithDefaultsProcessor(path, withDefa);
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
-                final var stateDataNode = readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, instance, fields);
+                final var stateDataNode = read(LogicalDatastoreType.OPERATIONAL, instance, fields);
                 // PREPARE CONFIG DATA NODE
-                final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, instance, fields);
-
-                yield ServerDataOperationsUtil.mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null
-                    ? configDataNode : ServerDataOperationsUtil.prepareDataByParamWithDef(configDataNode, path,
-                        withDefa.mode()));
+                final var configDataNode = read(LogicalDatastoreType.CONFIGURATION, instance, fields);
+                yield processor.all(stateDataNode, configDataNode);
             }
             case CONFIG -> {
-                final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, instance, fields);
-                yield withDefa == null ? read : ServerDataOperationsUtil.prepareDataByParamWithDef(read, path,
-                    withDefa.mode());
+                final var read = read(LogicalDatastoreType.CONFIGURATION, instance, fields);
+                yield processor.config(read);
             }
-            case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, instance, fields);
+            case NONCONFIG -> processor.nonConfig(read(LogicalDatastoreType.OPERATIONAL, instance, fields));
         };
-    }
-
-    /**
-     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
-     * specified subtrees that should only be read.
-     *
-     * @param store                 datastore type
-     * @param path                  parent path to selected fields
-     * @param fields                paths to selected subtrees which should be read, relative to the parent path
-     * @return {@link NormalizedNode}
-     * @throws RequestException when an error occurs
-     */
-    private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
-            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields)
-                throws RequestException {
-        return ServerDataOperationsUtil.syncAccess(read(store, path, fields), path).orElse(null);
     }
 
     @Override

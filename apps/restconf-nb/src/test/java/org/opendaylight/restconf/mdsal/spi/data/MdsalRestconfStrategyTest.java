@@ -27,6 +27,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -420,8 +421,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
         final var dataPath = modulesPath(path);
-
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM));
+        final var result = modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(data, result);
     }
 
     @Test
@@ -451,7 +453,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
         final var dataPath = modulesPath(path);
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM));
+        final var result = modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(data, result);
     }
 
     @Test
@@ -474,7 +478,9 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
         final var dataPath = modulesPath(path);
-        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM));
+        final var result = modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(content, result);
     }
 
     @Test

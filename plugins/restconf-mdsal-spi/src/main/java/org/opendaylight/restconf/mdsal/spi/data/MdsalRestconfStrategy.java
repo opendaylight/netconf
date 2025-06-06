@@ -10,6 +10,7 @@ package org.opendaylight.restconf.mdsal.spi.data;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.opendaylight.restconf.mdsal.spi.util.ServerDataOperationsUtil;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -116,15 +118,27 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             writerFactory = NormalizedNodeWriterFactory.of(depth);
         }
 
-        final NormalizedNode data;
-        try {
-            data = readData(params.content(), path, params.withDefaults());
-        } catch (RequestException e) {
-            request.completeWith(e);
-            return;
-        }
+        final var dataFuture = readData(params.content(), path, params.withDefaults());
 
-        ServerDataOperationsUtil.completeDataGET(request, data, path, writerFactory, null);
+        Futures.addCallback(dataFuture, new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Optional<NormalizedNode> result) {
+                // Non-existing data
+                if (result.isEmpty()) {
+                    request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                        "Request could not be completed because the relevant data model content does not exist"));
+                    return;
+                }
+                final var normalizedNode = result.orElseThrow();
+                final var body = NormalizedFormattableBody.of(path, normalizedNode, writerFactory);
+                request.completeWith(new DataGetResult(body));
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                request.completeWith(ServerDataOperationsUtil.decodeException(cause, "GET", path));
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
