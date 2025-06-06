@@ -27,6 +27,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +45,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
@@ -91,6 +93,11 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private DOMMountPointService mountPointService;
     @Mock
     private DOMMountPoint mountPoint;
+
+    static Data modulesPath(final YangInstanceIdentifier path) {
+        final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(path).orElseThrow();
+        return new Data(MODULES_DATABIND, childAndStack.stack().toInference(), path, childAndStack.node());
+    }
 
     @Override
     RestconfStrategy newDataOperations(final DatabindContext databind) {
@@ -413,8 +420,10 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
-
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var dataPath = modulesPath(path);
+        final var result = modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(data, result);
     }
 
     @Test
@@ -444,7 +453,10 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var dataPath = modulesPath(path);
+        final var result = modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(data, result);
     }
 
     @Test
@@ -467,7 +479,10 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var dataPath = modulesPath(path);
+        final var result = modulesStrategy().readData(ContentParam.ALL, dataPath, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(content, result);
     }
 
     @Test
