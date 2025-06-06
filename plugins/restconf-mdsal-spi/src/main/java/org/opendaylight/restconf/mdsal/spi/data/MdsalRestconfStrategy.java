@@ -28,6 +28,7 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -115,15 +116,16 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             writerFactory = NormalizedNodeWriterFactory.of(depth);
         }
 
-        final NormalizedNode data;
-        try {
-            data = readData(params.content(), path.instance(), params.withDefaults());
-        } catch (RequestException e) {
-            request.completeWith(e);
-            return;
-        }
+        final var mdsalGetRequest = request.<Optional<NormalizedNode>>transform(result -> {
+            if (result.isEmpty()) {
+                throw new IllegalStateException("Request transformation could not be completed without data");
+            }
+            final var normalizedNode = result.orElseThrow();
+            final var body = NormalizedFormattableBody.of(path, normalizedNode, writerFactory);
+            return new DataGetResult(body);
+        });
 
-        completeDataGET(request, data, path, writerFactory, null);
+        readData(mdsalGetRequest, params.content(), path, params.withDefaults());
     }
 
     @Override
