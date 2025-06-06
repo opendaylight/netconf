@@ -44,6 +44,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
@@ -79,6 +80,8 @@ import org.w3c.dom.DOMException;
 final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(
         YangParserTestUtils.parseYangResourceDirectory("/modules"));
+    private static final YangInstanceIdentifier CONT_IID = YangInstanceIdentifier.of(CONT_QNAME);
+    private static final Data CONT_DATA = moudlesPath(CONT_IID);
 
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
@@ -408,14 +411,16 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
             .build();
-        final var path = YangInstanceIdentifier.of(CONT_QNAME);
+
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
+                .read(LogicalDatastoreType.CONFIGURATION,  CONT_IID);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+                .read(LogicalDatastoreType.OPERATIONAL, CONT_IID);
 
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        modulesStrategy().readData(ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM, getServerRequest);
+        final var getResult = getServerRequest.getResult().orElseThrow();
+        assertEquals(data, getResult);
     }
 
     @Test
@@ -438,14 +443,15 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                     .build())
                 .build())
             .build();
-        final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
+                .read(LogicalDatastoreType.CONFIGURATION, CONT_IID);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+                .read(LogicalDatastoreType.OPERATIONAL, CONT_IID);
 
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        modulesStrategy().readData(ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM, getServerRequest);
+        final var getResult = getServerRequest.getResult().orElseThrow();
+        assertEquals(data, getResult);
     }
 
     @Test
@@ -461,14 +467,15 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                     .build())
                 .build())
             .build();
-        final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
+                .read(LogicalDatastoreType.CONFIGURATION, CONT_IID);
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+                .read(LogicalDatastoreType.OPERATIONAL, CONT_IID);
 
-        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        modulesStrategy().readData(ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM, getServerRequest);
+        final var getResult = getServerRequest.getResult().orElseThrow();
+        assertEquals(content, getResult);
     }
 
     @Test
