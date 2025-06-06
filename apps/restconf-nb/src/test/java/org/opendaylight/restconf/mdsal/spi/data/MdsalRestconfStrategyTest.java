@@ -27,6 +27,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +45,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
@@ -78,6 +80,7 @@ import org.w3c.dom.DOMException;
 final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(
         YangParserTestUtils.parseYangResourceDirectory("/modules"));
+    private static final Data CONT_DATA = moudlesPath(YangInstanceIdentifier.of(CONT_QNAME));
 
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
@@ -407,14 +410,16 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
             .build();
-        final var path = YangInstanceIdentifier.of(CONT_QNAME);
+
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
+                .read(LogicalDatastoreType.CONFIGURATION, CONT_DATA.instance());
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+                .read(LogicalDatastoreType.OPERATIONAL, CONT_DATA.instance());
 
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var result = modulesStrategy().readData(ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(data, result);
     }
 
     @Test
@@ -437,14 +442,15 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                     .build())
                 .build())
             .build();
-        final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
+                .read(LogicalDatastoreType.CONFIGURATION, CONT_DATA.instance());
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+                .read(LogicalDatastoreType.OPERATIONAL, CONT_DATA.instance());
 
-        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var result = modulesStrategy().readData(ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(data, result);
     }
 
     @Test
@@ -460,14 +466,15 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
                     .build())
                 .build())
             .build();
-        final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
+                .read(LogicalDatastoreType.CONFIGURATION, CONT_DATA.instance());
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+                .read(LogicalDatastoreType.OPERATIONAL, CONT_DATA.instance());
 
-        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        final var result = modulesStrategy().readData(ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM)
+            .get(2, TimeUnit.SECONDS).orElse(null);
+        assertEquals(content, result);
     }
 
     @Test
