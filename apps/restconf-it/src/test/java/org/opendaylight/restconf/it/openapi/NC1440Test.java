@@ -8,15 +8,14 @@
 package org.opendaylight.restconf.it.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpTimeoutException;
 import java.nio.file.Path;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
@@ -100,14 +99,14 @@ public class NC1440Test extends AbstractOpenApiTest {
         startDeviceSimulator("target/test-classes/nc1440-deviated");
         mountDeviceJson(devicePort);
 
-        final var exception = assertThrows(HttpTimeoutException.class, () -> {
-            client.send(HttpRequest.newBuilder()
+        final var exception = client.send(HttpRequest.newBuilder()
                 .GET()
                 .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1"))
                 .timeout(Duration.ofSeconds(10))
-                .build(), HttpResponse.BodyHandlers.discarding());
-        });
-        assertEquals("request timed out", exception.getMessage());
+                .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), exception.statusCode());
+        assertEquals("Data tree child (leafref:source?revision=2025-05-13)conts not present in module "
+            + "(leafref:source?revision=2025-05-13)leafref-source", exception.body());
     }
 
     private void startDeviceSimulator(final String path) {
