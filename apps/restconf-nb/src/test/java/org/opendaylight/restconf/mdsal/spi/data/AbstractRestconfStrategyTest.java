@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -56,6 +57,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
 abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
@@ -104,6 +106,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     private static final Data PLAYER_DATA = jukeboxPath(PLAYER_IID);
 
     // Read mock data
+    private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(
+        YangParserTestUtils.parseYangResourceDirectory("/modules"));
+
     static final QName BASE = QName.create("ns", "2016-02-28", "base");
     private static final QName LIST_KEY_QNAME = QName.create(BASE, "list-key");
     private static final QName LEAF_LIST_QNAME = QName.create(BASE, "leaf-list");
@@ -211,6 +216,10 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .build();
     private static final NodeIdentifier NODE_IDENTIFIER =
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
+    private static final Data PATH_DATA = moudlesPath(PATH);
+    private static final Data PATH_2_DATA = moudlesPath(PATH_2);
+    private static final Data PATH_3_DATA = moudlesPath(PATH_3);
+    private static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
 
     @Mock
     private EffectiveModelContext mockSchemaContext;
@@ -220,6 +229,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     private final CompletingServerRequest<DataYangPatchResult> dataYangPatchRequest = new CompletingServerRequest<>();
 
     final CompletingServerRequest<DataPutResult> dataPutRequest = new CompletingServerRequest<>();
+    final CompletingServerRequest<Optional<NormalizedNode>> getServerRequest = new CompletingServerRequest<>();
 
     abstract @NonNull RestconfStrategy newDataOperations(DatabindContext databind);
 
@@ -368,28 +378,28 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     final void readDataConfigTest() {
-        assertEquals(DATA_3, readData(ContentParam.CONFIG, PATH, readDataConfigTestStrategy()));
+        assertEquals(DATA_3, readData(ContentParam.CONFIG, PATH_DATA, readDataConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readDataConfigTestStrategy();
 
     @Test
     final void readAllHavingOnlyConfigTest() {
-        assertEquals(DATA_3, readData(ContentParam.ALL, PATH, readAllHavingOnlyConfigTestStrategy()));
+        assertEquals(DATA_3, readData(ContentParam.ALL, PATH_DATA, readAllHavingOnlyConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readAllHavingOnlyConfigTestStrategy();
 
     @Test
     final void readAllHavingOnlyNonConfigTest() {
-        assertEquals(DATA_2, readData(ContentParam.ALL, PATH_2, readAllHavingOnlyNonConfigTestStrategy()));
+        assertEquals(DATA_2, readData(ContentParam.ALL, PATH_2_DATA, readAllHavingOnlyNonConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readAllHavingOnlyNonConfigTestStrategy();
 
     @Test
     final void readDataNonConfigTest() {
-        assertEquals(DATA_2, readData(ContentParam.NONCONFIG, PATH_2, readDataNonConfigTestStrategy()));
+        assertEquals(DATA_2, readData(ContentParam.NONCONFIG, PATH_2_DATA, readDataNonConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readDataNonConfigTestStrategy();
@@ -400,7 +410,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .withNodeIdentifier(NODE_IDENTIFIER)
             .withChild(CONTENT_LEAF)
             .withChild(CONTENT_LEAF_2)
-            .build(), readData(ContentParam.ALL, PATH, readContainerDataAllTestStrategy()));
+            .build(), readData(ContentParam.ALL, PATH_DATA, readContainerDataAllTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readContainerDataAllTestStrategy();
@@ -411,7 +421,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .withNodeIdentifier(NODE_IDENTIFIER)
             .withChild(CONTENT_LEAF)
             .withChild(CONTENT_LEAF_2)
-            .build(), readData(ContentParam.ALL, PATH, readContainerDataConfigNoValueOfContentTestStrategy()));
+            .build(), readData(ContentParam.ALL, PATH_DATA, readContainerDataConfigNoValueOfContentTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy();
@@ -421,7 +431,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertEquals(ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
             .withChild(CHECK_DATA)
-            .build(), readData(ContentParam.ALL, PATH_3, readListDataAllTestStrategy()));
+            .build(), readData(ContentParam.ALL, PATH_3_DATA, readListDataAllTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readListDataAllTestStrategy();
@@ -431,7 +441,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         assertEquals(ImmutableNodes.newUserMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
             .withChild(CHECK_DATA)
-            .build(), readData(ContentParam.ALL, PATH_3, readOrderedListDataAllTestStrategy()));
+            .build(), readData(ContentParam.ALL, PATH_3_DATA, readOrderedListDataAllTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readOrderedListDataAllTestStrategy();
@@ -445,7 +455,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .withChild(UNKEYED_LIST_ENTRY_NODE_1.body().iterator().next())
                 .withChild(UNKEYED_LIST_ENTRY_NODE_2.body().iterator().next())
                 .build())
-            .build(), readData(ContentParam.ALL, PATH_3, readUnkeyedListDataAllTestStrategy()));
+            .build(), readData(ContentParam.ALL, PATH_3_DATA, readUnkeyedListDataAllTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readUnkeyedListDataAllTestStrategy();
@@ -458,7 +468,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .addAll(LEAF_SET_NODE_1.body())
                 .addAll(LEAF_SET_NODE_2.body())
                 .build())
-            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_PATH, readLeafListDataAllTestStrategy()));
+            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_DATA, readLeafListDataAllTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readLeafListDataAllTestStrategy();
@@ -471,14 +481,14 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .addAll(ORDERED_LEAF_SET_NODE_1.body())
                 .addAll(ORDERED_LEAF_SET_NODE_2.body())
                 .build())
-            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_PATH, readOrderedLeafListDataAllTestStrategy()));
+            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_DATA, readOrderedLeafListDataAllTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readOrderedLeafListDataAllTestStrategy();
 
     @Test
     void readDataWrongPathOrNoContentTest() {
-        assertNull(readData(ContentParam.CONFIG, PATH_2, readDataWrongPathOrNoContentTestStrategy()));
+        assertNull(readData(ContentParam.CONFIG, PATH_2_DATA, readDataWrongPathOrNoContentTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readDataWrongPathOrNoContentTestStrategy();
@@ -490,11 +500,12 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      * @param strategy       {@link RestconfStrategy} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
+    private @Nullable NormalizedNode readData(final @NonNull ContentParam content, final Data path,
+            final @NonNull RestconfStrategy strategy) {
         try {
-            return strategy.readData(content, path, null);
-        } catch (RequestException e) {
+            strategy.readData(content, path, null, getServerRequest);
+            return getServerRequest.getResult().orElse(null);
+        } catch (TimeoutException | InterruptedException | RequestException e) {
             throw new AssertionError(e);
         }
     }
@@ -517,5 +528,10 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             }
         }
         assertTrue(patchStatusContext.ok());
+    }
+
+    static Data moudlesPath(final YangInstanceIdentifier path) {
+        final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(path).orElseThrow();
+        return new Data(MODULES_DATABIND, childAndStack.stack().toInference(), path, childAndStack.node());
     }
 }
