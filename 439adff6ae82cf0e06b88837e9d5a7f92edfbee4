@@ -33,6 +33,24 @@
       "message": "only because we do not have filter we are going to filter all messages from stream?",
       "revId": "439adff6ae82cf0e06b88837e9d5a7f92edfbee4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "848740f1_1fa081f6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-10T14:28:03Z",
+      "side": 1,
+      "message": "In case there are no filters, we go to the https://git.opendaylight.org/gerrit/c/netconf/+/116579/17/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java#97 and use https://github.com/opendaylight/netconf/blob/4727fe852f41a4b5f5bcde128885771818d9fe43/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AcceptingEventFilter.java#L31, which passes all messages",
+      "parentUuid": "c6bae50b_1ea9bb1f",
+      "revId": "439adff6ae82cf0e06b88837e9d5a7f92edfbee4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
