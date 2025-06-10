@@ -33,6 +33,24 @@
       "message": "what has happened that we cannot assert output anymore?",
       "revId": "ed4b1c2a857a3b3b48d61cd175c58a4972be546c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ca9ef8b_24ae452f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-10T14:23:37Z",
+      "side": 1,
+      "message": "The message was rejected and was not pushed at all, because it contains more children (id, name) than the filter (id) allows",
+      "parentUuid": "435d9b83_d85b930a",
+      "revId": "ed4b1c2a857a3b3b48d61cd175c58a4972be546c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
