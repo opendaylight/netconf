@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12fa482d_aa02cc08",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 60
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-06-10T12:19:13Z",
+      "side": 1,
+      "message": "you can merge this with first case as the body of if is the same",
+      "range": {
+        "startLine": 669,
+        "startChar": 12,
+        "endLine": 669,
+        "endChar": 32
+      },
+      "revId": "1f0c5a070804182c67f491a7372f6e9aed8d0a94",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
