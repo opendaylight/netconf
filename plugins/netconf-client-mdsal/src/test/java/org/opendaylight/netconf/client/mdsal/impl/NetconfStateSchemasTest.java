@@ -45,7 +45,6 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
@@ -95,7 +94,7 @@ class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Disabled("We cannot handle a container as data -- only anyxml")
     void testCreate2() {
         final ContainerNode rpcReply = ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                     .withChild(ImmutableNodes.newContainerBuilder()

@@ -96,10 +96,6 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(Data.QNAME);
 
-    public static final @NonNull QName NETCONF_RPC_REPLY_QNAME = qnameOf(RpcReplyMessage.ELEMENT_NAME);
-    public static final @NonNull NodeIdentifier NETCONF_RPC_REPLY_NODEID =
-        NodeIdentifier.create(NETCONF_RPC_REPLY_QNAME);
-
     public static final @NonNull NodeIdentifier NETCONF_ERROR_OPTION_NODEID =
         NodeIdentifier.create(qnameOf("error-option"));
     public static final @NonNull NodeIdentifier NETCONF_RUNNING_NODEID = NodeIdentifier.create(qnameOf("running"));
@@ -107,6 +103,7 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_CANDIDATE_NODEID = NodeIdentifier.create(Candidate.QNAME);
     public static final @NonNull NodeIdentifier NETCONF_TARGET_NODEID = NodeIdentifier.create(qnameOf("target"));
     public static final @NonNull NodeIdentifier NETCONF_CONFIG_NODEID = NodeIdentifier.create(qnameOf("config"));
+    public static final @NonNull NodeIdentifier NETCONF_OUTPUT_NODEID = NodeIdentifier.create(qnameOf("output"));
 
     public static final @NonNull NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(Validate.QNAME);
     public static final @NonNull NodeIdentifier NETCONF_COPY_CONFIG_NODEID = NodeIdentifier.create(CopyConfig.QNAME);

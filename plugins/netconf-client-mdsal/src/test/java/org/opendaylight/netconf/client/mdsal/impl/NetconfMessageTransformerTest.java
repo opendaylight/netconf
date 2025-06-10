@@ -317,6 +317,7 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             GetConfig.QNAME);
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNotNull(compositeNodeRpcResult.value());
+        assertEquals(NetconfMessageTransformUtil.NETCONF_OUTPUT_NODEID, compositeNodeRpcResult.value().name());
 
         final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12"))
             .body();
