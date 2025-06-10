@@ -16,6 +16,24 @@
       "message": "final, check other params too too",
       "revId": "7265e600b3978791be81ed0685ed4359036cab52",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb7588f4_fa050eda",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 74
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-10T12:33:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc1d5c70_09f0187e",
+      "revId": "7265e600b3978791be81ed0685ed4359036cab52",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
