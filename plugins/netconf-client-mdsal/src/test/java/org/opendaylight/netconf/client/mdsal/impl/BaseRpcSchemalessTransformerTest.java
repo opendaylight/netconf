@@ -96,7 +96,7 @@ class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final var result = transformer.toRpcResult(RpcResultBuilder.success(msg).build(), GetConfig.QNAME);
         assertNotNull(result.value());
         final var rpcReply = result.value();
-        assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.name().getNodeType());
+        assertEquals(NetconfMessageTransformUtil.NETCONF_OUTPUT_NODEID, rpcReply.name());
         final var data = (DOMSourceAnyxmlNode) rpcReply.getChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
 
         final var diff = DiffBuilder.compare(dataElement.getOwnerDocument())
