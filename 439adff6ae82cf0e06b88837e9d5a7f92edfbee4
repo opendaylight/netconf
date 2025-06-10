@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6bae50b_1ea9bb1f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscribers.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-10T14:02:28Z",
+      "side": 1,
+      "message": "only because we do not have filter we are going to filter all messages from stream?",
+      "revId": "439adff6ae82cf0e06b88837e9d5a7f92edfbee4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
