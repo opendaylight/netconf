@@ -395,7 +395,7 @@ public class NetconfMessageTransformer
         final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                     .withValue(new DOMSource(NetconfMessageTransformUtil.getDataSubtree(message.getDocument())))
