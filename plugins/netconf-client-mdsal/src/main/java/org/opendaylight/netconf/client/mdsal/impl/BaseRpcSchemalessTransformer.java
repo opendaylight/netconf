@@ -87,7 +87,7 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
             data.appendChild(data.importNode(xmlData, true));
 
             normalizedNode = ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                     .withValue(new DOMSource(data))
