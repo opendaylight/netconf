@@ -107,6 +107,7 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_CANDIDATE_NODEID = NodeIdentifier.create(Candidate.QNAME);
     public static final @NonNull NodeIdentifier NETCONF_TARGET_NODEID = NodeIdentifier.create(qnameOf("target"));
     public static final @NonNull NodeIdentifier NETCONF_CONFIG_NODEID = NodeIdentifier.create(qnameOf("config"));
+    public static final @NonNull NodeIdentifier NETCONF_OUTPUT_NODEID = NodeIdentifier.create(qnameOf("output"));
 
     public static final @NonNull NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(Validate.QNAME);
     public static final @NonNull NodeIdentifier NETCONF_COPY_CONFIG_NODEID = NodeIdentifier.create(CopyConfig.QNAME);
