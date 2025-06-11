@@ -8,14 +8,14 @@
 package org.opendaylight.netconf.transport.spi;
 
 import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.IoHandlerFactory;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.util.Map;
-import java.util.concurrent.ThreadFactory;
 import jdk.net.ExtendedSocketOptions;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -30,7 +30,7 @@ final class NioNettyImpl extends NettyImpl {
     static final NioNettyImpl INSTANCE;
 
     static {
-        final var grp = new NioEventLoopGroup();
+        final var grp = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             try {
                 final var ch = new NioSocketChannel();
@@ -56,6 +56,7 @@ final class NioNettyImpl extends NettyImpl {
         }
     }
 
+    private final IoHandlerFactory ioHandlerFactory = NioIoHandler.newFactory();
     private final boolean supportsKeepalives;
 
     private NioNettyImpl(final boolean supportsKeepalives) {
@@ -78,8 +79,8 @@ final class NioNettyImpl extends NettyImpl {
     }
 
     @Override
-    EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
-        return new NioEventLoopGroup(numThreads, threadFactory);
+    IoHandlerFactory ioHandlerFactory() {
+        return ioHandlerFactory;
     }
 
     @Override
