@@ -89,6 +89,6 @@ final class NioNettyImpl extends NettyImpl {
 
     @Override
     public String toString() {
-        return "java.nio";
+        return "java.nio " + (supportsKeepalives ? "with" : "without") + " TCP keepalive options";
     }
 }
