@@ -189,6 +189,8 @@ class ConcurrentClientsTest {
     @AfterEach
     void afterEach() throws Exception {
         server.shutdown().get(TIMEOUT, MILLISECONDS);
+        // FIXME: this should not be necessary!
+        Thread.sleep(1_000);
         serverBootstrapFactory.close();
         if (clientFactory != null) {
             clientFactory.close();
