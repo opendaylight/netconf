@@ -13,6 +13,7 @@ import com.google.common.annotations.Beta;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
@@ -81,7 +82,7 @@ public final class NettyTransportSupport {
      * @return An EventLoopGroup
      */
     public static EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
-        return IMPL.newEventLoopGroup(numThreads, requireNonNull(threadFactory));
+        return new MultiThreadIoEventLoopGroup(numThreads, requireNonNull(threadFactory), IMPL.ioHandlerFactory());
     }
 
     /**
