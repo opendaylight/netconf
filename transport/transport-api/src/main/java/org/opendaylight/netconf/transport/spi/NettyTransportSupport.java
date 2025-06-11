@@ -15,6 +15,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.epoll.Epoll;
+import io.netty.channel.kqueue.KQueue;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
@@ -33,9 +34,16 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public final class NettyTransportSupport {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransportSupport.class);
-    private static final NettyImpl IMPL = Epoll.isAvailable() ? new EpollNettyImpl() : NioNettyImpl.INSTANCE;
+    private static final NettyImpl IMPL;
 
     static {
+        if (Epoll.isAvailable()) {
+            IMPL = new EpollNettyImpl();
+        } else if (KQueue.isAvailable()) {
+            IMPL = new KQueueNettyImpl();
+        } else {
+            IMPL = NioNettyImpl.INSTANCE;
+        }
         LOG.info("Netty transport backed by {}", IMPL);
     }
 

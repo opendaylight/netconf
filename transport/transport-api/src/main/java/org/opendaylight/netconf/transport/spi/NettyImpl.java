@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Wrapper around a particular Netty transport implementation.
  */
 @NonNullByDefault
-abstract sealed class NettyImpl permits EpollNettyImpl, NioNettyImpl {
+abstract sealed class NettyImpl permits EpollNettyImpl, KQueueNettyImpl, NioNettyImpl {
 
     abstract Class<? extends DatagramChannel> datagramChannelClass();
 
