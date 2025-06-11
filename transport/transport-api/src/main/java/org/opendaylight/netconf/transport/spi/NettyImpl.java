@@ -7,11 +7,10 @@
  */
 package org.opendaylight.netconf.transport.spi;
 
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
-import java.util.concurrent.ThreadFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -27,7 +26,7 @@ abstract sealed class NettyImpl permits EpollNettyImpl, NioNettyImpl {
 
     abstract Class<? extends ServerSocketChannel> serverChannelClass();
 
-    abstract EventLoopGroup newEventLoopGroup(int numThreads, ThreadFactory threadFactory);
+    abstract IoHandlerFactory ioHandlerFactory();
 
     abstract @Nullable NettyTcpKeepaliveOptions keepaliveOptions();
 

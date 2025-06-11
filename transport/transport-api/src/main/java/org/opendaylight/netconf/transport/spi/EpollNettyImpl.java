@@ -7,13 +7,12 @@
  */
 package org.opendaylight.netconf.transport.spi;
 
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollDatagramChannel;
-import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollIoHandler;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
-import java.util.concurrent.ThreadFactory;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -21,6 +20,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 final class EpollNettyImpl extends NettyImpl {
     private static final NettyTcpKeepaliveOptions KEEPALIVE_OPTIONS = new NettyTcpKeepaliveOptions(
         EpollChannelOption.TCP_KEEPCNT, EpollChannelOption.TCP_KEEPIDLE, EpollChannelOption.TCP_KEEPINTVL);
+
+    private final IoHandlerFactory ioHandlerFactory = EpollIoHandler.newFactory();
 
     @Override
     Class<EpollDatagramChannel> datagramChannelClass() {
@@ -38,8 +39,8 @@ final class EpollNettyImpl extends NettyImpl {
     }
 
     @Override
-    EventLoopGroup newEventLoopGroup(final int numThreads, final ThreadFactory threadFactory) {
-        return new EpollEventLoopGroup(numThreads, threadFactory);
+    IoHandlerFactory ioHandlerFactory() {
+        return ioHandlerFactory;
     }
 
     @Override
