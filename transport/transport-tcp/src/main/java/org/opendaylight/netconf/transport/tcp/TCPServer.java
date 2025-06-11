@@ -89,6 +89,7 @@ public final class TCPServer extends TCPTransportStack {
 
         bootstrap
             .childHandler(initializer)
+            .option(ChannelOption.SO_REUSEADDR, Boolean.TRUE)
             .bind(socketAddressOf(localBind.requireLocalAddress(), localBind.requireLocalPort()))
             .addListener((ChannelFutureListener) future -> {
                 final var cause = future.cause();
