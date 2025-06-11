@@ -37,14 +37,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 
-public final class TestUtils {
+final class TestUtils {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private TestUtils() {
         // utility class
     }
 
-    public static InlineOrTruststore buildInlineOrTruststore(final Map<String, byte[]> certNameToBytesMap) {
+    static InlineOrTruststore buildInlineOrTruststore(final Map<String, byte[]> certNameToBytesMap) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
             .inline.or.truststore.certs.grouping.inline.or.truststore.InlineBuilder()
             .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
@@ -59,7 +59,7 @@ public final class TestUtils {
             .build();
     }
 
-    public static InlineOrKeystoreAsymmetricKeyGrouping buildAsymmetricKeyGrouping(
+    static InlineOrKeystoreAsymmetricKeyGrouping buildAsymmetricKeyGrouping(
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes) {
         return new RawPrivateKeyBuilder()
@@ -79,7 +79,7 @@ public final class TestUtils {
             .build();
     }
 
-    public static InlineOrKeystoreEndEntityCertWithKeyGrouping buildEndEntityCertWithKeyGrouping(
+    static InlineOrKeystoreEndEntityCertWithKeyGrouping buildEndEntityCertWithKeyGrouping(
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes, final byte[] certificateBytes) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010
@@ -99,7 +99,7 @@ public final class TestUtils {
             .build();
     }
 
-    public static X509CertData generateX509CertData(final String algorithm) throws Exception {
+    static X509CertData generateX509CertData(final String algorithm) throws Exception {
         final var keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
         if (isRSA(algorithm)) {
             keyPairGenerator.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4), SECURE_RANDOM);
@@ -129,11 +129,7 @@ public final class TestUtils {
                 .setProvider(new BouncyCastleProvider()).getCertificate(certificateBuilder.build(contentSigner));
     }
 
-    public static boolean isRSA(final String algorithm) {
+    static boolean isRSA(final String algorithm) {
         return KeyUtils.RSA_ALGORITHM.equals(algorithm);
-    }
-
-    public record X509CertData(X509Certificate certificate, KeyPair keyPair, byte[] certBytes, byte[] publicKey,
-        byte[] privateKey, byte[] sshPublicKey) {
     }
 }
