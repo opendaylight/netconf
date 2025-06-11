@@ -15,6 +15,7 @@ module org.opendaylight.netconf.transport.api {
     requires transitive org.opendaylight.yangtools.yang.common;
     requires io.netty.buffer;
     requires io.netty.transport.classes.epoll;
+    requires io.netty.transport.classes.kqueue;
     requires jdk.net;
     requires org.slf4j;
 
