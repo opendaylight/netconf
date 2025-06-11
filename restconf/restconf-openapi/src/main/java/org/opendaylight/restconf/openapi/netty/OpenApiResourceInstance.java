@@ -103,21 +103,23 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final var next = peeler.next();
         return switch (next) {
-            case "mounts" -> peeler.hasNext() ? apiMounts(method, targetUri, peeler) : switch (method) {
-                case GET -> new EntityRequestResponse(service.getListOfMounts());
-                case HEAD -> JSON_OK;
-                case OPTIONS -> GHO_OK;
-                default -> GHO_METHOD_NOT_ALLOWED;
-            };
+            case "mounts" -> peeler.hasNext() ? apiMounts(method, targetUri, peeler)
+                : switch (method) {
+                    case GET -> new EntityRequestResponse(service.getListOfMounts());
+                    case HEAD -> JSON_OK;
+                    case OPTIONS -> GHO_OK;
+                    default -> GHO_METHOD_NOT_ALLOWED;
+                };
             case "single" -> single(method, targetUri, peeler);
             case "ui" -> HeadersResponse.of(HttpResponseStatus.SEE_OTHER,
                 HttpHeaderNames.LOCATION, "/" + path() + "/explorer/index.html");
-            default -> peeler.hasNext() ? EmptyResponse.NOT_FOUND : switch (method) {
-                case GET -> apiModule(targetUri, next, true);
-                case HEAD -> apiModule(targetUri, next, false);
-                case OPTIONS -> GHO_OK;
-                default -> GHO_METHOD_NOT_ALLOWED;
-            };
+            default -> peeler.hasNext() ? EmptyResponse.NOT_FOUND
+                : switch (method) {
+                    case GET -> apiModule(targetUri, next, true);
+                    case HEAD -> apiModule(targetUri, next, false);
+                    case OPTIONS -> GHO_OK;
+                    default -> GHO_METHOD_NOT_ALLOWED;
+                };
         };
     }
 
