@@ -63,6 +63,6 @@ public abstract class AbstractTestModelTest extends AbstractBaseSchemasTest {
     );
 
     protected static final DatabindContext TEST_DATABIND = DatabindContext.ofModel(TEST_MODEL);
-    protected static final ListenableFuture<EffectiveModelContext> TEST_MODEL_FUTURE =
+    public static final ListenableFuture<EffectiveModelContext> TEST_MODEL_FUTURE =
         Futures.immediateFuture(TEST_MODEL);
 }
