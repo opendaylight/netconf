@@ -53,6 +53,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Node;
 
 @ExtendWith(MockitoExtension.class)
@@ -114,10 +115,61 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     void testInvokeRpc() throws Exception {
         final var rpcResult = RpcResultBuilder.success(reply).build();
         doReturn(Futures.immediateFuture(rpcResult)).when(communicator).sendRequest(any(NetconfMessage.class));
-        ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
+        final var input = createBaseNetconfNode();
         final DOMRpcResult result = rpc.domRpcService().invokeRpc(type, input).get();
         assertEquals(expectedReply.value().name(), result.value().name());
-        assertEquals(resolveNode(expectedReply), resolveNode(result));
+        assertTrue(resolveNode(expectedReply).isEqualNode(resolveNode(result)));
+    }
+
+    @Test
+    void testInvokeRpcNoRewrite() throws Exception {
+        // Context has the same revision as the requested RPC -> no rewrite happens
+        final var rpcResult = RpcResultBuilder.success(reply).build();
+        doReturn(Futures.immediateFuture(rpcResult)).when(communicator).sendRequest(any(NetconfMessage.class));
+        // input uses the same module+revision as 'type'
+        final var input = createBaseNetconfNode();
+        final var result = rpc.invokeNetconf(type, input).get();
+
+        // container name (QName) should match exactly (no mapping)
+        assertEquals(expectedReply.value().name(), result.value().name());
+
+        // payload must be identical, too
+        assertTrue(resolveNode(expectedReply).isEqualNode(resolveNode(result)));
+    }
+
+    @Test
+    void testInvokeRpcRewriteToLatestAndBack() throws Exception {
+        // Build a model context which does NOT include 2011-06-01, but DOES include a later rev (e.g., 2013-09-29).
+        // Adjust resource paths/revisions below to whatever you have under test resources.
+        final var newerCtx = YangParserTestUtils.parseYangResources(NetconfDeviceRpcTest.class,
+            "/schemas/ietf-netconf@2013-09-29.yang",
+            "/META-INF/yang/ietf-inet-types@2013-07-15.yang",
+            "/META-INF/yang/ietf-netconf-acm@2018-02-14.yang",
+            "/META-INF/yang/ietf-yang-types@2013-07-15.yang");
+        final var transformerNew = new NetconfMessageTransformer(DatabindContext.ofModel(newerCtx), true,
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
+        final var rpcNew = new NetconfDeviceRpc(newerCtx, communicator, transformerNew);
+
+        // Communicator still returns a basic <rpc-reply><data/></rpc-reply>
+        final var rpcResult = RpcResultBuilder.success(reply).build();
+        doReturn(Futures.immediateFuture(rpcResult)).when(communicator).sendRequest(any(NetconfMessage.class));
+
+        // Call with the older revision (2011-06-01) - this forces the outbound rewrite
+        final var oldType = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get");
+        final var input = createBaseNetconfNode();
+
+        final var result = rpcNew.invokeNetconf(oldType, input).get();
+
+        // Verify the result was mapped back to the ORIGINAL revision on the inbound path
+        assertEquals("output", result.value().name().getNodeType().getLocalName());
+        assertEquals(oldType.getModule(), result.value().name().getNodeType().getModule());
+
+        // And the payload (anyxml <data/>) survived the round-trip
+        final var expectedOld = new NetconfMessageTransformer(DatabindContext.ofModel(
+            BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class)), true,
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())))
+            .toRpcResult(RpcResultBuilder.success(reply).build(), oldType);
+        assertTrue(resolveNode(expectedOld).isEqualNode(resolveNode(result)));
     }
 
     private static Node resolveNode(final DOMRpcResult result) {
@@ -144,9 +196,10 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         }
     }
 
-    private static ContainerNode createNode(final String namespace, final String date, final String localName) {
+    private static ContainerNode createBaseNetconfNode() {
         return ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(QName.create(namespace, date, localName)))
+            .withNodeIdentifier(new NodeIdentifier(QName.create("urn:ietf:params:xml:ns:netconf:base:1.0",
+                "2011-06-01", "filter")))
             .build();
     }
 }
