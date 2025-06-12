@@ -17,7 +17,8 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @NonNullByDefault
 public abstract class AbstractTestModelTest extends AbstractBaseSchemasTest {
     protected static final EffectiveModelContext TEST_MODEL =
-        YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
+        YangParserTestUtils.parseYangResources(AbstractTestModelTest.class,"/schemas/test-module.yang",
+            "/schemas/ietf-netconf@2011-06-01.yang", "/schemas/ietf-inet-types@2010-09-24.yang");
     protected static final DatabindContext TEST_DATABIND = DatabindContext.ofModel(TEST_MODEL);
     protected static final ListenableFuture<EffectiveModelContext> TEST_MODEL_FUTURE =
         Futures.immediateFuture(TEST_MODEL);

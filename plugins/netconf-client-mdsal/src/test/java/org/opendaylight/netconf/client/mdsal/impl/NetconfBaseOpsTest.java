@@ -90,7 +90,8 @@ class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @BeforeEach
     void setUp() {
-        final var rpc = new NetconfDeviceRpc(TEST_MODEL, listener, new NetconfMessageTransformer(TEST_DATABIND,
+        final var rpc = new NetconfDeviceRpc(TEST_MODEL, listener,
+            new NetconfMessageTransformer(TEST_DATABIND,
             true, BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of()))));
         callback = new NetconfRpcFutureCallback("prefix",
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
