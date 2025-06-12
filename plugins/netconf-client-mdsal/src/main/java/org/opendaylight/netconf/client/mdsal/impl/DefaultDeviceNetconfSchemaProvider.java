@@ -13,8 +13,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
@@ -24,13 +26,22 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.ProvidedSources;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.YangModuleInfoImpl;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource.Costs;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +49,35 @@ import org.slf4j.LoggerFactory;
 @VisibleForTesting
 public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSchemaProvider {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultDeviceNetconfSchemaProvider.class);
+
+    /**
+     * The RFC6241-standard QName of {@code ietf-netconf-yang}.
+     */
+    private static final @NonNull QName RFC6241_IETF_NETCONF = YangModuleInfoImpl.getInstance().getName();
+    /**
+     * The QName of {@code ietf-netconf.yang} as revision used by libnetconf2/sysrepon/IOS-XR and perhaps others.
+     * The delta is just addition of NACM extension instantiations. The data semantics remains the same.
+    */
+    private static final @NonNull QName RFC6536_IETF_NETCONF = RFC6241_IETF_NETCONF.unbind()
+        .bindTo(QNameModule.of(RFC6241_IETF_NETCONF.getNamespace(), Revision.of("2013-09-29")))
+        .intern();
+
+    private static final @NonNull SourceIdentifier RFC6241_SOURCE_ID =
+        new SourceIdentifier(RFC6241_IETF_NETCONF.getLocalName(), RFC6241_IETF_NETCONF.getRevision().orElse(null));
+    private static final @NonNull ListenableFuture<@NonNull YangTextSource> RFC6241_SOURCE =
+        Futures.immediateFuture(new DelegatedYangTextSource(RFC6241_SOURCE_ID,
+            YangModuleInfoImpl.getInstance().getYangTextCharSource()));
+
+    private static final @NonNull ProvidedSources<?> RFC6241_PROVIDED_SOURCES =
+        new ProvidedSources<>(YangTextSource.class, sourceId -> {
+            if (RFC6241_SOURCE_ID.name().equals(sourceId.name())) {
+                final var revision = sourceId.revision();
+                if (revision == null || revision.equals(RFC6241_SOURCE_ID.revision())) {
+                    return RFC6241_SOURCE;
+                }
+            }
+            return Futures.immediateFailedFuture(new MissingSchemaSourceException(sourceId, "Source is not available"));
+        }, Set.of(RFC6241_IETF_NETCONF));
 
     // FIXME: resolver seems to be a useless indirection
     private final NetconfDeviceSchemasResolver resolver = new NetconfStateSchemasResolverImpl();
@@ -72,9 +112,11 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     }
 
     private ListenableFuture<DeviceNetconfSchema> deviceNetconfSchemaFor(final RemoteDeviceId deviceId,
-            final NetconfSessionPreferences sessionPreferences, final NetconfDeviceSchemas deviceSources,
+            final NetconfSessionPreferences sessionPreferences, final NetconfDeviceSchemas origDeviceSources,
             final Executor processingExecutor) {
-        LOG.debug("{}: Resolved device sources to {}", deviceId, deviceSources);
+        LOG.debug("{}: Resolved device sources to {}", deviceId, origDeviceSources);
+
+        final var deviceSources = applyQuirks(deviceId, origDeviceSources);
 
         var requiredSources = deviceSources.requiredSources();
 
@@ -119,5 +161,53 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     @Override
     public EffectiveModelContextFactory contextFactory() {
         return contextFactory;
+    }
+
+    /**
+     * Applies all supported device schema compatibility quirks.
+     *
+     * <p>Some devices advertise NETCONF base modules with revisions that are semantically
+     * compatible but not directly supported by the controller's internal logic.
+     * In such cases, the controller applies a known quirk to normalize the schema
+     * to a revision that simplifies downstream processing.
+     *
+     * <p>Currently, this method detects devices advertising
+     * {@code ietf-netconf@2013-09-29} and applies a downgrade to
+     * {@code ietf-netconf@2011-06-01} (RFC 6241) via
+     * {@link #quirkIetfNetconf20130929(RemoteDeviceId, NetconfDeviceSchemas)}.
+     *
+     * @param deviceId the identifier of the remote NETCONF device
+     * @param deviceSchemas the original set of advertised device schemas
+     * @return either the original schemas or a modified instance with quirks applied
+     */
+    private static NetconfDeviceSchemas applyQuirks(final RemoteDeviceId deviceId,
+            final NetconfDeviceSchemas deviceSchemas) {
+        return deviceSchemas.requiredSources().contains(RFC6536_IETF_NETCONF)
+            ? quirkIetfNetconf20130929(deviceId, deviceSchemas)
+            : deviceSchemas;
+    }
+
+    /**
+     * Applies the compatibility quirk for {@code ietf-netconf@2013-09-29}.
+     *
+     * <p>This method rewrites required sources that reference {@code ietf-netconf@2013-09-29} to
+     * {@code ietf-netconf@2011-06-01} and injects the RFC 6241 provided sources into the device schema.
+     *
+     * @param deviceId the identifier of the remote NETCONF device
+     * @param deviceSchemas the original set of advertised device schemas
+     * @return a new {@link NetconfDeviceSchemas} instance with the quirk applied
+     */
+    private static NetconfDeviceSchemas quirkIetfNetconf20130929(final RemoteDeviceId deviceId,
+            final NetconfDeviceSchemas deviceSchemas) {
+        LOG.debug("{}: applying ietf-netconf@2013-09-29 quirk", deviceId);
+
+        return new NetconfDeviceSchemas(
+            deviceSchemas.requiredSources().stream()
+                .map(qname -> RFC6536_IETF_NETCONF.equals(qname) ? RFC6241_IETF_NETCONF : qname)
+                .collect(Collectors.toUnmodifiableSet()),
+            deviceSchemas.features(),
+            deviceSchemas.librarySources(),
+            Stream.concat(Stream.of(RFC6241_PROVIDED_SOURCES), deviceSchemas.providedSources().stream())
+                .collect(Collectors.toUnmodifiableList()));
     }
 }
