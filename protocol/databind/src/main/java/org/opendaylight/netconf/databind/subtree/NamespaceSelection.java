@@ -20,11 +20,21 @@ import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 @NonNullByDefault
 public sealed interface NamespaceSelection {
     /**
+     * Return {@code true} if this selection can match the supplied QName.
+     */
+    boolean matches(QName qname);
+
+    /**
      * An exact match.
      */
     record Exact(QName qname) implements NamespaceSelection {
         public Exact {
             requireNonNull(qname);
+        }
+
+        @Override
+        public boolean matches(QName other) {
+            return qname.equals(other);
         }
     }
 
@@ -38,6 +48,12 @@ public sealed interface NamespaceSelection {
                     throw new IllegalArgumentException(qname + " does not match name " + name.getLocalName());
                 }
             });
+        }
+
+        @Override
+        public boolean matches(QName other) {
+            // Wildcard matches any QName whose local-name equals `name`
+            return name.getLocalName().equals(other.getLocalName());
         }
     }
 }
