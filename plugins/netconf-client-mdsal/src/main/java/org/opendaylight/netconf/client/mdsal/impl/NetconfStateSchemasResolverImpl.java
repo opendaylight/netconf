@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
@@ -46,8 +47,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema.Location;
+import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -61,8 +64,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.FeatureSet;
+import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -86,6 +92,34 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
     private static final @NonNull NodeIdentifier SCHEMA_VERSION_NODEID = NodeIdentifier.create(qnameOf("version"));
     private static final @NonNull String NETCONF_LOCATION = Location.Enumeration.NETCONF.getName();
     private static final @NonNull ContainerNode GET_SCHEMAS_RPC;
+
+    /**
+     * The RFC6241-standard QName of {@code ietf-netconf-yang}.
+     */
+    private static final @NonNull QName RFC6241_IETF_NETCONF = YangModuleInfoImpl.getInstance().getName();
+    /**
+     * The QName of {@code ietf-netconf.yang} as revision used by libnetconf2/sysrepon/IOS-XR and perhaps others.
+     * The delta is just addition of NACM extension instantiations. The data semantics remains the same.
+    */
+    private static final @NonNull QName RFC6536_IETF_NETCONF = RFC6241_IETF_NETCONF.unbind()
+        .bindTo(QNameModule.of(RFC6241_IETF_NETCONF.getNamespace(), Revision.of("2013-09-29")))
+        .intern();
+
+    private static final @NonNull SourceIdentifier RFC6241_SOURCEID = SourceIdentifier.ofQName(RFC6241_IETF_NETCONF);
+    private static final @NonNull ListenableFuture<@NonNull YangTextSource> RFC6241_SOURCE =
+        Futures.immediateFuture(new DelegatedYangTextSource(RFC6241_SOURCEID,
+            YangModuleInfoImpl.getInstance().getYangTextCharSource()));
+
+    private static final @NonNull ProvidedSources<?> RFC6241_PROVIDED_SOURCES =
+        new ProvidedSources<>(YangTextSource.class, sourceId -> {
+            if (RFC6241_SOURCEID.name().equals(sourceId.name())) {
+                final var revision = sourceId.revision();
+                if (revision == null || revision.equals(RFC6241_SOURCEID.revision())) {
+                    return RFC6241_SOURCE;
+                }
+            }
+            return Futures.immediateFailedFuture(new MissingSchemaSourceException(sourceId, "Source is not available"));
+        }, Set.of(RFC6241_IETF_NETCONF));
 
     static {
         final var document = XmlUtil.newDocument();
@@ -408,12 +442,24 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
             requiredSources.addAll(providedSourcesNotRequired);
         }
 
+        // Apply the 2013-09-29 -> 2011-06-01 schema downgrade. The data semantics is the same and this quirk allows us
+        // to simplify a lot of other logic just by relying on RFC6241.
+        final List<ProvidedSources<?>> effectiveSources;
+        if (requiredSources.remove(RFC6536_IETF_NETCONF)) {
+            LOG.debug("{}: applying ietf-netconf@2013-09-29 quirk", deviceId);
+            requiredSources.add(RFC6241_IETF_NETCONF);
+
+            effectiveSources = Stream.concat(Stream.of(RFC6241_PROVIDED_SOURCES), monitoringSources.stream())
+                .collect(Collectors.toUnmodifiableList());
+        } else {
+            effectiveSources = monitoringSources;
+        }
 
         return Futures.immediateFuture(new NetconfDeviceSchemas(requiredSources,
             // FIXME: determine features
             FeatureSet.builder().build(),
             // FIXME: use this instead of adjusted required sources
             Set.of(),
-            monitoringSources));
+            effectiveSources));
     }
 }
