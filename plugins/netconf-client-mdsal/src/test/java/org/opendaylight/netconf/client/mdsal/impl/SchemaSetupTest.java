@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.FeatureSet;
@@ -123,5 +125,26 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .setCapability("(test:namespace?revision=2013-07-22)test-module")
             .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
             .build()), result.capabilities().resolvedCapabilities());
+    }
+
+    @Test
+    void testNetconfBaseRevisionQuirkHandled() throws Exception {
+        doReturn(Futures.immediateFuture(source)).when(schemaRepository)
+            .getSchemaSource(any(), eq(YangTextSource.class));
+        doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
+
+        final var namespace = "urn:ietf:params:xml:ns:netconf:base:1.0";
+        final var quirkModule = QName.create(namespace, "2013-09-29", "ietf-netconf");
+        final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
+            new NetconfDeviceSchemas(Set.of(quirkModule), FeatureSet.builder().build(), Set.of(), List.of()),
+            NetconfSessionPreferences.fromStrings(
+                Set.of(namespace + "?module=ietf-netconf&amp;revision=2013-09-29")));
+
+        Futures.getDone(setup.startResolution());
+
+        final var captor = ArgumentCaptor.<Collection<SourceIdentifier>>captor();
+        verify(contextFactory).createEffectiveModelContext(captor.capture());
+        final var expected = new SourceIdentifier("ietf-netconf", Revision.of("2011-06-01"));
+        assertEquals(List.of(expected), captor.getValue());
     }
 }

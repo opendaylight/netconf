@@ -42,6 +42,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -57,6 +59,11 @@ import org.slf4j.LoggerFactory;
  */
 final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSetup.class);
+
+    private static final XMLNamespace NETCONF_BASE_NAMESPACE = XMLNamespace.of("urn:ietf:params:xml:ns:netconf:base:1.0");
+    private static final String NETCONF_BASE_MODULE = "ietf-netconf";
+    private static final Revision NETCONF_BASE_REVISION_2011 = Revision.of("2011-06-01");
+    private static final Revision NETCONF_BASE_REVISION_2013 = Revision.of("2013-09-29");
 
     private final SettableFuture<DeviceNetconfSchema> resultFuture = SettableFuture.create();
     private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
@@ -92,6 +99,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         }
 
         requiredSources = deviceRequiredSources.stream()
+            .map(SchemaSetup::normalizeNetconfBaseRevision)
             .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getModule().revision()))
             .collect(Collectors.toList());
 
@@ -99,6 +107,22 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
             UnavailableCapability.FailureReason.MissingSource);
         requiredSources.removeAll(missingSources);
+    }
+
+    private static QName normalizeNetconfBaseRevision(final QName qname) {
+        if (isNetconfBase2013(qname)) {
+            return QName.create(qname.getNamespace().toString(), NETCONF_BASE_REVISION_2011.toString(),
+                qname.getLocalName());
+        }
+        return qname;
+    }
+
+    private static boolean isNetconfBase2013(final QName qname) {
+        final var module = qname.getModule();
+        return NETCONF_BASE_NAMESPACE.equals(module.namespace())
+            && NETCONF_BASE_MODULE.equals(qname.getLocalName())
+            && qname.getRevision().map(revision -> Objects.equals(revision, NETCONF_BASE_REVISION_2013))
+            .orElseThrow();
     }
 
     ListenableFuture<DeviceNetconfSchema> startResolution() {
