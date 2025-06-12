@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,13 +40,17 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
+import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.output.Data;
+import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -72,6 +77,8 @@ class NetconfBaseOpsTest extends AbstractTestModelTest {
     private static final NodeIdentifier LEAF_Z_NID = NodeIdentifier.create(LEAF_Z_QNAME);
     private static final NetconfMessage NETCONF_DATA_MESSAGE;
 
+    private static EffectiveModelContext schemaContext;
+
     static {
         final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
         try {
@@ -88,9 +95,15 @@ class NetconfBaseOpsTest extends AbstractTestModelTest {
     private NetconfRpcFutureCallback callback;
     private NetconfBaseOps baseOps;
 
+    @BeforeAll
+    static void beforeClass() {
+        schemaContext = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
+    }
+
     @BeforeEach
     void setUp() {
-        final var rpc = new NetconfDeviceRpc(TEST_MODEL, listener, new NetconfMessageTransformer(TEST_DATABIND,
+        final var rpc = new NetconfDeviceRpc(schemaContext, listener,
+            new NetconfMessageTransformer(DatabindContext.ofModel(schemaContext),
             true, BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of()))));
         callback = new NetconfRpcFutureCallback("prefix",
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
