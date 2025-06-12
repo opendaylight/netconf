@@ -42,6 +42,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -57,6 +59,11 @@ import org.slf4j.LoggerFactory;
  */
 final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSetup.class);
+
+    private static final XMLNamespace NETCONF_BASE_NAMESPACE = XMLNamespace.of("urn:ietf:params:xml:ns:netconf:"
+        + "base:1.0");
+    private static final String NETCONF_BASE_MODULE = "ietf-netconf";
+    private static final Revision NETCONF_BASE_REVISION_2011 = Revision.of("2011-06-01");
 
     private final SettableFuture<DeviceNetconfSchema> resultFuture = SettableFuture.create();
     private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
@@ -90,6 +97,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
                 org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
                     .YangModuleInfoImpl.getInstance().getName());
         }
+        normalizeNetconfBaseTo2011(deviceRequiredSources);
 
         requiredSources = deviceRequiredSources.stream()
             .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getModule().revision()))
@@ -99,6 +107,16 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
             UnavailableCapability.FailureReason.MissingSource);
         requiredSources.removeAll(missingSources);
+    }
+
+    private static void normalizeNetconfBaseTo2011(final Set<QName> req) {
+        req.removeIf(qn -> isNetconf(qn) && !qn.getRevision().orElseThrow().equals(NETCONF_BASE_REVISION_2011));
+        req.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
+            .YangModuleInfoImpl.getInstance().getName());
+    }
+
+    private static boolean isNetconf(final QName qn) {
+        return NETCONF_BASE_NAMESPACE.equals(qn.getNamespace()) && NETCONF_BASE_MODULE.equals(qn.getLocalName());
     }
 
     ListenableFuture<DeviceNetconfSchema> startResolution() {
