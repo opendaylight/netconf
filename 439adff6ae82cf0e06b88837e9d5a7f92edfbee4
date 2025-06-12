@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d64ea7f_e823c284",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeFilter.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-12T08:31:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb5f454a_b425d918",
+      "revId": "439adff6ae82cf0e06b88837e9d5a7f92edfbee4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6bae50b_1ea9bb1f",
