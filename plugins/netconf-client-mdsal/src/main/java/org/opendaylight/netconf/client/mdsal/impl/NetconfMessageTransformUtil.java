@@ -210,7 +210,7 @@ public final class NetconfMessageTransformUtil {
     public static boolean isDataRetrievalOperation(final QName rpc) {
         return YangConstants.NETCONF_NAMESPACE.equals(rpc.getNamespace())
             && (GetConfig.QNAME.getLocalName().equals(rpc.getLocalName())
-                || Get.QNAME.getLocalName().equals(rpc.getLocalName()));
+            || Get.QNAME.getLocalName().equals(rpc.getLocalName()));
     }
 
     @Deprecated

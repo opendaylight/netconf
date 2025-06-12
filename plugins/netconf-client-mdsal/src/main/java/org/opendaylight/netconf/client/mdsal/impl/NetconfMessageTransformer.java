@@ -390,34 +390,22 @@ public class NetconfMessageTransformer
         if (!resultPayload.isSuccessful()) {
             return new DefaultDOMRpcResult(resultPayload.getErrors());
         }
-
         final var message = resultPayload.getResult();
-        final ContainerNode normalizedNode;
-        if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
-            normalizedNode = ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_OUTPUT_NODEID)
-                .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
-                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
-                    .withValue(new DOMSource(NetconfMessageTransformUtil.getDataSubtree(message.getDocument())))
-                    .build())
-                .build();
+        // Determine whether a base netconf operation is being invoked
+        // and also check if the device exposed model for base netconf.
+        // If no, use pre built base netconf operations model
+        final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
+        if (mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc)) {
+            currentMappedRpcs = baseSchema.mappedRpcs();
         } else {
-            // Determine whether a base netconf operation is being invoked
-            // and also check if the device exposed model for base netconf.
-            // If no, use pre built base netconf operations model
-            final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
-            if (mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc)) {
-                currentMappedRpcs = baseSchema.mappedRpcs();
-            } else {
-                currentMappedRpcs = mappedRpcs;
-            }
-
-            final var rpcDefinition = currentMappedRpcs.get(rpc);
-            checkArgument(rpcDefinition != null, "Unable to parse response of %s, the rpc is unknown", rpc);
-
-            // In case no input for rpc is defined, we can simply construct the payload here
-            normalizedNode = parseResult(message, Absolute.of(rpc), rpcDefinition);
+            currentMappedRpcs = mappedRpcs;
         }
+
+        final var rpcDefinition = currentMappedRpcs.get(rpc);
+        checkArgument(rpcDefinition != null, "Unable to parse response of %s, the rpc is unknown", rpc);
+
+        // In case no input for rpc is defined, we can simply construct the payload here
+        final var normalizedNode = parseResult(message, Absolute.of(rpc), rpcDefinition);
         return new DefaultDOMRpcResult(normalizedNode);
     }
 
