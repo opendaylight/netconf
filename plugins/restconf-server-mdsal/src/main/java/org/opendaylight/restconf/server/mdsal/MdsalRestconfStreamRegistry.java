@@ -187,6 +187,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final DOMSchemaService schemaService,
             @Reference final RestconfStream.LocationProvider locationProvider,
             @Reference final DatabindProvider databindProvider) {
+        super(schemaService.getGlobalContext());
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);
@@ -195,7 +196,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         updateCounters = Executors.newSingleThreadScheduledExecutor(TF);
 
         // FIXME: the source should be handling its own updates and we should only call start() once
-        notificationSource = new DefaultNotificationSource(notificationService, schemaService.getGlobalContext());
+        notificationSource = new DefaultNotificationSource(notificationService, super.modelContext());
         start(notificationSource);
         sclReg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
 
@@ -286,7 +287,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }, MoreExecutors.directExecutor());
     }
 
-    private synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+    @VisibleForTesting
+    synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+        super.updateModelContext(context);
         if (notificationSource != null) {
             notificationSource.close();
         }
