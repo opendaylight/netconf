@@ -189,6 +189,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final DOMSchemaService schemaService,
             @Reference final RestconfStream.LocationProvider locationProvider,
             @Reference final DatabindProvider databindProvider) {
+        super(schemaService.getGlobalContext());
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);
@@ -289,6 +290,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     private synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+        super.updateModelContext(context);
         if (notificationSource != null) {
             notificationSource.close();
         }
