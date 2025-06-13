@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,10 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @ExtendWith(MockitoExtension.class)
 class CreateDataChangeEventSubscriptionRpcTest {
     private static final class TestRegistry extends AbstractRestconfStreamRegistry {
+        TestRegistry(@NonNull EffectiveModelContext ctx) {
+            super(ctx);
+        }
+
         @Override
         protected ListenableFuture<Void> putStream(final RestconfStream<?> stream, final String description,
                 final URI restconfURI) {
@@ -129,7 +134,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
 
         doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         doCallRealMethod().when(dataBroker).extension(any());
-        rpc = new CreateDataChangeEventSubscriptionRpc(new TestRegistry(), databindProvider, dataBroker);
+        rpc = new CreateDataChangeEventSubscriptionRpc(new TestRegistry(SCHEMA_CTX), databindProvider, dataBroker);
     }
 
     @Test
