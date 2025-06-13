@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -89,6 +90,8 @@ class MdsalRestconfStreamRegistryTest {
     private TransportSession.Description sessionDesc;
     @Mock
     private EffectiveModelContext effectiveModelContext;
+    @Mock
+    private EffectiveModelContext updatedModelContext;
 
     private MdsalRestconfStreamRegistry registry;
 
@@ -186,5 +189,16 @@ class MdsalRestconfStreamRegistryTest {
                 // Nothing else
             }
         }
+    }
+
+    /**
+     * Test that model context is present in AbstractRestconfStreamRegistry and is also modified when
+     * onModelContextUpdated is invoked.
+     */
+    @Test
+    void modelContextUpdateTest() {
+        assertSame(effectiveModelContext, registry.modelContext());
+        registry.onModelContextUpdated(updatedModelContext);
+        assertSame(updatedModelContext, registry.modelContext());
     }
 }
