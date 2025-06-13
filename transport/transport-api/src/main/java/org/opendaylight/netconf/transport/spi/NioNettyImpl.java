@@ -7,6 +7,10 @@
  */
 package org.opendaylight.netconf.transport.spi;
 
+import static java.util.Objects.requireNonNull;
+
+import io.netty.bootstrap.AbstractBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
@@ -19,6 +23,7 @@ import java.util.Map;
 import jdk.net.ExtendedSocketOptions;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 @NonNullByDefault
 final class NioNettyImpl extends NettyImpl {
@@ -26,8 +31,7 @@ final class NioNettyImpl extends NettyImpl {
         NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPCOUNT),
         NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPIDLE),
         NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPINTERVAL));
-
-    static final NioNettyImpl INSTANCE;
+    private static final boolean SUPPORTS_KEEPALIVES;
 
     static {
         final var grp = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
@@ -36,9 +40,8 @@ final class NioNettyImpl extends NettyImpl {
                 final var ch = new NioSocketChannel();
                 grp.register(ch).sync();
 
-                final boolean supportsKeepalives;
                 try {
-                    supportsKeepalives = ch.config().setOptions(Map.of(
+                    SUPPORTS_KEEPALIVES = ch.config().setOptions(Map.of(
                         ChannelOption.SO_KEEPALIVE, Boolean.TRUE,
                         KEEPALIVE_OPTIONS.tcpKeepIdle(), 7200,
                         KEEPALIVE_OPTIONS.tcpKeepCnt(), 3,
@@ -46,7 +49,6 @@ final class NioNettyImpl extends NettyImpl {
                 } finally {
                     ch.close().sync();
                 }
-                INSTANCE = new NioNettyImpl(supportsKeepalives);
             } finally {
                 grp.shutdownGracefully().sync();
             }
@@ -57,10 +59,10 @@ final class NioNettyImpl extends NettyImpl {
     }
 
     private final IoHandlerFactory ioHandlerFactory = NioIoHandler.newFactory();
-    private final boolean supportsKeepalives;
+    private final Throwable epollCause;
 
-    private NioNettyImpl(final boolean supportsKeepalives) {
-        this.supportsKeepalives = supportsKeepalives;
+    NioNettyImpl(final Throwable epollCause) {
+        this.epollCause = requireNonNull(epollCause);
     }
 
     @Override
@@ -85,11 +87,30 @@ final class NioNettyImpl extends NettyImpl {
 
     @Override
     @Nullable NettyTcpKeepaliveOptions keepaliveOptions() {
-        return supportsKeepalives ? KEEPALIVE_OPTIONS : null;
+        return SUPPORTS_KEEPALIVES ? KEEPALIVE_OPTIONS : null;
+    }
+
+    @Override
+    void setTcpMd5(final AbstractBootstrap<?, ?> bootstrap, final TcpMd5Secrets secrets)
+            throws UnsupportedConfigurationException {
+        requireNonNull(bootstrap);
+        requireNonNull(secrets);
+        throw uce();
+    }
+
+    @Override
+    boolean setTcpMd5(final Channel channel, final TcpMd5Secrets secrets) throws UnsupportedConfigurationException {
+        requireNonNull(channel);
+        requireNonNull(secrets);
+        throw uce();
     }
 
     @Override
     public String toString() {
-        return "java.nio " + (supportsKeepalives ? "with" : "without") + " TCP keepalive options";
+        return "java.nio " + (SUPPORTS_KEEPALIVES ? "with" : "without") + " TCP keepalive options";
+    }
+
+    private UnsupportedConfigurationException uce() {
+        return new UnsupportedConfigurationException("TCP MD5 Signatures are not supported", epollCause.getCause());
     }
 }

@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.spi;
 
+import io.netty.bootstrap.AbstractBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollDatagramChannel;
@@ -46,6 +48,16 @@ final class EpollNettyImpl extends NettyImpl {
     @Override
     @NonNull NettyTcpKeepaliveOptions keepaliveOptions() {
         return KEEPALIVE_OPTIONS;
+    }
+
+    @Override
+    void setTcpMd5(AbstractBootstrap<?, ?> bootstrap, TcpMd5Secrets secrets) {
+        bootstrap.option(EpollChannelOption.TCP_MD5SIG, secrets.map());
+    }
+
+    @Override
+    boolean setTcpMd5(final Channel channel, final TcpMd5Secrets secrets) {
+        return channel.config().setOption(EpollChannelOption.TCP_MD5SIG, secrets.map());
     }
 
     @Override

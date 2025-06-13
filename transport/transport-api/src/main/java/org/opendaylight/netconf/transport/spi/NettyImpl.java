@@ -7,12 +7,15 @@
  */
 package org.opendaylight.netconf.transport.spi;
 
+import io.netty.bootstrap.AbstractBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 /**
  * Wrapper around a particular Netty transport implementation.
@@ -29,6 +32,11 @@ abstract sealed class NettyImpl permits EpollNettyImpl, NioNettyImpl {
     abstract IoHandlerFactory ioHandlerFactory();
 
     abstract @Nullable NettyTcpKeepaliveOptions keepaliveOptions();
+
+    abstract void setTcpMd5(AbstractBootstrap<?, ?> bootstrap, TcpMd5Secrets secrets)
+        throws UnsupportedConfigurationException;
+
+    abstract boolean setTcpMd5(Channel channel, TcpMd5Secrets secrets) throws UnsupportedConfigurationException;
 
     @Override
     public abstract String toString();
