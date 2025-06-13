@@ -79,6 +79,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -412,9 +413,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     //              happening from a single node only.
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
 
+    private volatile @NonNull EffectiveModelContext modelContext;
     private volatile @Nullable Future<?> stopTimeTask;
     private volatile @Nullable Uint32 nextSubscriptionToStop;
     private volatile @Nullable Instant nextStopTime;
+
+    protected AbstractRestconfStreamRegistry(final @NonNull EffectiveModelContext ctx) {
+        modelContext = ctx;
+    }
 
     @Override
     public final RestconfStream<?> lookupStream(final String name) {
@@ -459,6 +465,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             }
         }, MoreExecutors.directExecutor());
     }
+
+    protected final synchronized void updateModelContext(final @NonNull EffectiveModelContext ctx) {
+        requireNonNull(ctx);
+        modelContext = ctx;
+        LOG.debug("Model context updated");
+    }
+
+    public final @NonNull EffectiveModelContext modelContext() {
+        return modelContext;
+    }
+
 
     /**
      * Create default {@link RestconfStream} with a predefined name.
