@@ -79,6 +79,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,9 +412,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     //              happening from a single node only.
     private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
 
+    private volatile @NonNull EffectiveModelContext modelContext;
     private volatile @Nullable Future<?> stopTimeTask;
     private volatile @Nullable Uint32 nextSubscriptionToStop;
     private volatile @Nullable Instant nextStopTime;
+
+    protected AbstractRestconfStreamRegistry(final @NonNull EffectiveModelContext ctx) {
+        modelContext = requireNonNull(ctx);
+    }
 
     @Override
     public final RestconfStream<?> lookupStream(final String name) {
@@ -434,6 +440,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         final var name = allocateStreamName();
         registerStream(request, restconfURI, description, new LegacyRestconfStream<>(this, source, name));
     }
+
+    public final @NonNull EffectiveModelContext modelContext() {
+        return modelContext;
+    }
+
 
     private <T> void registerStream(final ServerRequest<RestconfStream<T>> request, final URI restconfURI,
             final String description, final RestconfStream<T> stream) {
@@ -457,6 +468,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 request.completeWith(new RequestException("Failed to create stream " + name, cause));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    protected final synchronized void updateModelContext(final @NonNull EffectiveModelContext ctx) {
+        modelContext = requireNonNull(ctx);
+        LOG.debug("Model context updated to: {}", ctx);
     }
 
     /**
