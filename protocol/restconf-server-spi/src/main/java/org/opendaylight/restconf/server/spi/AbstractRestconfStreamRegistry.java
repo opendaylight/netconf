@@ -64,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,24 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     public interface EventStreamFilter {
 
         boolean test(YangInstanceIdentifier path, ContainerNode body);
+    }
+
+    private volatile @NonNull EffectiveModelContext modelContext;
+
+    protected final synchronized void updateModelContext(final @NonNull EffectiveModelContext ctx) {
+        requireNonNull(ctx);
+        final var oldCOntext = modelContext;
+        modelContext = ctx;
+
+        if (oldCOntext == null) {
+            LOG.debug("Initial model context installed");
+        } else if (!oldCOntext.equals(ctx)) {
+            LOG.debug("Model context updated");
+        }
+    }
+
+    protected final @NonNull EffectiveModelContext modelContext() {
+        return modelContext;
     }
 
     /**

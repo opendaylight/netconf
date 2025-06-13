@@ -231,6 +231,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     private synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+        super.updateModelContext(context);
         if (notificationSource != null) {
             notificationSource.close();
         }
