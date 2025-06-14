@@ -9,7 +9,6 @@ package org.opendaylight.netconf.northbound;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -24,10 +23,10 @@ import org.osgi.service.component.annotations.Deactivate;
 public final class DefaultNetconfMonitoringService extends NetconfMonitoringServiceImpl {
     static final String FACTORY_NAME = "org.opendaylight.netconf.impl.mdsal.DefaultNetconfMonitoringService";
 
-    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
-        .setNameFormat("netconf-server-monitoring-%d")
-        .setDaemon(true)
-        .build();
+    private static final ThreadFactory THREAD_FACTORY = Thread.ofVirtual()
+        .name("odl-netconf-server-monitoring-", 0)
+        .factory();
+
     private static final String OP_PROVIDER_PROP = ".opProvider";
     private static final String UPDATE_INTERVAL_PROP = ".updateInterval";
 
