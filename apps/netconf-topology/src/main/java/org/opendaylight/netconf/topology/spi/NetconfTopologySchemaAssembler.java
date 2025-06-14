@@ -13,7 +13,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -31,12 +30,10 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 public final class NetconfTopologySchemaAssembler implements AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
-        @AttributeDefinition(min = "0")
-        int assembler$_$min$_$threads() default 1;
-        @AttributeDefinition(min = "1")
+        @AttributeDefinition(min = "1", description = """
+            Maximum number of concurrent schema assmbly threads. This effectively limits the memory footprint by not
+            allowing too many YANG parser executions to run at the same time.""")
         int assembler$_$max$_$threads() default 4;
-        @AttributeDefinition(min = "0")
-        long assembler$_$keep$_$alive$_$millis() default 60_000;
     }
 
     private static final class SynchronousBlockingQueue extends ForwardingBlockingQueue<Runnable> {
@@ -60,28 +57,25 @@ public final class NetconfTopologySchemaAssembler implements AutoCloseable {
         .setNameFormat("topology-schema-assembler-%d")
         .setDaemon(true)
         .build();
-    private static final RejectedExecutionHandler BLOCKING_REJECTED_EXECUTION_HANDLER = (runnable, executor) -> {
-        // if maximum number of threads are reached, the threadpool would reject the execution. We override that
-        // behaviour and block until the queue accepts the task or we get interrupted
-        try {
-            executor.getQueue().put(runnable);
-        } catch (InterruptedException e) {
-            throw new RejectedExecutionException("Interrupted while waiting on the queue", e);
-        }
-    };
 
     private final ThreadPoolExecutor executor;
 
-    public NetconfTopologySchemaAssembler(final int minThreads, final int maxThreads, final long keepAliveTime,
-            final TimeUnit unit) {
-        executor = new ThreadPoolExecutor(minThreads, maxThreads, keepAliveTime, unit, new SynchronousBlockingQueue(),
-            THREAD_FACTORY, BLOCKING_REJECTED_EXECUTION_HANDLER);
+    public NetconfTopologySchemaAssembler(final int maxThreads) {
+        executor = new ThreadPoolExecutor(0, maxThreads, 0, TimeUnit.NANOSECONDS, new SynchronousBlockingQueue(),
+            THREAD_FACTORY, (runnable, exec) -> {
+                // if maximum number of threads are reached, the threadpool would reject the execution. We override that
+                // behaviour and block until the queue accepts the task or we get interrupted
+                try {
+                    exec.getQueue().put(runnable);
+                } catch (InterruptedException e) {
+                    throw new RejectedExecutionException("Interrupted while waiting on the queue", e);
+                }
+            });
     }
 
     @Activate
     public NetconfTopologySchemaAssembler(final Configuration config) {
-        this(config.assembler$_$min$_$threads(), config.assembler$_$max$_$threads(),
-            config.assembler$_$keep$_$alive$_$millis(), TimeUnit.MILLISECONDS);
+        this(config.assembler$_$max$_$threads());
     }
 
     @Override

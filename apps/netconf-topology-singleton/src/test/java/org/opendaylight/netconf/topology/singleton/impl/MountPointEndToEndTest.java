@@ -245,7 +245,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     void setUp() throws Exception {
         deleteCacheDir();
 
-        schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
+        schemaAssembler = new NetconfTopologySchemaAssembler(1);
 
         resourceManager = new DefaultSchemaResourceManager(new DefaultYangParserFactory(), TEST_ROOT_DIRECTORY,
             TEST_DEFAULT_SUBDIR);

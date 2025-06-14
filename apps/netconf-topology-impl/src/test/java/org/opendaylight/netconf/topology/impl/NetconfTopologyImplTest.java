@@ -13,7 +13,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -92,7 +91,7 @@ class NetconfTopologyImplTest {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
-        try (var schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS)) {
+        try (var schemaAssembler = new NetconfTopologySchemaAssembler(1)) {
             final var topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(),
                 mockedClientFactory, mockedTimer, schemaAssembler, mockedResourceManager, dataBroker, mountPointService,
                 encryptionService, builderFactory, rpcProviderService,

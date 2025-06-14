@@ -341,7 +341,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
             id -> null, sslContextFactoryProvider());
         final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
-        final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(1, 4, 1L, TimeUnit.MINUTES);
+        final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
         final var yangParserFactory = new DefaultYangParserFactory();
         final var schemaSourceMgr =
             new DefaultSchemaResourceManager(yangParserFactory, tmpDir.getAbsolutePath(), "schema");

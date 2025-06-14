@@ -122,7 +122,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
+        schemaAssembler = new NetconfTopologySchemaAssembler(1);
 
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
             @Override
