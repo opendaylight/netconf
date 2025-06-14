@@ -9,7 +9,6 @@ package org.opendaylight.netconf.transport.tcp;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
@@ -78,10 +77,10 @@ public final class NettyTransportSupport {
      */
     public static EventLoopGroup newEventLoopGroup(final String name, final int numThreads) {
         return org.opendaylight.netconf.transport.spi.NettyTransportSupport.newEventLoopGroup(numThreads,
-            new ThreadFactoryBuilder()
-                .setNameFormat(requireNonNull(name) + "-%d")
-                .setUncaughtExceptionHandler(
-                    (thread, ex) -> LOG.error("Thread terminated due to uncaught exception: {}", thread.getName(), ex))
-                .build());
+            Thread.ofPlatform()
+                .name(requireNonNull(name) + '-', 0)
+                .uncaughtExceptionHandler((thread, ex) ->
+                    LOG.error("Thread terminated due to uncaught exception: {}", thread.getName(), ex))
+                .factory());
     }
 }
