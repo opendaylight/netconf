@@ -9,7 +9,6 @@ package org.opendaylight.netconf.common.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
@@ -32,10 +31,7 @@ import org.slf4j.LoggerFactory;
 @Designate(ocd = NettyNetconfTimer.Configuration.class)
 public final class NettyNetconfTimer implements NetconfTimer, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NettyNetconfTimer.class);
-    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
-        .setNameFormat("netconf-timer-%d")
-        .setDaemon(true)
-        .build();
+    private static final ThreadFactory THREAD_FACTORY = Thread.ofVirtual().name("netconf-timer-", 0).factory();
 
     /**
      * Configuration of {@link NettyNetconfTimer}.
