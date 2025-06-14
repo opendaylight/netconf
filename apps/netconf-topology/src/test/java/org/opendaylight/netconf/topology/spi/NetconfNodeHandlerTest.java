@@ -137,7 +137,7 @@ class NetconfNodeHandlerTest {
 
     @BeforeEach
     void before() {
-        schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
+        schemaAssembler = new NetconfTopologySchemaAssembler(1);
 
         // Instantiate the handler
         handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, schemaAssembler,

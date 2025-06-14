@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -147,7 +146,7 @@ class AbstractNetconfTopologyTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
         doNothing().when(wtx).merge(any(), any(InstanceIdentifier.class), any());
 
-        final var schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
+        final var schemaAssembler = new NetconfTopologySchemaAssembler(1);
         final var topology = new TestingNetconfTopologyImpl("id", clientFactory, timer, schemaAssembler,
             schemaManager, dataBroker, mountPointService,
             new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
@@ -201,9 +200,8 @@ class AbstractNetconfTopologyTest {
         verify(delegate).close();
     }
 
-    private class TestingNetconfTopologyImpl extends AbstractNetconfTopology {
-
-        protected TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
+    private final class TestingNetconfTopologyImpl extends AbstractNetconfTopology {
+        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
             final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
             final SchemaResourceManager schemaManager, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
@@ -223,7 +221,7 @@ class AbstractNetconfTopologyTest {
 
         @Override
         protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final Credentials credentials,
-                boolean lockDatastore) {
+                final boolean lockDatastore) {
             return delegate;
         }
     }
