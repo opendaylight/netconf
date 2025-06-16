@@ -10,10 +10,13 @@ package org.opendaylight.restconf.mdsal.spi.data;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.doReturn;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYang;
 
 import com.google.common.util.concurrent.Futures;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -24,9 +27,9 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -92,7 +95,7 @@ class NC1495Test {
     private static final YangInstanceIdentifier CONTAINER_INSTANCE = YangInstanceIdentifier.of(CONTAINER_QNAME);
     private static final Data CONTAINER_PATH = ROOT.enterPath(CONTAINER_INSTANCE);
     @Mock
-    private NetconfDataTreeService netconfService;
+    private DataStoreService dataStoreService;
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
@@ -100,9 +103,11 @@ class NC1495Test {
 
     @Test
     void testListOrderInNetconfRestconfStrategy() throws Exception {
-        final var dataOperations = new DataOperationImpl(netconfService);
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).getConfig(CONTAINER_INSTANCE);
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(netconfService).get(CONTAINER_INSTANCE);
+        final var dataOperations = new DataOperationImpl(dataStoreService);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(dataStoreService).get(CONFIGURATION,
+            CONTAINER_INSTANCE, List.of());
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER))).when(dataStoreService).get(OPERATIONAL,
+            CONTAINER_INSTANCE, List.of());
         final var optionalNode = dataOperations.getData(CONTAINER_PATH,
                 DataGetParams.of(QueryParameters.of(ContentParam.ALL))).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
@@ -117,7 +122,7 @@ class NC1495Test {
         final var restconfStrategy = new MdsalRestconfStrategy(DATABIND, dataBroker);
         doReturn(readTransaction).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(CONTAINER))).when(readTransaction).read(
-            LogicalDatastoreType.CONFIGURATION, CONTAINER_INSTANCE);
+            CONFIGURATION, CONTAINER_INSTANCE);
         doReturn(immediateFluentFuture(Optional.of(CONTAINER))).when(readTransaction).read(
             LogicalDatastoreType.OPERATIONAL, CONTAINER_INSTANCE);
         final var optionalNode = restconfStrategy.readData(ContentParam.ALL, CONTAINER_PATH, null)
