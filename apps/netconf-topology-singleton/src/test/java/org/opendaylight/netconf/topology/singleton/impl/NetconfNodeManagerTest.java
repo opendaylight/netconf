@@ -58,7 +58,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -111,7 +111,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     @Mock
     private DataBroker mockDataBroker;
     @Mock
-    private NetconfDataTreeService netconfService;
+    private DataStoreService dataStoreService;
     @Mock
     private DOMDataBroker mockDeviceDataBroker;
     @Mock
@@ -383,7 +383,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     private void initializeMaster() {
         TestKit kit = new TestKit(masterSystem);
-        testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, netconfService,
+        testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, dataStoreService,
             SOURCE_IDENTIFIERS, new RemoteDeviceServices(mockRpcService, mockActionService)), kit.getRef());
 
         kit.expectMsgClass(MasterActorDataInitialized.class);
