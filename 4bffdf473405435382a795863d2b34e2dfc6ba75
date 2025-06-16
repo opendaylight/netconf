@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "262cbd56_dc86f50b",
+        "filename": "plugins/restconf-server-mdsal/src/test/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistryTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-16T12:53:10Z",
+      "side": 1,
+      "message": "This test is probably going to be moved in the future when we refactor mdsal/abstract registry to deal with databind changes.",
+      "revId": "4bffdf473405435382a795863d2b34e2dfc6ba75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
