@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.topology.singleton.messages.netconf;
 
 import java.io.Serial;
+import java.util.List;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -15,13 +17,26 @@ public class GetRequest implements ReadActorMessage {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private final LogicalDatastoreType store;
     private final YangInstanceIdentifier path;
+    private final List<YangInstanceIdentifier> fields;
 
-    public GetRequest(final YangInstanceIdentifier path) {
+    public GetRequest(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+            final List<YangInstanceIdentifier> fields) {
+        this.store = store;
         this.path = path;
+        this.fields = fields;
     }
 
-    public YangInstanceIdentifier getPath() {
+    public LogicalDatastoreType store() {
+        return store;
+    }
+
+    public YangInstanceIdentifier path() {
         return path;
+    }
+
+    public List<YangInstanceIdentifier> fields() {
+        return fields;
     }
 }
