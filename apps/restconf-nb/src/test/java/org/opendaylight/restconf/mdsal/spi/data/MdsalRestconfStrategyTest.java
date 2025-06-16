@@ -427,8 +427,8 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
 
     @Override
     NormalizedNode readData(final ContentParam content, Data path,
-            final AbstractServerDataOperations strategy) {
-        if (strategy instanceof MdsalRestconfStrategy mdsalRestconfStrategy) {
+            final AbstractServerDataOperations dataOperations) {
+        if (dataOperations instanceof MdsalRestconfStrategy mdsalRestconfStrategy) {
             try {
                 return mdsalRestconfStrategy.readData(content, path, null)
                     .get(2, TimeUnit.SECONDS)
@@ -437,7 +437,7 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
                 throw new AssertionError(e);
             }
         } else {
-            fail("wrong type");
+            fail("Wrong ServerDataOperations type" + dataOperations);
             return null;
         }
     }
