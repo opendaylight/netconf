@@ -71,7 +71,6 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         super.afterEach();
     }
 
-    @Disabled("Will be disabled until NETCONF-1465 has been resolved")
     @Test
     void filterNotificationReceivedTest() throws Exception {
         final var response = establishFilteredSubscription("""
