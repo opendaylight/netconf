@@ -17,7 +17,6 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -41,7 +40,7 @@ public class FieldsParamParser {
 
     /**
      * Translate a {@link FieldsParam} to a list of child node paths saved in lists, suitable for use with
-     * {@link NetconfDataTreeService}.
+     * {@link DataStoreService}.
      *
      * <p>Fields parser that stores a set of all the leaf {@link LinkedPathElement}s specified in {@link FieldsParam}.
      * Using {@link LinkedPathElement} it is possible to create a chain of path arguments and build complete paths
