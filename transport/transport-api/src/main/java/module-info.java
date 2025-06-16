@@ -10,10 +10,10 @@ module org.opendaylight.netconf.transport.api {
     exports org.opendaylight.netconf.transport.spi;
 
     requires transitive com.google.common;
+    requires transitive io.netty.buffer;
     requires transitive io.netty.common;
     requires transitive io.netty.transport;
     requires transitive org.opendaylight.yangtools.yang.common;
-    requires io.netty.buffer;
     requires io.netty.transport.classes.epoll;
     requires jdk.net;
     requires org.slf4j;
