@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.api.query;
 
+import java.io.Serial;
+import java.io.Serializable;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -14,11 +16,13 @@ import org.eclipse.jdt.annotation.Nullable;
  * This class represents a {@code depth} parameter as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.2">RFC8040 section 4.8.2</a>.
  */
-public final class DepthParam implements RestconfQueryParam<DepthParam> {
+public final class DepthParam implements RestconfQueryParam<DepthParam>, Serializable {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
     public static final @NonNull String uriName = "depth";
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private static final @NonNull DepthParam MIN = new DepthParam(1);
     private static final @NonNull DepthParam MAX = new DepthParam(65535);
 
