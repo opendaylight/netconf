@@ -12,12 +12,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.pekko.actor.ActorRef;
@@ -33,20 +35,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.topology.singleton.impl.netconf.NetconfServiceFailedException;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DeleteEditConfigRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.GetRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.LockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
@@ -66,16 +64,17 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 @ExtendWith(MockitoExtension.class)
 class NetconfDataTreeServiceActorTest {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
-    static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
     static final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
         .build();
+    private static final FluentFuture<DefaultDOMRpcResult> EMPTY_RPC = FluentFutures.immediateFluentFuture(
+        new DefaultDOMRpcResult());
 
     private static ActorSystem system = ActorSystem.apply();
 
     @Mock
-    private NetconfDataTreeService netconfService;
+    private DataStoreService dataStoreService;
 
     private TestProbe probe;
     private ActorRef actorRef;
@@ -83,7 +82,7 @@ class NetconfDataTreeServiceActorTest {
     @BeforeEach
     void setUp() {
         actorRef = TestActorRef.create(system,
-            NetconfDataTreeServiceActor.props(netconfService, Duration.ofSeconds(2)));
+            NetconfDataTreeServiceActor.props(dataStoreService, Duration.ofSeconds(2)));
         probe = TestProbe.apply(system);
     }
 
@@ -94,121 +93,108 @@ class NetconfDataTreeServiceActorTest {
 
     @Test
     void testGet() {
-        doReturn(immediateFluentFuture(Optional.of(NODE))).when(netconfService).get(PATH);
-        actorRef.tell(new GetRequest(PATH), probe.ref());
+        doReturn(immediateFluentFuture(Optional.of(NODE))).when(dataStoreService).get(OPERATIONAL, PATH, List.of());
+        actorRef.tell(new GetRequest(OPERATIONAL, PATH, List.of()), probe.ref());
 
-        verify(netconfService).get(PATH);
+        verify(dataStoreService).get(OPERATIONAL, PATH, List.of());
         final NormalizedNodeMessage response = probe.expectMsgClass(NormalizedNodeMessage.class);
         assertEquals(NODE, response.getNode());
     }
 
     @Test
     void testGetEmpty() {
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
-        actorRef.tell(new GetRequest(PATH), probe.ref());
+        doReturn(immediateFluentFuture(Optional.empty())).when(dataStoreService).get(OPERATIONAL, PATH, List.of());
+        actorRef.tell(new GetRequest(OPERATIONAL, PATH, List.of()), probe.ref());
 
-        verify(netconfService).get(PATH);
+        verify(dataStoreService).get(OPERATIONAL, PATH, List.of());
         probe.expectMsgClass(EmptyReadResponse.class);
     }
 
     @Test
     void testGetFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
-        doReturn(immediateFailedFluentFuture(cause)).when(netconfService).get(PATH);
-        actorRef.tell(new GetRequest(PATH), probe.ref());
+        doReturn(immediateFailedFluentFuture(cause)).when(dataStoreService).get(OPERATIONAL, PATH, List.of());
+        actorRef.tell(new GetRequest(OPERATIONAL, PATH, List.of()), probe.ref());
 
-        verify(netconfService).get(PATH);
+        verify(dataStoreService).get(OPERATIONAL, PATH, List.of());
         final Status.Failure response = probe.expectMsgClass(Status.Failure.class);
         assertEquals(cause, response.cause());
     }
 
     @Test
     void testGetConfig() {
-        doReturn(immediateFluentFuture(Optional.of(NODE))).when(netconfService).getConfig(PATH);
-        actorRef.tell(new GetConfigRequest(PATH), probe.ref());
+        doReturn(immediateFluentFuture(Optional.of(NODE))).when(dataStoreService).get(CONFIGURATION, PATH, List.of());
+        actorRef.tell(new GetRequest(CONFIGURATION, PATH, List.of()), probe.ref());
 
-        verify(netconfService).getConfig(PATH);
+        verify(dataStoreService).get(CONFIGURATION, PATH, List.of());
         final NormalizedNodeMessage response = probe.expectMsgClass(NormalizedNodeMessage.class);
         assertEquals(NODE, response.getNode());
     }
 
     @Test
     void testGetConfigEmpty() {
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH);
-        actorRef.tell(new GetConfigRequest(PATH), probe.ref());
+        doReturn(immediateFluentFuture(Optional.empty())).when(dataStoreService).get(CONFIGURATION, PATH, List.of());
+        actorRef.tell(new GetRequest(CONFIGURATION, PATH, List.of()), probe.ref());
 
-        verify(netconfService).getConfig(PATH);
+        verify(dataStoreService).get(CONFIGURATION, PATH, List.of());
         probe.expectMsgClass(EmptyReadResponse.class);
     }
 
     @Test
     void testGetConfigFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
-        doReturn(immediateFailedFluentFuture(cause)).when(netconfService).getConfig(PATH);
-        actorRef.tell(new GetConfigRequest(PATH), probe.ref());
+        doReturn(immediateFailedFluentFuture(cause)).when(dataStoreService).get(CONFIGURATION, PATH, List.of());
+        actorRef.tell(new GetRequest(CONFIGURATION, PATH, List.of()), probe.ref());
 
-        verify(netconfService).getConfig(PATH);
+        verify(dataStoreService).get(CONFIGURATION, PATH, List.of());
         final Status.Failure response = probe.expectMsgClass(Status.Failure.class);
         assertEquals(cause, response.cause());
     }
 
     @Test
-    void testLock() {
-        final ListenableFuture<? extends DOMRpcResult> future = Futures.immediateFuture(new DefaultDOMRpcResult());
-        doReturn(future).when(netconfService).lock();
-        actorRef.tell(new LockRequest(), probe.ref());
-        verify(netconfService).lock();
-    }
-
-    @Test
     void testMerge() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .merge(STORE, PATH, NODE, Optional.empty());
+        doReturn(EMPTY_RPC).when(dataStoreService).merge(PATH, NODE);
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
-        actorRef.tell(new MergeEditConfigRequest(STORE, node, null), probe.ref());
-        verify(netconfService).merge(STORE, PATH, NODE, Optional.empty());
+        actorRef.tell(new MergeEditConfigRequest(node), probe.ref());
+        verify(dataStoreService).merge(PATH, NODE);
     }
 
     @Test
     void testReplace() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(STORE, PATH, NODE, Optional.empty());
+        doReturn(EMPTY_RPC).when(dataStoreService).replace(PATH, NODE);
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
-        actorRef.tell(new ReplaceEditConfigRequest(STORE, node, null), probe.ref());
-        verify(netconfService).replace(STORE, PATH, NODE, Optional.empty());
+        actorRef.tell(new ReplaceEditConfigRequest(node), probe.ref());
+        verify(dataStoreService).replace(PATH, NODE);
     }
 
     @Test
     void testCreate() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .create(STORE, PATH, NODE, Optional.empty());
+        doReturn(EMPTY_RPC).when(dataStoreService).create(PATH, NODE);
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
-        actorRef.tell(new CreateEditConfigRequest(STORE, node, null), probe.ref());
-        verify(netconfService).create(STORE, PATH, NODE, Optional.empty());
+        actorRef.tell(new CreateEditConfigRequest(node), probe.ref());
+        verify(dataStoreService).create(PATH, NODE);
     }
 
     @Test
     void testDelete() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .delete(STORE, PATH);
-        actorRef.tell(new DeleteEditConfigRequest(STORE, PATH), probe.ref());
-        verify(netconfService).delete(STORE, PATH);
+        doReturn(EMPTY_RPC).when(dataStoreService).delete(PATH);
+        actorRef.tell(new DeleteEditConfigRequest(PATH), probe.ref());
+        verify(dataStoreService).delete(PATH);
     }
 
     @Test
     void testRemove() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .remove(STORE, PATH);
-        actorRef.tell(new RemoveEditConfigRequest(STORE, PATH), probe.ref());
-        verify(netconfService).remove(STORE, PATH);
+        doReturn(EMPTY_RPC).when(dataStoreService).remove(PATH);
+        actorRef.tell(new RemoveEditConfigRequest(PATH), probe.ref());
+        verify(dataStoreService).remove(PATH);
     }
 
     @Test
     void testCommit() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(EMPTY_RPC).when(dataStoreService).commit();
         actorRef.tell(new CommitRequest(), probe.ref());
 
-        verify(netconfService).commit();
+        verify(dataStoreService).commit();
         probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
@@ -218,10 +204,10 @@ class NetconfDataTreeServiceActorTest {
         final TransactionCommitFailedException failure = new TransactionCommitFailedException("fail", rpcError);
         final NetconfServiceFailedException cause = new NetconfServiceFailedException(
             String.format("%s: Commit of operation failed", 1), failure);
-        when(netconfService.commit()).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
+        when(dataStoreService.commit()).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
         actorRef.tell(new CommitRequest(), probe.ref());
 
-        verify(netconfService).commit();
+        verify(dataStoreService).commit();
         final Status.Failure response = probe.expectMsgClass(Status.Failure.class);
         assertEquals(cause, response.cause());
     }
@@ -230,10 +216,8 @@ class NetconfDataTreeServiceActorTest {
     void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
-        verify(netconfService, timeout(3000)).discardChanges();
-        verify(netconfService, timeout(3000)).unlock();
+        doReturn(EMPTY_RPC).when(dataStoreService).cancel();
+        verify(dataStoreService, timeout(3000)).cancel();
         testProbe.expectTerminated(actorRef, TIMEOUT.duration());
     }
 }
