@@ -16,6 +16,24 @@
       "message": "multiple identical signoffs",
       "revId": "42bb679a220960f8428b2d8e00d3d3e693e27bea",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df6d8769_a56da2db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 84
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-16T15:18:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ab7b9b4_b0c46e55",
+      "revId": "42bb679a220960f8428b2d8e00d3d3e693e27bea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
