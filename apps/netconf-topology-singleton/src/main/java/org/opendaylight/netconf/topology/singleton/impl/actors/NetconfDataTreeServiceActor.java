@@ -21,21 +21,16 @@ import org.apache.pekko.actor.Status;
 import org.apache.pekko.actor.UntypedAbstractActor;
 import org.apache.pekko.util.JavaDurationConverters;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.CancelChangesRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DeleteEditConfigRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.DiscardChangesRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigWithFieldsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.GetRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.GetWithFieldsRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.LockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditConfigRequest;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.PutEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
-import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
@@ -47,10 +42,10 @@ import org.slf4j.LoggerFactory;
 public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataTreeServiceActor.class);
 
-    private final NetconfDataTreeService netconfService;
+    private final DataStoreService netconfService;
     private final long idleTimeout;
 
-    private NetconfDataTreeServiceActor(final NetconfDataTreeService netconfService, final Duration idleTimeout) {
+    private NetconfDataTreeServiceActor(final DataStoreService netconfService, final Duration idleTimeout) {
         this.netconfService = netconfService;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
@@ -58,71 +53,43 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         }
     }
 
-    static Props props(final NetconfDataTreeService netconfService, final Duration idleTimeout) {
+    static Props props(final DataStoreService netconfService, final Duration idleTimeout) {
         return Props.create(NetconfDataTreeServiceActor.class, () ->
             new NetconfDataTreeServiceActor(netconfService, idleTimeout));
     }
 
     @Override
     public void onReceive(final Object message) {
-        if (message instanceof GetWithFieldsRequest getRequest) {
-            final YangInstanceIdentifier path = getRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.get(
-                    getRequest.getPath(), getRequest.getFields());
+        if (message instanceof GetRequest getRequest) {
+            final YangInstanceIdentifier path = getRequest.path();
+            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.read(getRequest.store(),
+                    getRequest.path(), getRequest.fields());
             context().stop(self());
             sendResult(future, path, sender(), self());
-        } else if (message instanceof GetRequest getRequest) {
-            final YangInstanceIdentifier path = getRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.get(path);
-            context().stop(self());
-            sendResult(future, path, sender(), self());
-        } else if (message instanceof GetConfigWithFieldsRequest getConfigRequest) {
-            final YangInstanceIdentifier path = getConfigRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.getConfig(
-                    path, getConfigRequest.getFields());
-            context().stop(self());
-            sendResult(future, path, sender(), self());
-        } else if (message instanceof GetConfigRequest getConfigRequest) {
-            final YangInstanceIdentifier path = getConfigRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.getConfig(path);
-            context().stop(self());
-            sendResult(future, path, sender(), self());
-        } else if (message instanceof LockRequest) {
-            invokeRpcCall(netconfService::lock, sender(), self());
         } else if (message instanceof MergeEditConfigRequest request) {
             netconfService.merge(
-                request.getStore(),
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode(),
-                Optional.ofNullable(request.getDefaultOperation()));
-        } else if (message instanceof ReplaceEditConfigRequest request) {
-            netconfService.replace(
-                request.getStore(),
+                request.getNormalizedNodeMessage().getNode());
+        } else if (message instanceof PutEditConfigRequest request) {
+            netconfService.put(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode(),
-                Optional.ofNullable(request.getDefaultOperation()));
+                request.getNormalizedNodeMessage().getNode());
         } else if (message instanceof CreateEditConfigRequest request) {
             netconfService.create(
-                request.getStore(),
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode(),
-                Optional.ofNullable(request.getDefaultOperation()));
+                request.getNormalizedNodeMessage().getNode());
         } else if (message instanceof DeleteEditConfigRequest request) {
-            netconfService.delete(request.getStore(), request.getPath());
+            netconfService.delete(request.getPath());
         } else if (message instanceof RemoveEditConfigRequest request) {
-            netconfService.remove(request.getStore(), request.getPath());
+            netconfService.remove(request.getPath());
         } else if (message instanceof CommitRequest) {
             submit(sender(), self());
-        } else if (message instanceof DiscardChangesRequest) {
-            invokeRpcCall(netconfService::discardChanges, sender(), self());
-        } else if (message instanceof UnlockRequest) {
-            context().stop(self());
-            invokeRpcCall(netconfService::unlock, sender(), self());
+        } else if (message instanceof CancelChangesRequest) {
+            invokeRpcCall(netconfService::cancel, sender(), self());
         } else if (message instanceof ReceiveTimeout) {
             LOG.warn("Haven't received any message for {} seconds, cancelling transaction and stopping actor",
                 idleTimeout);
-            invokeRpcCall(netconfService::discardChanges, sender(), self());
-            invokeRpcCall(netconfService::unlock, sender(), self());
+            invokeRpcCall(netconfService::cancel, sender(), self());
             context().stop(self());
         } else {
             unhandled(message);

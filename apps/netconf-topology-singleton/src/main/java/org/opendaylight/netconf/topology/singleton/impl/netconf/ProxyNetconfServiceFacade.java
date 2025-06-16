@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 
 /**
  * Interfaces with a netconf back-end.
  */
-public interface ProxyNetconfServiceFacade extends NetconfDataTreeService {
+public interface ProxyNetconfServiceFacade extends DataStoreService {
 }
