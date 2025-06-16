@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
@@ -30,7 +29,6 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.mdsal.spi.data.AsyncGetDataProcessor;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
@@ -56,69 +54,53 @@ public class DataOperationImpl implements DataOperationService {
         new DefaultDOMRpcResult());
 
     private final Map<Data, Collection<? extends NormalizedNode>> readListCache = new ConcurrentHashMap<>();
-    private final NetconfDataTreeService dataTreeService;
-    private final AtomicBoolean lock = new AtomicBoolean(false);
+    private final DataStoreService dataStoreService;
 
-    public DataOperationImpl(final NetconfDataTreeService dataStoreService) {
-        this.dataTreeService = dataStoreService;
+    public DataOperationImpl(final DataStoreService dataStoreService) {
+        this.dataStoreService = dataStoreService;
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> createData(final Data path, final NormalizedNode data) {
-        var futureChain = lock();
         final var instance = path.instance();
         if (isNonEmptyList(data)) {
+            var futureChain = RPC_SUCCESS;
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = instance.node(child.name());
-                futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.create(CONFIGURATION, childPath,
-                    child, Optional.empty()));
+                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.create(childPath, child));
             }
-            return addCancelIfFails(futureChain);
+            return futureChain;
         }
-        futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.create(CONFIGURATION, instance, data,
-            Optional.empty()));
-        return addCancelIfFails(futureChain);
+        return dataStoreService.create(instance, data);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> deleteData(final Data path) {
-        var futureChain = lock();
-        futureChain = addIntoFutureChain(futureChain, () -> eraseData(path,
-            (b) -> dataTreeService.delete(CONFIGURATION, b)));
-        return addCancelIfFails(futureChain);
+        return eraseData(path, dataStoreService::delete);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> removeData(final Data path) {
-        var futureChain = lock();
-        futureChain = addIntoFutureChain(futureChain, () -> eraseData(path,
-            (b) -> dataTreeService.remove(CONFIGURATION, b)));
-        return addCancelIfFails(futureChain);
+        return eraseData(path, dataStoreService::remove);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> mergeData(final Data path, final NormalizedNode data) {
-        var futureChain = lock();
-        futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.merge(CONFIGURATION, path.instance(), data,
-            Optional.empty()));
-        return addCancelIfFails(futureChain);
+        return dataStoreService.merge(path.instance(), data);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> putData(final Data path, final NormalizedNode data) {
-        var futureChain = lock();
         final var instance = path.instance();
         if (isNonEmptyList(data)) {
+            var futureChain = RPC_SUCCESS;
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = instance.node(child.name());
-                futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.replace(CONFIGURATION, childPath,
-                    child, Optional.empty()));
+                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.replace(childPath, child));
             }
-            return addCancelIfFails(futureChain);
+            return futureChain;
         } else {
-            futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.replace(CONFIGURATION, instance, data,
-                Optional.empty()));
-            return addCancelIfFails(futureChain);
+            return dataStoreService.replace(instance, data);
         }
     }
 
@@ -150,12 +132,11 @@ public class DataOperationImpl implements DataOperationService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> commit() {
-        var futureChain = addCancelIfFails(dataTreeService.commit());
-        return addIntoFutureChain(futureChain, this::unlock);
+        return dataStoreService.commit();
     }
 
     /**
-     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link NetconfDataTreeService} with
+     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
      * specified subtrees that should only be read.
      *
      * @param store  datastore type
@@ -173,21 +154,8 @@ public class DataOperationImpl implements DataOperationService {
         } catch (RequestException e) {
             return Futures.immediateFailedFuture(e);
         }
-
-        final var instance = path.instance();
-        if (store == CONFIGURATION) {
-            if (fieldPaths.isEmpty()) {
-                return dataTreeService.getConfig(instance);
-            } else {
-                return dataTreeService.getConfig(instance, fieldPaths);
-            }
-        } else {
-            if (fieldPaths.isEmpty()) {
-                return dataTreeService.get(instance);
-            } else {
-                return dataTreeService.get(instance, fieldPaths);
-            }
-        }
+        final var readFuture = dataStoreService.get(store, path.instance(), fieldPaths);
+        return readFuture;
     }
 
     /**
@@ -253,71 +221,13 @@ public class DataOperationImpl implements DataOperationService {
             final var keyFields = listSchemaNode.getKeyDefinition().stream().map(YangInstanceIdentifier::of).toList();
             final var child = NodeIdentifierWithPredicates.of(instance.getLastPathArgument().getNodeType());
             final var childPath = instance.node(child);
-            if (keyFields.isEmpty()) {
-                future = dataTreeService.getConfig(childPath);
-            } else {
-                future = dataTreeService.getConfig(childPath, keyFields);
-            }
+            future = dataStoreService.get(CONFIGURATION, childPath, keyFields);
         } else {
-            future = dataTreeService.getConfig(instance);
+            future = dataStoreService.get(CONFIGURATION, instance, List.of());
         }
 
         final var retrieved = RestconfStrategy.syncAccess(future, instance);
         return retrieved.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of());
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> lock() {
-        if (!lock.getAndSet(true)) {
-            return dataTreeService.lock();
-        }
-        return RPC_SUCCESS;
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> unlock() {
-        if (lock.getAndSet(false)) {
-            return dataTreeService.unlock();
-        }
-        return RPC_SUCCESS;
-    }
-
-    /**
-     * If the provided {@code future} fails, this method chains a call to {@link DataOperationImpl#cancel()} into the
-     * returned future. The result of the returned future is the result of the provided future. The result from
-     * {@link DataOperationImpl#cancel()} is ignored and only logged.
-     *
-     * @param future The {@link ListenableFuture} to be checked for failure.
-     * @return A {@link ListenableFuture} that includes a chained {@link DataOperationImpl#cancel()} call in case of
-     *         any failure. The result of this future is the result of the {@code future} provided as a parameter.
-     */
-    private ListenableFuture<? extends DOMRpcResult> addCancelIfFails(
-            final ListenableFuture<? extends DOMRpcResult> future) {
-        final var handleRpcErrorResult = Futures.transformAsync(future, result -> {
-            if (result != null && !result.errors().isEmpty() && !allWarnings(result.errors())) {
-                return Futures.transformAsync(cancel(), ignored ->
-                    Futures.immediateFuture(result), MoreExecutors.directExecutor());
-            }
-            return Futures.immediateFuture(result);
-        }, Executors.newSingleThreadExecutor());
-
-        return Futures.catchingAsync(handleRpcErrorResult, Throwable.class, t ->
-            Futures.transformAsync(cancel(), ignored ->
-                Futures.immediateFailedFuture(t), MoreExecutors.directExecutor()), MoreExecutors.directExecutor());
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> cancel() {
-        final var discardChanges = dataTreeService.discardChanges();
-        final var unlock = unlock();
-        return Futures.whenAllComplete(discardChanges, unlock).call(() -> {
-            final var unlockResult = Futures.getDone(unlock);
-            final var discard = Futures.getDone(discardChanges);
-            if (!discard.errors().isEmpty() && !allWarnings(discard.errors())) {
-                return discard;
-            }
-            if (!unlockResult.errors().isEmpty() && !allWarnings(unlockResult.errors())) {
-                return unlockResult;
-            }
-            return new DefaultDOMRpcResult();
-        }, MoreExecutors.directExecutor());
     }
 
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
@@ -325,8 +235,8 @@ public class DataOperationImpl implements DataOperationService {
     }
 
     private static ListenableFuture<? extends DOMRpcResult> addIntoFutureChain(
-            final ListenableFuture<? extends DOMRpcResult> futureChain,
-            final Supplier<ListenableFuture<? extends DOMRpcResult>> nextFuture) {
+        final ListenableFuture<? extends DOMRpcResult> futureChain,
+        final Supplier<ListenableFuture<? extends DOMRpcResult>> nextFuture) {
         return Futures.transformAsync(futureChain,
             result -> {
                 if (result != null && !result.errors().isEmpty() && !allWarnings(result.errors())) {
@@ -337,7 +247,7 @@ public class DataOperationImpl implements DataOperationService {
     }
 
     private static NetconfDocumentedException getNetconfDocumentedException(
-            final Collection<? extends RpcError> errors) {
+        final Collection<? extends RpcError> errors) {
         var errType = ErrorType.APPLICATION;
         var errSeverity = ErrorSeverity.ERROR;
         final var msgBuilder = new StringJoiner(" ");
