@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -221,10 +220,10 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
         .build();
     private static final NodeIdentifier NODE_IDENTIFIER =
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
-    private static final Data PATH_DATA = moudlesPath(PATH);
-    private static final Data PATH_2_DATA = moudlesPath(PATH_2);
-    private static final Data PATH_3_DATA = moudlesPath(PATH_3);
-    private static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
+    static final Data PATH_DATA = moudlesPath(PATH);
+    static final Data PATH_2_DATA = moudlesPath(PATH_2);
+    static final Data PATH_3_DATA = moudlesPath(PATH_3);
+    static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
 
     private final CompletingServerRequest<Empty> dataDeleteRequest = new CompletingServerRequest<>();
     private final CompletingServerRequest<DataPatchResult> dataPatchRequest = new CompletingServerRequest<>();
@@ -373,7 +372,7 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
         strategy.patchData(dataYangPatchRequest, new Data(ARTIST_DATA.databind()), patchContext);
 
         // Get patch result.
-        final var patchStatusContext = dataYangPatchRequest.getResult(1, TimeUnit.DAYS).status();
+        final var patchStatusContext = dataYangPatchRequest.getResult().status();
 
         // Verify failure and confirm that edit3 operation was not executed.
         assertFalse(patchStatusContext.ok());
