@@ -8,11 +8,8 @@
 package org.opendaylight.netconf.client.mdsal.spi;
 
 import static com.google.common.base.Verify.verifyNotNull;
-import static java.util.Objects.requireNonNull;
-import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -20,34 +17,22 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringJoiner;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.mdsal.spi.data.AsyncWithDefaultsProcessor;
+import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -70,19 +55,11 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
@@ -95,22 +72,19 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
     private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
+    private static final DataGetParams CONFIG_PARAM = new DataGetParams(ContentParam.CONFIG, null, null, null);
 
-    private final NetconfDataTreeService dataTreeService;
-    private final Map<Data, Collection<? extends NormalizedNode>> readListCache = new ConcurrentHashMap<>();
+    private final DataOperationService dataStoreService;
 
-    public NetconfDataOperations(final NetconfDataTreeService dataTreeService) {
-        this.dataTreeService = dataTreeService;
+    public NetconfDataOperations(final DataOperationService dataStoreService) {
+        this.dataStoreService = dataStoreService;
     }
 
     @Override
     protected void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final NormalizedNode data) {
-        var futureChain = dataTreeService.lock();
-        // FIXME: Get defaultOperation
-        futureChain = addIntoFutureChain(futureChain, () -> create(path, data));
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = dataStoreService.createData(path, data);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -130,7 +104,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "POST", path));
             }
         }, Executors.newSingleThreadExecutor());
@@ -145,16 +118,13 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             request.completeWith(cause);
             return;
         }
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> {
-            try {
-                return insertCreate(path, data, insert);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-        });
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        ListenableFuture<? extends DOMRpcResult> futureChain;
+        try {
+            futureChain = insertCreate(path, data, insert);
+        } catch (RequestException cause) {
+            futureChain = Futures.immediateFailedFuture(cause);
+        }
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -174,7 +144,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "POST", path));
             }
         }, Executors.newSingleThreadExecutor());
@@ -183,16 +152,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
     @Override
     public void deleteData(final ServerRequest<Empty> request, final Data path) {
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> {
-            try {
-                return delete(path);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-        });
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = dataStoreService.deleteData(path);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -202,7 +163,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
@@ -211,13 +171,7 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
     @Override
     public void getData(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
-        final ListenableFuture<Optional<NormalizedNode>> readFuture;
-        try {
-            readFuture = readData(path, params);
-        } catch (RequestException e) {
-            request.completeWith(e);
-            return;
-        }
+        final var readFuture = dataStoreService.getData(path, params);
 
         Futures.addCallback(readFuture, new FutureCallback<>() {
             @Override
@@ -243,10 +197,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
     @Override
     public void mergeData(final ServerRequest<DataPatchResult> request, final Data path, final NormalizedNode data) {
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> merge(path, data));
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = dataStoreService.mergeData(path, data);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -257,7 +209,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "MERGE", path));
             }
         }, MoreExecutors.directExecutor());
@@ -267,7 +218,7 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     public void patchData(final ServerRequest<DataYangPatchResult> request, final Data path, final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var entities = patch.entities();
-        var futureChain = dataTreeService.lock();
+        ListenableFuture<? extends DOMRpcResult> futureChain = RPC_SUCCESS;
 
         for (int i = 0; i < entities.size() ; i++) {
             final var currentEntity = entities.get(i);
@@ -284,12 +235,11 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         }
 
         if (entities.isEmpty()) {
-            futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
+            futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
         } else {
-            futureChain = chainPatchEditTransaction(futureChain, dataTreeService::commit,
+            futureChain = chainPatchEditTransaction(futureChain, dataStoreService::commit,
                 entities.get(entities.size() - 1), editCollection);
         }
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -300,7 +250,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 if (containsFailure(editCollection)) {
                     request.completeWith(new DataYangPatchResult(
                         new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, null)));
@@ -323,10 +272,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             request.completeWith(e);
             return;
         }
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = dataStoreService.putData(path, data);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -336,7 +283,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "PUT", path));
             }
         }, MoreExecutors.directExecutor());
@@ -357,16 +303,13 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             return;
         }
 
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> {
-            try {
-                return insertPut(path, data, insert, parentPath);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-        });
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        ListenableFuture<? extends DOMRpcResult> futureChain;
+        try {
+            futureChain = insertPut(path, data, insert, parentPath);
+        } catch (RequestException cause) {
+            futureChain = Futures.immediateFailedFuture(cause);
+        }
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -376,96 +319,20 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "PUT", path));
             }
         }, MoreExecutors.directExecutor());
-    }
-
-    private ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store, final Data path) {
-        return switch (store) {
-            case CONFIGURATION -> dataTreeService.getConfig(path.instance());
-            case OPERATIONAL -> dataTreeService.get(path.instance());
-        };
-    }
-
-    private ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store, final Data path,
-            final List<YangInstanceIdentifier> fields) {
-        return switch (store) {
-            case CONFIGURATION -> dataTreeService.getConfig(path.instance(), fields);
-            case OPERATIONAL -> dataTreeService.get(path.instance(), fields);
-        };
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> create(final Data path, final NormalizedNode data) {
-        if (isNonEmptyListPath(data)) {
-            final var futureChain = RPC_SUCCESS;
-            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
-                final var childPath = path.instance().node(child.name());
-                addIntoFutureChain(futureChain, () -> dataTreeService.create(CONFIGURATION, childPath, child,
-                    Optional.empty()));
-            }
-            return futureChain;
-        } else {
-            return dataTreeService.create(CONFIGURATION, path.instance(), data, Optional.empty());
-        }
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> merge(final Data path, final NormalizedNode data) {
-        return dataTreeService.merge(CONFIGURATION, path.instance(), data, Optional.empty());
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> replace(final Data path, final NormalizedNode data) {
-        if (isNonEmptyListPath(data)) {
-            final var futureChain = RPC_SUCCESS;
-            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
-                final var childPath = path.instance().node(child.name());
-                addIntoFutureChain(futureChain, () -> dataTreeService.replace(CONFIGURATION, childPath, child,
-                    Optional.empty()));
-            }
-            return futureChain;
-        } else {
-            return dataTreeService.replace(CONFIGURATION, path.instance(), data, Optional.empty());
-        }
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> delete(final Data path) throws RequestException {
-        return eraseData(path, (b) -> dataTreeService.delete(CONFIGURATION, b));
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> remove(final Data path) throws RequestException {
-        return eraseData(path, (b) -> dataTreeService.remove(CONFIGURATION, b));
-    }
-
-    private ListenableFuture<? extends DOMRpcResult> eraseData(final Data path,
-            final Function<YangInstanceIdentifier, ListenableFuture<? extends DOMRpcResult>> operation)
-            throws RequestException {
-        if (isListPath(path)) {
-            final var items = getListItemsForRemove(path);
-            if (items.isEmpty()) {
-                LOG.debug("Path {} contains no items, delete operation omitted.", path);
-                return RPC_SUCCESS;
-            } else {
-                var futureChain = RPC_SUCCESS;
-                for (final var childElement : items) {
-                    final var childPath = childPath(path, List.of(childElement.name()));
-                    futureChain = addIntoFutureChain(futureChain, () -> operation.apply(childPath.instance()));
-                }
-                return futureChain;
-            }
-        }
-        return operation.apply(path.instance());
     }
 
     private ListenableFuture<? extends DOMRpcResult> patchRequest(final Data path, final NormalizedNode data,
             final Operation operation) {
         try {
             return switch (operation) {
-                case Create -> create(path, data);
-                case Merge -> merge(path, data);
-                case Replace -> replace(path, data);
-                case Delete -> delete(path);
-                case Remove -> remove(path);
+                case Create -> dataStoreService.createData(path, data);
+                case Merge -> dataStoreService.mergeData(path, data);
+                case Replace -> dataStoreService.putData(path, data);
+                case Delete -> dataStoreService.deleteData(path);
+                case Remove -> dataStoreService.removeData(path);
                 default -> throw new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
                     "Not supported Yang Patch operation");
             };
@@ -474,61 +341,60 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         }
     }
 
-    private @NonNull Collection<? extends NormalizedNode> getListItemsForRemove(final Data path)
-            throws RequestException {
-        final var cached = readListCache.remove(path);
-        if (cached != null) {
-            return cached;
-        }
-        final ListenableFuture<Optional<NormalizedNode>> future;
-        // check if keys only can be filtered out to minimize amount of data retrieved
-        if (path.schema().dataSchemaNode() instanceof ListSchemaNode listSchemaNode) {
-            final var keyFields = listSchemaNode.getKeyDefinition().stream().map(YangInstanceIdentifier::of).toList();
-            final var child = NodeIdentifierWithPredicates.of(path.instance().getLastPathArgument().getNodeType());
-            final var childPath = childPath(path, List.of(child));
-            future = dataTreeService.getConfig(childPath.instance(), keyFields);
-        } else {
-            future = dataTreeService.getConfig(path.instance());
-        }
-
-        final var retrieved = RestconfStrategy.syncAccess(future, path.instance());
-        return retrieved.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of());
-    }
-
     private ListenableFuture<? extends DOMRpcResult> insertPut(final Data path, final NormalizedNode data,
             final @NonNull Insert insert, final Data parentPath) throws RequestException {
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = readList(parentPath);
-                if (readData == null || readData.isEmpty()) {
-                    yield replace(path, data);
-                }
-                var futureChain = remove(parentPath);
-                futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
-                yield addIntoFutureChain(futureChain, () -> replace(parentPath, readData));
+                final var readData = dataStoreService.getData(parentPath, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty()) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        var futureChain = dataStoreService.removeData(parentPath);
+                        futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
+                        result = addIntoFutureChain(futureChain,
+                            () -> dataStoreService.putData(parentPath, readNode.orElseThrow()));
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
-            case LAST -> replace(path, data);
+            case LAST -> dataStoreService.putData(path, data);
             case BEFORE -> {
-                final var readData = readList(parentPath);
-                if (readData == null || readData.isEmpty()) {
-                    yield replace(path, data);
-                }
-                yield insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()), readData, true);
+                final var readData = dataStoreService.getData(parentPath, CONFIG_PARAM);
+                yield Futures.transformAsync(readData,
+                    readNode -> {
+                        final ListenableFuture<? extends DOMRpcResult> result;
+                        if (readNode.isEmpty()) {
+                            result = dataStoreService.putData(path, data);
+                        } else {
+                            result = insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()),
+                                (NormalizedNodeContainer<?>) readNode.orElse(null), true);
+                        }
+                        return result;
+                    }, MoreExecutors.directExecutor());
             }
             case AFTER -> {
-                final var readData = readList(parentPath);
-                if (readData == null || readData.isEmpty()) {
-                    yield replace(path, data);
-                }
-                yield insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()), readData, false);
+                final var readData = dataStoreService.getData(parentPath, CONFIG_PARAM);
+                yield Futures.transformAsync(readData,
+                    readNode -> {
+                        final ListenableFuture<? extends DOMRpcResult> result;
+                        if (readNode.isEmpty()) {
+                            result = dataStoreService.putData(path, data);
+                        } else {
+                            result = insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()),
+                                (NormalizedNodeContainer<?>) readNode.orElse(null), false);
+                        }
+                        return result;
+                    }, MoreExecutors.directExecutor());
             }
         };
     }
 
     private ListenableFuture<? extends DOMRpcResult> insertWithPointPut(final Data path, final Data parentPath,
             final NormalizedNode data, final @NonNull PathArgument pointArg, final NormalizedNodeContainer<?> readList,
-            final boolean before) throws RequestException {
-        ListenableFuture<? extends DOMRpcResult> futureChain = remove(parentPath);
+            final boolean before) {
+        ListenableFuture<? extends DOMRpcResult> futureChain = dataStoreService.removeData(parentPath);
 
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
@@ -544,22 +410,22 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         int lastInsertedPosition = 0;
 
         final var emptySubtree = fromInstanceId(parentPath.databind().modelContext(), parentPath.instance());
-        futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.merge(CONFIGURATION,
-            YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree, Optional.empty()));
+        futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.mergeData(parentPath, emptySubtree));
 
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
+                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
             }
             final var conChild = childPath(parentPath, List.of(nodeChild.name()));
-            futureChain = addIntoFutureChain(futureChain, () -> replace(conChild, nodeChild));
+            futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(conChild,
+                nodeChild));
             lastInsertedPosition++;
         }
 
         // In case we are inserting after last element
         if (!before) {
             if (lastInsertedPosition == lastItemPosition) {
-                futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
+                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
             }
         }
         return futureChain;
@@ -569,41 +435,59 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             final @NonNull Insert insert) throws RequestException {
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = readList(path);
-                if (readData == null || readData.isEmpty()) {
-                    yield replace(path, data);
-                }
-                checkListDataDoesNotExist(path, data);
-                var futureChain = remove(path);
-                futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
-                yield addIntoFutureChain(futureChain, () -> replace(path, readData));
+                final var readData = dataStoreService.getData(path, CONFIG_PARAM);
+                yield Futures.transformAsync(readData,
+                    readNode -> {
+                        final ListenableFuture<? extends DOMRpcResult> result;
+                        if (readNode.isEmpty()) {
+                            result = dataStoreService.putData(path, data);
+                        } else {
+                            checkListDataDoesNotExist(path, data);
+                            var futureChain = dataStoreService.removeData(path);
+                            futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
+                            result = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path,
+                                readNode.orElseThrow()));
+                        }
+                        return result;
+                    }, MoreExecutors.directExecutor());
             }
-            case LAST -> create(path, data);
+            case LAST -> dataStoreService.createData(path, data);
             case BEFORE -> {
-                final var readData = readList(path);
-                if (readData == null || readData.isEmpty()) {
-                    yield replace(path, data);
-                } else {
-                    checkListDataDoesNotExist(path, data);
-                    yield insertWithPointPost(path, data, verifyNotNull(insert.pointArg()), readData, true);
-                }
+                final var readData = dataStoreService.getData(path, CONFIG_PARAM);
+                yield Futures.transformAsync(readData,
+                    readNode -> {
+                        final ListenableFuture<? extends DOMRpcResult> result;
+                        if (readNode.isEmpty()) {
+                            result = dataStoreService.putData(path, data);
+                        } else {
+                            checkListDataDoesNotExist(path, data);
+                            result = insertWithPointPost(path, data, verifyNotNull(insert.pointArg()),
+                                (NormalizedNodeContainer<?>) readNode.orElse(null), true);
+                        }
+                        return result;
+                    }, MoreExecutors.directExecutor());
             }
             case AFTER -> {
-                final var readData = readList(path);
-                if (readData == null || readData.isEmpty()) {
-                    yield replace(path, data);
-                } else {
-                    checkListDataDoesNotExist(path, data);
-                    yield insertWithPointPost(path, data, verifyNotNull(insert.pointArg()), readData, false);
-                }
+                final var readData = dataStoreService.getData(path, CONFIG_PARAM);
+                yield Futures.transformAsync(readData,
+                    readNode -> {
+                        final ListenableFuture<? extends DOMRpcResult> result;
+                        if (readNode.isEmpty()) {
+                            result = dataStoreService.putData(path, data);
+                        } else {
+                            checkListDataDoesNotExist(path, data);
+                            result = insertWithPointPost(path, data, verifyNotNull(insert.pointArg()),
+                                (NormalizedNodeContainer<?>) readNode.orElse(null), false);
+                        }
+                        return result;
+                    }, MoreExecutors.directExecutor());
             }
         };
     }
 
     private ListenableFuture<? extends DOMRpcResult> insertWithPointPost(final Data path, final NormalizedNode data,
-            final PathArgument pointArg, final NormalizedNodeContainer<?> readList, final boolean before)
-            throws RequestException {
-        var futureChain = remove(path);
+            final PathArgument pointArg, final NormalizedNodeContainer<?> readList, final boolean before) {
+        var futureChain = dataStoreService.removeData(path);
 
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
@@ -619,17 +503,18 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         int lastInsertedPosition = 0;
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
+                // FIXME: Should not be create here?
+                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
             }
             final var childPath = childPath(path, List.of(nodeChild.name()));
-            futureChain = addIntoFutureChain(futureChain, () -> replace(childPath, nodeChild));
+            futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(childPath, nodeChild));
             lastInsertedPosition++;
         }
 
         // In case we are inserting after last element
         if (!before) {
             if (lastInsertedPosition == lastItemPosition) {
-                futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
+                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
             }
         }
         return futureChain;
@@ -654,118 +539,10 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         }
     }
 
-    private @Nullable NormalizedNodeContainer<?> readList(final Data path) throws RequestException {
-        // reading list is mainly invoked for subsequent removal,
-        // cache data to avoid extra read invocation on delete/remove
-        final var result =  RestconfStrategy.syncAccess(read(CONFIGURATION, path),
-            path.instance());
-        readListCache.put(path, result.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of()));
-        return (NormalizedNodeContainer<?>) result.orElse(null);
-    }
-
-    /**
-     * Read specific type of data from data store via transaction with specified subtrees that should only be read.
-     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
-     *
-     * @param path     the parent path to read
-     * @param params value of with-defaults parameter
-     * @return {@link NormalizedNode}
-     * @throws RequestException when an error occurs
-     */
-    public ListenableFuture<Optional<NormalizedNode>> readData(final @NonNull Data path,
-            final @NonNull DataGetParams params) throws RequestException {
-        //  type of data to read (config, state, all)
-        final var content = params.content();
-        // value of with-defaults parameter
-        final var fields = params.fields();
-        final var processor = new AsyncWithDefaultsProcessor(path, params.withDefaults());
-        return switch (content) {
-            case ALL -> {
-                // PREPARE STATE DATA NODE
-                final var stateDataFuture = readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
-                // PREPARE CONFIG DATA NODE
-                final var configDataFuture = readDataViaTransaction(CONFIGURATION, path, fields);
-
-                yield processor.all(configDataFuture, stateDataFuture);
-            }
-            case CONFIG -> {
-                final var configDataFuture = readDataViaTransaction(CONFIGURATION, path, fields);
-                yield processor.config(configDataFuture);
-            }
-            case NONCONFIG -> processor.nonConfig(
-                readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields));
-        };
-    }
-
-    /**
-     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
-     * specified subtrees that should only be read.
-     *
-     * @param store                 datastore type
-     * @param path                  parent path to selected fields
-     * @param fields                paths to selected subtrees which should be read, relative to the parent path
-     * @return {@link NormalizedNode}
-     * @throws RequestException when an error occurs
-     */
-    private ListenableFuture<Optional<NormalizedNode>> readDataViaTransaction(final @NonNull LogicalDatastoreType store,
-            final @NonNull Data path, final FieldsParam fields) throws RequestException {
-        // Paths to selected subtrees which should be read, relative to the parent path
-        final List<YangInstanceIdentifier> fieldPaths;
-        if (fields != null) {
-            final var tmp = fieldsParamToPaths(path.inference().modelContext(), path.schema(), fields);
-            fieldPaths = tmp.isEmpty() ? null : tmp;
-        } else {
-            fieldPaths = null;
-        }
-
-        if (fieldPaths != null) {
-            return read(store, path, fieldPaths);
-        }
-        return read(store, path);
-    }
-
     private ListenableFuture<Boolean> exists(final Data path) {
-        return Futures.transform(remapException(dataTreeService.getConfig(path.instance())),
+        return Futures.transform(remapException(dataStoreService.getData(path, CONFIG_PARAM)),
             optionalNode -> optionalNode != null && optionalNode.isPresent(),
             MoreExecutors.directExecutor());
-    }
-
-    public void cancel() {
-        readListCache.clear();
-        executeWithLogging(dataTreeService::discardChanges);
-        executeWithLogging(dataTreeService::unlock);
-    }
-
-    private static void executeWithLogging(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation) {
-        var operationResult = operation.get();
-        Futures.addCallback(operationResult, new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(final DOMRpcResult rpcResult) {
-                if (rpcResult != null && !rpcResult.errors().isEmpty()) {
-                    LOG.error("Errors occurred during processing of the RPC operation: {}",
-                        rpcResult.errors().stream().map(Object::toString).collect(Collectors.joining(",")));
-                }
-            }
-
-            @Override
-            public void onFailure(final Throwable throwable) {
-                LOG.error("Error processing operation", throwable);
-            }
-        }, MoreExecutors.directExecutor());
-    }
-
-    private static boolean isNonEmptyListPath(final NormalizedNode data) {
-        return (data instanceof MapNode || data instanceof LeafSetNode)
-            && !((NormalizedNodeContainer<?>) data).body().isEmpty();
-    }
-
-    private static boolean isListPath(final Data path) {
-        if (path.instance().getLastPathArgument() instanceof NodeIdentifier) {
-            // list can be referenced by NodeIdentifier only, prevent list item do be identified as list
-            final var schemaNode = path.schema().dataSchemaNode();
-            return schemaNode instanceof ListSchemaNode || schemaNode instanceof LeafListSchemaNode;
-        }
-        return false;
     }
 
     /**
@@ -825,145 +602,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             }
         }, MoreExecutors.directExecutor());
         return ret;
-    }
-
-    /**
-     * Translate a {@link FieldsParam} to a list of child node paths saved in lists, suitable for use with
-     * {@link NetconfDataTreeService}.
-     *
-     * <p>Fields parser that stores a set of all the leaf {@link LinkedPathElement}s specified in {@link FieldsParam}.
-     * Using {@link LinkedPathElement} it is possible to create a chain of path arguments and build complete paths
-     * since this element contains identifiers of intermediary mixin nodes and also linked to its parent
-     * {@link LinkedPathElement}.
-     *
-     * <p>Example: field 'a(b/c;d/e)' ('e' is place under choice node 'x') is parsed into following levels:
-     * <pre>
-     *   - './a' +- 'a/b' - 'b/c'
-     *           |
-     *           +- 'a/d' - 'd/x/e'
-     * </pre>
-     *
-     *
-     * @param modelContext EffectiveModelContext
-     * @param startNode Root DataSchemaNode
-     * @param input input value of fields parameter
-     * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
-     *         of provided {@code identifier}
-     * @throws RequestException when an error occurs
-     */
-    @VisibleForTesting
-    public static @NonNull List<YangInstanceIdentifier> fieldsParamToPaths(
-            final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaContext startNode,
-            final @NonNull FieldsParam input) throws RequestException {
-        final var parsed = new HashSet<LinkedPathElement>();
-        processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
-            new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
-        return parsed.stream().map(NetconfDataOperations::buildPath).toList();
-    }
-
-    private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
-            final QNameModule startNamespace, final LinkedPathElement startPathElement,
-            final List<FieldsParam.NodeSelector> selectors) throws RequestException {
-        for (var selector : selectors) {
-            var pathElement = startPathElement;
-            var namespace = startNamespace;
-
-            // Note: path is guaranteed to have at least one step
-            final var it = selector.path().iterator();
-            do {
-                final var step = it.next();
-                final var module = step.module();
-                if (module != null) {
-                    // FIXME: this is not defensive enough, as we can fail to find the module
-                    namespace = context.findModules(module).iterator().next().getQNameModule();
-                }
-
-                // add parsed path element linked to its parent
-                pathElement = addChildPathElement(pathElement, step.identifier().bindTo(namespace));
-            } while (it.hasNext());
-
-            final var subs = selector.subSelectors();
-            if (!subs.isEmpty()) {
-                processSelectors(parsed, context, namespace, pathElement, subs);
-            } else {
-                parsed.add(pathElement);
-            }
-        }
-    }
-
-    private static LinkedPathElement addChildPathElement(final LinkedPathElement currentElement,
-            final QName childQName) throws RequestException {
-        final var collectedMixinNodes = new ArrayList<PathArgument>();
-
-        final var currentNode = currentElement.targetNode;
-        var actualContextNode = childByQName(currentNode, childQName);
-        if (actualContextNode == null) {
-            actualContextNode = resolveMixinNode(currentNode, currentNode.getPathStep().getNodeType());
-            actualContextNode = childByQName(actualContextNode, childQName);
-        }
-
-        while (actualContextNode instanceof DataSchemaContext.PathMixin) {
-            final var actualDataSchemaNode = actualContextNode.dataSchemaNode();
-            if (actualDataSchemaNode instanceof ListSchemaNode listSchema && listSchema.getKeyDefinition().isEmpty()) {
-                // we need just a single node identifier from list in the path IFF it is an unkeyed list, otherwise
-                // we need both (which is the default case)
-                actualContextNode = childByQName(actualContextNode, childQName);
-            } else if (actualDataSchemaNode instanceof LeafListSchemaNode) {
-                // NodeWithValue is unusable - stop parsing
-                break;
-            } else {
-                collectedMixinNodes.add(actualContextNode.getPathStep());
-                actualContextNode = childByQName(actualContextNode, childQName);
-            }
-        }
-
-        if (actualContextNode == null) {
-            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Child %s node missing in %s",
-                childQName.getLocalName(), currentNode.getPathStep().getNodeType().getLocalName());
-        }
-
-        return new LinkedPathElement(currentElement, collectedMixinNodes, actualContextNode);
-    }
-
-    private static @Nullable DataSchemaContext childByQName(final DataSchemaContext parent, final QName qname) {
-        return parent instanceof DataSchemaContext.Composite composite ? composite.childByQName(qname) : null;
-    }
-
-    private static YangInstanceIdentifier buildPath(final LinkedPathElement lastPathElement) {
-        var pathElement = lastPathElement;
-        final var path = new LinkedList<PathArgument>();
-        do {
-            path.addFirst(contextPathArgument(pathElement.targetNode));
-            path.addAll(0, pathElement.mixinNodesToTarget);
-            pathElement = pathElement.parentPathElement;
-        } while (pathElement.parentPathElement != null);
-
-        return YangInstanceIdentifier.of(path);
-    }
-
-    private static @NonNull PathArgument contextPathArgument(final DataSchemaContext context) {
-        final var arg = context.pathStep();
-        if (arg != null) {
-            return arg;
-        }
-
-        final var schema = context.dataSchemaNode();
-        if (schema instanceof ListSchemaNode listSchema && !listSchema.getKeyDefinition().isEmpty()) {
-            return NodeIdentifierWithPredicates.of(listSchema.getQName());
-        }
-        if (schema instanceof LeafListSchemaNode leafListSchema) {
-            return new YangInstanceIdentifier.NodeWithValue<>(leafListSchema.getQName(), Empty.value());
-        }
-        throw new UnsupportedOperationException("Unsupported schema " + schema);
-    }
-
-    private static DataSchemaContext resolveMixinNode(final DataSchemaContext node,
-            final @NonNull QName qualifiedName) {
-        DataSchemaContext currentNode = node;
-        while (currentNode != null && currentNode instanceof DataSchemaContext.PathMixin currentMixin) {
-            currentNode = currentMixin.childByQName(qualifiedName);
-        }
-        return currentNode;
     }
 
     private static ListenableFuture<? extends DOMRpcResult> chainPatchEditTransaction(
@@ -1028,28 +666,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         } else {
             throw new RequestException(ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
                 "Insert parameter can be used only with list or leaf-list");
-        }
-    }
-
-    /**
-     * {@link DataSchemaContext} of data element grouped with identifiers of leading mixin nodes and previous path
-     * element.<br>
-     *  - identifiers of mixin nodes on the path to the target node - required for construction of full valid
-     *    DOM paths,<br>
-     *  - {@link LinkedPathElement} of the previous non-mixin node - required to successfully create a chain
-     *    of {@link PathArgument}s
-     *
-     * @param parentPathElement     parent path element
-     * @param mixinNodesToTarget    identifiers of mixin nodes on the path to the target node
-     * @param targetNode            target non-mixin node
-     */
-    private record LinkedPathElement(
-        @Nullable LinkedPathElement parentPathElement,
-        @NonNull List<PathArgument> mixinNodesToTarget,
-        @NonNull DataSchemaContext targetNode) {
-        LinkedPathElement {
-            requireNonNull(mixinNodesToTarget);
-            requireNonNull(targetNode);
         }
     }
 }
