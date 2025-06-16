@@ -17,10 +17,18 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
+import static org.opendaylight.netconf.api.EffectiveOperation.CREATE;
+import static org.opendaylight.netconf.api.EffectiveOperation.DELETE;
+import static org.opendaylight.netconf.api.EffectiveOperation.MERGE;
+import static org.opendaylight.netconf.api.EffectiveOperation.REMOVE;
+import static org.opendaylight.netconf.api.EffectiveOperation.REPLACE;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
+import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +39,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.netconf.client.mdsal.spi.AbstractDataStore;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.netconf.databind.RequestException;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -83,27 +95,33 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     private final CompletingServerRequest<Empty> emptyRequest = new CompletingServerRequest<>();
 
     @Mock
-    private NetconfDataTreeService mockNetconfService;
+    private NetconfBaseOps mockNetconfService;
+
+    private DataStoreService spyService;
 
     NetconfDataOperations jukeboxDataOperations() {
-        return new NetconfDataOperations(mockNetconfService);
+        final var testId = new RemoteDeviceId("testId", mock(InetSocketAddress.class));
+        final var mock = mock(NetconfSessionPreferences.class);
+        doReturn(true).when(mock).isCandidateSupported();
+        spyService = spy(AbstractDataStore.of(testId, mockNetconfService, mock, true));
+        return new NetconfDataOperations((DataOperationService) spyService);
     }
 
     @Override
     AbstractServerDataOperations testDeleteDataStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(DELETE, YangInstanceIdentifier.of());
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations testNegativeDeleteDataStrategy() {
         mockLockUnlockDiscard();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(DELETE, YangInstanceIdentifier.of());
         doReturn(Futures.immediateFailedFuture(new NetconfDocumentedException("Data missing",
-                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))).when(mockNetconfService).commit();
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))).when(spyService).commit();
         return jukeboxDataOperations();
     }
 
@@ -121,27 +139,27 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         final var songKeyFields = List.of(YangInstanceIdentifier.of(SONG_INDEX_QNAME));
         mockLockUnlockCommit();
         // data fetched using key field names to minimize amount of data returned
-        doReturn(immediateFluentFuture(Optional.of(songListData))).when(mockNetconfService)
-            .getConfig(songListWildcardPath, songKeyFields);
+        doReturn(immediateFluentFuture(Optional.of(songListData))).when(spyService)
+            .read(CONFIGURATION, jukeboxPath(songListWildcardPath), songKeyFields);
         // list elements expected to be deleted one by one
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, song1Path);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, song2Path);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(DELETE, song1Path);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(DELETE, song2Path);
 
         jukeboxDataOperations().deleteData(emptyRequest, jukeboxPath(songListPath));
-        verify(mockNetconfService, timeout(1000)).getConfig(songListWildcardPath, songKeyFields);
-        verify(mockNetconfService, timeout(1000)).delete(LogicalDatastoreType.CONFIGURATION, song1Path);
-        verify(mockNetconfService, timeout(1000)).delete(LogicalDatastoreType.CONFIGURATION, song2Path);
-        verify(mockNetconfService, never()).delete(LogicalDatastoreType.CONFIGURATION, songListPath);
+        verify(spyService, timeout(1000)).read(CONFIGURATION, jukeboxPath(songListWildcardPath), songKeyFields);
+        verify(spyService, timeout(1000)).editConfig(DELETE, song1Path);
+        verify(spyService, timeout(1000)).editConfig(DELETE, song2Path);
+        verify(spyService, never()).editConfig(DELETE, songListPath);
         emptyRequest.getResult();
     }
 
     @Override
     AbstractServerDataOperations testPostContainerDataStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(CREATE, EMPTY_JUKEBOX, JUKEBOX_IID);
         return jukeboxDataOperations();
     }
 
@@ -149,24 +167,24 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     AbstractServerDataOperations testPostListDataStrategy(final MapEntryNode entryNode,
             final YangInstanceIdentifier node) {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).create(
-            LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(
+            CREATE, entryNode, node);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations testPostDataFailStrategy(final DOMException domException) {
         mockLockUnlockDiscard();
-        doReturn(immediateFailedFluentFuture(domException)).when(mockNetconfService)
+        doReturn(immediateFailedFluentFuture(domException)).when(spyService)
             // FIXME: exact match
-            .create(any(), any(), any(), any());
+            .editConfig(CREATE, any(), any());
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations testPatchContainerDataStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).merge(any(), any(),any(),
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(MERGE, any(),
             any());
         return jukeboxDataOperations();
     }
@@ -174,89 +192,84 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     @Override
     AbstractServerDataOperations testPatchLeafDataStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .merge(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(MERGE, any(), any());
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations testPatchListDataStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .merge(any(), any(),any(),any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(MERGE, any(), any());
         return jukeboxDataOperations();
     }
 
     @Test
     void testPutCreateContainerData() throws Exception {
         mockLockUnlockCommit();
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(JUKEBOX_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION,
+            JUKEBOX_PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REPLACE, EMPTY_JUKEBOX, JUKEBOX_IID);
 
         jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
-        verify(mockNetconfService, timeout(1000)).lock();
-        verify(mockNetconfService, timeout(1000)).getConfig(JUKEBOX_IID);
-        verify(mockNetconfService, timeout(1000)).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
-            EMPTY_JUKEBOX, Optional.empty());
+        verify(spyService, timeout(1000)).read(CONFIGURATION, JUKEBOX_PATH);
+        verify(spyService, timeout(1000)).editConfig(REPLACE, EMPTY_JUKEBOX, JUKEBOX_IID);
         assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
     void testPutReplaceContainerData() throws Exception {
         mockLockUnlockCommit();
-        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(mockNetconfService)
-            .getConfig(JUKEBOX_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
+        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(spyService)
+            .read(CONFIGURATION, JUKEBOX_PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REPLACE, EMPTY_JUKEBOX, JUKEBOX_IID);
 
         jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
-        verify(mockNetconfService, timeout(1000)).getConfig(JUKEBOX_IID);
-        verify(mockNetconfService, timeout(1000)).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
-            EMPTY_JUKEBOX, Optional.empty());
+        verify(spyService, timeout(1000)).read(CONFIGURATION, JUKEBOX_PATH);
+        verify(spyService, timeout(1000)).editConfig(REPLACE, EMPTY_JUKEBOX, JUKEBOX_IID);
         assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
     void testPutCreateLeafData() throws Exception {
         mockLockUnlockCommit();
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(GAP_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION, GAP_PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REPLACE, GAP_LEAF, GAP_IID);
 
         jukeboxDataOperations().putData(dataPutRequest, GAP_PATH, GAP_LEAF);
-        verify(mockNetconfService, timeout(1000)).getConfig(GAP_IID);
-        verify(mockNetconfService, timeout(1000)).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF,
-            Optional.empty());
+        verify(spyService, timeout(1000)).read(CONFIGURATION, GAP_PATH);
+        verify(spyService, timeout(1000)).editConfig(REPLACE, GAP_LEAF, GAP_IID);
         assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
     void testPutReplaceLeafData() throws Exception {
         mockLockUnlockCommit();
-        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(mockNetconfService)
-            .getConfig(GAP_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
+        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(spyService)
+            .read(CONFIGURATION, GAP_PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REPLACE, GAP_LEAF, GAP_IID);
 
         jukeboxDataOperations().putData(dataPutRequest, GAP_PATH, GAP_LEAF);
-        verify(mockNetconfService, timeout(1000)).getConfig(GAP_IID);
-        verify(mockNetconfService, timeout(1000)).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF,
-            Optional.empty());
+        verify(spyService, timeout(1000)).read(CONFIGURATION, GAP_PATH);
+        verify(spyService, timeout(1000)).editConfig(REPLACE, GAP_LEAF, GAP_IID);
         assertNotNull(dataPutRequest.getResult());
     }
 
     @Test
     void testPutCreateListData() throws Exception {
         mockLockUnlockCommit();
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(JUKEBOX_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION, GAP_PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REPLACE, JUKEBOX_WITH_BANDS, JUKEBOX_IID);
 
         jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, JUKEBOX_WITH_BANDS);
-        verify(mockNetconfService, timeout(1000)).getConfig(JUKEBOX_IID);
-        verify(mockNetconfService, timeout(1000)).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
-            JUKEBOX_WITH_BANDS,Optional.empty());
+        verify(spyService, timeout(1000)).read(CONFIGURATION, GAP_PATH);
+        verify(spyService, timeout(1000)).editConfig(REPLACE, JUKEBOX_WITH_BANDS, JUKEBOX_IID);
         assertNotNull(dataPutRequest.getResult());
     }
 
@@ -271,17 +284,17 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         // Spy of jukeboxStrategy will be used later to count how many items was inserted
         mockLockUnlockCommit();
 
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(any());
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).replace(any(), any(),
-            any(), any());
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).remove(any(), any());
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).merge(any(), any(), any(),
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION, any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(REPLACE, any(),
+            any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(REMOVE, any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(MERGE, any(),
             any());
 
         final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
-        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(mockNetconfService)
-            .getConfig(songListPath);
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyService)
+            .read(CONFIGURATION, jukeboxPath(songListPath));
 
         // Inserting new song at 3rd position (aka as last element)
         final var request = spy(new MappingServerRequest<DataPutResult>(null, QueryParameters.of(
@@ -320,7 +333,7 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
                 }""")));
 
         // Counting how many times we insert items in list
-        verify(mockNetconfService, timeout(1000).times(3)).replace(any(), any(), any(), any());
+        verify(spyService, timeout(1000).times(3)).editConfig(REPLACE, any(), any());
         verify(request, timeout(1000)).onSuccess(any());
     }
 
@@ -335,15 +348,15 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         // Spy of jukeboxStrategy will be used later to count how many items was inserted
         mockLockUnlockCommit();
 
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(any());
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).replace(any(), any(),
-            any(), any());
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).remove(any(), any());
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION, any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(REPLACE, any(),
+            any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(REMOVE, any());
 
         final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
-        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(mockNetconfService)
-            .getConfig(songListPath);
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyService)
+            .read(CONFIGURATION, jukeboxPath(songListPath));
 
         final var request = spy(new MappingServerRequest<DataPostResult>(null, QueryParameters.of(InsertParam.AFTER,
             PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE,
@@ -382,53 +395,52 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
                 }""")));
 
         // Counting how many times we insert items in list
-        verify(mockNetconfService, timeout(1000).times(3)).replace(any(), any(), any(), any());
+        verify(spyService, timeout(1000).times(3)).editConfig(REPLACE, any(), any());
         verify(request, timeout(1000)).onSuccess(any());
     }
 
     @Test
     void testPutReplaceListData() throws Exception {
         mockLockUnlockCommit();
-        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(mockNetconfService)
-            .getConfig(JUKEBOX_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
+        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(spyService)
+            .read(CONFIGURATION, JUKEBOX_PATH);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REPLACE, JUKEBOX_WITH_BANDS, JUKEBOX_IID);
 
         jukeboxDataOperations().putData(dataPutRequest, JUKEBOX_PATH, JUKEBOX_WITH_BANDS);
-        verify(mockNetconfService, timeout(1000)).getConfig(JUKEBOX_IID);
-        verify(mockNetconfService, timeout(1000)).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
-            JUKEBOX_WITH_BANDS,Optional.empty());
+        verify(spyService, timeout(1000)).read(CONFIGURATION, JUKEBOX_PATH);
+        verify(spyService, timeout(1000)).editConfig(REPLACE, JUKEBOX_WITH_BANDS, JUKEBOX_IID);
         assertNotNull(dataPutRequest.getResult());
     }
 
     @Override
     AbstractServerDataOperations testPatchDataReplaceMergeAndRemoveStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).merge(any(), any(),
-            any(), any());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .remove(LogicalDatastoreType.CONFIGURATION, ARTIST_IID);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(MERGE, any(),
+            any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(REMOVE, ARTIST_IID);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
             // FIXME: exact match
-            .replace(any(), any(), any(), any());
+            .editConfig(REPLACE, any(), any());
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations testPatchDataCreateAndDeleteStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(CREATE, EMPTY_JUKEBOX, PLAYER_IID);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(DELETE, GAP_IID);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations testPatchMergePutContainerStrategy() {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).merge(any(), any(),
-            any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService).editConfig(MERGE, any(),
+            any());
         return jukeboxDataOperations();
     }
 
@@ -438,9 +450,9 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         doReturn(Futures.immediateFailedFuture(
             new NetconfDocumentedException("Data missing", ErrorType.RPC, ErrorTag.DATA_MISSING,
                 ErrorSeverity.ERROR)))
-            .when(mockNetconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
+            .when(spyService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(spyService)
+            .editConfig(DELETE, GAP_IID);
         return jukeboxDataOperations();
     }
 
@@ -459,86 +471,90 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
 
     @Override
     AbstractServerDataOperations readDataConfigTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(mockNetconfService).getConfig(PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyService).read(CONFIGURATION, PATH_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readAllHavingOnlyConfigTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(mockNetconfService).getConfig(PATH);
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).get(PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyService).read(CONFIGURATION, PATH_DATA);
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(OPERATIONAL, PATH_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readAllHavingOnlyNonConfigTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(mockNetconfService).get(PATH_2);
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(PATH_2);
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(spyService).read(OPERATIONAL, PATH_2_DATA);
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION, PATH_2_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readDataNonConfigTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(mockNetconfService).get(PATH_2);
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(spyService).read(OPERATIONAL, PATH_2_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readContainerDataAllTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(mockNetconfService).getConfig(PATH);
-        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(mockNetconfService).get(PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyService).read(CONFIGURATION, PATH_DATA);
+        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(spyService).read(OPERATIONAL,PATH_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readContainerDataConfigNoValueOfContentTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(mockNetconfService).getConfig(PATH);
-        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(mockNetconfService).get(PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyService).read(CONFIGURATION, PATH_DATA);
+        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(spyService).read(OPERATIONAL, PATH_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readListDataAllTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(mockNetconfService).get(PATH_3);
-        doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(mockNetconfService).getConfig(PATH_3);
+        doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(spyService).read(OPERATIONAL, PATH_3_DATA);
+        doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(spyService).read(CONFIGURATION, PATH_3_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readOrderedListDataAllTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(mockNetconfService).get(PATH_3);
-        doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(mockNetconfService).getConfig(PATH_3);
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(spyService).read(OPERATIONAL,
+            PATH_3_DATA);
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(spyService).read(CONFIGURATION,
+            PATH_3_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readUnkeyedListDataAllTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(mockNetconfService).get(PATH_3);
-        doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(mockNetconfService).getConfig(PATH_3);
+        doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(spyService).read(OPERATIONAL,
+            PATH_3_DATA);
+        doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(spyService).read(CONFIGURATION,
+            PATH_3_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readLeafListDataAllTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(mockNetconfService)
-            .get(LEAF_SET_NODE_PATH);
-        doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(mockNetconfService)
-            .getConfig(LEAF_SET_NODE_PATH);
+        doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(spyService)
+            .read(OPERATIONAL, LEAF_SET_NODE_DATA);
+        doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(spyService)
+            .read(CONFIGURATION, LEAF_SET_NODE_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readOrderedLeafListDataAllTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(mockNetconfService)
-            .get(LEAF_SET_NODE_PATH);
-        doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(mockNetconfService)
-            .getConfig(LEAF_SET_NODE_PATH);
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(spyService)
+            .read(OPERATIONAL, LEAF_SET_NODE_DATA);
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(spyService)
+            .read(CONFIGURATION, LEAF_SET_NODE_DATA);
         return jukeboxDataOperations();
     }
 
     @Override
     AbstractServerDataOperations readDataWrongPathOrNoContentTestStrategy() {
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockNetconfService).getConfig(PATH_2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(spyService).read(CONFIGURATION, PATH_2_DATA);
         return jukeboxDataOperations();
     }
 
@@ -546,27 +562,27 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     NormalizedNode readData(final ContentParam content, final DatabindPath.Data path,
             final AbstractServerDataOperations strategy) {
         try {
-            return jukeboxDataOperations()
-                .readData(path, new DataGetParams(content, DepthParam.max(), null, null))
+            return ((DataOperationService) spyService)
+                .getData(path, new DataGetParams(content, DepthParam.max(), null, null))
                 .get(2, TimeUnit.SECONDS)
                 .orElse(null);
-        } catch (TimeoutException | InterruptedException | ExecutionException | RequestException e) {
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new AssertionError(e);
         }
     }
 
     private void mockLockUnlock()  {
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).unlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).unlockCandidate(any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).lockCandidate(any());
     }
 
     private void mockLockUnlockCommit() {
         mockLockUnlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).commit(any());
     }
 
     private void mockLockUnlockDiscard() {
         mockLockUnlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).discardChanges(any());
     }
 }

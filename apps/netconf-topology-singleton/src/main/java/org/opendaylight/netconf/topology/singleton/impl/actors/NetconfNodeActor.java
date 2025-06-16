@@ -39,7 +39,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyYangTextSourceProvider;
@@ -88,7 +89,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private DOMActionService deviceAction = null;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
-    private NetconfDataTreeService netconfService;
+    private DataStoreService netconfService;
     //readTxActor can be shared
     private ActorRef readTxActor;
     private List<Registration> registeredSchemas;
