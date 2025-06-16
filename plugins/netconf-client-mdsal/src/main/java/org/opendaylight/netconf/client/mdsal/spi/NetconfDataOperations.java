@@ -10,6 +10,11 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
+import static org.opendaylight.netconf.api.EffectiveOperation.CREATE;
+import static org.opendaylight.netconf.api.EffectiveOperation.DELETE;
+import static org.opendaylight.netconf.api.EffectiveOperation.MERGE;
+import static org.opendaylight.netconf.api.EffectiveOperation.REMOVE;
+import static org.opendaylight.netconf.api.EffectiveOperation.REPLACE;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -31,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -39,6 +43,7 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
@@ -96,21 +101,19 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
     private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
 
-    private final NetconfDataTreeService dataTreeService;
+    private final DataStoreService dataStoreService;
     private final Map<Data, Collection<? extends NormalizedNode>> readListCache = new ConcurrentHashMap<>();
 
-    public NetconfDataOperations(final NetconfDataTreeService dataTreeService) {
-        this.dataTreeService = dataTreeService;
+    public NetconfDataOperations(final DataStoreService dataStoreService) {
+        this.dataStoreService = dataStoreService;
     }
 
     @Override
     protected void createData(final ServerRequest<? super CreateResourceResult> request, final Data path,
             final NormalizedNode data) {
-        var futureChain = dataTreeService.lock();
         // FIXME: Get defaultOperation
-        futureChain = addIntoFutureChain(futureChain, () -> create(path, data));
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = create(path, data);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -130,7 +133,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "POST", path));
             }
         }, Executors.newSingleThreadExecutor());
@@ -145,16 +147,13 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             request.completeWith(cause);
             return;
         }
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> {
-            try {
-                return insertCreate(path, data, insert);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-        });
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        ListenableFuture<? extends DOMRpcResult> futureChain;
+        try {
+            futureChain = insertCreate(path, data, insert);
+        } catch (RequestException cause) {
+            futureChain = Futures.immediateFailedFuture(cause);
+        }
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -174,7 +173,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "POST", path));
             }
         }, Executors.newSingleThreadExecutor());
@@ -183,16 +181,13 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
     @Override
     public void deleteData(final ServerRequest<Empty> request, final Data path) {
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> {
-            try {
-                return delete(path);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-        });
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        ListenableFuture<? extends DOMRpcResult> futureChain;
+        try {
+            futureChain = delete(path);
+        } catch (RequestException cause) {
+            futureChain = Futures.immediateFailedFuture(cause);
+        }
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -202,7 +197,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
@@ -243,10 +237,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
     @Override
     public void mergeData(final ServerRequest<DataPatchResult> request, final Data path, final NormalizedNode data) {
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> merge(path, data));
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = merge(path, data);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -257,7 +249,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "MERGE", path));
             }
         }, MoreExecutors.directExecutor());
@@ -267,7 +258,7 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     public void patchData(final ServerRequest<DataYangPatchResult> request, final Data path, final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var entities = patch.entities();
-        var futureChain = dataTreeService.lock();
+        ListenableFuture<? extends DOMRpcResult> futureChain = RPC_SUCCESS;
 
         for (int i = 0; i < entities.size() ; i++) {
             final var currentEntity = entities.get(i);
@@ -284,12 +275,11 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         }
 
         if (entities.isEmpty()) {
-            futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
+            futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
         } else {
-            futureChain = chainPatchEditTransaction(futureChain, dataTreeService::commit,
+            futureChain = chainPatchEditTransaction(futureChain, dataStoreService::commit,
                 entities.get(entities.size() - 1), editCollection);
         }
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -300,7 +290,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 if (containsFailure(editCollection)) {
                     request.completeWith(new DataYangPatchResult(
                         new PatchStatusContext(patch.patchId(), List.copyOf(editCollection), false, null)));
@@ -323,10 +312,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             request.completeWith(e);
             return;
         }
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> replace(path, data));
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        var futureChain = replace(path, data);
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -336,7 +323,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "PUT", path));
             }
         }, MoreExecutors.directExecutor());
@@ -357,16 +343,13 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             return;
         }
 
-        var futureChain = dataTreeService.lock();
-        futureChain = addIntoFutureChain(futureChain, () -> {
-            try {
-                return insertPut(path, data, insert, parentPath);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-        });
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
+        ListenableFuture<? extends DOMRpcResult> futureChain;
+        try {
+            futureChain = insertPut(path, data, insert, parentPath);
+        } catch (RequestException cause) {
+            futureChain = Futures.immediateFailedFuture(cause);
+        }
+        futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -376,25 +359,9 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancel();
                 request.completeWith(decodeException(cause, "PUT", path));
             }
         }, MoreExecutors.directExecutor());
-    }
-
-    private ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store, final Data path) {
-        return switch (store) {
-            case CONFIGURATION -> dataTreeService.getConfig(path.instance());
-            case OPERATIONAL -> dataTreeService.get(path.instance());
-        };
-    }
-
-    private ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store, final Data path,
-            final List<YangInstanceIdentifier> fields) {
-        return switch (store) {
-            case CONFIGURATION -> dataTreeService.getConfig(path.instance(), fields);
-            case OPERATIONAL -> dataTreeService.get(path.instance(), fields);
-        };
     }
 
     private ListenableFuture<? extends DOMRpcResult> create(final Data path, final NormalizedNode data) {
@@ -402,17 +369,16 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             final var futureChain = RPC_SUCCESS;
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.instance().node(child.name());
-                addIntoFutureChain(futureChain, () -> dataTreeService.create(CONFIGURATION, childPath, child,
-                    Optional.empty()));
+                addIntoFutureChain(futureChain, () -> dataStoreService.editConfig(child, CREATE, childPath));
             }
             return futureChain;
         } else {
-            return dataTreeService.create(CONFIGURATION, path.instance(), data, Optional.empty());
+            return dataStoreService.editConfig(data, CREATE, path.instance());
         }
     }
 
     private ListenableFuture<? extends DOMRpcResult> merge(final Data path, final NormalizedNode data) {
-        return dataTreeService.merge(CONFIGURATION, path.instance(), data, Optional.empty());
+        return dataStoreService.editConfig(data, EffectiveOperation.MERGE, path.instance());
     }
 
     private ListenableFuture<? extends DOMRpcResult> replace(final Data path, final NormalizedNode data) {
@@ -420,21 +386,20 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             final var futureChain = RPC_SUCCESS;
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.instance().node(child.name());
-                addIntoFutureChain(futureChain, () -> dataTreeService.replace(CONFIGURATION, childPath, child,
-                    Optional.empty()));
+                addIntoFutureChain(futureChain, () -> dataStoreService.editConfig(data, REPLACE, childPath));
             }
             return futureChain;
         } else {
-            return dataTreeService.replace(CONFIGURATION, path.instance(), data, Optional.empty());
+            return dataStoreService.editConfig(data, REPLACE, path.instance());
         }
     }
 
     private ListenableFuture<? extends DOMRpcResult> delete(final Data path) throws RequestException {
-        return eraseData(path, (b) -> dataTreeService.delete(CONFIGURATION, b));
+        return eraseData(path, (b) -> dataStoreService.editConfig(DELETE, b));
     }
 
     private ListenableFuture<? extends DOMRpcResult> remove(final Data path) throws RequestException {
-        return eraseData(path, (b) -> dataTreeService.remove(CONFIGURATION, b));
+        return eraseData(path, (b) -> dataStoreService.editConfig(REMOVE, b));
     }
 
     private ListenableFuture<? extends DOMRpcResult> eraseData(final Data path,
@@ -486,9 +451,9 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             final var keyFields = listSchemaNode.getKeyDefinition().stream().map(YangInstanceIdentifier::of).toList();
             final var child = NodeIdentifierWithPredicates.of(path.instance().getLastPathArgument().getNodeType());
             final var childPath = childPath(path, List.of(child));
-            future = dataTreeService.getConfig(childPath.instance(), keyFields);
+            future = dataStoreService.read(CONFIGURATION, childPath.instance(), keyFields);
         } else {
-            future = dataTreeService.getConfig(path.instance());
+            future = dataStoreService.read(CONFIGURATION, path.instance());
         }
 
         final var retrieved = RestconfStrategy.syncAccess(future, path.instance());
@@ -544,8 +509,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         int lastInsertedPosition = 0;
 
         final var emptySubtree = fromInstanceId(parentPath.databind().modelContext(), parentPath.instance());
-        futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.merge(CONFIGURATION,
-            YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree, Optional.empty()));
+        futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.editConfig(emptySubtree, MERGE,
+            YangInstanceIdentifier.of(emptySubtree.name())));
 
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -657,7 +622,7 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     private @Nullable NormalizedNodeContainer<?> readList(final Data path) throws RequestException {
         // reading list is mainly invoked for subsequent removal,
         // cache data to avoid extra read invocation on delete/remove
-        final var result =  RestconfStrategy.syncAccess(read(CONFIGURATION, path),
+        final var result =  RestconfStrategy.syncAccess(dataStoreService.read(CONFIGURATION, path.instance()),
             path.instance());
         readListCache.put(path, result.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of()));
         return (NormalizedNodeContainer<?>) result.orElse(null);
@@ -719,39 +684,15 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         }
 
         if (fieldPaths != null) {
-            return read(store, path, fieldPaths);
+            return dataStoreService.read(store, path.instance(), fieldPaths);
         }
-        return read(store, path);
+        return dataStoreService.read(store, path.instance());
     }
 
     private ListenableFuture<Boolean> exists(final Data path) {
-        return Futures.transform(remapException(dataTreeService.getConfig(path.instance())),
+        return Futures.transform(remapException(dataStoreService.read(CONFIGURATION, path.instance())),
             optionalNode -> optionalNode != null && optionalNode.isPresent(),
             MoreExecutors.directExecutor());
-    }
-
-    public void cancel() {
-        readListCache.clear();
-        executeWithLogging(dataTreeService::discardChanges);
-        executeWithLogging(dataTreeService::unlock);
-    }
-
-    private static void executeWithLogging(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation) {
-        var operationResult = operation.get();
-        Futures.addCallback(operationResult, new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(final DOMRpcResult rpcResult) {
-                if (rpcResult != null && !rpcResult.errors().isEmpty()) {
-                    LOG.error("Errors occurred during processing of the RPC operation: {}",
-                        rpcResult.errors().stream().map(Object::toString).collect(Collectors.joining(",")));
-                }
-            }
-
-            @Override
-            public void onFailure(final Throwable throwable) {
-                LOG.error("Error processing operation", throwable);
-            }
-        }, MoreExecutors.directExecutor());
     }
 
     private static boolean isNonEmptyListPath(final NormalizedNode data) {
