@@ -7,9 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
-import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
@@ -21,12 +18,11 @@ import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.util.Timeout;
 import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationService;
+import org.opendaylight.netconf.databind.DatabindPath;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -38,7 +34,7 @@ import scala.concurrent.Future;
  * ProxyNetconfService uses provided {@link ActorRef} to delegate method calls to master
  * {@link org.opendaylight.netconf.topology.singleton.impl.actors.NetconfDataTreeServiceActor}.
  */
-public class ProxyNetconfService implements NetconfDataTreeService {
+public class ProxyNetconfService implements DataOperationService {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyNetconfService.class);
 
     private final RemoteDeviceId id;
@@ -68,108 +64,44 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<DOMRpcResult> lock() {
-        LOG.debug("{}: Lock", id);
-        final SettableFuture<DOMRpcResult> future = SettableFuture.create();
-        processNetconfOperation(facade -> future.setFuture(facade.lock()));
-        return future;
+    public ListenableFuture<? extends DOMRpcResult> createData(YangInstanceIdentifier path, NormalizedNode data) {
+        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.createData(path, data)));
+        return returnFuture;
     }
 
     @Override
-    public ListenableFuture<DOMRpcResult> unlock() {
-        LOG.debug("{}: Unlock", id);
-        final SettableFuture<DOMRpcResult> future = SettableFuture.create();
-        processNetconfOperation(facade -> future.setFuture(facade.unlock()));
-        return future;
+    public ListenableFuture<? extends DOMRpcResult> deleteData(DatabindPath.Data path) {
+        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.deleteData(path)));
+        return returnFuture;
     }
 
     @Override
-    public ListenableFuture<DOMRpcResult> discardChanges() {
-        LOG.debug("{}: Discard changes", id);
-        final SettableFuture<DOMRpcResult> future = SettableFuture.create();
-        processNetconfOperation(facade -> future.setFuture(facade.discardChanges()));
-        return future;
+    public ListenableFuture<? extends DOMRpcResult> removeData(DatabindPath.Data path) {
+        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.removeData(path)));
+        return returnFuture;
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
-        LOG.debug("{}: Get {} {}", id, OPERATIONAL, path);
+    public ListenableFuture<? extends DOMRpcResult> mergeData(YangInstanceIdentifier path, NormalizedNode data) {
+        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.mergeData(path, data)));
+        return returnFuture;
+    }
+
+    @Override
+    public ListenableFuture<? extends DOMRpcResult> putData(YangInstanceIdentifier path, NormalizedNode data) {
+        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.putData(path, data)));
+        return returnFuture;
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode>> getData(DatabindPath.Data path, DataGetParams params) {
         final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.get(path)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path,
-                                                          final List<YangInstanceIdentifier> fields) {
-        LOG.debug("{}: Get {} {} with fields: {}", id, OPERATIONAL, path, fields);
-        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.get(path, fields)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path) {
-        LOG.debug("{}: Get config {} {}", id, CONFIGURATION, path);
-        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path,
-                                                                final List<YangInstanceIdentifier> fields) {
-        LOG.debug("{}: Get config {} {} with fields: {}", id, CONFIGURATION, path, fields);
-        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path, fields)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<EffectiveOperation> defaultOperation) {
-        LOG.debug("{}: Merge {} {}", id, store, path);
-        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.merge(store, path, data, defaultOperation)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<EffectiveOperation> defaultOperation) {
-        LOG.debug("{}: Replace {} {}", id, store, path);
-        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.replace(store, path, data, defaultOperation)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<EffectiveOperation> defaultOperation) {
-        LOG.debug("{}: Create {} {}", id, store, path);
-        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.create(store, path, data, defaultOperation)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
-        LOG.debug("{}: Delete {} {}", id, store, path);
-        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.delete(store, path)));
-        return returnFuture;
-    }
-
-    @Override
-    public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
-        LOG.debug("{}: Remove {} {}", id, store, path);
-        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.remove(store, path)));
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.getData(path, params)));
         return returnFuture;
     }
 
@@ -179,11 +111,6 @@ public class ProxyNetconfService implements NetconfDataTreeService {
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.commit()));
         return returnFuture;
-    }
-
-    @Override
-    public @NonNull Object getDeviceId() {
-        return id;
     }
 
     private void processNetconfOperation(final Consumer<ProxyNetconfServiceFacade> operation) {

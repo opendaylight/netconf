@@ -27,12 +27,12 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.client.mdsal.spi.AbstractNetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.AbstractDataStore;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
 import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -57,7 +57,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private RemoteDeviceServices deviceServices = null;
     private DOMDataBroker deviceDataBroker = null;
-    private NetconfDataTreeService netconfService = null;
+    private DataOperationService netconfService = null;
 
     /**
      * MasterSalFacade is responsible for handling the connection and disconnection
@@ -181,9 +181,9 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         return new NetconfDeviceDataBroker(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
-    protected NetconfDataTreeService newNetconfDataTreeService(final DatabindContext databind,
+    protected DataOperationService newNetconfDataTreeService(final DatabindContext databind,
             final NetconfSessionPreferences preferences) {
-        return AbstractNetconfDataTreeService.of(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
+        return AbstractDataStore.of(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
     private Future<Object> sendInitialDataToActor() {
