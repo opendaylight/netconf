@@ -16,6 +16,24 @@
       "message": "please complete, add your test implementation of Subscription",
       "revId": "02bb1e6987675e256e88cbb93294f8f5631c787f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2ec4670_dce06db8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionTest.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-16T15:45:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b553bf6_22eb1a7b",
+      "revId": "02bb1e6987675e256e88cbb93294f8f5631c787f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
