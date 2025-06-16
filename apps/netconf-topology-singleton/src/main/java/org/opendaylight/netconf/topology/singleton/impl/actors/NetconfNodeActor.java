@@ -39,7 +39,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyYangTextSourceProvider;
@@ -88,7 +88,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private DOMActionService deviceAction = null;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
-    private NetconfDataTreeService netconfService;
+    private DataStoreService dataStoreService;
     //readTxActor can be shared
     private ActorRef readTxActor;
     private List<Registration> registeredSchemas;
@@ -116,7 +116,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         if (message instanceof CreateInitialMasterActorData masterActorData) { // master
             sourceIdentifiers = masterActorData.getSourceIndentifiers();
             deviceDataBroker = masterActorData.getDeviceDataBroker();
-            netconfService = masterActorData.getNetconfDataTreeService();
+            dataStoreService = masterActorData.getDataStoreService();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
 
@@ -178,7 +178,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             id = refreshSlave.getId();
             schemaProvider = refreshSlave.getSetup().getDeviceSchemaProvider();
         } else if (message instanceof NetconfDataTreeServiceRequest) {
-            final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(netconfService,
+            final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(dataStoreService,
                 writeTxIdleTimeout));
             sender().tell(new Success(netconfActor), self());
         }
