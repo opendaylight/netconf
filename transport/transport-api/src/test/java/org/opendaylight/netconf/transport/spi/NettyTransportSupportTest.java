@@ -7,15 +7,19 @@
  */
 package org.opendaylight.netconf.transport.spi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.google.common.collect.Maps;
 import io.netty.bootstrap.AbstractBootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollChannelOption;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,9 +42,11 @@ class NettyTransportSupportTest {
         final var bootstrap = method.get();
         final var secrets = TcpMd5Secrets.of(InetAddress.getLoopbackAddress(), "");
         NettyTransportSupport.setTcpMd5(bootstrap, secrets);
-        final var option = bootstrap.config().options().get(EpollChannelOption.TCP_MD5SIG);
-        assertNotNull(option);
-        assertSame(secrets.map(), option);
+        @SuppressWarnings("unchecked")
+        final var option = Maps.transformValues(
+            assertInstanceOf(Map.class, bootstrap.config().options().get(EpollChannelOption.TCP_MD5SIG)),
+            obj -> Unpooled.wrappedBuffer((byte[]) obj));
+        assertEquals(secrets.asMap(), option);
     }
 
     @Test

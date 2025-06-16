@@ -52,12 +52,12 @@ final class EpollNettyImpl extends NettyImpl {
 
     @Override
     void setTcpMd5(AbstractBootstrap<?, ?> bootstrap, TcpMd5Secrets secrets) {
-        bootstrap.option(EpollChannelOption.TCP_MD5SIG, secrets.map());
+        bootstrap.option(EpollChannelOption.TCP_MD5SIG, secrets.toOption());
     }
 
     @Override
     boolean setTcpMd5(final Channel channel, final TcpMd5Secrets secrets) {
-        return channel.config().setOption(EpollChannelOption.TCP_MD5SIG, secrets.map());
+        return channel.config().setOption(EpollChannelOption.TCP_MD5SIG, secrets.toOption());
     }
 
     @Override
