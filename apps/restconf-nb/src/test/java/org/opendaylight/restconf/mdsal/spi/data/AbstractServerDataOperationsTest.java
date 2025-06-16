@@ -222,10 +222,10 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
         .build();
     private static final NodeIdentifier NODE_IDENTIFIER =
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
-    private static final Data PATH_DATA = moudlesPath(PATH);
-    private static final Data PATH_2_DATA = moudlesPath(PATH_2);
-    private static final Data PATH_3_DATA = moudlesPath(PATH_3);
-    private static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
+    static final Data PATH_DATA = moudlesPath(PATH);
+    static final Data PATH_2_DATA = moudlesPath(PATH_2);
+    static final Data PATH_3_DATA = moudlesPath(PATH_3);
+    static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
 
     private final CompletingServerRequest<Empty> dataDeleteRequest = new CompletingServerRequest<>();
     private final CompletingServerRequest<DataPatchResult> dataPatchRequest = new CompletingServerRequest<>();
