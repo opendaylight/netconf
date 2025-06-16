@@ -11,13 +11,15 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.COMMIT_RPC_CONTENT;
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
@@ -46,6 +49,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,55 +59,35 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     @Captor
     private ArgumentCaptor<ContainerNode> captor;
 
-    private AbstractNetconfDataTreeService netconService;
+    private DataStoreService dataStoreService;
     private NetconfMessageTransformer netconfMessageTransformer;
 
     @BeforeEach
     void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
-        netconService = getNetconService();
+        dataStoreService = getDataStoreService();
         final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class);
         netconfMessageTransformer = new NetconfMessageTransformer(DatabindContext.ofModel(model), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test
-    void lock() {
-        netconService.lock();
-        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
-    }
-
-    @Test
-    void unlock() {
-        netconService.lock();
-        netconService.unlock();
-        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
-        verify(rpcService).invokeNetconf(eq(Unlock.QNAME), any());
-    }
-
-    @Test
-    void discardChanges() {
-        netconService.discardChanges();
-        verify(rpcService).invokeNetconf(eq(DiscardChanges.QNAME), any());
-    }
-
-    @Test
     void get() {
-        netconService.get(null);
+        dataStoreService.get(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(), List.of());
         verify(rpcService).invokeNetconf(eq(Get.QNAME), any());
     }
 
     @Test
     void getConfig() {
-        netconService.getConfig(null);
+        dataStoreService.get(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(), List.of());
         verify(rpcService).invokeNetconf(eq(GetConfig.QNAME), any());
     }
 
     @Test
     void merge() {
-        netconService.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
-                Optional.empty());
-        verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        dataStoreService.merge(TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
             EditConfig.QNAME, captor.getValue());
@@ -112,9 +96,9 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     void replace() {
-        netconService.replace(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
-                Optional.empty());
-        verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        dataStoreService.replace(TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
             EditConfig.QNAME, captor.getValue());
@@ -123,9 +107,9 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     void create() {
-        netconService.create(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
-            Optional.empty());
-        verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        dataStoreService.create(TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
             EditConfig.QNAME, captor.getValue());
@@ -134,8 +118,9 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     void delete() {
-        netconService.delete(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
-        verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        dataStoreService.delete(TxTestUtils.getLeafId().getParent());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
             EditConfig.QNAME, captor.getValue());
@@ -144,8 +129,9 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     void remove() {
-        netconService.remove(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
-        verify(rpcService).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        dataStoreService.remove(TxTestUtils.getLeafId().getParent());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
             EditConfig.QNAME, captor.getValue());
@@ -154,13 +140,42 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     void commit() {
-        netconService.commit();
+        dataStoreService.create(TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
+
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
+            EditConfig.QNAME, captor.getValue());
+        assertThat(netconfMessage.toString(), containsString("operation=\"create\""));
+
+        dataStoreService.commit();
         verify(rpcService).invokeNetconf(eq(Commit.QNAME), any());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(Unlock.QNAME), any());
+        verify(rpcService, after(2000).never()).invokeNetconf(eq(DiscardChanges.QNAME), any());
     }
 
-    private AbstractNetconfDataTreeService getNetconService() {
+    @Test
+    void discard() {
+        dataStoreService.create(TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(EditConfig.QNAME), captor.capture());
+        verify(rpcService).invokeNetconf(eq(Lock.QNAME), any());
+
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
+            EditConfig.QNAME, captor.getValue());
+        assertThat(netconfMessage.toString(), containsString("operation=\"create\""));
+
+        doReturn(Futures.immediateFailedFuture(new RequestException("Test Exception"))).when(rpcService)
+            .invokeNetconf(Commit.QNAME, COMMIT_RPC_CONTENT);
+
+        dataStoreService.commit();
+        verify(rpcService).invokeNetconf(eq(Commit.QNAME), any());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(Unlock.QNAME), any());
+        verify(rpcService, timeout(2000)).invokeNetconf(eq(DiscardChanges.QNAME), any());
+    }
+
+    private DataStoreService getDataStoreService() {
         final var prefs = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
         final var id = new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return AbstractNetconfDataTreeService.of(id, TEST_DATABIND, rpcService, prefs, true);
+        return AbstractDataStore.of(id, TEST_DATABIND, rpcService, prefs, true);
     }
 }
