@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f31e751_1e4ad985",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 1049,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-06-17T15:19:40Z",
+      "side": 1,
+      "message": "promoting Exception.getMessage() to ErrorMessage -- i.e. something that is usually specified https://www.rfc-editor.org/rfc/rfc7950#section-7.5.4.1.\n\nthis needs to be justified with a comment as to why we are making this projection",
+      "range": {
+        "startLine": 1049,
+        "startChar": 24,
+        "endLine": 1049,
+        "endChar": 49
+      },
+      "revId": "1d21ad249f9afe0e991400e469e1fb1a883bed1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
