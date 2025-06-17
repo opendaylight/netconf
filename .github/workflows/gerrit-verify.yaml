@@ -8,10 +8,6 @@ name: Gerrit Composed Maven Verify
 on:
   workflow_dispatch:
     inputs:
-      GERRIT_BRANCH:
-        description: "Branch that change is against"
-        required: true
-        type: string
       GERRIT_CHANGE_ID:
         description: "The ID for the change"
         required: true
@@ -20,24 +16,13 @@ on:
         description: "The Gerrit number"
         required: true
         type: string
-      GERRIT_CHANGE_URL:
-        description: "URL to the change"
+      GERRIT_URL:
+        description: "URL to gerrit repo (above project)"
         required: true
         type: string
-      GERRIT_EVENT_TYPE:
-        description: "Type of Gerrit event"
-        required: true
-        type: string
+      # TODO: Is GERRIT_EVENT_TYPE_NEEDED?
       GERRIT_PATCHSET_NUMBER:
         description: "The patch number for the change"
-        required: true
-        type: string
-      GERRIT_PATCHSET_REVISION:
-        description: "The revision sha"
-        required: true
-        type: string
-      GERRIT_PROJECT:
-        description: "Project in Gerrit"
         required: true
         type: string
       GERRIT_REFSPEC:
@@ -47,7 +32,7 @@ on:
 
 concurrency:
   # yamllint disable-line rule:line-length
-  group: compose-maven-verify-${{ github.workflow }}-${{ github.event.inputs.GERRIT_CHANGE_ID || github.run_id }}
+  group: compose-maven-verify-${{ github.workflow }}-${{ github.event.inputs.GERRIT_REFSPEC }}
   cancel-in-progress: true
 
 jobs:
@@ -73,16 +58,10 @@ jobs:
     needs: prepare
     # use compose-jjb-verify from the v0.4 series of releng-reusable-workflows
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/compose-maven-verify.yaml@main
+    uses: vrpolakatcisco/releng-reusable-workflows/.github/workflows/gerrit-compose-maven-verify.yaml@e79ab1ec0ea8d7b85786d8c520bd603620630850
     with:
-      GERRIT_BRANCH: ${{ inputs.GERRIT_BRANCH }}
-      GERRIT_CHANGE_ID: ${{ inputs.GERRIT_CHANGE_ID }}
-      GERRIT_CHANGE_NUMBER: ${{ inputs.GERRIT_CHANGE_NUMBER }}
-      GERRIT_CHANGE_URL: ${{ inputs.GERRIT_CHANGE_URL }}
-      GERRIT_EVENT_TYPE: ${{ inputs.GERRIT_EVENT_TYPE }}
-      GERRIT_PATCHSET_NUMBER: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
-      GERRIT_PATCHSET_REVISION: ${{ inputs.GERRIT_PATCHSET_REVISION }}
-      GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
+      GERRIT_PROJECT: netconf
+      GERRIT_URL: ${{ inputs.GERRIT_URL }}
       GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
       JDK_VERSION: "21"
       MVN_VERSION: "3.9.6"
