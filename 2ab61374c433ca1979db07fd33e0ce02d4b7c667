@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "110e3266_a746965b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-06-17T15:20:46Z",
+      "side": 1,
+      "message": "also move this patch before https://git.opendaylight.org/gerrit/c/netconf/+/116542",
+      "revId": "2ab61374c433ca1979db07fd33e0ce02d4b7c667",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8119e80d_a503f7de",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfRestconfStrategyTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-06-17T15:20:46Z",
+      "side": 1,
+      "message": "on previous line",
+      "range": {
+        "startLine": 446,
+        "startChar": 12,
+        "endLine": 446,
+        "endChar": 31
+      },
+      "revId": "2ab61374c433ca1979db07fd33e0ce02d4b7c667",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
