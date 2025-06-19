@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a21eb8ea_7bce4296",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-19T13:51:06Z",
+      "side": 1,
+      "message": "SseClientServerTest has been removed/replaced with https://git.opendaylight.org/gerrit/c/netconf/+/114952 since its only purpose had been to test removed ServerSseHandler.",
+      "revId": "67e4dd16b5d81b37753a3d0082bad866e82eb4eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
