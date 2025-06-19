@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.it.subscription;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -20,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -156,6 +159,38 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         // verify name was filtered out
         assertNull(eventListener.readNext());
+    }
+
+    @Test
+    void filteredRfc7950NotificationTest() throws Exception {
+        final var response = establishFilteredSubscription("""
+            <top xmlns="test:notification">
+                <contNotif>
+                    <msg/>
+                </contNotif>
+            </top>
+            """, streamClient);
+
+        assertEquals(HttpResponseStatus.OK, response.status());
+        final var id = extractSubscriptionId(response);
+        final var eventListener = startSubscriptionStream(String.valueOf(id));
+
+        final var namespace = ExampleNotification.QNAME.getNamespace();
+        final var topQname = QName.create(namespace, "top");
+        final var notifQname = QName.create(namespace, "contNotif");
+        final var msgQname = QName.create(namespace, "msg");
+
+        final var absolute = SchemaNodeIdentifier.Absolute.of(topQname, notifQname);
+        final var path = YangInstanceIdentifier.of(NodeIdentifier.create(topQname));
+        final var contNotifBody = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(notifQname))
+            .withChild(ImmutableNodes.leafNode(msgQname, "hello"))
+            .build();
+        domNotificationRouter.notificationService().registerNotificationListener(n -> { }, List.of(absolute));
+
+        publishService().putNotification(new DOMNotificationEvent.Rfc7950(absolute, path, contNotifBody, EVENT_TIME));
+
+        assertNotNull(eventListener.readNext());
     }
 
     @Disabled("Will be disabled until YANGTOOLS-1670 has been resolved")

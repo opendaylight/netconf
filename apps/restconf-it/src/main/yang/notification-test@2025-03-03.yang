@@ -5,6 +5,17 @@ module notification-test {
     description "Test model for notifications";
     revision "2025-03-03";
 
+    container top {
+        leaf id {
+            type string;
+        }
+        notification contNotif {
+            leaf msg {
+                type string;
+            }
+        }
+    }
+
     notification example-notification {
         list entry {
             key "id";

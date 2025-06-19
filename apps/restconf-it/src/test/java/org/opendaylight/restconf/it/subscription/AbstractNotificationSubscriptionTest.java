@@ -125,9 +125,9 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private EventStreamService clientStreamService;
     private HTTPClient subscriptionStreamClient;
     private EventStreamService.StreamControl streamControl;
-    private DOMNotificationRouter domNotificationRouter;
+    protected DOMNotificationRouter domNotificationRouter;
     private DOMRpcRouter domRpcRouter;
-    private MdsalRestconfStreamRegistry streamRegistry;
+    protected MdsalRestconfStreamRegistry streamRegistry;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
