@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0060b28_a1624bf1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionTest.java",
+        "patchSetId": 87
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-20T07:27:21Z",
+      "side": 1,
+      "message": "no need to be public",
+      "revId": "1afc5f7bdb203e50e3fd7dacb9c7e70eeabf54ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
