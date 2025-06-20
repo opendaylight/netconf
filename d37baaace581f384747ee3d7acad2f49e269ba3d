@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ae923d7_79bfffb3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-20T07:25:11Z",
+      "side": 1,
+      "message": "Cannot we just use Mockito instead of Awaitility?",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba0d4571_d6168eb0",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-20T07:25:11Z",
+      "side": 1,
+      "message": "final",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45a2d43b_9f5d4313",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-20T07:25:11Z",
+      "side": 1,
+      "message": "final Instant and use if-else",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cce6625_a29d1b83",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-20T07:25:11Z",
+      "side": 1,
+      "message": "isBefore?",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42f20ad5_1343b3a1",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 661,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-20T07:25:11Z",
+      "side": 1,
+      "message": "one empty line",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
