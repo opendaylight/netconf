@@ -16,6 +16,24 @@
       "message": "according to which model?",
       "revId": "1151b68f2dde34d7f5a39fb95cc45d29b1618523",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14da992f_d41c1c3d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-20T16:58:58Z",
+      "side": 1,
+      "message": "Any model which support rpc and has output container, e.g. ietf-netconf@2011-06-01 from https://www.rfc-editor.org/rfc/rfc6241",
+      "parentUuid": "2b505ac0_c257ff31",
+      "revId": "1151b68f2dde34d7f5a39fb95cc45d29b1618523",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
