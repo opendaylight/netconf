@@ -52,6 +52,24 @@
       "parentUuid": "df6d8769_a56da2db",
       "revId": "42bb679a220960f8428b2d8e00d3d3e693e27bea",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a2166da_b33067a6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 84
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-23T06:43:10Z",
+      "side": 1,
+      "message": "In patchset 86.",
+      "parentUuid": "47d3f116_57084485",
+      "revId": "42bb679a220960f8428b2d8e00d3d3e693e27bea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
