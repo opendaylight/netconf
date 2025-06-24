@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8f15917d_83d013ad",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T12:07:05Z",
+      "side": 1,
+      "message": "What happens when we kill/delete subscription?",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9f77adc5_3b9b288e",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 80
