@@ -89,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b29ce88_a9a08767",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-24T13:46:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "452ce4ab_276b33a5",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4dd8026_584dcf28",
@@ -156,6 +174,24 @@
       "side": 1,
       "message": "I mean every time create a new NodeIdentifier object when toRpcResult is invoked",
       "parentUuid": "b3a7c88d_3b823e9f",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0e30b3d_cef8af74",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-24T13:46:39Z",
+      "side": 1,
+      "message": "NETCONF_RPC_REPLY_NODEID has been eliminated",
+      "parentUuid": "0ed89ed3_8ba56939",
       "revId": "f212b7f7c60872936fbdde63775139495df10137",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
