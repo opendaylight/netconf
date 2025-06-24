@@ -69,6 +69,24 @@
       "parentUuid": "f4dd8026_584dcf28",
       "revId": "f212b7f7c60872936fbdde63775139495df10137",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3a7c88d_3b823e9f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T13:15:32Z",
+      "side": 1,
+      "message": "I have found only one 😊",
+      "parentUuid": "ea82d56f_52397f1d",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
