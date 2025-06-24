@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfe446bb_743276c9",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T06:17:59Z",
+      "side": 1,
+      "message": "We could by mocking eventListener-s, but for those we are using our TestEventStreamListener and we can easily read notifications, what imo is more suitable.",
+      "parentUuid": "9ae923d7_79bfffb3",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba0d4571_d6168eb0",
