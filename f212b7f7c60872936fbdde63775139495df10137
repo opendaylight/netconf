@@ -38,6 +38,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "987393d0_6238d66e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T13:19:57Z",
+      "side": 1,
+      "message": "why do we need to change container, what is the problem? the previous one is incorrect?",
+      "parentUuid": "4adeb275_12003161",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "452ce4ab_276b33a5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T13:19:57Z",
+      "side": 1,
+      "message": "only one usage",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4dd8026_584dcf28",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
         "patchSetId": 6
