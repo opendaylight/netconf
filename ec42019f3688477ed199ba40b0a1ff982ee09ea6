@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b789e7b4_f724b5f7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamSubscription.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T07:58:19Z",
+      "side": 1,
+      "message": "we would need to add stop-time to toString()",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
