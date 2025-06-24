@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c758aeb_058c8d5d",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T12:29:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b11d7d71_e0dd7cab",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f54875b6_44146e22",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-24T11:05:31Z",
       "side": 1,
       "message": ".. we never get to this because validation fails when we actually invoke RPC",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f404d4_f0a8c853",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T12:29:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f54875b6_44146e22",
       "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27f71c8a_76b0be18",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T12:29:31Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "3952bc1e_7638f944",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18b22e16_9655b890",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-06-24T08:06:18Z",
       "side": 1,
       "message": "can be private",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31cd4603_dfac7b3c",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T12:29:31Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "18b22e16_9655b890",
       "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee0557e9_5a5ea82c",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T12:29:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d46ab34_79bd7863",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b789e7b4_f724b5f7",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-06-24T07:58:19Z",
       "side": 1,
       "message": "we would need to add stop-time to toString()",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44e6c483_bb96cc25",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamSubscription.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T12:29:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b789e7b4_f724b5f7",
       "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
