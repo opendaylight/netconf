@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe7ed048_71a237a5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 78
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T10:11:10Z",
+      "side": 1,
+      "message": "JUnit5 - no more public",
+      "revId": "2a44781958251284eb7fff62a12029504a0f78f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f221d1c4_6c115fc7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 78
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T10:11:10Z",
+      "side": 1,
+      "message": "What if we stop all subscriptions then we add new one?",
+      "revId": "2a44781958251284eb7fff62a12029504a0f78f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
