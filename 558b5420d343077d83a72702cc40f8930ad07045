@@ -68,6 +68,74 @@
       "parentUuid": "3a9fb4ad_5a9b906c",
       "revId": "558b5420d343077d83a72702cc40f8930ad07045",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cfec647_7b2891c3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T12:06:04Z",
+      "side": 1,
+      "message": "Handle",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aaea009_1367e0bc",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T12:06:04Z",
+      "side": 1,
+      "message": "private, final, final",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c7d4b0d_fc9f8c19",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T12:06:04Z",
+      "side": 1,
+      "message": "why only newStopTime.isAfter(nextStopTime)? what if its sooner?",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4154f10_d1d3c286",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T12:06:04Z",
+      "side": 1,
+      "message": "IIRC we require filter, thus not Nullable",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
