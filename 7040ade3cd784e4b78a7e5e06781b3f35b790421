@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f77adc5_3b9b288e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:29:46Z",
+      "side": 1,
+      "message": "scheduleNext?",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2c4034a_6ec79cae",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:29:46Z",
+      "side": 1,
+      "message": "can you try?\nhttps://www.baeldung.com/java-scheduledexecutorservice-virtual-threads#2-scheduling-virtual-threads-using-singlethreadexecutor",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8e39c7f_86204f1b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:29:46Z",
+      "side": 1,
+      "message": "empty line\n\u003cp\u003e",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f21f03a8_fc9facb8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:29:46Z",
+      "side": 1,
+      "message": "private",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba59e326_7e2cd996",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:29:46Z",
+      "side": 1,
+      "message": "protected",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
