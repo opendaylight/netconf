@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3952bc1e_7638f944",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T08:07:24Z",
+      "side": 1,
+      "message": "final, final",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "18b22e16_9655b890",
         "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
         "patchSetId": 39
