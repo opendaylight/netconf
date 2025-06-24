@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b11d7d71_e0dd7cab",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:05:31Z",
+      "side": 1,
+      "message": "here, we should have DateTime instance which should be already in desired format, which can be Instant.parse() without errors",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f54875b6_44146e22",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T11:05:31Z",
+      "side": 1,
+      "message": ".. we never get to this because validation fails when we actually invoke RPC",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3952bc1e_7638f944",
         "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
         "patchSetId": 39
