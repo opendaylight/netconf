@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "18b22e16_9655b890",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T08:06:18Z",
+      "side": 1,
+      "message": "can be private",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d46ab34_79bd7863",
+        "filename": "apps/restconf-subscription/src/test/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T08:06:18Z",
+      "side": 1,
+      "message": "we write comments above, additionally you can use Instant#toString instead of Strings",
+      "revId": "ec42019f3688477ed199ba40b0a1ff982ee09ea6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b789e7b4_f724b5f7",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamSubscription.java",
         "patchSetId": 39
