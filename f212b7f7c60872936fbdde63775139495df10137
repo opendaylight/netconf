@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4adeb275_12003161",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-24T13:07:51Z",
+      "side": 1,
+      "message": "I just keep the codebase consistent with every NETCONF element that is live in NetconfMessageTransformUtil.",
+      "parentUuid": "5da7e0b4_d4c40a18",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4dd8026_584dcf28",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-24T12:53:36Z",
       "side": 1,
       "message": "Are there other usages of NETCONF_RPC_REPLY_NODEID, can we remove it?",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea82d56f_52397f1d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-24T13:07:51Z",
+      "side": 1,
+      "message": "We don\u0027t want to call NodeIdentifier#create every time",
+      "parentUuid": "f4dd8026_584dcf28",
       "revId": "f212b7f7c60872936fbdde63775139495df10137",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
