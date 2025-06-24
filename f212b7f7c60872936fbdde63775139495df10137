@@ -87,6 +87,24 @@
       "parentUuid": "ea82d56f_52397f1d",
       "revId": "f212b7f7c60872936fbdde63775139495df10137",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ed89ed3_8ba56939",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-06-24T13:18:25Z",
+      "side": 1,
+      "message": "I mean every time create a new NodeIdentifier object when toRpcResult is invoked",
+      "parentUuid": "b3a7c88d_3b823e9f",
+      "revId": "f212b7f7c60872936fbdde63775139495df10137",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
