@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f726bd3_388d9bf8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "kill/delete invoke terminateImpl() above where after subscription is removed from subscriptions map subscriptionRemoved(id) is called and if that subscription was the one stop time task was scheduled for, it is canceled and new task is scheduled for next subscription",
+      "parentUuid": "8f15917d_83d013ad",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f77adc5_3b9b288e",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-24T11:29:46Z",
       "side": 1,
       "message": "scheduleNext?",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "111e92d3_381120fc",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "done in executeStopTimeTask()",
+      "parentUuid": "9f77adc5_3b9b288e",
       "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5afbea9b_cdcdb210",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "hope i implemented it how you expected\nto me it look unnecessary complicated, and less effective as each time task is scheduled new newSingleThreadScheduledExecutor is created, instead of reusing same one, as we only use one service for all subscriptions",
+      "parentUuid": "e2c4034a_6ec79cae",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d8e39c7f_86204f1b",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 80
@@ -65,6 +119,24 @@
       "writtenOn": "2025-06-24T11:29:46Z",
       "side": 1,
       "message": "empty line\n\u003cp\u003e",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e3e90eb_60c6308d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8e39c7f_86204f1b",
       "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e19b001_c72690c6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f21f03a8_fc9facb8",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba59e326_7e2cd996",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-06-24T11:29:46Z",
       "side": 1,
       "message": "protected",
+      "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ee29fa4_0449d411",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba59e326_7e2cd996",
       "revId": "7040ade3cd784e4b78a7e5e06781b3f35b790421",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

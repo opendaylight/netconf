@@ -51,6 +51,24 @@
       "message": "What if we stop all subscriptions then we add new one?",
       "revId": "2a44781958251284eb7fff62a12029504a0f78f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44910e36_d891959a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 78
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-24T15:24:44Z",
+      "side": 1,
+      "message": "here all variables are set to null\nwhen DynSubscription is created in establishSubscription, for every subscription with non-null stop time initiateStopTime() is called.\nIn that method if stopTimeTask is null, new task is scheduled",
+      "parentUuid": "f221d1c4_6c115fc7",
+      "revId": "2a44781958251284eb7fff62a12029504a0f78f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
