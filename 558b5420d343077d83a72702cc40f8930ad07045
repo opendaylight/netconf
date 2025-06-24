@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "14c1635e_f09967bf",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T08:13:17Z",
+      "side": 1,
+      "message": "we are missing stop time here",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3a9fb4ad_5a9b906c",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 69
