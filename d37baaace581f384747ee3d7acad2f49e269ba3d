@@ -161,6 +161,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "78aa5af5_2235f326",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-24T07:51:39Z",
+      "side": 1,
+      "message": "and, it must be in future when established, so move this check to #establishSubscription",
+      "parentUuid": "ab5bb364_ee52be88",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "42f20ad5_1343b3a1",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 65
