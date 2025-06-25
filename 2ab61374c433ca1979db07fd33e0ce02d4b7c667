@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7961c513_6a838b5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-06-25T08:22:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "110e3266_a746965b",
+      "revId": "2ab61374c433ca1979db07fd33e0ce02d4b7c667",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8119e80d_a503f7de",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-06-17T15:20:46Z",
       "side": 1,
       "message": "on previous line",
+      "range": {
+        "startLine": 446,
+        "startChar": 12,
+        "endLine": 446,
+        "endChar": 31
+      },
+      "revId": "2ab61374c433ca1979db07fd33e0ce02d4b7c667",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddf71a9f_cc7e7117",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfRestconfStrategyTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-06-25T08:22:22Z",
+      "side": 1,
+      "message": "Fixed in \"Enhance RequestException with more details\" commit\nhttps://git.opendaylight.org/gerrit/c/netconf/+/115401/15\n\nBefore this patch, RequestException with this type of constructor was always used with null value.\n\nOnly possible use-case how to test it here is to invoke MissingNameSpaceException, UnexpectedElementException or UnexpectedNamespaceException with ErrorTag.DATA_EXISTS or ErrorTag.DATA_MISSING in any NetconfDataTreeService operation. \nhttps://github.com/opendaylight/netconf/blob/master/plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java#L1052-L1063\nIMHO, this is probably will not happen in real world.\n\nSince this is a simple change, we can keep it without a test until it will be used. Or we can move it back after the \u0027Enhance RequestException with more details\u0027 commit.",
+      "parentUuid": "8119e80d_a503f7de",
       "range": {
         "startLine": 446,
         "startChar": 12,
