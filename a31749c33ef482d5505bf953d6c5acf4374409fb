@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "a31749c33ef482d5505bf953d6c5acf4374409fb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98d8a497_fea55596",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-06-25T14:03:31Z",
+      "side": 1,
+      "message": "I am afraid this can have deeper impact, see how we are creating RPC reply, its assumed its a reply with data, no output with data.\n\nDescribe in task and in commit message what error I can get/what has been resolved when I do no/do apply your patch.",
+      "revId": "a31749c33ef482d5505bf953d6c5acf4374409fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
