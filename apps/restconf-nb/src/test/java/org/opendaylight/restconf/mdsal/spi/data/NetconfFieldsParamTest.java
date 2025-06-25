@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfRestconfStrategy;
+import org.opendaylight.netconf.client.mdsal.spi.FieldsParamParser;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -26,14 +26,14 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Unit test for {@link NetconfFieldsParam}.
+ * Unit test for {@link FieldsParamParser}.
  */
 @ExtendWith(MockitoExtension.class)
 class NetconfFieldsParamTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
     protected List<YangInstanceIdentifier> translateFields(final EffectiveModelContext modelContext,
             final DataSchemaContext startNode, final FieldsParam fields) throws RequestException {
-        return NetconfRestconfStrategy.fieldsParamToPaths(modelContext, startNode, fields);
+        return FieldsParamParser.fieldsParamsToPaths(modelContext, startNode, fields);
     }
 
     @Override
