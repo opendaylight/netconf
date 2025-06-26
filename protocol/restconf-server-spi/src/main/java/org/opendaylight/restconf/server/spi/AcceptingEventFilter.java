@@ -9,6 +9,8 @@ package org.opendaylight.restconf.server.spi;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -29,6 +31,11 @@ final class AcceptingEventFilter<T> extends EventFilter<T> {
 
     @Override
     boolean matches(final EffectiveModelContext modelContext, final T event) {
+        return true;
+    }
+
+    @Override
+    public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
         return true;
     }
 
