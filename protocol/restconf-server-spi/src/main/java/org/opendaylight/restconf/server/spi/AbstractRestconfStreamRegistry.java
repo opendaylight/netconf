@@ -396,7 +396,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         void setFilter(final EventStreamFilter newFilter) {
             filter = newFilter;
             for (final var receiver : receivers) {
-                receiver.setEventStreamFilter(newFilter);
+                receiver.replaceEventStreamFilter(newFilter);
             }
         }
 
