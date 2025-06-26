@@ -602,7 +602,8 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
             getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            AcceptingEventFilter.instance(), receiverName, eventStreamFilter, state));
+            eventStreamFilter != null ? (EventFilter<T>) eventStreamFilter : AcceptingEventFilter.instance(),
+            receiverName, state));
     }
 
     private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
