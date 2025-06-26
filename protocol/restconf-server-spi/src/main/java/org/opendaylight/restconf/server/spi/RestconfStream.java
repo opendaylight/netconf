@@ -554,7 +554,7 @@ public final class RestconfStream<T> {
             throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
             getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            AcceptingEventFilter.instance(), receiverName, eventStreamFilter));
+            (EventFilter<T>) eventStreamFilter, receiverName));
     }
 
     private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
