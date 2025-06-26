@@ -42,6 +42,7 @@ import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.EventFilter;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
@@ -99,7 +100,7 @@ class CreateDataChangeEventSubscriptionRpcTest {
         }
 
         @Override
-        protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
+        protected EventFilter<?> parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
             throw new UnsupportedOperationException();
         }
 

@@ -98,7 +98,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @Beta
     @NonNullByDefault
     public interface EventStreamFilter {
-
         boolean test(YangInstanceIdentifier path, ContainerNode body);
     }
 
@@ -109,11 +108,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
 
-        private @Nullable EventStreamFilter filter;
+        private @Nullable EventFilter filter;
         private @Nullable String filterName;
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter,
+                final TransportSession session, final @Nullable EventFilter filter,
                 final @Nullable String filterName, final @Nullable Instant stopTime) {
             super(id, encoding, streamName, receiverName, session, stopTime);
             this.filter = filter;
@@ -389,10 +388,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             }
         }
 
-        void setFilter(final EventStreamFilter newFilter) {
+        void setFilter(final EventFilter newFilter) {
             filter = newFilter;
             for (final var receiver : receivers) {
-                receiver.setEventStreamFilter(newFilter);
+                receiver.eventStreamFilter(newFilter);
             }
         }
 
@@ -405,7 +404,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         @Override
-        protected @Nullable EventStreamFilter filter() {
+        protected @Nullable EventFilter filter() {
             return filter;
         }
 
@@ -502,7 +501,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final ConcurrentMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
     private final ReentrantLock filterLock = new ReentrantLock(true);
-    private final AtomicReference<ImmutableMap<String, EventStreamFilter>> filters =
+    private final AtomicReference<ImmutableMap<String, EventFilter>> filters =
         new AtomicReference<>(ImmutableMap.of());
 
     private volatile @NonNull EffectiveModelContext modelContext;
@@ -670,7 +669,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        final EventStreamFilter filterImpl;
+        final EventFilter filterImpl;
         try {
             filterImpl = resolveFilter(filter);
         } catch (RequestException e) {
@@ -726,7 +725,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        final EventStreamFilter filterImpl;
+        final EventFilter filterImpl;
         try {
             filterImpl = resolveFilter(filter);
         } catch (RequestException e) {
@@ -1011,7 +1010,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     protected abstract ListenableFuture<Void> filtersOperationalViewUpdated(Set<String> workingNames);
 
     @NonNullByDefault
-    private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
+    private EventFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
         final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
         if (subtree != null) {
             return parseSubtreeFilter(subtree);
@@ -1023,7 +1022,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         throw new RequestException("Unsupported filter %s", filterSpec);
     }
 
-    private @Nullable EventStreamFilter resolveFilter(final @Nullable SubscriptionFilter filter)
+    private @Nullable EventFilter resolveFilter(final @Nullable SubscriptionFilter filter)
             throws RequestException {
         return switch (filter) {
             case null -> null;
@@ -1034,7 +1033,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    private EventStreamFilter getFilter(final String filterName) throws RequestException {
+    private EventFilter getFilter(final String filterName) throws RequestException {
         final var impl = filters.getAcquire().get(filterName);
         if (impl != null) {
             return impl;
@@ -1044,10 +1043,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     @NonNullByDefault
-    protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
+    protected abstract EventFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
 
     @NonNullByDefault
-    private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
+    private static EventFilter parseXpathFilter(final String xpath) throws RequestException {
         // TODO: integrate yang-xpath-api and validate the propose xpath
         // TODO: implement XPath filter evaluation
         throw new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,

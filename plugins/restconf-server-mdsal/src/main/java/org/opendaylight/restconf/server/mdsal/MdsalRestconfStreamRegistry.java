@@ -62,6 +62,7 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.mdsal.spi.NotificationSource;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.EventFilter;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -590,7 +591,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
 
     @Override
-    protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
+    protected EventFilter<?> parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
         final SubtreeFilter databindFilter;
         try {
             final var databindContext = databindProvider.currentDatabind();
@@ -609,7 +610,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Failed to parse anydata to subtree filter {}", filter.prettyTree(), e);
             throw new RequestException("Failed to parse subtree filter", e);
         }
-        return new SubtreeEventStreamFilter(databindFilter);
+        return new SubtreeEventStreamFilter<>(databindFilter);
     }
 
     @NonNullByDefault
