@@ -96,9 +96,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * An Event Stream Filter.
      */
     @Beta
-    @NonNullByDefault
     public interface EventStreamFilter {
-
         boolean test(YangInstanceIdentifier path, ContainerNode body);
     }
 
@@ -392,7 +390,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         void setFilter(final EventStreamFilter newFilter) {
             filter = newFilter;
             for (final var receiver : receivers) {
-                receiver.setEventStreamFilter(newFilter);
+                receiver.eventStreamFilter(newFilter);
             }
         }
 
