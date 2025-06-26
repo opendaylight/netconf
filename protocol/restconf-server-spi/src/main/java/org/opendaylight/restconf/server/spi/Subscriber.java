@@ -73,7 +73,6 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         private final String receiverName;
 
-        private @Nullable EventStreamFilter eventStreamFilter;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long excludedEventRecords;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
@@ -81,11 +80,9 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         private State receiverState;
 
         Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
-                final EventFilter<T> filter, final String receiverName,
-                @Nullable final EventStreamFilter eventStreamFilter, final State receiverState) {
+                final EventFilter<T> filter, final String receiverName, final State receiverState) {
             super(stream, sender, formatter, filter);
             this.receiverName = requireNonNull(receiverName);
-            this.eventStreamFilter = eventStreamFilter;
             this.receiverState = requireNonNull(receiverState);
         }
 
@@ -140,12 +137,8 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
             return Uint64.fromLongBits((long) vh.getAcquire(this));
         }
 
-        @Nullable EventStreamFilter eventStreamFilter() {
-            return eventStreamFilter;
-        }
-
-        public void setEventStreamFilter(final EventStreamFilter newEventStreamFilter) {
-            this.eventStreamFilter = newEventStreamFilter;
+        public void replaceEventStreamFilter(final EventStreamFilter newEventStreamFilter) {
+            swapFilter((EventFilter<T>) newEventStreamFilter);
         }
 
         public void setReceiverState(final State newState) {
@@ -155,8 +148,8 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
     private final RestconfStream<T> stream;
     private final EventFormatter<T> formatter;
-    private final EventFilter<T> filter;
     private final Sender sender;
+    private volatile EventFilter<T> filter;
 
     Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
             final EventFilter<T> filter) {
@@ -176,6 +169,10 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
     final Sender sender() {
         return sender;
+    }
+
+    protected final void swapFilter(EventFilter<? super T> newFilter) {
+        this.filter = requireNonNull((EventFilter<T>) newFilter);
     }
 
     /**
