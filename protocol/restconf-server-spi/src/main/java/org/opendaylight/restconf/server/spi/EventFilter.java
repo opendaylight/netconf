@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.spi;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -18,10 +20,14 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @param <T> the type of events
  */
 @NonNullByDefault
-public abstract sealed class EventFilter<T> permits AcceptingEventFilter, XPathEventFilter {
+public abstract sealed class EventFilter<T> implements AbstractRestconfStreamRegistry.EventStreamFilter permits AcceptingEventFilter, SubtreeEventStreamFilter, XPathEventFilter {
 
     abstract boolean matches(EffectiveModelContext modelContext, T event);
 
+    @Override
+    public boolean test(YangInstanceIdentifier path, ContainerNode body) {
+        return false;
+    }
     @Override
     public final String toString() {
         return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
