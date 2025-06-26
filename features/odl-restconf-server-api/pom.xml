@@ -13,7 +13,7 @@
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>feature-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../parent</relativePath>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>odl-restconf-server-api</artifactId>
