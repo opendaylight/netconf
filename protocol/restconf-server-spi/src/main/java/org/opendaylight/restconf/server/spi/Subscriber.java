@@ -68,18 +68,15 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         private final String receiverName;
 
-        private @Nullable EventStreamFilter eventStreamFilter;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long excludedEventRecords;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long sentEventRecords;
 
         Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
-                final EventFilter<T> filter, final String receiverName,
-                @Nullable final EventStreamFilter eventStreamFilter) {
+                final EventFilter<T> filter, final String receiverName) {
             super(stream, sender, formatter, filter);
             this.receiverName = requireNonNull(receiverName);
-            this.eventStreamFilter = eventStreamFilter;
         }
 
         @Override
@@ -110,18 +107,14 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
             return Uint64.fromLongBits((long) vh.getAcquire(this));
         }
 
-        @Nullable EventStreamFilter eventStreamFilter() {
-            return eventStreamFilter;
-        }
-
         public void setEventStreamFilter(final EventStreamFilter newEventStreamFilter) {
-            this.eventStreamFilter = newEventStreamFilter;
+            this.filter = (EventFilter<T>) newEventStreamFilter;
         }
     }
 
     private final RestconfStream<T> stream;
     private final EventFormatter<T> formatter;
-    private final EventFilter<T> filter;
+    EventFilter<T> filter;
     private final Sender sender;
 
     Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
