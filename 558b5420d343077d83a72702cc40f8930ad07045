@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65c01664_fdfd94f5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14c1635e_f09967bf",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a9fb4ad_5a9b906c",
@@ -70,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21c23fe5_8a91ddd6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d40dbf5_7f989d35",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cfec647_7b2891c3",
@@ -83,6 +119,24 @@
       "writtenOn": "2025-06-24T12:06:04Z",
       "side": 1,
       "message": "Handle",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edcc6f44_8b57d985",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cfec647_7b2891c3",
       "revId": "558b5420d343077d83a72702cc40f8930ad07045",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -104,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0002d33_5edb3c8c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0aaea009_1367e0bc",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c7d4b0d_fc9f8c19",
@@ -121,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bffec4e2_3899dc41",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "in that case newStopTime.isBefore(nextStopTime) in first condition is true and task is rescheduled.\n\nwhat i try to achieve here:\nwhen new stop time is sooner than time task is scheduled for, we want to reschedule task for this new stop time and subscription\n\nwhen new stop time is later we only care about it if it is for subscription that was to be removed next, in that case, another subscription may need to be removed earlier, so we reschedule\n\nnewStopTime.isAfter(nextStopTime) is not necessary, but it prevents unnecessary rescheduling if stop time for this subscription is same as before as this is called when subscription with non-null stop time was modified, not necessarily meaning stop time was modified too",
+      "parentUuid": "6c7d4b0d_fc9f8c19",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4154f10_d1d3c286",
@@ -134,6 +224,24 @@
       "writtenOn": "2025-06-24T12:06:04Z",
       "side": 1,
       "message": "IIRC we require filter, thus not Nullable",
+      "revId": "558b5420d343077d83a72702cc40f8930ad07045",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4277a46_3029595b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 69
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4154f10_d1d3c286",
       "revId": "558b5420d343077d83a72702cc40f8930ad07045",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

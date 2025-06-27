@@ -177,6 +177,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35b3f472_66858ed7",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/ModifySubscriptionRpc.java",
+        "patchSetId": 65
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-06-27T07:53:14Z",
+      "side": 1,
+      "message": "so used !isAfter, and moved check to AbstractRestconfStreamRegistry#modifySubscription\nand in first patch done same for establishSubscription",
+      "parentUuid": "78aa5af5_2235f326",
+      "revId": "d37baaace581f384747ee3d7acad2f49e269ba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42f20ad5_1343b3a1",
