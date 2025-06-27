@@ -118,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "490a870f_b0067b65",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-06-27T05:50:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b077d02a_79a99f05",
+      "range": {
+        "startLine": 351,
+        "startChar": 36,
+        "endLine": 351,
+        "endChar": 51
+      },
+      "revId": "5ee150bd5864add0ecea44b8294377149ce66f50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cab0146a_efb59e6c",
@@ -225,6 +249,30 @@
       "writtenOn": "2025-06-17T15:14:16Z",
       "side": 1,
       "message": "this looks like duplicate code. should this be a DataPath instance method?",
+      "range": {
+        "startLine": 43,
+        "startChar": 7,
+        "endLine": 43,
+        "endChar": 45
+      },
+      "revId": "5ee150bd5864add0ecea44b8294377149ce66f50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a91f56a4_de27aff7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractServerDataOperations.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-06-27T05:50:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4670c93_754fda13",
       "range": {
         "startLine": 43,
         "startChar": 7,
