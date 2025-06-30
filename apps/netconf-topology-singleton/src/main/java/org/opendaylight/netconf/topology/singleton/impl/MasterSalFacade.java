@@ -27,13 +27,13 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.client.mdsal.spi.AbstractDataStore;
+import org.opendaylight.netconf.client.mdsal.spi.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
-import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
 import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -58,7 +58,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private RemoteDeviceServices deviceServices = null;
     private DOMDataBroker deviceDataBroker = null;
-    private DataStoreService dataStoreService = null;
+    private NetconfDataTreeService netconfService = null;
 
     /**
      * MasterSalFacade is responsible for handling the connection and disconnection
@@ -164,7 +164,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             "Device has no capabilities yet. Probably not fully connected.");
 
         deviceDataBroker = newDeviceDataBroker(databind, preferences);
-        dataStoreService = newDataStoreService(databind, preferences);
+        netconfService = newNetconfDataTreeService(databind, preferences);
 
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
@@ -181,9 +181,9 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         return new NetconfDeviceDataBroker(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
-    protected DataStoreService newDataStoreService(final DatabindContext databind,
+    protected NetconfDataTreeService newNetconfDataTreeService(final DatabindContext databind,
             final NetconfSessionPreferences preferences) {
-        return AbstractDataStore.of(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
+        return AbstractNetconfDataTreeService.of(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
     private Future<Object> sendInitialDataToActor() {
@@ -194,8 +194,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             masterActorRef);
 
         // send initial data to master actor
-        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker,
-            dataStoreService, sourceIdentifiers, deviceServices), actorResponseWaitTime);
+        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, netconfService,
+            sourceIdentifiers, deviceServices), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {

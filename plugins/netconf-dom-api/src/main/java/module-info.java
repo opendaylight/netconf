@@ -6,6 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 module org.opendaylight.netconf.dom.api {
+    exports org.opendaylight.netconf.dom.api;
     exports org.opendaylight.netconf.dom.api.tx;
 
     requires transitive org.opendaylight.yangtools.yang.data.api;

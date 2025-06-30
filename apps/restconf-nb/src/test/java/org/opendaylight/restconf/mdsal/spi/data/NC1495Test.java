@@ -16,7 +16,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYang;
 
 import com.google.common.util.concurrent.Futures;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -26,9 +25,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
-import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -114,7 +113,7 @@ class NC1495Test {
     private static final DataGetParams ALL_PARAMS = DataGetParams.of(QueryParameters.of(ContentParam.ALL));
 
     @Mock
-    private DataStoreService dataStoreService;
+    private NetconfDataTreeService netconfService;
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
@@ -124,11 +123,10 @@ class NC1495Test {
 
     @Test
     void testListOrderInNetconfDataOperation() throws Exception {
-        final var dataOperations = new DataOperationImpl(dataStoreService);
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(dataStoreService).get(CONFIGURATION,
-            CONTAINER_INSTANCE, List.of());
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(dataStoreService).get(OPERATIONAL,
-            CONTAINER_INSTANCE, List.of());
+        final var dataOperations = new DataOperationImpl(netconfService);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService)
+            .getConfig(CONTAINER_INSTANCE);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService).get(CONTAINER_INSTANCE);
         final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 
@@ -139,11 +137,11 @@ class NC1495Test {
 
     @Test
     void testLeafListOrderInNetconfDataOperation() throws Exception {
-        final var dataOperations = new DataOperationImpl(dataStoreService);
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(dataStoreService).get(CONFIGURATION,
-            CONTAINER_INSTANCE, List.of());
-        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(dataStoreService).get(OPERATIONAL,
-            CONTAINER_INSTANCE, List.of());
+        final var dataOperations = new DataOperationImpl(netconfService);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
+            .getConfig(CONTAINER_INSTANCE);
+        doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
+            .get(CONTAINER_INSTANCE);
         final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 

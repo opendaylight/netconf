@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.mdsal.spi.data;
 
+import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -222,10 +223,10 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
         .build();
     private static final NodeIdentifier NODE_IDENTIFIER =
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
-    static final Data PATH_DATA = moudlesPath(PATH);
-    static final Data PATH_2_DATA = moudlesPath(PATH_2);
-    static final Data PATH_3_DATA = moudlesPath(PATH_3);
-    static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
+    private static final Data PATH_DATA = moudlesPath(PATH);
+    private static final Data PATH_2_DATA = moudlesPath(PATH_2);
+    private static final Data PATH_3_DATA = moudlesPath(PATH_3);
+    private static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH);
 
     private final CompletingServerRequest<Empty> dataDeleteRequest = new CompletingServerRequest<>();
     private final CompletingServerRequest<DataPatchResult> dataPatchRequest = new CompletingServerRequest<>();
@@ -369,7 +370,7 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
 
     @ParameterizedTest
     @MethodSource("getPatchContext")
-    public final void testPatchWithDataExistException(final PatchContext patchContext) throws Exception {
+    final void testPatchWithDataExistException(final PatchContext patchContext) throws Exception {
         // Prepare patch request.
         final var strategy = testPatchWithDataExistExceptionStrategy();
         strategy.patchData(dataYangPatchRequest, new Data(ARTIST_DATA.databind()), patchContext);
@@ -383,20 +384,20 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
         assertEquals(2, patchStatusContext.editCollection().size());
 
         // Verify that first request is without errors.
-        final var delete = patchStatusContext.editCollection().get(0);
+        final var delete = patchStatusContext.editCollection().getFirst();
         assertTrue(delete.isOk());
         assertEquals("edit1", delete.getEditId());
         assertNull(delete.getEditErrors());
 
         // Verify that second request failed on DATA_EXISTS.
-        final var firstCreate = patchStatusContext.editCollection().get(1);
+        final var firstCreate = patchStatusContext.editCollection().getLast();
         assertFalse(firstCreate.isOk());
         assertEquals("edit2", firstCreate.getEditId());
         assertNotNull(firstCreate.getEditErrors());
         final var serverError = firstCreate.getEditErrors().getFirst();
         assertEquals(ErrorTag.DATA_EXISTS, serverError.tag());
         assertEquals(new ErrorPath(PLAYER_DATA), serverError.path());
-        assertEquals("Data already exists", serverError.message().elementBody());
+        assertEquals("Data already exists", requireNonNull(serverError.message()).elementBody());
     }
 
     abstract @NonNull ServerDataOperations testPatchWithDataExistExceptionStrategy();

@@ -30,7 +30,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -104,7 +103,7 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     @Mock
     private EffectiveModelContext mockSchemaContext;
 
-    private @NonNull MdsalRestconfStrategy modulesStrategy() {
+    private MdsalRestconfStrategy modulesStrategy() {
         return new MdsalRestconfStrategy(MODULES_DATABIND, dataBroker);
     }
 
@@ -425,6 +424,9 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     }
 
     @Override
+<<<<<<< HEAD
+    NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations dataOperations) {
+=======
     void assertReadDataWrongPathOrNoContentTest(final Supplier<NormalizedNode> readResult) {
         final var assertionError = assertThrows(AssertionError.class, readResult::get);
         final var requestException = assertInstanceOf(RequestException.class, assertionError.getCause());
@@ -437,6 +439,7 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     @Override
     NormalizedNode readData(final ContentParam content, Data path,
             final ServerDataOperations dataOperations) {
+>>>>>>> bda2205498 (Add DataOperationService)
         if (dataOperations instanceof MdsalRestconfStrategy mdsalRestconfStrategy) {
             try {
                 mdsalRestconfStrategy.readData(getServerRequest, content, path, null);
@@ -517,6 +520,7 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
                 .read(LogicalDatastoreType.CONFIGURATION, CONT_IID);
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, CONT_IID);
+
         modulesStrategy().readData(getServerRequest, ContentParam.ALL, CONT_DATA, WithDefaultsParam.TRIM);
         final var getResult = getServerRequest.getResult().orElseThrow();
         assertEquals(content, getResult);
