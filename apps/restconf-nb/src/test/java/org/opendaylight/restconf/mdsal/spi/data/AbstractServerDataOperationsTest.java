@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -376,7 +377,7 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
         strategy.patchData(dataYangPatchRequest, new Data(ARTIST_DATA.databind()), patchContext);
 
         // Get patch result.
-        final var patchStatusContext = dataYangPatchRequest.getResult().status();
+        final var patchStatusContext = dataYangPatchRequest.getResult(2, TimeUnit.DAYS).status();
 
         // Verify failure and confirm that edit3 operation was not executed.
         assertFalse(patchStatusContext.ok());

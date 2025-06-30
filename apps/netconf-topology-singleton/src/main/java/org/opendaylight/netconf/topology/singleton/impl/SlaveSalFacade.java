@@ -14,6 +14,7 @@ import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -51,7 +52,7 @@ public class SlaveSalFacade {
             actorSystem.dispatcher(), actorResponseWaitTime);
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
-        final var netconfDataOperations = new NetconfDataOperations(proxyNetconfService);
+        final var netconfDataOperations = new NetconfDataOperations(new DataOperationImpl(proxyNetconfService));
         mount.onDeviceConnected(remoteSchemaContext,
             netconfDataOperations,
             services, netconfDeviceDataBroker);
