@@ -13,14 +13,18 @@ import static org.opendaylight.netconf.api.EffectiveOperation.MERGE;
 import static org.opendaylight.netconf.api.EffectiveOperation.REMOVE;
 import static org.opendaylight.netconf.api.EffectiveOperation.REPLACE;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfRpcFutureCallback;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -37,6 +41,9 @@ import org.slf4j.LoggerFactory;
  */
 final class Running extends AbstractDataStore {
     private static final Logger LOG = LoggerFactory.getLogger(Running.class);
+
+    // Stores edit-config requests in the exact order as they were created.
+    private final Map<ConfigNodeKey, Optional<NormalizedNode>> nodes = new LinkedHashMap<>();
 
     Running(final NetconfBaseOps netconfOps, final RemoteDeviceId id, final boolean rollbackSupport,
             final boolean lockDatastore) {
@@ -73,8 +80,27 @@ final class Running extends AbstractDataStore {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> commit() {
-        LOG.trace("Execute commit on device {}", id);
-        return RPC_SUCCESS;
+        final ChoiceNode editConfigStructure;
+        final var nodesCopy = ImmutableMap.copyOf(nodes);
+        nodes.clear();
+        try {
+            editConfigStructure = netconfOps.createEditConfigStructure(nodesCopy);
+        } catch (IllegalArgumentException | IllegalStateException cause) {
+            LOG.error("Failed to create edit-config structure node on device {} for children", nodesCopy);
+            final var documentedException = new NetconfDocumentedException(
+                "Failed to create edit-config structure node", cause, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                ErrorSeverity.ERROR);
+            return Futures.immediateFailedFuture(documentedException);
+        }
+
+        final var callback = new NetconfRpcFutureCallback("Edit running", id);
+        LOG.trace("Execute commit with single edit-config on device {} with node {}", id, editConfigStructure);
+        // FIXME: Set default-operation" parameter based on called DataStoreService method.
+        //        https://www.rfc-editor.org/rfc/rfc6241#section-7.2
+        final var edit = addLockBeforeFuture(() -> netconfOps.editConfigRunning(callback, editConfigStructure,
+            rollbackSupport));
+        final var editWithUnlock = addUnlockAfterFuture(edit);
+        return addCancelIfFails(editWithUnlock);
     }
 
     @Override
@@ -103,47 +129,15 @@ final class Running extends AbstractDataStore {
 
     private ListenableFuture<? extends DOMRpcResult> editConfig(final EffectiveOperation operation,
             final NormalizedNode child, final YangInstanceIdentifier path) {
-        final ChoiceNode editStructure;
-        try {
-            editStructure = netconfOps.createEditConfigStructure(Optional.of(child), Optional.of(operation), path);
-        } catch (IllegalArgumentException | IllegalStateException cause) {
-            LOG.error("Failed to create edit-config structure node on device {} for child {} with path {}, with RPC"
-                    + " operation {}", id, child, path, operation);
-            final var documentedException = new NetconfDocumentedException(
-                "Failed to create edit-config structure node for RPC operation", cause, ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
-            return Futures.immediateFailedFuture(documentedException);
-        }
-        final var callback = new NetconfRpcFutureCallback("Edit running", id);
-        LOG.trace("Execute editConfig operation {} on device {} with data {} and path {}", id, operation, child, path);
-        // FIXME: Set default-operation" parameter based on called DataStoreService method.
-        //        https://www.rfc-editor.org/rfc/rfc6241#section-7.2
-        final var edit = addLockBeforeFuture(() -> netconfOps.editConfigRunning(callback, editStructure,
-            rollbackSupport));
-        final var editWithUnlock = addUnlockAfterFuture(edit);
-        return addCancelIfFails(editWithUnlock);
+        LOG.trace("Append editConfig operation {} on device {} with data {} and path {}", id, operation, child, path);
+        nodes.put(new ConfigNodeKey(path, operation), Optional.of(child));
+        return RPC_SUCCESS;
     }
 
     private ListenableFuture<? extends DOMRpcResult> editConfig(final EffectiveOperation operation,
             final YangInstanceIdentifier path) {
-        final ChoiceNode editStructure;
-        try {
-            editStructure = netconfOps.createEditConfigStructure(Optional.empty(), Optional.of(operation), path);
-        } catch (IllegalArgumentException | IllegalStateException cause) {
-            LOG.error("Failed to create edit-config structure node with path {}, with RPC operation {}", path,
-                operation);
-            final var documentedException = new NetconfDocumentedException(
-                "Failed to create edit-config structure node for RPC operation", cause, ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
-            return Futures.immediateFailedFuture(documentedException);
-        }
-        final var callback = new NetconfRpcFutureCallback("Edit running", id);
-        LOG.trace("Execute editConfig operation {} on device {} with path {}", id, operation, path);
-        // FIXME: Set default-operation" parameter based on called DataStoreService method.
-        //        https://www.rfc-editor.org/rfc/rfc6241#section-7.2
-        final var edit = addLockBeforeFuture(() -> netconfOps.editConfigRunning(callback, editStructure,
-            rollbackSupport));
-        final var editWithUnlock = addUnlockAfterFuture(edit);
-        return addCancelIfFails(editWithUnlock);
+        LOG.trace("Append editConfig operation {} on device {} with path {}", id, operation, path);
+        nodes.put(new ConfigNodeKey(path, operation), Optional.empty());
+        return RPC_SUCCESS;
     }
 }
