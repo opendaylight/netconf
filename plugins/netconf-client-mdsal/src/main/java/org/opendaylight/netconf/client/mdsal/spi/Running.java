@@ -16,7 +16,6 @@ import static org.opendaylight.netconf.api.EffectiveOperation.REPLACE;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.EffectiveOperation;
@@ -25,10 +24,10 @@ import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfRpcFutureCallback;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class Running extends AbstractDataStore {
+    private final List<AnyxmlNode<DOMSource>> nodes = new ArrayList<>();
 
     Running(NetconfBaseOps netconfOps, final RemoteDeviceId id,
             boolean rollbackSupport, boolean lockDatastore) {
@@ -52,12 +51,21 @@ public class Running extends AbstractDataStore {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> cancel() {
+        nodes.clear();
         return unlock();
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> commit() {
-        return RPC_SUCCESS;
+        final var editConfigStructure = netconfOps.createEditConfigStructure(nodes);
+        nodes.clear();
+        final var callback = new NetconfRpcFutureCallback("Edit running", id);
+        // FIXME: Set default-operation" parameter based on called DataStoreService method.
+        //        https://www.rfc-editor.org/rfc/rfc6241#section-7.2
+        final var edit = addIntoFutureChain(lock(), () -> netconfOps.editConfigRunning(callback, editConfigStructure,
+                rollbackSupport));
+        final var editWithUnlock = addUnlock(edit);
+        return addCancelIfFails(editWithUnlock);
     }
 
     @Override
@@ -87,26 +95,13 @@ public class Running extends AbstractDataStore {
 
     public ListenableFuture<? extends DOMRpcResult> editConfig(final EffectiveOperation operation,
             final NormalizedNode child, final YangInstanceIdentifier path) {
-        final var callback = new NetconfRpcFutureCallback("Edit running", id);
-        final var editStructure = netconfOps.createEditConfigStructure(Optional.of(child), Optional.of(operation),
-            path);
-        // FIXME: Set default-operation" parameter based on called DataStoreService method.
-        //        https://www.rfc-editor.org/rfc/rfc6241#section-7.2
-        final var edit = addIntoFutureChain(lock(), () -> netconfOps.editConfigRunning(callback, editStructure,
-            rollbackSupport));
-        final var editWithUnlock = addUnlock(edit);
-        return addCancelIfFails(editWithUnlock);
+        nodes.add(netconfOps.createNode(child, operation, path));
+        return RPC_SUCCESS;
     }
 
     public ListenableFuture<? extends DOMRpcResult> editConfig(final EffectiveOperation operation,
             final YangInstanceIdentifier path) {
-        final var callback = new NetconfRpcFutureCallback("Edit running", id);
-        final var editStructure = netconfOps.createEditConfigStructure(Optional.empty(), Optional.of(operation), path);
-        // FIXME: Set default-operation" parameter based on called DataStoreService method.
-        //        https://www.rfc-editor.org/rfc/rfc6241#section-7.2
-        final var edit = addIntoFutureChain(lock(), () -> netconfOps.editConfigRunning(callback, editStructure,
-            rollbackSupport));
-        final var editWithUnlock = addUnlock(edit);
-        return addCancelIfFails(editWithUnlock);
+        nodes.add(netconfOps.createNode(operation, path));
+        return RPC_SUCCESS;
     }
 }

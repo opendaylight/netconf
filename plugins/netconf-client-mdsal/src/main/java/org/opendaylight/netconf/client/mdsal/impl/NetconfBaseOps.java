@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.EffectiveOperation;
@@ -58,6 +59,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -358,6 +360,24 @@ public final class NetconfBaseOps {
             .withNodeIdentifier(EDIT_CONTENT_NODEID)
             .withChild(transformer.createEditConfigStructure(lastChild, dataPath, operation))
             .build();
+    }
+
+    public ChoiceNode createEditConfigStructure(final List<AnyxmlNode<DOMSource>> childs) {
+        final var containerNodeBuilder = ImmutableNodes.newChoiceBuilder()
+                .withNodeIdentifier(EDIT_CONTENT_NODEID);
+        for (AnyxmlNode<DOMSource> child : childs) {
+            containerNodeBuilder.withChild(child);
+        }
+        return containerNodeBuilder.build();
+    }
+
+    public AnyxmlNode<DOMSource> createNode(final NormalizedNode lastChild,
+        final EffectiveOperation operation, final YangInstanceIdentifier path) {
+        return transformer.createEditConfigStructure(Optional.of(lastChild), path, Optional.of(operation));
+    }
+
+    public AnyxmlNode<DOMSource> createNode(final EffectiveOperation operation, final YangInstanceIdentifier path) {
+        return transformer.createEditConfigStructure(Optional.empty(), path, Optional.of(operation));
     }
 
     private static ContainerNode getEditConfigContent(final NodeIdentifier datastore,
