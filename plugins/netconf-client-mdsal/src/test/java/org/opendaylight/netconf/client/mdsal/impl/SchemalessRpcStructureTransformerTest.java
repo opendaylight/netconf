@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.google.common.collect.ImmutableMap;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -25,11 +26,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.Document;
 import org.xmlunit.builder.DiffBuilder;
@@ -86,6 +89,37 @@ class SchemalessRpcStructureTransformerTest {
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE));
         final var diff = DiffBuilder.compare(Files.readString(Path.of(getClass()
                 .getResource("/schemaless/edit-config/" + testDataset).toURI())))
+            .withTest(anyXmlNode.body().getNode())
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.hasDifferences(), diff.toString());
+    }
+
+    @ParameterizedTest
+    @MethodSource("parameters")
+    void testCreateSingleEditConfigStructure(final YangInstanceIdentifier path, final String testDataset,
+            final Class<? extends Throwable> expectedException) throws Exception {
+        final var source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
+            .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
+        final var data = ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
+            .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
+            .withValue(source)
+            .build();
+
+        final var elements = new LinkedHashMap<ConfigNodeKey, Optional<NormalizedNode>>();
+        elements.put(new ConfigNodeKey(path, EffectiveOperation.REPLACE), Optional.of(data));
+        elements.put(new ConfigNodeKey(path, EffectiveOperation.DELETE), Optional.of(data));
+        elements.put(new ConfigNodeKey(path, EffectiveOperation.CREATE), Optional.of(data));
+
+        if (expectedException != null) {
+            assertThrows(expectedException, () -> adapter.createEditConfigStructure(elements));
+            return;
+        }
+
+        final var anyXmlNode = adapter.createEditConfigStructure(elements);
+        final var diff = DiffBuilder.compare(Files.readString(Path.of(getClass()
+                .getResource("/schemaless/single-edit-config/" + testDataset).toURI())))
             .withTest(anyXmlNode.body().getNode())
             .ignoreWhitespace()
             .checkForIdentical()
