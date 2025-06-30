@@ -13,6 +13,7 @@ import static org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil.appe
 import static org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil.writeSchemalessFilter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -21,6 +22,7 @@ import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.input.Filter;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -77,6 +79,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     @Override
     public AnyxmlNode<DOMSource> createEditConfigStructure(final Optional<NormalizedNode> data,
             final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation) {
+        //FIXME: DELETE operation should not be forced to provide data.
         final var dataValue = data.orElseThrow();
         if (!(dataValue instanceof DOMSourceAnyxmlNode anxmlData)) {
             throw new IllegalArgumentException("Unexpected data " + dataValue.prettyTree());
@@ -102,6 +105,48 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         operation.ifPresent(modifyAction -> setOperationAttribute(modifyAction, document, dataNode));
         //append data
         parentXmlStructure.appendChild(document.importNode(dataNode, true));
+        return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
+            .withNodeIdentifier(NETCONF_CONFIG_NODEID)
+            .withValue(new DOMSource(document.getDocumentElement()))
+            .build();
+    }
+
+    @Override
+    public AnyxmlNode<DOMSource> createEditConfigStructure(
+            final Map<ConfigNodeKey, Optional<NormalizedNode>> elements) {
+        final var document = XmlUtil.newDocument();
+        final var configElement = document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.CONFIG_KEY);
+        document.appendChild(configElement);
+
+        for (final var nodeEntry : elements.entrySet()) {
+            //FIXME: DELETE operation should not be forced to provide data.
+            final var dataValue = nodeEntry.getValue().orElseThrow();
+            if (!(dataValue instanceof DOMSourceAnyxmlNode anxmlData)) {
+                throw new IllegalArgumentException("Unexpected data " + dataValue.prettyTree());
+            }
+            final var configNodeKey = nodeEntry.getKey();
+            final var dataPath = configNodeKey.identifier();
+            final var dataNode = (Element) document.importNode(getSourceElement(anxmlData.body()), true);
+            checkDataValidForPath(dataPath, dataNode);
+
+            final Element parentXmlStructure;
+            if (dataPath.isEmpty()) {
+                parentXmlStructure = dataNode;
+                configElement.appendChild(parentXmlStructure);
+            } else {
+                final var pathArguments = dataPath.getPathArguments();
+                // last will be appended later
+                parentXmlStructure = instanceIdToXmlStructure(pathArguments.subList(0, pathArguments.size() - 1),
+                    configElement);
+            }
+            final var operation = configNodeKey.operation();
+            if (operation != null) {
+                setOperationAttribute(operation, document, dataNode);
+            }
+            //append data
+            parentXmlStructure.appendChild(document.importNode(dataNode, true));
+        }
+
         return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
             .withNodeIdentifier(NETCONF_CONFIG_NODEID)
             .withValue(new DOMSource(document.getDocumentElement()))

@@ -12,16 +12,19 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.EDIT_CONTENT_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.createEditConfigAnyxml;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.createEditConfigStructure;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toFilterStructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,10 +37,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.CapabilityURN;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
@@ -447,6 +452,80 @@ class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                       </schema>
                     </schemas>
                   </netconf-state>
+                </config>
+              </edit-config>
+            </rpc>""");
+    }
+
+    @Test
+    void testSingleEditConfigRunningRequest() throws Exception {
+        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12"))
+            .body();
+        final var keys = new HashMap<QName, Object>();
+        for (var value : values) {
+            keys.put(value.name().getNodeType(), value.body());
+        }
+
+        final var schemaNode = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keys))
+            .withValue(values)
+            .build();
+        final var id = YangInstanceIdentifier.builder()
+            .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
+            .nodeWithKey(Schema.QNAME, keys).build();
+
+        final var elements = new LinkedHashMap<ConfigNodeKey, Optional<NormalizedNode>>();
+        elements.put(new ConfigNodeKey(id, EffectiveOperation.DELETE), Optional.empty());
+        elements.put(new ConfigNodeKey(id, EffectiveOperation.CREATE), Optional.of(schemaNode));
+        elements.put(new ConfigNodeKey(id, null), Optional.of(schemaNode));
+
+        final var editConfigStructure = createEditConfigAnyxml(BASE_SCHEMAS.baseSchemaForCapabilities(
+            NetconfSessionPreferences.fromStrings(Set.of(
+                CapabilityURN.WRITABLE_RUNNING,
+                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring"
+                    + "&revision=2010-10-04"))).modelContext(), elements);
+        final var editContentNode = ImmutableNodes.newChoiceBuilder()
+            .withNodeIdentifier(EDIT_CONTENT_NODEID)
+            .withChild(editConfigStructure)
+            .build();
+
+        final var target = NetconfBaseOps.getTargetNode(NETCONF_RUNNING_NODEID);
+        final var wrap = NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_NODEID, editContentNode, target);
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(EditConfig.QNAME, wrap);
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <edit-config>
+                <target>
+                  <running/>
+                </target>
+                <config>
+                    <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                        <schemas>
+                            <schema xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="delete">
+                                <identifier>module</identifier>
+                                <format>yang</format>
+                                <version>2012-12-12</version>
+                            </schema>
+                        </schemas>
+                    </netconf-state>
+                    <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                        <schemas>
+                            <schema xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="create">
+                                <identifier>module</identifier>
+                                <format>yang</format>
+                                <version>2012-12-12</version>
+                            </schema>
+                        </schemas>
+                    </netconf-state>
+                    <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                        <schemas>
+                            <schema>
+                                <identifier>module</identifier>
+                                <format>yang</format>
+                                <version>2012-12-12</version>
+                            </schema>
+                        </schemas>
+                    </netconf-state>
                 </config>
               </edit-config>
             </rpc>""");
