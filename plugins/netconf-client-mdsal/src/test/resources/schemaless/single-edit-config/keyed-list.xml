@@ -1,0 +1,26 @@
+<config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <top xmlns="http://example.com/schema/1.2/config">
+        <users>
+            <user xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="replace">
+                <key>k1</key>
+                <name>fred</name>
+            </user>
+        </users>
+    </top>
+    <top xmlns="http://example.com/schema/1.2/config">
+        <users>
+            <user xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="delete">
+                <key>k1</key>
+                <name>fred</name>
+            </user>
+        </users>
+    </top>
+    <top xmlns="http://example.com/schema/1.2/config">
+        <users>
+            <user xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="create">
+                <key>k1</key>
+                <name>fred</name>
+            </user>
+        </users>
+    </top>
+</config>
