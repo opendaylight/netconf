@@ -28,6 +28,8 @@ import com.google.common.util.concurrent.Futures;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,10 +39,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -95,11 +98,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     @Mock
     private NetconfDataTreeService mockNetconfService;
 
+    private DataOperationService operationService;
     private NetconfDataOperations netconfData;
 
     @BeforeEach
     public void beforeEach() {
-        netconfData = new NetconfDataOperations(mockNetconfService);
+        operationService = new DataOperationImpl(mockNetconfService);
+        netconfData = new NetconfDataOperations(operationService);
     }
 
     @Override
@@ -609,9 +614,11 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     NormalizedNode readData(final ContentParam content, final Data path,
             final ServerDataOperations strategy) {
         try {
-            netconfData.readData(getServerRequest, path, new DataGetParams(content, DepthParam.max(), null, null));
-            return getServerRequest.getResult().orElse(null);
-        } catch (TimeoutException | InterruptedException | RequestException e) {
+            return operationService
+                .getData(path, new DataGetParams(content, DepthParam.max(), null, null))
+                .get(2, TimeUnit.SECONDS)
+                .orElse(null);
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new AssertionError(e);
         }
     }
