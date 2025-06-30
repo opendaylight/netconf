@@ -12,10 +12,12 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -64,6 +66,13 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.createEditConfigAnyxml(databind.modelContext(), dataPath, operation,
             data);
+    }
+
+    @Override
+    public AnyxmlNode<DOMSource> createEditConfigStructure(
+            final Map<ConfigNodeKey, Optional<NormalizedNode>> elements) {
+        // FIXME: propagate MountPointContext
+        return NetconfMessageTransformUtil.createEditConfigAnyxml(databind.modelContext(), elements);
     }
 
     @Override
