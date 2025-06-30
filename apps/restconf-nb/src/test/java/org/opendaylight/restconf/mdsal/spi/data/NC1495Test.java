@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -120,11 +120,11 @@ class NC1495Test {
 
     @Test
     void testListOrderInNetconfDataOperation() throws Exception {
-        final var dataOperations = new NetconfDataOperations(netconfService);
+        final var dataOperations = new DataOperationImpl(netconfService);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService)
             .getConfig(CONTAINER_INSTANCE);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService).get(CONTAINER_INSTANCE);
-        final var optionalNode = dataOperations.readData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
+        final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
@@ -134,12 +134,12 @@ class NC1495Test {
 
     @Test
     void testLeafListOrderInNetconfDataOperation() throws Exception {
-        final var dataOperations = new NetconfDataOperations(netconfService);
+        final var dataOperations = new DataOperationImpl(netconfService);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
             .getConfig(CONTAINER_INSTANCE);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
             .get(CONTAINER_INSTANCE);
-        final var optionalNode = dataOperations.readData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
+        final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
