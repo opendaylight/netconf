@@ -330,8 +330,8 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
             .build();
 
         patch(new PatchContext("patchRMRm",
-            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
-                new PatchEntity("edit2", Operation.Merge, ARTIST_DATA, buildArtistList),
+            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA.parent(), buildArtistList),
+                new PatchEntity("edit2", Operation.Merge, ARTIST_DATA.parent(), buildArtistList),
                 new PatchEntity("edit3", Operation.Remove, ARTIST_DATA))),
             testPatchDataReplaceMergeAndRemoveStrategy(), false, ARTIST_DATA.databind());
     }
@@ -569,7 +569,7 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
 
         final PatchStatusContext patchStatusContext;
         try {
-            patchStatusContext = dataYangPatchRequest.getResult().status();
+            patchStatusContext = dataYangPatchRequest.getResult(1, TimeUnit.DAYS).status();
         } catch (RequestException | InterruptedException | TimeoutException e) {
             throw new AssertionError(e);
         }
