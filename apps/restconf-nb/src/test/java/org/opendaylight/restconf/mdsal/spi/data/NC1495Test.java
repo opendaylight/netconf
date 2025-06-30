@@ -17,13 +17,14 @@ import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.pars
 
 import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationsServiceImpl;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -122,12 +123,12 @@ class NC1495Test {
 
     @Test
     void testListOrderInNetconfDataOperations() throws Exception {
-        final var dataOperations = new NetconfDataOperations(netconfService);
+        final var dataOperations = new DataOperationsServiceImpl(netconfService);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService)
             .getConfig(CONTAINER_INSTANCE);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LIST))).when(netconfService).get(CONTAINER_INSTANCE);
-        dataOperations.readData(getServerRequest, CONTAINER_PATH, ALL_PARAMS);
-        final var normalizedNode = getServerRequest.getResult().orElseThrow();
+        final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
+        final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
         assertEquals(1, containerNode.body().size());
@@ -136,13 +137,13 @@ class NC1495Test {
 
     @Test
     void testLeafListOrderInNetconfDataOperations() throws Exception {
-        final var dataOperations = new NetconfDataOperations(netconfService);
+        final var dataOperations = new DataOperationsServiceImpl(netconfService);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
             .getConfig(CONTAINER_INSTANCE);
         doReturn(Futures.immediateFuture(Optional.of(CONTAINER_LEAF_LIST))).when(netconfService)
             .get(CONTAINER_INSTANCE);
-        dataOperations.readData(getServerRequest, CONTAINER_PATH, ALL_PARAMS);
-        final var normalizedNode = getServerRequest.getResult().orElseThrow();
+        final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
+        final var normalizedNode = optionalNode.orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
         assertEquals(1, containerNode.body().size());
