@@ -8,9 +8,11 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -31,6 +33,16 @@ interface RpcStructureTransformer {
      */
     AnyxmlNode<DOMSource> createEditConfigStructure(Optional<NormalizedNode> data, YangInstanceIdentifier dataPath,
         Optional<EffectiveOperation> operation);
+
+    /**
+     * Transforms provided Map with key {@link ConfigNodeKey} and value of {@code Optional} {@link NormalizedNode} to
+     * the single edit config element structure. It means creating {@code config} list structure
+     * with multiple elements specified by path and data.
+     *
+     * @param elements Map of elements appended into config structure
+     * @return config structure
+     */
+    AnyxmlNode<DOMSource> createEditConfigStructure(Map<ConfigNodeKey, Optional<NormalizedNode>> elements);
 
     /**
      * Transforms path to filter structure.
