@@ -12,11 +12,11 @@ import static java.util.Objects.requireNonNull;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,13 +149,14 @@ final class ServerRequestExecutor implements PendingRequestListener {
     // Hand-coded, as simple as possible
     @NonNullByDefault
     private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
-        final var message = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        final var content = message.content();
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
-        ByteBufUtil.writeUtf8(content, cause.getMessage() != null ? cause.getMessage() : "");
-        HttpUtil.setContentLength(message, content.readableBytes());
-        return message;
+        final var message = cause.getMessage();
+        final var content = Unpooled.buffer(0);
+        if (message != null) {
+            ByteBufUtil.writeUtf8(content, message);
+        }
+        return new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
     }
 
     // Executed on respExecutor, so it is okay to block
