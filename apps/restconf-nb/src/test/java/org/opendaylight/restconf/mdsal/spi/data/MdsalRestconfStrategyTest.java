@@ -29,6 +29,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -423,7 +424,18 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     }
 
     @Override
-    NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations dataOperations) {
+    void assertReadDataWrongPathOrNoContent(final Supplier<NormalizedNode> readResult) {
+        final var assertionError = assertThrows(AssertionError.class, readResult::get);
+        final var requestException = assertInstanceOf(RequestException.class, assertionError.getCause());
+        final var requestError = requestException.errors().getFirst();
+        assertNotNull(requestError.message());
+        assertEquals("Request could not be completed because the relevant data model content does not exist",
+            requestError.message().elementBody());
+    }
+
+    @Override
+    NormalizedNode readData(final ContentParam content, Data path,
+            final ServerDataOperations dataOperations) {
         if (dataOperations instanceof MdsalRestconfStrategy mdsalRestconfStrategy) {
             try {
                 mdsalRestconfStrategy.readData(getServerRequest, content, path, null);
