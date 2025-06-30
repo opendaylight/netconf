@@ -39,10 +39,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationImpl;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -97,11 +98,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     @Mock
     private NetconfDataTreeService mockNetconfService;
 
+    private DataOperationService operationService;
     private NetconfDataOperations netconfData;
 
     @BeforeEach
     public void beforeEach() {
-        netconfData = new NetconfDataOperations(mockNetconfService);
+        operationService = new DataOperationImpl(mockNetconfService);
+        netconfData = new NetconfDataOperations(operationService);
     }
 
     @Override
@@ -443,7 +446,7 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
             new PatchEntity("edit1", Edit.Operation.Delete, GAP_PATH)));
         final var completingServerRequest = new CompletingServerRequest<DataYangPatchResult>();
 
-        jukeboxDataOperations().patchData(completingServerRequest, new Data(GAP_PATH.databind()), patchContext);
+        netconfData.patchData(completingServerRequest, new Data(GAP_PATH.databind()), patchContext);
         final var status = completingServerRequest.getResult().status();
 
         // Verify correct exception output.
@@ -490,7 +493,7 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
             .replace(eq(CONFIGURATION), eq(ARTIST_CHILD_IID), any(MapEntryNode.class), eq(Optional.empty()));
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(mockNetconfService)
             .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
-        return jukeboxDataOperations();
+        return netconfData;
     }
 
     @Override
@@ -615,11 +618,11 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     NormalizedNode readData(final ContentParam content, final Data path,
             final ServerDataOperations strategy) {
         try {
-            return netconfData
-                .readData(path, new DataGetParams(content, DepthParam.max(), null, null))
+            return operationService
+                .getData(path, new DataGetParams(content, DepthParam.max(), null, null))
                 .get(2, TimeUnit.SECONDS)
                 .orElse(null);
-        } catch (TimeoutException | InterruptedException | ExecutionException | RequestException e) {
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new AssertionError(e);
         }
     }
