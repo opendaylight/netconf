@@ -16,7 +16,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.api.EffectiveOperation.CREATE;
 import static org.opendaylight.netconf.api.EffectiveOperation.DELETE;
@@ -26,9 +25,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
-import java.util.Optional;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import javax.xml.transform.dom.DOMSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +48,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -68,6 +69,8 @@ class RunningTest {
     private NetconfBaseOps mockNetconfBaseOps;
     @Mock
     private ChoiceNode mockNode;
+    @Mock
+    private AnyxmlNode<DOMSource> mockAnyXmlNode;
 
     private DataStoreService dataStoreService;
 
@@ -83,8 +86,8 @@ class RunningTest {
     void createAndCommitTest() throws Exception {
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).lockRunning(any());
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).unlockRunning(any());
-        doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE),
-            Optional.of(CREATE), EMPTY_PATH);
+        doReturn(mockAnyXmlNode).when(mockNetconfBaseOps).createNode(EMPTY_NODE, CREATE, EMPTY_PATH);
+        doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(List.of(mockAnyXmlNode));
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class),
             eq(mockNode), eq(false));
 
@@ -92,7 +95,7 @@ class RunningTest {
         dataStoreService.commit().get(2, TimeUnit.SECONDS);
 
         verify(mockNetconfBaseOps).lockRunning(any());
-        verify(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE), Optional.of(CREATE), EMPTY_PATH);
+        verify(mockNetconfBaseOps).createNode(EMPTY_NODE, CREATE, EMPTY_PATH);
         verify(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class), eq(mockNode), eq(false));
         verify(mockNetconfBaseOps).unlockRunning(any());
     }
@@ -100,8 +103,7 @@ class RunningTest {
     @Test
     void createAndCommitFailedSerializeAnyXmlNode() {
         doThrow(new IllegalStateException("Unable to serialize edit config content element for path"))
-            .when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE),
-                Optional.of(CREATE), EMPTY_PATH);
+            .when(mockNetconfBaseOps).createNode(EMPTY_NODE, CREATE, EMPTY_PATH);
 
         final var createFuture = dataStoreService.create(YangInstanceIdentifier.of(), EMPTY_NODE);
         final var createExecutionException = assertThrows(ExecutionException.class,
@@ -116,7 +118,18 @@ class RunningTest {
         assertEquals(ErrorType.APPLICATION, documentedException.getErrorType());
         assertEquals(ErrorSeverity.ERROR, documentedException.getErrorSeverity());
 
-        verify(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE), Optional.of(CREATE), EMPTY_PATH);
+        final var commitFuture = dataStoreService.commit();
+        final var commitExecutionException = assertThrows(ExecutionException.class,
+            () -> commitFuture.get(2, TimeUnit.SECONDS));
+        final var commitDocumentedException = assertInstanceOf(NetconfDocumentedException.class,
+            commitExecutionException.getCause());
+        assertEquals("Can not perform edit-config into Running data store without provided data",
+            commitDocumentedException.getMessage());
+        assertEquals(ErrorTag.OPERATION_FAILED, commitDocumentedException.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, commitDocumentedException.getErrorType());
+        assertEquals(ErrorSeverity.ERROR, commitDocumentedException.getErrorSeverity());
+
+        verify(mockNetconfBaseOps).createNode(EMPTY_NODE, CREATE, EMPTY_PATH);
         verify(mockNetconfBaseOps, never()).lockRunning(any());
         verify(mockNetconfBaseOps, never()).unlockRunning(any());
     }
@@ -125,72 +138,53 @@ class RunningTest {
     void deleteMergeAndCommitTest() throws Exception {
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).lockRunning(any());
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).unlockRunning(any());
-        doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(),
-            Optional.of(DELETE), EMPTY_PATH);
+        doReturn(mockAnyXmlNode).when(mockNetconfBaseOps).createNode(DELETE, EMPTY_PATH);
+        final var mockMergeAnyXml = mock(AnyxmlNode.class);
+        doReturn(mockMergeAnyXml).when(mockNetconfBaseOps).createNode(EMPTY_NODE, MERGE, EMPTY_PATH);
+        doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(List.of(mockAnyXmlNode, mockMergeAnyXml));
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class),
             eq(mockNode), eq(false));
-        final var mockMergeNode = mock(ChoiceNode.class);
-        doReturn(mockMergeNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE),
-            Optional.of(MERGE), EMPTY_PATH);
-        doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class),
-            eq(mockMergeNode), eq(false));
 
         dataStoreService.delete(YangInstanceIdentifier.of()).get(2, TimeUnit.SECONDS);
         dataStoreService.merge(YangInstanceIdentifier.of(), EMPTY_NODE).get(2, TimeUnit.SECONDS);
         dataStoreService.commit().get(2, TimeUnit.SECONDS);
 
-        verify(mockNetconfBaseOps, times(2)).lockRunning(any());
-        verify(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(), Optional.of(DELETE), EMPTY_PATH);
-        verify(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE), Optional.of(MERGE), EMPTY_PATH);
-        verify(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class), eq(mockNode), eq(false));
-        verify(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class), eq(mockNode), eq(false));
-        verify(mockNetconfBaseOps, times(2)).unlockRunning(any());
+        verify(mockNetconfBaseOps).lockRunning(any());
+        verify(mockNetconfBaseOps).createNode(DELETE, EMPTY_PATH);
+        verify(mockNetconfBaseOps).createNode(EMPTY_NODE, MERGE, EMPTY_PATH);
+        verify(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class), eq(mockNode),
+            eq(false));
+        verify(mockNetconfBaseOps).unlockRunning(any());
     }
 
     @Test
-    void deleteMergeAndCommitFailsTest() {
+    void deleteMergeAndCommitFailsTest() throws Exception {
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).lockRunning(any());
         doReturn(EMPTY_RESULT).when(mockNetconfBaseOps).unlockRunning(any());
-
-        doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(),
-            Optional.of(DELETE), EMPTY_PATH);
-        final var mockMergeNode = mock(ChoiceNode.class);
+        doReturn(mockAnyXmlNode).when(mockNetconfBaseOps).createNode(DELETE, EMPTY_PATH);
+        final var mockMergeAnyXml = mock(AnyxmlNode.class);
+        doReturn(mockMergeAnyXml).when(mockNetconfBaseOps).createNode(EMPTY_NODE, MERGE, EMPTY_PATH);
+        doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(List.of(mockAnyXmlNode, mockMergeAnyXml));
         doReturn(FAIL_RESULT).when(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class),
             eq(mockNode), eq(false));
 
-        doReturn(mockMergeNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE),
-            Optional.of(MERGE), EMPTY_PATH);
-        doReturn(FAIL_RESULT).when(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class),
-            eq(mockMergeNode), eq(false));
+        dataStoreService.delete(YangInstanceIdentifier.of()).get(2, TimeUnit.SECONDS);
+        dataStoreService.merge(YangInstanceIdentifier.of(), EMPTY_NODE).get(2, TimeUnit.SECONDS);
 
-        final var deleteFuture = dataStoreService.delete(YangInstanceIdentifier.of());
-        final var deleteExecutionException = assertThrows(ExecutionException.class,
-            () -> deleteFuture.get(2, TimeUnit.SECONDS));
-        final var deleteDocumentedException = assertInstanceOf(NetconfDocumentedException.class,
-            deleteExecutionException.getCause());
-        assertEquals("RPC during tx failed. test failure null", deleteDocumentedException.getMessage());
-        assertEquals(ErrorTag.OPERATION_FAILED, deleteDocumentedException.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, deleteDocumentedException.getErrorType());
-        assertEquals(ErrorSeverity.ERROR, deleteDocumentedException.getErrorSeverity());
+        final var commitFuture = dataStoreService.commit();
+        final var commitExecutionException = assertThrows(ExecutionException.class,
+            () -> commitFuture.get(2, TimeUnit.SECONDS));
+        final var commitDocumentedException = assertInstanceOf(NetconfDocumentedException.class,
+            commitExecutionException.getCause());
+        assertEquals("RPC during tx failed. test failure null", commitDocumentedException.getMessage());
+        assertEquals(ErrorTag.OPERATION_FAILED, commitDocumentedException.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, commitDocumentedException.getErrorType());
+        assertEquals(ErrorSeverity.ERROR, commitDocumentedException.getErrorSeverity());
 
         verify(mockNetconfBaseOps).lockRunning(any());
-        verify(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(), Optional.of(DELETE), EMPTY_PATH);
+        verify(mockNetconfBaseOps).createNode(DELETE, EMPTY_PATH);
+        verify(mockNetconfBaseOps).createNode(EMPTY_NODE, MERGE, EMPTY_PATH);
         verify(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class), eq(mockNode), eq(false));
         verify(mockNetconfBaseOps).unlockRunning(any());
-
-        final var mergeFuture = dataStoreService.merge(YangInstanceIdentifier.of(), EMPTY_NODE);
-        final var mergeExecutionException = assertThrows(ExecutionException.class,
-            () -> mergeFuture.get(2, TimeUnit.SECONDS));
-        final var mergeDocumentedException = assertInstanceOf(NetconfDocumentedException.class,
-            mergeExecutionException.getCause());
-        assertEquals("RPC during tx failed. test failure null", mergeDocumentedException.getMessage());
-        assertEquals(ErrorTag.OPERATION_FAILED, mergeDocumentedException.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, mergeDocumentedException.getErrorType());
-        assertEquals(ErrorSeverity.ERROR, mergeDocumentedException.getErrorSeverity());
-
-        verify(mockNetconfBaseOps, times(2)).lockRunning(any());
-        verify(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_NODE), Optional.of(MERGE), EMPTY_PATH);
-        verify(mockNetconfBaseOps).editConfigRunning(any(NetconfRpcFutureCallback.class), eq(mockMergeNode), eq(false));
-        verify(mockNetconfBaseOps, times(2)).unlockRunning(any());
     }
 }
