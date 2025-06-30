@@ -28,6 +28,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.AbstractNetconfDataTreeService;
+import org.opendaylight.netconf.client.mdsal.spi.DataOperationsServiceImpl;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
@@ -168,7 +169,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
         mount.onDeviceConnected(databind.modelContext(),
-            new NetconfDataOperations(proxyNetconfService),
+            new NetconfDataOperations(new DataOperationsServiceImpl(proxyNetconfService)),
             deviceServices,
             // We need to create ProxyDOMDataBroker so accessing mountpoint
             // on leader node would be same as on follower node
