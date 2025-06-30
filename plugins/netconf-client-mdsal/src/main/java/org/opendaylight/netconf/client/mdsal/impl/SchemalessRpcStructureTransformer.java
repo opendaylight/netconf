@@ -13,6 +13,7 @@ import static org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil.appe
 import static org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil.writeSchemalessFilter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -21,6 +22,7 @@ import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.input.Filter;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -106,6 +108,12 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
             .withNodeIdentifier(NETCONF_CONFIG_NODEID)
             .withValue(new DOMSource(document.getDocumentElement()))
             .build();
+    }
+
+    @Override
+    public AnyxmlNode<DOMSource> createEditConfigStructure(
+            final Map<ConfigNodeKey, Optional<NormalizedNode>> elements) {
+        return null;
     }
 
     /**

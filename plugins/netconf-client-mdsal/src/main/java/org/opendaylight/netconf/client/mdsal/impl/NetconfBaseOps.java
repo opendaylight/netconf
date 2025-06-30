@@ -360,6 +360,13 @@ public final class NetconfBaseOps {
             .build();
     }
 
+    public ChoiceNode createEditConfigStructure(final Map<ConfigNodeKey, Optional<NormalizedNode>> elements) {
+        return ImmutableNodes.newChoiceBuilder()
+            .withNodeIdentifier(EDIT_CONTENT_NODEID)
+            .withChild(transformer.createEditConfigStructure(elements))
+            .build();
+    }
+
     private static ContainerNode getEditConfigContent(final NodeIdentifier datastore,
             final DataContainerChild editStructure, final Optional<EffectiveOperation> defaultOperation,
             final boolean rollback) {
@@ -431,4 +438,6 @@ public final class NetconfBaseOps {
             .withChild(getTargetNode(datastore))
             .build();
     }
+
+    public record ConfigNodeKey(YangInstanceIdentifier identifier, EffectiveOperation operation) {};
 }
