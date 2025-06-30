@@ -35,6 +35,7 @@ import org.opendaylight.netconf.api.xml.XMLSupport;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Candidate;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CommitInput;
@@ -267,6 +268,59 @@ public final class NetconfMessageTransformUtil {
             }
         } catch (final IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
+        }
+
+        return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
+            .withNodeIdentifier(NETCONF_CONFIG_NODEID)
+            .withValue(new DOMSource(element))
+            .build();
+    }
+
+    /**
+     * Create edit-config structure to invoke {@code operation} with {@code lastChildOverride} data on {@code dataPath}.
+     *
+     * @param elements {@link EffectiveModelContext} device's model context
+     * @return {@link DOMSourceAnyxmlNode} containing edit-config structure
+     */
+    public static AnyxmlNode<DOMSource> createEditConfigAnyxml(final EffectiveModelContext ctx,
+            final Map<ConfigNodeKey, Optional<NormalizedNode>> elements) {
+        final var element = BLANK_DOCUMENT.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.CONFIG_KEY);
+        for (Map.Entry<ConfigNodeKey, Optional<NormalizedNode>> nodeEntry : elements.entrySet()) {
+            final var dataPath = nodeEntry.getKey().identifier();
+            final var optNode = nodeEntry.getValue();
+
+            if (dataPath.isEmpty()) {
+                final var override = optNode.orElseThrow(() -> new IllegalArgumentException(
+                    "Data has to be present when creating structure for top level element"));
+                Preconditions.checkArgument(override instanceof DataContainerChild,
+                    "Data has to be either container or a list node when creating structure for top level element, "
+                        + "but was: %s", override);
+            }
+            final var operation = nodeEntry.getKey().operation();
+            final var metadata = operation == null ? null : leafMetadata(dataPath, operation);
+            try {
+                if (optNode.isPresent()) {
+                    // TODO do not transform this into result and then to xml, rework the whole pipeline to directly
+                    //  write into xml
+
+                    final var parentPath = dataPath.isEmpty() ? dataPath : dataPath.coerceParent();
+                    var result = new NormalizationResultHolder();
+                    try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(result)) {
+                        try (var iidWriter = YangInstanceIdentifierWriter.open(streamWriter, ctx, parentPath);
+                                var nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
+                            nnWriter.write(optNode.orElseThrow());
+                        }
+                    }
+                    NormalizedDataUtil.writeNormalizedNode(result.getResult().data(), metadata, new DOMResult(element),
+                        ctx,
+                        null);
+                } else {
+                    NormalizedDataUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), ctx, null);
+                }
+            } catch (final IOException | XMLStreamException e) {
+                throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath,
+                    e);
+            }
         }
 
         return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
