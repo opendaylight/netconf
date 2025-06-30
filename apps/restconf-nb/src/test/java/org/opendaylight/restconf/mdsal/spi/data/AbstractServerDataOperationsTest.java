@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Test;
@@ -540,16 +540,13 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
 
     @Test
     void readDataWrongPathOrNoContentTest() {
-        final var assertionError = assertThrows(AssertionError.class,
-            () -> readData(ContentParam.CONFIG, PATH_2_DATA, readDataWrongPathOrNoContentTestStrategy()));
-        final var requestException = assertInstanceOf(RequestException.class, assertionError.getCause());
-        final var requestError = requestException.errors().getFirst();
-        assertNotNull(requestError.message());
-        assertEquals("Request could not be completed because the relevant data model content does not exist",
-            requestError.message().elementBody());
+        assertReadDataWrongPathOrNoContentTest(() -> readData(ContentParam.CONFIG, PATH_2_DATA,
+            readDataWrongPathOrNoContentTestStrategy()));
     }
 
     abstract @NonNull ServerDataOperations readDataWrongPathOrNoContentTestStrategy();
+
+    abstract void assertReadDataWrongPathOrNoContentTest(Supplier<NormalizedNode> readResult);
 
     static Data moudlesPath(final YangInstanceIdentifier path) {
         final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(path).orElseThrow();
