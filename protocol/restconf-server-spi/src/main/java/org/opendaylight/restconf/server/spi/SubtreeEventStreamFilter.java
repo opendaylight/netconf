@@ -21,8 +21,12 @@ public final class SubtreeEventStreamFilter implements AbstractRestconfStreamReg
 
     @Override
     public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
-        if (!path.isEmpty() && filter.permitsQName(path.getLastPathArgument().getNodeType())) {
-            return false;
+        if (!path.isEmpty()) {
+            for (final var pathArgument : path.getPathArguments()) {
+                if (!filter.permitsQName(pathArgument.getNodeType())) {
+                    return false;
+                }
+            }
         }
         return new SubtreeMatcher(filter, body).matches();
     }
