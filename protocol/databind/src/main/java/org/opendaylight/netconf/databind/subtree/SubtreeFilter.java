@@ -21,7 +21,6 @@ import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 import org.opendaylight.yangtools.concepts.PrettyTreeAware;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**
@@ -98,47 +97,6 @@ public final class SubtreeFilter implements Immutable, PrettyTreeAware, SiblingS
      */
     public void writeTo(final XMLStreamWriter writer) throws XMLStreamException {
         SubtreeFilterWriter.writeSubtreeFilter(writer, this);
-    }
-
-    /**
-     * Determine whether the supplied {@link QName} is explicitly permitted by this
-     * Subtree Filter.
-     *
-     * <p>The check is purely structural: it walks the filter’s <em>sibling
-     * tree</em> and returns {@code true} as soon as the QName is mentioned in any
-     * of:</p>
-     * <ul>
-     *   <li>a {@code content-match} node,</li>
-     *   <li>a {@code selection} node, or</li>
-     *   <li>a {@code containment} node (directly or somewhere in its descendants).</li>
-     * </ul>
-     *
-     * @param qname the QName being tested
-     * @return {@code true} if the QName occurs anywhere in the filter,
-     *         {@code false} otherwise
-     */
-    public boolean permitsQName(final QName qname) {
-        return permitsQName(qname, this);
-    }
-
-    private static boolean permitsQName(final QName qname, final SiblingSet node) {
-        for (var contentMatch : node.contentMatches()) {
-            if (contentMatch.selection().matches(qname)) {
-                return true;
-            }
-        }
-        for (var selection : node.selections()) {
-            if (selection.selection().matches(qname)) {
-                return true;
-            }
-        }
-        // first check the node itself, then recurse
-        for (var containment : node.containments()) {
-            if (containment.selection().matches(qname) || permitsQName(qname, containment)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public DatabindContext databind() {
