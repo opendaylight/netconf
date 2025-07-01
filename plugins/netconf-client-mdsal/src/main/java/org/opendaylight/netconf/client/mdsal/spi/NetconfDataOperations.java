@@ -49,6 +49,7 @@ import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.PatchContext;
+import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -57,6 +58,7 @@ import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.Insert;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -258,66 +260,29 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     public void patchData(final ServerRequest<DataYangPatchResult> request, final Data path, final PatchContext patch) {
         LOG.debug("Execute PATCH operation with path {} and PatchContext {}", path, patch);
         final var editCollection = new ArrayList<PatchStatusEntity>();
+        final var entities = patch.entities();
         var futureChain = dataTreeService.lock();
 
-        for (var patchEntity : patch.entities()) {
-            if (!containsFailure(editCollection)) {
-                final var targetNode = patchEntity.getDataPath();
-                final var editId = patchEntity.getEditId();
-
-                switch (patchEntity.getOperation()) {
-                    case Create:
-                        futureChain = addIntoFutureChain(futureChain, () -> create(targetNode, patchEntity.getNode()));
-                        editCollection.add(new PatchStatusEntity(editId, true, null));
-                        break;
-                    case Delete:
-                        futureChain = addIntoFutureChain(futureChain, () -> {
-                            try {
-                                final var delete = delete(targetNode);
-                                editCollection.add(new PatchStatusEntity(editId, true, null));
-                                return delete;
-                            } catch (RequestException cause) {
-                                editCollection.add(new PatchStatusEntity(editId, false, cause.errors()));
-                                return Futures.immediateFailedFuture(cause);
-                            }
-                        });
-                        break;
-                    case Merge:
-                        futureChain = addIntoFutureChain(futureChain, () -> merge(targetNode, patchEntity.getNode()));
-                        editCollection.add(new PatchStatusEntity(editId, true, null));
-                        break;
-                    case Replace:
-                        futureChain = addIntoFutureChain(futureChain, () -> replace(targetNode, patchEntity.getNode()));
-                        editCollection.add(new PatchStatusEntity(editId, true, null));
-                        break;
-                    case Remove:
-                        futureChain = addIntoFutureChain(futureChain, () -> {
-                            try {
-                                final var remove = remove(targetNode);
-                                editCollection.add(new PatchStatusEntity(editId, true, null));
-                                return remove;
-                            } catch (RequestException cause) {
-                                editCollection.add(new PatchStatusEntity(editId, false, cause.errors()));
-                                return Futures.immediateFailedFuture(cause);
-                            }
-                        });
-                        break;
-                    default:
-                        editCollection.add(new PatchStatusEntity(editId, false, List.of(
-                            new RequestError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
-                                "Not supported Yang Patch operation"))));
-                        break;
-                }
+        for (int i = 0; i < entities.size() ; i++) {
+            final var currentEntity = entities.get(i);
+            final var targetNode = currentEntity.getDataPath();
+            final var previousEntity = i > 0 ? entities.get(i - 1) : null;
+            if (previousEntity == null) {
+                futureChain = addIntoFutureChain(futureChain,
+                    () -> patchRequest(targetNode, currentEntity.getNode(), currentEntity.getOperation()));
+            } else {
+                futureChain = chainPatchEditTransaction(futureChain,
+                    () -> patchRequest(targetNode, currentEntity.getNode(), currentEntity.getOperation()),
+                    previousEntity, editCollection);
             }
         }
 
-        if (containsFailure(editCollection)) {
-            cancel();
-            request.completeWith(new DataYangPatchResult(new PatchStatusContext(patch.patchId(),
-                List.copyOf(editCollection), false, null)));
-            return;
+        if (entities.isEmpty()) {
+            futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
+        } else {
+            futureChain = chainPatchEditTransaction(futureChain, dataTreeService::commit,
+                entities.get(entities.size() - 1), editCollection);
         }
-        futureChain = addIntoFutureChain(futureChain, dataTreeService::commit);
         futureChain = addIntoFutureChain(futureChain, dataTreeService::unlock);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
@@ -558,6 +523,23 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
             }
         }
         return operation.apply(path.instance());
+    }
+
+    private ListenableFuture<? extends DOMRpcResult> patchRequest(final Data path, final NormalizedNode data,
+            final Operation operation) {
+        try {
+            return switch (operation) {
+                case Create -> create(path, data);
+                case Merge -> merge(path, data);
+                case Replace -> replace(path, data);
+                case Delete -> delete(path);
+                case Remove -> remove(path);
+                default -> throw new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                    "Not supported Yang Patch operation");
+            };
+        } catch (RequestException cause) {
+            return Futures.immediateFailedFuture(cause);
+        }
     }
 
     private @NonNull Collection<? extends NormalizedNode> getListItemsForRemove(final Data path)
@@ -857,6 +839,27 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
 
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
         return errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING);
+    }
+
+    private static ListenableFuture<? extends DOMRpcResult> chainPatchEditTransaction(
+            final ListenableFuture<? extends DOMRpcResult> futureChain,
+            final Supplier<ListenableFuture<? extends DOMRpcResult>> nextFuture,
+            final PatchEntity previousEntity, final List<PatchStatusEntity> editCollection) {
+        return Futures.transformAsync(futureChain,
+            result -> {
+                if (result != null && !result.errors().isEmpty() && !allWarnings(result.errors())) {
+                    LOG.trace("Failed patch operation with PatchEntity {} and result {}", previousEntity, result);
+                    final var requestErrors = result.errors().stream()
+                        .map(t -> RequestError.ofRpcError(t, previousEntity.getDataPath().toErrorPath()))
+                        .toList();
+                    editCollection.add(new PatchStatusEntity(previousEntity.getEditId(), false, requestErrors));
+                    final var requestException = new RequestException(requestErrors, null, "Failed Patch operation with"
+                        + " edit-id " + previousEntity.getEditId());
+                    return Futures.immediateFailedFuture(requestException);
+                }
+                editCollection.add(new PatchStatusEntity(previousEntity.getEditId(), true, null));
+                return nextFuture.get();
+            }, MoreExecutors.directExecutor());
     }
 
     private static ListenableFuture<? extends DOMRpcResult> addIntoFutureChain(
