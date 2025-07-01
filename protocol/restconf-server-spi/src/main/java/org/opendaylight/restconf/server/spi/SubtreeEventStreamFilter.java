@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import static org.opendaylight.netconf.databind.subtree.SubtreeMatcher.permitsPath;
+
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.netconf.databind.subtree.SubtreeMatcher;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -21,9 +23,10 @@ public final class SubtreeEventStreamFilter implements AbstractRestconfStreamReg
 
     @Override
     public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
-        if (!path.isEmpty() && filter.permitsQName(path.getLastPathArgument().getNodeType())) {
-            return false;
+        if (path.isEmpty()) {
+            return new SubtreeMatcher(filter, body).matches();
+        } else {
+            return permitsPath(filter, path) && new SubtreeMatcher(filter, body, path).matches();
         }
-        return new SubtreeMatcher(filter, body).matches();
     }
 }
