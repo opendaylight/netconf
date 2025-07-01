@@ -122,11 +122,6 @@ public final class SubtreeFilter implements Immutable, PrettyTreeAware, SiblingS
     }
 
     private static boolean permitsQName(final QName qname, final SiblingSet node) {
-        for (var contentMatch : node.contentMatches()) {
-            if (contentMatch.selection().matches(qname)) {
-                return true;
-            }
-        }
         for (var selection : node.selections()) {
             if (selection.selection().matches(qname)) {
                 return true;
