@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -29,25 +30,57 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 public final class SubtreeMatcher implements Immutable {
     private final SubtreeFilter filter;
     private final ContainerNode data;
+    private final YangInstanceIdentifier contextPath;
 
     public SubtreeMatcher(final SubtreeFilter filter, final ContainerNode data) {
         this.filter = requireNonNull(filter);
         this.data = requireNonNull(data);
+        this.contextPath = YangInstanceIdentifier.of();
+    }
+
+    public SubtreeMatcher(final SubtreeFilter filter, final ContainerNode data,
+            final YangInstanceIdentifier contextPath) {
+        this.filter = requireNonNull(filter);
+        this.data = requireNonNull(data);
+        this.contextPath = requireNonNull(contextPath);
     }
 
     public boolean matches() {
-        for (final var containment : filter.containments()) {
-            if (!matchContainment(containment, data)) {
+        final var siblingSet = contextPath.isEmpty() ? filter : tailForPath(filter, contextPath);
+        if (siblingSet == null) {
+            return false;
+        }
+        return matchesFrom(siblingSet, data);
+    }
+
+    private static @Nullable SiblingSet tailForPath(final SiblingSet root, final YangInstanceIdentifier path) {
+        var current = root;
+        for (final var arg : path.getPathArguments()) {
+            ContainmentNode next = null;
+            for (final var containment : current.containments()) {
+                if (containment.selection().matches(arg.getNodeType())) {
+                    next = containment;
+                    break;
+                }
+            }
+            current = next;
+        }
+        return current;
+    }
+
+    public boolean matchesFrom(final SiblingSet filterSet, final ContainerNode containerNode) {
+        for (final var containment : filterSet.containments()) {
+            if (!matchContainment(containment, containerNode)) {
                 return false;
             }
         }
-        for (final var contentMatch : filter.contentMatches()) {
-            if (!matchContent(contentMatch, data)) {
+        for (final var contentMatch : filterSet.contentMatches()) {
+            if (!matchContent(contentMatch, containerNode)) {
                 return false;
             }
         }
-        for (final var selection : filter.selections()) {
-            if (!matchSelectionNode(selection, data)) {
+        for (final var selection : filterSet.selections()) {
+            if (!matchSelectionNode(selection, containerNode)) {
                 return false;
             }
         }
