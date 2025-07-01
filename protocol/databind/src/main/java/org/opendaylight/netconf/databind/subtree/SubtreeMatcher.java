@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -29,25 +30,113 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 public final class SubtreeMatcher implements Immutable {
     private final SubtreeFilter filter;
     private final ContainerNode data;
+    private final YangInstanceIdentifier contextPath;
 
     public SubtreeMatcher(final SubtreeFilter filter, final ContainerNode data) {
         this.filter = requireNonNull(filter);
         this.data = requireNonNull(data);
+        this.contextPath = YangInstanceIdentifier.of();
     }
 
+    public SubtreeMatcher(final SubtreeFilter filter, final ContainerNode data,
+            final YangInstanceIdentifier contextPath) {
+        this.filter = requireNonNull(filter);
+        this.data = requireNonNull(data);
+        this.contextPath = requireNonNull(contextPath);
+    }
+
+    /**
+     * Evaluate this matcher against the provided data, honoring an optional
+     * context path.
+     *
+     * <p>If {@code contextPath} is empty, validation starts at the filter root.
+     * Otherwise, the method first resolves the deepest {@link SiblingSet}
+     * reachable by walking the filter’s containment hierarchy along
+     * {@code contextPath} (ancestor path of an instance notification). If any
+     * path segment has no matching containment, the method returns {@code false}.
+     * If the path is accepted, the notification body is then checked against
+     * that {@link SiblingSet} via {@link #matchesFrom(SiblingSet, ContainerNode)}.
+     *
+     * @return {@code true} if the ancestor path is permitted and the body
+     *         satisfies the filter; {@code false} otherwise
+     */
     public boolean matches() {
-        for (final var containment : filter.containments()) {
-            if (!matchContainment(containment, data)) {
+        final var siblingSet = contextPath.isEmpty() ? filter : tailForPath(filter, contextPath);
+        if (siblingSet == null) {
+            return false;
+        }
+        return matchesFrom(siblingSet, data);
+    }
+
+    /**
+     * Return {@code true} when every QName which appears in {@code path} is accepted by this filter’s containment
+     * hierarchy.
+     *
+     * <p>The method walks the path top-down and descends into exactly one containment node on each level;
+     * it stops as soon as a segment has no matching containment.
+     *
+     * <p><b>Note:</b> This validates only the ancestor path of an instance notification (RFC7950). Content inside the
+     * notification body is still evaluated later by {@link SubtreeMatcher}.
+     */
+    public static boolean permitsPath(final SubtreeFilter filter, final YangInstanceIdentifier path) {
+        SiblingSet current = filter;
+        for (final var arg : path.getPathArguments()) {
+            ContainmentNode next = null;
+            // look for a containment that accepts this QName
+            for (final var cont : current.containments()) {
+                if (cont.selection().matches(arg.getNodeType())) {
+                    next = cont;
+                    break;
+                }
+            }
+            if (next == null) {
+                // no match on this level
+                return false;
+            }
+            // continue one level deeper
+            current = next;
+        }
+        return true;
+    }
+
+    /**
+     * Walk the filter's containment hierarchy following {@code path} and return
+     * the deepest {@link SiblingSet} reached. If any segment has no matching
+     * containment on the current level, returns {@code null}.
+     */
+    private static @Nullable SiblingSet tailForPath(final SiblingSet root, final YangInstanceIdentifier path) {
+        var current = root;
+        for (final var arg : path.getPathArguments()) {
+            ContainmentNode next = null;
+            for (final var containment : current.containments()) {
+                if (containment.selection().matches(arg.getNodeType())) {
+                    next = containment;
+                    break;
+                }
+            }
+            current = next;
+        }
+        return current;
+    }
+
+    /**
+     * Check that {@code containerNode} satisfies all siblings in {@code filterSet}
+     * at the current level. Returns {@code false} on the first failed check,
+     * otherwise {@code true}.
+     */
+    private boolean matchesFrom(final SiblingSet filterSet, final ContainerNode containerNode) {
+        for (final var containment : filterSet.containments()) {
+            if (!matchContainment(containment, containerNode)) {
                 return false;
             }
         }
-        for (final var contentMatch : filter.contentMatches()) {
-            if (!matchContent(contentMatch, data)) {
+        for (final var contentMatch : filterSet.contentMatches()) {
+            if (!matchContent(contentMatch, containerNode)) {
                 return false;
             }
         }
-        for (final var selection : filter.selections()) {
-            if (!matchSelectionNode(selection, data)) {
+        for (final var selection : filterSet.selections()) {
+            if (!matchSelectionNode(selection, containerNode)) {
                 return false;
             }
         }
