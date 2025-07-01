@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,8 +24,11 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.netconf.databind.ErrorPath;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataPatchResult;
@@ -341,6 +345,62 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull ServerDataOperations testPatchDataCreateAndDeleteStrategy();
+
+    @MethodSource
+    static List<PatchContext> getPatchContext() {
+        final var buildArtistList = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
+            .withChild(ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
+                .build())
+            .build();
+        return List.of(
+            new PatchContext("VerifyNotExecutingLastPatchEntity", List.of(
+                new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
+                new PatchEntity("edit2", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX),
+                new PatchEntity("edit3", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX))),
+            new PatchContext("VerifyExceptionOnLastPatchEntity", List.of(
+                new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
+                new PatchEntity("edit2", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX)))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getPatchContext")
+    public final void testPatchWithDataExistException(final PatchContext patchContext) throws Exception {
+        // Prepare patch request.
+        final var strategy = testPatchWithDataExistExceptionStrategy();
+        strategy.patchData(dataYangPatchRequest, new Data(ARTIST_DATA.databind()), patchContext);
+
+        // Get patch result.
+        final var patchStatusContext = dataYangPatchRequest.getResult().status();
+
+        // Verify failure and confirm that edit3 operation was not executed.
+        assertFalse(patchStatusContext.ok());
+        assertNull(patchStatusContext.globalErrors());
+        assertEquals(2, patchStatusContext.editCollection().size());
+
+        // Verify that first request is without errors.
+        final var delete = patchStatusContext.editCollection().getFirst();
+        assertTrue(delete.isOk());
+        assertEquals("edit1", delete.getEditId());
+        assertNull(delete.getEditErrors());
+
+        // Verify that second request failed on DATA_EXISTS.
+        final var firstCreate = patchStatusContext.editCollection().getLast();
+        assertFalse(firstCreate.isOk());
+        assertEquals("edit2", firstCreate.getEditId());
+        assertNotNull(firstCreate.getEditErrors());
+        final var serverError = firstCreate.getEditErrors().getFirst();
+        assertEquals(ErrorTag.DATA_EXISTS, serverError.tag());
+        assertEquals(new ErrorPath(PLAYER_DATA), serverError.path());
+        assertNotNull(serverError.message());
+        assertEquals("Data already exists", serverError.message().elementBody());
+    }
+
+    abstract @NonNull ServerDataOperations testPatchWithDataExistExceptionStrategy();
 
     @Test
     final void testPatchMergePutContainer() {
