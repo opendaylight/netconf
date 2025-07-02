@@ -24,6 +24,23 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7dbe752_03903bd1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-07-02T08:17:12Z",
+      "side": 1,
+      "message": "We can consider a fixed buffer size approach\n`final var content \u003d message !\u003d null ? Unpooled.copiedBuffer(message, CharsetUtil.UTF_8) : Unpooled.EMPTY_BUFFER;`",
+      "revId": "fb79a0404d1fd195111e64bd81ecc29d00e9fb58",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69fd17bf_be759860",
