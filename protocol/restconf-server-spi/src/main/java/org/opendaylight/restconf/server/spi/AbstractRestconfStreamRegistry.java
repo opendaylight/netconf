@@ -64,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,9 +77,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     @Beta
     @NonNullByDefault
-    public interface EventStreamFilter {
+    public interface EventStreamFilter extends EventFilterInterface<FilterEvent> {
 
         boolean test(YangInstanceIdentifier path, ContainerNode body);
+    }
+
+    public record FilterEvent(YangInstanceIdentifier path, ContainerNode body) {
     }
 
     /**
