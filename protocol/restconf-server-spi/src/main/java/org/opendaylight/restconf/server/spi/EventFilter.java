@@ -18,9 +18,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @param <T> the type of events
  */
 @NonNullByDefault
-public abstract sealed class EventFilter<T> permits AcceptingEventFilter, XPathEventFilter {
+public abstract sealed class EventFilter<T> implements EventFilterInterface<T> permits AcceptingEventFilter, XPathEventFilter {
 
-    abstract boolean matches(EffectiveModelContext modelContext, T event);
+    public abstract boolean matches(EffectiveModelContext modelContext, T event);
 
     @Override
     public final String toString() {

@@ -82,7 +82,7 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
     }
 
     @Override
-    final boolean matches(final EffectiveModelContext modelContext, final T event) {
+    public final boolean matches(final EffectiveModelContext modelContext, final T event) {
         final Document doc;
         try {
             doc = DBF.newDocumentBuilder().newDocument();
