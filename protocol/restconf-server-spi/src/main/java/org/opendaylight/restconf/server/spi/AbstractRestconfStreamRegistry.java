@@ -76,9 +76,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     @Beta
     @NonNullByDefault
-    public interface EventStreamFilter {
+    public sealed interface EventStreamFilter extends EventFilterInterface<FilterEvent>
+            permits SubtreeEventStreamFilter {
 
         boolean test(YangInstanceIdentifier path, ContainerNode body);
+    }
+
+    public record FilterEvent(YangInstanceIdentifier path, ContainerNode body) {
     }
 
     /**
