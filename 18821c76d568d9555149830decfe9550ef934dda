@@ -33,6 +33,24 @@
       "message": "can we log that?",
       "revId": "18821c76d568d9555149830decfe9550ef934dda",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c71f769_3087a656",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-07-03T07:37:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea43fe00_bd5c7cba",
+      "revId": "18821c76d568d9555149830decfe9550ef934dda",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
