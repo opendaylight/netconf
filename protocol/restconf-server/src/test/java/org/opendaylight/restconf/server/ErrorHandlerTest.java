@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.opendaylight.restconf.server.PathParameters.MODULES;
 import static org.opendaylight.restconf.server.PathParameters.OPERATIONS;
@@ -19,6 +20,7 @@ import static org.opendaylight.restconf.server.TestUtils.assertResponse;
 import static org.opendaylight.restconf.server.TestUtils.assertResponseHeaders;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
 
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -119,6 +121,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
     void runtimeException(final TestEncoding encoding) {
         final var errorMessage = "runtime-error";
         doThrow(new IllegalStateException(errorMessage)).when(server).dataGET(any());
+        doReturn(ByteBufAllocator.DEFAULT).when(ctx).alloc();
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
         final var response = dispatch(request);
         assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());

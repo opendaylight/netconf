@@ -75,9 +75,9 @@ class AbstractRequestProcessorTest {
     @Mock
     protected RestconfServer server;
     @Mock
-    private PrincipalService principalService;
+    protected ChannelHandlerContext ctx;
     @Mock
-    private ChannelHandlerContext ctx;
+    private PrincipalService principalService;
     @Mock
     private Channel channel;
     @Mock
