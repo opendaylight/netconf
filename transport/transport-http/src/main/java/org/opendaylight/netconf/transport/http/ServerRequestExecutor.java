@@ -108,7 +108,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
         LOG.warn("Internal error while processing {}", request, cause);
         final var req = pendingRequests.remove(request);
         if (req != null) {
-            HTTPServerSession.respond(req.ctx, req.streamId, formatException(cause, req.version()));
+            HTTPServerSession.respond(req.ctx, req.streamId, formatException(cause, req.ctx(), req.version()));
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
         }
@@ -136,19 +136,22 @@ final class ServerRequestExecutor implements PendingRequestListener {
             HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version));
         } catch (RuntimeException e) {
             LOG.warn("Internal error while processing response {}", response, e);
-            HTTPServerSession.respond(ctx, streamId, formatException(e, version));
+            HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
         }
     }
 
     // Hand-coded, as simple as possible
     @NonNullByDefault
-    private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
+    private static FullHttpResponse formatException(final Exception cause, final ChannelHandlerContext ctx,
+            final HttpVersion version) {
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
         final var message = cause.getMessage();
-        final var content = Unpooled.buffer(0);
+        final ByteBuf content;
         if (message != null) {
-            ByteBufUtil.writeUtf8(content, message);
+            content = ByteBufUtil.writeUtf8(ctx.alloc(), message);
+        } else {
+            content = Unpooled.EMPTY_BUFFER;
         }
         final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
         HttpUtil.setContentLength(response, content.readableBytes());
@@ -180,7 +183,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
             return response.toHttpResponse(ctx.alloc(), version);
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
-            return formatException(e, version);
+            return formatException(e, ctx, version);
         }
     }
 }
