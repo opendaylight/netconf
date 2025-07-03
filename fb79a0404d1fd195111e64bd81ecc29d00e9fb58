@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "24f935d0_07dbae6c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-03T13:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5697d3f7_b1db9ae1",
+      "range": {
+        "startLine": 9,
+        "startChar": 42,
+        "endLine": 9,
+        "endChar": 50
+      },
+      "revId": "fb79a0404d1fd195111e64bd81ecc29d00e9fb58",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e7dbe752_03903bd1",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -90,6 +114,24 @@
       "side": 1,
       "message": "IMO its no more needed since we construct message wit already written content. I will check again 😊 to be sure.",
       "parentUuid": "69fd17bf_be759860",
+      "revId": "fb79a0404d1fd195111e64bd81ecc29d00e9fb58",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60847e8e_09c99886",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-03T13:48:31Z",
+      "side": 1,
+      "message": "Yes, it was lost. Fixed.",
+      "parentUuid": "5a8ee21d_333027cb",
       "revId": "fb79a0404d1fd195111e64bd81ecc29d00e9fb58",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
