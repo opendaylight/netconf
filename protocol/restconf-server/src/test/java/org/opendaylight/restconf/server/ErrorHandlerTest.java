@@ -120,7 +120,7 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
         final var errorMessage = "runtime-error";
         doThrow(new IllegalStateException(errorMessage)).when(server).dataGET(any());
         final var request = buildRequest(HttpMethod.GET, DATA_PATH, encoding, null);
-        final var response = dispatch(request);
+        final var response = dispatchWithAlloc(request);
         assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
         assertEquals("runtime-error", response.content().toString(StandardCharsets.UTF_8));
     }
