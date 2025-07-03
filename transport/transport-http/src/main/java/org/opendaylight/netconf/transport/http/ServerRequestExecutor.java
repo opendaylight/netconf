@@ -10,6 +10,7 @@ package org.opendaylight.netconf.transport.http;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -108,7 +109,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
         LOG.warn("Internal error while processing {}", request, cause);
         final var req = pendingRequests.remove(request);
         if (req != null) {
-            HTTPServerSession.respond(req.ctx, req.streamId, formatException(cause, req.version()));
+            HTTPServerSession.respond(req.ctx, req.streamId, formatException(cause, req.version(), req.ctx.alloc()));
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
         }
@@ -143,19 +144,22 @@ final class ServerRequestExecutor implements PendingRequestListener {
             HTTPServerSession.respond(ctx, streamId, formatResponse(response, ctx, version));
         } catch (RuntimeException e) {
             LOG.warn("Internal error while processing response {}", response, e);
-            HTTPServerSession.respond(ctx, streamId, formatException(e, version));
+            HTTPServerSession.respond(ctx, streamId, formatException(e, version, ctx.alloc()));
         }
     }
 
     // Hand-coded, as simple as possible
     @NonNullByDefault
-    private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
+    private static FullHttpResponse formatException(final Exception cause, final HttpVersion version,
+            final ByteBufAllocator alloc) {
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
         final var message = cause.getMessage();
-        final var content = Unpooled.buffer(0);
+        final ByteBuf content;
         if (message != null) {
-            ByteBufUtil.writeUtf8(content, message);
+            content = ByteBufUtil.writeUtf8(alloc, message);
+        } else {
+            content = Unpooled.EMPTY_BUFFER;
         }
         final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
         HttpUtil.setContentLength(response, content.readableBytes());
@@ -188,7 +192,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
             ready = response.toReadyResponse(ctx.alloc());
         } catch (IOException e) {
             LOG.warn("IO error while converting formatting response", e);
-            return formatException(e, version);
+            return formatException(e, version, ctx.alloc());
         }
         return ready.toHttpResponse(version);
     }
