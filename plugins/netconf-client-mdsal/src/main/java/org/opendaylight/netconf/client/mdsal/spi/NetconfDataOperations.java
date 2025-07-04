@@ -10,7 +10,6 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
@@ -83,8 +82,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class NetconfDataOperations extends AbstractServerDataOperations {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataOperations.class);
-    private static final ListenableFuture<? extends DOMRpcResult> RPC_SUCCESS = Futures.immediateFuture(
-        new DefaultDOMRpcResult());
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
     private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
@@ -492,15 +489,18 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends DOMRpcResult> create(final Data path, final NormalizedNode data) {
-        if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(path.databind().modelContext(), path.instance());
-            final var futureChain = merge(path, emptySubTree);
-            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+        if (isNonEmptyListPath(data)) {
+            final var iterator = ((NormalizedNodeContainer<?>) data).body().iterator();
+            final var first = (NormalizedNode) iterator.next();
+            final var firstPath = path.instance().node(first.name());
+            var future = dataTreeService.create(CONFIGURATION, firstPath, first, Optional.empty());
+            while (iterator.hasNext()) {
+                final var child = (NormalizedNode) iterator.next();
                 final var childPath = path.instance().node(child.name());
-                addIntoFutureChain(futureChain, () -> dataTreeService.create(CONFIGURATION, childPath, child,
+                addIntoFutureChain(future, () -> dataTreeService.create(CONFIGURATION, childPath, child,
                     Optional.empty()));
             }
-            return futureChain;
+            return future;
         } else {
             return dataTreeService.create(CONFIGURATION, path.instance(), data, Optional.empty());
         }
@@ -511,15 +511,18 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends DOMRpcResult> replace(final Data path, final NormalizedNode data) {
-        if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(path.databind().modelContext(), path.instance());
-            final var futureChain = merge(path, emptySubTree);
-            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+        if (isNonEmptyListPath(data)) {
+            final var iterator = ((NormalizedNodeContainer<?>) data).body().iterator();
+            final var first = (NormalizedNode) iterator.next();
+            final var firstPath = path.instance().node(first.name());
+            var future = dataTreeService.create(CONFIGURATION, firstPath, first, Optional.empty());
+            while (iterator.hasNext()) {
+                final var child = (NormalizedNode) iterator.next();
                 final var childPath = path.instance().node(child.name());
-                addIntoFutureChain(futureChain, () -> dataTreeService.replace(CONFIGURATION, childPath, child,
+                addIntoFutureChain(future, () -> dataTreeService.replace(CONFIGURATION, childPath, child,
                     Optional.empty()));
             }
-            return futureChain;
+            return future;
         } else {
             return dataTreeService.replace(CONFIGURATION, path.instance(), data, Optional.empty());
         }
@@ -540,14 +543,18 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
                 LOG.debug("Path {} contains no items, delete operation omitted.", path);
-                return RPC_SUCCESS;
+                return Futures.immediateFuture(new DefaultDOMRpcResult());
             } else {
-                var futureChain = RPC_SUCCESS;
-                for (final var childElement : items) {
+                final var iterator = items.iterator();
+                final var first = (NormalizedNode) iterator.next();
+                final var firstChildPath = path.instance().node(first.name());
+                var future = operation.apply(firstChildPath);
+                while (iterator.hasNext()) {
+                    final var childElement = iterator.next();
                     final var childPath = path.instance().node(childElement.name());
-                    futureChain = addIntoFutureChain(futureChain, () -> operation.apply(childPath));
+                    future = addIntoFutureChain(future, () -> operation.apply(childPath));
                 }
-                return futureChain;
+                return future;
             }
         }
         return operation.apply(path.instance());
@@ -623,10 +630,6 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
         }
 
         final var parentInstance = parentPath.instance();
-        final var emptySubtree = fromInstanceId(parentPath.databind().modelContext(), parentInstance);
-        futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.merge(CONFIGURATION,
-            YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree, Optional.empty()));
-
         int lastInsertedPosition = 0;
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -800,6 +803,11 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
                 LOG.error("Error processing operation", throwable);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private static boolean isNonEmptyListPath(final NormalizedNode data) {
+        return (data instanceof MapNode || data instanceof LeafSetNode)
+            && !((NormalizedNodeContainer<?>) data).body().isEmpty();
     }
 
     private static boolean isListPath(final Data path) {
