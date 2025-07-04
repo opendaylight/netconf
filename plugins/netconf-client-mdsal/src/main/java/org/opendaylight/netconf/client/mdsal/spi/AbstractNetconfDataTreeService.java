@@ -10,7 +10,6 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -56,13 +55,13 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
         }
 
         @Override
-        ListenableFuture<? extends DOMRpcResult> lockSingle() {
+        ListenableFuture<? extends DOMRpcResult> lockImpl() {
             return netconfOps.lockCandidate(new NetconfRpcFutureCallback("Lock candidate", id));
         }
 
         @Override
-        List<ListenableFuture<? extends DOMRpcResult>> unlockImpl() {
-            return List.of(netconfOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id)));
+        ListenableFuture<? extends DOMRpcResult> unlockImpl() {
+            return netconfOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
         }
 
         @Override
@@ -93,13 +92,13 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
         }
 
         @Override
-        ListenableFuture<? extends DOMRpcResult> lockSingle() {
+        ListenableFuture<? extends DOMRpcResult> lockImpl() {
             return netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
         }
 
         @Override
-        List<ListenableFuture<? extends DOMRpcResult>> unlockImpl() {
-            return List.of(netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id)));
+        ListenableFuture<? extends DOMRpcResult> unlockImpl() {
+            return netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
         }
 
         @Override
@@ -108,44 +107,6 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit running", id);
             return defaultOperation == null ? netconfOps.editConfigRunning(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigRunning(callback, editStructure, defaultOperation, rollbackSupport);
-        }
-    }
-
-    private static final class CandidateWithRunning extends AbstractNetconfDataTreeService {
-        private final Candidate candidate;
-        private final Running running;
-
-        CandidateWithRunning(final RemoteDeviceId id, final NetconfBaseOps netconfOps,
-                final boolean rollbackSupport, final boolean lockDatastore) {
-            super(id, netconfOps, rollbackSupport, lockDatastore);
-            candidate = new Candidate(id, netconfOps, rollbackSupport, lockDatastore);
-            running = new Running(id, netconfOps, rollbackSupport, lockDatastore);
-        }
-
-        @Override
-        public ListenableFuture<? extends DOMRpcResult> discardChanges() {
-            return candidate.discardChanges();
-        }
-
-        @Override
-        ListenableFuture<DOMRpcResult> lockSingle() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        List<ListenableFuture<? extends DOMRpcResult>> lockImpl() {
-            return List.of(candidate.lockSingle(), running.lockSingle());
-        }
-
-        @Override
-        List<ListenableFuture<? extends DOMRpcResult>> unlockImpl() {
-            return List.of(running.unlock(), candidate.unlock());
-        }
-
-        @Override
-        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
-                final EffectiveOperation defaultOperation) {
-            return candidate.editConfig(editStructure, defaultOperation);
         }
     }
 
@@ -174,9 +135,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
 
         // Examine preferences and decide which implementation to use
         if (sessionPreferences.isCandidateSupported()) {
-            return sessionPreferences.isRunningWritable()
-                ? new CandidateWithRunning(id, netconfOps, rollbackSupport, lockDatastore)
-                    : new Candidate(id, netconfOps, rollbackSupport, lockDatastore);
+            return new Candidate(id, netconfOps, rollbackSupport, lockDatastore);
         } else if (sessionPreferences.isRunningWritable()) {
             return new Running(id, netconfOps, rollbackSupport, lockDatastore);
         } else {
@@ -186,14 +145,14 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
     }
 
     @Override
-    public synchronized ListenableFuture<DOMRpcResult> lock() {
+    public synchronized ListenableFuture<? extends DOMRpcResult> lock() {
         if (!lockDatastore) {
             LOG.trace("Lock is not allowed by device configuration, ignoring lock results: {}", id);
             return RPC_SUCCESS;
         }
 
-        final ListenableFuture<DOMRpcResult> result = mergeFutures(lockImpl());
-        Futures.addCallback(result, new FutureCallback<>() {
+        var result = lockImpl();
+        Futures.addCallback(result, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 final var errors = result.errors();
@@ -218,21 +177,17 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
         return result;
     }
 
-    List<ListenableFuture<? extends DOMRpcResult>> lockImpl() {
-        return List.of(lockSingle());
-    }
-
-    abstract ListenableFuture<? extends DOMRpcResult> lockSingle();
+    abstract ListenableFuture<? extends DOMRpcResult> lockImpl();
 
     @Override
-    public synchronized ListenableFuture<DOMRpcResult> unlock() {
+    public synchronized ListenableFuture<? extends DOMRpcResult> unlock() {
         if (!lockDatastore) {
             LOG.trace("Unlock is not allowed: {}", id);
             return RPC_SUCCESS;
         }
 
-        final ListenableFuture<DOMRpcResult> result = mergeFutures(unlockImpl());
-        Futures.addCallback(result, new FutureCallback<>() {
+        final var result = unlockImpl();
+        Futures.addCallback(result, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 final var errors = result.errors();
@@ -256,7 +211,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
         return result;
     }
 
-    abstract List<ListenableFuture<? extends DOMRpcResult>> unlockImpl();
+    abstract ListenableFuture<? extends DOMRpcResult> unlockImpl();
 
     @Override
     public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
@@ -344,23 +299,6 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
 
     private static void checkEditable(final LogicalDatastoreType store) {
         checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can only edit configuration data, not %s", store);
-    }
-
-    // Transform list of futures related to RPC operation into a single Future
-    private static ListenableFuture<DOMRpcResult> mergeFutures(
-            final List<ListenableFuture<? extends DOMRpcResult>> futures) {
-        return Futures.whenAllComplete(futures).call(() -> {
-            if (futures.size() == 1) {
-                // Fast path
-                return Futures.getDone(futures.get(0));
-            }
-
-            final var builder = ImmutableList.<RpcError>builder();
-            for (ListenableFuture<? extends DOMRpcResult> future : futures) {
-                builder.addAll(Futures.getDone(future).errors());
-            }
-            return new DefaultDOMRpcResult(null, builder.build());
-        }, MoreExecutors.directExecutor());
     }
 
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
