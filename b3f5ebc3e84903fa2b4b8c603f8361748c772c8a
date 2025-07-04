@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d24bfa9c_d5284be4",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-04T06:18:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97666683_c2b92e9b",
+      "range": {
+        "startLine": 40,
+        "startChar": 7,
+        "endLine": 40,
+        "endChar": 12
+      },
+      "revId": "b3f5ebc3e84903fa2b4b8c603f8361748c772c8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b82bec9d_016e5260",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2538ba7b_97b96929",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-04T06:18:02Z",
+      "side": 1,
+      "message": "Thanks, forgot to remove it.",
+      "parentUuid": "b82bec9d_016e5260",
+      "range": {
+        "startLine": 44,
+        "startChar": 65,
+        "endLine": 44,
+        "endChar": 81
+      },
+      "revId": "b3f5ebc3e84903fa2b4b8c603f8361748c772c8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e95846b4_f2141af6",
@@ -60,6 +108,30 @@
       "writtenOn": "2025-07-02T15:22:40Z",
       "side": 1,
       "message": "naming?\nnullable?",
+      "range": {
+        "startLine": 45,
+        "startChar": 28,
+        "endLine": 45,
+        "endChar": 35
+      },
+      "revId": "b3f5ebc3e84903fa2b4b8c603f8361748c772c8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04a23e90_495ae44b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-04T06:18:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e95846b4_f2141af6",
       "range": {
         "startLine": 45,
         "startChar": 28,
