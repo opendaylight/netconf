@@ -70,6 +70,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
@@ -248,7 +249,7 @@ final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
     }
 
     @Override
-    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
+    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy(final MapNode artistList) {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return jukeboxDataOperations();

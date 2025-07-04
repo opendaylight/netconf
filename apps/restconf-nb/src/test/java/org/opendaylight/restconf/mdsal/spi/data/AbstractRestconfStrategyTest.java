@@ -97,10 +97,12 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .node(JUKEBOX_QNAME)
         .node(LIBRARY_QNAME)
         .node(ARTIST_QNAME)
-        .nodeWithKey(ARTIST_QNAME, NAME_QNAME, "name of artist")
         .build();
+    static final YangInstanceIdentifier ARTIST_CHILD_IID = ARTIST_IID
+        .node(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"));
 
     private static final Data ARTIST_DATA = jukeboxPath(ARTIST_IID);
+    private static final Data ARTIST_CHILD_DATA = jukeboxPath(ARTIST_CHILD_IID);
     private static final Data PLAYER_DATA = jukeboxPath(PLAYER_IID);
 
     // Read mock data
@@ -323,11 +325,11 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         patch(new PatchContext("patchRMRm",
             List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
                 new PatchEntity("edit2", Operation.Merge, ARTIST_DATA, buildArtistList),
-                new PatchEntity("edit3", Operation.Remove, ARTIST_DATA))),
-            testPatchDataReplaceMergeAndRemoveStrategy(), false);
+                new PatchEntity("edit3", Operation.Remove, ARTIST_CHILD_DATA))),
+            testPatchDataReplaceMergeAndRemoveStrategy(buildArtistList), false);
     }
 
-    abstract @NonNull RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy();
+    abstract @NonNull RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy(MapNode artistList);
 
     @Test
     final void testPatchDataCreateAndDelete() {
