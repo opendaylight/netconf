@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d529faea_37a4285a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-07-04T13:01:17Z",
+      "side": 1,
+      "message": "Didn\u0027t use this method, as Netty do chunking of byteBufer itself and response was chunked two times",
+      "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4097ac74_8624cf47",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-07-04T13:01:17Z",
+      "side": 1,
+      "message": "Here, we rely on catching a RuntimeException that can occur during the filing generator to send a status 500 and an error message body. This approach was acceptable when we created the whole response before sending it. However, now the error is thrown while we\u0027re already writing data to the ResponseBodyOutputStream, and the first chunk—including the response status and part of the data—might have already been sent.",
+      "range": {
+        "startLine": 145,
+        "startChar": 11,
+        "endLine": 145,
+        "endChar": 82
+      },
+      "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
