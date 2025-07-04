@@ -9,7 +9,6 @@ package org.opendaylight.netconf.client.mdsal.spi;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
@@ -485,9 +484,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends DOMRpcResult> create(final Data path, final NormalizedNode data) {
-        if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(path.databind().modelContext(), path.instance());
-            final var futureChain = merge(path, emptySubTree);
+        if (isNonEmptyListPath(data)) {
+            final var futureChain = RPC_SUCCESS;
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.instance().node(child.name());
                 addIntoFutureChain(futureChain, () -> dataTreeService.create(CONFIGURATION, childPath, child,
@@ -504,9 +502,8 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends DOMRpcResult> replace(final Data path, final NormalizedNode data) {
-        if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(path.databind().modelContext(), path.instance());
-            final var futureChain = merge(path, emptySubTree);
+        if (isNonEmptyListPath(data)) {
+            final var futureChain = RPC_SUCCESS;
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.instance().node(child.name());
                 addIntoFutureChain(futureChain, () -> dataTreeService.replace(CONFIGURATION, childPath, child,
@@ -616,10 +613,6 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
         }
 
         final var parentInstance = parentPath.instance();
-        final var emptySubtree = fromInstanceId(parentPath.databind().modelContext(), parentInstance);
-        futureChain = addIntoFutureChain(futureChain, () -> dataTreeService.merge(CONFIGURATION,
-            YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree, Optional.empty()));
-
         int lastInsertedPosition = 0;
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -802,6 +795,11 @@ public class NetconfDataOperations extends AbstractServerDataOperations {
             return schemaNode instanceof ListSchemaNode || schemaNode instanceof LeafListSchemaNode;
         }
         return false;
+    }
+
+    private static boolean isNonEmptyListPath(final NormalizedNode data) {
+        return (data instanceof MapNode || data instanceof LeafSetNode)
+            && !((NormalizedNodeContainer<?>) data).body().isEmpty();
     }
 
     /**

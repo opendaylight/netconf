@@ -151,8 +151,6 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     ServerDataOperations testPostListDataStrategy(final MapEntryNode entryNode,
             final YangInstanceIdentifier node) {
         mockLockUnlockCommit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .merge(eq(CONFIGURATION), eq(PLAYLIST_IID), any(ContainerNode.class), eq(Optional.empty()));
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService).create(
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
         return netconfData;
@@ -276,8 +274,6 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
             SONG1_PATH);
         doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).remove(CONFIGURATION,
             SONG2_PATH);
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).merge(any(), any(), any(),
-            any());
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(mockNetconfService)
             .getConfig(SONG_LIST_PATH);
 
@@ -319,8 +315,6 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
 
         verify(mockNetconfService).remove(CONFIGURATION, SONG1_PATH);
         verify(mockNetconfService).remove(CONFIGURATION, SONG2_PATH);
-        verify(mockNetconfService).merge(eq(CONFIGURATION), eq(JUKEBOX_IID), any(ContainerNode.class),
-            eq(Optional.empty()));
         verify(mockNetconfService).getConfig(SONG_LIST_PATH);
         verify(mockNetconfService).lock();
         verify(mockNetconfService).unlock();
@@ -354,8 +348,6 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
             SONG1_PATH);
         doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).remove(CONFIGURATION,
             SONG2_PATH);
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(mockNetconfService).merge(eq(CONFIGURATION),
-            eq(SONG_LIST_PATH), any(ContainerNode.class), eq(Optional.empty()));
 
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(mockNetconfService)
             .getConfig(SONG_LIST_PATH);
@@ -399,8 +391,6 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         verify(mockNetconfService).remove(CONFIGURATION, SONG1_PATH);
         verify(mockNetconfService).remove(CONFIGURATION, SONG2_PATH);
         verify(mockNetconfService).getConfig(SONG_LIST_PATH);
-        verify(mockNetconfService).merge(eq(CONFIGURATION), eq(SONG_LIST_PATH), any(ContainerNode.class),
-            eq(Optional.empty()));
         verify(mockNetconfService).lock();
         verify(mockNetconfService).commit();
         verify(mockNetconfService).unlock();
@@ -441,8 +431,6 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
             .remove(CONFIGURATION, ARTIST_CHILD_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
             .replace(CONFIGURATION, ARTIST_CHILD_IID, artistList.body().iterator().next(), Optional.empty());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfService)
-            .merge(eq(CONFIGURATION), eq(ARTIST_IID), any(ContainerNode.class), eq(Optional.empty()));
         return netconfData;
     }
 
