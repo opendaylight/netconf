@@ -96,16 +96,28 @@ public abstract class AbstractJukeboxTest {
         .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
+    protected static final YangInstanceIdentifier SONG_LIST_PATH = YangInstanceIdentifier.builder()
+        .node(JUKEBOX_QNAME)
+        .node(PLAYLIST_QNAME)
+        .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0"))
+        .node(SONG_QNAME)
+        .build();
     protected static final MapEntryNode SONG1 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
             Uint32.ONE))
         .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "A"))
         .build();
+    protected static final YangInstanceIdentifier SONG1_PATH = SONG_LIST_PATH
+        .node(NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME, Uint32.ONE));
     protected static final MapEntryNode SONG2 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
             Uint32.TWO))
         .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
         .build();
+    protected static final YangInstanceIdentifier SONG2_PATH = SONG_LIST_PATH
+        .node(NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME, Uint32.TWO));
+    protected static final YangInstanceIdentifier SONG3_PATH = SONG_LIST_PATH
+        .node(NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME, Uint32.valueOf(3)));
     protected static final SystemMapNode PLAYLIST_WITH_SONGS = ImmutableNodes.newSystemMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
             .withChild(SONG1)
