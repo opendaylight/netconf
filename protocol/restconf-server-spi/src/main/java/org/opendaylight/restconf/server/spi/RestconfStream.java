@@ -342,8 +342,48 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         @NonNullByDefault
         public abstract void publishStateNotif(String message);
 
+        /**
+         * Terminates this subscription and completes the caller's {@link ServerRequest}.
+         *
+         * <p>This method:
+         * <ol>
+         *   <li>Asynchronously removes the subscription from the OPERATIONAL datastore via
+         *       {@code removeSubscription(id, reason)}.</li>
+         *   <li>On success: removes the in-memory subscription from {@code subscriptions}, triggers
+         *       {@code subscriptionRemoved(id)} to reschedule stop-time handling, notifies all receivers with
+         *       {@code Subscriber#endOfStream()}, and completes {@code request} with {@link Empty}.</li>
+         *   <li>On failure: leaves the subscription in memory and completes {@code request} with
+         *       {@link RequestException}.</li>
+         * </ol>
+         *
+         * <p>State notifications (e.g. {@code subscription-terminated}) are published by the registry's
+         * {@code removeSubscription(...)} implementation.
+         *
+         * <h4>Usage</h4>
+         * Use this variant when the termination is triggered by an external RPC/HTTP request and a reply
+         * must be delivered. For internal tear-downs with no outward reply, prefer {@link #terminateInternal(QName)}.
+         *
+         * @param request the request to complete (must not be {@code null})
+         * @param reason  IETF {@code subscription-terminated} reason identity (e.g. {@code NoSuchSubscription.QNAME})
+         */
         @NonNullByDefault
         protected abstract void terminateImpl(ServerRequest<Empty> request, QName reason);
+
+        /**
+         * Terminates this subscription without completing an external {@link ServerRequest}.
+         *
+         * <p>Semantics are the same as {@link #terminateImpl(ServerRequest, QName)} except no request is completed.
+         * This is intended for internal tear-downs (e.g., invalidated filter, transport loss, or stop-time expiry)
+         * where there is no client waiting for a response.
+         *
+         * <p>On success, the subscription is removed from the OPERATIONAL datastore and from the in-memory registry,
+         * receivers are closed with {@code endOfStream()}, and the registry publishes the appropriate state
+         * notification. On failure, the subscription remains in memory and the exception is logged.
+         *
+         * @param reason IETF {@code subscription-terminated} reason identit (e.g. {@code FilterUnavailable.QNAME},
+         *      {@code StreamUnavailable.QNAME})
+         */
+        protected abstract void terminateInternal(QName reason);
 
         protected abstract void stopTimeReached();
 
