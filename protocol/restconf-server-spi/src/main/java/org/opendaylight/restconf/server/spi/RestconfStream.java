@@ -206,6 +206,7 @@ public final class RestconfStream<T> {
          * @param encoding requested encoding
          * @param streamName requested stream name
          * @param filter optional filter
+         * @param stopTime optional stop-time
          * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
          */
         @NonNullByDefault
