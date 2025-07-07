@@ -26,10 +26,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -51,6 +53,9 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
+import org.opendaylight.mdsal.singleton.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
@@ -66,7 +71,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.su
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionResumed;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspended;
@@ -133,6 +137,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
     private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
+    private static final YangInstanceIdentifier FILTERS_OPER_PATH = YangInstanceIdentifier.of(FILTERS_NODEID);
+    private static final ServiceGroupIdentifier SGI = new ServiceGroupIdentifier("restconf-stream-filters");
     /**
      * {@link NodeIdentifier} of {@code leaf reason} in {@link SubscriptionSuspended} and
      * {@link SubscriptionTerminated}. Value domains are identities derived from {@link SubscriptionSuspendedReason} and
@@ -169,14 +175,36 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }
     }
 
+    /** Handles the *cluster-singleton* lifecycle only. */
+    private final class LeaderService implements ClusterSingletonService {
+        @Override
+        public void instantiateServiceInstance() {
+            LOG.info("Cluster leadership acquired – will write OPERATIONAL view");
+            isLeader.set(true);
+        }
+
+        @Override
+        public ListenableFuture<?> closeServiceInstance() {
+            LOG.info("Cluster leadership lost – stop writing OPERATIONAL view");
+            isLeader.set(false);
+            return Futures.immediateVoidFuture();
+        }
+
+        @Override
+        public @NonNull ServiceGroupIdentifier getIdentifier() {
+            return SGI;
+        }
+    }
+
     private final ScheduledExecutorService updateCounters;
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
     private final DatabindProvider databindProvider;
+    private final Registration leaderReg;
     private final List<StreamSupport> supports;
     private final Registration sclReg;
     private final Registration tclReg;
-
+    private final AtomicBoolean isLeader = new AtomicBoolean(false);
     private DefaultNotificationSource notificationSource;
     private DOMTransactionChain txChain;
 
@@ -186,7 +214,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final DOMNotificationService notificationService,
             @Reference final DOMSchemaService schemaService,
             @Reference final RestconfStream.LocationProvider locationProvider,
-            @Reference final DatabindProvider databindProvider) {
+            @Reference final DatabindProvider databindProvider,
+            @Reference final ClusterSingletonServiceProvider cssProvider) {
         super(schemaService.getGlobalContext());
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
@@ -194,7 +223,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
         allocateTxChain();
         updateCounters = Executors.newSingleThreadScheduledExecutor(TF);
-
+        leaderReg = cssProvider.registerClusterSingletonService(new LeaderService());
         // FIXME: the source should be handling its own updates and we should only call start() once
         notificationSource = new DefaultNotificationSource(notificationService, this::modelContext);
         start(notificationSource);
@@ -237,6 +266,9 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         sclReg.close();
         if (notificationSource != null) {
             notificationSource.close();
+        }
+        if (leaderReg != null) {
+            leaderReg.close();
         }
         updateCounters.shutdownNow();
         txChain.close();
@@ -391,12 +423,13 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @Override
-    public synchronized ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId) {
+    public synchronized ListenableFuture<@Nullable Void> removeSubscription(final Uint32 subscriptionId,
+            final QName reason) {
         final var tx = txChain.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, MdsalRestconfStreamRegistry.subscriptionPath(subscriptionId));
         return tx.commit().transform(info -> {
             final var subscription = lookupSubscription(subscriptionId);
-            final var notificationNode = subscriptionTerminated(subscriptionId, NoSuchSubscription.QNAME);
+            final var notificationNode = subscriptionTerminated(subscriptionId, reason);
             final var formattedNotification = getFormattedNotification(subscriptionId, subscription.encoding(),
                 notificationNode, State.TERMINATED, Instant.now(), databindProvider.currentDatabind().modelContext());
             subscription.publishStateNotif(formattedNotification);
@@ -537,6 +570,35 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             subscriptionPath(subscriptionId).node(RECEIVERS_NODEID).node(RECEIVER_NODEID), receiver);
         return mapFuture(tx.commit());
     }
+
+    @Override
+    protected synchronized ListenableFuture<Void> filtersOperationalViewUpdated(final Set<String> workingNames) {
+        if (!isLeader.get()) {
+            return Futures.immediateVoidFuture();
+        }
+
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        for (final var entry : snapshotFilterSpecs().entrySet()) {
+            final var name = entry.getKey();
+            final var spec = entry.getValue();
+            final var path = FILTERS_OPER_PATH
+                .node(NodeIdentifierWithPredicates.of(StreamFilter.QNAME, NAME_QNAME, name))
+                .node(FILTER_SPEC_NODEID);
+
+            if (workingNames.contains(name)) {
+                // spec compiled OK → publish it in OPERATIONAL
+                tx.put(LogicalDatastoreType.OPERATIONAL, path, spec);
+            } else {
+                // spec failed → make sure it is absent from OPERATIONAL
+                tx.delete(LogicalDatastoreType.OPERATIONAL, path);
+            }
+        }
+        return tx.commit().transform(info -> {
+            LOG.debug("Filter operational view updated {}", info);
+            return null;
+        }, MoreExecutors.directExecutor());
+    }
+
 
     @Override
     protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {

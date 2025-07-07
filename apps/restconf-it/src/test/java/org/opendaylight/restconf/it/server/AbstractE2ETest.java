@@ -69,6 +69,7 @@ import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcProviderService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.odl.device.notification.SubscribeDeviceNotificationRpc;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
@@ -204,10 +205,14 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext,
             new RouterDOMRpcProviderService(domRpcRouter));
         domNotificationRouter = new DOMNotificationRouter(32);
+        final ClusterSingletonServiceProvider cssProvider = service -> {
+            service.instantiateServiceInstance();
+            return service::closeServiceInstance;
+        };
 
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker,
             new RouterDOMNotificationService(domNotificationRouter),
-            schemaService, uri -> uri.resolve("streams"), dataBindProvider);
+            schemaService, uri -> uri.resolve("streams"), dataBindProvider, cssProvider);
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
