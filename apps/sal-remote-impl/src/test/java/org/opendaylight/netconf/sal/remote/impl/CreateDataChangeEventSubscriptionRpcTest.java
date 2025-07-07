@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,6 +101,11 @@ class CreateDataChangeEventSubscriptionRpcTest {
         @Override
         protected ListenableFuture<Void> updateSubscriptionReceivers(final Uint32 subscriptionId,
                 final MapNode receivers) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected ListenableFuture<Void> filtersOperationalViewUpdated(final Set<String> workingNames) {
             throw new UnsupportedOperationException();
         }
     }
