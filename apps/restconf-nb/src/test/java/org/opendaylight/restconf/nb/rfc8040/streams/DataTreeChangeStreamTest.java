@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.sal.remote.impl.DataTreeChangeSource;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
@@ -215,6 +216,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     @Mock
     private DOMNotificationService notificationService;
+    @Mock
+    private ClusterSingletonServiceProvider cssProvider;
 
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
@@ -227,7 +230,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         domDataBroker = getDomBroker();
         databindProvider = () -> AbstractInstanceIdentifierTest.IID_DATABIND;
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, notificationService,
-            new FixedDOMSchemaService(AbstractInstanceIdentifierTest.IID_SCHEMA), x -> x, databindProvider);
+            new FixedDOMSchemaService(AbstractInstanceIdentifierTest.IID_SCHEMA), x -> x, databindProvider,
+            cssProvider);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
