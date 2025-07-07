@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -92,6 +93,8 @@ class MdsalRestconfStreamRegistryTest {
     private EffectiveModelContext effectiveModelContext;
     @Mock
     private EffectiveModelContext updatedModelContext;
+    @Mock
+    private ClusterSingletonServiceProvider cssProvider;
 
     private MdsalRestconfStreamRegistry registry;
 
@@ -105,7 +108,7 @@ class MdsalRestconfStreamRegistryTest {
         when(dtxExt.registerTreeChangeListener(any(), any())).thenReturn(regMock);
         when(schemaService.getGlobalContext()).thenReturn(effectiveModelContext);
         registry = new MdsalRestconfStreamRegistry(dataBroker, notifService, schemaService, locProvider,
-            databindProvider);
+            databindProvider, cssProvider);
     }
 
     @AfterEach
