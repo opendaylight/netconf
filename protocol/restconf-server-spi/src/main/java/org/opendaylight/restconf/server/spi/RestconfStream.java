@@ -203,9 +203,10 @@ public final class RestconfStream<T> {
          * the established subscription.
          *
          * @param request {@link ServerRequest} for this invocation
-         * @param encoding requested encoding
          * @param streamName requested stream name
+         * @param encoding requested encoding
          * @param filter optional filter
+         * @param stopTime optional stop-time
          * @throws NullPointerException if {@code encoding} or {@code streamName} is {@code null}
          */
         @NonNullByDefault
