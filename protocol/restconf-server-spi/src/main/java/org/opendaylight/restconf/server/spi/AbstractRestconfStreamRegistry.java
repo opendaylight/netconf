@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -33,6 +34,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -104,12 +107,24 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
 
         private @Nullable EventStreamFilter filter;
+        private @Nullable String filterName;
 
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
-                final @Nullable Instant stopTime) {
+                final @Nullable String filterName, final @Nullable Instant stopTime) {
             super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
             this.filter = filter;
+            this.filterName = filterName;
+        }
+
+        void suspend(final String reason) {
+            if (state() == SubscriptionState.SUSPENDED) {
+                return;
+            }
+            LOG.warn("Suspending subscription {} – {}", id(), reason);
+            setState(SubscriptionState.SUSPENDED);
+            // downstream receivers should ignore event data
+            //receivers.forEach(Rfc8639Subscriber::suspend);
         }
 
         @Override
@@ -301,6 +316,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return filter;
         }
 
+        protected @Nullable String filterName() {
+            return filterName;
+        }
+
         @Override
         public List<String> receiversNames() {
             return receivers.stream()
@@ -394,14 +413,16 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final ConcurrentMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
-    // FIXME: This is not quite sufficient and should be split into two maps:
-    //          1. filterSpecs, which is a HashMap<String, ChoiceNode> recording known filter-spec definitions
-    //             access should be guarded by a lock
-    //          2. filters, which is a volatile ImmutableMap<String, EventStreamFilter>
-    //             - lookups should go through getAcquire()
-    //             - updates should hold a lock and publish new versions via setRelease()
-    //        The distinction is crucial, as we need to recompile filters when EffectiveModelContext changes and update
-    //        filters accordingly.
+    // --- Filter Management ---
+    // filterSpecs: HashMap<String, ChoiceNode> recording known filter-spec definitions, access guarded by filterLock
+    // filters: volatile ImmutableMap<String, EventStreamFilter>; reads via getAcquire(), writes via setRelease()
+    // This enables safe re-compilation after every EffectiveModelContext change.
+    // After every (re)compile, filtersOperationalViewUpdated(Set<String> workingNames) is called to update the operational datastore
+    // with the list of filter names that compiled successfully (removing those that failed).
+    private final ReentrantLock filterLock = new ReentrantLock();
+    protected final Map<String, ChoiceNode> filterSpecs = new HashMap<>();
+    private final AtomicReference<ImmutableMap<String, EventStreamFilter>> filters =
+        new AtomicReference<>(ImmutableMap.of());
     // FIXME: There is also a missing piece: we are not populating the operational datastore. This needs to be addressed
     //        after we address the above, so that anytime we update filters, we issue a callout to subclass to update
     //        oper so that it contains those filterSpecs for which we have EventStreamFilters. Those that failed to
@@ -410,8 +431,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     //        really in use.
     //        Note: the MD-SAL implementation needs to use a Cluster Singleton Service to ensure oper updates are
     //              happening from a single node only.
-    private final ConcurrentMap<String, EventStreamFilter> filters = new ConcurrentHashMap<>();
-
     private volatile @Nullable Future<?> stopTimeTask;
     private volatile @Nullable Uint32 nextSubscriptionToStop;
     private volatile @Nullable Instant nextStopTime;
@@ -584,7 +603,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onSuccess(final Void result) {
                     final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
-                        session, filterImpl, stopTime);
+                        session, filterImpl, null, stopTime);
                     subscriptions.put(id, subscription);
                     if (stopTime != null) {
                         initiateStopTime(id, stopTime);
@@ -801,29 +820,73 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * @param nameToSpec the update map, {@code null} values indicate removals
      */
     @NonNullByDefault
-    protected final void updateFilterDefinitions(final Map<String, @Nullable ChoiceNode> nameToSpec) {
-        for (var entry : nameToSpec.entrySet()) {
-            final var filterName = entry.getKey();
-            final var filterSpec = entry.getValue();
-            if (filterSpec == null) {
-                filters.remove(filterName);
-                LOG.debug("Removed filter {} without specification", filterName);
-                continue;
-            }
-
-            final EventStreamFilter filter;
-            try {
-                filter = parseFilter(filterSpec);
-            } catch (RequestException e) {
-                filters.remove(filterName);
-                LOG.warn("Removed filter {} due to parse failure", filterSpec.prettyTree(), e);
-                continue;
-            }
-
-            filters.put(filterName, filter);
-            LOG.debug("Updated filter {} to {}", filterName, filter);
+    protected final void updateFilterDefinitions(Map<String,@Nullable ChoiceNode> nameToSpec) {
+        filterLock.lock();
+        try {
+            nameToSpec.forEach((name,spec) -> {
+                if (spec == null) {
+                    filterSpecs.remove(name);
+                } else {
+                    filterSpecs.put(name,spec);
+                }
+            });
+            rebuildFiltersLocked(nameToSpec.keySet());
+        } finally {
+            filterLock.unlock();
         }
     }
+
+    private void rebuildFiltersLocked(Set<String> touchedFilters) {
+        if (!filterLock.isHeldByCurrentThread()) {
+            throw new IllegalStateException("rebuildFiltersLocked must be called while holding filterLock");
+        }
+        // Start with the currently published map to retain unaffected entries
+        final var freshFilters = new HashMap<>(filters.getAcquire());
+
+        for (final var filterName : touchedFilters) {
+            final var filterSpec = filterSpecs.get(filterName);
+            if (filterSpec == null) {
+                if (freshFilters.remove(filterName) != null) {
+                    LOG.debug("Removed filter {} without specification", filterName);
+                };
+                continue;
+            }
+            try {
+                final var filter = parseFilter(filterSpec);
+                freshFilters.put(filterName, filter);
+                LOG.debug("Updated filter {} to {}", filterName, filter);
+            } catch (RequestException e) {
+                if (freshFilters.remove(filterName) != null) {
+                LOG.warn("Removed filter {} due to parse failure", filterSpec.prettyTree(), e);
+                }
+            }
+        }
+
+        filters.setRelease(ImmutableMap.copyOf(freshFilters));
+        // Callback to update operational datastore with the list of filter names that compiled successfully
+        filtersOperationalViewUpdated(filters.getAcquire().keySet());
+        refreshSubscriptions(touchedFilters);
+    }
+
+    private void refreshSubscriptions(Set<String> names) {
+        for (var subscription : subscriptions.values()) {
+            var subscribtionFilter = subscription.filterName();
+            if (subscribtionFilter != null && names.contains(subscribtionFilter)) {
+                var newFilter = filters.getAcquire().get(subscribtionFilter);
+                if (newFilter != null) {
+                    subscription.setFilter(newFilter);
+                } else {
+                    subscription.suspend("Filter no longer valid");
+                }
+            }
+        }
+    }
+
+    /**
+     * Called after every (re)compile with the set of filter names that compiled
+     * successfully.  Implementation must update the operational datastore.
+     */
+    protected abstract void filtersOperationalViewUpdated(Set<String> workingNames);
 
     @NonNullByDefault
     private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
@@ -850,7 +913,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     @NonNullByDefault
     private EventStreamFilter getFilter(final String filterName) throws RequestException {
-        final var impl = filters.get(filterName);
+        final var impl = filters.getAcquire().get(filterName);
         if (impl != null) {
             return impl;
         }
