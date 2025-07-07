@@ -54,6 +54,7 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.mdsal.DeviceActionFactoryImpl;
@@ -139,6 +140,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
+    private ClusterSingletonServiceProvider cssProvider;
 
     @BeforeAll
     static void beforeAll() {
@@ -193,9 +195,12 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
         domNotificationRouter = new DOMNotificationRouter(32);
-
+        cssProvider = service -> {
+            service.instantiateServiceInstance();
+            return service::closeServiceInstance;
+        };
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
-            schemaService, uri -> uri.resolve("streams"), dataBindProvider);
+            schemaService, uri -> uri.resolve("streams"), dataBindProvider, cssProvider);
         final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
             domRpcRouter.actionService(), domMountPointService, List.of());
 
