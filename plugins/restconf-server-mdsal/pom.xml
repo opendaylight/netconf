@@ -59,6 +59,10 @@
             <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-singleton-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
         </dependency>
