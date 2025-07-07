@@ -126,8 +126,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier RECEIVERS_NODEID = NodeIdentifier.create(Receivers.QNAME);
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
-    private static final NodeIdentifier STOP_TIME =
-        NodeIdentifier.create(QName.create(Subscription.QNAME, "stop-time").intern());
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
@@ -378,7 +376,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
 
         if (stopTime != null) {
-            node.withChild(ImmutableNodes.leafNode(STOP_TIME, stopTime.toString()));
+            node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
         }
 
         final var tx = txChain.newWriteOnlyTransaction();
