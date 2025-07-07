@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -142,11 +143,14 @@ final class ServerRequestExecutor implements PendingRequestListener {
     // Hand-coded, as simple as possible
     @NonNullByDefault
     private static FullHttpResponse formatException(final Exception cause, final HttpVersion version) {
-        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        final var content = response.content();
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
-        ByteBufUtil.writeUtf8(content, cause.getMessage() != null ? cause.getMessage() : "");
+        final var message = cause.getMessage();
+        final var content = Unpooled.buffer(0);
+        if (message != null) {
+            ByteBufUtil.writeUtf8(content, message);
+        }
+        final var response = new DefaultFullHttpResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
         HttpUtil.setContentLength(response, content.readableBytes());
         return response;
     }
