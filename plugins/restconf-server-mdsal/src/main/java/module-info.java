@@ -27,4 +27,5 @@ module org.opendaylight.restconf.server.mdsal {
     requires static org.checkerframework.checker.qual;
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
+    requires org.opendaylight.mdsal.singleton.api;
 }

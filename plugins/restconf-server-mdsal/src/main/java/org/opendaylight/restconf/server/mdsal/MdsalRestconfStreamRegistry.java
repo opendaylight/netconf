@@ -21,10 +21,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Map;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonService;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -133,6 +136,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
     private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
+    private static final YangInstanceIdentifier FILTERS_OPER_PATH = YangInstanceIdentifier.of(FILTERS_NODEID);
     /**
      * {@link NodeIdentifier} of {@code leaf reason} in {@link SubscriptionSuspended} and
      * {@link SubscriptionTerminated}. Value domains are identities derived from {@link SubscriptionSuspendedReason} and
@@ -175,6 +179,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private final DOMDataBroker dataBroker;
     private final DOMNotificationService notificationService;
     private final DatabindProvider databindProvider;
+    private final ClusterSingletonService clusterSingletonService;
     private final List<StreamSupport> supports;
     private final Registration sclReg;
     private final Registration tclReg;
@@ -188,10 +193,12 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final DOMNotificationService notificationService,
             @Reference final DOMSchemaService schemaService,
             @Reference final RestconfStream.LocationProvider locationProvider,
-            @Reference final DatabindProvider databindProvider) {
+            @Reference final DatabindProvider databindProvider,
+            @Reference final ClusterSingletonService clusterSingletonService) {
         this.dataBroker = requireNonNull(dataBroker);
         this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);
+        this.clusterSingletonService = requireNonNull(clusterSingletonService);
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
         allocateTxChain();
         updateCounters = Executors.newSingleThreadScheduledExecutor(TF);
@@ -507,6 +514,34 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             subscriptionPath(subscriptionId).node(RECEIVERS_NODEID).node(RECEIVER_NODEID), receiver);
         return mapFuture(tx.commit());
     }
+
+    @Override
+    protected void filtersOperationalViewUpdated(final Set<String> workingNames) {
+        // FIXME: add logic for updating data only on single node
+        if (!clusterSingletonService.()) {
+            return;
+        }
+
+        final var tx = txChain.newWriteOnlyTransaction();
+        for (final var entry : filterSpecs.entrySet()) {
+            final var name = entry.getKey();
+            final var spec = entry.getValue();
+
+            final var path = FILTERS_OPER_PATH.node(NodeIdentifierWithPredicates
+                    .of(StreamFilter.QNAME, NAME_QNAME, name))
+                .node(FILTER_SPEC_NODEID);
+
+            if (workingNames.contains(name)) {
+                // spec compiled OK → publish it in OPERATIONAL
+                tx.put(LogicalDatastoreType.OPERATIONAL, path, spec);
+            } else {
+                // spec failed → make sure it is absent from OPERATIONAL
+                tx.delete(LogicalDatastoreType.OPERATIONAL, path);
+            }
+        }
+        tx.commit();
+    }
+
 
     @Override
     protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
