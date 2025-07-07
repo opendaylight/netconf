@@ -53,6 +53,7 @@ import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMPublishNotificationService;
 import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
@@ -195,6 +196,10 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
         domRpcRouter = new DOMRpcRouter(schemaService);
+        final ClusterSingletonServiceProvider cssProvider = service -> {
+            service.instantiateServiceInstance();
+            return service::closeServiceInstance;
+        };
 
         final var domMountPointService = new DOMMountPointServiceImpl();
 
@@ -204,7 +209,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
 
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker,
             new RouterDOMNotificationService(domNotificationRouter), schemaService,
-            uri -> uri.resolve("streams"), dataBindProvider);
+            uri -> uri.resolve("streams"), dataBindProvider, cssProvider);
 
         final var rpcImplementations = List.of(
             // register subscribed notifications RPCs to be tested
