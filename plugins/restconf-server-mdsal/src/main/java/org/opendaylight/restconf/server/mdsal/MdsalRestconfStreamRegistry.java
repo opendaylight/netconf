@@ -376,7 +376,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
 
         if (stopTime != null) {
-            node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
+            node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, new DateAndTime(stopTime.toString())));
         }
 
         final var tx = txChain.newWriteOnlyTransaction();
@@ -490,7 +490,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
 
         if (stopTime != null) {
-            node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
+            node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, new DateAndTime(stopTime.toString())));
         }
 
         tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg), node.build());
@@ -591,7 +591,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 .build());
         }
         if (stopTime != null) {
-            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
+            body.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, new DateAndTime(stopTime.toString())));
         }
         if (uri != null) {
             body.withChild(ImmutableNodes.leafNode(URI_NODEID, uri));
