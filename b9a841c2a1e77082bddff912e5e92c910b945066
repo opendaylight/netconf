@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08c41be4_4290a4fb",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-07-08T11:32:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ea333dd_5467a6c3",
+      "revId": "b9a841c2a1e77082bddff912e5e92c910b945066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7895c5d2_c91ba7ad",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-08T11:09:06Z",
       "side": 1,
       "message": "We do not use \u003c/p\u003e",
+      "revId": "b9a841c2a1e77082bddff912e5e92c910b945066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1642f379_88ce70f8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-07-08T11:32:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7895c5d2_c91ba7ad",
       "revId": "b9a841c2a1e77082bddff912e5e92c910b945066",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
