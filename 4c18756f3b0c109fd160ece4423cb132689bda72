@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20b0ddec_bd61d7a6",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/TestEventStreamListener.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-07-08T10:24:26Z",
+      "side": 1,
+      "message": "this is only test class so I don\u0027t think it\u0027s needed",
+      "parentUuid": "e4d2810c_89611a10",
+      "revId": "4c18756f3b0c109fd160ece4423cb132689bda72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a539654a_074fd1a9",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-08T09:11:37Z",
       "side": 1,
       "message": "Try to add: https://git.opendaylight.org/gerrit/c/netconf/+/116526/89/apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java#122",
+      "revId": "4c18756f3b0c109fd160ece4423cb132689bda72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "805f988d_3eafd1d3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-07-08T10:24:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a539654a_074fd1a9",
       "revId": "4c18756f3b0c109fd160ece4423cb132689bda72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce6b26ba_7636f4a2",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-07-08T10:24:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86589854_735f435e",
+      "revId": "4c18756f3b0c109fd160ece4423cb132689bda72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "475520bd_aac4b54b",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-07-08T09:11:37Z",
       "side": 1,
       "message": "receivers.forEach(Subscriber::endOfStream);",
+      "revId": "4c18756f3b0c109fd160ece4423cb132689bda72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e34e378_ac090e69",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-07-08T10:24:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "475520bd_aac4b54b",
       "revId": "4c18756f3b0c109fd160ece4423cb132689bda72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
