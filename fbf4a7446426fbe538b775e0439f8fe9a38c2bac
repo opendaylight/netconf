@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c825c4d9_21e453be",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "what is RestconfStreamImpl?",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4da93461_d57bd81b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/DefaultRestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "format javadoc",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50253c61_32433108",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/LegacyRestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "format javadoc",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f08e24cc_244dc94b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "no abstract",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05c6368c_22e409e7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "format javadoc",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "581aa1ce_2ffcd5b0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "no abstract, default implementation which call terminate(), marked for removal",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "922fedc4_f6b72408",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 641,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-08T08:10:57Z",
+      "side": 1,
+      "message": "private",
+      "revId": "fbf4a7446426fbe538b775e0439f8fe9a38c2bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
