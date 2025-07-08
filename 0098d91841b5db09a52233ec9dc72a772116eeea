@@ -16,6 +16,24 @@
       "message": "deal with FIXMEs",
       "revId": "0098d91841b5db09a52233ec9dc72a772116eeea",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a9f4de9_de0d7671",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 79
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-07-08T12:56:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bc1010d_e2087d60",
+      "revId": "0098d91841b5db09a52233ec9dc72a772116eeea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

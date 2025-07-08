@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27d81bbd_cc2407d2",
+        "filename": "plugins/restconf-server-mdsal/src/test/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistryTest.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-07-08T12:56:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a69e959b_e0a77343",
+      "revId": "cef181729a7d2978658a0e7b458ec32aa472f413",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f216e21b_e768e366",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-08T10:58:44Z",
       "side": 1,
       "message": "filter is Nullable",
+      "revId": "cef181729a7d2978658a0e7b458ec32aa472f413",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f905df33_3b21da79",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 80
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-07-08T12:56:24Z",
+      "side": 1,
+      "message": "shuould be nonNull",
+      "parentUuid": "f216e21b_e768e366",
       "revId": "cef181729a7d2978658a0e7b458ec32aa472f413",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
