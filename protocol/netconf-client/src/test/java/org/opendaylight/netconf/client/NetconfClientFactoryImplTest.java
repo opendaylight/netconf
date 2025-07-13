@@ -175,8 +175,15 @@ class NetconfClientFactoryImplTest {
         keyMgr.init(keyStore, EMPTY_SECRET);
         final var trustMgr = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustMgr.init(keyStore);
-        final var serverContext = SslContextBuilder.forServer(keyMgr).trustManager(trustMgr).build();
-        final var clientContext = SslContextBuilder.forClient().keyManager(keyMgr).trustManager(trustMgr).build();
+        final var serverContext = SslContextBuilder.forServer(keyMgr)
+            .trustManager(trustMgr)
+            .build();
+        final var clientContext = SslContextBuilder.forClient()
+            .keyManager(keyMgr)
+            .trustManager(trustMgr)
+            // FIXME: do not disable host name verification
+            .endpointIdentificationAlgorithm(null)
+            .build();
 
         final var server = TLSServer.listen(serverTransportListener, SERVER_FACTORY.newServerBootstrap(),
             tcpServerParams, new FixedSslHandlerFactory(serverContext)).get(1, TimeUnit.SECONDS);

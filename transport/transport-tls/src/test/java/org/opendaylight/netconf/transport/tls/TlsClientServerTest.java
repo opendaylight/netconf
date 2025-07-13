@@ -201,8 +201,12 @@ class TlsClientServerTest {
         final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
         final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
             .clientAuth(ClientAuth.REQUIRE).trustManager(buildTrustManagerFactory(clientKs)).build();
-        final var clientContext = SslContextBuilder.forClient().keyManager(buildKeyManagerFactory(clientKs))
-            .trustManager(buildTrustManagerFactory(serverKs)).build();
+        final var clientContext = SslContextBuilder.forClient()
+            .keyManager(buildKeyManagerFactory(clientKs))
+            .trustManager(buildTrustManagerFactory(serverKs))
+            // FIXME: do not disable host name verification
+            .endpointIdentificationAlgorithm(null)
+            .build();
 
         integrationTest(
             () -> TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
@@ -254,9 +258,15 @@ class TlsClientServerTest {
         final var serverKs = buildKeystoreWithGeneratedCert(RSA_ALGORITHM);
         final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
         final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
-            .clientAuth(ClientAuth.REQUIRE).trustManager(buildTrustManagerFactory(clientKs)).build();
-        final var clientContext = SslContextBuilder.forClient().keyManager(buildKeyManagerFactory(clientKs))
-            .trustManager(buildTrustManagerFactory(serverKs)).build();
+            .clientAuth(ClientAuth.REQUIRE)
+            .trustManager(buildTrustManagerFactory(clientKs))
+            .build();
+        final var clientContext = SslContextBuilder.forClient()
+            .keyManager(buildKeyManagerFactory(clientKs))
+            .trustManager(buildTrustManagerFactory(serverKs))
+            // FIXME: do not disable host name verification
+            .endpointIdentificationAlgorithm(null)
+            .build();
 
         // start call-home client
         final var client = TLSClient.listen(clientListener, NettyTransportSupport.newServerBootstrap().group(group),

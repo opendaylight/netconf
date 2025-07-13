@@ -32,6 +32,9 @@ module org.opendaylight.netconf.transport.tls {
     requires org.opendaylight.yangtools.binding.spec;
     requires org.slf4j;
 
+    // Testing only
+    requires static org.bouncycastle.pkix;
+
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;
     requires static org.kohsuke.metainf_services;

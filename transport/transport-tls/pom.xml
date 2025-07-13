@@ -114,7 +114,8 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <scope>test</scope>
+            <!-- disabled until we figure out tests -->
+            <!--scope>test</scope-->
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -128,4 +129,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependencies>org.bouncycastle:bcpkix-jdk18on</ignoredNonTestScopedDependencies>
+                    </ignoredNonTestScopedDependencies>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

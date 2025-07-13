@@ -108,7 +108,10 @@ class CallHomeTlsServerTest {
         // SSL context for call-home server (acting as client): denies client 1, allows client 2,3
         final var serverCtx = SslContextBuilder.forClient()
             .keyManager(keyManagerFor(serverCert))
-            .trustManager(trustManagerFor(clientCert2, clientCert3)).build();
+            .trustManager(trustManagerFor(clientCert2, clientCert3))
+            // FIXME: do not disable validation
+            .endpointIdentificationAlgorithm(null)
+            .build();
 
         // SSL context for call-home clients (acting as servers)
         final var serverTrustMgr = trustManagerFor(serverCert);
