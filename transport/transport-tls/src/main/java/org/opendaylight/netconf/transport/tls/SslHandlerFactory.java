@@ -261,17 +261,19 @@ public abstract class SslHandlerFactory {
         final var max = Objects.requireNonNullElse(versions.getMax(), Tls13$I.VALUE);
 
         return switch (min) {
-            case Tls12$I min12 -> switch (max) {
-                case Tls12$I max12 -> List.of(max12);
-                case Tls13$I max13 -> List.of(min12, max13);
-                default -> throw new UnsupportedConfigurationException("Unsupported TLS version " + min);
-            };
-            case Tls13$I min13 -> switch (max) {
-                case Tls12$I max12 -> throw new UnsupportedConfigurationException(
-                    "Invalid TLS version range in " + versions);
-                case Tls13$I max13 -> List.of(Tls13$I.VALUE);
-                default -> throw new UnsupportedConfigurationException("Unsupported TLS version " + min);
-            };
+            case Tls12$I min12 ->
+                switch (max) {
+                    case Tls12$I max12 -> List.of(max12);
+                    case Tls13$I max13 -> List.of(min12, max13);
+                    default -> throw new UnsupportedConfigurationException("Unsupported TLS version " + min);
+                };
+            case Tls13$I min13 ->
+                switch (max) {
+                    case Tls12$I max12 -> throw new UnsupportedConfigurationException(
+                        "Invalid TLS version range in " + versions);
+                    case Tls13$I max13 -> List.of(Tls13$I.VALUE);
+                    default -> throw new UnsupportedConfigurationException("Unsupported TLS version " + min);
+                };
             default -> throw new UnsupportedConfigurationException("Unsupported TLS version " + min);
         };
     }
