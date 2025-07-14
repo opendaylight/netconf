@@ -16,6 +16,24 @@
       "message": "This change will allow simultaneous update of both candidate \u0026 running datastore, hence making it possible to change the running configuration in a way that conflicts with the changes made to the candidate datastore, which will be merged into the running datastore when committed.",
       "revId": "ba2853959e7ba3b41dddf1f80f05a96d1f573da5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0baa4f1a_f3af04a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-14T13:42:56Z",
+      "side": 1,
+      "message": "Make sense. Thanks, I have implemented the CandidateWithRunning class in the \"Replace NetconfDataTreeService\" patch.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116782/24/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/CandidateWithRunning.java",
+      "parentUuid": "cf16f119_1dd268bd",
+      "revId": "ba2853959e7ba3b41dddf1f80f05a96d1f573da5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
