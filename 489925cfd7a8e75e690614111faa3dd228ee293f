@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc4bbfa5_5bae140f",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/WellKnownResourcesTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-07-15T09:26:23Z",
+      "side": 1,
+      "message": "The test has been significantly simplified. The .toReadyResponse() method is no longer available, so we can\u0027t prepare the response as before. Comparison of XML and JSON response bodies is already covered in HostMetaE2ETest.",
+      "range": {
+        "startLine": 55,
+        "startChar": 9,
+        "endLine": 55,
+        "endChar": 20
+      },
+      "revId": "489925cfd7a8e75e690614111faa3dd228ee293f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
