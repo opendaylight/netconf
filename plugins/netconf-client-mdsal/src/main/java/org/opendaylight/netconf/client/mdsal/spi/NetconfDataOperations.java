@@ -19,10 +19,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.netconf.databind.RequestError;
@@ -124,12 +126,7 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
             request.failWith(cause);
             return;
         }
-        ListenableFuture<? extends DOMRpcResult> futureChain;
-        try {
-            futureChain = insertCreate(path, data, insert);
-        } catch (RequestException cause) {
-            futureChain = Futures.immediateFailedFuture(cause);
-        }
+        var futureChain = insertCreate(path, data, insert);
         futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
@@ -158,7 +155,6 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
             }
         }, MoreExecutors.directExecutor());
     }
-
 
     @Override
     public void deleteData(final ServerRequest<Empty> request, final Data path) {
@@ -319,24 +315,20 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     public void putData(final ServerRequest<DataPutResult> request, final Data path, final Insert insert,
             final NormalizedNode data) {
         LOG.debug("Execute PUT operation with {} INSERT query, data {} and path {}", insert, data, path);
-        final var instance = path.instance();
-        final var parentInstance = instance.coerceParent();
+        final var parentInstance = path.instance().coerceParent();
         final var parentPath = path.enterPath(parentInstance);
-        final Boolean exists;
         try {
-            exists = RestconfStrategy.syncAccess(exists(path), instance);
             checkListAndOrderedType(parentPath);
         } catch (RequestException e) {
             request.failWith(e);
             return;
         }
 
-        ListenableFuture<? extends DOMRpcResult> futureChain;
-        try {
-            futureChain = insertPut(path, data, insert, parentPath);
-        } catch (RequestException cause) {
-            futureChain = Futures.immediateFailedFuture(cause);
-        }
+        final var exists = new AtomicBoolean();
+        var futureChain = Futures.transformAsync(exists(path), result -> {
+            exists.set(Boolean.TRUE.equals(result));
+            return insertPut(path, data, insert, parentPath);
+        }, MoreExecutors.directExecutor());
         futureChain = addIntoFutureChain(futureChain, dataStoreService::commit);
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {
@@ -344,7 +336,7 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
             public void onSuccess(final DOMRpcResult result) {
                 LOG.debug("Successful PUT operation with {} INSERT query, data {}, path {} and result {}", insert,
                     data, path, result);
-                request.completeWith(exists ? PUT_REPLACED : PUT_CREATED);
+                request.completeWith(exists.get() ? PUT_REPLACED : PUT_CREATED);
             }
 
             @Override
@@ -373,37 +365,49 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends DOMRpcResult> insertPut(final Data path, final NormalizedNode data,
-            final @NonNull Insert insert, final Data parentPath) throws RequestException {
+            final @NonNull Insert insert, final Data parentPath) {
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = RestconfStrategy.syncAccess(dataStoreService.getData(parentPath, CONFIG_PARAM),
-                    parentPath.instance());
-                if (readData.isEmpty() || isEmptyContainerNode(readData.orElseThrow())) {
-                    yield dataStoreService.putData(path, data);
-                }
-                var futureChain = dataStoreService.removeData(parentPath);
-                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
-                yield addIntoFutureChain(futureChain, () -> dataStoreService.putData(parentPath,
-                    readData.orElseThrow()));
+                final var readData = dataStoreService.getData(parentPath, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty() || isEmptyContainerNode(readNode.orElseThrow())) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        var futureChain = dataStoreService.removeData(parentPath);
+                        futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
+                        result = addIntoFutureChain(futureChain,
+                            () -> dataStoreService.putData(parentPath, readNode.orElseThrow()));
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
             case LAST -> dataStoreService.putData(path, data);
             case BEFORE -> {
-                final var readData = RestconfStrategy.syncAccess(dataStoreService.getData(parentPath, CONFIG_PARAM),
-                    parentPath.instance());
-                if (readData.isEmpty() || isEmptyContainerNode(readData.orElseThrow())) {
-                    yield dataStoreService.putData(path, data);
-                }
-                yield insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()),
-                    (NormalizedNodeContainer<?>) readData.orElseThrow(), true);
+                final var readData = dataStoreService.getData(parentPath, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty() || isEmptyContainerNode(readNode.orElseThrow())) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        result = insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()),
+                            (NormalizedNodeContainer<?>) readNode.orElse(null), true);
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
             case AFTER -> {
-                final var readData = RestconfStrategy.syncAccess(dataStoreService.getData(parentPath, CONFIG_PARAM),
-                    parentPath.instance());
-                if (readData.isEmpty() || isEmptyContainerNode(readData.orElseThrow())) {
-                    yield dataStoreService.putData(path, data);
-                }
-                yield insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()),
-                    (NormalizedNodeContainer<?>) readData.orElseThrow(), false);
+                final var readData = dataStoreService.getData(parentPath, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty() || isEmptyContainerNode(readNode.orElseThrow())) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        result = insertWithPointPut(path, parentPath, data, verifyNotNull(insert.pointArg()),
+                            (NormalizedNodeContainer<?>) readNode.orElse(null), false);
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
         };
     }
@@ -446,39 +450,54 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     private ListenableFuture<? extends DOMRpcResult> insertCreate(final Data path, final NormalizedNode data,
-            final @NonNull Insert insert) throws RequestException {
+            final @NonNull Insert insert) {
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = RestconfStrategy.syncAccess(dataStoreService.getData(path, CONFIG_PARAM),
-                    path.instance());
-                if (readData.isEmpty() || isEmptyContainerNode(readData.orElseThrow())) {
-                    yield dataStoreService.putData(path, data);
-                }
-                checkListDataDoesNotExist(path, data);
-                var futureChain = dataStoreService.removeData(path);
-                futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
-                yield addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, readData.orElseThrow()));
+                final var readData = dataStoreService.getData(path, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty() || isEmptyContainerNode(readNode.orElseThrow())) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        var futureChain = checkListDataDoesNotExist(path, data);
+                        futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.removeData(path));
+                        futureChain = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path, data));
+                        result = addIntoFutureChain(futureChain, () -> dataStoreService.putData(path,
+                            readNode.orElseThrow()));
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
             case LAST -> dataStoreService.createData(path, data);
             case BEFORE -> {
-                final var readData = RestconfStrategy.syncAccess(dataStoreService.getData(path, CONFIG_PARAM),
-                    path.instance());
-                if (readData.isEmpty() || isEmptyContainerNode(readData.orElseThrow())) {
-                    yield dataStoreService.putData(path, data);
-                }
-                checkListDataDoesNotExist(path, data);
-                yield insertWithPointPost(path, data, verifyNotNull(insert.pointArg()),
-                    (NormalizedNodeContainer<?>) readData.orElseThrow(), true);
+                final var readData = dataStoreService.getData(path, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty() || isEmptyContainerNode(readNode.orElseThrow())) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        var futureChain = checkListDataDoesNotExist(path, data);
+                        result = addIntoFutureChain(futureChain, () -> insertWithPointPost(path, data,
+                            verifyNotNull(insert.pointArg()), (NormalizedNodeContainer<?>) readNode.orElseThrow(),
+                            true));
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
             case AFTER -> {
-                final var readData = RestconfStrategy.syncAccess(dataStoreService.getData(path, CONFIG_PARAM),
-                    path.instance());
-                if (readData.isEmpty() || isEmptyContainerNode(readData.orElseThrow())) {
-                    yield dataStoreService.putData(path, data);
-                }
-                checkListDataDoesNotExist(path, data);
-                yield insertWithPointPost(path, data, verifyNotNull(insert.pointArg()),
-                    (NormalizedNodeContainer<?>) readData.orElseThrow(), false);
+                final var readData = dataStoreService.getData(path, CONFIG_PARAM);
+                yield Futures.transformAsync(readData, readNode -> {
+                    final ListenableFuture<? extends DOMRpcResult> result;
+                    if (readNode.isEmpty() || isEmptyContainerNode(readNode.orElseThrow())) {
+                        result = dataStoreService.putData(path, data);
+                    } else {
+                        var futureChain = checkListDataDoesNotExist(path, data);
+                        result = addIntoFutureChain(futureChain, () -> insertWithPointPost(path, data,
+                            verifyNotNull(insert.pointArg()), (NormalizedNodeContainer<?>) readNode.orElseThrow(),
+                            false));
+                    }
+                    return result;
+                }, MoreExecutors.directExecutor());
             }
         };
     }
@@ -519,19 +538,24 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     }
 
     /**
-     * Check if child items do NOT already exists in List at specified {@code path}.
+     * Check if child items do NOT already exists in List at specified {@code path}. Required check before execution of
+     * POST operation with an insert query, as this operation overwrites all existing data at that path and reorders it.
+     * Therefore, after the POST operation, it becomes impossible to determine if a specific item previously existed.
      *
      * @param data Data to be checked
      * @param path Path to be checked
      * @throws RequestException if data already exists.
      */
-    private void checkListDataDoesNotExist(final Data path, final NormalizedNode data) throws RequestException {
+    private ListenableFuture<? extends DOMRpcResult> checkListDataDoesNotExist(final Data path,
+            final NormalizedNode data) throws RequestException {
         if (data instanceof NormalizedNodeContainer<?> dataNode) {
+            var futureChain = RPC_SUCCESS;
             final var instance = path.instance();
             for (final var child : dataNode.body()) {
                 final var childPath = path.enterPath(instance.node(child.name()));
-                checkItemDoesNotExists(exists(childPath), childPath);
+                futureChain = addIntoFutureChain(futureChain, () -> checkItemDoesNotExists(childPath));
             }
+            return futureChain;
         } else {
             throw new RequestException("Unexpected node type: " + data.getClass().getName());
         }
@@ -552,17 +576,18 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
     /**
      * Check if items do NOT already exists at specified {@code path}.
      *
-     * @param existsFuture if checked data exists
      * @param path path to be checked
-     * @throws RequestException if data already exists.
      */
-    private static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture, final Data path)
-            throws RequestException {
-        if (RestconfStrategy.syncAccess(existsFuture, path.instance())) {
-            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
-                path.toErrorPath());
-        }
+    private ListenableFuture<? extends DOMRpcResult> checkItemDoesNotExists(final Data path) {
+        final var existsFuture = exists(path);
+        return Futures.whenAllComplete(existsFuture).call(() -> {
+            final var exists = Futures.getDone(existsFuture);
+            if (Boolean.TRUE.equals(exists)) {
+                throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
+                    path.toErrorPath());
+            }
+            return new DefaultDOMRpcResult();
+        }, MoreExecutors.directExecutor());
     }
 
     private static NetconfDocumentedException getNetconfDocumentedException(
