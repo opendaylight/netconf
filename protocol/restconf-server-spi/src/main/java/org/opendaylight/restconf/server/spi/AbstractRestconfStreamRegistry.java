@@ -115,7 +115,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         @Override
         public void addReceiver(final ServerRequest<Registration> request, final Sender sender) {
-            if (state() == SubscriptionState.END) {
+            final var state = state();
+            if (state == SubscriptionState.END) {
                 LOG.debug("Subscription for id {} is not active", id());
                 // TODO: this should be mapped to 404 Not Found
                 request.completeWith(new RequestException("Subscription terminated"));
@@ -140,7 +141,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final Rfc8639Subscriber<?> newSubscriber;
             try {
                 newSubscriber = stream.addSubscriber(sender, encodingName(),
-                    newReceiverName(session.description(), request.principal()), filter());
+                    newReceiverName(session.description(), request.principal()), filter(),
+                    state == SubscriptionState.SUSPENDED ? State.Suspended : State.Active);
             } catch (UnsupportedEncodingException e) {
                 request.completeWith(new RequestException(e));
                 return;
@@ -192,8 +194,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         MapNode createReceivers() {
             final var list = new ArrayList<MapEntryNode>();
             for (var subscriber : receivers) {
-                list.add(receiverNode(subscriber.receiverName(), State.Active, subscriber.sentEventRecords(),
-                    subscriber.excludedEventRecords()));
+                list.add(receiverNode(subscriber.receiverName(), subscriber.receiverState(),
+                    subscriber.sentEventRecords(), subscriber.excludedEventRecords()));
             }
             if (list.isEmpty()) {
                 list.add(receiverNode(receiverName(), State.Suspended, Uint64.ZERO, Uint64.ZERO));
@@ -328,7 +330,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                     .setReceiver(receivers.stream()
                         .map(receiver -> new ReceiverBuilder()
                             .setName(receiver.receiverName())
-                            .setState(State.Active)
+                            .setState(receiver.receiverState())
                             .setSentEventRecords(new ZeroBasedCounter64(receiver.sentEventRecords()))
                             .setExcludedEventRecords(new ZeroBasedCounter64(receiver.excludedEventRecords()))
                             .build())
