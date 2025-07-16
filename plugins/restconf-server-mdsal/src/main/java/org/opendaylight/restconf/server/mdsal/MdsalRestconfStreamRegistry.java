@@ -401,6 +401,18 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }, MoreExecutors.directExecutor());
     }
 
+
+    @Override
+    protected ListenableFuture<@Nullable Void> suspendSubscription(final Uint32 subscriptionId,
+            final SubscriptionSuspendedReason reason) {
+        return null;
+    }
+
+    @Override
+    protected ListenableFuture<@Nullable Void> resumeSubscription(Uint32 subscriptionId) {
+        return null;
+    }
+
     /**
      * Used to format {@link DOMNotification} into XML or JSON string ready to be sent to receivers.
      *

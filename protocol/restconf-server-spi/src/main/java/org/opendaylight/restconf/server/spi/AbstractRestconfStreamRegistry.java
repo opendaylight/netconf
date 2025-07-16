@@ -50,6 +50,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionSuspendedReason;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
@@ -778,6 +779,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> updateSubscriptionReceivers(Uint32 subscriptionId,
         MapNode receivers);
+
+    @NonNullByDefault
+    protected abstract ListenableFuture<@Nullable Void> suspendSubscription(Uint32 subscriptionId,
+        SubscriptionSuspendedReason reason);
+
+    @NonNullByDefault
+    protected abstract ListenableFuture<@Nullable Void> resumeSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
     protected final Map<Uint32, MapNode> currentReceivers() {
