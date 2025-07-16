@@ -16,9 +16,12 @@ import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Uint64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A single subscriber to an {@link RestconfStream}.
@@ -54,6 +57,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
      * @param <T> event type
      */
     static final class Rfc8639Subscriber<T> extends Subscriber<T> {
+        private static final Logger LOG = LoggerFactory.getLogger(Rfc8639Subscriber.class);
         private static final VarHandle EER_VH;
         private static final VarHandle SER_VH;
 
@@ -85,8 +89,28 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
             this.receiverState = requireNonNull(receiverState);
         }
 
+        /**
+         * Method try to send data if Receiver state is Active, otherwise data is not send.
+         *
+         * @param data Data to send.
+         */
         @Override
         void sendDataMessage(final @Nullable String data) {
+            if (receiverState() == Receiver.State.Active) {
+                LOG.debug("Receiver {} is active, sending data", receiverName);
+                sendMessage(data);
+            } else {
+                LOG.debug("Receiver {} is not Active, sending data blocked", receiverName);
+            }
+        }
+
+        /**
+         * This method sends data regardless of subscription state.
+         * This is used for sending state notifications which are send regardless of state.
+         *
+         * @param data Data to send.
+         */
+        void sendMessage(final @Nullable String data) {
             final VarHandle vh;
             if (data != null) {
                 sender().sendDataMessage(data);
