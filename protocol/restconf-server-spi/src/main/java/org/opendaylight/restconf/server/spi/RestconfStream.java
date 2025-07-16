@@ -349,6 +349,10 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             return (QName) TERMINATED_VH.getVolatile(this);
         }
 
+        public abstract void suspendSubscription(QName reason);
+
+        public abstract void resumeSubscription();
+
         @Override
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
