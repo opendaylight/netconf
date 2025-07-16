@@ -177,6 +177,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             updateOperationalDatastore();
         }
 
+        private ListenableFuture<Void> updateReceiverState(final State newState){
+            for (var subscriber : receivers) {
+                subscriber.setReceiverState(newState);
+            }
+            return updateOperationalDatastore();
+        }
+
         private ListenableFuture<Void> updateOperationalDatastore() {
             if (terminated() != null) {
                 // it is possible this Subscription was already terminated, in which case we don't want to
@@ -274,6 +281,40 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                     subscriptions.remove(id);
                 }
             }, MoreExecutors.directExecutor());
+        }
+
+
+        @Override
+        void suspendSubscription(final QName reason) {
+            Futures.addCallback(updateReceiverState(State.Suspended), new FutureCallback<>() {
+                @Override
+                public void onSuccess(Void result) {
+                    setState(SubscriptionState.SUSPENDED);
+                    suspendedSubscription(id(), reason);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Cannot suspend subscription {}", id(), cause);
+                }
+            }, MoreExecutors.directExecutor());
+        }
+
+        @Override
+        void resumeSubscription() {
+            Futures.addCallback(updateReceiverState(State.Active), new FutureCallback<>() {
+                @Override
+                public void onSuccess(Void result) {
+                    setState(SubscriptionState.ACTIVE);
+                    resumedSubscription(id());
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Cannot resume subscription {}", id(), cause);
+                }
+            }, MoreExecutors.directExecutor());
+
         }
 
         void controlSessionClosed() {
@@ -778,6 +819,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> updateSubscriptionReceivers(Uint32 subscriptionId,
         MapNode receivers);
+
+    @NonNullByDefault
+    protected abstract void suspendedSubscription(Uint32 subscriptionId, QName reason);
+
+    @NonNullByDefault
+    protected abstract void resumedSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
     protected final Map<Uint32, MapNode> currentReceivers() {
