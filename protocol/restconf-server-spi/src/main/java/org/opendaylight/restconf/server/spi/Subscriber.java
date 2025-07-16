@@ -16,6 +16,7 @@ import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Uint64;
 
@@ -73,13 +74,15 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         private long excludedEventRecords;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long sentEventRecords;
+        private State receiverState;
 
         Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
-                final EventFilter<T> filter, final String receiverName,
-                @Nullable final EventStreamFilter eventStreamFilter) {
+                final EventFilter<T> filter, final String receiverName, final State receiverState,
+            @Nullable final EventStreamFilter eventStreamFilter) {
             super(stream, sender, formatter, filter);
             this.receiverName = requireNonNull(receiverName);
             this.eventStreamFilter = eventStreamFilter;
+            this.receiverState = receiverState;
         }
 
         @Override
@@ -96,6 +99,10 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         String receiverName() {
             return receiverName;
+        }
+
+        State receiverState() {
+            return receiverState;
         }
 
         Uint64 excludedEventRecords() {
@@ -116,6 +123,10 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         public void setEventStreamFilter(final EventStreamFilter newEventStreamFilter) {
             this.eventStreamFilter = newEventStreamFilter;
+        }
+
+        public void setReceiverState(final State newState) {
+            receiverState = newState;
         }
     }
 
