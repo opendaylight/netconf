@@ -33,6 +33,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -575,11 +576,11 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
 
     @NonNullByDefault
     @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
-            final String receiverName, @Nullable final EventStreamFilter eventStreamFilter)
+            final String receiverName, @Nullable final EventStreamFilter eventStreamFilter, final State state)
             throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
             getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            AcceptingEventFilter.instance(), receiverName, eventStreamFilter));
+            AcceptingEventFilter.instance(), receiverName, state, eventStreamFilter));
     }
 
     private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
