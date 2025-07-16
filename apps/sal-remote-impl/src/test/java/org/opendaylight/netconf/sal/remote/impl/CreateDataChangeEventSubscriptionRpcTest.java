@@ -107,6 +107,16 @@ class CreateDataChangeEventSubscriptionRpcTest {
                 final MapNode receivers) {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        protected void publishSubscriptionSuspendedStateNotification(final Uint32 subscriptionId, final QName reason) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected void resumedSubscription(final Uint32 subscriptionId) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private static final EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");

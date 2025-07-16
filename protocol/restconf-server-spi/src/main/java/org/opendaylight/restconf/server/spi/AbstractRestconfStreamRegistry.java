@@ -180,6 +180,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             updateOperationalDatastore();
         }
 
+        private ListenableFuture<Void> updateReceiversState(final State newState) {
+            for (var subscriber : receivers) {
+                subscriber.setReceiverState(newState);
+            }
+            return updateOperationalDatastore();
+        }
+
         private ListenableFuture<Void> updateOperationalDatastore() {
             if (terminated() != null) {
                 // it is possible this Subscription was already terminated, in which case we don't want to
@@ -244,7 +251,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @Override
         public void publishStateNotif(final String message) {
             for (final var subscriber : receivers) {
-                subscriber.sendDataMessage(message);
+                subscriber.sendMessage(message);
             }
         }
 
@@ -275,6 +282,39 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onFailure(final Throwable cause) {
                     LOG.warn("Subscription {} failed to clean up", id, cause);
                     subscriptions.remove(id);
+                }
+            }, MoreExecutors.directExecutor());
+        }
+
+
+        @Override
+        void suspendSubscription(final QName reason) {
+            Futures.addCallback(updateReceiversState(State.Suspended), new FutureCallback<>() {
+                @Override
+                public void onSuccess(Void result) {
+                    setState(SubscriptionState.SUSPENDED);
+                    publishSubscriptionSuspendedStateNotification(id(), reason);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Cannot suspend subscription {}", id(), cause);
+                }
+            }, MoreExecutors.directExecutor());
+        }
+
+        @Override
+        void resumeSubscription() {
+            Futures.addCallback(updateReceiversState(State.Active), new FutureCallback<>() {
+                @Override
+                public void onSuccess(Void result) {
+                    setState(SubscriptionState.ACTIVE);
+                    resumedSubscription(id());
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    LOG.warn("Cannot resume subscription {}", id(), cause);
                 }
             }, MoreExecutors.directExecutor());
         }
@@ -655,6 +695,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 subscription.setFilter(filterImpl);
                 subscription.updateStopTime(stopTime);
                 subscriptionModified(id, stopTime);
+                if (subscription.state() == SubscriptionState.SUSPENDED) {
+                    subscription.resumeSubscription();
+                }
                 request.completeWith(subscription);
             }
 
@@ -796,6 +839,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @NonNullByDefault
     protected abstract ListenableFuture<@Nullable Void> updateSubscriptionReceivers(Uint32 subscriptionId,
         MapNode receivers);
+
+    @NonNullByDefault
+    protected abstract void publishSubscriptionSuspendedStateNotification(Uint32 subscriptionId, QName reason);
+
+    @NonNullByDefault
+    protected abstract void resumedSubscription(Uint32 subscriptionId);
 
     @NonNullByDefault
     protected final Map<Uint32, MapNode> currentReceivers() {
