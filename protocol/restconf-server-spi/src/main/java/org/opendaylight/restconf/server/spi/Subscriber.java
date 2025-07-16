@@ -87,6 +87,12 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         @Override
         void sendDataMessage(final @Nullable String data) {
+            if (receiverState() == Receiver.State.Active) {
+                sendMessage(data);
+            }
+        }
+
+        void sendMessage(final @Nullable String data) {
             final VarHandle vh;
             if (data != null) {
                 sender().sendDataMessage(data);
