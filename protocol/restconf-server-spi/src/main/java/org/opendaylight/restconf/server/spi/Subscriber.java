@@ -16,6 +16,7 @@ import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Uint64;
@@ -87,6 +88,12 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         @Override
         void sendDataMessage(final @Nullable String data) {
+            if (receiverState() == Receiver.State.Active) {
+                sendMessage(data);
+            }
+        }
+
+        void sendMessage(final @Nullable String data) {
             final VarHandle vh;
             if (data != null) {
                 sender().sendDataMessage(data);
