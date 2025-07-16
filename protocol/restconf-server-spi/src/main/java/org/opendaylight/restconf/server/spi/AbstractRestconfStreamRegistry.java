@@ -191,8 +191,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         MapNode createReceivers() {
             final var list = new ArrayList<MapEntryNode>();
             for (var subscriber : receivers) {
-                list.add(receiverNode(subscriber.receiverName(), State.Active, subscriber.sentEventRecords(),
-                    subscriber.excludedEventRecords()));
+                list.add(receiverNode(subscriber.receiverName(), subscriber.receiverState(),
+                    subscriber.sentEventRecords(), subscriber.excludedEventRecords()));
             }
             if (list.isEmpty()) {
                 list.add(receiverNode(receiverName(), State.Suspended, Uint64.ZERO, Uint64.ZERO));
@@ -327,7 +327,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                     .setReceiver(receivers.stream()
                         .map(receiver -> new ReceiverBuilder()
                             .setName(receiver.receiverName())
-                            .setState(State.Active)
+                            .setState(receiver.receiverState())
                             .setSentEventRecords(new ZeroBasedCounter64(receiver.sentEventRecords()))
                             .setExcludedEventRecords(new ZeroBasedCounter64(receiver.excludedEventRecords()))
                             .build())
