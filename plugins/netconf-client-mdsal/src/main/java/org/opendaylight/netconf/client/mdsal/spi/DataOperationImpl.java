@@ -33,7 +33,6 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.mdsal.spi.data.AsyncGetDataProcessor;
-import org.opendaylight.restconf.mdsal.spi.data.RestconfStrategy;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -58,7 +57,7 @@ public final class DataOperationImpl implements DataOperationService {
     private static final ListenableFuture<? extends DOMRpcResult> RPC_SUCCESS = Futures.immediateFuture(
         new DefaultDOMRpcResult());
 
-    private final Map<Data, Collection<? extends NormalizedNode>> readListCache = new ConcurrentHashMap<>();
+    private final Map<Data, NormalizedNodeContainer<?>> readListCache = new ConcurrentHashMap<>();
     private final NetconfDataTreeService dataTreeService;
     private final AtomicBoolean lock = new AtomicBoolean(false);
 
@@ -202,8 +201,8 @@ public final class DataOperationImpl implements DataOperationService {
                 // If list data are present store them into readListCache.
                 if (resultData != null && resultData.isPresent()
                         && resultData.orElseThrow() instanceof NormalizedNodeContainer<?> container) {
-                    LOG.trace("Populate cache list on path {} with data {}", path, container.body());
-                    readListCache.put(path, container.body());
+                    LOG.trace("Populate cache list on path {} with data {}", path, container);
+                    readListCache.put(path, container);
                 }
                 return resultData;
             }, MoreExecutors.directExecutor());
@@ -214,52 +213,47 @@ public final class DataOperationImpl implements DataOperationService {
     private ListenableFuture<? extends DOMRpcResult> eraseData(final Data path,
             final Function<YangInstanceIdentifier, ListenableFuture<? extends DOMRpcResult>> operation) {
         if (isListPath(path)) {
-            final Collection<? extends NormalizedNode> items;
-            try {
-                items = getListItemsForRemove(path);
-            } catch (RequestException cause) {
-                return Futures.immediateFailedFuture(cause);
-            }
-            if (items.isEmpty()) {
-                LOG.debug("Path {} contains no items, delete operation omitted.", path);
-                return RPC_SUCCESS;
-            } else {
-                var futureChain = RPC_SUCCESS;
-                for (final var childElement : items) {
-                    final var childPath = path.instance().node(childElement.name());
-                    futureChain = addIntoFutureChain(futureChain, () -> operation.apply(childPath));
-                }
-                return futureChain;
-            }
+            final var getListFuture = getListItemsForRemove(path);
+            return Futures.transformAsync(getListFuture,
+                result -> {
+                    final var listData = result.map(data -> ((NormalizedNodeContainer<?>) data).body())
+                        .orElse(List.of());
+                    var futureChain = RPC_SUCCESS;
+                    if (listData.isEmpty()) {
+                        // No items to delete, result in returning RPC_SUCCESS.
+                        LOG.debug("Path {} contains no items, delete operation omitted.", path);
+                    } else {
+                        for (final var childElement : listData) {
+                            final var childPath = path.instance().node(childElement.name());
+                            futureChain = addIntoFutureChain(futureChain, () -> operation.apply(childPath));
+                        }
+                    }
+                    return futureChain;
+                }, MoreExecutors.directExecutor());
         }
         return operation.apply(path.instance());
     }
 
-    private @NonNull Collection<? extends NormalizedNode> getListItemsForRemove(final Data path)
-            throws RequestException {
+    private ListenableFuture<Optional<NormalizedNode>> getListItemsForRemove(final Data path) {
         final var cached = readListCache.remove(path);
         if (cached != null) {
             LOG.debug("Found cached list data {} on path {}", cached, path);
-            return cached;
+            return Futures.immediateFuture(Optional.of(cached));
         }
         final var instance = path.instance();
-        final ListenableFuture<Optional<NormalizedNode>> future;
         // check if keys only can be filtered out to minimize amount of data retrieved
         if (path.schema().dataSchemaNode() instanceof ListSchemaNode listSchemaNode) {
             final var keyFields = listSchemaNode.getKeyDefinition().stream().map(YangInstanceIdentifier::of).toList();
             final var child = NodeIdentifierWithPredicates.of(instance.getLastPathArgument().getNodeType());
             final var childPath = instance.node(child);
             if (keyFields.isEmpty()) {
-                future = dataTreeService.getConfig(childPath);
+                return dataTreeService.getConfig(childPath);
             } else {
-                future = dataTreeService.getConfig(childPath, keyFields);
+                return dataTreeService.getConfig(childPath, keyFields);
             }
         } else {
-            future = dataTreeService.getConfig(instance);
+            return dataTreeService.getConfig(instance);
         }
-
-        final var retrieved = RestconfStrategy.syncAccess(future, instance);
-        return retrieved.map(data -> ((NormalizedNodeContainer<?>) data).body()).orElse(List.of());
     }
 
     private ListenableFuture<? extends DOMRpcResult> lock() {
