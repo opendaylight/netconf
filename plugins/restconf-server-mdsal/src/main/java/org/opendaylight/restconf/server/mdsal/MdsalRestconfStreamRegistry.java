@@ -409,6 +409,24 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    protected void suspendReceivers(final Uint32 subscriptionId, final QName reason) {
+        final var subscription = lookupSubscription(subscriptionId);
+        final var notificationNode = subscriptionSuspended(subscriptionId, reason);
+        final var formattedNotification = getFormattedNotification(subscriptionId, subscription.encoding(),
+            notificationNode, State.SUSPENDED, Instant.now(), databindProvider.currentDatabind().modelContext());
+        subscription.publishStateNotif(formattedNotification);
+    }
+
+    @Override
+    protected void resumeReceivers(final Uint32 subscriptionId) {
+        final var subscription = lookupSubscription(subscriptionId);
+        final var notificationNode = subscriptionResumed(subscriptionId);
+        final var formattedNotification = getFormattedNotification(subscriptionId, subscription.encoding(),
+            notificationNode, State.RESUMED, Instant.now(), databindProvider.currentDatabind().modelContext());
+        subscription.publishStateNotif(formattedNotification);
+    }
+
     /**
      * Used to format {@link DOMNotification} into XML or JSON string ready to be sent to receivers.
      *
