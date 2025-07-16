@@ -111,6 +111,10 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
 
     abstract void stopTimeRemoveSubscription();
 
+    abstract void suspendSubscription(QName reason);
+
+    abstract void resumeSubscription();
+
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         helper.add("id", id)
