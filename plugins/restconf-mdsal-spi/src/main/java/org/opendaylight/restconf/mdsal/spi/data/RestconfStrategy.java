@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -905,7 +906,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         return switch (configDataNode) {
             case UserMapNode configMap -> {
                 final var builder = ImmutableNodes.newUserMapBuilder().withNodeIdentifier(configMap.name());
-                mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
+                mapOrderedValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
                 yield builder.build();
             }
             case SystemMapNode configMap -> {
@@ -932,7 +933,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                 final var configLeafSet = (UserLeafSetNode<Object>) userLeafSet;
                 final var builder = ImmutableNodes.<Object>newUserLeafSetBuilder()
                     .withNodeIdentifier(configLeafSet.name());
-                mapValueToBuilder(configLeafSet.body(), ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
+                mapOrderedValueToBuilder(configLeafSet.body(), ((UserLeafSetNode<Object>) stateDataNode).body(),
+                    builder);
                 yield builder.build();
             }
             case SystemLeafSetNode<?> systemLeafSet -> {
@@ -971,6 +973,28 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
         final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
+
+        // merge config and state data of children with different identifiers
+        mapDataToBuilder(configMap, stateMap, builder);
+
+        // merge config and state data of children with the same identifiers
+        mergeDataToBuilder(configMap, stateMap, builder);
+    }
+
+    /**
+     * Map value from ordered container node to builder.
+     *
+     * @param configData collection of config data nodes
+     * @param stateData  collection of state data nodes
+     * @param builder    builder
+     */
+    private static <T extends NormalizedNode> void mapOrderedValueToBuilder(
+            final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
+        final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity(),
+            (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity(),
+            (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
         // merge config and state data of children with different identifiers
         mapDataToBuilder(configMap, stateMap, builder);
