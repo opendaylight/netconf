@@ -1,0 +1,14 @@
+module userOrderList {
+  namespace "urn:userOrderList";
+  prefix uol;
+
+  container container {
+    list orderedList {
+      ordered-by user;
+      key key;
+      leaf key {
+        type string;
+      }
+    }
+  }
+}
