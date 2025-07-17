@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -969,8 +970,10 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     private static <T extends NormalizedNode> void mapValueToBuilder(
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
-        final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
-        final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
+        final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity(),
+            (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity(),
+            (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
         // merge config and state data of children with different identifiers
         mapDataToBuilder(configMap, stateMap, builder);
