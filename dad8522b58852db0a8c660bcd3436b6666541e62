@@ -16,6 +16,24 @@
       "message": "I propose to create 9.0.x from dad8522b58852db0a8c660bcd3436b6666541e62",
       "revId": "dad8522b58852db0a8c660bcd3436b6666541e62",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "641cbfc3_fbcdbd40",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-22T12:54:25Z",
+      "side": 1,
+      "message": "From its parent: bdfb6f4b",
+      "parentUuid": "44b6a16a_caedef8a",
+      "revId": "dad8522b58852db0a8c660bcd3436b6666541e62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
