@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 @Beta
 public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest>
-        permits ConcurrentHTTPServerSession, PipelinedHTTPServerSession{
+        permits ConcurrentHTTPServerSession, PipelinedHTTPServerSession {
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
     private static final Map<HttpMethod, ImplementedMethod> ALL_METHODS = Arrays.stream(ImplementedMethod.values())
@@ -180,7 +180,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         // - origin-form, as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.1
         // - absolute-form, as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.2
         // - authority-form, as per https://www.rfc-editor.org/rfc/rfc9112#section-3.2.3
-        // BUT but we do not implement the CONNECT method, so let's enlist URI's services first
+        // BUT we do not implement the CONNECT method, so let's enlist URI's services first
         final URI requestUri;
         try {
             requestUri = new URI(uri);
@@ -243,7 +243,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
 
     /**
      * Prepare an incoming HTTP request. The first two arguments are provided as context, which should be reflected back
-     * to {@link #respond(ChannelHandlerContext, Integer, FullHttpResponse)} when reponding to the request.
+     * to {@link #respond(ChannelHandlerContext, Integer, HttpResponse)} when responding to the request.
      *
      * <p>The ownership of request body is transferred to the implementation of this method. It is its responsibility to
      * {@link ByteBuf#release()} it when no longer needed.
