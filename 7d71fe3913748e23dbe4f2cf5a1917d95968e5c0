@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e0634715_af0cb591",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "check what\u0027s the meaning of this header, does it mean connection is still open?",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "93bd2b6d_6ffa8ca1",
         "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/AbstractRequestProcessorTest.java",
         "patchSetId": 43
@@ -31,6 +48,108 @@
       "writtenOn": "2025-07-23T13:58:01Z",
       "side": 1,
       "message": "follow: https://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee709780_9ad4b1db",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "final",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b94797a0_5bf95d27",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HeadersResponse.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "public is first in file.. maybe there could be even better place for EMPTY_HEADERS?",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7cf3896_ec7570df",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseOutput.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78ed53ff_a2222817",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseOutput.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "requireNonNull?",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac63fa2d_95753beb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "case Inactive ignored -\u003e {",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47b0f6ba_ea5fa6bb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T08:11:52Z",
+      "side": 1,
+      "message": "true?",
       "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
