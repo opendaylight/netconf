@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9576eccb_243a4bc1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 43
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-24T13:09:05Z",
+      "side": 1,
+      "message": "PUT to netconf-topology is broken.",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e0634715_af0cb591",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
         "patchSetId": 43
