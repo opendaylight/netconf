@@ -187,6 +187,24 @@
       "message": "true?",
       "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b68b5796_7ff8b201",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T11:56:51Z",
+      "side": 1,
+      "message": "Your logic seems to be negation of what it should be",
+      "parentUuid": "47b0f6ba_ea5fa6bb",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
