@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "121769a6_c36cdf76",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "try to keep the same order of fields, constructor parameters, its assignments in constructor",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1327c74_eb00d0a3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "let\u0027s make streamId the last - it depends on version",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5acf6811_3dc80ad7",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "IMO `if` is not needed with session.sendResponsePart(createChunk(buffer));",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58b6bc6e_5175efde",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "we can reuse Closed.INSTANCE",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3fdf558_5a62f429",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "IMO if is not needed with session.sendResponsePart(createChunk(buffer));",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a360ef6_b32a4e4a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "we can reuse Closed.INSTANCE",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

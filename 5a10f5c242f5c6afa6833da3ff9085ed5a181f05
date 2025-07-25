@@ -39,6 +39,30 @@
       },
       "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4381c71_0c439201",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-25T08:24:51Z",
+      "side": 1,
+      "message": "We need to compare behavior with JAXRS",
+      "parentUuid": "4097ac74_8624cf47",
+      "range": {
+        "startLine": 145,
+        "startChar": 11,
+        "endLine": 145,
+        "endChar": 82
+      },
+      "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
