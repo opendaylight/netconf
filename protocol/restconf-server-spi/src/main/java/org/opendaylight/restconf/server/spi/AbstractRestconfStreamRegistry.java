@@ -295,7 +295,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
 
         @Override
-        void suspendSubscription(final QName reason) {
+        public void suspendSubscription(final QName reason) {
             Futures.addCallback(updateReceiversState(State.Suspended), new FutureCallback<>() {
                 @Override
                 public void onSuccess(Void result) {
@@ -311,7 +311,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         @Override
-        void resumeSubscription() {
+        public void resumeSubscription() {
             Futures.addCallback(updateReceiversState(State.Active), new FutureCallback<>() {
                 @Override
                 public void onSuccess(Void result) {
