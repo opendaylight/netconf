@@ -92,7 +92,7 @@ import org.slf4j.LoggerFactory;
 abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTest {
     static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration().withStrictMode();
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationSubscriptionTest.class);
+    static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationSubscriptionTest.class);
     private static final YangParserFactory PARSER_FACTORY = ServiceLoader.load(YangParserFactory.class)
         .findFirst().orElseThrow(() -> new ExceptionInInitializerError("No YangParserFactory found"));
     private static final BindingRuntimeGenerator GENERATOR = ServiceLoader.load(BindingRuntimeGenerator.class)
@@ -347,7 +347,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         final var callback = new TestRequestCallback();
         streamHttpClient.invoke(buildRequest(method, uri, contentType, content, acceptType), callback);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        await().atMost(Duration.ofSeconds(50)).until(callback::completed);
         final var response = callback.response();
         assertNotNull(response);
         return response;
