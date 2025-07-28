@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
@@ -349,7 +350,8 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             return (QName) TERMINATED_VH.getVolatile(this);
         }
 
-        abstract void suspendSubscription(QName reason);
+        @VisibleForTesting
+        public abstract void suspendSubscription(QName reason);
 
         abstract void resumeSubscription();
 
