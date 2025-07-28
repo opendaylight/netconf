@@ -301,7 +301,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
          * @param reason Reason of suspension;
          */
         @Override
-        void suspendSubscription(final QName reason) {
+        public void suspendSubscription(final QName reason) {
             if (state().canMoveTo(SubscriptionState.SUSPENDED)) {
                 Futures.addCallback(updateReceiversState(State.Suspended), new FutureCallback<>() {
                     @Override
