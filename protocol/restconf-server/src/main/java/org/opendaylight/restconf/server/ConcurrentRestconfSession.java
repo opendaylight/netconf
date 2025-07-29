@@ -70,6 +70,10 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
         return root.prepare(transportSession, method, targetUri, headers);
     }
 
+    @Override
+    public void responded(ChannelHandlerContext ctx) {
+    }
+
     @VisibleForTesting
     @NonNull TransportSession transportSession() {
         return transportSession;

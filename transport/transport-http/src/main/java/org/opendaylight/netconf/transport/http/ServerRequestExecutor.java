@@ -146,6 +146,8 @@ final class ServerRequestExecutor implements PendingRequestListener {
             response.writeTo(new ResponseOutput(ctx, version, streamId));
         } catch (RuntimeException | IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
+        } finally {
+            session.responded(ctx);
         }
     }
 

@@ -168,6 +168,11 @@ class HttpClientServerTest {
                                 final HttpHeaders headers) {
                             return new TestRequest(method, targetUri);
                         }
+
+                        @Override
+                        public void responded(ChannelHandlerContext ctx) {
+
+                        }
                     };
                 }
 
@@ -178,6 +183,11 @@ class HttpClientServerTest {
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
                             return new TestRequest(method, targetUri);
+                        }
+
+                        @Override
+                        public void responded(ChannelHandlerContext ctx) {
+
                         }
                     };
                 }

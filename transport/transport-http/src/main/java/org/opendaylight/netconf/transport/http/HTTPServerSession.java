@@ -122,7 +122,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     }
 
     @Override
-    protected final void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
         final var headers = msg.headers();
         // non-null indicates HTTP/2 request, which we need to propagate to any response
         final var streamId = headers.getInt(STREAM_ID);
@@ -286,4 +286,5 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         return responseWriter;
     }
 
+    public abstract void responded(ChannelHandlerContext ctx);
 }
