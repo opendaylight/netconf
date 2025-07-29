@@ -20,11 +20,13 @@ import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpObject;
+import io.netty.util.concurrent.ImmediateEventExecutor;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.text.ParseException;
@@ -111,6 +113,8 @@ class AbstractRequestProcessorTest {
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         session.handlerAdded(ctx);
         doReturn(null).when(principalService).acquirePrincipal(any());
+        doReturn(new DefaultChannelPromise(channel, ImmediateEventExecutor.INSTANCE).setSuccess())
+            .when(ctx).writeAndFlush(any());
     }
 
     void mockSession() {
