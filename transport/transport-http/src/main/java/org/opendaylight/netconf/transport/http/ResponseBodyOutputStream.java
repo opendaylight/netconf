@@ -406,6 +406,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
         Closed close(final ReadOnlyHttpHeaders trailers) throws IOException {
             sendResponsePart(session, buffer.asReadOnly());
             sendResponseEnd(session, trailers);
+            session.notifyRequestFinished(ctx);
             return Closed.INSTANCE;
         }
 
