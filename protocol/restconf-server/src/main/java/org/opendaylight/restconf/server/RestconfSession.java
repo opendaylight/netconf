@@ -10,13 +10,20 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http2.Http2Exception;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
@@ -32,6 +39,8 @@ import org.opendaylight.restconf.server.spi.DefaultTransportSession;
 final class RestconfSession extends PipelinedHTTPServerSession {
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
+    private final @NonNull AtomicBoolean processing = new AtomicBoolean(false);
+    private final @NonNull Deque<FullHttpRequest> pipeline = new ConcurrentLinkedDeque<>();
 
     @NonNullByDefault
     RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
@@ -62,6 +71,35 @@ final class RestconfSession extends PipelinedHTTPServerSession {
         } finally {
             transportSession.close();
         }
+    }
+
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        pipeline.offer(msg);
+        processPipeline(ctx);
+    }
+
+    private synchronized void processPipeline(final ChannelHandlerContext ctx) {
+        if (pipeline.peek() != null) {
+            if (processing.compareAndSet(false, true)) {
+                super.channelRead0(ctx, pipeline.poll());
+            }
+        }
+    }
+
+    @Override
+    protected ChannelFuture respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final HttpResponse response) {
+        processing.compareAndSet(true, false);
+        final var respond = super.respond(ctx, streamId, response);
+        respond.addListener(future -> {
+            if (future.isSuccess()) {
+                processPipeline(ctx);
+            } else {
+                ctx.close();
+            }
+        });
+        return respond;
     }
 
     @Override
