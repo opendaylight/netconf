@@ -38,6 +38,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -89,6 +90,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTest {
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration().withStrictMode();
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationSubscriptionTest.class);
     private static final YangParserFactory PARSER_FACTORY = ServiceLoader.load(YangParserFactory.class)
         .findFirst().orElseThrow(() -> new ExceptionInInitializerError("No YangParserFactory found"));
@@ -404,7 +407,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
      * Utility method to extract subscription ID from response.
      */
     static long extractSubscriptionId(final FullHttpResponse response) {
-        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
+            JSON_PARSER_CONFIGURATION);
         return jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
     }
 }
