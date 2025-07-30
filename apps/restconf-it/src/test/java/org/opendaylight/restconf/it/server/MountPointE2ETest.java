@@ -211,7 +211,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         //          "stream-name": "urn:uuid:01a56682-f2ab-419f-8a77-9cf995a52220"
         //      }
         //  }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
         final var streamName = json.getJSONObject("odl-device-notification:output").getString("stream-name");
         assertNotNull(streamName, "Stream name is undefined");
 
@@ -372,7 +372,7 @@ class MountPointE2ETest extends AbstractE2ETest {
     private boolean deviceConnectedJson() throws Exception {
         final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
         assertEquals(HttpResponseStatus.OK, response.status());
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
         //{
         //  "netconf-node-topology:netconf-node": {
         //    "connection-status": "connected"
