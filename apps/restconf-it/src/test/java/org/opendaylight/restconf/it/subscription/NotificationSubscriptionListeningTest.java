@@ -67,7 +67,8 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         assertEquals(HttpResponseStatus.OK, response.status());
 
         // Extract subscription ID from response
-        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
+            JSON_PARSER_CONFIGURATION);
         final var subscriptionId = jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
 
         // Start listening on notifications

@@ -175,7 +175,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     }
 
     private static void assertCounter(final FullHttpResponse response, final String sent, final String excluded) {
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8))
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION)
             .getJSONObject("ietf-subscribed-notifications:receivers")
             //there is only one receiver
             .getJSONArray("receiver").getJSONObject(0);

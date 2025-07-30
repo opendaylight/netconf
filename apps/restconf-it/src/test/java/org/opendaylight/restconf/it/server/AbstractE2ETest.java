@@ -47,6 +47,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -106,6 +107,8 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration().withStrictMode();
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -331,7 +334,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         //         }]
         //    }
         // }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
         final var error = json.getJSONObject("errors").getJSONArray("error").getJSONObject(0);
         assertNotNull(error);
         assertEquals(expectedErrorType.elementBody(), error.getString("error-type"));
@@ -414,7 +417,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         //              "description": "..."
         //      }]
         // }
-        final var json = new JSONObject(content);
+        final var json = new JSONObject(content, JSON_PARSER_CONFIGURATION);
         final var stream = json.getJSONArray("ietf-restconf-monitoring:stream").getJSONObject(0);
         for (var access : stream.getJSONArray("access")) {
             final var accessObj = (JSONObject) access;

@@ -77,7 +77,7 @@ class StreamsE2ETest extends AbstractE2ETest {
         //          "stream-name":"urn:uuid:6413c077-5dfe-464c-b17f-20c5bbb456f4"
         //       }
         // }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
         final var streamName = json.getJSONObject("sal-remote:output").getString("stream-name");
         assertNotNull(streamName, "Stream name is undefined");
 
