@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96f75c71_3fc86e3a",
+        "filename": "plugins/restconf-server-mdsal/pom.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-07-30T11:41:07Z",
+      "side": 1,
+      "message": "alpha-sort",
+      "range": {
+        "startLine": 135,
+        "startChar": 13,
+        "endLine": 135,
+        "endChar": 41
+      },
+      "revId": "6dfa03e32afc0427aac799dc05e53d1dc076695f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c45146e_ce865eee",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-07-30T11:41:07Z",
+      "side": 1,
+      "message": "bad indent\nthis also lends itself towards confusion between CSS and AutoCloseable lifecycle -- make the CSS part an internal class",
+      "range": {
+        "startLine": 122,
+        "startChar": 15,
+        "endLine": 122,
+        "endChar": 38
+      },
+      "revId": "6dfa03e32afc0427aac799dc05e53d1dc076695f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75e5d3aa_f829b7a5",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-07-30T11:41:07Z",
+      "side": 1,
+      "message": "move to next line",
+      "range": {
+        "startLine": 561,
+        "startChar": 46,
+        "endLine": 561,
+        "endChar": 51
+      },
+      "revId": "6dfa03e32afc0427aac799dc05e53d1dc076695f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
