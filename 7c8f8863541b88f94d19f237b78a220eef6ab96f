@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5613078b_c93778c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-07-30T14:39:01Z",
+      "side": 1,
+      "message": "can we also enable strict parsing while we are here?",
+      "revId": "7c8f8863541b88f94d19f237b78a220eef6ab96f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
