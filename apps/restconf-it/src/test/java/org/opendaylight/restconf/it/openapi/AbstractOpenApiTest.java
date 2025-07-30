@@ -39,6 +39,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -96,6 +97,9 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class AbstractOpenApiTest extends AbstractDataBrokerTest {
+    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
+        .withStrictMode();
+
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final String TOPOLOGY_URI =
         "/rests/data/network-topology:network-topology/topology=topology-netconf";
@@ -317,7 +321,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private boolean deviceConnectedJson() throws Exception {
         final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
         assertEquals(HttpResponseStatus.OK, response.status());
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8));
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
         //{
         //  "netconf-node-topology:netconf-node": {
         //    "connection-status": "connected"
