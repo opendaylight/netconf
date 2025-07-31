@@ -1208,11 +1208,11 @@ public abstract class RestconfStrategy implements DatabindAware {
                                                        final @NonNull NormalizedNode stateDataNode) {
         if (configDataNode instanceof UserMapNode configMap) {
             final var builder = ImmutableNodes.newUserMapBuilder().withNodeIdentifier(configMap.name());
-            mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
+            mapValueToBuilder(configMap.asMap(), ((UserMapNode) stateDataNode).asMap(), builder);
             return builder.build();
         } else if (configDataNode instanceof SystemMapNode configMap) {
             final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(configMap.name());
-            mapValueToBuilder(configMap.body(), ((SystemMapNode) stateDataNode).body(), builder);
+            mapValueToBuilder(configMap.asMap(), ((SystemMapNode) stateDataNode).asMap(), builder);
             return builder.build();
         } else if (configDataNode instanceof MapEntryNode configEntry) {
             final var builder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(configEntry.name());
@@ -1266,12 +1266,18 @@ public abstract class RestconfStrategy implements DatabindAware {
     private static <T extends NormalizedNode> void mapValueToBuilder(
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
-        final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
-        final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
+        mapValueToBuilder(
+            configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity())),
+            stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity())),
+            builder);
+    }
 
+    private static <T extends NormalizedNode> void mapValueToBuilder(
+            final @NonNull Map<? extends PathArgument, T> configMap,
+            final @NonNull Map<? extends PathArgument, T> stateMap,
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         // merge config and state data of children with different identifiers
         mapDataToBuilder(configMap, stateMap, builder);
-
         // merge config and state data of children with the same identifiers
         mergeDataToBuilder(configMap, stateMap, builder);
     }
@@ -1285,7 +1291,8 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param builder   - builder
      */
     private static <T extends NormalizedNode> void mapDataToBuilder(
-            final @NonNull Map<PathArgument, T> configMap, final @NonNull Map<PathArgument, T> stateMap,
+            final @NonNull Map<? extends PathArgument, T> configMap,
+            final @NonNull Map<? extends PathArgument, T> stateMap,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         configMap.entrySet().stream().filter(x -> !stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild(y.getValue()));
@@ -1303,7 +1310,8 @@ public abstract class RestconfStrategy implements DatabindAware {
      */
     @SuppressWarnings("unchecked")
     private static <T extends NormalizedNode> void mergeDataToBuilder(
-            final @NonNull Map<PathArgument, T> configMap, final @NonNull Map<PathArgument, T> stateMap,
+            final @NonNull Map<? extends PathArgument, T> configMap,
+            final @NonNull Map<? extends PathArgument, T> stateMap,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         // it is enough to process only config data because operational contains the same data
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
