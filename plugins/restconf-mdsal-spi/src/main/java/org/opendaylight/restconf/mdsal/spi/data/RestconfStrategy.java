@@ -793,12 +793,13 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final Collection<DataContainerChild> children, final DataSchemaContext ctxNode, final boolean trim) {
         for (var child : children) {
             final var childCtx = getChildContext(ctxNode, child);
-            if (child instanceof ContainerNode container) {
-                appendContainer(builder, container, childCtx, trim);
-            } else if (child instanceof MapNode map) {
-                appendMap(builder, map, childCtx, trim);
-            } else if (child instanceof LeafNode<?> leaf) {
-                appendLeaf(builder, leaf, childCtx, trim, List.of());
+            switch (child) {
+                case ContainerNode container -> appendContainer(builder, container, childCtx, trim);
+                case MapNode map -> appendMap(builder, map, childCtx, trim);
+                case LeafNode<?> leaf -> appendLeaf(builder, leaf, childCtx, trim, List.of());
+                default -> {
+                    // No-op
+                }
             }
         }
     }
