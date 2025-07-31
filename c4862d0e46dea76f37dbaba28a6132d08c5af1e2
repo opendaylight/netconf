@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52eff369_0c469daa",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 991,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-07-31T07:46:47Z",
+      "side": 1,
+      "message": "can\u0027t say I like this code duplication: why not just use ImmutableMap.toImmutableMap() instead?",
+      "range": {
+        "startLine": 991,
+        "startChar": 51,
+        "endLine": 991,
+        "endChar": 75
+      },
+      "revId": "c4862d0e46dea76f37dbaba28a6132d08c5af1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
