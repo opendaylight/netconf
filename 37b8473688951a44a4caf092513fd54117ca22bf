@@ -16,6 +16,29 @@
       "message": "An idea, needs figuring out why it does not work as expected, completion and testing.",
       "revId": "37b8473688951a44a4caf092513fd54117ca22bf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5535c6c_af990c57",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-07-31T11:27:41Z",
+      "side": 1,
+      "message": "this is needlessly complex and undocumented.\n\nwhat we really want to have here is \u0027blockedRequests\u0027 and then:\n- in channelRead0() check if the queue is becoming non-empty, if so, process start processing the request\n- in respond() remove the first entry before calling super and start processing the next entry once super returns",
+      "range": {
+        "startLine": 42,
+        "startChar": 27,
+        "endLine": 42,
+        "endChar": 79
+      },
+      "revId": "37b8473688951a44a4caf092513fd54117ca22bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
