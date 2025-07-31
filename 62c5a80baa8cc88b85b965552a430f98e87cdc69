@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d5339c9_dbb23c8b",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NC1495Test.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-31T12:50:43Z",
+      "side": 1,
+      "message": "Should this test really be here instead of `org.opendaylight.restconf.mdsal.spi.data` as class which contributes fix?",
+      "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
