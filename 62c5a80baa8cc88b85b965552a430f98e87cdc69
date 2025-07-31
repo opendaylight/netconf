@@ -16,6 +16,24 @@
       "message": "Should this test really be here instead of `org.opendaylight.restconf.mdsal.spi.data` as class which contributes fix?",
       "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8f4b905_aac8f63d",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NC1495Test.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-31T13:54:30Z",
+      "side": 1,
+      "message": "If I understand correctly that you are referring to moving this class into plugins/restconf-mdsal-spi, then yes, as all test for those classes are located here in apps/restconf-nb.",
+      "parentUuid": "4d5339c9_dbb23c8b",
+      "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
