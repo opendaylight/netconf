@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9d0eb06_26e210fb",
+        "filename": "plugins/restconf-server-mdsal/pom.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-07-31T10:50:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96f75c71_3fc86e3a",
+      "range": {
+        "startLine": 135,
+        "startChar": 13,
+        "endLine": 135,
+        "endChar": 41
+      },
+      "revId": "6dfa03e32afc0427aac799dc05e53d1dc076695f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c45146e_ce865eee",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84e9dfd0_ffea8a7d",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-07-31T10:50:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c45146e_ce865eee",
+      "range": {
+        "startLine": 122,
+        "startChar": 15,
+        "endLine": 122,
+        "endChar": 38
+      },
+      "revId": "6dfa03e32afc0427aac799dc05e53d1dc076695f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75e5d3aa_f829b7a5",
@@ -60,6 +108,30 @@
       "writtenOn": "2025-07-30T11:41:07Z",
       "side": 1,
       "message": "move to next line",
+      "range": {
+        "startLine": 561,
+        "startChar": 46,
+        "endLine": 561,
+        "endChar": 51
+      },
+      "revId": "6dfa03e32afc0427aac799dc05e53d1dc076695f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c1163a3_d5a19fb9",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-07-31T10:50:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75e5d3aa_f829b7a5",
       "range": {
         "startLine": 561,
         "startChar": 46,
