@@ -34,6 +34,24 @@
       "parentUuid": "4d5339c9_dbb23c8b",
       "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e255f2_34949209",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NC1495Test.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-31T13:58:34Z",
+      "side": 1,
+      "message": "But seems that there is no problem to move it into plugins/restconf-mdsal-spi.",
+      "parentUuid": "e8f4b905_aac8f63d",
+      "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
