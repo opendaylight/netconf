@@ -16,6 +16,24 @@
       "message": "can we also enable strict parsing while we are here?",
       "revId": "7c8f8863541b88f94d19f237b78a220eef6ab96f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90a8b4e7_11083a57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-07-31T12:31:37Z",
+      "side": 1,
+      "message": "We are using:\n```\njson.getJSONObject(\"odl-device-notification:output\").getString(\"stream-name\");\n```\nwhat should be strict compared to optJSONObject, etc.",
+      "parentUuid": "5613078b_c93778c9",
+      "revId": "7c8f8863541b88f94d19f237b78a220eef6ab96f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
