@@ -52,6 +52,24 @@
       "parentUuid": "e8f4b905_aac8f63d",
       "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c77a9588_ff604ac6",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NC1495Test.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-31T14:01:50Z",
+      "side": 1,
+      "message": "No, my bad this would require adding dependency to netconf-dom-api and netconf-client-mdsal into restconf-mdsal-spi project. So I will rather keep it at the current location.",
+      "parentUuid": "a9e255f2_34949209",
+      "revId": "62c5a80baa8cc88b85b965552a430f98e87cdc69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
