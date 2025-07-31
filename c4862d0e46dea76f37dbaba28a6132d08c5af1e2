@@ -22,6 +22,30 @@
       },
       "revId": "c4862d0e46dea76f37dbaba28a6132d08c5af1e2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e53f3946_4f7d73a7",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 991,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-07-31T11:12:34Z",
+      "side": 1,
+      "message": "Switched to ImmutableMap.toImmutableMap()",
+      "parentUuid": "52eff369_0c469daa",
+      "range": {
+        "startLine": 991,
+        "startChar": 51,
+        "endLine": 991,
+        "endChar": 75
+      },
+      "revId": "c4862d0e46dea76f37dbaba28a6132d08c5af1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
