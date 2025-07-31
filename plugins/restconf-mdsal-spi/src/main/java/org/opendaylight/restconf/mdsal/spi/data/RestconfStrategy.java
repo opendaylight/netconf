@@ -1022,7 +1022,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         }
     }
 
-    protected final @NonNull RequestException decodeException(final Throwable ex, final String txType,
+    protected static final @NonNull RequestException decodeException(final Throwable ex, final String txType,
             final Data dataPath) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
