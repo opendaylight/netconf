@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -24,7 +25,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -970,8 +970,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         mapValueToBuilder(
-            configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity())),
-            stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity())),
+            configData.stream().collect(ImmutableMap.toImmutableMap(NormalizedNode::name, Function.identity())),
+            stateData.stream().collect(ImmutableMap.toImmutableMap(NormalizedNode::name, Function.identity())),
             builder);
     }
 
