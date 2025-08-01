@@ -1267,8 +1267,8 @@ public abstract class RestconfStrategy implements DatabindAware {
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         mapValueToBuilder(
-            configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity())),
-            stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity())),
+            configData.stream().collect(ImmutableMap.toImmutableMap(NormalizedNode::name, Function.identity())),
+            stateData.stream().collect(ImmutableMap.toImmutableMap(NormalizedNode::name, Function.identity())),
             builder);
     }
 
