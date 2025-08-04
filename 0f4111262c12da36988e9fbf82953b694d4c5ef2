@@ -22,6 +22,30 @@
       },
       "revId": "0f4111262c12da36988e9fbf82953b694d4c5ef2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48c4983d_15e4ce5c",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-04T14:04:25Z",
+      "side": 1,
+      "message": "Switching readData method to operate on ServerRequest would add too much complexity to this patch. This is because it would require: \n 1) Moving Callback from getData() into readData method. \n 2) Reworking AbstractRestconfStrategyTest and MdsalRestconfStrategyTest to compare FormattableBody instead of NormalizedNode \n https://git.opendaylight.org/gerrit/c/netconf/+/116701/24/apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractRestconfStrategyTest.java#511 \n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116701/24/apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java#478\n\nConsidering the second part, keeping the current method for test purposes seems reasonable.\n\nPlease let me know if you still want to rework the readData method to operate on ServerRequest, and if it should be done in this patch.",
+      "parentUuid": "c02e3ef1_2222ba53",
+      "range": {
+        "startLine": 556,
+        "startChar": 20,
+        "endLine": 556,
+        "endChar": 62
+      },
+      "revId": "0f4111262c12da36988e9fbf82953b694d4c5ef2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
