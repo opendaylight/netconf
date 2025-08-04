@@ -34,6 +34,24 @@
       "parentUuid": "5613078b_c93778c9",
       "revId": "7c8f8863541b88f94d19f237b78a220eef6ab96f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e12b4339_f64849e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-04T08:57:08Z",
+      "side": 1,
+      "message": "./src/test/java/org/opendaylight/restconf/it/server/AuthTest.java:        final var json \u003d new JSONObject(content);\n\nstrict mode refers to parsing of the string ...",
+      "parentUuid": "90a8b4e7_11083a57",
+      "revId": "7c8f8863541b88f94d19f237b78a220eef6ab96f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
