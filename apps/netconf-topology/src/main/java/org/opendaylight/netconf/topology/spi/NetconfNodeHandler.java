@@ -194,8 +194,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         if (rpcMessageLimit < 1) {
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
         }
+        final long rpcMessageTimeout = node.requireConcurentRpcTimeoutMillis().toJava();
+        if (rpcMessageTimeout < 1) {
+            LOG.info("Concurrent rpc time-out is smaller than 1, no time-out will be enforced for device {}", deviceId);
+        }
 
-        communicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
+        communicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit, rpcMessageTimeout,
             NetconfNodeUtils.extractUserCapabilities(node));
 
         if (keepAliveFacade != null) {

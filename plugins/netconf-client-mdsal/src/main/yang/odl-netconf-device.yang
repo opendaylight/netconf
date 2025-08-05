@@ -10,6 +10,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2025-08-05 {
+    description "Add concurent-rpc-timeout leaf.";
+  }
+
   revision 2024-10-09 {
     description "Add range restriction for backoff-multiplier leaf.";
   }
@@ -285,6 +289,14 @@ module odl-netconf-device {
       default 0;
       description "Limit of concurrent messages that can be send before reply messages are received.
                    If value <1 is provided, no limit will be enforced";
+    }
+
+    leaf concurent-rpc-timeout-millis {
+      config true;
+      type uint32;
+      default 0;
+      description "Specifies timeout in milliseconds after which thread for concurrent messages should be aquired
+                   if concurrent-rpc-limit is set.";
     }
 
     leaf actor-response-wait-time {
