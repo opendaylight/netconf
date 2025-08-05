@@ -17,10 +17,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.EOFException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.NonNull;
@@ -72,12 +73,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
     private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
-    private final Lock sessionLock = new ReentrantLock();
+    private final Lock sessionLock = new ReentrantLock(true);
 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
+    private final long concurentRpcTimeout;
 
-    private final Queue<Request> requests = new ArrayDeque<>();
+    private final Queue<Request> requests = new LinkedBlockingDeque<>();
     private NetconfClientSession currentSession;
 
     // isSessionClosing indicates a close operation on the session is issued and tearDown will surely be called later
@@ -95,18 +97,21 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
-            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit) {
-        this(id, remoteDevice, rpcMessageLimit, null);
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
+            final long rpcTimeout) {
+        this(id, remoteDevice, rpcMessageLimit, rpcTimeout, null);
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
             final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
-            final @Nullable UserPreferences overrideNetconfCapabilities) {
+            final long rpcTimeout, final @Nullable UserPreferences overrideNetconfCapabilities) {
         concurentRpcMsgs = rpcMessageLimit;
+        concurentRpcTimeout = rpcTimeout;
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
-        semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+        semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit, true) : null;
+
     }
 
     @Override
@@ -256,26 +261,23 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private @Nullable Request pollRequest() {
-        sessionLock.lock();
-        try {
-            var request = requests.peek();
-            if (request != null) {
-                request = requests.poll();
-                // we have just removed one request from the queue
-                // we can also release one permit
-                if (semaphore != null) {
-                    semaphore.release();
-                }
-                return request;
+        var request = requests.peek();
+        if (request != null) {
+            request = requests.poll();
+            // we have just removed one request from the queue
+            // we can also release one permit
+            if (semaphore != null) {
+                semaphore.release();
             }
-            return null;
-        } finally {
-            sessionLock.unlock();
+            return request;
         }
+        return null;
     }
 
     private void processMessage(final NetconfMessage message) {
+        LOG.info("Message with messageNumber received {} ", getMessageNumber(message));
         final var request = pollRequest();
+
         if (request == null) {
             // No matching request, bail out
             if (LOG.isWarnEnabled()) {
@@ -358,18 +360,33 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 LOG.warn("{}: Session is disconnected, failing RPC request {}", id, message);
                 return Futures.immediateFuture(createSessionDownRpcResult());
             }
-            if (semaphore != null && !semaphore.tryAcquire()) {
+            LOG.info("Attempt to acquire semaphore with messageNumber {} ", getMessageNumber(message));
+            if (semaphore != null && !semaphore.tryAcquire(concurentRpcTimeout, TimeUnit.MILLISECONDS)) {
+                LOG.info("Failed Attempt to acquire semaphore with messageNumber {} ", getMessageNumber(message));
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
                 return Futures.immediateFailedFuture(new DocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
-
+            LOG.info("Successfully Attempt to acquire semaphore with messageNumber {} ", getMessageNumber(message));
             return sendRequestWithLock(message);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.warn("Limit of concurrent rpc messages was reached (limit: {}) after 2s time-out."
+                + " Rpc reply message is needed. Discarding request of Netconf device with id: {}", concurentRpcMsgs,
+                id.name());
+            return Futures.immediateFailedFuture(new DocumentedException(
+                "Limit of rpc messages was reached after timeOut (Limit :" + concurentRpcMsgs
+                    + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
         } finally {
             sessionLock.unlock();
         }
+    }
+
+    private String getMessageNumber(final NetconfMessage message) {
+        return message.getDocument().getDocumentElement()
+            .getAttribute(XmlNetconfConstants.MESSAGE_ID);
     }
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message) {

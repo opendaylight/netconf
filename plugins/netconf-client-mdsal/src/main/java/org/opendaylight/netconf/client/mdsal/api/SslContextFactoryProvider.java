@@ -10,7 +10,7 @@ package org.opendaylight.netconf.client.mdsal.api;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslContextFactory;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.parameters.protocol.Specification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev250805.connection.parameters.protocol.Specification;
 
 /**
  * A provider for {@link SslContextFactory} implementations. This allows the factory to be tailored with a
