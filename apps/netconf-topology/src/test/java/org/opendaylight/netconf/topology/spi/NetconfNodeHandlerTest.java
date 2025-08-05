@@ -62,10 +62,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.KeyAuthBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.LoginPwUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.key.auth.KeyBasedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev250805.credentials.credentials.KeyAuthBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev250805.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev250805.credentials.credentials.key.auth.KeyBasedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev250805.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
@@ -151,6 +151,7 @@ class NetconfNodeHandlerTest {
                 .setTcpOnly(true)
                 .setBackoffMultiplier(Decimal64.valueOf("1.5"))
                 .setConcurrentRpcLimit(Uint16.ONE)
+                .setConcurentRpcTimeoutMillis(Uint32.ZERO)
                 // One reconnection attempt
                 .setMaxConnectionAttempts(Uint32.TWO)
                 .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
@@ -284,6 +285,7 @@ class NetconfNodeHandlerTest {
                 .setProtocol(null)
                 .setBackoffMultiplier(Decimal64.valueOf("1.5"))
                 .setConcurrentRpcLimit(Uint16.ONE)
+                .setConcurentRpcTimeoutMillis(Uint32.ZERO)
                 // One reconnection attempt
                 .setMaxConnectionAttempts(Uint32.ONE)
                 .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
@@ -329,6 +331,7 @@ class NetconfNodeHandlerTest {
             .setTcpOnly(true)
             .setBackoffMultiplier(Decimal64.valueOf("1"))
             .setConcurrentRpcLimit(Uint16.ONE)
+            .setConcurentRpcTimeoutMillis(Uint32.ZERO)
             .setMaxConnectionAttempts(Uint32.ZERO)
             .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
             .setMinBackoffMillis(Uint16.valueOf(minBackoffMillis))

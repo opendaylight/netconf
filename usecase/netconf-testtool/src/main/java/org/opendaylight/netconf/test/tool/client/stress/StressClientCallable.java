@@ -34,7 +34,7 @@ public class StressClientCallable implements Callable<Boolean> {
                                 final NetconfClientFactory netconfClientFactory,
                                 final NetconfClientConfiguration baseConfiguration,
                                 final List<NetconfMessage> preparedMessages) {
-        sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit);
+        sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit, params.msgTimeout);
         final var cfg = getNetconfClientConfiguration(baseConfiguration, sessionListener);
 
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
@@ -63,9 +63,9 @@ public class StressClientCallable implements Callable<Boolean> {
     }
 
     private static NetconfDeviceCommunicator getSessionListener(final InetSocketAddress inetAddress,
-            final int messageLimit) {
+            final int messageLimit, final long messageTimeout) {
         return new NetconfDeviceCommunicator(new RemoteDeviceId("secure-test", inetAddress),
-            StressClient.LOGGING_REMOTE_DEVICE, messageLimit);
+            StressClient.LOGGING_REMOTE_DEVICE, messageLimit, messageTimeout);
     }
 
     private static NetconfClientConfiguration getNetconfClientConfiguration(final NetconfClientConfiguration base,

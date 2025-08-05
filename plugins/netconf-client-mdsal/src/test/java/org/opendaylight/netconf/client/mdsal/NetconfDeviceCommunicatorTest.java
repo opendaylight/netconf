@@ -71,6 +71,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 class NetconfDeviceCommunicatorTest {
     private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
     private static final int RPC_MESSAGE_LIMIT = 10;
+    private static final long RPC_MESSAGE_TIMEOUT = 1000L;
 
     @Mock
     private RemoteDevice<NetconfDeviceCommunicator> mockDevice;
@@ -85,7 +86,8 @@ class NetconfDeviceCommunicatorTest {
     @BeforeEach
     void setUp() {
         communicator = new NetconfDeviceCommunicator(new RemoteDeviceId("test",
-            InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT);
+            InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT,
+            RPC_MESSAGE_TIMEOUT);
         spySession = spy(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
             SESSION_ID, Set.of()));
     }
