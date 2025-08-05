@@ -37,6 +37,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 @ExtendWith(MockitoExtension.class)
 class NC1462Test {
     private static final int RPC_MESSAGE_LIMIT = 1;
+    private static final long RPC_MESSAGE_TIMEOUT = 0L;
     private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
     private static final NetconfMessage MESSAGE = createNetconfMessage();
 
@@ -51,7 +52,8 @@ class NC1462Test {
     void beforeEach() {
         // Prepare NetconfDeviceCommunicator.
         communicator = new NetconfDeviceCommunicator(new RemoteDeviceId("test-device",
-            InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT);
+            InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT,
+            RPC_MESSAGE_TIMEOUT);
 
         doReturn(Collections.emptyList()).when(mockNetconfClientSession).getServerCapabilities();
         doReturn(SESSION_ID).when(mockNetconfClientSession).sessionId();

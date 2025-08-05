@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.NonNull;
@@ -76,6 +77,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
+    private final long concurentRpcTimeout;
 
     private final Queue<Request> requests = new ConcurrentLinkedQueue<>();
     private NetconfClientSession currentSession;
@@ -95,14 +97,16 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
-            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit) {
-        this(id, remoteDevice, rpcMessageLimit, null);
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
+            final long rpcTimeout) {
+        this(id, remoteDevice, rpcMessageLimit, rpcTimeout, null);
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
             final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
-            final @Nullable UserPreferences overrideNetconfCapabilities) {
+            final long rpcTimeout, final @Nullable UserPreferences overrideNetconfCapabilities) {
         concurentRpcMsgs = rpcMessageLimit;
+        concurentRpcTimeout = rpcTimeout;
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
@@ -270,6 +274,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private void processMessage(final NetconfMessage message) {
         final var request = pollRequest();
+
         if (request == null) {
             // No matching request, bail out
             if (LOG.isWarnEnabled()) {
@@ -352,15 +357,20 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 LOG.warn("{}: Session is disconnected, failing RPC request {}", id, message);
                 return Futures.immediateFuture(createSessionDownRpcResult());
             }
-            if (semaphore != null && !semaphore.tryAcquire()) {
+            if (semaphore != null && !semaphore.tryAcquire(concurentRpcTimeout, TimeUnit.MILLISECONDS)) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
                 return Futures.immediateFailedFuture(new DocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
-
             return sendRequestWithLock(message);
+        } catch (InterruptedException cause) {
+            Thread.currentThread().interrupt();
+            LOG.warn("Waiting fot concurrent rpc messages was interrupted. Discarding request of Netconf device with"
+                + " id: {}", id.name());
+            return Futures.immediateFailedFuture(new DocumentedException("Waiting fot concurrent rpc messages was"
+                + "interrupted. Discarding request of Netconf device with id: " + id.name(), cause));
         } finally {
             sessionLock.unlock();
         }
