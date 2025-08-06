@@ -119,12 +119,12 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         if (http2) {
             // External HTTP 2 to internal HTTP 1.1 adapter handler
             final var connection = new DefaultHttp2Connection(false);
-            final var frameListener = Http2ToHttpAdapter.builder(connection)
-                    .maxContentLength(MAX_HTTP_CONTENT_LENGTH)
-                    .build();
 
             initializePipeline(underlayChannel, pipeline, new HttpToHttp2ConnectionHandlerBuilder()
-                .frameListener(new DelegatingDecompressorFrameListener(connection, frameListener))
+                .frameListener(new DelegatingDecompressorFrameListener(connection,
+                    Http2ToHttpAdapter.builder(connection).maxContentLength(MAX_HTTP_CONTENT_LENGTH).build(),
+                    // FIXME: allow for maxAllocation control to prevent OutOfMemoryError
+                    0))
                 .connection(connection)
                 .frameLogger(FRAME_LOGGER)
                 .gracefulShutdownTimeoutMillis(0L)
