@@ -72,7 +72,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
     private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
-    private final Lock sessionLock = new ReentrantLock();
+    private final Lock sessionLock = new ReentrantLock(true);
 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
@@ -106,7 +106,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
-        semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+        semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit, true) : null;
     }
 
     @Override
