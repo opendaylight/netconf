@@ -101,9 +101,8 @@ public class NetconfDeviceSimulator implements Closeable {
             if (sendFakeSchema) {
                 sendFakeSchema = false;
                 return new FakeCapability((YangModuleCapability) input);
-            } else {
-                return input;
             }
+            return input;
         }));
         transformedCapabilities.add(new BasicCapability(CapabilityURN.CANDIDATE));
         final var monitoringService1 = new DummyMonitoringService(transformedCapabilities);
@@ -175,7 +174,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final var startingPort = getStartingPort(configuration);
         final var deviceCount = configuration.getDeviceCount();
         final var ports = IntStream.range(startingPort, Math.min(startingPort + deviceCount, 65536))
-            .mapToObj(Integer::new).toList();
+            .mapToObj(Integer::valueOf).toList();
 
         final var openDevices = new ArrayList<Integer>(ports.size());
         final var configurator = configuration.isSsh() ? createServerFactoryManagerConfigurator(configuration) : null;
