@@ -95,7 +95,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getRevision().orElse(null)))
             .collect(Collectors.toList());
 
-        final var missingSources = filterMissingSources(requiredSources);
+        final var missingSources = checkMissingSourcesRecursively(requiredSources);
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
             UnavailableCapability.FailureReason.MissingSource);
         requiredSources.removeAll(missingSources);
@@ -159,6 +159,17 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             LOG.debug("{}: no more sources for schema context", deviceId);
             resultFuture.setException(
                 new EmptySchemaContextException(deviceId + ": No more sources for schema context"));
+        }
+    }
+
+    private List<SourceIdentifier> checkMissingSourcesRecursively(final Collection<SourceIdentifier> missingSources) {
+        final var filteredSources = filterMissingSources(missingSources);
+        // If missing sources have not changed after filtering again, consider them as missing.
+        if (!filteredSources.isEmpty() && filteredSources.size() < missingSources.size()) {
+            LOG.debug("Recheck missing sources {}", missingSources);
+            return checkMissingSourcesRecursively(filteredSources);
+        } else {
+            return filteredSources;
         }
     }
 

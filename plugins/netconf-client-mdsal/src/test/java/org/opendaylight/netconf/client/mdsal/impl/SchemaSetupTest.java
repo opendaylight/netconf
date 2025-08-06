@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,8 +53,10 @@ class SchemaSetupTest extends AbstractTestModelTest {
     private static final String TEST_REVISION = "2013-07-22";
     private static final SourceIdentifier TEST_SID = new SourceIdentifier(TEST_MODULE, TEST_REVISION);
     private static final SourceIdentifier TEST_SID2 = new SourceIdentifier(TEST_MODULE + "2", TEST_REVISION);
+    private static final SourceIdentifier TEST_SID3 = new SourceIdentifier(TEST_MODULE + "3", TEST_REVISION);
     private static final QName TEST_QNAME = QName.create(TEST_NAMESPACE, TEST_REVISION, TEST_MODULE);
     private static final QName TEST_QNAME2 = QName.create(TEST_NAMESPACE, TEST_REVISION, TEST_MODULE + "2");
+    private static final QName TEST_QNAME3 = QName.create(TEST_NAMESPACE, TEST_REVISION, TEST_MODULE + "3");
 
     @Mock
     private EffectiveModelContextFactory contextFactory;
@@ -104,6 +107,43 @@ class SchemaSetupTest extends AbstractTestModelTest {
         verify(contextFactory).createEffectiveModelContext(captor.capture());
         assertEquals(List.of(TEST_SID2), captor.getValue());
         assertSame(TEST_MODEL, result.modelContext());
+    }
+
+    @Test
+    void testNetconfDeviceMissingSourceWithRecheck() throws Exception {
+        // Make fallback attempt to fail due to empty resolved sources
+        final var ex = new MissingSchemaSourceException(TEST_SID, "fail first");
+        doReturn(Futures.immediateFailedFuture(ex))
+            .when(schemaRepository).getSchemaSource(TEST_SID, YangTextSource.class);
+        doReturn(Futures.immediateFuture(source)).when(schemaRepository)
+            .getSchemaSource(TEST_SID2, YangTextSource.class);
+        // Set first call for TEST_SID3 to a failure and second to a success.
+        doReturn(Futures.immediateFailedFuture(ex))
+            .doReturn(Futures.immediateFuture(source)).when(schemaRepository)
+            .getSchemaSource(TEST_SID3, YangTextSource.class);
+        doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
+
+        final var testQnames = Set.of(TEST_QNAME, TEST_QNAME2, TEST_QNAME3);
+        final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
+            new NetconfDeviceSchemas(testQnames, FeatureSet.builder().build(), Set.of(),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, testQnames))),
+            NetconfSessionPreferences.fromStrings(Set.of()));
+
+        final var result = Futures.getDone(setup.startResolution());
+        assertSame(TEST_MODEL, result.modelContext());
+        // Received on the first attempt.
+        verify(schemaRepository).getSchemaSource(TEST_SID2, YangTextSource.class);
+        // First attempt was unsuccessful, but the second was successful.
+        verify(schemaRepository, times(2)).getSchemaSource(TEST_SID3, YangTextSource.class);
+        // 1 round for all, 2 to recheck missing sources, and 3 to recheck due to a TEST_SID3 state change.
+        verify(schemaRepository, times(3)).getSchemaSource(TEST_SID, YangTextSource.class);
+
+        final var captor = ArgumentCaptor.forClass(Collection.class);
+        verify(contextFactory).createEffectiveModelContext(captor.capture());
+        final var resultCollection = captor.getValue();
+        assertEquals(2, resultCollection.size());
+        assertTrue(resultCollection.contains(TEST_SID2));
+        assertTrue(resultCollection.contains(TEST_SID3));
     }
 
     @Test
