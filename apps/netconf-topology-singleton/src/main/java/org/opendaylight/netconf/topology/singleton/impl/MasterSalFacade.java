@@ -88,7 +88,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.lockDatastore = lockDatastore;
 
-        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id,
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_OID, id,
             credentials);
     }
 
