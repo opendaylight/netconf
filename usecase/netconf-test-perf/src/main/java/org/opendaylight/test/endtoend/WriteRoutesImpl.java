@@ -51,8 +51,9 @@ record WriteRoutesImpl(MountPointService mountPointService) implements WriteRout
 
     @Override
     public ListenableFuture<RpcResult<WriteRoutesOutput>> invoke(final WriteRoutesInput input) {
-        final var optMountPoint = mountPointService.getMountPoint(NetconfNodeUtils.DEFAULT_TOPOLOGY_IID
-            .child(Node.class, new NodeKey(new NodeId(input.getMountName()))));
+        final var optMountPoint = mountPointService.findMountPoint(NetconfNodeUtils.DEFAULT_TOPOLOGY_OID.toBuilder()
+            .child(Node.class, new NodeKey(new NodeId(input.getMountName())))
+            .build());
         if (optMountPoint.isEmpty()) {
             return RpcResultBuilder.<WriteRoutesOutput>failed()
                 .withError(ErrorType.TRANSPORT, "Mount point not present")
