@@ -96,9 +96,23 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             .collect(Collectors.toList());
 
         final var missingSources = filterMissingSources(requiredSources);
-        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
+        List<SourceIdentifier> refiltered = refilterSourcesIfRequired(missingSources);
+
+        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(refiltered),
             UnavailableCapability.FailureReason.MissingSource);
-        requiredSources.removeAll(missingSources);
+        requiredSources.removeAll(refiltered);
+    }
+
+    private List<SourceIdentifier> refilterSourcesIfRequired(final List<SourceIdentifier> missingSources) {
+        if (!missingSources.isEmpty()) {
+            final var refilteredSources = filterMissingSources(missingSources);
+            if (!refilteredSources.isEmpty() && refilteredSources.size() < missingSources.size()) {
+                return refilterSourcesIfRequired(refilteredSources);
+            } else {
+                return missingSources;
+            }
+        }
+        return missingSources;
     }
 
     ListenableFuture<DeviceNetconfSchema> startResolution() {
