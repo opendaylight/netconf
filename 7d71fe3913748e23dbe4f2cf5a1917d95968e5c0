@@ -367,6 +367,24 @@
       "parentUuid": "b68b5796_7ff8b201",
       "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6405cd5_147f3d81",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-06T06:12:50Z",
+      "side": 1,
+      "message": "sendResponseEnd is true when we have issue?",
+      "parentUuid": "2c528838_da6dbf37",
+      "revId": "7d71fe3913748e23dbe4f2cf5a1917d95968e5c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
