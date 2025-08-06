@@ -17,9 +17,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.EOFException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -77,7 +77,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
 
-    private final Queue<Request> requests = new ArrayDeque<>();
+    private final Queue<Request> requests = new ConcurrentLinkedQueue<>();
     private NetconfClientSession currentSession;
 
     // isSessionClosing indicates a close operation on the session is issued and tearDown will surely be called later
@@ -256,22 +256,16 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private @Nullable Request pollRequest() {
-        sessionLock.lock();
-        try {
-            var request = requests.peek();
-            if (request != null) {
-                request = requests.poll();
-                // we have just removed one request from the queue
-                // we can also release one permit
-                if (semaphore != null) {
-                    semaphore.release();
-                }
-                return request;
+        final var request = requests.poll();
+        if (request != null) {
+            // we have just removed one request from the queue
+            // we can also release one permit
+            if (semaphore != null) {
+                semaphore.release();
             }
-            return null;
-        } finally {
-            sessionLock.unlock();
+            return request;
         }
+        return null;
     }
 
     private void processMessage(final NetconfMessage message) {
