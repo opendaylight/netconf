@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -51,8 +50,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
@@ -60,8 +58,8 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 @ExtendWith(MockitoExtension.class)
 class NetconfTopologyImplTest {
     private static final TopologyKey TOPOLOGY_KEY = new TopologyKey(new TopologyId("testing-topology"));
-    private static final KeyedInstanceIdentifier<Topology, TopologyKey> TOPOLOGY_PATH =
-        InstanceIdentifier.builder(NetworkTopology.class).child(Topology.class, TOPOLOGY_KEY).build();
+    private static final DataObjectIdentifier.WithKey<Topology, TopologyKey> TOPOLOGY_PATH =
+        DataObjectIdentifier.builder(NetworkTopology.class).child(Topology.class, TOPOLOGY_KEY).build();
 
     @Mock
     private NetconfClientFactory mockedClientFactory;
@@ -128,8 +126,7 @@ class NetconfTopologyImplTest {
             doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).modificationType();
             doReturn(node).when(objMod).dataAfter();
 
-            doReturn(DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
-                TOPOLOGY_PATH.child(Node.class, key))).when(treeMod).getRootPath();
+            doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
             final var changes = List.of(treeMod);
 
             doReturn(objMod).when(treeMod).getRootNode();

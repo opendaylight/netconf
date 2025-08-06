@@ -42,7 +42,8 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -52,10 +53,10 @@ import org.slf4j.LoggerFactory;
 public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
-    private final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath;
-    private final DataBroker dataBroker;
-    private final RemoteDeviceId id;
-    private final Credentials credentials;
+    private final @NonNull WithKey<Topology, TopologyKey> topologyPath;
+    private final @NonNull DataBroker dataBroker;
+    private final @NonNull RemoteDeviceId id;
+    private final @NonNull Credentials credentials;
 
     @GuardedBy("this")
     private SettableFuture<Empty> closeFuture;
@@ -67,13 +68,28 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
      * within the topology, handling updates to its operational data in the datastore.
      *
      * @param dataBroker   the DataBroker used to interact with the datastore
-     * @param topologyPath the InstanceIdentifier pointing to the topology this device belongs to
+     * @param topologyPath the KeyedInstanceIdentifier pointing to the topology this device belongs to
      * @param id           the unique identifier of the remote device
      * @param credentials  the credentials used to authenticate the remote device
      */
+    @Deprecated
     public NetconfDeviceTopologyAdapter(final DataBroker dataBroker,
             final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id,
             final Credentials credentials) {
+        this(dataBroker, topologyPath.toIdentifier(), id, credentials);
+    }
+
+    /**
+     * NetconfDeviceTopologyAdapter is responsible for managing the state of a NETCONF device
+     * within the topology, handling updates to its operational data in the datastore.
+     *
+     * @param dataBroker   the DataBroker used to interact with the datastore
+     * @param topologyPath the DataObjectIdentifier pointing to the topology this device belongs to
+     * @param id           the unique identifier of the remote device
+     * @param credentials  the credentials used to authenticate the remote device
+     */
+    public NetconfDeviceTopologyAdapter(final DataBroker dataBroker, final WithKey<Topology, TopologyKey> topologyPath,
+            final RemoteDeviceId id, final Credentials credentials) {
         this.dataBroker = requireNonNull(dataBroker);
         this.topologyPath = requireNonNull(topologyPath);
         this.id = requireNonNull(id);
@@ -86,7 +102,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
             tx.getIdentifier());
         final var nodePath = nodePath();
         tx.put(LogicalDatastoreType.OPERATIONAL, nodePath, new NodeBuilder()
-            .withKey(nodePath.getKey())
+            .withKey(nodePath.key())
             .addAugmentation(new NetconfNodeAugmentBuilder()
                 .setNetconfNode(new NetconfNodeBuilder()
                     .setConnectionStatus(ConnectionStatus.Connecting)
@@ -155,12 +171,12 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         return closeFuture;
     }
 
-    private @NonNull KeyedInstanceIdentifier<Node, NodeKey> nodePath() {
-        return topologyPath.child(Node.class, new NodeKey(new NodeId(id.name())));
+    private @NonNull WithKey<Node, NodeKey> nodePath() {
+        return topologyPath.toBuilder().child(Node.class, new NodeKey(new NodeId(id.name()))).build();
     }
 
-    private @NonNull InstanceIdentifier<NetconfNode> netconfNodePath() {
-        return nodePath().augmentation(NetconfNodeAugment.class).child(NetconfNode.class);
+    private @NonNull DataObjectIdentifier<NetconfNode> netconfNodePath() {
+        return nodePath().toBuilder().augmentation(NetconfNodeAugment.class).child(NetconfNode.class).build();
     }
 
     private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities,
