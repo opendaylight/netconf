@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fb0ad43_ac630688",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-06T12:27:26Z",
+      "side": 1,
+      "message": "sessionLock protects more than just the queue",
+      "revId": "c8ad1a57afc36af39a4a090bd5196474dfa24bbc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
