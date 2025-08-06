@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
-import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
@@ -54,8 +53,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
 public final class NetconfTopologyRPCProvider implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
-    private final @NonNull InstanceIdentifier<Topology> topologyPath;
+    private final @NonNull WithKey<Topology, TopologyKey> topologyPath;
     private final @NonNull AAAEncryptionService encryptionService;
     private final @NonNull DataBroker dataBroker;
 
@@ -75,16 +75,12 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
             final AAAEncryptionService encryptionService, final String topologyId) {
         this.dataBroker = requireNonNull(dataBroker);
         this.encryptionService = requireNonNull(encryptionService);
-        topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
+        topologyPath = DataObjectIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
             .build();
         reg = rpcProviderService.registerRpcImplementations(
             (CreateDevice) this::createDevice,
             (DeleteDevice) this::deleteDevice);
-    }
-
-    protected @NonNull InstanceIdentifier<Topology> topologyPath() {
-        return topologyPath;
     }
 
     @Override
@@ -108,14 +104,13 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     private ListenableFuture<RpcResult<DeleteDeviceOutput>> deleteDevice(final DeleteDeviceInput input) {
-        final NodeId nodeId = new NodeId(input.getNodeId());
+        final var nodeId = new NodeId(input.getNodeId());
 
-        final InstanceIdentifier<Node> niid = topologyPath.child(Node.class, new NodeKey(nodeId));
+        final var wtx = dataBroker.newWriteOnlyTransaction();
+        wtx.delete(LogicalDatastoreType.CONFIGURATION,
+            topologyPath.toBuilder().child(Node.class, new NodeKey(nodeId)).build());
 
-        final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
-        wtx.delete(LogicalDatastoreType.CONFIGURATION, niid);
-
-        final SettableFuture<RpcResult<DeleteDeviceOutput>> rpcFuture = SettableFuture.create();
+        final var rpcFuture = SettableFuture.<RpcResult<DeleteDeviceOutput>>create();
 
         wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
@@ -187,10 +182,9 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
 
     private void writeToConfigDS(final Node node, final NodeId nodeId,
             final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult) {
-
-        final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final InstanceIdentifier<Node> niid = topologyPath.child(Node.class, new NodeKey(nodeId));
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, niid, node);
+        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION,
+            topologyPath.toBuilder().child(Node.class, new NodeKey(nodeId)).build(), node);
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
 
             @Override

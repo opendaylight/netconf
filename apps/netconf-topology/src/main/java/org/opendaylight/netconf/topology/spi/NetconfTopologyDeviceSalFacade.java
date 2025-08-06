@@ -42,7 +42,7 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     public NetconfTopologyDeviceSalFacade(final RemoteDeviceId id, final Credentials credentials,
             final DOMMountPointService mountPointService, final boolean lockDatastore, final DataBroker dataBroker) {
         super(id, mountPointService, NetconfNodeUtils.defaultTopologyMountPath(id), lockDatastore);
-        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id,
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_OID, id,
             credentials);
     }
 
