@@ -14,7 +14,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 class NetconfTopologyUtilTest {
     @Test
@@ -25,13 +24,12 @@ class NetconfTopologyUtilTest {
 
     @Test
     void testCreateListPath() {
-        final InstanceIdentifier<Node> listPath =
-                NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(new NodeId("nodeId")), "topologyId");
+        final var listPath = NetconfTopologyUtils.createTopologyNodeListPath(
+            new NodeKey(new NodeId("nodeId")), "topologyId");
 
-        assertEquals("nodeId", listPath.firstKeyOf(Node.class).getNodeId().getValue());
-        assertEquals("topologyId", listPath.firstKeyOf(Topology.class).getTopologyId().getValue());
-
-        assertEquals("topologyId",  NetconfTopologyUtils.createTopologyNodePath("topologyId")
-                .firstKeyOf(Topology.class).getTopologyId().getValue());
+        assertEquals("nodeId", listPath.getFirstKeyOf(Node.class).getNodeId().getValue());
+        assertEquals("topologyId", listPath.getFirstKeyOf(Topology.class).getTopologyId().getValue());
+        assertEquals("topologyId", NetconfTopologyUtils.createTopologyNodePath("topologyId")
+            .getFirstKeyOf(Topology.class).getTopologyId().getValue());
     }
 }
