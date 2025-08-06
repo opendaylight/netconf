@@ -95,7 +95,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getRevision().orElse(null)))
             .collect(Collectors.toList());
 
-        final var missingSources = filterMissingSources(requiredSources);
+        final var missingSources = checkMissingSourcesRecursively(requiredSources);
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
             UnavailableCapability.FailureReason.MissingSource);
         requiredSources.removeAll(missingSources);
@@ -159,6 +159,24 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             LOG.debug("{}: no more sources for schema context", deviceId);
             resultFuture.setException(
                 new EmptySchemaContextException(deviceId + ": No more sources for schema context"));
+        }
+    }
+
+    /**
+     * Recursively checks a collection of {@code sources} and returns a list of those that are missing from either
+     * the device or the cache folder.
+     *
+     * @param sources Collection of {@link SourceIdentifier} to check.
+     * @return List of {@link SourceIdentifier} that were not found.
+     */
+    private List<SourceIdentifier> checkMissingSourcesRecursively(final Collection<SourceIdentifier> sources) {
+        final var filteredSources = filterMissingSources(sources);
+        // If missing sources have not changed after filtering again, consider them as missing.
+        if (!filteredSources.isEmpty() && filteredSources.size() < sources.size()) {
+            LOG.debug("Recheck missing sources {}", sources);
+            return checkMissingSourcesRecursively(filteredSources);
+        } else {
+            return filteredSources;
         }
     }
 
