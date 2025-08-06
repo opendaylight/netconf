@@ -17,10 +17,11 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
+import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.binding.DataObjectStep;
 import org.opendaylight.yangtools.binding.KeyStep;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -56,20 +57,21 @@ public final class NetconfTopologyUtils {
         throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
     }
 
-    public static @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(
-            final String topologyId) {
-        return InstanceIdentifier.create(NetworkTopology.class)
-            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    public static @NonNull WithKey<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
+        return DataObjectIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build();
     }
 
-    public static @NonNull KeyedInstanceIdentifier<Node, NodeKey> createTopologyNodeListPath(final NodeKey key,
+    public static @NonNull WithKey<Node, NodeKey> createTopologyNodeListPath(final NodeKey key,
             final String topologyId) {
-        return createTopologyListPath(topologyId)
-                .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
+        return createTopologyListPath(topologyId).toBuilder()
+            .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())))
+            .build();
     }
 
-    public static @NonNull InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
-        return createTopologyListPath(topologyId).child(Node.class);
+    public static DataObjectReference<Node> createTopologyNodePath(final String topologyId) {
+        return createTopologyListPath(topologyId).toBuilder().toReferenceBuilder().child(Node.class).build();
     }
 
     public static @NonNull DocumentedException createMasterIsDownException(final RemoteDeviceId id,
