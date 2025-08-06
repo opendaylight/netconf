@@ -15,11 +15,12 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 
 public final class NetconfIidFactory {
-    public static final InstanceIdentifier<Topology> NETCONF_TOPOLOGY_IID =
-            InstanceIdentifier.builder(NetworkTopology.class)
+    public static final WithKey<Topology, TopologyKey> NETCONF_TOPOLOGY_IID =
+        DataObjectIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
             .build();
 
@@ -27,7 +28,7 @@ public final class NetconfIidFactory {
         // Hidden on purpose
     }
 
-    public static InstanceIdentifier<Node> netconfNodeIid(final String nodeId) {
-        return NETCONF_TOPOLOGY_IID.child(Node.class, new NodeKey(new NodeId(nodeId)));
+    public static WithKey<Node, NodeKey> netconfNodeIid(final String nodeId) {
+        return NETCONF_TOPOLOGY_IID.toBuilder().child(Node.class, new NodeKey(new NodeId(nodeId))).build();
     }
 }

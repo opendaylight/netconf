@@ -45,7 +45,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -176,8 +175,8 @@ public class NetconfCommandsImpl implements NetconfCommands {
 
     @Override
     public boolean disconnectDevice(final String netconfNodeId) {
-        final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
-        final InstanceIdentifier<Node> iid = NetconfIidFactory.netconfNodeIid(netconfNodeId);
+        final var transaction = dataBroker.newWriteOnlyTransaction();
+        final var iid = NetconfIidFactory.netconfNodeIid(netconfNodeId);
         transaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
 
         try {
@@ -203,61 +202,59 @@ public class NetconfCommandsImpl implements NetconfCommands {
         final Node node = NetconfConsoleUtils.read(LogicalDatastoreType.OPERATIONAL,
             NetconfIidFactory.netconfNodeIid(netconfNodeId), dataBroker);
 
-        if (node != null && node.augmentation(NetconfNodeAugment.class) != null) {
-            final NetconfNode netconfNode = node.augmentation(NetconfNodeAugment.class).getNetconfNode();
-
-            // Get NETCONF attributes to update if present else get their original values from NetconfNode instance
-            final String deviceIp = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_IP))
-                    ? netconfNode.getHost().getIpAddress().getIpv4Address().getValue()
-                    : updated.get(NetconfConsoleConstants.NETCONF_IP);
-            final String devicePort = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_PORT))
-                    ? netconfNode.getPort().getValue().toString() : updated.get(NetconfConsoleConstants.NETCONF_PORT);
-            final Boolean tcpOnly = updated.get(NetconfConsoleConstants.TCP_ONLY).equals("true");
-            final Boolean isSchemaless =
-                    updated.get(NetconfConsoleConstants.SCHEMALESS).equals("true");
-            final String newUsername = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.USERNAME))
-                    ? updated.get(NetconfConsoleConstants.USERNAME) : username;
-            final String newPassword = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.PASSWORD))
-                    ? updated.get(NetconfConsoleConstants.PASSWORD) : password;
-
-            final Node updatedNode = new NodeBuilder()
-                    .withKey(node.key())
-                    .setNodeId(node.getNodeId())
-                    .addAugmentation(new NetconfNodeAugmentBuilder()
-                        .setNetconfNode(new NetconfNodeBuilder()
-                            .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
-                            .setPort(new PortNumber(Uint16.valueOf(Integer.decode(devicePort))))
-                            .setTcpOnly(tcpOnly)
-                            .setSchemaless(isSchemaless)
-                            .setCredentials(new LoginPwUnencryptedBuilder()
-                                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
-                                    .setUsername(newUsername)
-                                    .setPassword(newPassword)
-                                    .build())
-                                .build())
-                            .build())
-                        .build())
-                    .build();
-
-            final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
-            transaction.put(LogicalDatastoreType.CONFIGURATION,
-                    NetconfIidFactory.netconfNodeIid(updatedNode.getNodeId().getValue()), updatedNode);
-
-            transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
-                @Override
-                public void onSuccess(final CommitInfo result) {
-                    LOG.debug("NetconfNode={} updated successfully", netconfNode);
-                }
-
-                @Override
-                public void onFailure(final Throwable throwable) {
-                    LOG.error("Failed to updated NetconfNode={}", netconfNode, throwable);
-                }
-            }, MoreExecutors.directExecutor());
-
-            return "NETCONF node: " + netconfNodeId + " updated successfully.";
-        } else {
+        if (node == null || node.augmentation(NetconfNodeAugment.class) == null) {
             return "NETCONF node: " + netconfNodeId + " does not exist to update";
         }
+        final NetconfNode netconfNode = node.augmentation(NetconfNodeAugment.class).getNetconfNode();
+
+        // Get NETCONF attributes to update if present else get their original values from NetconfNode instance
+        final String deviceIp = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_IP))
+            ? netconfNode.getHost().getIpAddress().getIpv4Address().getValue()
+                : updated.get(NetconfConsoleConstants.NETCONF_IP);
+        final String devicePort = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_PORT))
+            ? netconfNode.getPort().getValue().toString() : updated.get(NetconfConsoleConstants.NETCONF_PORT);
+        final Boolean tcpOnly = updated.get(NetconfConsoleConstants.TCP_ONLY).equals("true");
+        final Boolean isSchemaless = updated.get(NetconfConsoleConstants.SCHEMALESS).equals("true");
+        final String newUsername = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.USERNAME))
+            ? updated.get(NetconfConsoleConstants.USERNAME) : username;
+        final String newPassword = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.PASSWORD))
+            ? updated.get(NetconfConsoleConstants.PASSWORD) : password;
+
+        final Node updatedNode = new NodeBuilder()
+            .withKey(node.key())
+            .setNodeId(node.getNodeId())
+            .addAugmentation(new NetconfNodeAugmentBuilder()
+                .setNetconfNode(new NetconfNodeBuilder()
+                    .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
+                    .setPort(new PortNumber(Uint16.valueOf(Integer.decode(devicePort))))
+                    .setTcpOnly(tcpOnly)
+                    .setSchemaless(isSchemaless)
+                    .setCredentials(new LoginPwUnencryptedBuilder()
+                        .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                            .setUsername(newUsername)
+                            .setPassword(newPassword)
+                            .build())
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
+        transaction.put(LogicalDatastoreType.CONFIGURATION,
+                NetconfIidFactory.netconfNodeIid(updatedNode.getNodeId().getValue()), updatedNode);
+
+        transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("NetconfNode={} updated successfully", netconfNode);
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Failed to updated NetconfNode={}", netconfNode, throwable);
+            }
+        }, MoreExecutors.directExecutor());
+
+        return "NETCONF node: " + netconfNodeId + " updated successfully.";
     }
 }
