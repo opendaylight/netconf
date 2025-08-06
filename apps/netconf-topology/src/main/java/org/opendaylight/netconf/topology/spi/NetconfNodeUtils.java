@@ -27,7 +27,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -46,11 +45,6 @@ public final class NetconfNodeUtils {
         DataObjectIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(DEFAULT_TOPOLOGY_NAME)))
             .build();
-
-    // FIXME: extract this into caller and pass to constructor
-    @Deprecated(forRemoval = true)
-    public static final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> DEFAULT_TOPOLOGY_IID =
-        DEFAULT_TOPOLOGY_OID.toLegacy();
 
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
     // FIXME: push this out to callers
