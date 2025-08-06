@@ -200,11 +200,13 @@ public enum HTTPScheme {
         final var connection = new DefaultHttp2Connection(true);
         return new HttpToHttp2ConnectionHandlerBuilder()
             .connection(connection)
-            .frameListener(
-                new DelegatingDecompressorFrameListener(connection, new InboundHttp2ToHttpAdapterBuilder(connection)
+            .frameListener(new DelegatingDecompressorFrameListener(connection,
+                new InboundHttp2ToHttpAdapterBuilder(connection)
                     .maxContentLength(HTTPServer.MAX_HTTP_CONTENT_LENGTH)
                     .propagateSettings(true)
-                    .build()))
+                    .build(),
+                // FIXME: allow for maxAllocation control to prevent OutOfMemoryError
+                0))
             .frameLogger(frameLogger)
             .gracefulShutdownTimeoutMillis(0L)
             .build();
