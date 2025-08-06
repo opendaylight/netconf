@@ -83,7 +83,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -206,16 +205,15 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         initializeMaster();
 
         Registration mockListenerReg = mock(Registration.class);
-        doReturn(mockListenerReg).when(mockDataBroker).registerTreeChangeListener(any(), any());
+        doReturn(mockListenerReg).when(mockDataBroker).registerTreeChangeListener(any(), any(), any());
 
         final NodeId nodeId = new NodeId("device");
         final NodeKey nodeKey = new NodeKey(nodeId);
         final String topologyId = "topology-netconf";
-        final InstanceIdentifier<Node> nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(
-                nodeKey, topologyId);
+        final var nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(nodeKey, topologyId);
 
         netconfNodeManager.registerDataTreeChangeListener(topologyId, nodeKey);
-        verify(mockDataBroker).registerTreeChangeListener(any(), eq(netconfNodeManager));
+        verify(mockDataBroker).registerTreeChangeListener(any(), any(), eq(netconfNodeManager));
 
         // Invoke onDataTreeChanged with a NetconfNode WRITE to simulate the master writing the operational state to
         // Connected. Expect the slave mount point created and registered.
@@ -310,8 +308,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NodeId nodeId = new NodeId("device");
         final NodeKey nodeKey = new NodeKey(nodeId);
         final String topologyId = "topology-netconf";
-        final InstanceIdentifier<Node> nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(
-                nodeKey, topologyId);
+        final var nodeListPath = NetconfTopologyUtils.createTopologyNodeListPath(nodeKey, topologyId);
 
         final NetconfNodeAugment netconfNodeAugment = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
