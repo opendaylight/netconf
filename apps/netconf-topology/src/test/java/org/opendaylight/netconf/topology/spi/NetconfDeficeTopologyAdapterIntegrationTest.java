@@ -38,9 +38,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -50,9 +50,9 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 // FIXME: base on AbstractDataBrokerTest test?
 class NetconfDeficeTopologyAdapterIntegrationTest {
     private static final RemoteDeviceId ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
-    private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
+    private static final WithKey<Topology, TopologyKey> TEST_TOPOLOGY_ID =
         // FIXME: do not use this constant
-        NetconfNodeUtils.DEFAULT_TOPOLOGY_IID;
+        NetconfNodeUtils.DEFAULT_TOPOLOGY_OID;
 
     private static BindingRuntimeContext RUNTIME_CONTEXT;
 
@@ -80,7 +80,7 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
 
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID, new TopologyBuilder()
-            .withKey(TEST_TOPOLOGY_ID.getKey())
+            .withKey(TEST_TOPOLOGY_ID.key())
             .build());
         tx.commit().get(2, TimeUnit.SECONDS);
 
@@ -97,9 +97,10 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
         adapter.setDeviceAsFailed(null);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> dataBroker.newReadWriteTransaction()
-            .read(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID
+            .read(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID.toBuilder()
                 .child(Node.class, new NodeKey(new NodeId(ID.name())))
-                .augmentation(NetconfNodeAugment.class))
+                .augmentation(NetconfNodeAugment.class)
+                .build())
             .get(5, TimeUnit.SECONDS)
             .filter(conn -> conn.getNetconfNode().getConnectionStatus() == ConnectionStatus.UnableToConnect)
             .isPresent());

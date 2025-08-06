@@ -44,16 +44,16 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfDeviceTopologyAdapterTest {
-    private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
+    private static final WithKey<Topology, TopologyKey> TEST_TOPOLOGY_ID =
         // FIXME: do not use this constant
-        NetconfNodeUtils.DEFAULT_TOPOLOGY_IID;
+        NetconfNodeUtils.DEFAULT_TOPOLOGY_OID;
     private final RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
     @Mock
@@ -71,7 +71,7 @@ class NetconfDeviceTopologyAdapterTest {
     void before() {
         doReturn(mockTx).when(mockChain).newWriteOnlyTransaction();
         // FIXME: exact match
-        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
+        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class),
             any(Node.class));
         doReturn("test transaction").when(mockTx).getIdentifier();
         doReturn(CommitInfo.emptyFluentFuture()).when(mockTx).commit();
@@ -97,39 +97,39 @@ class NetconfDeviceTopologyAdapterTest {
     @Test
     void testFailedDevice() {
         // FIXME: exact match
-        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
+        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class),
             any(NetconfNode.class));
 
         adapter.setDeviceAsFailed(null);
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         // FIXME: LogicationDataStoreStype, concrete identifier, concreate (or captured/asserted) data
-        verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),
+        verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class),
             any(Node.class));
     }
 
     @Test
     void testDeviceUpdate() throws Exception {
         // FIXME: exact match
-        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
+        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class),
             any(NetconfNode.class));
         adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
-        verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
-        verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
+        verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class), any(Node.class));
+        verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class), any(Node.class));
     }
 
     @Test
     void testRemoveDeviceConfiguration() throws Exception {
         // FIXME: exact match
-        doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
+        doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class));
         doNothing().when(mockChain).close();
 
         final var future = adapter.shutdown();
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx).delete(LogicalDatastoreType.OPERATIONAL,
-            TEST_TOPOLOGY_ID.child(Node.class, new NodeKey(new NodeId(id.name()))));
+            TEST_TOPOLOGY_ID.toBuilder().child(Node.class, new NodeKey(new NodeId(id.name()))).build());
         verify(mockTx, times(2)).commit();
         verify(mockChain).close();
 
@@ -146,13 +146,13 @@ class NetconfDeviceTopologyAdapterTest {
     @Test
     void testShutdownCompletion() throws Exception {
         // FIXME: exact match
-        doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
+        doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class));
         doNothing().when(mockChain).close();
 
         final var future = adapter.shutdown();
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx).delete(LogicalDatastoreType.OPERATIONAL,
-            TEST_TOPOLOGY_ID.child(Node.class, new NodeKey(new NodeId(id.name()))));
+            TEST_TOPOLOGY_ID.toBuilder().child(Node.class, new NodeKey(new NodeId(id.name()))).build());
         verify(mockTx, times(2)).commit();
         verify(mockChain).close();
 
