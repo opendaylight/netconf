@@ -44,7 +44,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
@@ -62,22 +61,6 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private SettableFuture<Empty> closeFuture;
     @GuardedBy("this")
     private TransactionChain txChain;
-
-    /**
-     * NetconfDeviceTopologyAdapter is responsible for managing the state of a NETCONF device
-     * within the topology, handling updates to its operational data in the datastore.
-     *
-     * @param dataBroker   the DataBroker used to interact with the datastore
-     * @param topologyPath the KeyedInstanceIdentifier pointing to the topology this device belongs to
-     * @param id           the unique identifier of the remote device
-     * @param credentials  the credentials used to authenticate the remote device
-     */
-    @Deprecated
-    public NetconfDeviceTopologyAdapter(final DataBroker dataBroker,
-            final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id,
-            final Credentials credentials) {
-        this(dataBroker, topologyPath.toIdentifier(), id, credentials);
-    }
 
     /**
      * NetconfDeviceTopologyAdapter is responsible for managing the state of a NETCONF device
