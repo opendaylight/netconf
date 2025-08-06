@@ -55,7 +55,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -130,14 +129,14 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.binding.DataObject;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.binding.Rpc;
 import org.opendaylight.yangtools.binding.data.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -177,7 +176,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final String TOPOLOGY_ID = NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME;
-    private static final @NonNull KeyedInstanceIdentifier<Node, NodeKey> NODE_INSTANCE_ID =
+    private static final @NonNull WithKey<Node, NodeKey> NODE_INSTANCE_ID =
         NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(new NodeId("node-id")), TOPOLOGY_ID);
 
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
@@ -434,27 +433,21 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         // Since the master and slave use separate DataBrokers we need to copy the master's oper node to the slave.
         // This is essentially what happens in a clustered environment but we'll use a DTCL here.
 
-        masterDataBroker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID), changes -> {
-                final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
-                for (var dataTreeModification : changes) {
-                    var rootNode = dataTreeModification.getRootNode();
-                    var path = dataTreeModification.getRootPath().path();
-                    switch (rootNode.modificationType()) {
-                        case WRITE:
-                        case SUBTREE_MODIFIED:
-                            slaveTx.merge(LogicalDatastoreType.OPERATIONAL, path, rootNode.dataAfter());
-                            break;
-                        case DELETE:
-                            slaveTx.delete(LogicalDatastoreType.OPERATIONAL, path);
-                            break;
-                        default:
-                            break;
-                    }
+        masterDataBroker.registerTreeChangeListener(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID, changes -> {
+            final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
+            for (var dataTreeModification : changes) {
+                var rootNode = dataTreeModification.getRootNode();
+                switch (rootNode.modificationType()) {
+                    case null -> throw new NullPointerException();
+                    case SUBTREE_MODIFIED, WRITE ->
+                        slaveTx.merge(LogicalDatastoreType.OPERATIONAL, dataTreeModification.path(),
+                            rootNode.dataAfter());
+                    case DELETE -> slaveTx.delete(LogicalDatastoreType.OPERATIONAL, dataTreeModification.path());
                 }
+            }
 
-                slaveTx.commit();
-            });
+            slaveTx.commit();
+        });
 
         DOMMountPoint slaveMountPoint = awaitMountPoint(slaveMountPointService);
 
@@ -654,7 +647,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             .build());
     }
 
-    private static <T extends DataObject> void putData(final DataBroker databroker, final InstanceIdentifier<T> path,
+    private static <T extends DataObject> void putData(final DataBroker databroker, final DataObjectIdentifier<T> path,
             final T data) throws Exception {
         final var writeTx = databroker.newWriteOnlyTransaction();
         writeTx.put(LogicalDatastoreType.CONFIGURATION, path, data);

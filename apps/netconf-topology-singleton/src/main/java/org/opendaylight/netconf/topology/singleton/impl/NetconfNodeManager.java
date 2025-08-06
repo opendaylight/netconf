@@ -19,7 +19,6 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -32,12 +31,10 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.ConnectionOper.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,10 +131,10 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
     }
 
     void registerDataTreeChangeListener(final String topologyId, final NodeKey key) {
-        final InstanceIdentifier<Node> path = NetconfTopologyUtils.createTopologyNodeListPath(key, topologyId);
+        final var path = NetconfTopologyUtils.createTopologyNodeListPath(key, topologyId);
         LOG.debug("{}: Registering data tree change listener on path {}", id, path);
         dataChangeListenerRegistration = setup.getDataBroker().registerTreeChangeListener(
-                DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path), this);
+            LogicalDatastoreType.OPERATIONAL, path, this);
     }
 
     private synchronized void handleSlaveMountPoint(final DataObjectModification<Node> rootNode) {
@@ -145,9 +142,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
             return;
         }
 
-        @SuppressWarnings("ConstantConditions")
-        final NetconfNode netconfNodeAfter = rootNode.dataAfter().augmentation(NetconfNodeAugment.class)
-            .getNetconfNode();
+        final var netconfNodeAfter = rootNode.dataAfter().augmentation(NetconfNodeAugment.class).getNetconfNode();
 
         if (ConnectionStatus.Connected == netconfNodeAfter.getConnectionStatus()) {
             lastUpdateCount++;

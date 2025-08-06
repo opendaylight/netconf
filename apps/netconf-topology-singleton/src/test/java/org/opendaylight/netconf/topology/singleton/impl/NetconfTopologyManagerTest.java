@@ -43,7 +43,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
@@ -78,7 +77,6 @@ import org.opendaylight.yangtools.binding.Rpc;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
@@ -117,7 +115,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private NetconfTopologySchemaAssembler schemaAssembler;
     private DataBroker dataBroker;
 
-    private final Map<InstanceIdentifier<Node>, Function<NetconfTopologySetup, NetconfTopologyContext>>
+    private final Map<DataObjectIdentifier<Node>, Function<NetconfTopologySetup, NetconfTopologyContext>>
             mockContextMap = new HashMap<>();
 
     @BeforeEach
@@ -135,7 +133,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         dataBroker = spy(dataBrokerTest.getDataBroker());
 
         doNothing().when(mockListenerReg).close();
-        doReturn(mockListenerReg).when(dataBroker).registerTreeChangeListener(any(), any());
+        doReturn(mockListenerReg).when(dataBroker).registerTreeChangeListener(any(), any(), any());
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any(Rpc[].class));
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
@@ -169,9 +167,10 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         // verify registration is called with right parameters
 
-        verify(dataBroker).registerTreeChangeListener(
-                DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, NetconfTopologyUtils
-                        .createTopologyListPath(TOPOLOGY_ID).child(Node.class)), netconfTopologyManager);
+        verify(dataBroker).registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID).toBuilder().toReferenceBuilder()
+                .child(Node.class)
+                .build(), netconfTopologyManager);
 
         netconfTopologyManager.close();
         verify(mockListenerReg).close();
@@ -185,12 +184,10 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     void testOnDataTreeChanged() {
         // Notify of 2 created Node objects.
         final NodeId nodeId1 = new NodeId("node-id-1");
-        final InstanceIdentifier<Node> nodeInstanceId1 = NetconfTopologyUtils.createTopologyNodeListPath(
-                new NodeKey(nodeId1), TOPOLOGY_ID);
+        final var nodeInstanceId1 = NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(nodeId1), TOPOLOGY_ID);
 
         final NodeId nodeId2 = new NodeId("node-id-2");
-        final InstanceIdentifier<Node> nodeInstanceId2 = NetconfTopologyUtils.createTopologyNodeListPath(
-                new NodeKey(nodeId2), TOPOLOGY_ID);
+        final var nodeInstanceId2 = NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(nodeId2), TOPOLOGY_ID);
 
         final NetconfNodeAugment netconfNodeAugment1 = new NetconfNodeAugmentBuilder()
             .setNetconfNode(new NetconfNodeBuilder()
@@ -338,8 +335,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     @Test
     void testClusterSingletonServiceRegistrationFailure() {
         final NodeId nodeId = new NodeId("node-id");
-        final InstanceIdentifier<Node> nodeInstanceId = NetconfTopologyUtils.createTopologyNodeListPath(
-                new NodeKey(nodeId), TOPOLOGY_ID);
+        final var nodeInstanceId = NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(nodeId), TOPOLOGY_ID);
 
         final Node node = new NodeBuilder()
                 .setNodeId(nodeId)
