@@ -21,7 +21,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -72,7 +71,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
     private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
-    private final Lock sessionLock = new ReentrantLock();
+    // Note: fair to balance sendRequest() and processMessage()
+    private final ReentrantLock sessionLock = new ReentrantLock(true);
 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
