@@ -64,7 +64,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
@@ -147,12 +146,11 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -235,7 +233,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private BindingNormalizedNodeSerializer bindingToNormalized;
     private YangInstanceIdentifier yangNodeInstanceId;
     private final TopDOMRpcImplementation topRpcImplementation = new TopDOMRpcImplementation();
-    private final ContainerNode getTopInput = ImmutableNodes.containerNode(GetTopInput.QNAME);
+    private final ContainerNode getTopInput = ImmutableNodes.newContainerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(GetTopInput.QNAME))
+        .build();
 
     private SchemaResourceManager resourceManager;
     private NetconfTopologySchemaAssembler schemaAssembler;
@@ -596,16 +596,22 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeWriteTransaction writeTx = dataBroker.newWriteOnlyTransaction();
 
-        final ContainerNode topNode = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Top.QNAME)).build();
-        final YangInstanceIdentifier topPath = YangInstanceIdentifier.of(Top.QNAME);
+        final var topNode = ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(Top.QNAME))
+                .build();
+        final var topPath = YangInstanceIdentifier.of(Top.QNAME);
         writeTx.put(LogicalDatastoreType.CONFIGURATION, topPath, topNode);
 
-        final QName name = QName.create(TopLevelList.QNAME, "name");
-        final YangInstanceIdentifier listPath = YangInstanceIdentifier.builder(topPath)
-                .node(TopLevelList.QNAME).build();
-        final MapEntryNode listEntryNode = ImmutableNodes.mapEntry(TopLevelList.QNAME, name, "one");
-        final MapNode listNode = ImmutableNodes.mapNodeBuilder(TopLevelList.QNAME).addChild(listEntryNode).build();
+        final var name = QName.create(TopLevelList.QNAME, "name");
+        final var listPath = YangInstanceIdentifier.builder(topPath).node(TopLevelList.QNAME).build();
+        final var listEntryNode = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(TopLevelList.QNAME, name, "one"))
+            .withChild(ImmutableNodes.leafNode(name, "one"))
+            .build();
+        final var listNode = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(TopLevelList.QNAME))
+            .addChild(listEntryNode)
+            .build();
         writeTx.merge(LogicalDatastoreType.CONFIGURATION, listPath, listNode);
         writeTx.commit().get(5, TimeUnit.SECONDS);
 
@@ -616,14 +622,14 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         writeTx.delete(LogicalDatastoreType.CONFIGURATION, topPath);
         writeTx.commit().get(5, TimeUnit.SECONDS);
 
-        DOMDataTreeReadWriteTransaction readTx = dataBroker.newReadWriteTransaction();
+        final var readTx = dataBroker.newReadWriteTransaction();
         assertFalse(readTx.exists(LogicalDatastoreType.CONFIGURATION, topPath).get(5, TimeUnit.SECONDS));
         assertTrue(readTx.cancel());
     }
 
     private static void writeNetconfNode(final String cacheDir, final DataBroker dataBroker) throws Exception {
         putData(dataBroker, NODE_INSTANCE_ID, new NodeBuilder()
-            .withKey(NODE_INSTANCE_ID.getKey())
+            .withKey(NODE_INSTANCE_ID.key())
             .addAugmentation(new NetconfNodeAugmentBuilder()
                 .setNetconfNode(new NetconfNodeBuilder()
                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -685,7 +691,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         dataBrokerTest.setup();
 
         final var path = NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID);
-        putData(dataBrokerTest.getDataBroker(), path, new TopologyBuilder().withKey(path.getKey()).build());
+        putData(dataBrokerTest.getDataBroker(), path, new TopologyBuilder().withKey(path.key()).build());
         return dataBrokerTest;
     }
 
