@@ -50,7 +50,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class CallHomeMountServiceTest {
@@ -59,8 +58,11 @@ class CallHomeMountServiceTest {
     private static final String ID1 = "id1";
     private static final NodeId NODE_ID1 = new NodeId(ID1);
     private static final String ID2 = "id2";
-    private static final InstanceIdentifier<Device> IDENTIFIER = InstanceIdentifier.builder(
-        NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class, new DeviceKey(ID1)).build();
+    private static final DataObjectIdentifier<Device> IDENTIFIER =
+        DataObjectIdentifier.builder(NetconfCallhomeServer.class)
+            .child(AllowedDevices.class)
+            .child(Device.class, new DeviceKey(ID1))
+            .build();
 
     @Mock
     private CallHomeTopology topology;
@@ -144,13 +146,13 @@ class CallHomeMountServiceTest {
         when(mockObjectModification.modificationType()).thenReturn(WRITE);
         when(mockObjectModification.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
-            IDENTIFIER.toIdentifier(), mockObjectModification)));
+            IDENTIFIER, mockObjectModification)));
         verify(topology, times(1)).disableNode(NODE_ID1);
 
         // modification of deleting device from 'allowed-devices' container
         when(mockObjectModification.modificationType()).thenReturn(DELETE);
-        service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
-            IDENTIFIER.toIdentifier(), mockObjectModification)));
+        service.onAllowedDevicesChanged(List.of(
+            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockObjectModification)));
         verify(topology, times(2)).disableNode(NODE_ID1);
     }
 
@@ -170,10 +172,8 @@ class CallHomeMountServiceTest {
         when(mockModification2.dataBefore()).thenReturn(mockDevice2);
 
         service.onAllowedDevicesChanged(List.of(
-            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER.toIdentifier(),
-                mockModification1),
-            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER.toIdentifier(),
-                mockModification2)
+            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockModification1),
+            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockModification2)
         ));
 
         verify(topology, times(1)).disableNode(new NodeId(ID1));
