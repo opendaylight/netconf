@@ -28,8 +28,8 @@ import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -100,10 +100,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (moduleName != null) {
             builder.append(moduleName).append(':');
         }
-        for (final PathArgument arg : key.getPathArguments()) {
+        for (var arg : key.getPathArguments()) {
             final String name = arg.getNodeType().getLocalName();
-            if (arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates nodeId) {
-                for (final Entry<QName, Object> entry : nodeId.entrySet()) {
+            if (arg instanceof NodeIdentifierWithPredicates nodeId) {
+                for (var entry : nodeId.entrySet()) {
                     builder.deleteCharAt(builder.length() - 1).append("=").append(entry.getValue()).append('/');
                 }
             } else {
@@ -181,8 +181,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
-        return ((YangInstanceIdentifier.NodeIdentifierWithPredicates.Singleton)iid.getLastPathArgument())
-                .values().getElement().toString();
+        return ((NodeIdentifierWithPredicates.Singleton) iid.getLastPathArgument()).values().getFirst().toString();
     }
 
     private DocumentEntity generateDataStoreOpenApi(final EffectiveModelContext modelContext, final URI uri,
