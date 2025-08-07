@@ -28,6 +28,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
@@ -79,7 +81,7 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
         final var stack = inference.toSchemaInferenceStack();
         stack.exit();
 
-        return new DataFormattableBody<>(path.databind(), stack.toInference(), wrapListEntryNodes(data), writerFactory);
+        return new DataFormattableBody<>(path.databind(), stack.toInference(), wrapIfEntry(data), writerFactory);
     }
 
     /**
@@ -142,24 +144,30 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     }
 
     /**
-     * Wrap the NormalizedNode with a parent node if it is a MapEntryNode or LeafSetEntryNode.
+     * Wrap a {@link NormalizedNode} with a parent node if it is a {@link MapEntryNode} or {@link LeafSetEntryNode}.
      *
      * @param data data
-     * @return {@link NormalizedNode}
+     * @return wrapped data
      */
-    private static NormalizedNode wrapListEntryNodes(final NormalizedNode data) {
-        if (data instanceof MapEntryNode mapEntry) {
-            return ImmutableNodes.newSystemMapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
-                .withChild(mapEntry)
-                .build();
-        } if (data instanceof LeafSetEntryNode leafSetNode) {
-            return ImmutableNodes.newSystemLeafSetBuilder()
-                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
-                .withChild(leafSetNode)
-                .build();
-        } else {
-            return data;
-        }
+    private static NormalizedNode wrapIfEntry(final NormalizedNode data) {
+        return switch (data) {
+            case MapEntryNode entry -> wrapEntry(entry);
+            case LeafSetEntryNode<?> entry -> wrapEntry(entry);
+            default -> data;
+        };
+    }
+
+    private static SystemMapNode wrapEntry(final MapEntryNode entry) {
+        return ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(entry.name().getNodeType()))
+            .withChild(entry)
+            .build();
+    }
+
+    private static <T> SystemLeafSetNode<T> wrapEntry(final LeafSetEntryNode<T> entry) {
+        return ImmutableNodes.<T>newSystemLeafSetBuilder()
+            .withNodeIdentifier(new NodeIdentifier(entry.name().getNodeType()))
+            .withChild(entry)
+            .build();
     }
 }
