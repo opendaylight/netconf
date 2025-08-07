@@ -8,27 +8,31 @@
 package org.opendaylight.netconf.client;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 
+@ExtendWith(MockitoExtension.class)
 class NetconfClientSessionNegotiatorFactoryTest {
+    @Mock
+    private NetconfClientSessionListener sessionListener;
+    @Mock
+    private Channel channel;
+    @Mock
+    private Promise<NetconfClientSession> promise;
+
     @Test
     void testGetSessionNegotiator() throws Exception {
-        NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         final var timer = new DefaultNetconfTimer();
+        final var negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(), 200L);
 
-        Channel channel = mock(Channel.class);
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
-                Optional.empty(), 200L);
-
-        NetconfClientSessionNegotiator sessionNegotiator = negotiatorFactory.getSessionNegotiator(sessionListener,
-            channel, promise);
+        final var sessionNegotiator = negotiatorFactory.getSessionNegotiator(sessionListener, channel, promise);
         assertNotNull(sessionNegotiator);
     }
 }
