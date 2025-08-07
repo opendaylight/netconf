@@ -65,7 +65,7 @@ class DefaultCloseSessionTest {
 
         final ChannelPromise sendFuture = mock(ChannelPromise.class);
         doAnswer(invocation -> {
-            invocation.getArgument(0, GenericFutureListener.class).operationComplete(sendFuture);
+            invocation.<GenericFutureListener<ChannelFuture>>getArgument(0).operationComplete(sendFuture);
             return null;
         }).when(sendFuture).addListener(any());
         doReturn(sendFuture).when(channel).newPromise();
