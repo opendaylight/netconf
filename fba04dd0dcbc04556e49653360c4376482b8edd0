@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f2e724c_44e70db7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-07T13:11:20Z",
+      "side": 1,
+      "message": "This has little to do with NETCONF-1498 and should be a separate enhancement",
+      "revId": "fba04dd0dcbc04556e49653360c4376482b8edd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
