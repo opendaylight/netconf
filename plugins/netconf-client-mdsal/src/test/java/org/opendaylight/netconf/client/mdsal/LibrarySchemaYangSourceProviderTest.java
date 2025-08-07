@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class LibrarySchemaYangSourceProviderTest {
 
     @Test
     void testGetSourceFailure() throws Exception {
-        final var sourceIdentifierURLMap = Map.of(workingSid, new URL("http://non-existing-entity.yang"));
+        final var sourceIdentifierURLMap = Map.of(workingSid, new URI("http://non-existing-entity.yang").toURL());
         final var failingYangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
             sourceIdentifierURLMap);
 
