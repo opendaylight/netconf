@@ -13,7 +13,6 @@ module org.opendaylight.restconf.subscription {
 
     provides YangFeatureProvider with IetfSubscriptionFeatureProvider;
 
-    requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.restconf.server.spi;
     requires transitive org.opendaylight.yangtools.concepts;
     requires transitive org.opendaylight.yangtools.yang.common;
@@ -24,7 +23,6 @@ module org.opendaylight.restconf.subscription {
     requires org.slf4j;
 
     // Annotations
-    requires static transitive java.annotation;
     requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
     requires static org.kohsuke.metainf_services;
