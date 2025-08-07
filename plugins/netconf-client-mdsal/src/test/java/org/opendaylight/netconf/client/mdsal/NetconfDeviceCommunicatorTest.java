@@ -77,7 +77,7 @@ class NetconfDeviceCommunicatorTest {
     @Mock
     private ChannelFuture mockChannelFuture;
     @Mock
-    private Future operationFuture;
+    private Future<Void> operationFuture;
 
     private NetconfClientSession spySession;
     private NetconfDeviceCommunicator communicator;
@@ -164,7 +164,6 @@ class NetconfDeviceCommunicatorTest {
         assertEquals(SESSION_ID, actualCapabilites.sessionId());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void testOnSessionDown() {
         assertTimeout(Duration.ofMillis(5000), () -> {
@@ -194,7 +193,7 @@ class NetconfDeviceCommunicatorTest {
     void testOnSessionTerminated() throws Exception {
         setupSession();
 
-        final ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest();
+        final var resultFuture = sendRequest();
 
         doNothing().when(mockDevice).onRemoteSessionDown();
 
@@ -218,7 +217,7 @@ class NetconfDeviceCommunicatorTest {
     void testMessageLimitAfterDisconnect() throws Exception {
         // Prepare environment.
         setupSession();
-        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
+        final ArgumentCaptor<GenericFutureListener<Future<Void>>> futureListener = ArgumentCaptor.captor();
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
@@ -246,14 +245,13 @@ class NetconfDeviceCommunicatorTest {
         verify(mockChannelFuture, times(RPC_MESSAGE_LIMIT + 1)).addListener(futureListener.capture());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void testSendRequest() throws Exception {
         setupSession();
 
         final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
 
-        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
+        final ArgumentCaptor<GenericFutureListener<Future<Void>>> futureListener = ArgumentCaptor.captor();
 
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
