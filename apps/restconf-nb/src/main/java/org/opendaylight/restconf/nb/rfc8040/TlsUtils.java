@@ -9,10 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -49,55 +49,54 @@ final class TlsUtils {
         if (certificateFilePath.isEmpty() || privateKeyFilePath.isEmpty()) {
             return null;
         }
-        final var certificate = readCertificate(new File(certificateFilePath));
-        final var privateKey = readPrivateKey(new File(privateKeyFilePath));
+        final var certificate = readCertificate(Path.of(certificateFilePath));
+        final var privateKey = readPrivateKey(Path.of(privateKeyFilePath));
         if (certificate == null || privateKey == null) {
-            LOG.warn("TLS transport configurations for Netty RESTCONF server endpoint "
-                     + "is ignored as invalid or incomplete.");
+            LOG.warn(
+                "TLS transport configurations for Netty RESTCONF server endpoint s ignored as invalid or incomplete.");
             return null;
-        } else {
-            return new CertificateKey(certificate, privateKey);
         }
+        return new CertificateKey(certificate, privateKey);
     }
 
-    private static X509Certificate readCertificate(final File file) {
-        if (!file.exists()) {
-            LOG.warn("Configured certificate file {} does not exists", file.getAbsolutePath());
-            return null;
-        }
-        try (var certReader = new PEMParser(new FileReader(file, StandardCharsets.UTF_8))) {
+    private static X509Certificate readCertificate(final Path file) {
+        try (var certReader = new PEMParser(Files.newBufferedReader(file))) {
             final var obj = certReader.readObject();
             if (obj instanceof X509CertificateHolder cert) {
                 return new JcaX509CertificateConverter().getCertificate(cert);
-            } else {
-                // FIXME: NPE if obj == null, which is a valid return
-                LOG.warn("Configured certificate file {} contains unexpected object {}. Content ignored as invalid.",
-                    file.getAbsolutePath(), obj.getClass());
             }
+            // FIXME: NPE if obj == null, which is a valid return
+            LOG.warn("Configured certificate file {} contains unexpected object {}. Content ignored as invalid.",
+                file.toAbsolutePath(), obj.getClass());
+        } catch (NoSuchFileException e) {
+            LOG.warn("Configured certificate file {} does not exists", file.toAbsolutePath());
         } catch (IOException | DecoderException | CertificateException e) {
-            LOG.warn("Error reading certificate file {} ", file.getAbsolutePath(), e);
+            LOG.warn("Error reading certificate file {} ", file.toAbsolutePath(), e);
         }
         return null;
     }
 
-    private static PrivateKey readPrivateKey(final File file) {
-        if (!file.exists()) {
-            LOG.warn("Configured private key file {} file does not exists", file.getAbsolutePath());
-            return null;
-        }
-        try (var keyReader = new PEMParser(new FileReader(file, StandardCharsets.UTF_8))) {
+    private static PrivateKey readPrivateKey(final Path file) {
+        try (var keyReader = new PEMParser(Files.newBufferedReader(file))) {
             final var obj = keyReader.readObject();
-            if (obj instanceof PEMKeyPair keyPair) {
-                return new JcaPEMKeyConverter().getKeyPair(keyPair).getPrivate();
-            } else if (obj instanceof PrivateKeyInfo pkInfo) {
-                return new JcaPEMKeyConverter().getPrivateKey(pkInfo);
-            } else {
-                // FIXME: NPE if obj == null, which is a valid return
-                LOG.warn("Configured private key file {} contains unexpected object {}. Content ignored as invalid.",
-                    file.getAbsolutePath(), obj.getClass());
+            switch (obj) {
+                case PEMKeyPair keyPair -> {
+                    return new JcaPEMKeyConverter().getKeyPair(keyPair).getPrivate();
+                }
+                case PrivateKeyInfo pkInfo -> {
+                    return new JcaPEMKeyConverter().getPrivateKey(pkInfo);
+                }
+                case null, default -> {
+                    // FIXME: NPE if obj == null, which is a valid return
+                    LOG.warn(
+                        "Configured private key file {} contains unexpected object {}. Content ignored as invalid.",
+                        file.toAbsolutePath(), obj.getClass());
+                }
             }
+        } catch (NoSuchFileException e) {
+            LOG.warn("Configured private key file {} file does not exists", file.toAbsolutePath());
         } catch (IOException | DecoderException e) {
-            LOG.warn("Error reading private key file {} ", file.getAbsolutePath(), e);
+            LOG.warn("Error reading private key file {} ", file.toAbsolutePath(), e);
         }
         return null;
     }
