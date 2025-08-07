@@ -18,6 +18,10 @@
     <artifactId>netconf-client-mdsal</artifactId>
     <packaging>bundle</packaging>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.spotbugs</groupId>
@@ -60,14 +64,6 @@
             <artifactId>checker-qual</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>aaa-encrypt-service</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-binding-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-common-api</artifactId>
         </dependency>
@@ -86,6 +82,10 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6241</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc6243</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
@@ -133,11 +133,27 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-mdsal-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>rfc5277</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>binding-runtime-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
@@ -226,12 +242,19 @@
 
         <!-- test dependencies -->
         <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-core</artifactId>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>aaa-encrypt-service</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-legacy</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-singleton-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -245,6 +268,14 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-test-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-legacy</artifactId>
         </dependency>
     </dependencies>
 
