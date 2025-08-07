@@ -60,8 +60,8 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.p
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Key;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.util.BindingMap;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -259,7 +259,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             true, false, false, false);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final var iid = InstanceIdentifier.create(PatchCont.class);
+        final var iid = DataObjectIdentifier.builder(PatchCont.class).build();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
                 .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
@@ -293,7 +293,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             false);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final var iid = InstanceIdentifier.create(PatchCont.class);
+        final var iid = DataObjectIdentifier.builder(PatchCont.class).build();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
                 .setPatchChoice2(new PatchCase11Builder()
@@ -334,7 +334,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON, false, false, false,
             true);
 
-        final var iid = InstanceIdentifier.create(PatchCont.class).child(MyList1.class, new MyList1Key("Althea"));
+        final var iid = DataObjectIdentifier.builder(PatchCont.class)
+            .child(MyList1.class, new MyList1Key("Althea"))
+            .build();
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid,
             new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build());
@@ -365,7 +367,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             false);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final var iid = InstanceIdentifier.create(PatchCont.class);
+        final var iid = DataObjectIdentifier.builder(PatchCont.class).build();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
                 .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
@@ -412,7 +414,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             false);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final var iid = InstanceIdentifier.create(PatchCont.class);
+        final var iid = DataObjectIdentifier.builder(PatchCont.class).build();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
                 .setPatchChoice2(new PatchCase11Builder()
@@ -466,7 +468,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, false, false, false,
             true);
 
-        final var iid = InstanceIdentifier.create(PatchCont.class).child(MyList1.class, new MyList1Key("Althea"));
+        final var iid = DataObjectIdentifier.builder(PatchCont.class)
+            .child(MyList1.class, new MyList1Key("Althea"))
+            .build();
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid,
             new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build());
@@ -568,8 +572,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         var builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        final var iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
+        final var iid = DataObjectIdentifier.builder(PatchCont.class)
+                .child(MyList1.class, new MyList1Key("Althea"))
+                .build();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         handler.assertGot(getNotifJson(jsonNotifCreate));
@@ -592,8 +597,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         var builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        final var iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
+        final var iid = DataObjectIdentifier.builder(PatchCont.class)
+                .child(MyList1.class, new MyList1Key("Althea"))
+                .build();
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         handler.assertXmlSimilar(getResultXml(xmlNotifCreate));
