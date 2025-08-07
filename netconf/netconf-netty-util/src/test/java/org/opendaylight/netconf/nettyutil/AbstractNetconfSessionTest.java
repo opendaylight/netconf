@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -108,7 +109,7 @@ class AbstractNetconfSessionTest {
     void testReplaceHandlers() throws Exception {
         doReturn(writeFuture).when(channel).newPromise();
         doReturn(pipeline).when(channel).pipeline();
-        doReturn(null).when(pipeline).replace(any(Class.class), anyString(), any());
+        doReturn(null).when(pipeline).replace(eq(MessageDecoder.class), anyString(), any());
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
             invocation.getArgument(0, Runnable.class).run();
