@@ -46,6 +46,30 @@
       },
       "revId": "0f4111262c12da36988e9fbf82953b694d4c5ef2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c6af575_a003d084",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-07T13:05:52Z",
+      "side": 1,
+      "message": "I do not see how ServerRequest would imply FormattableBody -- what\u0027s wrong with ServerRequest\u003cOptional\u003cNormalizedNode\u003e\u003e?",
+      "parentUuid": "48c4983d_15e4ce5c",
+      "range": {
+        "startLine": 556,
+        "startChar": 20,
+        "endLine": 556,
+        "endChar": 62
+      },
+      "revId": "0f4111262c12da36988e9fbf82953b694d4c5ef2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
