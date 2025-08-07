@@ -100,7 +100,7 @@ class SchemaSetupTest extends AbstractTestModelTest {
             NetconfSessionPreferences.fromStrings(Set.of()));
 
         final var result = Futures.getDone(setup.startResolution());
-        final var captor = ArgumentCaptor.forClass(Collection.class);
+        final ArgumentCaptor<Collection<SourceIdentifier>> captor = ArgumentCaptor.captor();
         verify(contextFactory).createEffectiveModelContext(captor.capture());
         assertEquals(List.of(TEST_SID2), captor.getValue());
         assertSame(TEST_MODEL, result.modelContext());
