@@ -20,6 +20,10 @@
     <name>${project.artifactId}</name>
     <description>RESTCONF server API test library</description>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -45,6 +49,10 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
