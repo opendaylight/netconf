@@ -272,7 +272,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId2.toIdentifier(),
                     dataObjectModification2)));
 
-        ArgumentCaptor<NetconfTopologySetup> mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
+        final var mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
         verify(mockContext1).refresh(mockContext1Setup.capture());
         assertEquals(updatedNode1, mockContext1Setup.getValue().getNode());
 
@@ -347,7 +347,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                     .build())
                 .build();
 
-        final DataObjectModification<Node> dataObjectModification = mock(DataObjectModification.class);
+        final DataObjectModification<Node> dataObjectModification = mock();
         doReturn(WRITE).when(dataObjectModification).modificationType();
         doReturn(node).when(dataObjectModification).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId))).when(dataObjectModification).step();
