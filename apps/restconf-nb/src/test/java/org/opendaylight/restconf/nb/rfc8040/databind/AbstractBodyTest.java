@@ -10,28 +10,26 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
-public abstract class AbstractBodyTest extends AbstractInstanceIdentifierTest {
-    static final List<File> loadFiles(final String resourceDirectory) throws FileNotFoundException {
-        final String path = requireNonNull(AbstractBodyTest.class.getResource(resourceDirectory), resourceDirectory)
-            .getPath();
-        final File testDir = new File(path);
-        final String[] fileList = testDir.list();
-        final List<File> testFiles = new ArrayList<>();
-        if (fileList == null) {
-            throw new FileNotFoundException(resourceDirectory);
+abstract class AbstractBodyTest extends AbstractInstanceIdentifierTest {
+    static final List<File> loadFiles(final String resourceDirectory) {
+        final var dirURL = requireNonNull(AbstractBodyTest.class.getResource(resourceDirectory), resourceDirectory);
+        try (var files = Files.list(Path.of(dirURL.toURI()))) {
+            return files
+                .filter(file -> file.toString().endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION))
+                .filter(Files::isRegularFile)
+                .map(Path::toFile)
+                .collect(Collectors.toList());
+        } catch (IOException | URISyntaxException e) {
+            throw new AssertionError(e);
         }
-        for (final String fileName : fileList) {
-            if (fileName.endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION)
-                && !new File(testDir, fileName).isDirectory()) {
-                testFiles.add(new File(testDir, fileName));
-            }
-        }
-        return testFiles;
     }
 }
