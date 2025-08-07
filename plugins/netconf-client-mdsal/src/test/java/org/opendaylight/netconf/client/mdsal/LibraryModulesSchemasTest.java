@@ -9,8 +9,7 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -32,14 +31,14 @@ class LibraryModulesSchemasTest {
         verifySchemas(libraryModuleSchemas);
     }
 
-    private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws MalformedURLException {
+    private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws Exception {
         assertEquals(Map.of(
             new SourceIdentifier("module-with-revision", "2014-04-08"),
-            new URL("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08"),
+            new URI("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08").toURL(),
             new SourceIdentifier("another-module-with-revision", "2013-10-21"),
-            new URL("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21"),
+            new URI("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21").toURL(),
             new SourceIdentifier("module-without-revision"),
-            new URL("http://localhost:8181/yanglib/schemas/module-without-revision/")),
+            new URI("http://localhost:8181/yanglib/schemas/module-without-revision/").toURL()),
 
             libraryModulesSchemas.getAvailableModels());
     }
@@ -49,7 +48,7 @@ class LibraryModulesSchemasTest {
         LibraryModulesSchemas libraryModulesSchemas =
                 LibraryModulesSchemas.create(getClass().getResource("/yang-library-fail.xml").toString());
 
-        assertEquals(Map.of(new SourceIdentifier("good-ol-module"), new URL("http://www.example.com")),
+        assertEquals(Map.of(new SourceIdentifier("good-ol-module"), new URI("http://www.example.com").toURL()),
             libraryModulesSchemas.getAvailableModels());
     }
 
