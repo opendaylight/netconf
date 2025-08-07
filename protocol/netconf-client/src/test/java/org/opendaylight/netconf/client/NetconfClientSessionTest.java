@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,7 +53,8 @@ class NetconfClientSessionTest {
         final var encoder = new MessageEncoder(messageWriter);
 
         doReturn(pipeline).when(channel).pipeline();
-        doReturn(channelHandler).when(pipeline).replace(any(Class.class), anyString(), any(MessageDecoder.class));
+        doReturn(channelHandler).when(pipeline).replace(eq(MessageDecoder.class), anyString(),
+            any(MessageDecoder.class));
         doReturn(encoder).when(pipeline).get(MessageEncoder.class);
 
         final var session = new NetconfClientSession(sessionListener, channel, sessId, caps);
@@ -68,6 +70,6 @@ class NetconfClientSessionTest {
         assertEquals(caps, session.getServerCapabilities());
         assertEquals(session, session.thisInstance());
 
-        verify(pipeline, times(2)).replace(any(Class.class), anyString(), any(MessageDecoder.class));
+        verify(pipeline, times(2)).replace(eq(MessageDecoder.class), anyString(), any(MessageDecoder.class));
     }
 }
