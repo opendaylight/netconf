@@ -98,7 +98,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Test
     void testDeadlock() {
         // when rpc is successful, but transformer fails for some reason
-        final RpcTransformer<ContainerNode, DOMRpcResult> failingTransformer = mock(RpcTransformer.class);
+        final RpcTransformer<ContainerNode, DOMRpcResult> failingTransformer = mock();
         final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
         final NetconfMessage msg = null;
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
@@ -130,7 +130,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Test
     void testRegisterRpcListener() {
-        final var argument = ArgumentCaptor.forClass(Collection.class);
+        final ArgumentCaptor<Collection<DOMRpcIdentifier>> argument = ArgumentCaptor.captor();
 
         rpc.domRpcService().registerRpcListener(listener);
 
