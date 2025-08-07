@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opendaylight.restconf.nb.rfc8040.databind.AbstractBodyTest.loadFiles;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,17 +22,15 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 class NC1452Test {
-    private static final String URI_PATH = "foo:foo/baz-list=delta";
-    private static final LeafSetEntryNode<Object> EXPECTED_LEAF_SET_ENTRY = ImmutableNodes.newLeafSetEntryBuilder()
-        .withNodeIdentifier(new YangInstanceIdentifier.NodeWithValue<>(
-            QName.create("urn:foo", "baz-list"), "delta"))
+    private static final LeafSetEntryNode<?> EXPECTED_LEAF_SET_ENTRY = ImmutableNodes.newLeafSetEntryBuilder()
+        .withNodeIdentifier(new NodeWithValue<>(QName.create("urn:foo", "baz-list"), "delta"))
         .withValue("delta")
         .build();
 
@@ -42,9 +39,18 @@ class NC1452Test {
 
     @BeforeAll
     static void initModelContext() throws Exception {
-        final var testFiles = loadFiles("/nt1452");
-        DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
-        APIPATH = ApiPath.parse(URI_PATH);
+        DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYang("""
+            module foo {
+              namespace "urn:foo";
+              prefix foo;
+
+              container foo {
+                leaf-list baz-list {
+                  type string;
+                }
+              }
+            }"""));
+        APIPATH = ApiPath.parse("foo:foo/baz-list=delta");
     }
 
     @Test
