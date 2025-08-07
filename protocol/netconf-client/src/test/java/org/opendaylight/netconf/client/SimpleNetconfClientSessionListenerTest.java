@@ -19,8 +19,6 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +43,7 @@ class SimpleNetconfClientSessionListenerTest {
         doReturn(channelFuture).when(channel).newPromise();
         doReturn(channelFuture).when(channel).writeAndFlush(any());
         doReturn(channelFuture).when(channel).writeAndFlush(any(), any(ChannelPromise.class));
-        doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
+        doReturn(channelFuture).when(channelFuture).addListener(any());
         final var caps = Set.of("a", "b");
         helloMessage = HelloMessage.createServerHello(caps, new SessionIdType(Uint32.TEN));
         message = new NetconfMessage(helloMessage.getDocument());
@@ -54,18 +52,18 @@ class SimpleNetconfClientSessionListenerTest {
     }
 
     private void mockEventLoop() {
-        final EventLoop eventLoop = mock(EventLoop.class);
+        final var eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.<Runnable>getArgument(0).run();
+            invocation.getArgument(0, Runnable.class).run();
             return null;
-        }).when(eventLoop).execute(any(Runnable.class));
+        }).when(eventLoop).execute(any());
     }
 
     @Test
     void testSessionDown() {
-        SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
-        final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
+        final var simpleListener = new SimpleNetconfClientSessionListener();
+        final var promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
         verify(channel, times(1)).writeAndFlush(any(), any());
 
@@ -75,8 +73,8 @@ class SimpleNetconfClientSessionListenerTest {
 
     @Test
     void testSendRequest() {
-        SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
-        final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
+        final var simpleListener = new SimpleNetconfClientSessionListener();
+        final var promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
         verify(channel, times(1)).writeAndFlush(any(), any());
 
@@ -86,8 +84,8 @@ class SimpleNetconfClientSessionListenerTest {
 
     @Test
     void testOnMessage() {
-        SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
-        final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
+        final var simpleListener = new SimpleNetconfClientSessionListener();
+        final var promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
         verify(channel, times(1)).writeAndFlush(any(), any());
 
