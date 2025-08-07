@@ -9,9 +9,10 @@ package org.opendaylight.netconf.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -28,7 +29,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.io.InputStream;
 import java.util.Optional;
@@ -93,7 +93,7 @@ class NetconfClientSessionNegotiatorTest {
 
     private static ChannelPromise mockChannelFuture() {
         ChannelPromise future = mock(ChannelPromise.class);
-        doReturn(future).when(future).addListener(any(GenericFutureListener.class));
+        doReturn(future).when(future).addListener(any());
         return future;
     }
 
@@ -119,7 +119,7 @@ class NetconfClientSessionNegotiatorTest {
             throw new AssertionError(e);
         }
 
-        doReturn(null).when(pipeline).replace(any(Class.class), anyString(), any(exiClass));
+        doReturn(null).when(pipeline).replace(eq(MessageDecoder.class), anyString(), any(exiClass));
         return pipeline;
     }
 
@@ -133,8 +133,7 @@ class NetconfClientSessionNegotiatorTest {
     }
 
     private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(
-            final Promise<NetconfClientSession> promise,
-            final RpcMessage startExi) {
+            final Promise<NetconfClientSession> promise, final RpcMessage startExi) {
         ChannelProgressivePromise progressivePromise = mock(ChannelProgressivePromise.class);
         doReturn(progressivePromise).when(promise).setFailure(any(Throwable.class));
 
@@ -156,7 +155,7 @@ class NetconfClientSessionNegotiatorTest {
 
     @Test
     void testNetconfClientSessionNegotiator() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock();
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
@@ -168,7 +167,7 @@ class NetconfClientSessionNegotiatorTest {
 
     @Test
     void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock();
         doReturn(false).when(promise).isDone();
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
@@ -181,7 +180,7 @@ class NetconfClientSessionNegotiatorTest {
 
     @Test
     void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock();
         RpcMessage exiMessage = NetconfStartExiMessageProvider.create(EXIParameters.empty(), "msg-id");
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
@@ -205,12 +204,12 @@ class NetconfClientSessionNegotiatorTest {
         // for hello message
         verify(pipeline).replace(anyString(), anyString(), any(MessageDecoder.class));
         // for exiMessage
-        verify(pipeline).replace(any(Class.class), anyString(), any(MessageDecoder.class));
+        verify(pipeline).replace(eq(MessageDecoder.class), anyString(), any(MessageDecoder.class));
     }
 
     @Test
     void testNetconfClientSessionNegotiatorGetCached() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock();
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
@@ -232,6 +231,6 @@ class NetconfClientSessionNegotiatorTest {
         assertEquals(cachedS3, cachedS2);
         assertNotEquals(cachedS3, cachedS1);
         assertNotEquals(cachedS2, cachedS1);
-        assertTrue(cachedS2 == cachedS3);
+        assertSame(cachedS2, cachedS3);
     }
 }
