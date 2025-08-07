@@ -21,6 +21,10 @@
     <packaging>bundle</packaging>
     <description>ietf-restconf-server from draft-ietf-netconf-restconf-client-server-</description>
 
+    <properties>
+        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
@@ -34,18 +38,26 @@
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
         </dependency>
-        <!-- FIXME: once the RFCs are published we should just depend on model artifacts -->
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9645-ietf-tls-server</artifactId>
+        </dependency>
+        <!-- FIXME: we should just depend on ietf-http-server once the RFC is published -->
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>transport-tcp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>transport-tls</artifactId>
         </dependency>
     </dependencies>
 </project>
