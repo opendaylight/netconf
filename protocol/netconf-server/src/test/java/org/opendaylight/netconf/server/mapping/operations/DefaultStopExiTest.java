@@ -10,6 +10,7 @@ package org.opendaylight.netconf.server.mapping.operations;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,13 +51,13 @@ class DefaultStopExiTest {
         final Document doc = XmlUtil.newDocument();
         final var encoder = new MessageEncoder(messageWriter);
         doReturn(pipeline).when(channel).pipeline();
-        doReturn(decoder).when(pipeline).replace(any(Class.class), anyString(), any(MessageDecoder.class));
+        doReturn(decoder).when(pipeline).replace(eq(MessageDecoder.class), anyString(), any(MessageDecoder.class));
         doReturn(encoder).when(pipeline).get(MessageEncoder.class);
 
         exi.setNetconfSession(new NetconfServerSession(sessionListener, channel, new SessionIdType(Uint32.TWO), null));
 
         assertNotNull(exi.handleWithNoSubsequentOperations(doc,
                 XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"))));
-        verify(pipeline, times(1)).replace(any(Class.class), anyString(), any(MessageDecoder.class));
+        verify(pipeline, times(1)).replace(eq(MessageDecoder.class), anyString(), any(MessageDecoder.class));
     }
 }
