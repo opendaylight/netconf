@@ -16,6 +16,24 @@
       "message": "As noted in the issue, this is not how the issue should be fixed.",
       "revId": "2dda9963d085029ceb82c23e9054d942ad755bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2173eb81_69bc614e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-08T06:40:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20d92d10_178ddf2e",
+      "revId": "2dda9963d085029ceb82c23e9054d942ad755bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
