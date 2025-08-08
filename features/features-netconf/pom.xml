@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>features-netconf</artifactId>
-    <version>7.0.12-SNAPSHOT</version>
+    <version>7.0.12</version>
     <packaging>feature</packaging>
 
     <dependencyManagement>
