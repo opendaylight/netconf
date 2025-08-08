@@ -19,7 +19,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-karaf-static</artifactId>
     <description>Apache Karaf static distribution with integrated NETCONF and RESTCONF</description>
-    <version>7.0.12</version>
+    <version>7.0.13-SNAPSHOT</version>
     <packaging>karaf-assembly</packaging>
 
     <properties>

@@ -19,7 +19,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>truststore-aggregator</artifactId>
-    <version>7.0.12</version>
+    <version>7.0.13-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
 
