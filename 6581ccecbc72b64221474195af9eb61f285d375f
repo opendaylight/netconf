@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ba08d1b9_ca8acd06",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-11T14:48:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0642c8a9_9dd895a2",
+      "revId": "6581ccecbc72b64221474195af9eb61f285d375f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a06e2e68_ff5f1377",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 22
