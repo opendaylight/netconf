@@ -50,6 +50,24 @@
       "message": "maybe we need to check if its presence container, here https://lf-opendaylight.atlassian.net/browse/NETCONF-1328",
       "revId": "6581ccecbc72b64221474195af9eb61f285d375f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "027f3592_39961363",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-11T14:43:56Z",
+      "side": 1,
+      "message": "It seems like an issue with the mdsal request at MdsalRestconfStrategy. This patch only affects the request sent to the device. However, I can try this on a netopeer device.",
+      "parentUuid": "78a78c35_03d7bddc",
+      "revId": "6581ccecbc72b64221474195af9eb61f285d375f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
