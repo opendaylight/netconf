@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -50,7 +51,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
@@ -368,16 +368,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private static final String DEFAULT_STREAM_NAME = "NETCONF";
     private static final String DEFAULT_STREAM_DESCRIPTION = "Default XML encoded NETCONF stream";
 
-    protected static final QName NAME_QNAME = QName.create(StreamFilter.QNAME, "name").intern();
+    protected static final QName NAME_QNAME = qnameOf("name");
 
     protected static final NodeIdentifier EXCLUDED_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "excluded-event-records"));
+        NodeIdentifier.create(qnameOf("excluded-event-records"));
     protected static final NodeIdentifier NAME_NODEID = NodeIdentifier.create(NAME_QNAME);
     protected static final NodeIdentifier RECEIVER_NODEID = NodeIdentifier.create(Receiver.QNAME);
     protected static final NodeIdentifier SENT_EVENT_RECORDS_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "sent-event-records").intern());
-    protected static final NodeIdentifier STATE_NODEID =
-        NodeIdentifier.create(QName.create(Receiver.QNAME, "state").intern());
+        NodeIdentifier.create(qnameOf("sent-event-records"));
+    protected static final NodeIdentifier STATE_NODEID = NodeIdentifier.create(qnameOf("state"));
 
     /**
      * Previous dynamic subscription ID. We follow
