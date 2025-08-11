@@ -70,6 +70,30 @@
       },
       "revId": "0f4111262c12da36988e9fbf82953b694d4c5ef2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb9fd300_35c7ef7a",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/RestconfStrategy.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-11T12:10:22Z",
+      "side": 1,
+      "message": "Switched to using a ServerRequest\u003cOptional\u003cNormalizedNode\u003e\u003e as a parameter in this method, and changed the return type to void.",
+      "parentUuid": "1c6af575_a003d084",
+      "range": {
+        "startLine": 556,
+        "startChar": 20,
+        "endLine": 556,
+        "endChar": 62
+      },
+      "revId": "0f4111262c12da36988e9fbf82953b694d4c5ef2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
