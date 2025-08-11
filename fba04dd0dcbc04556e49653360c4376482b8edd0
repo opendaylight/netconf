@@ -16,6 +16,24 @@
       "message": "This has little to do with NETCONF-1498 and should be a separate enhancement",
       "revId": "fba04dd0dcbc04556e49653360c4376482b8edd0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c12689a7_278cb041",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-11T13:28:26Z",
+      "side": 1,
+      "message": "Switched to new task. Also, I have removed the Semaphore constructor with a fairness policy because it is not required. The sessionLock with a changed fairness policy also affects the Semaphore since it is under sessionLock, which will maintain fairness within the Semaphore.",
+      "parentUuid": "8f2e724c_44e70db7",
+      "revId": "fba04dd0dcbc04556e49653360c4376482b8edd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
