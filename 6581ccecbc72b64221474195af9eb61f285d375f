@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "0642c8a9_9dd895a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-11T14:21:44Z",
+      "side": 1,
+      "message": "can be related to https://lf-opendaylight.atlassian.net/browse/NETCONF-1328",
+      "revId": "6581ccecbc72b64221474195af9eb61f285d375f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a06e2e68_ff5f1377",
@@ -14,6 +31,23 @@
       "writtenOn": "2025-08-11T12:34:15Z",
       "side": 1,
       "message": "recheck",
+      "revId": "6581ccecbc72b64221474195af9eb61f285d375f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78a78c35_03d7bddc",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-11T14:21:44Z",
+      "side": 1,
+      "message": "maybe we need to check if its presence container, here https://lf-opendaylight.atlassian.net/browse/NETCONF-1328",
       "revId": "6581ccecbc72b64221474195af9eb61f285d375f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
