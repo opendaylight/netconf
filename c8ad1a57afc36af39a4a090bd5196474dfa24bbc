@@ -16,6 +16,24 @@
       "message": "sessionLock protects more than just the queue",
       "revId": "c8ad1a57afc36af39a4a090bd5196474dfa24bbc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b171ac8_5f2fbea6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-11T12:53:35Z",
+      "side": 1,
+      "message": "Can you please describe what I missed in the commit description and the reason why we need to keep sessionLock in this method?\n\nWithout this change, I am also closing the next patch, as it would not work:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/117309/4",
+      "parentUuid": "7fb0ad43_ac630688",
+      "revId": "c8ad1a57afc36af39a4a090bd5196474dfa24bbc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
