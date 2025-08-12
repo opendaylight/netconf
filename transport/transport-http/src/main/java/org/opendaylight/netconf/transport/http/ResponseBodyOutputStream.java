@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.transport.http.ServerRequestExecutor.formatException;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -73,6 +74,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
         abstract Closed close(ReadOnlyHttpHeaders trailers) throws IOException;
 
+        abstract Closed handleError(RuntimeException e) throws IOException;
+
         abstract ToStringHelper addToStringAttributes(ToStringHelper helper);
 
         @Override
@@ -109,6 +112,11 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
         @Override
         Closed close(final ReadOnlyHttpHeaders trailers) throws IOException {
+            throw eof();
+        }
+
+        @Override
+        Closed handleError(RuntimeException e) throws IOException{
             throw eof();
         }
 
@@ -196,6 +204,12 @@ public final class ResponseBodyOutputStream extends OutputStream {
             final var response = new DefaultFullHttpResponse(version, status, Unpooled.EMPTY_BUFFER);
             headers.forEach(entry -> response.headers().add(entry.getKey(), entry.getValue()));
             HTTPServerSession.respond(ctx, streamId, response);
+            return Closed.INSTANCE;
+        }
+
+        @Override
+        Closed handleError(final RuntimeException e) {
+            HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
             return Closed.INSTANCE;
         }
 
@@ -354,6 +368,12 @@ public final class ResponseBodyOutputStream extends OutputStream {
         }
 
         @Override
+        Closed handleError(final RuntimeException e) {
+            HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
+            return Closed.INSTANCE;
+        }
+
+        @Override
         ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return super.addToStringAttributes(helper.add("status", status).add("headers", headers));
         }
@@ -416,6 +436,11 @@ public final class ResponseBodyOutputStream extends OutputStream {
                 session.sendResponsePart(buffer);
             }
             session.sendResponseEnd(trailers);
+            return Closed.INSTANCE;
+        }
+
+        @Override
+        Closed handleError(RuntimeException e) {
             return Closed.INSTANCE;
         }
     }
@@ -481,6 +506,10 @@ public final class ResponseBodyOutputStream extends OutputStream {
             LOG.debug("Error occurred during closing: ", e);
             state = Closed.INSTANCE;
         }
+    }
+
+    public void handleError(RuntimeException e) throws IOException {
+         state = state.handleError(e);
     }
 
     @Override
