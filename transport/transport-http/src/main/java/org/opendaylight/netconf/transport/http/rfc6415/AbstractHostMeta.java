@@ -34,10 +34,16 @@ public abstract sealed class AbstractHostMeta extends AbstractFiniteResponse imp
         this.xrd = requireNonNull(xrd);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public final void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status(), HttpHeaderNames.CONTENT_TYPE, mediaType())) {
-            writeBody(out);
+            try {
+                writeBody(out);
+            } catch (RuntimeException | IOException e) {
+                out.handleError(e);
+                throw e;
+            }
         }
     }
 
