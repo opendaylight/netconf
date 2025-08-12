@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.transport.http.ServerRequestExecutor.formatException;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -73,6 +74,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
         abstract Closed close(ReadOnlyHttpHeaders trailers) throws IOException;
 
+        abstract Closed handleError(RuntimeException e) throws IOException;
+
         abstract ToStringHelper addToStringAttributes(ToStringHelper helper);
 
         @Override
@@ -109,6 +112,11 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
         @Override
         Closed close(final ReadOnlyHttpHeaders trailers) throws IOException {
+            throw eof();
+        }
+
+        @Override
+        Closed handleError(RuntimeException e) throws IOException{
             throw eof();
         }
 
@@ -196,6 +204,12 @@ public final class ResponseBodyOutputStream extends OutputStream {
             final var response = new DefaultFullHttpResponse(version, status, Unpooled.EMPTY_BUFFER);
             headers.forEach(entry -> response.headers().add(entry.getKey(), entry.getValue()));
             HTTPServerSession.respond(ctx, streamId, response);
+            return Closed.INSTANCE;
+        }
+
+        @Override
+        Closed handleError(final RuntimeException e) {
+            HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
             return Closed.INSTANCE;
         }
 
@@ -316,8 +330,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
             LOG.debug("Response body exceeded {} bytes, sending first chunk", maxChunkSize);
             session.sendResponseStart(status, headers, version);
-            session.sendResponsePart(createChunk(buffer));
-            return new FollowingChunk(session, alloc, maxChunkSize).writeByte(value);
+            session.sendResponsePart((buffer));
+            return new FollowingChunk(session, alloc, maxChunkSize, ctx).writeByte(value);
         }
 
         @Override
@@ -331,7 +345,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
             LOG.debug("Response body exceeded {} bytes, sending first chunk", maxChunkSize);
             session.sendResponseStart(status, headers, version);
-            session.sendResponsePart(createChunk(buffer));
+            session.sendResponsePart((buffer));
             return followingChunk().writeBytes(bytes, offset + accept, remaining);
         }
 
@@ -354,12 +368,18 @@ public final class ResponseBodyOutputStream extends OutputStream {
         }
 
         @Override
+        Closed handleError(final RuntimeException e) {
+            HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
+            return Closed.INSTANCE;
+        }
+
+        @Override
         ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return super.addToStringAttributes(helper.add("status", status).add("headers", headers));
         }
 
         private FollowingChunk followingChunk() {
-            return new FollowingChunk(session, alloc, maxChunkSize);
+            return new FollowingChunk(session, alloc, maxChunkSize, ctx);
         }
     }
 
@@ -370,8 +390,12 @@ public final class ResponseBodyOutputStream extends OutputStream {
      */
     @NonNullByDefault
     private static final class FollowingChunk extends WithBody {
-        FollowingChunk(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize) {
+        private final ChannelHandlerContext ctx;
+
+        FollowingChunk(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize,
+            final ChannelHandlerContext ctx) {
             super(session, alloc, maxChunkSize, alloc.buffer());
+            this.ctx = ctx;
         }
 
         @Override
@@ -382,8 +406,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
             }
 
             LOG.debug("Response chunk reached {} bytes, sending it", maxChunkSize);
-            session.sendResponsePart(createChunk(buffer));
-            return new FollowingChunk(session, alloc, maxChunkSize);
+            session.sendResponsePart((buffer));
+            return new FollowingChunk(session, alloc, maxChunkSize, ctx);
         }
 
         @Override
@@ -394,8 +418,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
                 return this;
             }
             LOG.debug("Response chunk reached {} bytes, sending it", maxChunkSize);
-            session.sendResponsePart(createChunk(buffer));
-            return new FollowingChunk(session, alloc, maxChunkSize).writeBytes(bytes, offset + accept, length - accept);
+            session.sendResponsePart((buffer));
+            return new FollowingChunk(session, alloc, maxChunkSize, ctx).writeBytes(bytes, offset + accept, length - accept);
         }
 
         @Override
@@ -406,8 +430,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
             }
 
             LOG.debug("Flushing {}-byte chunk", size);
-            session.sendResponsePart(createChunk(buffer));
-            return new FollowingChunk(session, alloc, maxChunkSize);
+            session.sendResponsePart((buffer));
+            return new FollowingChunk(session, alloc, maxChunkSize, ctx);
         }
 
         @Override
@@ -418,11 +442,17 @@ public final class ResponseBodyOutputStream extends OutputStream {
             session.sendResponseEnd(trailers);
             return Closed.INSTANCE;
         }
+
+        @Override
+        Closed handleError(RuntimeException e) {
+            ctx.channel().close();
+            return Closed.INSTANCE;
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponseBodyOutputStream.class);
     // FIXME: make maxChunkSize tunable
-    private static final int MAX_CHUNK_SIZE = 256 * 1024;
+    private static final int MAX_CHUNK_SIZE = 16 * 1024;
 
     private @NonNull State state;
 
@@ -481,6 +511,10 @@ public final class ResponseBodyOutputStream extends OutputStream {
             LOG.debug("Error occurred during closing: ", e);
             state = Closed.INSTANCE;
         }
+    }
+
+    public void handleError(RuntimeException e) throws IOException {
+         state = state.handleError(e);
     }
 
     @Override
