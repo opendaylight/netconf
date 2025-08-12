@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -136,10 +135,10 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
             response.content().toString(StandardCharsets.UTF_8));
     }
 
-    @Disabled("Will be disabled until NETCONF-1492 has been resolved")
     @ParameterizedTest
     @MethodSource("encodings")
     void encodingResponseFailure(final TestEncoding encoding) throws IOException {
+        mockSession();
         final var result = new DataGetResult(body);
         doAnswer(answerCompleteWith(result)).when(server).dataGET(any());
 

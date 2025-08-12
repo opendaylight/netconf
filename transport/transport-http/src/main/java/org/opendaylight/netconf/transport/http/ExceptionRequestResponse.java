@@ -35,10 +35,16 @@ public final class ExceptionRequestResponse extends AbstractFiniteResponse {
         return cause;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status())) {
-            out.write(cause.toString().getBytes(StandardCharsets.UTF_8));
+            try {
+                out.write(cause.toString().getBytes(StandardCharsets.UTF_8));
+            } catch (RuntimeException | IOException e) {
+                out.handleError(e);
+                throw e;
+            }
         }
     }
 
