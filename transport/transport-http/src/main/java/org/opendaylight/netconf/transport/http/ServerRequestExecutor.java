@@ -141,16 +141,15 @@ final class ServerRequestExecutor implements PendingRequestListener {
             final HttpVersion version, final FiniteResponse response) {
         try {
             response.writeTo(new ResponseOutput(ctx, version, streamId));
-        } catch (RuntimeException | IOException e) {
+        } catch (IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
-            HTTPServerSession.respond(ctx, streamId, formatException(e, ctx, version));
         }
     }
 
     // Hand-coded, as simple as possible
     @NonNullByDefault
-    private static FullHttpResponse formatException(final Exception cause, final ChannelHandlerContext ctx,
-            final HttpVersion version) {
+    static FullHttpResponse formatException(final Exception cause, final ChannelHandlerContext ctx,
+        final HttpVersion version) {
         // Note: we are tempted to do a cause.toString() here, but we are dealing with unhandled badness here,
         //       so we do not want to be too revealing -- hence a message is all the user gets.
         final var message = cause.getMessage();
