@@ -35,7 +35,12 @@ public final class ByteSourceResponse extends AbstractFiniteResponse {
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status(), HttpHeaderNames.CONTENT_TYPE, contentType)) {
-            source.copyTo(out);
+            try {
+                source.copyTo(out);
+            } catch (IOException e) {
+                out.handleError(e);
+                throw e;
+            }
         }
     }
 
