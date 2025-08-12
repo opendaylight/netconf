@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
@@ -116,7 +117,7 @@ final class TestUtils {
         };
     }
 
-    static void assertResponse(final FullHttpResponse response, final HttpResponseStatus expectedStatus) {
+    static void assertResponse(final HttpResponse response, final HttpResponseStatus expectedStatus) {
         assertNotNull(response);
         assertEquals(expectedStatus, response.status());
     }
@@ -130,7 +131,7 @@ final class TestUtils {
         assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, expectedContentType));
     }
 
-    static void assertResponseHeaders(final FullHttpResponse response, final Map<CharSequence, Object> headers) {
+    static void assertResponseHeaders(final HttpResponse response, final Map<CharSequence, Object> headers) {
         for (var entry : headers.entrySet()) {
             final var headerName = entry.getKey().toString();
             final var headerValue = String.valueOf(entry.getValue());
