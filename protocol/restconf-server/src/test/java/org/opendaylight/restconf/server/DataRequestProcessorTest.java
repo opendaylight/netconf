@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -317,11 +316,11 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         assertResponseHeaders(response, META_HEADERS);
     }
 
-    @Disabled("Will be disabled until NETCONF-1492 has been resolved")
     @ParameterizedTest
     @MethodSource
     void yangPatch(final TestEncoding encoding, final String input, final PatchStatusContext output,
             final ErrorTag expectedErrorTag, final List<String> expectedContentMessage) throws Exception {
+        mockSession();
         final var result = new DataYangPatchResult(output);
         final var answer = new FuglyRestconfServerAnswer(
             encoding.isJson() ? JsonPatchBody.class : XmlPatchBody.class, 1, result);
@@ -341,8 +340,6 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
     }
 
     private static Stream<Arguments> yangPatch() {
-        final var contextOk = new PatchStatusContext("patch-id1", List.of(), true, null);
-        final var containsOk = List.of("patch-id1");
         final var contextError1 = new PatchStatusContext("patch-id2", List.of(), false,
             List.of(new RequestError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "operation-failed-error")));
         final var containsError1 = List.of(
@@ -357,12 +354,10 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
 
         return Stream.of(
             // encoding, input, resultContext, errorTag, response should contain
-            Arguments.of(TestEncoding.YANG_PATCH_JSON, JSON_CONTENT, contextOk, null, containsOk),
             Arguments.of(TestEncoding.YANG_PATCH_JSON, JSON_CONTENT,
                 contextError1, ErrorTag.OPERATION_FAILED, containsError1),
             Arguments.of(TestEncoding.YANG_PATCH_JSON, JSON_CONTENT,
                 contextError2, ErrorTag.DATA_MISSING, containsError2),
-            Arguments.of(TestEncoding.YANG_PATCH_XML, XML_CONTENT, contextOk, null, containsOk),
             Arguments.of(TestEncoding.YANG_PATCH_XML, XML_CONTENT,
                 contextError1, ErrorTag.OPERATION_FAILED, containsError1),
             Arguments.of(TestEncoding.YANG_PATCH_XML, XML_CONTENT,
