@@ -136,10 +136,10 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
             response.content().toString(StandardCharsets.UTF_8));
     }
 
-    @Disabled("Will be disabled until NETCONF-1492 has been resolved")
     @ParameterizedTest
     @MethodSource("encodings")
     void encodingResponseFailure(final TestEncoding encoding) throws IOException {
+        mockSession();
         final var result = new DataGetResult(body);
         doAnswer(answerCompleteWith(result)).when(server).dataGET(any());
 

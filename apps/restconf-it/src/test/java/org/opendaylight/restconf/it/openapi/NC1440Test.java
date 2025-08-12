@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.test.tool.NetconfDeviceSimulator;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
@@ -96,13 +95,13 @@ public class NC1440Test extends AbstractOpenApiTest {
      * <p>The resulting context will throw an error when OpenApi tries to resolve the leafref type. This scenario
      * reproduces the issue that occurred in NC1440.
      */
-    @Disabled("Will be disabled until NETCONF-1492 has been resolved")
     @Test
     public void leafrefNotResolvedTest() throws Exception {
         startDeviceSimulator("target/test-classes/nc1440-deviated");
         mountDeviceJson(devicePort);
 
         final var exception = client.send(HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
                 .GET()
                 .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1"))
                 .timeout(Duration.ofSeconds(10))
