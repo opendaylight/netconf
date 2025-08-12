@@ -41,6 +41,9 @@ final class URLRequestResponse extends AbstractFiniteResponse {
             if (withContent) {
                 try (var in = url.openStream()) {
                     in.transferTo(out);
+                } catch (IllegalArgumentException | IOException e) {
+                    out.handleError(e);
+                    throw e;
                 }
             }
         }
