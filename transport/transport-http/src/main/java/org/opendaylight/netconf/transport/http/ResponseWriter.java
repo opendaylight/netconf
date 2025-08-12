@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Netty pipeline integration for outbound responses.
  */
-final class ResponseWriter extends ChannelInboundHandlerAdapter {
+public final class ResponseWriter extends ChannelInboundHandlerAdapter {
     @NonNullByDefault
     private sealed interface State {
         // Nothing else

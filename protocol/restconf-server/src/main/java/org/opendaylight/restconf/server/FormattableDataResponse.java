@@ -55,10 +55,16 @@ final class FormattableDataResponse extends AbstractFiniteResponse {
         this(HttpResponseStatus.OK, body, encoding, prettyPrint);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status(), headers)) {
-            encoding.formatBody(body, prettyPrint, out);
+            try {
+                encoding.formatBody(body, prettyPrint, out);
+            } catch (RuntimeException | IOException e) {
+                out.handleError(e);
+                throw e;
+            }
         }
     }
 
