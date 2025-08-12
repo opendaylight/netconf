@@ -7,8 +7,10 @@
  */
 package org.opendaylight.restconf.server;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -19,13 +21,17 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.local.LocalAddress;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpObject;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
@@ -87,6 +93,8 @@ class AbstractRequestProcessorTest {
     private RestconfStream.Registry streamRegistry;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
+    @Captor
+    private ArgumentCaptor<HttpObject> chunkedCaptor;
 
     private RestconfSession session;
 
@@ -109,6 +117,12 @@ class AbstractRequestProcessorTest {
         doReturn(session).when(pipeline).get(HTTPServerSession.class);
     }
 
+    void writableResponseWriter() {
+        mockSession();
+        doReturn(true).when(channel).isWritable();
+        session.responseWriter().handlerAdded(ctx);
+    }
+
     @SuppressWarnings("checkstyle:illegalCatch")
     protected final FullHttpResponse dispatch(final FullHttpRequest request) {
         try {
@@ -123,6 +137,23 @@ class AbstractRequestProcessorTest {
     protected final FullHttpResponse dispatchWithAlloc(final FullHttpRequest request) {
         doReturn(UnpooledByteBufAllocator.DEFAULT).when(ctx).alloc();
         return dispatch(request);
+    }
+
+    @SuppressWarnings("checkstyle:illegalCatch")
+    protected final List<HttpObject> dispatchChunked(final FullHttpRequest request) throws Exception {
+        doReturn(UnpooledByteBufAllocator.DEFAULT).when(ctx).alloc();
+        session.channelRead(ctx, request);
+
+        // Capture all chunks until DefaultLastHttpContent is captured
+        Awaitility.await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                verify(ctx, atLeastOnce()).writeAndFlush(chunkedCaptor.capture());
+                assertThat(chunkedCaptor.getAllValues())
+                    .anyMatch(msg -> msg instanceof DefaultLastHttpContent);
+            });
+
+        return chunkedCaptor.getAllValues();
     }
 
     protected static final List<Arguments> encodings() {

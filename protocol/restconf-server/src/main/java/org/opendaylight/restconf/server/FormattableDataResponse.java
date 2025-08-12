@@ -58,7 +58,12 @@ final class FormattableDataResponse extends AbstractFiniteResponse {
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status(), headers)) {
-            encoding.formatBody(body, prettyPrint, out);
+            try {
+                encoding.formatBody(body, prettyPrint, out);
+            } catch (IllegalArgumentException | IOException e) {
+                out.handleError(e);
+                throw e;
+            }
         }
     }
 

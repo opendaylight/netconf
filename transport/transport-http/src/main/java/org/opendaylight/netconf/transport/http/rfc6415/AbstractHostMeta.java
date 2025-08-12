@@ -37,7 +37,12 @@ public abstract sealed class AbstractHostMeta extends AbstractFiniteResponse imp
     @Override
     public final void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status(), HttpHeaderNames.CONTENT_TYPE, mediaType())) {
-            writeBody(out);
+            try {
+                writeBody(out);
+            } catch (IllegalArgumentException | IOException e) {
+                out.handleError(e);
+                throw e;
+            }
         }
     }
 

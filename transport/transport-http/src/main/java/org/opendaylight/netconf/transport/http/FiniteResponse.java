@@ -21,6 +21,11 @@ public abstract non-sealed class FiniteResponse implements Response {
     /**
      * Write this response into the provided {@link ResponseOutput}.
      *
+     * <p>Implementations catch and rethrow errors that occur while generating
+     * a response in order to properly manage the output stream before it is closed.
+     * This ensures that either an error message is sent, or the last chunk of
+     * a chunked response is omitted.
+     * 
      * @param output the {@link ResponseOutput}
      * @throws IOException when an I/O error occurs
      */
