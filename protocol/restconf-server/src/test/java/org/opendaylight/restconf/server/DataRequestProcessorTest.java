@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -21,9 +22,13 @@ import static org.opendaylight.restconf.server.TestUtils.newOptionsRequest;
 import static org.opendaylight.restconf.server.TestUtils.newRequest;
 
 import io.netty.handler.codec.DateFormatter;
+import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -31,7 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -317,26 +321,31 @@ class DataRequestProcessorTest extends AbstractRequestProcessorTest {
         assertResponseHeaders(response, META_HEADERS);
     }
 
-    @Disabled("Will be disabled until NETCONF-1492 has been resolved")
     @ParameterizedTest
     @MethodSource
     void yangPatch(final TestEncoding encoding, final String input, final PatchStatusContext output,
             final ErrorTag expectedErrorTag, final List<String> expectedContentMessage) throws Exception {
+        writableResponseWriter();
         final var result = new DataYangPatchResult(output);
         final var answer = new FuglyRestconfServerAnswer(
             encoding.isJson() ? JsonPatchBody.class : XmlPatchBody.class, 1, result);
         doAnswer(answer).when(server).dataPATCH(any(), any(PatchBody.class));
 
         final var request = buildRequest(HttpMethod.PATCH, DATA_PATH, encoding, input);
-        final var response = dispatchWithAlloc(request);
+        final var response = dispatchChunked(request);
         answer.assertContent(input);
+
+        assertInstanceOf(DefaultHttpResponse.class, response.getFirst());
+        assertInstanceOf(DefaultLastHttpContent.class, response.getLast());
 
         final var expectedStatus = expectedErrorTag == null ? HttpResponseStatus.OK
             : HttpResponseStatus.valueOf(TestUtils.ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code());
-        assertResponse(response, expectedStatus);
-        assertResponseHeaders(response, Map.of(HttpHeaderNames.CONTENT_TYPE, encoding.responseType));
 
-        final var content = response.content().toString(StandardCharsets.UTF_8);
+        assertResponse((HttpResponse) response.getFirst(), expectedStatus);
+        assertResponseHeaders((HttpResponse) response.getFirst(), Map.of(HttpHeaderNames.CONTENT_TYPE,
+            encoding.responseType));
+
+        final var content = ((HttpContent)response.get(1)).content().toString(StandardCharsets.UTF_8);
         assertContentSimplified(content, encoding, expectedContentMessage);
     }
 
