@@ -31,6 +31,7 @@ final class URLRequestResponse extends AbstractFiniteResponse {
         this.withContent = withContent;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
         final var mediaType = URLConnection.guessContentTypeFromName(url.getFile());
@@ -41,6 +42,9 @@ final class URLRequestResponse extends AbstractFiniteResponse {
             if (withContent) {
                 try (var in = url.openStream()) {
                     in.transferTo(out);
+                } catch (RuntimeException | IOException e) {
+                    out.handleError(e);
+                    throw e;
                 }
             }
         }

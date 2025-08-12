@@ -33,11 +33,17 @@ final class EntityRequestResponse extends AbstractFiniteResponse {
         this.entity = requireNonNull(entity);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
         try (var out = output.start(status(), HEADERS)) {
             final var generator = FACTORY.createGenerator(out);
-            entity.generate(generator);
+            try {
+                entity.generate(generator);
+            } catch (RuntimeException | IOException e) {
+                out.handleError(e);
+                throw e;
+            }
             generator.flush();
         }
     }
