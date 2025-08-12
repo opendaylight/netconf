@@ -16,6 +16,24 @@
       "message": "I am confused, here we have `requiredSources` but method\u0027s parameter name says `missingSources`.",
       "revId": "bb20e59560e810519bea4826c23ba433d231f862",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94a4ac1a_30a44278",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-12T12:43:19Z",
+      "side": 1,
+      "message": "I have provided more descriptive javadoc for the checkMissingSourcesRecursively method.\n\nThe method checks the collection of \u0027requiredSources\u0027 to see which ones are available. Those that are not available are returned to the \u0027missingSources\u0027 variable.",
+      "parentUuid": "e201db5b_02e5237a",
+      "revId": "bb20e59560e810519bea4826c23ba433d231f862",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
