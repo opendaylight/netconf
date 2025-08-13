@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f5813c2_8dc781df",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "Probably this left from dev testing.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1797f779_5e0c3799",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "Move this class after the \"enum State\" object in this class to keep order in method visibility.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1343364_f203f3f4",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "I would keep reverse order of how you initialize objects here, even if it seems that leaderReg does not affect others objects.\n\nOr you can switch initialization of leaderReg after tclReg.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ac4bbf6_91c27600",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "final",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d431d904_4b543c5f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "Probably this should be new ReentrantLock(true).\n\nhttps://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/ReentrantLock.html#ReentrantLock-boolean-\n\nWithout this, it will randomly give access to threads which request to access the \u0027filterLock\u0027",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5ec5c5f_ab206764",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "The protected attribute should be below private attributes, separate by empty space.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbacc68c_38700203",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 806,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "Missing space",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42ba13d2_e55aea6d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "Do we need to have ListenableFuture\u003cVoid\u003e as return variable here when it is not used? Can we utilize it here?",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d08ee8f9_18689f09",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:56:49Z",
+      "side": 1,
+      "message": "Please comment out also else statement. Now it is code smell for else without body.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
