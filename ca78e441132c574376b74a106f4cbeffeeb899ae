@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0392f60b_67340762",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T10:58:21Z",
+      "side": 1,
+      "message": "I would keep reverse order of how you **close** objects here,",
+      "parentUuid": "e1343364_f203f3f4",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ac4bbf6_91c27600",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 10
