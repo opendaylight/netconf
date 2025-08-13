@@ -184,34 +184,31 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
     }
 
     /**
-     * Tests modify subscription with null value of stop-time.
+     * Tests modify subscription with absent stop-time.
      *
-     * <p>Initially, the first subscription has a sooner stop-time than the second.
-     * After modification, it should have null stop-time and should not be terminated and second subscription should be
-     * terminated on its configured stop-time.
+     * <p>Test that modifying subscription with absent field of stop-time doesn't affect stop-time and subscription is
+     * properly terminated when time is reached.
      */
     @Test
-    void subscriptionNullStopTimeModifiedTest() throws Exception {
-        final var subscriptionId1 = establishSubscription(Instant.now().plus(Duration.ofSeconds(3)));
-        final var subscriptionId2 = establishSubscription(Instant.now().plus(Duration.ofSeconds(4)));
+    void subscriptionModifiedAbsentStopTimeTest() throws Exception {
+        final var subscriptionId = establishSubscription(Instant.now().plus(Duration.ofSeconds(2)));
 
         // Start listening on notifications
-        final var eventListener1 = startSubscriptionStream(subscriptionId1);
-        final var eventListener2 = startSubscriptionStream(subscriptionId2);
+        final var eventListener = startSubscriptionStream(subscriptionId);
 
-        // modify the first subscription with null stop time
+        // modify the subscription with absent stop time
         final var modifyInput = String.format("""
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", subscriptionId1);
+             </input>""", subscriptionId);
         final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         // receive subscription modified notification
-        var notification1 = Awaitility.await().atMost(1, TimeUnit.SECONDS).until(eventListener1::readNext,
+        var notification1 = Awaitility.await().atMost(1, TimeUnit.SECONDS).until(eventListener::readNext,
             Objects::nonNull);
         JSONAssert.assertEquals(String.format("""
             {
@@ -222,10 +219,10 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                   "encoding" : "ietf-subscribed-notifications:encode-json",
                 }
               }
-            }""", subscriptionId1), notification1, JSONCompareMode.LENIENT);
+            }""", subscriptionId), notification1, JSONCompareMode.LENIENT);
 
-        // receive subscription terminated notification for a second subscription
-        final var notification2 = Awaitility.await().atMost(5, TimeUnit.SECONDS).until(eventListener2::readNext,
+        // receive subscription terminated notification
+        final var notification2 = Awaitility.await().atMost(3, TimeUnit.SECONDS).until(eventListener::readNext,
             Objects::nonNull);
         JSONAssert.assertEquals(String.format("""
             {
@@ -236,10 +233,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                 }
               }
             }
-            """, subscriptionId2), notification2, JSONCompareMode.LENIENT);
-
-        // there should be no notification for a first subscription, as it should not be stopped
-        assertNull(eventListener1.readNext());
+            """, subscriptionId), notification2, JSONCompareMode.LENIENT);
     }
 
     private String establishSubscription(final Instant stopTime) {
