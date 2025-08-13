@@ -668,8 +668,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             @Override
             public void onSuccess(final Void result) {
                 subscription.setFilter(filterImpl);
-                subscription.updateStopTime(stopTime);
-                subscriptionModified(id, stopTime);
+                // Ignore stop-time if it is null
+                if (stopTime != null) {
+                    subscription.updateStopTime(stopTime);
+                    subscriptionModified(id, stopTime);
+                }
                 request.completeWith(subscription);
             }
 
