@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a240c26e_7b1c59b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-13T07:53:15Z",
+      "side": 1,
+      "message": "Be careful when you have multiple two session for two requests - requests cannot be blocked.",
+      "parentUuid": "35741e1a_2c286415",
+      "revId": "37b8473688951a44a4caf092513fd54117ca22bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5535c6c_af990c57",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-07-31T11:27:41Z",
       "side": 1,
       "message": "this is needlessly complex and undocumented.\n\nwhat we really want to have here is \u0027blockedRequests\u0027 and then:\n- in channelRead0() check if the queue is becoming non-empty, if so, process start processing the request\n- in respond() remove the first entry before calling super and start processing the next entry once super returns",
+      "range": {
+        "startLine": 42,
+        "startChar": 27,
+        "endLine": 42,
+        "endChar": 79
+      },
+      "revId": "37b8473688951a44a4caf092513fd54117ca22bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f16746b_25421e0c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-13T07:53:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5535c6c_af990c57",
       "range": {
         "startLine": 42,
         "startChar": 27,
