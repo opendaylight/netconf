@@ -487,6 +487,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 //                    .build())
                 .build());
 
+        // Ignore stop-time if it is null
         if (stopTime != null) {
             node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
         }
