@@ -140,6 +140,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "349f31e6_2ae0ea3e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T12:39:46Z",
+      "side": 1,
+      "message": "Is there any reason why to use filterSpecs attribute? And not this approach?\n\n```\n    protected final void updateFilterDefinitions(final Map\u003cString,@Nullable ChoiceNode\u003e nameToSpec) {\n        filterLock.lock();\n        final var acquire \u003d new HashMap\u003c\u003e(filters.getAcquire());\n        try {\n            nameToSpec.forEach((name, spec) -\u003e {\n                if (spec \u003d\u003d null \u0026\u0026 acquire.remove(name) !\u003d null) {\n                    LOG.debug(\"Removed filter {} without specification\", name);\n                } else {\n                    try {\n                        final var eventStreamFilter \u003d parseFilter(spec);\n                        acquire.put(name, eventStreamFilter);\n                        LOG.debug(\"Updated filter {} to {}\", name, eventStreamFilter);\n                    } catch (RequestException e) {\n                        LOG.warn(\"Filter not parsed {}, ignored\", spec, e);\n                    }\n                }\n            });\n            rebuildFiltersLocked(nameToSpec.keySet());\n            filters.setRelease(ImmutableMap.copyOf(acquire));\n            // Callback to update operational datastore with the list of filter names that compiled successfully\n            filtersOperationalViewUpdated(filters.getAcquire().keySet());\n            refreshSubscriptions(nameToSpec.keySet());\n        } finally {\n            filterLock.unlock();\n        }\n    }\n```",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bbacc68c_38700203",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 10
