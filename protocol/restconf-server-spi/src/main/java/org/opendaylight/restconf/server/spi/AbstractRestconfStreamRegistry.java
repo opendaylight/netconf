@@ -634,8 +634,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             @Override
             public void onSuccess(final Void result) {
                 subscription.setFilter(filterImpl);
-                subscription.updateStopTime(stopTime);
-                subscriptionModified(id, stopTime);
+                // Ignore stop-time if it is null
+                if (stopTime != null) {
+                    subscription.updateStopTime(stopTime);
+                    subscriptionModified(id, stopTime);
+                }
                 request.completeWith(subscription);
             }
 
@@ -749,14 +752,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * @param newStopTime the updated stop time of the subscription; must not be null
      */
     @NonNullByDefault
-    private synchronized void subscriptionModified(final Uint32 id, final @Nullable Instant newStopTime) {
-        if (newStopTime == null) {
-            if (id.equals(nextSubscriptionToStop)) {
-                nextSubscriptionToStop = null;
-                stopTimeTask.cancel(true);
-                scheduleNextStopTimeTask();
-            }
-        } else if (stopTimeTask == null || nextStopTime == null || newStopTime.isBefore(nextStopTime)) {
+    private synchronized void subscriptionModified(final Uint32 id, final Instant newStopTime) {
+        if (stopTimeTask == null || nextStopTime == null || newStopTime.isBefore(nextStopTime)) {
             scheduleStopTimeTask(id, newStopTime);
         } else if (id.equals(nextSubscriptionToStop) && newStopTime.isAfter(nextStopTime)) {
             scheduleNextStopTimeTask();
