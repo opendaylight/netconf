@@ -72,6 +72,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b6f6a6b0_a9b28dc5",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-08-13T13:41:16Z",
+      "side": 1,
+      "message": "With this approach:\nprotocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java\n\nThis code could be changed to the following (Both code advises needs more testing):\n```\n    protected synchronized ListenableFuture\u003cVoid\u003e filtersOperationalViewUpdated(final Set\u003cString\u003e workingNames,\n            final Map\u003cString,@Nullable ChoiceNode\u003e nameToSpec) {\n        if (!isLeader.get()) {\n            return Futures.immediateVoidFuture();\n        }\n\n        final var tx \u003d dataBroker.newWriteOnlyTransaction();\n        for (final var name : workingNames) {\n            final var path \u003d FILTERS_OPER_PATH\n                .node(NodeIdentifierWithPredicates.of(StreamFilter.QNAME, NAME_QNAME, name))\n                .node(FILTER_SPEC_NODEID);\n\n            final var choiceNode \u003d nameToSpec.get(name);\n            if (choiceNode !\u003d null) {\n                // spec compiled OK → publish it in OPERATIONAL\n                tx.put(LogicalDatastoreType.OPERATIONAL, path, choiceNode);\n            } else {\n                // spec failed → make sure it is absent from OPERATIONAL\n                tx.delete(LogicalDatastoreType.OPERATIONAL, path);\n            }\n        }\n        return tx.commit().transform(info -\u003e {\n            LOG.debug(\"Filter operational view updated {}\", info);\n            return null;\n        }, MoreExecutors.directExecutor());\n    }\n```",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fed9dd3b_1f2e3ac5",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
         "patchSetId": 10
