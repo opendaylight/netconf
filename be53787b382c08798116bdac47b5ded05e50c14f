@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb5b654a_aaecfc6f",
+        "filename": "apps/sal-remote-impl/src/test/java/org/opendaylight/netconf/sal/remote/impl/CreateDataChangeEventSubscriptionRpcTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-08-13T08:53:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbcb2ff3_43053982",
+      "revId": "be53787b382c08798116bdac47b5ded05e50c14f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e2eb46a_0ace9d60",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-13T08:15:01Z",
       "side": 1,
       "message": "Can you change order of these methods to keep some structure in method visibility.",
+      "revId": "be53787b382c08798116bdac47b5ded05e50c14f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1c8389e_b7056acb",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-08-13T08:53:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e2eb46a_0ace9d60",
       "revId": "be53787b382c08798116bdac47b5ded05e50c14f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
