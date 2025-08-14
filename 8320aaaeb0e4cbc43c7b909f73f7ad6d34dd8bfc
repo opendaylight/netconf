@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae86537f_308978b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-08-14T10:49:19Z",
+      "side": 1,
+      "message": "JIRA:",
+      "revId": "8320aaaeb0e4cbc43c7b909f73f7ad6d34dd8bfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64471818_45d45ac2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-08-14T10:49:19Z",
+      "side": 1,
+      "message": "Otherwise looks good to me",
+      "revId": "8320aaaeb0e4cbc43c7b909f73f7ad6d34dd8bfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ae1f61e_18b2633f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/EventFilter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-08-14T10:49:19Z",
+      "side": 1,
+      "message": "I don\u0027t exactly see the benefit of this. Its never used if I\u0027m not mistaken.\n\nI think the main benefits of this reconcile are covered by adding SubtreeEventStreamFilter\u003cT\u003e extends EventFilter\u003cT\u003e",
+      "range": {
+        "startLine": 21,
+        "startChar": 44,
+        "endLine": 21,
+        "endChar": 103
+      },
+      "revId": "8320aaaeb0e4cbc43c7b909f73f7ad6d34dd8bfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
