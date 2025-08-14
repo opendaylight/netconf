@@ -298,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57dbe0ed_89acec3c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T09:48:04Z",
+      "side": 1,
+      "message": "We keep filterSpecs on purpose. It holds the raw ChoiceNode definitions exactly as they exist in CONFIG, which we need to recompile all filters whenever the ModelContext changes (schema update/feature toggle). If we only updated the compiled filters map, we’d lose the source specs and couldn’t safely reparse on a context change; we’d also lose visibility of names that exist but currently fail to compile (so OPERATIONAL removals wouldn’t be correct)",
+      "parentUuid": "349f31e6_2ae0ea3e",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbacc68c_38700203",
