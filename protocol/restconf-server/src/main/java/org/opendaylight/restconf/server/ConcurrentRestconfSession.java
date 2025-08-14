@@ -10,19 +10,31 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2Exception;
+import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.codec.http2.Http2HeadersFrame;
+import io.netty.handler.codec.http2.Http2ResetFrame;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.DefaultTransportSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTTP/2+ RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>.
@@ -30,8 +42,11 @@ import org.opendaylight.restconf.server.spi.DefaultTransportSession;
  * <p>It acts as glue between a Netty channel and a RESTCONF server and services multiple HTTP/2+ logical connections.
  */
 final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentRestconfSession.class);
+
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
+    private final Set<Integer> aliveStreams = ConcurrentHashMap.newKeySet();
 
     @NonNullByDefault
     ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
@@ -61,7 +76,59 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
             super.channelInactive(ctx);
         } finally {
             transportSession.close();
+            aliveStreams.clear();
         }
+    }
+
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        final var frameCodec = ctx.pipeline().get(Http2FrameCodec.class);
+        if (frameCodec != null) {
+            final var connection = frameCodec.connection();
+            final var streams = connection.numActiveStreams();
+            LOG.info("The number of streams: {}", streams);
+        }
+
+        if (msg instanceof Http2HeadersFrame headersFrame) {
+            int id = headersFrame.stream().id();
+            aliveStreams.add(id);
+            LOG.info("New stream: {}", id);
+
+            if (headersFrame.isEndStream()) {
+                super.channelRead0(ctx, msg);
+            }
+        } else if (msg instanceof Http2DataFrame dataFrame) {
+            final var id = dataFrame.stream().id();
+            if (!aliveStreams.contains(id)) {
+                // error
+            }
+
+            // TODO collect all frames using framesize to have complete payload
+            if (dataFrame.isEndStream()) {
+                super.channelRead0(ctx, msg);
+            }
+        } else if (msg instanceof Http2ResetFrame resetFrame) {
+            final var id = resetFrame.stream().id();
+            aliveStreams.remove(id);
+            LOG.info("Stream reset: {}", id);
+            final var code = resetFrame.errorCode();
+            LOG.info("Error code: {}", code);
+            terminate(id);
+        }
+    }
+
+    private void terminate(final int id) {
+        // TODO terminate remaining executions for reset id
+    }
+
+    @Override
+    protected ChannelFuture respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+            final HttpResponse response) {
+        if (!aliveStreams.contains(streamId)) {
+            // error
+        }
+        // TODO use framesize to stream response
+        return super.respond(ctx, streamId, response);
     }
 
     @Override
