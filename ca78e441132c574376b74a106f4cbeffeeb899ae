@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a031aeba_958a2fa8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f5813c2_8dc781df",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1797f779_5e0c3799",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-13T10:56:49Z",
       "side": 1,
       "message": "Move this class after the \"enum State\" object in this class to keep order in method visibility.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f51c235_2016614b",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1797f779_5e0c3799",
       "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -70,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff73de55_d741c1aa",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0392f60b_67340762",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6f6a6b0_a9b28dc5",
@@ -100,6 +154,24 @@
       "writtenOn": "2025-08-13T12:17:48Z",
       "side": 1,
       "message": "Futures.immediateVoidFuture();",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d585877_b6692292",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fed9dd3b_1f2e3ac5",
       "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -138,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15c3b993_89b5ea98",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d431d904_4b543c5f",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5ec5c5f_ab206764",
@@ -151,6 +241,24 @@
       "writtenOn": "2025-08-13T10:56:49Z",
       "side": 1,
       "message": "The protected attribute should be below private attributes, separate by empty space.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c105e1c_028bdc38",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5ec5c5f_ab206764",
       "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -189,6 +297,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b37a64f_072d3376",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 806,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbacc68c_38700203",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42ba13d2_e55aea6d",
@@ -206,6 +332,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df548c2f_29e93cea",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42ba13d2_e55aea6d",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d08ee8f9_18689f09",
@@ -219,6 +363,24 @@
       "writtenOn": "2025-08-13T10:56:49Z",
       "side": 1,
       "message": "Please comment out also else statement. Now it is code smell for else without body.",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3316328_966cb289",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T07:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d08ee8f9_18689f09",
       "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
