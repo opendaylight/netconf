@@ -11,8 +11,12 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http2.Http2Exception;
+import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.codec.http2.Http2HeadersFrame;
+import io.netty.handler.codec.http2.Http2ResetFrame;
 import java.net.SocketAddress;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
@@ -23,6 +27,8 @@ import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.DefaultTransportSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTTP/2+ RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>.
@@ -30,6 +36,8 @@ import org.opendaylight.restconf.server.spi.DefaultTransportSession;
  * <p>It acts as glue between a Netty channel and a RESTCONF server and services multiple HTTP/2+ logical connections.
  */
 final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentRestconfSession.class);
+
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
 
@@ -62,6 +70,33 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
         } finally {
             transportSession.close();
         }
+    }
+
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        final var frameCodec = ctx.pipeline().get(Http2FrameCodec.class);
+        if (frameCodec != null) {
+            final var connection = frameCodec.connection();
+            final var streams = connection.numActiveStreams();
+            LOG.info("The number of streams: {}", streams);
+        }
+
+        if (msg instanceof Http2HeadersFrame headersFrame) {
+            int id = headersFrame.stream().id();
+            LOG.info("New stream: {}", id);
+        }
+
+        if (msg instanceof Http2ResetFrame resetFrame) {
+            final var id = resetFrame.stream().id();
+            LOG.info("Stream reset: {}", id);
+            final var code = resetFrame.errorCode();
+            LOG.info("Error code: {}", code);
+            terminate(id);
+        }
+    }
+
+    private void terminate(final int id) {
+        // TODO terminate remaining executions for reset id
     }
 
     @Override
