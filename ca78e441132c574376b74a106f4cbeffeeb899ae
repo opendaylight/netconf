@@ -141,6 +141,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "821b9d0c_0f9b0988",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-14T09:59:32Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116964/comment/349f31e6_2ae0ea3e/",
+      "parentUuid": "b6f6a6b0_a9b28dc5",
+      "revId": "ca78e441132c574376b74a106f4cbeffeeb899ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fed9dd3b_1f2e3ac5",
