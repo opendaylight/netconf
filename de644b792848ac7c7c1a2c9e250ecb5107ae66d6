@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6a8eef0_d633d558",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-15T05:44:28Z",
+      "side": 1,
+      "message": "lets try `curl -v --parallel --config \u003cURL1\u003e \u003cURL2\u003e`",
+      "revId": "de644b792848ac7c7c1a2c9e250ecb5107ae66d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
