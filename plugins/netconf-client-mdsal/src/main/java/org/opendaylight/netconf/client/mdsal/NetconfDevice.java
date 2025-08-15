@@ -33,6 +33,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.RpcsDecorator;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
@@ -66,6 +67,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final Executor processingExecutor;
 
     private final RemoteDeviceHandler salFacade;
+    private final RpcsDecorator rpcsDecorator;
     private final DeviceActionFactory deviceActionFactory;
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
@@ -75,21 +77,23 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
-            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
-        this(id, baseSchemaProvider, deviceSchemaProvider, salFacade, globalProcessingExecutor,
+            final RpcsDecorator rpcsDecorator, final Executor globalProcessingExecutor,
+            final boolean reconnectOnSchemasChange) {
+        this(id, baseSchemaProvider, deviceSchemaProvider, salFacade, rpcsDecorator, globalProcessingExecutor,
             reconnectOnSchemasChange, null);
     }
 
     public NetconfDevice(final RemoteDeviceId id, final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
-            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory) {
+            final RpcsDecorator rpcsDecorator, final Executor globalProcessingExecutor,
+            final boolean reconnectOnSchemasChange, final DeviceActionFactory deviceActionFactory) {
         this.id = requireNonNull(id);
         this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
         this.deviceSchemaProvider = requireNonNull(deviceSchemaProvider);
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         this.deviceActionFactory = deviceActionFactory;
         this.salFacade = salFacade;
+        this.rpcsDecorator = requireNonNull(rpcsDecorator);
         processingExecutor = requireNonNull(globalProcessingExecutor);
         notificationHandler = new NotificationHandler(salFacade, id);
     }
@@ -105,15 +109,15 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final var baseSchema = baseSchemaProvider.baseSchemaForCapabilities(remoteSessionCapabilities);
-        final var initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
+        final var netconfRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
             new NetconfMessageTransformer(baseSchema.databind(), false, baseSchema));
-
-        final var deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpc,
+        final var initRpcs = rpcsDecorator.decorateRpcs(netconfRpc);
+        final var deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpcs,
             baseSchema, processingExecutor);
 
         // Potentially acquire mount point list and interpret it
         final var netconfDeviceSchemaFuture = Futures.transformAsync(deviceSchema,
-            result -> Futures.transform(discoverMountPoints(result.modelContext(), baseSchema, listener),
+            result -> Futures.transform(discoverMountPoints(result.modelContext(), initRpcs),
                 withMounts -> new NetconfDeviceSchema(withMounts, result.capabilities()),
                 processingExecutor),
             processingExecutor);
@@ -123,7 +127,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             @Override
             public void onSuccess(final NetconfDeviceSchema result) {
                 handleSalInitializationSuccess(listener, baseSchema, result, remoteSessionCapabilities,
-                    getDeviceSpecificRpc(result.databind(), listener, baseSchema));
+                    rpcsDecorator.decorateRpcs(getDeviceSpecificRpc(result.databind(), listener, baseSchema)));
             }
 
             @Override
@@ -219,8 +223,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private ListenableFuture<@NonNull DatabindContext> discoverMountPoints(
-            final EffectiveModelContext modelContext, final BaseNetconfSchema baseSchema,
-            final NetconfDeviceCommunicator listener) {
+            final EffectiveModelContext modelContext, final Rpcs initRpc) {
         final var emptyDatabind = DatabindContext.ofModel(modelContext);
         if (modelContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
             return Futures.immediateFuture(emptyDatabind);
@@ -228,10 +231,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
         // Create a temporary RPC invoker and acquire the mount point tree
         LOG.debug("{}: Acquiring available mount points", id);
-        final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(modelContext, listener,
-            new NetconfMessageTransformer(emptyDatabind, false, baseSchema));
-
-        return Futures.transform(deviceRpc.invokeNetconf(Get.QNAME, ImmutableNodes.newContainerBuilder()
+        return Futures.transform(initRpc.invokeNetconf(Get.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, modelContext))
             .build()), rpcResult -> processSchemaMounts(rpcResult, emptyDatabind), MoreExecutors.directExecutor());
