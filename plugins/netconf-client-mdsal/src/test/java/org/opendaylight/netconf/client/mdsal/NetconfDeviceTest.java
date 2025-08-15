@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -31,10 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -47,7 +51,10 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.api.RpcsTimeoutAndRecoveryHandler;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultDeviceNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
+import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -79,6 +86,8 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     @Mock
     private RemoteDeviceHandler facade;
     @Mock
+    private RpcsTimeoutAndRecoveryHandler recoveryHandler;
+    @Mock
     private NetconfDeviceCommunicator listener;
     @Mock
     private EffectiveModelContextFactory schemaFactory;
@@ -89,6 +98,15 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     static void setupNotification() throws Exception {
         NOTIFICATION = new NetconfMessage(XmlUtil.readXmlToDocument(
             NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
+    }
+
+    @BeforeEach
+    public void before() {
+        // Mock the RpcsTimeoutAndRecoveryHandler functionality.
+        when(recoveryHandler.decorateRpcs(any(RemoteDeviceServices.Rpcs.class))).thenAnswer(
+            // Return a spy of the received RPC service. This allows us to verify that the decorator was used.
+            inv -> spy(inv.getArgument(0, RemoteDeviceServices.Rpcs.class))
+        );
     }
 
     @Test
@@ -104,6 +122,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
 
@@ -139,6 +158,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(remoteDeviceHandler)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
 
@@ -176,6 +196,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
         final var sessionCaps = getSessionCaps(true,
@@ -206,6 +227,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
         //session up, start schema resolution
@@ -235,6 +257,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
         final var sessionCaps = getSessionCaps(true,
@@ -266,6 +289,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
@@ -299,6 +323,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
@@ -325,6 +350,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
+            .setRpcsDecorator(recoveryHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
@@ -348,6 +374,53 @@ class NetconfDeviceTest extends AbstractTestModelTest {
                 .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
                 .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
                 .build()), argument.getValue().capabilities().resolvedCapabilities());
+    }
+
+    @Test
+    void testNetconfDeviceProvideDecoratedRPCsToKeepaliveRpcService() {
+        // Prepare the NetconfDevice with a spy instance of KeepaliveSalFacade.
+        final var spySalFacade = spy(new KeepaliveSalFacade(
+            new RemoteDeviceId("test", new InetSocketAddress("localhost", 22)), mock(RemoteDeviceHandler.class),
+            new DefaultNetconfTimer()));
+        final var netconfDevice = new NetconfDeviceBuilder()
+            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
+            .setProcessingExecutor(MoreExecutors.directExecutor())
+            .setId(getId())
+            .setSalFacade(spySalFacade)
+            .setRpcsDecorator(recoveryHandler)
+            .setBaseSchemaProvider(BASE_SCHEMAS)
+            .build();
+
+        // Invoke onRemoteSessionUp on the prepared NetconfDevice instance.
+        netconfDevice.onRemoteSessionUp(getSessionCaps(false).replaceModuleCaps(Map.of(
+            org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                .YangModuleInfoImpl.getInstance().getName(), CapabilityOrigin.DeviceAdvertised,
+            org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                .YangModuleInfoImpl.getInstance().getName(), CapabilityOrigin.DeviceAdvertised
+        )), listener);
+
+        // Verify the invocation of the onDeviceConnected method on the KeepaliveSalFacade instance and capture
+        // the device schema and RPC service.
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        final var deviceServicesCaptor = ArgumentCaptor.forClass(RemoteDeviceServices.class);
+        verify(spySalFacade, timeout(5000)).onDeviceConnected(argument.capture(),
+            any(NetconfSessionPreferences.class), deviceServicesCaptor.capture());
+
+        // Verify the models provided to the KeepaliveSalFacade instance.
+        assertEquals(Set.of(
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:yang:ietf-yang-types?revision=2013-07-15)ietf-yang-types")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build(),
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build()),
+            argument.getValue().capabilities().resolvedCapabilities());
+
+        // Verify that KeepaliveSalFacade received an RPCs service decorated by RpcsTimeoutAndRecoveryHandler.
+        assertTrue(Mockito.mockingDetails(deviceServicesCaptor.getValue().rpcs()).isSpy(), "The RPCs service"
+            + " passed to the KeepaliveSalFacade should be a Spy (decorated by RpcsTimeoutAndRecoveryHandler)");
     }
 
     private EffectiveModelContextFactory getSchemaFactory() {
