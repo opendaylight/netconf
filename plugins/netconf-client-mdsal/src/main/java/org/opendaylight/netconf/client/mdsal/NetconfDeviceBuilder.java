@@ -16,6 +16,7 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RpcsDecorator;
 
 // FIXME: everything except DeviceActionFactory is mandatory, hence this builder is a superfluous indirection
 public final class NetconfDeviceBuilder {
@@ -23,6 +24,7 @@ public final class NetconfDeviceBuilder {
     private DeviceNetconfSchemaProvider deviceSchemaProvider;
     private RemoteDeviceId id;
     private RemoteDeviceHandler salFacade;
+    private RpcsDecorator rpcsDecorator;
     // FIXME: this should not be here
     private Executor processingExecutor;
     private DeviceActionFactory deviceActionFactory;
@@ -40,6 +42,11 @@ public final class NetconfDeviceBuilder {
 
     public @NonNull NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler salFacade) {
         this.salFacade = requireNonNull(salFacade);
+        return this;
+    }
+
+    public @NonNull NetconfDeviceBuilder setRpcsDecorator(final RpcsDecorator rpcsDecorator) {
+        this.rpcsDecorator = requireNonNull(rpcsDecorator);
         return this;
     }
 
@@ -70,6 +77,7 @@ public final class NetconfDeviceBuilder {
             requireNonNull(baseSchemaProvider, "BaseNetconfSchemaProvider is not initialized"),
             requireNonNull(deviceSchemaProvider, "DeviceNetconfSchemaProvider is not initialized"),
             requireNonNull(salFacade, "RemoteDeviceHandler is not initialized"),
+            requireNonNull(rpcsDecorator, "RpcsHandler is not initialized"),
             requireNonNull(processingExecutor, "Executor is not initialized"),
             reconnectOnSchemasChange, deviceActionFactory);
     }

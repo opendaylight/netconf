@@ -91,7 +91,7 @@ class NC1458Test {
             InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT);
 
         final var timer = new DefaultNetconfTimer();
-        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L, 10000L);
+        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L);
         keepaliveSalFacade.setListener(communicator);
         doReturn(deviceDomRpc).when(deviceRpc).domRpcService();
 
