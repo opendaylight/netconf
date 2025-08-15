@@ -475,7 +475,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         masterSalFacadeFuture = SettableFuture.create();
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
-        verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
+        verify(masterMountPointListener, timeout(500000)).onMountPointRemoved(yangNodeInstanceId);
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(

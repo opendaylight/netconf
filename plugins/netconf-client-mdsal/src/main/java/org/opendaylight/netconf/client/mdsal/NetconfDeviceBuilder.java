@@ -14,7 +14,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 
 // FIXME: everything except DeviceActionFactory is mandatory, hence this builder is a superfluous indirection
@@ -22,7 +21,7 @@ public final class NetconfDeviceBuilder {
     private boolean reconnectOnSchemasChange;
     private DeviceNetconfSchemaProvider deviceSchemaProvider;
     private RemoteDeviceId id;
-    private RemoteDeviceHandler salFacade;
+    private InitialRpcHandler initialRpcHandler;
     // FIXME: this should not be here
     private Executor processingExecutor;
     private DeviceActionFactory deviceActionFactory;
@@ -38,8 +37,8 @@ public final class NetconfDeviceBuilder {
         return this;
     }
 
-    public @NonNull NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler salFacade) {
-        this.salFacade = requireNonNull(salFacade);
+    public @NonNull NetconfDeviceBuilder setTimeoutRpc(final InitialRpcHandler initialRpcTimeoutHandler) {
+        this.initialRpcHandler = requireNonNull(initialRpcTimeoutHandler);
         return this;
     }
 
@@ -69,7 +68,7 @@ public final class NetconfDeviceBuilder {
             requireNonNull(id, "RemoteDeviceId is not initialized"),
             requireNonNull(baseSchemaProvider, "BaseNetconfSchemaProvider is not initialized"),
             requireNonNull(deviceSchemaProvider, "DeviceNetconfSchemaProvider is not initialized"),
-            requireNonNull(salFacade, "RemoteDeviceHandler is not initialized"),
+            requireNonNull(initialRpcHandler, "RemoteDeviceHandler is not initialized"),
             requireNonNull(processingExecutor, "Executor is not initialized"),
             reconnectOnSchemasChange, deviceActionFactory);
     }

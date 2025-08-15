@@ -32,6 +32,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
+import org.opendaylight.netconf.client.mdsal.InitialRpcTimeoutHandler;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
@@ -160,18 +161,17 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // The facade we are going it present to NetconfDevice
-        RemoteDeviceHandler salFacade;
-        final KeepaliveSalFacade keepAliveFacade;
+        final RemoteDeviceHandler salFacade;
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, this, timer, keepaliveDelay,
+            salFacade = new KeepaliveSalFacade(deviceId, this, timer, keepaliveDelay,
                 node.requireDefaultRequestTimeoutMillis().toJava());
         } else {
             salFacade = this;
-            keepAliveFacade = null;
         }
-
+        final var timeoutRpc = new InitialRpcTimeoutHandler(deviceId, salFacade, timer,
+            node.requireDefaultRequestTimeoutMillis().toJava());
         final RemoteDevice<NetconfDeviceCommunicator> device;
         if (node.requireSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemaProvider, deviceId, salFacade);
@@ -184,7 +184,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 .setDeviceSchemaProvider(resources)
                 .setProcessingExecutor(schemaAssembler.executor())
                 .setId(deviceId)
-                .setSalFacade(salFacade)
+                .setTimeoutRpc(timeoutRpc)
                 .setDeviceActionFactory(deviceActionFactory)
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
@@ -197,10 +197,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
         communicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
             NetconfNodeUtils.extractUserCapabilities(node));
-
-        if (keepAliveFacade != null) {
-            keepAliveFacade.setListener(communicator);
-        }
+        timeoutRpc.setListener(communicator);
     }
 
     public synchronized void connect() {
