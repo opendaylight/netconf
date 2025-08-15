@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.RpcsTimeoutAndRecoveryHandler;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -58,13 +59,16 @@ class KeepaliveSalFacadeTest {
 
     private DefaultNetconfTimer timer;
     private KeepaliveSalFacade keepaliveSalFacade;
+    private RpcsTimeoutAndRecoveryHandler rpcsTimeoutHandler;
     private Rpcs proxyRpc;
 
     @BeforeEach
     void beforeEach() {
         timer = new DefaultNetconfTimer();
-        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L, 1L);
+        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L);
         keepaliveSalFacade.setListener(listener);
+        rpcsTimeoutHandler = new RpcsTimeoutAndRecoveryHandler(REMOTE_DEVICE_ID, new DefaultNetconfTimer(), 1L);
+        rpcsTimeoutHandler.setListener(listener);
         doReturn(deviceDomRpc).when(deviceRpc).domRpcService();
     }
 
@@ -93,8 +97,8 @@ class KeepaliveSalFacadeTest {
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeNetconf(any(), any());
         doNothing().when(listener).disconnect();
-
-        keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
+        final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
+        keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
         verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
 
@@ -108,8 +112,8 @@ class KeepaliveSalFacadeTest {
         doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(mock(RpcError.class)))).when(deviceRpc)
             .invokeNetconf(any(), any());
-
-        keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
+        final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
+        keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
         verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
 
@@ -125,10 +129,10 @@ class KeepaliveSalFacadeTest {
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceDomRpc).invokeRpc(any(), any());
 
-        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 100L, 1L);
+        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 100L);
         keepaliveSalFacade.setListener(listener);
-
-        keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
+        final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
+        keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
         assertInstanceOf(Rpcs.Normalized.class, proxyRpc).domRpcService()
             .invokeRpc(QName.create("foo", "bar"), mock(ContainerNode.class));
@@ -142,7 +146,8 @@ class KeepaliveSalFacadeTest {
         doNothing().when(listener).disconnect();
         doReturn(SettableFuture.create()).when(deviceRpc).invokeNetconf(any(), any());
 
-        keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
+        final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
+        keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
         verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
 
