@@ -24,6 +24,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -35,6 +36,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
+import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
@@ -109,9 +111,15 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         final var baseSchema = baseSchemaProvider.baseSchemaForCapabilities(remoteSessionCapabilities);
         final var initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
             new NetconfMessageTransformer(baseSchema.databind(), false, baseSchema));
-
-        final var deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpc,
-            baseSchema, processingExecutor);
+        final ListenableFuture<DeviceNetconfSchema> deviceSchema;
+        if (salFacade instanceof KeepaliveSalFacade keepaliveSalFacade) {
+            final var keepaliveRpc = keepaliveSalFacade.keepaliveRpc(initRpc, true);
+            deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, keepaliveRpc,
+                baseSchema, processingExecutor);
+        } else {
+            deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpc,
+                    baseSchema, processingExecutor);
+        }
 
         // Potentially acquire mount point list and interpret it
         final var netconfDeviceSchemaFuture = Futures.transformAsync(deviceSchema,

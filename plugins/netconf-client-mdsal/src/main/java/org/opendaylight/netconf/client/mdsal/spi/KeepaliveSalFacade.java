@@ -132,16 +132,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final var devRpc = services.rpcs();
         task = new KeepaliveTask(devRpc);
-
-        final Rpcs keepaliveRpcs;
-        if (devRpc instanceof Rpcs.Normalized normalized) {
-            keepaliveRpcs = new NormalizedKeepaliveRpcs(normalized);
-        } else if (devRpc instanceof Rpcs.Schemaless schemaless) {
-            keepaliveRpcs = new SchemalessKeepaliveRpcs(schemaless);
-        } else {
-            throw new IllegalStateException("Unhandled " + devRpc);
-        }
-
+        final var keepaliveRpcs = keepaliveRpc(devRpc, true);
         deviceHandler.onDeviceConnected(deviceSchema, sessionPreferences, new RemoteDeviceServices(keepaliveRpcs,
             // FIXME: wrap with keepalive
             services.actions()));
@@ -183,8 +174,19 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         deviceHandler.close();
     }
 
-    private <T> @NonNull ListenableFuture<T> scheduleTimeout(final ListenableFuture<T> invokeFuture) {
-        final var timeout = new RequestTimeoutTask<>(invokeFuture);
+    public Rpcs keepaliveRpc(final Rpcs rpcs, final boolean disconnectOnFailure) {
+        if (rpcs instanceof Rpcs.Normalized normalized) {
+            return new NormalizedKeepaliveRpcs(normalized, disconnectOnFailure);
+        } else if (rpcs instanceof Rpcs.Schemaless schemaless) {
+            return new SchemalessKeepaliveRpcs(schemaless);
+        } else {
+            throw new IllegalStateException("Unhandled " + rpcs);
+        }
+    }
+
+    private <T> @NonNull ListenableFuture<T> scheduleTimeout(final ListenableFuture<T> invokeFuture,
+            final boolean disconnectOnFailure) {
+        final var timeout = new RequestTimeoutTask<>(invokeFuture, disconnectOnFailure);
         scheduleTimeout(invokeFuture, timeout);
         return timeout.userFuture;
     }
@@ -338,9 +340,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      */
     private final class RequestTimeoutTask<V> extends TimeoutTask implements FutureCallback<V> {
         private final @NonNull SettableFuture<V> userFuture = SettableFuture.create();
+        private final boolean disconnectOnFailure;
 
-        RequestTimeoutTask(final ListenableFuture<V> rpcResultFuture) {
+        RequestTimeoutTask(final ListenableFuture<V> rpcResultFuture, final boolean disconnectOnFailure) {
             super(rpcResultFuture);
+            this.disconnectOnFailure = disconnectOnFailure;
             // Note: this will also wire run() to onFailure()
             Futures.addCallback(rpcResultFuture, this, MoreExecutors.directExecutor());
         }
@@ -357,13 +361,18 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public void onFailure(final Throwable throwable) {
             // User/Application RPC failed (The RPC did not reach the remote device or it has timeed out)
             if (throwable instanceof CancellationException) {
-                LOG.warn("{}: RPC timed out. Reconnecting netconf session", deviceId);
+                LOG.warn("{}: RPC timed out", deviceId);
             } else {
-                LOG.warn("{}: RPC failed. Reconnecting netconf session", deviceId, throwable);
+                LOG.warn("{}: RPC failed", deviceId, throwable);
             }
             userFuture.setException(throwable);
-            // There is no point in keeping this session. Reconnect.
-            disconnect();
+
+            // Disconnect the session only after initial schema fetch is completed.
+            // This prevents discarding successful schema requests during the initial connection process.
+            if (disconnectOnFailure) {
+                LOG.info("Reconnecting netconf session {}", deviceId);
+                disconnect();
+            }
         }
     }
 
@@ -374,17 +383,19 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private final class NormalizedKeepaliveRpcs implements Rpcs.Normalized {
         private final @NonNull KeepaliveDOMRpcService domRpcService;
         private final Rpcs.Normalized delegate;
+        private final boolean disconnectOnFailure;
 
-        NormalizedKeepaliveRpcs(final Rpcs.Normalized delegate) {
+        NormalizedKeepaliveRpcs(final Rpcs.Normalized delegate, final boolean disconnectOnFailure) {
             this.delegate = requireNonNull(delegate);
-            domRpcService = new KeepaliveDOMRpcService(delegate.domRpcService());
+            domRpcService = new KeepaliveDOMRpcService(delegate.domRpcService(), disconnectOnFailure);
+            this.disconnectOnFailure = disconnectOnFailure;
         }
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeNetconf(type, input));
+            return scheduleTimeout(delegate.invokeNetconf(type, input), disconnectOnFailure);
         }
 
         @Override
@@ -395,16 +406,18 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     private final class KeepaliveDOMRpcService implements DOMRpcService {
         private final @NonNull DOMRpcService delegate;
+        private final boolean disconnectOnFailure;
 
-        KeepaliveDOMRpcService(final DOMRpcService delegate) {
+        KeepaliveDOMRpcService(final DOMRpcService delegate, final boolean disconnectOnFailure) {
             this.delegate = requireNonNull(delegate);
+            this.disconnectOnFailure = disconnectOnFailure;
         }
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeRpc(type, input));
+            return scheduleTimeout(delegate.invokeRpc(type, input), disconnectOnFailure);
         }
 
         @Override
@@ -431,7 +444,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeNetconf(type, input));
+            return scheduleTimeout(delegate.invokeNetconf(type, input), true);
         }
 
         @Override
@@ -451,7 +464,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource payload) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeRpc(type, payload));
+            return scheduleTimeout(delegate.invokeRpc(type, payload), true);
         }
     }
 }
