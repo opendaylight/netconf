@@ -48,6 +48,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultDeviceNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
+import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -352,6 +354,42 @@ class NetconfDeviceTest extends AbstractTestModelTest {
                 .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
                 .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
                 .build()), argument.getValue().capabilities().resolvedCapabilities());
+    }
+
+    @Test
+    void testNetconfDeviceNotificationsModelIsPresentWithKeepaliveRpcService() {
+        final var spySalFacade = spy(new KeepaliveSalFacade(
+            new RemoteDeviceId("test", new InetSocketAddress("localhost", 22)), mock(RemoteDeviceHandler.class),
+            new DefaultNetconfTimer()));
+        final var netconfDevice = new NetconfDeviceBuilder()
+            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
+            .setProcessingExecutor(MoreExecutors.directExecutor())
+            .setId(getId())
+            .setSalFacade(spySalFacade)
+            .setBaseSchemaProvider(BASE_SCHEMAS)
+            .build();
+
+        netconfDevice.onRemoteSessionUp(getSessionCaps(false).replaceModuleCaps(Map.of(
+            org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                .YangModuleInfoImpl.getInstance().getName(), CapabilityOrigin.DeviceAdvertised,
+            org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                .YangModuleInfoImpl.getInstance().getName(), CapabilityOrigin.DeviceAdvertised
+        )), listener);
+
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        verify(spySalFacade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
+            any(RemoteDeviceServices.class));
+
+        assertEquals(Set.of(
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:yang:ietf-yang-types?revision=2013-07-15)ietf-yang-types")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build(),
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build()),
+            argument.getValue().capabilities().resolvedCapabilities());
     }
 
     private EffectiveModelContextFactory getSchemaFactory() {
