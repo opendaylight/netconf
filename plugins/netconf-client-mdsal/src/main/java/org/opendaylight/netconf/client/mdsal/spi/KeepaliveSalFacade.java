@@ -132,16 +132,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final var devRpc = services.rpcs();
         task = new KeepaliveTask(devRpc);
-
-        final Rpcs keepaliveRpcs;
-        if (devRpc instanceof Rpcs.Normalized normalized) {
-            keepaliveRpcs = new NormalizedKeepaliveRpcs(normalized);
-        } else if (devRpc instanceof Rpcs.Schemaless schemaless) {
-            keepaliveRpcs = new SchemalessKeepaliveRpcs(schemaless);
-        } else {
-            throw new IllegalStateException("Unhandled " + devRpc);
-        }
-
+        final var keepaliveRpcs = keepaliveRpc(devRpc);
         deviceHandler.onDeviceConnected(deviceSchema, sessionPreferences, new RemoteDeviceServices(keepaliveRpcs,
             // FIXME: wrap with keepalive
             services.actions()));
@@ -181,6 +172,16 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     public void close() {
         stopKeepalives();
         deviceHandler.close();
+    }
+
+    public Rpcs keepaliveRpc(final Rpcs rpcs) {
+        if (rpcs instanceof Rpcs.Normalized normalized) {
+            return new NormalizedKeepaliveRpcs(normalized);
+        } else if (rpcs instanceof Rpcs.Schemaless schemaless) {
+            return new SchemalessKeepaliveRpcs(schemaless);
+        } else {
+            throw new IllegalStateException("Unhandled " + rpcs);
+        }
     }
 
     private <T> @NonNull ListenableFuture<T> scheduleTimeout(final ListenableFuture<T> invokeFuture) {
